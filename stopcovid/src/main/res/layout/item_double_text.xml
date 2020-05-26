@@ -1,0 +1,47 @@
+<!--
+  ~ This Source Code Form is subject to the terms of the Mozilla Public
+  ~ License, v. 2.0. If a copy of the MPL was not distributed with this
+  ~ file, You can obtain one at https://mozilla.org/MPL/2.0/.
+  ~
+  ~ Authors
+  ~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ Created by Lunabee Studio / Date - 2020/07/05 - for the STOP-COVID project
+  -->
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?selectableItemBackground"
+    tools:ignore="Overdraw">
+
+    <TextView
+        android:id="@+id/titleTextView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="@dimen/spacing_large"
+        android:layout_marginStart="@dimen/spacing_large"
+        android:layout_marginEnd="@dimen/spacing_medium"
+        android:textAppearance="@style/TextAppearance.StopCovid.Title"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/captionTextView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="@tools:sample/lorem[15]" />
+
+    <TextView
+        android:id="@+id/captionTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="@dimen/spacing_large"
+        android:layout_marginStart="@dimen/spacing_medium"
+        android:layout_marginEnd="@dimen/spacing_large"
+        android:gravity="end"
+        android:textAppearance="@style/TextAppearance.StopCovid.Caption"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/titleTextView"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="@tools:sample/lorem[1]" />
+</androidx.constraintlayout.widget.ConstraintLayout>

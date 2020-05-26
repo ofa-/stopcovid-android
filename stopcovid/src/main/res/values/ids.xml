@@ -1,0 +1,25 @@
+<!--
+  ~ This Source Code Form is subject to the terms of the Mozilla Public
+  ~ License, v. 2.0. If a copy of the MPL was not distributed with this
+  ~ file, You can obtain one at https://mozilla.org/MPL/2.0/.
+  ~
+  ~ Authors
+  ~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ Created by Lunabee Studio / Date - 2020/04/05 - for the STOP-COVID project
+  -->
+<resources>
+    <item name="item_big_title" type="id" />
+    <item name="item_contact" type="id" />
+    <item name="item_danger_button" type="id" />
+    <item name="item_double_button" type="id" />
+    <item name="item_double_logo" type="id" />
+    <item name="item_double_text" type="id" />
+    <item name="item_edit_text" type="id" />
+    <item name="item_icon_title" type="id" />
+    <item name="item_link" type="id" />
+    <item name="item_logo" type="id" />
+    <item name="item_logo_body" type="id" />
+    <item name="item_number" type="id" />
+    <item name="item_progress_button" type="id" />
+    <item name="item_proximity_button" type="id" />
+</resources>

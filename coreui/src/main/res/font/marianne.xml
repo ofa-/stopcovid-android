@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ This Source Code Form is subject to the terms of the Mozilla Public
+  ~ License, v. 2.0. If a copy of the MPL was not distributed with this
+  ~ file, You can obtain one at https://mozilla.org/MPL/2.0/.
+  ~
+  ~ Authors
+  ~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ Created by Lunabee Studio / Date - 2020/18/05 - for the STOP-COVID project
+  -->
+
+<font-family xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+    <font
+        android:font="@font/marianne_medium"
+        android:fontStyle="normal"
+        android:fontWeight="400"
+
+        app:font="@font/marianne_medium"
+        app:fontStyle="normal"
+        app:fontWeight="400"
+
+        tools:ignore="UnusedAttribute" />
+
+    <font
+        android:font="@font/marianne_bold"
+        android:fontStyle="normal"
+        android:fontWeight="700"
+
+        app:font="@font/marianne_bold"
+        app:fontStyle="normal"
+        app:fontWeight="700"
+
+        tools:ignore="UnusedAttribute" />
+
+    <font
+        android:font="@font/marianne_extrabold"
+        android:fontStyle="normal"
+        android:fontWeight="900"
+
+        app:font="@font/marianne_extrabold"
+        app:fontStyle="normal"
+        app:fontWeight="900"
+
+        tools:ignore="UnusedAttribute" />
+
+</font-family>

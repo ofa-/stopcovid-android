@@ -1,0 +1,52 @@
+[
+    {
+        "section": "ATTENTION version beta - textes non finalisés"
+    },
+    {
+        "section": "Vos données sont protégées",
+        "description": "StopCovid est conforme à la réglementation qui garantit la protection de vos données.",
+        "links": [
+            {
+                "label": "Plus d'informations sur RGPD",
+                "url": "https://gitlab.inria.fr/stopcovid19/accueil"
+            }
+        ]
+    },
+    {
+        "section": "Comment les données sont échangées ?",
+        "description": "StopCovid utilise uniquement le Bluetooth de votre téléphone. Vos données de géolocalisation ne sont ni enregistrées ni échangées."
+    },
+    {
+        "section": "Quelles données sont échangées ?",
+        "description": "Les données échangées entre deux téléphones via Bluetooth sont des pseudo-identifiants éphémères."
+    },
+    {
+        "section": "Où sont stockées les données ?",
+        "description": "Les données sont stockées sur votre téléphone et elles sont indéchiffrables. En cas de test positif, et avec votre consentement, vous pourrez protéger vos proches et les personnes que vous avez croisées en partageant sur le serveur de l'autorité de santé cet historique de proximité."
+    },
+    {
+        "section": "Combien de temps sont-elles stockées ?",
+        "description": "Les données stockées sur le téléphone et sur le serveur sont automatiquement effacées après 14 jours."
+    },
+    {
+        "section": "Puis-je supprimer les données ?",
+        "description": "Conformément au règlement général sur la protection des données (RGPD), vous pouvez supprimer : les données stockées sur votre téléphone, les données sur le serveur ainsi que les données liées à votre enregistrement (et vous désinscrire)."
+    },
+    {
+        "section": "Qui a créé StopCovid ?",
+        "description": "Cette application a été réalisée par l'équipe StopCovid, sous la supervision du Ministère des Solidarités et de la Santé et du Secrétariat d'Etat chargé du Numérique.\nL'équipe StopCovid : Inria, ANSSI, Capgemini, Dassault Systèmes, Inserm, Lunabee Studio, Ministère des Solidarités et de la Santé, Orange, Santé Publique France et Withings.\nLe code source de cette plateforme est intégralement ouvert et accessible à l’adresse ci-dessous."
+    },
+    {
+        "section": "Informations complémentaires",
+        "links": [
+            {
+                "label": "Code source de l'application",
+                "url": "https://gitlab.inria.fr/stopcovid19/accueil"
+            },
+            {
+                "label": "Politique de protection des données",
+                "url": "https://gitlab.inria.fr/stopcovid19/accueil"
+            }
+        ]
+    }
+]

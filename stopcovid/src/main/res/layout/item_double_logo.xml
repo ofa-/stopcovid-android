@@ -1,0 +1,45 @@
+<!--
+  ~ This Source Code Form is subject to the terms of the Mozilla Public
+  ~ License, v. 2.0. If a copy of the MPL was not distributed with this
+  ~ file, You can obtain one at https://mozilla.org/MPL/2.0/.
+  ~
+  ~ Authors
+  ~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ Created by Lunabee Studio / Date - 2020/04/05 - for the STOP-COVID project
+  -->
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginVertical="@dimen/spacing_small"
+    android:importantForAccessibility="no">
+
+    <ImageView
+        android:id="@+id/leftImageView"
+        android:layout_width="@dimen/double_item_image_width"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/spacing_large"
+        android:adjustViewBounds="true"
+        android:importantForAccessibility="no"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/rightImageView"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@drawable/republic_fr" />
+
+    <ImageView
+        android:id="@+id/rightImageView"
+        android:layout_width="@dimen/double_item_image_width"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/spacing_large"
+        android:adjustViewBounds="true"
+        android:importantForAccessibility="no"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/leftImageView"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@drawable/sante_publique" />
+</androidx.constraintlayout.widget.ConstraintLayout>

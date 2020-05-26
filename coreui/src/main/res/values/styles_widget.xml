@@ -1,0 +1,67 @@
+<!--
+  ~ This Source Code Form is subject to the terms of the Mozilla Public
+  ~ License, v. 2.0. If a copy of the MPL was not distributed with this
+  ~ file, You can obtain one at https://mozilla.org/MPL/2.0/.
+  ~
+  ~ Authors
+  ~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ Created by Lunabee Studio / Date - 2020/04/05 - for the STOP-COVID project
+  -->
+<resources>
+
+    <style name="Widget.StopCovid.Toolbar.Surface" parent="Widget.MaterialComponents.Toolbar">
+        <item name="android:theme">@style/ThemeOverlay.StopCovid.Toolbar.Surface</item>
+        <item name="popupTheme">@style/ThemeOverlay.StopCovid.PopUp</item>
+    </style>
+
+    <style name="ThemeOverlay.StopCovid.Toolbar.Surface" parent="ThemeOverlay.MaterialComponents.ActionBar">
+        <item name="android:background">?colorSurface</item>
+    </style>
+
+    <style name="ThemeOverlay.StopCovid.PopUp" parent="ThemeOverlay.MaterialComponents">
+        <item name="android:colorBackground">?colorSurface</item>
+        <item name="android:textColor">?colorOnSurface</item>
+    </style>
+
+    <style name="Theme.StopCovid.Button" parent="Widget.MaterialComponents.Button">
+        <item name="android:padding">@dimen/spacing_large</item>
+        <item name="android:textSize">@dimen/button_font_size</item>
+        <item name="elevation">0dp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="cornerRadius">@dimen/corner_radius</item>
+        <item name="android:letterSpacing">@dimen/button_letter_spacing</item>
+        <item name="rippleColor">@color/color_primary_light</item>
+    </style>
+
+    <style name="Theme.StopCovid.Button.Light" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="cornerRadius">@dimen/corner_radius</item>
+        <item name="android:padding">@dimen/spacing_large</item>
+        <item name="strokeColor">@color/color_primary_light</item>
+        <item name="elevation">0dp</item>
+        <item name="rippleColor">@color/color_primary_light</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">@color/color_primary</item>
+        <item name="android:textSize">@dimen/button_font_size</item>
+        <item name="android:letterSpacing">@dimen/button_letter_spacing</item>
+    </style>
+
+    <style name="Theme.StopCovid.Button.Danger" parent="Theme.StopCovid.Button.Light">
+        <item name="strokeColor">@color/color_error_light</item>
+        <item name="elevation">0dp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="rippleColor">@color/color_error_light</item>
+        <item name="android:textColor">@color/color_error</item>
+    </style>
+
+    <style name="Theme.StopCovid.TextInput" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="boxCornerRadiusTopStart">@dimen/corner_radius</item>
+        <item name="boxCornerRadiusTopEnd">@dimen/corner_radius</item>
+        <item name="boxCornerRadiusBottomStart">@dimen/corner_radius</item>
+        <item name="boxCornerRadiusBottomEnd">@dimen/corner_radius</item>
+        <item name="android:layout_marginStart">@dimen/spacing_xlarge</item>
+        <item name="android:layout_marginEnd">@dimen/spacing_xlarge</item>
+        <item name="errorIconDrawable">@null</item>
+        <item name="errorEnabled">true</item>
+    </style>
+
+</resources>

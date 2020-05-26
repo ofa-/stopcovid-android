@@ -1,0 +1,37 @@
+<!--
+  ~ This Source Code Form is subject to the terms of the Mozilla Public
+  ~ License, v. 2.0. If a copy of the MPL was not distributed with this
+  ~ file, You can obtain one at https://mozilla.org/MPL/2.0/.
+  ~
+  ~ Authors
+  ~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ Created by Lunabee Studio / Date - 2020/04/05 - for the STOP-COVID project
+  -->
+<ImageSwitcher
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/imageSwitcher"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/logo_height"
+    android:importantForAccessibility="no">
+
+    <ImageView
+        android:id="@+id/imageView1"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:adjustViewBounds="true"
+        android:importantForAccessibility="no"
+        android:scaleType="fitCenter"
+        tools:src="@drawable/logo" />
+
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:adjustViewBounds="true"
+        android:importantForAccessibility="no"
+        android:scaleType="fitCenter"
+        tools:src="@drawable/logo" />
+</ImageSwitcher>

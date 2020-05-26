@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ This Source Code Form is subject to the terms of the Mozilla Public
+  ~ License, v. 2.0. If a copy of the MPL was not distributed with this
+  ~ file, You can obtain one at https://mozilla.org/MPL/2.0/.
+  ~
+  ~ Authors
+  ~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ Created by Lunabee Studio / Date - 2020/19/05 - for the STOP-COVID project
+  -->
+<network-security-config>
+    <!-- TODO add certificates for Prod server -->
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="true">www.google.com</domain>
+        <domain includeSubdomains="true">gstatic.com</domain>
+        <trust-anchors>
+            <certificates src="@raw/giag4" />
+            <certificates src="@raw/giag4ecc" />
+            <certificates src="@raw/googleca1" />
+            <certificates src="@raw/gsr2" />
+            <certificates src="@raw/gsr4" />
+            <certificates src="@raw/gts1d2" />
+            <certificates src="@raw/gts1o1" />
+            <certificates src="@raw/gtsca1d3" />
+            <certificates src="@raw/gtsltsr" />
+            <certificates src="@raw/gtsltsx" />
+            <certificates src="@raw/gtsr1" />
+            <certificates src="@raw/gtsr2" />
+            <certificates src="@raw/gtsr3" />
+            <certificates src="@raw/gtsr4" />
+            <certificates src="@raw/gtsy1" />
+            <certificates src="@raw/gtsy2" />
+            <certificates src="@raw/gtsy3" />
+            <certificates src="@raw/gtsy4" />
+        </trust-anchors>
+    </domain-config>
+</network-security-config>

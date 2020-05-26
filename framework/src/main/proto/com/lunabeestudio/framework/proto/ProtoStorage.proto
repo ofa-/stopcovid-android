@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package model;
+
+option java_package = "com.lunabeestudio.framework.proto";
+option java_outer_classname = "ProtoStorage";
+
+message LocalProximityProto {
+    string eccBase64 = 1;
+    string ebidBase64 = 2;
+    string macBase64 = 3;
+    int32 helloTime = 4;
+    int64 collectedTime = 5;
+    int32 rawRssi = 6;
+    int32 calibratedRssi = 7;
+}
+
+message LocalProximityProtoList {
+    repeated LocalProximityProto localProximityProtoList = 1;
+}

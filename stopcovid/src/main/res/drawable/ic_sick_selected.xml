@@ -1,0 +1,22 @@
+<!--
+  ~ This Source Code Form is subject to the terms of the Mozilla Public
+  ~ License, v. 2.0. If a copy of the MPL was not distributed with this
+  ~ file, You can obtain one at https://mozilla.org/MPL/2.0/.
+  ~
+  ~ Authors
+  ~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ Created by Lunabee Studio / Date - 2020/04/05 - for the STOP-COVID project
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="30dp"
+    android:height="30dp"
+    android:viewportWidth="30"
+    android:viewportHeight="30">
+  <path
+      android:pathData="M29.4033,14.1943C29.4033,21.9727 22.9727,28.4033 15.209,28.4033C7.4453,28.4033 1,21.9727 1,14.1943C1,13.036 1.1432,11.9073 1.4125,10.8252L6.9998,16.4138L6.9995,22.9106C9.1571,24.9455 12.0537,26.2017 15.2078,26.2017C18.1663,26.2017 20.8956,25.0966 23.0008,23.2803L23.0008,23.2803L22.9998,16.4338L28.7927,10.1152C29.1895,11.4101 29.4033,12.7801 29.4033,14.1943ZM15.1943,0C20.8149,0 25.7445,3.3704 28.0378,8.177L27.9386,8.0871L21.6008,14.9998L8.4138,14.9998L2.1231,8.7082C4.294,3.6206 9.3689,0 15.1943,0ZM11.4648,9C10.6592,9 10,9.7031 10,10.7139C10,11.7246 10.6592,12.4277 11.4648,12.4277C12.2852,12.4277 12.959,11.7246 12.959,10.7139C12.959,9.7031 12.2852,9 11.4648,9ZM18.4922,9C17.6865,9 17.0273,9.7031 17.0273,10.7139C17.0273,11.7246 17.6865,12.4277 18.4922,12.4277C19.2979,12.4277 19.9863,11.7246 19.9863,10.7139C19.9863,9.7031 19.2979,9 18.4922,9Z"
+      android:strokeWidth="1"
+      android:fillColor="#000000"
+      android:fillType="nonZero"
+      android:strokeColor="#00000000"/>
+</vector>

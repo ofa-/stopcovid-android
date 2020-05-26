@@ -1,0 +1,15 @@
+================================================================================
+Apache 2.0
+================================================================================
+
+Component: Kotlinx Coroutines
+License Text URL: https://github.com/Kotlin/kotlinx.coroutines/blob/master/LICENSE.txt
+Source Code: https://github.com/Kotlin/kotlinx.coroutines
+
+================================================================================
+BSD 3-Clause
+================================================================================
+
+Component: Android Scanner Compat Library
+License Text URL: https://github.com/NordicSemiconductor/Android-Scanner-Compat-Library/blob/master/LICENSE
+Source Code: https://github.com/NordicSemiconductor/Android-Scanner-Compat-Library

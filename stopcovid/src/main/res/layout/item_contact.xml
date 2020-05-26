@@ -1,0 +1,66 @@
+<!--
+  ~ This Source Code Form is subject to the terms of the Mozilla Public
+  ~ License, v. 2.0. If a copy of the MPL was not distributed with this
+  ~ file, You can obtain one at https://mozilla.org/MPL/2.0/.
+  ~
+  ~ Authors
+  ~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ Created by Lunabee Studio / Date - 2020/07/05 - for the STOP-COVID project
+  -->
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/color_primary_light"
+    tools:ignore="Overdraw"
+    tools:text="@tools:sample/lorem[5]">
+
+    <TextView
+        android:id="@+id/headerTextView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/spacing_large"
+        android:layout_marginTop="@dimen/spacing_medium"
+        android:textAppearance="@style/TextAppearance.StopCovid.Header"
+        app:layout_constraintBottom_toTopOf="@id/titleTextView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="@tools:sample/lorem[5]" />
+
+    <TextView
+        android:id="@+id/titleTextView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/spacing_large"
+        android:textAppearance="@style/TextAppearance.StopCovid.Title"
+        app:layout_constraintBottom_toTopOf="@id/captionTextView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/headerTextView"
+        tools:text="@tools:sample/lorem[5]" />
+
+    <TextView
+        android:id="@+id/captionTextView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/spacing_large"
+        android:textAppearance="@style/TextAppearance.StopCovid.Caption"
+        app:layout_constraintBottom_toTopOf="@id/linkLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/titleTextView"
+        tools:text="@tools:sample/lorem[15]" />
+
+    <include
+        android:id="@+id/linkLayout"
+        layout="@layout/item_link"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/captionTextView" />
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,92 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * Authors
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * Created by Lunabee Studio / Date - 2020/04/05 - for the STOP-COVID project
+ */
+
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
+apply plugin: 'androidx.navigation.safeargs.kotlin'
+apply plugin: 'shot'
+
+apply from: 'test.gradle'
+
+android {
+    compileSdkVersion 29
+    buildToolsVersion "29.0.3"
+    buildTypes {
+        release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+
+            packagingOptions {
+                exclude 'DebugProbesKt.bin'
+            }
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions.jvmTarget = JavaVersion.VERSION_1_8.toString()
+
+    defaultConfig {
+        applicationId "fr.gouv.android.stopcovid"
+        minSdkVersion 21
+        targetSdkVersion 29
+        versionCode 22
+        versionName "0.9.17"
+
+        testInstrumentationRunner = 'com.lunabeestudio.stopcovid.TestRunner'
+
+        buildConfigField 'String', 'CAPTCHA_API_KEY', '"fakekey"'
+        buildConfigField 'String', 'APP_MAINTENANCE_CERTIFICATE_SHA256', '"sha256/D9B0D1C95B2448817F012CF1965562018B5F941FE701CA5999A91706358A8418"'
+        buildConfigField 'String', 'APP_MAINTENANCE_URL', '"https://fakeurl.fr//"'
+        buildConfigField 'String', 'SERVICE_UUID', '"910c7798-9f3a-11ea-bb37-0242ac130002"'
+        buildConfigField 'String', 'SERVICE_PAYLOAD_CHARACTERISTIC_UUID', '"910c7798-9f3a-11ea-bb37-0242ac130002"'
+        buildConfigField 'String', 'BACKGROUND_SERVICE_MANUFACTURER_DATA_IOS', '"0.0.0.0.1.1.0.0"'
+    }
+
+    lintOptions {
+        disable "InvalidPackage",
+                "ObsoleteLintCustomCheck",
+                "UnsafeExperimentalUsageError",
+                "UnsafeExperimentalUsageWarning"
+    }
+
+    testOptions {
+        animationsDisabled true
+    }
+
+    viewBinding {
+        enabled = true
+    }
+}
+
+dependencies {
+    implementation 'androidx.documentfile:documentfile:1.0.1'
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.0.0'
+
+    implementation('com.journeyapps:zxing-android-embedded:4.1.0') { transitive = false }
+    //noinspection GradleDependency (New version require minSdk 24)
+    implementation 'com.google.zxing:core:3.3.0'
+
+    implementation 'com.github.razir.progressbutton:progressbutton:2.1.0'
+
+    implementation project(path: ':coreui')
+    implementation project(path: ':framework')
+    implementation project(path: ':robert')
+
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-contrib:3.2.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-intents:3.2.0'
+    androidTestImplementation 'androidx.test:rules:1.2.0'
+}

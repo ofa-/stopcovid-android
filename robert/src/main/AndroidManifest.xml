@@ -1,0 +1,23 @@
+<!--
+  ~ This Source Code Form is subject to the terms of the Mozilla Public
+  ~ License, v. 2.0. If a copy of the MPL was not distributed with this
+  ~ file, You can obtain one at https://mozilla.org/MPL/2.0/.
+  ~
+  ~ Authors
+  ~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ Created by Lunabee Studio / Date - 2020/04/05 - for the STOP-COVID project
+  -->
+
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.lunabeestudio.robert">
+
+    <application>
+        <service
+            android:name="androidx.work.impl.background.systemjob.SystemJobService"
+            android:exported="false"
+            android:permission="android.permission.BIND_JOB_SERVICE"
+            tools:node="replace" />
+    </application>
+</manifest>

@@ -1,0 +1,20 @@
+{
+    "atRisk": true,
+    "lastExposureTimeframe": 0,
+    "message": "Votre test COVID-19 est positif. Merci de respecter la période de quatorzaine. Prenez soin de vous et de vos proches.",
+    "idsForEpochs": [
+        {
+            "epochId": 1,
+            "key": {
+                "ebid": "Salted__G▒g▒▒)▒ތ:D▒▒B1a▒W▒1▒▒▒▒▒M[",
+                "ecc": "Salted__e▒▒Ի▒▒▒▒督0▒,▒ⱼ"
+            }
+        }
+    ],
+    "filteringAlgoConfig": [
+        {
+            "name": "distance",
+            "value": 12
+        }
+    ]
+}

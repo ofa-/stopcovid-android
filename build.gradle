@@ -1,0 +1,36 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * Authors
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * Created by Lunabee Studio / Date - 2020/04/05 - for the STOP-COVID project
+ */
+
+buildscript {
+    ext.kotlin_version = '1.3.72'
+    ext.androidX_navigation = '2.2.2'
+    repositories {
+        google()
+        jcenter()
+    }
+    dependencies {
+        classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$androidX_navigation"
+        classpath 'com.android.tools.build:gradle:3.6.3'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "com.karumi:shot:4.0.0"
+        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.12'
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        jcenter()
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}

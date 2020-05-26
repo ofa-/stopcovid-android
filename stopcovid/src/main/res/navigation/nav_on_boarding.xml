@@ -1,0 +1,120 @@
+<!--
+  ~ This Source Code Form is subject to the terms of the Mozilla Public
+  ~ License, v. 2.0. If a copy of the MPL was not distributed with this
+  ~ file, You can obtain one at https://mozilla.org/MPL/2.0/.
+  ~
+  ~ Authors
+  ~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ Created by Lunabee Studio / Date - 2020/04/05 - for the STOP-COVID project
+  -->
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_on_boarding"
+    app:startDestination="@id/onBoardingWelcomeFragment"
+    tools:ignore="UnusedNavigation">
+
+    <activity
+        android:id="@+id/mainActivity"
+        android:name="com.lunabeestudio.stopcovid.activity.MainActivity"
+        tools:layout="@layout/activity_main" />
+
+    <fragment
+        android:id="@+id/onBoardingWelcomeFragment"
+        android:name="com.lunabeestudio.stopcovid.fragment.OnBoardingWelcomeFragment"
+        tools:layout="@layout/fragment_recycler_view">
+        <action
+            android:id="@+id/action_onBoardingWelcomeFragment_to_onBoardingExplanationFragment"
+            app:destination="@id/onBoardingExplanationFragment"
+            app:enterAnim="@anim/nav_slide_enter_anim"
+            app:exitAnim="@anim/nav_slide_exit_anim"
+            app:popEnterAnim="@anim/nav_slide_pop_enter_anim"
+            app:popExitAnim="@anim/nav_slide_pop_exit_anim" />
+        <action
+            android:id="@+id/action_onBoardingWelcomeFragment_to_mainActivity"
+            app:destination="@id/mainActivity"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+    </fragment>
+    <fragment
+        android:id="@+id/onBoardingExplanationFragment"
+        android:name="com.lunabeestudio.stopcovid.fragment.OnBoardingExplanationFragment"
+        tools:layout="@layout/fragment_recycler_view">
+        <action
+            android:id="@+id/action_onBoardingExplanationFragment_to_onBoardingPrivacyFragment"
+            app:destination="@id/onBoardingPrivacyFragment"
+            app:enterAnim="@anim/nav_slide_enter_anim"
+            app:exitAnim="@anim/nav_slide_exit_anim"
+            app:popEnterAnim="@anim/nav_slide_pop_enter_anim"
+            app:popExitAnim="@anim/nav_slide_pop_exit_anim" />
+    </fragment>
+    <fragment
+        android:id="@+id/onBoardingPrivacyFragment"
+        android:name="com.lunabeestudio.stopcovid.fragment.OnBoardingPrivacyFragment"
+        tools:layout="@layout/fragment_recycler_view">
+        <action
+            android:id="@+id/action_onBoardingPrivacyFragment_to_onBoardingProximityFragment"
+            app:destination="@id/onBoardingProximityFragment"
+            app:enterAnim="@anim/nav_slide_enter_anim"
+            app:exitAnim="@anim/nav_slide_exit_anim"
+            app:popEnterAnim="@anim/nav_slide_pop_enter_anim"
+            app:popExitAnim="@anim/nav_slide_pop_exit_anim" />
+    </fragment>
+    <fragment
+        android:id="@+id/onBoardingProximityFragment"
+        android:name="com.lunabeestudio.stopcovid.fragment.OnBoardingProximityFragment"
+        tools:layout="@layout/fragment_recycler_view">
+        <action
+            android:id="@+id/action_onBoardingProximityFragment_to_onBoardingNotificationFragment"
+            app:destination="@id/onBoardingNotificationFragment"
+            app:enterAnim="@anim/nav_slide_enter_anim"
+            app:exitAnim="@anim/nav_slide_exit_anim"
+            app:popEnterAnim="@anim/nav_slide_pop_enter_anim"
+            app:popExitAnim="@anim/nav_slide_pop_exit_anim" />
+        <action
+            android:id="@+id/action_onBoardingProximityFragment_to_onBoardingBatteryFragment"
+            app:destination="@id/onBoardingBatteryFragment"
+            app:enterAnim="@anim/nav_slide_enter_anim"
+            app:exitAnim="@anim/nav_slide_exit_anim"
+            app:popEnterAnim="@anim/nav_slide_pop_enter_anim"
+            app:popExitAnim="@anim/nav_slide_pop_exit_anim" />
+    </fragment>
+    <fragment
+        android:id="@+id/onBoardingBatteryFragment"
+        android:name="com.lunabeestudio.stopcovid.fragment.OnBoardingBatteryFragment"
+        tools:layout="@layout/fragment_recycler_view">
+        <action
+            android:id="@+id/action_onBoardingBatteryFragment_to_onBoardingNotificationFragment"
+            app:destination="@id/onBoardingNotificationFragment"
+            app:enterAnim="@anim/nav_slide_enter_anim"
+            app:exitAnim="@anim/nav_slide_exit_anim"
+            app:popEnterAnim="@anim/nav_slide_pop_enter_anim"
+            app:popExitAnim="@anim/nav_slide_pop_exit_anim" />
+    </fragment>
+    <fragment
+        android:id="@+id/onBoardingNotificationFragment"
+        android:name="com.lunabeestudio.stopcovid.fragment.OnBoardingNotificationFragment"
+        tools:layout="@layout/fragment_recycler_view">
+        <action
+            android:id="@+id/action_onBoardingNotificationFragment_to_onBoardingGestureFragment"
+            app:destination="@id/onBoardingGestureFragment"
+            app:enterAnim="@anim/nav_slide_enter_anim"
+            app:exitAnim="@anim/nav_slide_exit_anim"
+            app:popEnterAnim="@anim/nav_slide_pop_enter_anim"
+            app:popExitAnim="@anim/nav_slide_pop_exit_anim" />
+    </fragment>
+    <fragment
+        android:id="@+id/onBoardingGestureFragment"
+        android:name="com.lunabeestudio.stopcovid.fragment.OnBoardingGestureFragment"
+        tools:layout="@layout/fragment_recycler_view">
+        <action
+            android:id="@+id/action_onBoardingGestureFragment_to_mainActivity"
+            app:destination="@id/mainActivity"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+    </fragment>
+</navigation>

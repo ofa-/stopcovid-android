@@ -1,0 +1,94 @@
+<!--
+  ~ This Source Code Form is subject to the terms of the Mozilla Public
+  ~ License, v. 2.0. If a copy of the MPL was not distributed with this
+  ~ file, You can obtain one at https://mozilla.org/MPL/2.0/.
+  ~
+  ~ Authors
+  ~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ Created by Lunabee Studio / Date - 2020/04/05 - for the STOP-COVID project
+  -->
+<resources>
+    <string name="app_name" translatable="false">StopCovid</string>
+    <string name="captcha_script" translatable="false"><![CDATA[
+<script type=\"text/javascript\">
+   const observers = new Array();
+   const observeDOM = function(element, completion) {
+     const obs = new MutationObserver(completion);
+     obs.observe(element, {
+       attributes: true,
+       childList: true,
+       subtree: true,
+       attributeFilter: [\"style\"]
+     });
+
+     observers.push(obs);
+   };
+
+   const clearObservers = function() {
+     observers.forEach(function(o) {
+       o.disconnect();
+     });
+     observers = [];
+   };
+
+   const execute = function() {
+     try {
+       document.getElementsByTagName(\"div\")[4].outerHTML = \"\";
+     } catch (e) {}
+
+     try {
+       observeDOM(document.getElementsByTagName(\"div\")[3], function() {
+         %2$s.showReCaptcha();
+       });
+     } catch (e) {}
+
+     grecaptcha.execute();
+   };
+
+   var onloadCallback = function() {
+     grecaptcha.render(\"submit\", {
+       sitekey: \"%1$s\",
+       callback: function(token) {
+         %2$s.token(token);
+         clearObservers();
+       },
+       \"expired-callback\": function() {
+         %2$s.error();
+       },
+       \"error-callback\": function() {
+         %2$s.error();
+       },
+       size: \"invisible\"
+     });
+
+     grecaptcha.ready(function() {
+        observeDOM(document.getElementById(\"body\"), function(mut) {
+           for (var i = 0; i < mut.length; i++) {
+              if (mut[i].type === \'childList\') {
+                 for (var j = 0; j < mut[i].addedNodes.length; j++) {
+                    if (mut[i].addedNodes[j].nodeName === \"IFRAME\" && !!mut[i].addedNodes[j].name) {
+                       %2$s.didLoad();
+                    }
+                 }
+              }
+           }
+        });
+     });
+   };
+</script>
+]]></string>
+    <string name="captcha_html" translatable="false"><![CDATA[
+<html>
+   <head>
+      <meta name=\"viewport\" content=\"width=device-width\" />
+      <meta http-equiv=\"Content-Security-Policy\" content=\"default-src https://www.google.com/;
+      script-src \'sha256-%2$s\' https://www.google.com/recaptcha/api.js https://www.gstatic.com/recaptcha/\">
+      %1$s
+   </head>
+   <body id=\"body\">
+      <span id=\"submit\" style=\"visibility: hidden;\"></span>
+      <script src=\"https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit&hl=%3$s\" async defer></script>
+   </body>
+</html>
+]]></string>
+</resources>

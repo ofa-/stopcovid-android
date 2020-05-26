@@ -1,0 +1,38 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * Authors
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * Created by Lunabee Studio / Date - 2020/04/05 - for the STOP-COVID project
+ */
+
+// While androidTest files are not merged
+task addManifest {
+    doFirst {
+        ant.copy file: "src/debug/AndroidManifest.test.xml",
+                tofile: "src/debug/AndroidManifest.xml",
+                overwrite: "false"
+    }
+}
+
+// put back debug AndroidManifest as it was
+task removeManifest {
+    doLast {
+        ant.delete file: "src/debug/AndroidManifest.xml"
+    }
+}
+
+// Force replaceManifest to be done at the beginning
+tasks.preBuild {
+    shouldRunAfter addManifest
+}
+
+tasks.all {
+    task ->
+        if (task.name.endsWith('ScreenshotTests') || task.name.endsWith('AndroidTest')) {
+            task.dependsOn addManifest
+            task.finalizedBy removeManifest
+        }
+}

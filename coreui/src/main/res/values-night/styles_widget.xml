@@ -1,0 +1,24 @@
+<!--
+  ~ This Source Code Form is subject to the terms of the Mozilla Public
+  ~ License, v. 2.0. If a copy of the MPL was not distributed with this
+  ~ file, You can obtain one at https://mozilla.org/MPL/2.0/.
+  ~
+  ~ Authors
+  ~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ Created by Lunabee Studio / Date - 2020/13/05 - for the STOP-COVID project
+  -->
+<resources>
+
+    <style name="Theme.StopCovid.Button.Light">
+        <item name="backgroundTint">@color/color_primary_light</item>
+        <item name="android:textColor">@color/color_on_primary_light</item>
+        <item name="rippleColor">@color/color_primary</item>
+    </style>
+
+    <style name="Theme.StopCovid.Button.Danger" parent="Theme.StopCovid.Button.Light">
+        <item name="backgroundTint">@color/color_error_light</item>
+        <item name="rippleColor">@color/color_error</item>
+        <item name="android:textColor">@color/color_error</item>
+    </style>
+
+</resources>

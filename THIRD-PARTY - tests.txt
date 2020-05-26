@@ -1,0 +1,39 @@
+================================================================================
+Apache 2.0
+================================================================================
+
+Component: Truth
+License Text URL: https://github.com/google/truth/blob/master/LICENSE
+Source Code: https://github.com/google/truth
+
+================================================================================
+EPL 1.0
+================================================================================
+
+Component: JUnit 4
+License Text URL: https://github.com/junit-team/junit4/blob/master/LICENSE-junit.txt
+Source Code: https://github.com/junit-team/junit4
+
+================================================================================
+LGPL 3.0
+================================================================================
+
+Component: Zohhak
+License Text URL: https://github.com/piotrturski/zohhak/blob/master/LICENSE-LGPL-3.0.txt
+Source Code: https://github.com/piotrturski/zohhak
+
+================================================================================
+MIT
+================================================================================
+
+Component: Mockito
+License Text URL: https://github.com/mockito/mockito/blob/release/3.x/LICENSE
+Source Code: https://github.com/mockito/mockito
+
+Component: Mockito Kotlin
+License Text URL: https://github.com/nhaarman/mockito-kotlin/blob/2.x/LICENSE
+Source Code: https://github.com/nhaarman/mockito-kotlin
+
+Component: Robolectric
+License Text URL: https://github.com/robolectric/robolectric/blob/master/LICENSE
+Source Code: https://github.com/robolectric/robolectric

@@ -1,0 +1,56 @@
+<!--
+  ~ This Source Code Form is subject to the terms of the Mozilla Public
+  ~ License, v. 2.0. If a copy of the MPL was not distributed with this
+  ~ file, You can obtain one at https://mozilla.org/MPL/2.0/.
+  ~
+  ~ Authors
+  ~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ Created by Lunabee Studio / Date - 2020/04/05 - for the STOP-COVID project
+  -->
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/swipeRefreshLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:ignore="UnusedResources">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="@dimen/spacing_large">
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/logo_height"
+            android:layout_marginBottom="@dimen/spacing_xlarge"
+            android:importantForAccessibility="no" />
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/spacing_large"
+            android:layout_marginBottom="@dimen/spacing_xlarge"
+            android:gravity="center"
+            android:textAppearance="?textAppearanceBody1"
+            tools:text="@tools:sample/lorem[22]" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button"
+            style="@style/Theme.StopCovid.Button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="@tools:sample/lorem[3]" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/refreshButton"
+            style="@style/Theme.StopCovid.Button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="@tools:sample/lorem[2]" />
+    </LinearLayout>
+</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

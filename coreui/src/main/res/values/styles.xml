@@ -1,0 +1,36 @@
+<!--
+  ~ This Source Code Form is subject to the terms of the Mozilla Public
+  ~ License, v. 2.0. If a copy of the MPL was not distributed with this
+  ~ file, You can obtain one at https://mozilla.org/MPL/2.0/.
+  ~
+  ~ Authors
+  ~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ Created by Lunabee Studio / Date - 2020/13/05 - for the STOP-COVID project
+  -->
+<resources>
+
+    <style name="Theme.Base.StopCovid" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="android:windowBackground">?colorSurface</item>
+        <item name="android:windowSoftInputMode">adjustResize</item>
+
+        <item name="colorPrimary">@color/color_primary</item>
+        <item name="colorPrimaryVariant">?colorPrimary</item>
+        <item name="colorPrimaryDark">?colorPrimary</item>
+        <item name="colorOnPrimary">@color/color_on_primary</item>
+        <item name="colorSecondary">?colorPrimary</item>
+        <item name="colorSecondaryVariant">?colorSecondary</item>
+        <item name="colorOnSecondary">?colorOnPrimary</item>
+        <item name="colorAccent">?colorSecondary</item>
+        <item name="colorControlNormal">?colorPrimary</item>
+
+        <item name="appBarLayoutStyle">@style/Widget.MaterialComponents.AppBarLayout.Surface</item>
+        <item name="toolbarStyle">@style/Widget.StopCovid.Toolbar.Surface</item>
+        <item name="actionMenuTextColor">?colorControlNormal</item>
+
+        <item name="android:windowTranslucentNavigation">true</item>
+    </style>
+
+    <!-- Base application theme. -->
+    <style name="Theme.StopCovid" parent="Theme.Base.StopCovid" />
+
+</resources>

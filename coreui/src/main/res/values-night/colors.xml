@@ -1,0 +1,18 @@
+<!--
+  ~ This Source Code Form is subject to the terms of the Mozilla Public
+  ~ License, v. 2.0. If a copy of the MPL was not distributed with this
+  ~ file, You can obtain one at https://mozilla.org/MPL/2.0/.
+  ~
+  ~ Authors
+  ~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ Created by Lunabee Studio / Date - 2020/13/05 - for the STOP-COVID project
+  -->
+<resources>
+    <color name="color_primary">#85BBFF</color>
+    <color name="color_on_primary">#00285A</color>
+    <color name="color_primary_light">#29394D</color>
+    <color name="color_on_primary_light">#FFFFFF</color>
+    <color name="color_error">#FF6F4D</color>
+    <color name="color_error_light">#331716</color>
+    <color name="color_icon_background">#000000</color>
+</resources>
