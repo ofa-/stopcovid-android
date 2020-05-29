@@ -24,8 +24,11 @@ enum class ErrorCode {
     ROBERT_UNKNOWN,
     ROBERT_NO_EBID_FOR_EPOCH,
     ROBERT_NO_EBID,
+    DECRYPT_FAIL,
     KEYSTORE_NO_KEY,
-    KEYSTORE_DECRYPT
+    BLE_ADVERTISER,
+    BLE_SCANNER,
+    BLE_PROXIMITY_NOTIFICATION
 }
 
 class UnknownException(message: String = "Unknown error occurred") :
@@ -44,7 +47,10 @@ class ProximityException(val throwable: Throwable? = null,
     message: String = "An error occurs in BLE proximity") :
     RobertException(ErrorCode.PROXIMITY_UNKNOWN, message)
 
-class NoSharedKeyException(message: String = "No shared key found") :
+class ServerDecryptException(message: String = "Server data decrypt fail") :
+    RobertException(ErrorCode.DECRYPT_FAIL, message)
+
+class NoKeyException(message: String = "No key found") :
     RobertException(ErrorCode.KEYSTORE_NO_KEY, message)
 
 class NoEphemeralBluetoothIdentifierFoundForEpoch(message: String = "No EphemeralBluetoothIdentifier found for the requested time") :
@@ -56,6 +62,11 @@ class NoEphemeralBluetoothIdentifierFound(message: String? = null) :
 class RobertUnknownException(message: String = "Unknown error occurred") :
     RobertException(ErrorCode.ROBERT_UNKNOWN, message)
 
-class KeyDecryptionFailed(val throwable: Throwable? = null,
-    message: String = throwable?.localizedMessage ?: "The stored key cannot be decrypt") :
-    RobertException(ErrorCode.KEYSTORE_DECRYPT, message)
+class BLEAdvertiserException(message: String = "An error occurs in BLE advertiser") :
+    RobertException(ErrorCode.BLE_ADVERTISER, message)
+
+class BLEScannerException(message: String = "An error occurs in BLE scanner") :
+    RobertException(ErrorCode.BLE_SCANNER, message)
+
+class BLEProximityNotificationException(message: String = "An error occurs in BLE proximity notification") :
+    RobertException(ErrorCode.BLE_PROXIMITY_NOTIFICATION, message)

@@ -13,7 +13,11 @@ package com.orange.proximitynotification.ble.scanner
 import android.os.ParcelUuid
 import android.util.Log
 import com.orange.proximitynotification.ble.BleSettings
-import no.nordicsemi.android.support.v18.scanner.*
+import no.nordicsemi.android.support.v18.scanner.BluetoothLeScannerCompat
+import no.nordicsemi.android.support.v18.scanner.ScanCallback
+import no.nordicsemi.android.support.v18.scanner.ScanFilter
+import no.nordicsemi.android.support.v18.scanner.ScanResult
+import no.nordicsemi.android.support.v18.scanner.ScanSettings
 
 class BleScannerImpl(
     override val settings: BleSettings,
@@ -54,7 +58,6 @@ class BleScannerImpl(
         scanCallback = null
     }
 
-
     private fun buildScanSettings(): ScanSettings {
         return ScanSettings.Builder()
             .setLegacy(true)
@@ -86,8 +89,6 @@ class BleScannerImpl(
         override fun onBatchScanResults(results: List<ScanResult>) {
             super.onBatchScanResults(results)
 
-            Log.d(TAG, "onBatchScanResults results = $results")
-
             results
                 .distinctBy { it.device }
                 .toBleScannedDevices(settings.serviceUuid)
@@ -101,7 +102,6 @@ class BleScannerImpl(
         ) {
             super.onScanResult(callbackType, result)
 
-            Log.d(TAG, "onScanResult results = $result")
             callback.onResult(listOf(result.toBleScannedDevice(settings.serviceUuid)))
         }
 

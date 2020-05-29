@@ -22,6 +22,7 @@
         android:name=".StopCovid"
         android:allowBackup="false"
         android:configChanges="uiMode"
+        android:debuggable="false"
         android:hardwareAccelerated="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -30,12 +31,14 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.StopCovid"
         android:usesCleartextTraffic="false"
-        tools:ignore="AllowBackup,LockedOrientationActivity"
+        tools:ignore="AllowBackup,HardcodedDebugMode,LockedOrientationActivity"
         tools:targetApi="m">
         <activity
             android:name=".activity.OnBoardingActivity"
             android:exported="true"
+            android:launchMode="singleInstance"
             android:screenOrientation="portrait"
+            android:taskAffinity=""
             android:theme="@style/Theme.StopCovid.Splashscreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -49,21 +52,25 @@
             android:exported="false"
             android:launchMode="singleInstance"
             android:screenOrientation="portrait"
+            android:taskAffinity=""
             android:theme="@style/Theme.StopCovid" />
         <activity
             android:name=".activity.AppMaintenanceActivity"
             android:exported="false"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:taskAffinity="" />
 
         <service
             android:name=".service.ProximityService"
             android:enabled="true"
             android:exported="false"
-            android:foregroundServiceType="location|connectedDevice" />
+            android:foregroundServiceType="location|connectedDevice"
+            android:taskAffinity="" />
 
         <activity
             android:name="com.journeyapps.barcodescanner.CaptureActivity"
             android:exported="false"
+            android:taskAffinity=""
             tools:node="replace" />
 
         <provider

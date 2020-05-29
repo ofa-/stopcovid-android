@@ -11,9 +11,8 @@
 package com.lunabeestudio.domain.model
 
 class RegisterReport(
-    val key: String,
+    val tuples: String,
     val message: String?,
-    val ephemeralBluetoothIdentifierList: List<EphemeralBluetoothIdentifier>,
     val timeStart: Long,
-    val filterings: List<ClientFilteringAlgorithmConfiguration>?
+    val configuration: List<Configuration>?
 )

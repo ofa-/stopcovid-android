@@ -15,7 +15,15 @@ import android.bluetooth.BluetoothManager
 import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.nhaarman.mockitokotlin2.*
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.atLeastOnce
+import com.nhaarman.mockitokotlin2.doAnswer
+import com.nhaarman.mockitokotlin2.doReturn
+import com.nhaarman.mockitokotlin2.eq
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.times
+import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.whenever
 import com.orange.proximitynotification.CoroutineTestRule
 import com.orange.proximitynotification.ble.BleSettings
 import com.orange.proximitynotification.ble.bluetoothDevice
@@ -91,7 +99,6 @@ class BleGattManagerImplTest {
             verify(bleGattClientProvider, times(3)).fromDevice(any())
         }
 
-
     @Test
     fun requestRemoteRssi_given_gattClient_in_success_should_return_remote_rssi() =
         testCoroutineRule.runBlockingTest {
@@ -115,7 +122,6 @@ class BleGattManagerImplTest {
             assertThat(result).isEqualTo(rssi)
         }
 
-
     @Test
     fun requestRemoteRssi_given_gattClient_with_error_should_return_null() =
         testCoroutineRule.runBlockingTest {
@@ -137,7 +143,6 @@ class BleGattManagerImplTest {
             verify(client, atLeastOnce()).close()
             assertThat(result).isNull()
         }
-
 
     private suspend fun <T> onLifecycle(
         callback: BleGattManager.Callback,

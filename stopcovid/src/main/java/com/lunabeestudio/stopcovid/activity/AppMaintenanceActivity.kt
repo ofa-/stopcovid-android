@@ -17,6 +17,7 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
+import com.github.razir.progressbutton.DrawableButton
 import com.github.razir.progressbutton.bindProgressButton
 import com.github.razir.progressbutton.hideProgress
 import com.github.razir.progressbutton.showProgress
@@ -85,6 +86,7 @@ class AppMaintenanceActivity : AppCompatActivity() {
         binding.refreshButton.setOnClickListener {
             binding.refreshButton.showProgress {
                 progressColor = ContextCompat.getColor(this@AppMaintenanceActivity, R.color.color_on_primary)
+                gravity = DrawableButton.GRAVITY_CENTER
             }
             AppMaintenanceManager.updateCheckForMaintenanceUpgrade(this,
                 appIsFreeCompletion = this@AppMaintenanceActivity::finish,

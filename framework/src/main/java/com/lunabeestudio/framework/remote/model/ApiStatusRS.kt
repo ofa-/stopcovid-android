@@ -10,25 +10,22 @@
 
 package com.lunabeestudio.framework.remote.model
 
-import com.lunabeestudio.domain.RobertConstant
 import com.lunabeestudio.domain.model.StatusReport
 
 internal class ApiStatusRS(
     val atRisk: Boolean,
     val lastExposureTimeframe: Int?,
     val message: String?,
-    val idsForEpochs: List<ApiIdListRS>,
-    val filteringAlgoConfig: List<ApiClientFilteringAlgorithmConfigurationRS>
+    val tuples: String,
+    val config: List<ApiConfigurationRS>
 )
 
-internal fun ApiStatusRS.toDomain(ntpInitialTimeS: Long) = StatusReport(
-    atRisk,
-    lastExposureTimeframe,
-    message,
-    idsForEpochs.map { apiIdListRS ->
-        apiIdListRS.toDomain(ntpInitialTimeS, RobertConstant.EPOCH_DURATION_S)
-    },
-    filteringAlgoConfig.map {
+internal fun ApiStatusRS.toDomain() = StatusReport(
+    atRisk = atRisk,
+    lastExposureTimeframe = lastExposureTimeframe,
+    message = message,
+    tuples = tuples,
+    config = config.map {
         it.toDomain()
     }
 )

@@ -174,7 +174,6 @@ abstract class ProximityNotificationService : Service(),
         doStart()
     }
 
-
     /**
      * Create the Notification to display once this foreground service is running
      *

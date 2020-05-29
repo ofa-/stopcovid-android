@@ -17,13 +17,14 @@ import androidx.core.view.updatePadding
 import com.google.android.material.appbar.AppBarLayout
 import com.lunabeestudio.stopcovid.activity.OnBoardingActivity
 import com.lunabeestudio.stopcovid.coreui.extension.registerToAppBarLayoutForLiftOnScroll
-import com.lunabeestudio.stopcovid.coreui.fragment.FastAdapterFragment
 import com.lunabeestudio.stopcovid.coreui.extension.safeEmojiSpanify
+import com.lunabeestudio.stopcovid.coreui.fragment.FastAdapterFragment
+
 abstract class OnBoardingFragment : FastAdapterFragment() {
 
     abstract fun getTitleKey(): String
-    abstract fun getButtonTitle(): String?
-    abstract fun getOnButtonClickListener(): View.OnClickListener
+    abstract fun getButtonTitleKey(): String?
+    abstract fun getOnButtonClick(): () -> Unit
 
     private fun getActivityBinding() = (activity as OnBoardingActivity).binding
 
@@ -38,11 +39,17 @@ abstract class OnBoardingFragment : FastAdapterFragment() {
     override fun refreshScreen() {
         super.refreshScreen()
         (activity as AppCompatActivity).supportActionBar?.title = strings[getTitleKey()]
-        getActivityBinding().bottomSheetLayout.bottomSheetButton.text = getButtonTitle().safeEmojiSpanify()
+        getActivityBinding().bottomSheetLayout.bottomSheetButton.text = strings[getButtonTitleKey()].safeEmojiSpanify()
     }
 
     private fun initBottomButton() {
-        getActivityBinding().bottomSheetLayout.bottomSheetButton.setOnClickListener(getOnButtonClickListener())
+        getActivityBinding().bottomSheetLayout.bottomSheetButton.setOnClickListener {
+            try {
+                getOnButtonClick().invoke()
+            } catch (e: IllegalArgumentException) {
+                // back and button pressed quickly can trigger this exception.
+            }
+        }
         getActivityBinding().bottomSheetLayout.bottomSheetFrameLayout.post {
             binding?.recyclerView?.updatePadding(bottom = getActivityBinding().bottomSheetLayout.bottomSheetFrameLayout.height)
         }

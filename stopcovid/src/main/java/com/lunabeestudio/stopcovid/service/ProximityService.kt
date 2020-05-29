@@ -21,12 +21,10 @@ import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
-import com.lunabeestudio.framework.ble.RobertBleSettings
 import com.lunabeestudio.framework.ble.service.RobertProximityService
 import com.lunabeestudio.robert.RobertApplication
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.robert.model.RobertException
-import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.R
 import com.lunabeestudio.stopcovid.coreui.UiConstants
@@ -47,8 +45,6 @@ class ProximityService : RobertProximityService() {
     override val robertManager: RobertManager by lazy {
         robertManager()
     }
-
-    override val appBleSettings: RobertBleSettings = Constants.BleSettings
 
     override val foregroundNotificationId: Int = UiConstants.Notification.PROXIMITY.notificationId
 

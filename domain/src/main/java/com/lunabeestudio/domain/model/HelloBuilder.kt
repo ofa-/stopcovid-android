@@ -10,7 +10,7 @@
 
 package com.lunabeestudio.domain.model
 
-import com.lunabeestudio.domain.extension.safeDestroy
+import com.lunabeestudio.domain.extension.safeUse
 import com.lunabeestudio.domain.extension.unixTimeMsToNtpTimeS
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
@@ -41,22 +41,25 @@ class HelloBuilder(
      * @throws IllegalArgumentException if the [currentTimeMillis] does not match the ephemeralBluetoothIdentifier validity frame
      */
     fun build(currentTimeMillis: Long = System.currentTimeMillis()): Hello {
-        val time = currentTimeMillis.unixTimeMsToNtpTimeS()
+        val hello = secretKeySpec.safeUse {
+            val time = currentTimeMillis.unixTimeMsToNtpTimeS()
 
-        return if (isValid(time)) {
-            val timeByteArray = byteArrayOf(
-                (time shr 8).toByte(),
-                time.toByte()
-            )
+            if (isValid(time)) {
+                val timeByteArray = byteArrayOf(
+                    (time shr 8).toByte(),
+                    time.toByte()
+                )
 
-            val message = ephemeralBluetoothIdentifier.ecc + ephemeralBluetoothIdentifier.ebid + timeByteArray
-            val mac = mac.doFinal(byteArrayOf(settings.prefix) + message).copyOfRange(0, 5)
+                val message = ephemeralBluetoothIdentifier.ecc + ephemeralBluetoothIdentifier.ebid + timeByteArray
+                val mac = mac.doFinal(byteArrayOf(settings.prefix) + message).copyOfRange(0, 5)
 
-            secretKeySpec.safeDestroy()
-
-            Hello(ephemeralBluetoothIdentifier.ecc, ephemeralBluetoothIdentifier.ebid, timeByteArray, mac)
-        } else {
-            throw IllegalArgumentException("The provided time is not valid for the ebid.")
+                Hello(ephemeralBluetoothIdentifier.ecc, ephemeralBluetoothIdentifier.ebid, timeByteArray, mac)
+            } else {
+                null
+            }
         }
+
+        return hello ?: throw IllegalArgumentException("The provided time is not valid for the ebid.")
+
     }
 }

@@ -10,25 +10,20 @@
 
 package com.lunabeestudio.framework.remote.model
 
-import com.lunabeestudio.domain.RobertConstant
 import com.lunabeestudio.domain.model.RegisterReport
 
 internal class ApiRegisterRS(
-    val key: String,
+    val tuples: String,
     val message: String?,
-    val idsForEpochs: List<ApiIdListRS>,
     val timeStart: Long,
-    val filteringAlgoConfig: List<ApiClientFilteringAlgorithmConfigurationRS>?
+    val config: List<ApiConfigurationRS>?
 )
 
 internal fun ApiRegisterRS.toDomain() = RegisterReport(
-    key,
-    message,
-    idsForEpochs.map { apiListRs ->
-        apiListRs.toDomain(timeStart, RobertConstant.EPOCH_DURATION_S)
-    },
-    timeStart,
-    filteringAlgoConfig?.map {
+    tuples = tuples,
+    message = message,
+    timeStart = timeStart,
+    configuration = config?.map {
         it.toDomain()
     }
 )

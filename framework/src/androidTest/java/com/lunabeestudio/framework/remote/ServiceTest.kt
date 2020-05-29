@@ -5,15 +5,16 @@
  *
  * Authors
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Created by Lunabee Studio / Date - 2020/04/05 - for the STOP-COVID project
+ * Created by Lunabee Studio / Date - 2020/20/05 - for the STOP-COVID project
  */
 
-package com.lunabeestudio.framework
+package com.lunabeestudio.framework.remote
 
 import androidx.test.core.app.ApplicationProvider
 import com.google.common.truth.Truth.assertThat
 import com.lunabeestudio.domain.model.ServerStatusUpdate
 import com.lunabeestudio.framework.remote.datasource.ServiceDataSource
+import com.lunabeestudio.framework.testutils.ResourcesHelper
 import com.lunabeestudio.robert.model.BackendException
 import com.lunabeestudio.robert.model.ErrorCode
 import com.lunabeestudio.robert.model.RobertResult
@@ -25,7 +26,6 @@ import okhttp3.mockwebserver.MockWebServer
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
-import java.nio.ByteBuffer
 
 class ServiceTest {
 
@@ -42,54 +42,49 @@ class ServiceTest {
     @Test
     fun registerTest() {
         server.enqueue(MockResponse().setResponseCode(200)
-            .setBody(readTestFile("registerSuccess")))
+            .setBody(ResourcesHelper.readTestFileAsString("registerSuccess")))
         val result = runBlocking {
-            dataSource.register("")
+            dataSource.register("", "")
         }
         assertThat(result).isInstanceOf(RobertResultData.Success::class.java)
-        assertThat((result as RobertResultData.Success).data.key).isEqualTo("Y2VjaWVzdHVuZWNsZWRldGVzdA==")
+        result as RobertResultData.Success
         assertThat(result.data.message).isEqualTo("The application did register successfully")
-        assertThat(result.data.ephemeralBluetoothIdentifierList.size).isEqualTo(4)
-        assertThat(result.data.ephemeralBluetoothIdentifierList[0].ecc).isEqualTo("102".toByteArray())
-        assertThat(result.data.ephemeralBluetoothIdentifierList[0].ebid).isEqualTo("97.98.99.100.101.102.103.104".toByteArray())
         assertThat(result.data.timeStart).isEqualTo(3796669679L)
-        assertThat(result.data.filterings?.size).isEqualTo(1)
-        assertThat(result.data.filterings?.get(0)?.name).isEqualTo("distance")
-        assertThat(result.data.filterings?.get(0)?.value).isEqualTo(12.0)
+        assertThat(result.data.configuration?.size).isEqualTo(1)
+        assertThat(result.data.configuration?.get(0)?.name).isEqualTo("distance")
+        assertThat(result.data.configuration?.get(0)?.value).isEqualTo(12.0)
 
         testDataErrors {
-            dataSource.register("")
+            dataSource.register("", "")
         }
     }
 
     @Test
     fun statusTest() {
         server.enqueue(MockResponse().setResponseCode(200)
-            .setBody(readTestFile("statusSuccess")))
+            .setBody(ResourcesHelper.readTestFileAsString("statusSuccess")))
         val result = runBlocking {
-            dataSource.status(ServerStatusUpdate("", "", ""), 0)
+            dataSource.status(ServerStatusUpdate("", 0L, "", ""))
         }
         assertThat(result).isInstanceOf(RobertResultData.Success::class.java)
         assertThat((result as RobertResultData.Success).data.atRisk)
         assertThat(result.data.lastExposureTimeframe).isEqualTo(0)
         assertThat(result.data.message)
             .isEqualTo("Votre test COVID-19 est positif. Merci de respecter la période de quatorzaine. Prenez soin de vous et de vos proches.")
-        assertThat(result.data.ephemeralBluetoothIdentifierList.size).isEqualTo(1)
-        assertThat(result.data.ephemeralBluetoothIdentifierList[0].ecc).isEqualTo("73.-87.109.121.-41.-76".toByteArray())
-        assertThat(result.data.ephemeralBluetoothIdentifierList[0].ebid).isEqualTo("73.-87.109.121.-47.-96.12.29.90.91.83".toByteArray())
-        assertThat(result.data.filterings.size).isEqualTo(1)
-        assertThat(result.data.filterings[0].name).isEqualTo("distance")
-        assertThat(result.data.filterings[0].value).isEqualTo(12.0)
+        assertThat(result.data.tuples).isNotNull()
+        assertThat(result.data.config.size).isEqualTo(1)
+        assertThat(result.data.config[0].name).isEqualTo("distance")
+        assertThat(result.data.config[0].value).isEqualTo(12.0)
 
         testDataErrors {
-            dataSource.status(ServerStatusUpdate("", "", ""), 0)
+            dataSource.status(ServerStatusUpdate("", 0L, "", ""))
         }
     }
 
     @Test
     fun reportTest() {
         server.enqueue(MockResponse().setResponseCode(200)
-            .setBody(readTestFile("reportSuccess")))
+            .setBody(ResourcesHelper.readTestFileAsString("reportSuccess")))
         val result = runBlocking {
             dataSource.report("", emptyList())
         }
@@ -103,28 +98,28 @@ class ServiceTest {
     @Test
     fun unregisterTest() {
         server.enqueue(MockResponse().setResponseCode(200)
-            .setBody(readTestFile("unregisterSuccess")))
+            .setBody(ResourcesHelper.readTestFileAsString("unregisterSuccess")))
         val result = runBlocking {
-            dataSource.unregister(ServerStatusUpdate("", "", ""))
+            dataSource.unregister(ServerStatusUpdate("", 0L, "", ""))
         }
         assertThat(result).isInstanceOf(RobertResult.Success::class.java)
 
         testErrors {
-            dataSource.unregister(ServerStatusUpdate("", "", ""))
+            dataSource.unregister(ServerStatusUpdate("", 0L, "", ""))
         }
     }
 
     @Test
     fun deleteExposureHistory() {
         server.enqueue(MockResponse().setResponseCode(200)
-            .setBody(readTestFile("deleteExposureHistorySuccess")))
+            .setBody(ResourcesHelper.readTestFileAsString("deleteExposureHistorySuccess")))
         val result = runBlocking {
-            dataSource.deleteExposureHistory(ServerStatusUpdate("", "", ""))
+            dataSource.deleteExposureHistory(ServerStatusUpdate("", 0L, "", ""))
         }
         assertThat(result).isInstanceOf(RobertResult.Success::class.java)
 
         testErrors {
-            dataSource.deleteExposureHistory(ServerStatusUpdate("", "", ""))
+            dataSource.deleteExposureHistory(ServerStatusUpdate("", 0L, "", ""))
         }
     }
 
@@ -170,18 +165,4 @@ class ServiceTest {
     fun tearDown() {
         server.shutdown()
     }
-
-    private fun String.toByteArray(): ByteArray {
-        val split = split('.')
-        val byteBuffer = ByteBuffer.allocate(split.size)
-        split.forEach {
-            byteBuffer.put(it.toByte())
-        }
-        return byteBuffer.array()
-    }
-
-    private fun readTestFile(filename: String): String =
-        this.javaClass.classLoader!!.getResourceAsStream(filename).use {
-            it.bufferedReader().readText()
-        }
 }

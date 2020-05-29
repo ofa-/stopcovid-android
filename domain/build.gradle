@@ -32,10 +32,10 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 
     testImplementation "junit:junit:4.13"
-    testImplementation "androidx.test.ext:truth:1.3.0-beta01"
+    testImplementation "androidx.test.ext:truth:1.3.0-rc01"
     testImplementation "com.googlecode.zohhak:zohhak:1.1.1"
 
     androidTestImplementation "androidx.test:runner:1.2.0"
     androidTestImplementation "androidx.test:rules:1.2.0"
-    androidTestImplementation "androidx.test.ext:truth:1.3.0-beta01"
+    androidTestImplementation "androidx.test.ext:truth:1.3.0-rc01"
 }

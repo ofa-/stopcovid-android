@@ -18,6 +18,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.github.razir.progressbutton.DrawableButton
 import com.github.razir.progressbutton.hideProgress
 import com.github.razir.progressbutton.showProgress
 import com.google.android.material.button.MaterialButton
@@ -33,6 +34,7 @@ import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.fastitem.logoItem
 import com.lunabeestudio.stopcovid.fastitem.progressButtonItem
 import com.lunabeestudio.stopcovid.model.BackendException
+import com.lunabeestudio.stopcovid.model.UnauthorizedException
 import com.lunabeestudio.stopcovid.viewmodel.CodeViewModel
 import com.lunabeestudio.stopcovid.viewmodel.CodeViewModelFactory
 import com.mikepenz.fastadapter.GenericItem
@@ -61,16 +63,17 @@ class SendHistoryFragment : MainFragment() {
             if (inProgress) {
                 progressButton?.get()?.showProgress {
                     progressColor = ContextCompat.getColor(requireContext(), R.color.color_on_primary)
+                    gravity = DrawableButton.GRAVITY_CENTER
                 }
             } else {
                 progressButton?.get()?.hideProgress(strings["common.send"])
             }
         }
         viewModel.codeSuccess.observe(viewLifecycleOwner) {
-            findNavController().navigate(SendHistoryFragmentDirections.actionSendHistoryFragmentToSickFragment())
+            findNavController().navigate(SendHistoryFragmentDirections.actionSendHistoryFragmentToIsSickFragment())
         }
         viewModel.covidException.observe(viewLifecycleOwner) { error ->
-            if (error is BackendException) {
+            if (error is BackendException || error is UnauthorizedException) {
                 MaterialAlertDialogBuilder(requireContext())
                     .setTitle(strings["sendHistoryController.alert.invalidCode.title"])
                     .setMessage(strings["sendHistoryController.alert.invalidCode.message"])
@@ -107,7 +110,7 @@ class SendHistoryFragment : MainFragment() {
             text = strings["common.send"]
             gravity = Gravity.CENTER
             onClickListener = View.OnClickListener {
-                viewModel.verifyCode(args.code, args.date, requireContext().applicationContext as RobertApplication)
+                viewModel.verifyCode(args.code, args.firstSymptoms, requireContext().applicationContext as RobertApplication)
             }
             startInProgress = viewModel.loadingInProgress.value == true
             getProgressButton = { button ->

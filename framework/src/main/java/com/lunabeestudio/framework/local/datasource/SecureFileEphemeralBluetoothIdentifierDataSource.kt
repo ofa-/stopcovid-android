@@ -15,13 +15,13 @@ import androidx.annotation.WorkerThread
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.lunabeestudio.domain.model.EphemeralBluetoothIdentifier
-import com.lunabeestudio.framework.utils.CryptoManager
+import com.lunabeestudio.framework.local.LocalCryptoManager
 import com.lunabeestudio.robert.datasource.LocalEphemeralBluetoothIdentifierDataSource
 import java.io.File
 
 class SecureFileEphemeralBluetoothIdentifierDataSource(
     context: Context,
-    private val cryptoManager: CryptoManager
+    private val cryptoManager: LocalCryptoManager
 ) : LocalEphemeralBluetoothIdentifierDataSource {
 
     private val epochFile = File(context.filesDir, "epochs")

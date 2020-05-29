@@ -10,7 +10,7 @@
 
 package com.orange.proximitynotification.ble
 
-import java.util.*
+import java.util.UUID
 
 /**
  * @param serviceUuid Service UUID used by BLE advertiser / scanner

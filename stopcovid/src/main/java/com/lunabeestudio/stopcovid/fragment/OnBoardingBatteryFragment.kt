@@ -15,7 +15,6 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Build
 import android.view.Gravity
-import android.view.View
 import androidx.annotation.RequiresApi
 import androidx.navigation.fragment.findNavController
 import com.lunabeestudio.stopcovid.R
@@ -30,12 +29,12 @@ import com.mikepenz.fastadapter.GenericItem
 class OnBoardingBatteryFragment : OnBoardingFragment() {
 
     override fun getTitleKey(): String = "onboarding.batteryController.title"
-    override fun getButtonTitle(): String? = strings["onboarding.batteryController.accept"]
+    override fun getButtonTitleKey(): String? = "onboarding.batteryController.accept"
 
     @SuppressLint("BatteryLife")
     @RequiresApi(Build.VERSION_CODES.M)
-    override fun getOnButtonClickListener(): View.OnClickListener = View.OnClickListener {
-        if (!ProximityManager.isBatteryOptimizationOn(requireContext()) && !isEmulator()) {
+    override fun getOnButtonClick(): () -> Unit = {
+        if (!ProximityManager.isBatteryOptimizationOn(requireContext())) {
             ProximityManager.requestIgnoreBatteryOptimization(this)
         } else {
             findNavController()
@@ -71,30 +70,15 @@ class OnBoardingBatteryFragment : OnBoardingFragment() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == UiConstants.Activity.BATTERY.ordinal) {
             if (resultCode == Activity.RESULT_OK) {
-                findNavController()
-                    .navigate(OnBoardingBatteryFragmentDirections.actionOnBoardingBatteryFragmentToOnBoardingNotificationFragment())
+                try {
+                    findNavController()
+                        .navigate(OnBoardingBatteryFragmentDirections.actionOnBoardingBatteryFragmentToOnBoardingNotificationFragment())
+                } catch (e: IllegalArgumentException) {
+                    // back and button pressed quickly can trigger this exception.
+                }
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data)
         }
-    }
-
-    private fun isEmulator(): Boolean {
-        return (Build.BRAND.startsWith("generic") && Build.DEVICE.startsWith("generic")
-            || Build.FINGERPRINT.startsWith("generic")
-            || Build.FINGERPRINT.startsWith("unknown")
-            || Build.HARDWARE.contains("goldfish")
-            || Build.HARDWARE.contains("ranchu")
-            || Build.MODEL.contains("google_sdk")
-            || Build.MODEL.contains("Emulator")
-            || Build.MODEL.contains("Android SDK built for x86")
-            || Build.MANUFACTURER.contains("Genymotion")
-            || Build.PRODUCT.contains("sdk_google")
-            || Build.PRODUCT.contains("google_sdk")
-            || Build.PRODUCT.contains("sdk")
-            || Build.PRODUCT.contains("sdk_x86")
-            || Build.PRODUCT.contains("vbox86p")
-            || Build.PRODUCT.contains("emulator")
-            || Build.PRODUCT.contains("simulator"))
     }
 }

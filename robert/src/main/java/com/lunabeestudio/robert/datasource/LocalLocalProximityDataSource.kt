@@ -11,11 +11,9 @@
 package com.lunabeestudio.robert.datasource
 
 import com.lunabeestudio.domain.model.LocalProximity
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.Flow
 
 interface LocalLocalProximityDataSource {
-    fun getAll(): List<LocalProximity>
+    fun getUntilTime(ntpTimeS: Long): List<LocalProximity>
     suspend fun saveAll(vararg localProximity: LocalProximity)
     fun removeUntilTime(ntpTimeS: Long)
     fun removeAll()

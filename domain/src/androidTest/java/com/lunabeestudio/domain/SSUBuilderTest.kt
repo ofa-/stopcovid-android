@@ -12,9 +12,9 @@ package com.lunabeestudio.domain
 
 import android.util.Base64
 import com.google.common.truth.Truth.assertThat
+import com.lunabeestudio.domain.model.EphemeralBluetoothIdentifier
 import com.lunabeestudio.domain.model.SSUBuilder
 import com.lunabeestudio.domain.model.SSUSettings
-import com.lunabeestudio.domain.model.EphemeralBluetoothIdentifier
 import org.junit.Test
 
 class SSUBuilderTest {
@@ -26,11 +26,12 @@ class SSUBuilderTest {
         val key64 = "I5lqt1XfQKstC8TYw6YOVhzfwvsTnJPfHLbwj3HZzTw="
         val currentTimeMillis = 1588752561000 // 3797741361 ntp seconds
 
-        val expectedMac64 = "H8CFj59BLSU8lwodvW+UQM3d0AgWUNkMVVN8FQyhwlg="
+        val expectedMac64 = "0BqhnJ3k7l7oaSxdoYgOLZwJRinH7YZzk4s0yDy3RLI="
 
         val builder = SSUBuilder(
-            settings = SSUSettings(prefix = RobertConstant.PREFIX.C2),
+            settings = SSUSettings(prefix = 0b00000010),
             ephemeralBluetoothIdentifier = EphemeralBluetoothIdentifier(
+                epochId = 0,
                 ntpStartTimeS = 0,
                 ntpEndTimeS = 0,
                 ecc = Base64.decode(ecc64, Base64.NO_WRAP),

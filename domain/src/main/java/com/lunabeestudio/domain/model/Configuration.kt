@@ -8,16 +8,9 @@
  * Created by Lunabee Studio / Date - 2020/04/05 - for the STOP-COVID project
  */
 
-package com.lunabeestudio.framework.remote.model
+package com.lunabeestudio.domain.model
 
-import com.lunabeestudio.domain.model.ClientFilteringAlgorithmConfiguration
-
-internal class ApiClientFilteringAlgorithmConfigurationRS(
+class Configuration(
     val name: String,
     val value: Any
-)
-
-internal fun ApiClientFilteringAlgorithmConfigurationRS.toDomain() = ClientFilteringAlgorithmConfiguration(
-    name,
-    value
 )

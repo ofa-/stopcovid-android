@@ -5,12 +5,11 @@
  *
  * Authors
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Created by Lunabee Studio / Date - 2020/04/05 - for the STOP-COVID project
+ * Created by Lunabee Studio / Date - 2020/28/05 - for the STOP-COVID project
  */
 
-package com.lunabeestudio.domain.model
+package com.lunabeestudio.stopcovid.model
 
-class ClientFilteringAlgorithmConfiguration(
-    val name: String,
-    val value: Any
-)
+import com.lunabeestudio.domain.model.Configuration
+
+class ConfigurationWrapper(val config: List<Configuration>?)

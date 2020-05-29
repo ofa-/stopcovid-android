@@ -48,7 +48,7 @@ class MainActivityTest {
     @Test
     fun mainActivityTest() {
         Screenshot.snapActivity(activityTestRule.activity).setName("proximity").record()
-        onView(allOf(withId(R.id.sickFragment), isDisplayed())).perform(click())
+        onView(allOf(withId(R.id.reportFragment), isDisplayed())).perform(click())
         Screenshot.snapActivity(activityTestRule.activity).setName("sick").record()
         onView(allOf(withId(R.id.sharingFragment), isDisplayed())).perform(click())
         Screenshot.snapActivity(activityTestRule.activity).setName("sharing").record()
@@ -57,20 +57,20 @@ class MainActivityTest {
     @Test
     fun privacyTest() {
         onView(allOf(withId(R.id.recycler_view)))
-            .perform(actionOnItemAtPosition<RecyclerView.ViewHolder>(9, click()))
+            .perform(actionOnItemAtPosition<RecyclerView.ViewHolder>(8, click()))
         Screenshot.snapActivity(activityTestRule.activity).setName("privacy").record()
     }
 
     @Test
     fun manageDataTest() {
         onView(allOf(withId(R.id.recycler_view)))
-            .perform(actionOnItemAtPosition<RecyclerView.ViewHolder>(7, click()))
+            .perform(actionOnItemAtPosition<RecyclerView.ViewHolder>(6, click()))
         Screenshot.snapActivity(activityTestRule.activity).setName("manageData").record()
     }
 
     @Test
     fun enterCodeManualTest() {
-        onView(allOf(withId(R.id.sickFragment), isDisplayed())).perform(click())
+        onView(allOf(withId(R.id.reportFragment), isDisplayed())).perform(click())
         onView(withId(R.id.button2)).perform(click())
         Screenshot.snapActivity(activityTestRule.activity).setName("enterCode").record()
         onView(allOf(withId(R.id.editText), isDisplayed()))
@@ -87,7 +87,7 @@ class MainActivityTest {
 
     @Test
     fun scanCodeTest() {
-        onView(allOf(withId(R.id.sickFragment), isDisplayed())).perform(click())
+        onView(allOf(withId(R.id.reportFragment), isDisplayed())).perform(click())
         onView(withId(R.id.button1)).perform(click())
         Screenshot.snapActivity(activityTestRule.activity).setName("scanCode").record()
     }

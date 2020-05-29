@@ -26,8 +26,8 @@ class OnBoardingGestureFragment : OnBoardingFragment() {
     }
 
     override fun getTitleKey(): String = "onboarding.gesturesController.title"
-    override fun getButtonTitle(): String? = strings["onboarding.gesturesController.noted"]
-    override fun getOnButtonClickListener(): View.OnClickListener = View.OnClickListener {
+    override fun getButtonTitleKey(): String? = "onboarding.gesturesController.noted"
+    override fun getOnButtonClick(): () -> Unit = {
         sharedPreferences.edit {
             putBoolean(Constants.SharedPrefs.ON_BOARDING_DONE, true)
         }

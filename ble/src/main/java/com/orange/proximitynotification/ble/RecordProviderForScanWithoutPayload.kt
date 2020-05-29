@@ -17,7 +17,7 @@ import com.orange.proximitynotification.tools.ExpiringCache
 internal class RecordProviderForScanWithoutPayload(
     settings: BleSettings,
     private val maxCacheSize: Int = 1000
-) : BleRecordProvider(){
+) : BleRecordProvider() {
 
     internal val lastPayloadByDeviceId =
         ExpiringCache<DeviceId, BlePayload>(

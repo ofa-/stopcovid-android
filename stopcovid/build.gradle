@@ -42,17 +42,15 @@ android {
         applicationId "fr.gouv.android.stopcovid"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 22
-        versionName "0.9.17"
+        versionCode 25
+        versionName "1.0.0"
 
         testInstrumentationRunner = 'com.lunabeestudio.stopcovid.TestRunner'
 
-        buildConfigField 'String', 'CAPTCHA_API_KEY', '"fakekey"'
-        buildConfigField 'String', 'APP_MAINTENANCE_CERTIFICATE_SHA256', '"sha256/D9B0D1C95B2448817F012CF1965562018B5F941FE701CA5999A91706358A8418"'
-        buildConfigField 'String', 'APP_MAINTENANCE_URL', '"https://fakeurl.fr//"'
-        buildConfigField 'String', 'SERVICE_UUID', '"910c7798-9f3a-11ea-bb37-0242ac130002"'
-        buildConfigField 'String', 'SERVICE_PAYLOAD_CHARACTERISTIC_UUID', '"910c7798-9f3a-11ea-bb37-0242ac130002"'
-        buildConfigField 'String', 'BACKGROUND_SERVICE_MANUFACTURER_DATA_IOS', '"0.0.0.0.1.1.0.0"'
+        buildConfigField 'String', 'CAPTCHA_API_KEY', STOPCOVID_CAPTCHA_API_KEY
+        buildConfigField 'String', 'CAPTCHA_URL', STOPCOVID_CAPTCHA_URL
+        buildConfigField 'String', 'APP_MAINTENANCE_CERTIFICATE_SHA256', '"sha256/sXQojvwsiyblrpMQIVRXGC5u7AgknzTJm+VIK1kQmD8="'
+        buildConfigField 'String', 'APP_MAINTENANCE_URL', '"https://app.stopcovid.gouv.fr/maintenance/info-maintenance-v2.json"'
     }
 
     lintOptions {
@@ -74,9 +72,10 @@ android {
 dependencies {
     implementation 'androidx.documentfile:documentfile:1.0.1'
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.0.0'
+    implementation 'androidx.work:work-runtime-ktx:2.3.4'
 
     implementation('com.journeyapps:zxing-android-embedded:4.1.0') { transitive = false }
-    //noinspection GradleDependency (New version require minSdk 24)
+    //noinspection NewerVersionAvailable,GradleDependency (New version require minSdk 24)
     implementation 'com.google.zxing:core:3.3.0'
 
     implementation 'com.github.razir.progressbutton:progressbutton:2.1.0'
@@ -84,6 +83,7 @@ dependencies {
     implementation project(path: ':coreui')
     implementation project(path: ':framework')
     implementation project(path: ':robert')
+    implementation project(path: ':domain')
 
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-contrib:3.2.0'

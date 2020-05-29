@@ -20,7 +20,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
-import java.util.*
+import java.util.Date
 
 @RunWith(ZohhakRunner::class)
 class ProximityInfoRiskComputerTest {
@@ -96,7 +96,6 @@ class ProximityInfoRiskComputerTest {
                         }
                     }
             }
-
 
         val score = scores.getOrNull(index)
         if (score == null) {

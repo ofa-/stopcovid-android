@@ -14,8 +14,8 @@ import com.lunabeestudio.domain.extension.unixTimeMsToNtpTimeS
 import com.lunabeestudio.domain.model.LocalProximity
 import com.lunabeestudio.framework.extension.toDomain
 import com.lunabeestudio.framework.extension.toProto
+import com.lunabeestudio.framework.local.LocalCryptoManager
 import com.lunabeestudio.framework.proto.ProtoStorage
-import com.lunabeestudio.framework.utils.CryptoManager
 import com.lunabeestudio.robert.datasource.LocalLocalProximityDataSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -32,7 +32,7 @@ import kotlin.math.max
 
 open class SecureFileLocalProximityDataSource(
     private val storageDir: File,
-    private val cryptoManager: CryptoManager) : LocalLocalProximityDataSource {
+    private val cryptoManager: LocalCryptoManager) : LocalLocalProximityDataSource {
 
     protected val daySinceNtp: Long
         get() = System.currentTimeMillis().unixTimeMsToNtpTimeS() / (60 * 60 * 24)
@@ -46,7 +46,7 @@ open class SecureFileLocalProximityDataSource(
             return _encryptedFile!!
         }
 
-    protected val cacheMtx = Mutex()
+    protected val cacheMtx: Mutex = Mutex()
     protected val localProximityList: MutableList<LocalProximity> = mutableListOf()
 
     private var dumpRequested = false
@@ -54,18 +54,23 @@ open class SecureFileLocalProximityDataSource(
 
     private var dumpJob: Job? = null
 
-    override fun getAll(): List<LocalProximity> {
-        return storageDir
-            .walkBottomUp()
-            .filter {
-                it.isFile && it.name.matches(Regex("^$daySinceNtp-\\d+$"))
+    override fun getUntilTime(ntpTimeS: Long): List<LocalProximity> {
+        return storageDir.listFiles { file ->
+            file.isDirectory && file.name.toIntOrNull() != null
+        }?.mapNotNull { file ->
+            val dirDay = file.name.toInt()
+            if (dirDay >= ntpTimeS / (60 * 60 * 24)) {
+                file
+            } else {
+                null
             }
-            .toList()
-            .flatMap {
-                cryptoManager.createCipherInputStream(it.inputStream()).use { cis ->
-                    ProtoStorage.LocalProximityProtoList.parseFrom(cis).toDomain()
-                }
+        }?.flatMap {
+            it.listFiles()?.asList() ?: emptyList()
+        }?.flatMap {
+            cryptoManager.createCipherInputStream(it.inputStream()).use { cis ->
+                ProtoStorage.LocalProximityProtoList.parseFrom(cis).toDomain()
             }
+        } ?: emptyList()
     }
 
     override suspend fun saveAll(vararg localProximity: LocalProximity) {

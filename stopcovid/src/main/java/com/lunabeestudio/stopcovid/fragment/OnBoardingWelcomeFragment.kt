@@ -31,8 +31,8 @@ class OnBoardingWelcomeFragment : OnBoardingFragment() {
     private val viewModel: OnBoardingViewModel by activityViewModels { OnBoardingViewModelFactory() }
 
     override fun getTitleKey(): String = "onboarding.welcomeController.title"
-    override fun getButtonTitle(): String? = strings["onboarding.welcomeController.howDoesItWork"]
-    override fun getOnButtonClickListener(): View.OnClickListener = View.OnClickListener {
+    override fun getButtonTitleKey(): String? = "onboarding.welcomeController.howDoesItWork"
+    override fun getOnButtonClick(): () -> Unit = {
         findNavController()
             .navigate(OnBoardingWelcomeFragmentDirections.actionOnBoardingWelcomeFragmentToOnBoardingExplanationFragment())
     }

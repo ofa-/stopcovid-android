@@ -11,6 +11,7 @@
 package com.lunabeestudio.stopcovid.coreui.manager
 
 import android.content.Context
+import androidx.annotation.WorkerThread
 import com.google.gson.Gson
 import com.lunabeestudio.stopcovid.coreui.BuildConfig
 import com.lunabeestudio.stopcovid.coreui.UiConstants
@@ -32,12 +33,13 @@ abstract class ServerManager {
     protected open fun extension(): String = ".json"
     protected open fun url(): String = BuildConfig.SERVER_URL
 
+    @WorkerThread
     protected fun fetchLast(context: Context, languageCode: String): Boolean {
         return try {
             if (!BuildConfig.USE_LOCAL_DATA) {
                 val filename = "${prefix(context)}${languageCode}${extension()}"
                 Timber.d("Fetching remote data at ${url()}$filename")
-                "${url()}$filename".saveTo(File(context.filesDir, filename))
+                "${url()}$filename".saveTo(context, File(context.filesDir, filename))
                 true
             } else {
                 Timber.d("Only use local data")

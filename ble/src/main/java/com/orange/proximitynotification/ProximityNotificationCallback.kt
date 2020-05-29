@@ -12,5 +12,5 @@ package com.orange.proximitynotification
 
 interface ProximityNotificationCallback {
     fun onProximity(proximityInfo: ProximityInfo)
-    fun onError(error : ProximityNotificationError)
+    fun onError(error: ProximityNotificationError)
 }

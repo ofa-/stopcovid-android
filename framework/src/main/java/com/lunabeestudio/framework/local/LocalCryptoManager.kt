@@ -5,10 +5,10 @@
  *
  * Authors
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Created by Lunabee Studio / Date - 2020/05/05 - for the STOP-COVID project
+ * Created by Lunabee Studio / Date - 2020/20/05 - for the STOP-COVID project
  */
 
-package com.lunabeestudio.framework.utils
+package com.lunabeestudio.framework.local
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -18,8 +18,9 @@ import android.security.KeyPairGeneratorSpec
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.util.Base64
-import com.lunabeestudio.domain.extension.safeDestroy
 import com.lunabeestudio.domain.extension.safeUse
+import com.lunabeestudio.framework.utils.SelfDestroyCipherInputStream
+import com.lunabeestudio.framework.utils.SelfDestroyCipherOutputStream
 import com.lunabeestudio.robert.extension.randomize
 import java.io.File
 import java.io.IOException
@@ -42,8 +43,6 @@ import java.security.spec.RSAKeyGenParameterSpec
 import java.util.Calendar
 import java.util.Date
 import javax.crypto.Cipher
-import javax.crypto.CipherInputStream
-import javax.crypto.CipherOutputStream
 import javax.crypto.IllegalBlockSizeException
 import javax.crypto.KeyGenerator
 import javax.crypto.NoSuchPaddingException
@@ -54,23 +53,7 @@ import javax.crypto.spec.SecretKeySpec
 import javax.security.auth.x500.X500Principal
 import javax.security.cert.CertificateException
 
-class SelfDestroyCipherInputStream(inputStream: InputStream, cipher: Cipher, private val key: SecretKey)
-    : CipherInputStream(inputStream, cipher) {
-    override fun close() {
-        super.close()
-        key.safeDestroy()
-    }
-}
-
-class SelfDestroyCipherOutputStream(outputStream: OutputStream, cipher: Cipher, private val key: SecretKey)
-    : CipherOutputStream(outputStream, cipher) {
-    override fun close() {
-        super.close()
-        key.safeDestroy()
-    }
-}
-
-class CryptoManager(private val appContext: Context) {
+class LocalCryptoManager(private val appContext: Context) {
 
     private val keyStore: KeyStore = KeyStore.getInstance(ANDROID_KEY_STORE_PROVIDER).apply {
         this.load(null)
@@ -145,14 +128,16 @@ class CryptoManager(private val appContext: Context) {
     @Synchronized
     fun decrypt(encryptedData: ByteArray): ByteArray {
 
-        val iv: ByteArray = encryptedData.copyOfRange(0, AES_GCM_IV_LENGTH)
+        val iv: ByteArray = encryptedData.copyOfRange(0,
+            AES_GCM_IV_LENGTH)
 
         val cipher = Cipher.getInstance(AES_GCM_CIPHER_TYPE)
         val ivSpec = GCMParameterSpec(AES_GCM_KEY_SIZE_IN_BITS, iv)
 
         return localProtectionKey.safeUse { secretKey ->
             cipher.init(Cipher.DECRYPT_MODE, secretKey, ivSpec)
-            cipher.doFinal(encryptedData, AES_GCM_IV_LENGTH, encryptedData.size - AES_GCM_IV_LENGTH)
+            cipher.doFinal(encryptedData,
+                AES_GCM_IV_LENGTH, encryptedData.size - AES_GCM_IV_LENGTH)
         }
     }
 
@@ -184,7 +169,8 @@ class CryptoManager(private val appContext: Context) {
             secretKey = if (keyStore.containsAlias(AES_LOCAL_PROTECTION_KEY_ALIAS)) {
                 keyStore.getKey(AES_LOCAL_PROTECTION_KEY_ALIAS, null) as SecretKey
             } else {
-                val generator: KeyGenerator = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, ANDROID_KEY_STORE_PROVIDER)
+                val generator: KeyGenerator = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES,
+                    ANDROID_KEY_STORE_PROVIDER)
                 generator.init(
                     KeyGenParameterSpec.Builder(AES_LOCAL_PROTECTION_KEY_ALIAS,
                         KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT)
@@ -273,7 +259,7 @@ class CryptoManager(private val appContext: Context) {
      * Create a CipherInputStream instance.
      *
      * @param inputStream the input stream
-     * @return in, or the created InputStream, or null if the InputStream `in`  does not contain encrypted data
+     * @return the created InputStream
      */
     @Throws(NoSuchPaddingException::class,
         NoSuchAlgorithmException::class,

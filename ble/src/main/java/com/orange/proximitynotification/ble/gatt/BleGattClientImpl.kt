@@ -45,19 +45,14 @@ internal class BleGattClientImpl(
     private var bluetoothGatt: BluetoothGatt? = null
 
     override suspend fun open() {
-        Log.d(TAG, "Connecting (device=$bluetoothDevice)")
         bluetoothGatt = bluetoothDevice.connectGattCompat(context, Callback())
         connectionStateChannel.receive() // suspends until connectionStateChanged is received
         check(isConnected)
-        Log.d(TAG, "Connected (device=$bluetoothDevice)")
     }
 
     override suspend fun close() {
         if (!isClosed) {
-            Log.d(TAG, "Closing (device=$bluetoothDevice)")
             doClose()
-        } else {
-            Log.d(TAG, "Already closed (device=$bluetoothDevice)")
         }
     }
 

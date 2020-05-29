@@ -10,13 +10,11 @@
 
 package com.lunabeestudio.domain.model
 
-import com.lunabeestudio.domain.RobertConstant
-
 /**
  * @property algorithm Algorithm used to compute message sum. Default is HmacSHA256
  * @property prefix Prefix applied to message
  */
 data class HelloSettings(
     val algorithm: String = "HmacSHA256",
-    val prefix: Byte = RobertConstant.PREFIX.C1
+    val prefix: Byte
 )

@@ -8,7 +8,7 @@
  * Created by Lunabee Studio / Date - 2020/04/05 - for the STOP-COVID project
  */
 
-package com.lunabeestudio.stopcovid.utils
+package com.lunabeestudio.stopcovid.coreui.utils
 
 import androidx.annotation.MainThread
 import androidx.lifecycle.LifecycleOwner

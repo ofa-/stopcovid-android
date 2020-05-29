@@ -14,6 +14,6 @@ class StatusReport(
     val atRisk: Boolean,
     val lastExposureTimeframe: Int?,
     val message: String?,
-    val ephemeralBluetoothIdentifierList: List<EphemeralBluetoothIdentifier>,
-    val filterings: List<ClientFilteringAlgorithmConfiguration>
+    val tuples: String?,
+    val config: List<Configuration>
 )

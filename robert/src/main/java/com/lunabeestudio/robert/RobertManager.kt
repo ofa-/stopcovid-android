@@ -10,6 +10,8 @@
 
 package com.lunabeestudio.robert
 
+import android.content.Context
+import com.lunabeestudio.domain.model.DeviceParameterCorrection
 import com.lunabeestudio.domain.model.HelloBuilder
 import com.lunabeestudio.domain.model.LocalProximity
 import com.lunabeestudio.robert.model.RobertResult
@@ -23,9 +25,25 @@ interface RobertManager {
 
     val isAtRisk: Boolean
 
+    val atRiskLastRefresh: Long?
+
+    val atRiskMinHourContactNotif: Int
+
+    val atRiskMaxHourContactNotif: Int
+
     val lastExposureTimeframe: Int
 
+    val quarantinePeriod: Int
+
     val isSick: Boolean
+
+    val calibration: List<DeviceParameterCorrection>
+
+    val serviceUUID: String
+
+    val characteristicUUID: String
+
+    val backgroundServiceManufacturerData: String
 
     suspend fun register(application: RobertApplication, captcha: String): RobertResult
 
@@ -33,11 +51,13 @@ interface RobertManager {
 
     fun deactivateProximity(application: RobertApplication)
 
-    suspend fun updateStatus(): RobertResult
+    suspend fun updateStatus(robertApplication: RobertApplication): RobertResult
 
     fun clearOldData()
 
-    suspend fun report(token: String, application: RobertApplication): RobertResult
+    fun clearLocalData(application: RobertApplication)
+
+    suspend fun report(token: String, firstSymptoms: Int, application: RobertApplication): RobertResult
 
     suspend fun storeLocalProximity(vararg localProximity: LocalProximity)
 

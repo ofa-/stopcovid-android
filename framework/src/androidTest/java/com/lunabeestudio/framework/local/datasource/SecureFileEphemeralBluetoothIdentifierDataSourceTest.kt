@@ -14,7 +14,7 @@ import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import com.google.common.truth.Truth.assertThat
 import com.lunabeestudio.domain.model.EphemeralBluetoothIdentifier
-import com.lunabeestudio.framework.utils.CryptoManager
+import com.lunabeestudio.framework.local.LocalCryptoManager
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -27,7 +27,8 @@ class SecureFileEphemeralBluetoothIdentifierDataSourceTest {
     @Before
     fun createDataSource() {
         val context = ApplicationProvider.getApplicationContext<Context>()
-        secureFileEphemeralBluetoothIdentifierDataSource = SecureFileEphemeralBluetoothIdentifierDataSource(context, CryptoManager(context))
+        secureFileEphemeralBluetoothIdentifierDataSource = SecureFileEphemeralBluetoothIdentifierDataSource(context,
+            LocalCryptoManager(context))
         File(context.filesDir, "epochs").delete()
     }
 
@@ -87,6 +88,7 @@ class SecureFileEphemeralBluetoothIdentifierDataSourceTest {
 
     private fun getEphemeralBluetoothIdentifier(start: Long, end: Long): EphemeralBluetoothIdentifier {
         return EphemeralBluetoothIdentifier(
+            epochId = 0,
             ntpStartTimeS = start,
             ntpEndTimeS = end,
             ecc = byteArrayOf(1),

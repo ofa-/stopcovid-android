@@ -12,6 +12,7 @@ package com.lunabeestudio.domain.model
 
 class ServerStatusUpdate(
     val ebid: String,
+    val epochId: Long,
     val time: String,
     val mac: String
 )

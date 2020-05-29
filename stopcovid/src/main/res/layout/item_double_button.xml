@@ -20,6 +20,7 @@
         style="@style/Theme.StopCovid.Button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginVertical="@dimen/spacing_medium"
         android:textAllCaps="false"
         tools:ignore="MissingConstraints"
         tools:text="@tools:sample/lorem[2]" />
@@ -29,6 +30,7 @@
         style="@style/Theme.StopCovid.Button.Light"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginVertical="@dimen/spacing_medium"
         android:textAllCaps="false"
         tools:ignore="MissingConstraints"
         tools:text="@tools:sample/lorem[4]" />

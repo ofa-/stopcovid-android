@@ -11,6 +11,7 @@
 package com.lunabeestudio.framework.remote.datasource
 
 import android.content.Context
+import com.lunabeestudio.domain.model.Configuration
 import com.lunabeestudio.domain.model.LocalProximity
 import com.lunabeestudio.domain.model.RegisterReport
 import com.lunabeestudio.domain.model.ServerStatusUpdate
@@ -41,9 +42,9 @@ class ServiceDataSource(context: Context, baseUrl: String = BuildConfig.BASE_URL
 
     private var api: StopCovidApi = RetrofitClient.getService(context, StopCovidApi::class.java, baseUrl.toHttpUrl())
 
-    override suspend fun register(captcha: String): RobertResultData<RegisterReport> {
+    override suspend fun register(captcha: String, clientPublicECDHKey: String): RobertResultData<RegisterReport> {
         val result = tryCatchRequestData {
-            api.register(ApiRegisterRQ(captcha))
+            api.register(ApiRegisterRQ(captcha = captcha, clientPublicECDHKey = clientPublicECDHKey))
         }
         return when (result) {
             is RobertResultData.Success -> RobertResultData.Success(result.data.toDomain())
@@ -51,18 +52,21 @@ class ServiceDataSource(context: Context, baseUrl: String = BuildConfig.BASE_URL
         }
     }
 
-    override suspend fun unregister(serverStatusUpdate: ServerStatusUpdate): RobertResult {
+    override suspend fun unregister(ssu: ServerStatusUpdate): RobertResult {
         return tryCatchRequest {
-            api.unregister(ApiUnregisterRQ(serverStatusUpdate.ebid, serverStatusUpdate.time, serverStatusUpdate.mac))
+            api.unregister(ApiUnregisterRQ(ebid = ssu.ebid, epochId = ssu.epochId, time = ssu.time, mac = ssu.mac))
         }
     }
 
-    override suspend fun status(serverStatusUpdate: ServerStatusUpdate, ntpInitialTimeS: Long): RobertResultData<StatusReport> {
+    override suspend fun status(ssu: ServerStatusUpdate): RobertResultData<StatusReport> {
         val result = tryCatchRequestData {
-            api.status(ApiStatusRQ(serverStatusUpdate.ebid, serverStatusUpdate.time, serverStatusUpdate.mac))
+            api.status(ApiStatusRQ(ebid = ssu.ebid,
+                epochId = ssu.epochId,
+                time = ssu.time,
+                mac = ssu.mac))
         }
         return when (result) {
-            is RobertResultData.Success -> RobertResultData.Success(result.data.toDomain(ntpInitialTimeS))
+            is RobertResultData.Success -> RobertResultData.Success(result.data.toDomain())
             is RobertResultData.Failure -> RobertResultData.Failure(result.error)
         }
     }
@@ -73,16 +77,10 @@ class ServiceDataSource(context: Context, baseUrl: String = BuildConfig.BASE_URL
         }
     }
 
-    override suspend fun deleteExposureHistory(serverStatusUpdate: ServerStatusUpdate): RobertResult {
+    override suspend fun deleteExposureHistory(ssu: ServerStatusUpdate): RobertResult {
         return tryCatchRequest {
-            api.deleteExposureHistory(ApiDeleteExposureHistoryRQ(serverStatusUpdate.ebid, serverStatusUpdate.time, serverStatusUpdate.mac))
+            api.deleteExposureHistory(ApiDeleteExposureHistoryRQ(ebid = ssu.ebid, epochId = ssu.epochId, time = ssu.time, mac = ssu.mac))
         }
-    }
-
-    override suspend fun eraseRemoteAlert(): RobertResult {
-        // TODO call WS
-        delay(TimeUnit.SECONDS.toMillis(2))
-        return RobertResult.Success()
     }
 
     private suspend fun tryCatchRequest(doRequest: suspend () -> Response<ApiCommonRS>): RobertResult {

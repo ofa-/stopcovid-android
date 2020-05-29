@@ -1,38 +1,8 @@
 {
-    "key": "Y2VjaWVzdHVuZWNsZWRldGVzdA==",
     "message": "The application did register successfully",
-    "idsForEpochs": [
-        {
-            "epochId": 414,
-            "key": {
-                "ebid": "YWJjZGVmZ2g=",
-                "ecc": "Zg=="
-            }
-        },
-        {
-            "epochId": 415,
-            "key": {
-                "ebid": "YWJjZGVmZ2g=",
-                "ecc": "Zg=="
-            }
-        },
-        {
-            "epochId": 416,
-            "key": {
-                "ebid": "YWJjZGVmZ2g=",
-                "ecc": "Zg=="
-            }
-        },
-        {
-            "epochId": 417,
-            "key": {
-                "ebid": "YWJjZGVmZ2g=",
-                "ecc": "Zg=="
-            }
-        }
-    ],
+    "tuples": "",
     "timeStart": 3796669679,
-    "filteringAlgoConfig": [
+    "config": [
         {
             "name": "distance",
             "value": 12

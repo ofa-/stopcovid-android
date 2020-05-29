@@ -21,7 +21,7 @@ import com.nhaarman.mockitokotlin2.whenever
 import no.nordicsemi.android.support.v18.scanner.ScanRecord
 import no.nordicsemi.android.support.v18.scanner.ScanResult
 import org.junit.runner.RunWith
-import java.util.*
+import java.util.UUID
 
 @RunWith(ZohhakRunner::class)
 class ScanResultExtKtTest {
@@ -55,7 +55,6 @@ class ScanResultExtKtTest {
         assertThat(result).isEqualTo(expected.copy(timestamp = result.timestamp))
     }
 
-
     private fun givenScanResult(
         device: BluetoothDevice = mock(),
         rssi: Int = 0,
@@ -68,7 +67,6 @@ class ScanResultExtKtTest {
         whenever(scanResult.scanRecord).thenReturn(scanRecord)
         return scanResult
     }
-
 
     private fun givenScanRecord(data: ByteArray? = null): ScanRecord {
         val scanRecord = mock<ScanRecord>()

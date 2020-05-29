@@ -11,8 +11,11 @@
 package com.orange.proximitynotification.ble
 
 import android.bluetooth.BluetoothDevice
-import android.util.Log
-import com.orange.proximitynotification.*
+import com.orange.proximitynotification.ProximityInfo
+import com.orange.proximitynotification.ProximityNotification
+import com.orange.proximitynotification.ProximityNotificationCallback
+import com.orange.proximitynotification.ProximityNotificationError
+import com.orange.proximitynotification.ProximityPayloadProvider
 import com.orange.proximitynotification.ble.advertiser.BleAdvertiser
 import com.orange.proximitynotification.ble.gatt.BleGattManager
 import com.orange.proximitynotification.ble.scanner.BleScannedDevice
@@ -111,7 +114,7 @@ class BleProximityNotification(
                                     BleScannedDevice(device = device, rssi = rssi)
                                 bleRecordProviderForScanWithoutPayload.fromScan(scannedDevice, payload)
                             }
-                       }
+                        }
                     }?.let { notifyProximity(it) }
                 }
             }
@@ -168,7 +171,6 @@ class BleProximityNotification(
     }
 
     private fun notifyProximity(proximityInfo: ProximityInfo) {
-        Log.d(TAG, "Proximity notification (proximityInfo=$proximityInfo")
         callback.onProximity(proximityInfo)
     }
 

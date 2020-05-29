@@ -12,7 +12,7 @@ package com.orange.proximitynotification.ble.scanner
 
 import android.os.ParcelUuid
 import no.nordicsemi.android.support.v18.scanner.ScanResult
-import java.util.*
+import java.util.UUID
 
 internal fun ScanResult.toBleScannedDevice(serviceUuid: UUID): BleScannedDevice =
     BleScannedDevice(

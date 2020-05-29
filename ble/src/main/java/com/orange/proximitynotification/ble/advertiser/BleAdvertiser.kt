@@ -13,12 +13,12 @@ package com.orange.proximitynotification.ble.advertiser
 import com.orange.proximitynotification.ble.BleSettings
 
 interface BleAdvertiser {
-    val settings : BleSettings
+    val settings: BleSettings
 
     interface Callback {
         fun onError(errorCode: Int)
     }
 
-    fun start(data : ByteArray, callback: Callback)
+    fun start(data: ByteArray, callback: Callback)
     fun stop()
 }

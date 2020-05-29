@@ -11,24 +11,16 @@
 package com.lunabeestudio.domain.model
 
 import android.util.Base64
+import org.json.JSONArray
+import org.json.JSONObject
 
 data class EphemeralBluetoothIdentifier(
+    val epochId: Long,
     val ntpStartTimeS: Long,
     val ntpEndTimeS: Long,
     val ecc: ByteArray,
     val ebid: ByteArray
 ) {
-
-    constructor(
-        ntpStartTimeS: Long,
-        ntpEndTimeS: Long,
-        ecc: String,
-        ebid: String) : this(
-        ntpStartTimeS = ntpStartTimeS,
-        ntpEndTimeS = ntpEndTimeS,
-        ecc = Base64.decode(ecc, Base64.NO_WRAP),
-        ebid = Base64.decode(ebid, Base64.NO_WRAP)
-    )
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -52,4 +44,31 @@ data class EphemeralBluetoothIdentifier(
         return result
     }
 
+    companion object {
+        fun createFromTuples(
+            ntpInitialTimeS: Long,
+            epochDurationS: Int,
+            ebidTuplesJson: String
+        ): List<EphemeralBluetoothIdentifier> {
+
+            val ebids = mutableListOf<EphemeralBluetoothIdentifier>()
+            val jsonArray = JSONArray(ebidTuplesJson)
+            for (i in 0 until jsonArray.length()) {
+                val json = jsonArray[i] as JSONObject
+
+                val epochId = (json["epochId"] as Int).toLong()
+                val key = (json["key"] as JSONObject)
+                val ebid = key["ebid"] as String
+                val ecc = key["ecc"] as String
+
+                ebids += EphemeralBluetoothIdentifier(epochId = epochId,
+                    ntpStartTimeS = ntpInitialTimeS + epochId * epochDurationS,
+                    ntpEndTimeS = ntpInitialTimeS + (epochId + 1) * epochDurationS,
+                    ecc = Base64.decode(ecc, Base64.NO_WRAP),
+                    ebid = Base64.decode(ebid, Base64.NO_WRAP))
+            }
+
+            return ebids
+        }
+    }
 }

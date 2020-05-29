@@ -26,7 +26,7 @@ class BleGattClientImplTest {
     @get:Rule
     val testCoroutineRule = CoroutineTestRule()
 
-    private val context : Context = mock()
+    private val context: Context = mock()
 
     @Test
     fun close_given_open_not_called_should_not_fail() = testCoroutineRule.runBlockingTest {

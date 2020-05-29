@@ -12,6 +12,7 @@ package com.lunabeestudio.framework.remote.model
 
 internal class ApiDeleteExposureHistoryRQ(
     val ebid: String,
+    val epochId: Long,
     val time: String,
     val mac: String
 )

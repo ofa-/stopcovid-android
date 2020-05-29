@@ -18,14 +18,11 @@ import androidx.core.content.ContextCompat
 import androidx.navigation.fragment.findNavController
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.UiConstants
-import com.lunabeestudio.stopcovid.coreui.extension.callPhone
 import com.lunabeestudio.stopcovid.coreui.extension.openAppSettings
 import com.lunabeestudio.stopcovid.coreui.extension.showPermissionRationale
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
-import com.lunabeestudio.stopcovid.coreui.fastitem.lightButtonItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
-import com.lunabeestudio.stopcovid.extension.openInChromeTab
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.fastitem.contactItem
 import com.lunabeestudio.stopcovid.fastitem.doubleButtonItem
@@ -34,76 +31,20 @@ import com.mikepenz.fastadapter.GenericItem
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Date
 import java.util.Locale
 
-class SickFragment : AboutMainFragment() {
+class ReportFragment : AboutMainFragment() {
 
     private val robertManager by lazy {
         requireContext().robertManager()
     }
 
-    override fun getTitleKey(): String = if (robertManager.isSick) {
-        "sickController.sick.title"
-    } else {
-        "sickController.title"
-    }
+    override fun getTitleKey(): String = "sickController.title"
 
     private val dateFormat: DateFormat = SimpleDateFormat("dd LLLL", Locale.getDefault())
 
     override fun getItems(): List<GenericItem> {
-        return if (robertManager.isSick) {
-            sickItems()
-        } else {
-            notSickItems()
-        }
-    }
-
-    private fun sickItems(): List<GenericItem> {
-        val items = ArrayList<GenericItem>()
-
-        items += logoItem {
-            imageRes = R.drawable.sick
-            identifier = items.count().toLong()
-        }
-        items += spaceItem {
-            spaceRes = R.dimen.spacing_xlarge
-            identifier = items.size.toLong()
-        }
-        items += titleItem {
-            text = strings["sickController.sick.mainMessage.title"]
-            gravity = Gravity.CENTER
-            identifier = items.count().toLong()
-        }
-        items += captionItem {
-            text = strings["sickController.sick.mainMessage.subtitle"]
-            gravity = Gravity.CENTER
-            identifier = items.count().toLong()
-        }
-        items += spaceItem {
-            spaceRes = R.dimen.spacing_xlarge
-            identifier = items.size.toLong()
-        }
-        items += lightButtonItem {
-            text = strings["sickController.button.recommendations"]
-            gravity = Gravity.CENTER
-            onClickListener = View.OnClickListener {
-                strings["sickController.button.recommendations.url"]?.openInChromeTab(requireContext())
-            }
-            identifier = items.count().toLong()
-        }
-        items += lightButtonItem {
-            text = strings["informationController.step.appointment.buttonTitle"]
-            gravity = Gravity.CENTER
-            onClickListener = View.OnClickListener {
-                strings["callCenter.phoneNumber"]?.callPhone(requireContext())
-            }
-            identifier = items.count().toLong()
-        }
-
-        return items
-    }
-
-    private fun notSickItems(): List<GenericItem> {
         val items = ArrayList<GenericItem>()
 
         items += logoItem {
@@ -116,10 +57,12 @@ class SickFragment : AboutMainFragment() {
         }
         if (robertManager.isAtRisk) {
             val exposureCalendar = Calendar.getInstance()
-            exposureCalendar.add(Calendar.DAY_OF_YEAR, -robertManager.lastExposureTimeframe)
+            robertManager.atRiskLastRefresh?.let {
+                exposureCalendar.time = Date(it)
+            }
             val exposureDate = exposureCalendar.time
             val endExposureCalendar = Calendar.getInstance()
-            endExposureCalendar.add(Calendar.DAY_OF_YEAR, 14)
+            endExposureCalendar.add(Calendar.DAY_OF_YEAR, robertManager.quarantinePeriod - robertManager.lastExposureTimeframe)
             val endExposureDate = endExposureCalendar.time
             items += spaceItem {
                 spaceRes = R.dimen.spacing_large
@@ -131,7 +74,7 @@ class SickFragment : AboutMainFragment() {
                 caption = stringsFormat("sickController.state.contact.subtitle", dateFormat.format(endExposureDate))
                 more = strings["common.readMore"]
                 moreClickListener = View.OnClickListener {
-                    findNavController().navigate(SickFragmentDirections.actionSickFragmentToInformationFragment())
+                    findNavController().navigate(ReportFragmentDirections.actionReportFragmentToInformationFragment())
                 }
             }
             items += spaceItem {
@@ -169,11 +112,11 @@ class SickFragment : AboutMainFragment() {
                             UiConstants.Permissions.CAMERA.ordinal)
                     }
                 } else {
-                    findNavController().navigate(SickFragmentDirections.actionSickFragmentToQrCodeFragment())
+                    findNavController().navigate(ReportFragmentDirections.actionReportFragmentToQrCodeFragment())
                 }
             }
             onClickListener2 = View.OnClickListener {
-                findNavController().navigate(SickFragmentDirections.actionSickFragmentToCodeFragment())
+                findNavController().navigate(ReportFragmentDirections.actionReportFragmentToCodeFragment())
             }
             identifier = items.count().toLong()
         }
@@ -188,7 +131,11 @@ class SickFragment : AboutMainFragment() {
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         if (requestCode == UiConstants.Permissions.CAMERA.ordinal) {
             if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                findNavController().navigate(SickFragmentDirections.actionSickFragmentToQrCodeFragment())
+                try {
+                    findNavController().navigate(ReportFragmentDirections.actionReportFragmentToQrCodeFragment())
+                } catch (e: IllegalArgumentException) {
+                    // Fragment already changed before QRCodeFragment could be shown
+                }
             } else if (!shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)) {
                 context?.showPermissionRationale(strings, "common.needCameraAccessToScan", "common.settings") {
                     openAppSettings()

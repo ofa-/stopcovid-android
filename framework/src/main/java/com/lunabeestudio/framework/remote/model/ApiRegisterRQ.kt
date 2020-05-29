@@ -11,5 +11,6 @@
 package com.lunabeestudio.framework.remote.model
 
 internal class ApiRegisterRQ(
-    val captcha: String
+    val captcha: String,
+    val clientPublicECDHKey: String
 )

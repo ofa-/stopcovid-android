@@ -11,8 +11,12 @@
 package com.orange.proximitynotification
 
 import com.orange.proximitynotification.ble.BleProximityMetadata
-import java.util.*
-import kotlin.math.*
+import java.util.Date
+import kotlin.math.ceil
+import kotlin.math.exp
+import kotlin.math.floor
+import kotlin.math.ln
+import kotlin.math.min
 
 /**
  * ProximityInfo risk computer
@@ -45,7 +49,7 @@ class ProximityInfoRiskComputer {
         // Fading compensation
 
         val timestampedRssis = proximityInfos.mapNotNull { proximityInfo ->
-            val metadata =  proximityInfo.metadata as? BleProximityMetadata
+            val metadata = proximityInfo.metadata as? BleProximityMetadata
 
             return@mapNotNull metadata?.let {
                 val timestampDelta = (proximityInfo.timestamp.time - from.time) / 1_000
@@ -67,7 +71,7 @@ class ProximityInfoRiskComputer {
         val score = range.fold(0.0) { partialScore, minute ->
             val rssis = groupedRssis[minute] + groupedRssis[minute + 1]
 
-            return@fold if(rssis.isEmpty()) {
+            return@fold if (rssis.isEmpty()) {
                 0.0
             } else {
                 val averageRssi = softmax(rssis)

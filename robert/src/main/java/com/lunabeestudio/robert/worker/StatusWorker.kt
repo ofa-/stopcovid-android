@@ -22,11 +22,12 @@ class StatusWorker(context: Context, workerParams: WorkerParameters)
     : CoroutineWorker(context, workerParams) {
 
     override suspend fun doWork(): Result {
-        val robertManager: RobertManager = (applicationContext as RobertApplication).robertManager
+        val robertApplication: RobertApplication = applicationContext as RobertApplication
+        val robertManager: RobertManager = robertApplication.robertManager
 
         Timber.d("Start updating status")
         val wasAtRisk = robertManager.isAtRisk
-        val result = robertManager.updateStatus()
+        val result = robertManager.updateStatus(robertApplication)
 
         if (!wasAtRisk && robertManager.isAtRisk) {
             (applicationContext as RobertApplication).atRiskDetected()

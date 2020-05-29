@@ -15,7 +15,8 @@ import androidx.test.core.app.ApplicationProvider
 import com.google.common.truth.Truth.assertThat
 import com.lunabeestudio.domain.model.Hello
 import com.lunabeestudio.domain.model.LocalProximity
-import com.lunabeestudio.framework.utils.CryptoManager
+import com.lunabeestudio.framework.extension.toProto
+import com.lunabeestudio.framework.local.LocalCryptoManager
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -26,15 +27,18 @@ import kotlin.random.Random
 
 class SecureFileLocalProximityDataSourceTest {
 
-    lateinit var secureFileLocalProximityDataSource: SecureFileLocalProximityDataSource
-    lateinit var localStorage: File
+    private lateinit var secureFileLocalProximityDataSource: SecureFileLocalProximityDataSource
+    private lateinit var localCryptoManager: LocalCryptoManager
+    private lateinit var localStorage: File
 
     @Before
     fun createDataSource() {
         val context = ApplicationProvider.getApplicationContext<Context>()
         localStorage = File(context.filesDir, "local_proximity_test")
         localStorage.deleteRecursively()
-        secureFileLocalProximityDataSource = SecureFileLocalProximityDataSource(localStorage, CryptoManager(context))
+        localCryptoManager = LocalCryptoManager(context)
+        secureFileLocalProximityDataSource = SecureFileLocalProximityDataSource(localStorage,
+            localCryptoManager)
     }
 
     @After
@@ -50,7 +54,7 @@ class SecureFileLocalProximityDataSourceTest {
             delay(250)
         }
 
-        val getList = secureFileLocalProximityDataSource.getAll()
+        val getList = secureFileLocalProximityDataSource.getUntilTime(0)
 
         assertThat(getList).isEqualTo(list)
     }
@@ -65,7 +69,7 @@ class SecureFileLocalProximityDataSourceTest {
 
         secureFileLocalProximityDataSource.removeAll()
 
-        val removedList = secureFileLocalProximityDataSource.getAll()
+        val removedList = secureFileLocalProximityDataSource.getUntilTime(0)
         assertThat(removedList).isEmpty()
     }
 
@@ -78,9 +82,31 @@ class SecureFileLocalProximityDataSourceTest {
             delay(250)
         }
 
-        val getList = secureFileLocalProximityDataSource.getAll()
+        val getList = secureFileLocalProximityDataSource.getUntilTime(0)
 
         assertThat(getList).isEmpty()
+    }
+
+    @Test
+    fun get_until() {
+        val proximityNumber = 10L
+        val dayNumber = 10
+        val sessionNumber = 10
+        val proto = generateLocalProximity(proximityNumber).toProto()
+        (0 until dayNumber).map { dirName ->
+            val dir = File(localStorage, dirName.toString())
+            dir.mkdirs()
+            (0 until sessionNumber).map { fileName ->
+                localCryptoManager.createCipherOutputStream(File(dir, "$dirName-$fileName").outputStream()).use {
+                    proto.writeTo(it)
+                }
+            }
+        }
+
+        assertThat(secureFileLocalProximityDataSource.getUntilTime(5 * 60 * 60 * 24)).hasSize(5 * dayNumber * sessionNumber)
+        assertThat(secureFileLocalProximityDataSource.getUntilTime(9 * 60 * 60 * 24)).hasSize(dayNumber * sessionNumber)
+        assertThat(secureFileLocalProximityDataSource.getUntilTime(10 * 60 * 60 * 24)).hasSize(0)
+        assertThat(secureFileLocalProximityDataSource.getUntilTime(0L)).hasSize((proximityNumber * dayNumber * sessionNumber).toInt())
     }
 
     @Test
@@ -89,7 +115,7 @@ class SecureFileLocalProximityDataSourceTest {
             val dir = File(localStorage, dirName.toString())
             dir.mkdirs()
             (0 until 10).map { fileName ->
-                File(dir, "test-$fileName").writeText("test")
+                File(dir, "$dirName-$fileName").writeText("test")
             }
         }
 

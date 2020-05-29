@@ -39,8 +39,9 @@ class HelloBuilderTest {
 
         buffer.flip()
 
-        val builder = HelloBuilder(HelloSettings(),
-            EphemeralBluetoothIdentifier(ntpStartTimeS = 6485025595,
+        val builder = HelloBuilder(HelloSettings(prefix = 1),
+            EphemeralBluetoothIdentifier(epochId = 0,
+                ntpStartTimeS = 6485025595,
                 ntpEndTimeS = 6485025596,
                 ecc = byteArrayOf(ecc.toByte(16)),
                 ebid = buffer.array()),
@@ -68,8 +69,9 @@ class HelloBuilderTest {
 
         buffer.flip()
 
-        val builder = HelloBuilder(HelloSettings(),
-            EphemeralBluetoothIdentifier(ntpStartTimeS = 6485025595,
+        val builder = HelloBuilder(HelloSettings(prefix = 1),
+            EphemeralBluetoothIdentifier(epochId = 0,
+                ntpStartTimeS = 6485025595,
                 ntpEndTimeS = 6485025596,
                 ecc = byteArrayOf(ecc.toByte(16)),
                 ebid = buffer.array()),

@@ -5,12 +5,13 @@
  *
  * Authors
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Created by Lunabee Studio / Date - 2020/04/05 - for the STOP-COVID project
+ * Created by Lunabee Studio / Date - 2020/28/05 - for the STOP-COVID project
  */
 
-package com.lunabeestudio.robert
+package com.lunabeestudio.domain.model
 
-internal object Constant {
-    const val DAYS_TO_ERASE_AFTER: Long = 14L
-    const val STATUS_WORKER_NAME: String = "RobertManager.Status.Worker"
-}
+class DeviceParameterCorrection(
+    val device_handset_model: String,
+    val tx_RSS_correction_factor: Double,
+    val rx_RSS_correction_factor: Double
+)

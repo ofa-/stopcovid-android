@@ -25,13 +25,15 @@ import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupActionBarWithNavController
 import com.google.android.material.snackbar.Snackbar
 import com.lunabeestudio.robert.RobertManager
-import com.lunabeestudio.stopcovid.coreui.extension.hideBottomSheet
+import com.lunabeestudio.stopcovid.NavMainDirections
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.applyAndConsumeWindowInsetBottom
+import com.lunabeestudio.stopcovid.coreui.extension.hideBottomSheet
 import com.lunabeestudio.stopcovid.coreui.extension.showSnackBar
 import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
 import com.lunabeestudio.stopcovid.databinding.ActivityMainBinding
 import com.lunabeestudio.stopcovid.extension.robertManager
+import com.lunabeestudio.stopcovid.fragment.IsSickFragmentDirections
 
 class MainActivity : AppCompatActivity() {
 
@@ -84,7 +86,7 @@ class MainActivity : AppCompatActivity() {
                 val destinationId = menu.children.find {
                     destination.id == it.itemId
                 }
-                isVisible = destinationId != null && !robertManager.isSick
+                isVisible = destinationId != null
                 binding.toolbar.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_FOCUSED)
                 if (destinationId != menu.findItem(R.id.proximityFragment)) {
                     binding.errorLayout.isInvisible = true
@@ -95,14 +97,13 @@ class MainActivity : AppCompatActivity() {
         }
 
         if (robertManager.isSick) {
-            binding.bottomNavigationView.isVisible = false
-            binding.bottomNavigationView.selectedItemId = R.id.sickFragment
+            navController.navigate(IsSickFragmentDirections.actionGlobalIsSickFragment())
         }
     }
 
     private fun refreshMenuItemTitles(menu: Menu) {
         menu.findItem(R.id.proximityFragment).title = strings["proximityController.tabBar.title"]
-        menu.findItem(R.id.sickFragment).title = strings["sickController.tabBar.title"]
+        menu.findItem(R.id.reportFragment).title = strings["sickController.tabBar.title"]
         menu.findItem(R.id.sharingFragment).title = strings["sharingController.tabBar.title"]
     }
 

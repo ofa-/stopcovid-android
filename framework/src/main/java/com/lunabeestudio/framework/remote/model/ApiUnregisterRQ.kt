@@ -12,6 +12,7 @@ package com.lunabeestudio.framework.remote.model
 
 internal class ApiUnregisterRQ(
     val ebid: String,
+    val epochId: Long,
     val time: String,
     val mac: String
 )

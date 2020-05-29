@@ -12,10 +12,13 @@ package com.lunabeestudio.stopcovid.fragment
 
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
+import android.bluetooth.le.AdvertiseCallback
+import android.bluetooth.le.AdvertiseData
+import android.bluetooth.le.AdvertiseSettings
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.ParcelUuid
 import android.view.Gravity
-import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -24,17 +27,19 @@ import com.lunabeestudio.stopcovid.coreui.UiConstants
 import com.lunabeestudio.stopcovid.coreui.extension.openAppSettings
 import com.lunabeestudio.stopcovid.coreui.extension.showPermissionRationale
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
-import com.lunabeestudio.stopcovid.fastitem.logoItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
+import com.lunabeestudio.stopcovid.fastitem.logoItem
 import com.lunabeestudio.stopcovid.manager.ProximityManager
 import com.mikepenz.fastadapter.GenericItem
+import timber.log.Timber
+import java.util.UUID
 
 class OnBoardingProximityFragment : OnBoardingFragment() {
 
     override fun getTitleKey(): String = "onboarding.proximityController.title"
-    override fun getButtonTitle(): String? = strings["onboarding.proximityController.allowProximity"]
-    override fun getOnButtonClickListener(): View.OnClickListener = View.OnClickListener {
+    override fun getButtonTitleKey(): String = "onboarding.proximityController.allowProximity"
+    override fun getOnButtonClick(): () -> Unit = {
         if (ContextCompat.checkSelfPermission(requireContext(), ProximityManager.getManifestLocationPermission())
             != PackageManager.PERMISSION_GRANTED) {
             MaterialAlertDialogBuilder(requireContext())
@@ -108,12 +113,61 @@ class OnBoardingProximityFragment : OnBoardingFragment() {
     }
 
     private fun startNextController() {
-        if (!ProximityManager.isBatteryOptimizationOn(requireContext())) {
-            findNavController()
-                .navigate(OnBoardingProximityFragmentDirections.actionOnBoardingProximityFragmentToOnBoardingBatteryFragment())
-        } else {
-            findNavController()
-                .navigate(OnBoardingProximityFragmentDirections.actionOnBoardingProximityFragmentToOnBoardingNotificationFragment())
+        testAdvertisement { success ->
+            try {
+                if (success) {
+                    if (!ProximityManager.isBatteryOptimizationOn(requireContext())) {
+                        findNavController()
+                            .navigate(OnBoardingProximityFragmentDirections.actionOnBoardingProximityFragmentToOnBoardingBatteryFragment())
+                    } else {
+                        findNavController()
+                            .navigate(OnBoardingProximityFragmentDirections.actionOnBoardingProximityFragmentToOnBoardingNotificationFragment())
+                    }
+                } else {
+                    findNavController()
+                        .navigate(OnBoardingProximityFragmentDirections.actionOnBoardingProximityFragmentToOnBoardingNoBleFragment())
+                }
+            } catch (e: IllegalArgumentException) {
+                // back and button pressed quickly can trigger this exception.
+            }
         }
+    }
+
+    private fun testAdvertisement(callback: (Boolean) -> Unit) {
+        BluetoothAdapter.getDefaultAdapter()?.bluetoothLeAdvertiser?.let { bluetoothAdvertiser ->
+            bluetoothAdvertiser.startAdvertising(
+                buildAdvertiseSettings(),
+                buildAdvertiseData(),
+                object : AdvertiseCallback() {
+                    override fun onStartSuccess(settingsInEffect: AdvertiseSettings?) {
+                        bluetoothAdvertiser.stopAdvertising(this)
+                        callback(true)
+                    }
+
+                    override fun onStartFailure(errorCode: Int) {
+                        bluetoothAdvertiser.stopAdvertising(this)
+                        Timber.e("Advertisement not supported (Error code : $errorCode)")
+                        callback(errorCode != ADVERTISE_FAILED_FEATURE_UNSUPPORTED)
+                    }
+                }
+            )
+        } ?: callback(false)
+    }
+
+    private fun buildAdvertiseSettings(): AdvertiseSettings {
+        return AdvertiseSettings.Builder()
+            .setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_LOW_LATENCY)
+            .setConnectable(true)
+            .setTxPowerLevel(AdvertiseSettings.ADVERTISE_TX_POWER_MEDIUM)
+            .setTimeout(0)
+            .build()
+    }
+
+    private fun buildAdvertiseData(): AdvertiseData {
+        return AdvertiseData.Builder()
+            .addServiceUuid(ParcelUuid(UUID.randomUUID()))
+            .setIncludeDeviceName(false)
+            .setIncludeTxPowerLevel(false)
+            .build()
     }
 }

@@ -36,7 +36,6 @@ class SSUBuilder(
      */
     fun build(currentTimeMillis: Long = System.currentTimeMillis()): ServerStatusUpdate {
         val timeLong = currentTimeMillis.unixTimeMsToNtpTimeS()
-
         val timeByteArray = byteArrayOf(
             (timeLong shr 24).toByte(),
             (timeLong shr 16).toByte(),
@@ -44,7 +43,15 @@ class SSUBuilder(
             timeLong.toByte()
         )
 
-        val message = ephemeralBluetoothIdentifier.ebid + timeByteArray
+        val epochId = ephemeralBluetoothIdentifier.epochId
+        val epochIdByteArray = byteArrayOf(
+            (epochId shr 24).toByte(),
+            (epochId shr 16).toByte(),
+            (epochId shr 8).toByte(),
+            epochId.toByte()
+        )
+
+        val message = ephemeralBluetoothIdentifier.ebid + epochIdByteArray + timeByteArray
         val macByteArray = mac.doFinal(byteArrayOf(settings.prefix) + message)
 
         secretKeySpec.safeDestroy()
@@ -53,6 +60,6 @@ class SSUBuilder(
         val time = Base64.encodeToString(timeByteArray, Base64.NO_WRAP)
         val mac = Base64.encodeToString(macByteArray, Base64.NO_WRAP)
 
-        return ServerStatusUpdate(ebid, time, mac)
+        return ServerStatusUpdate(ebid, ephemeralBluetoothIdentifier.epochId, time, mac)
     }
 }

@@ -13,8 +13,7 @@ package com.lunabeestudio.framework.local.datasource
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import com.google.common.truth.Truth.assertThat
-import com.lunabeestudio.framework.utils.CryptoManager
-import com.lunabeestudio.robert.model.RobertResultData
+import com.lunabeestudio.framework.local.LocalCryptoManager
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -37,7 +36,7 @@ class KeystoreDataSourceTest {
         context.getSharedPreferences("robert_prefs", Context.MODE_PRIVATE).edit().remove("shared.pref.db_key").commit()
         context.getSharedPreferences("crypto_prefs", Context.MODE_PRIVATE).edit().remove("aes_wrapped_local_protection").commit()
 
-        keystoreDataSource = SecureKeystoreDataSource(context, CryptoManager(context))
+        keystoreDataSource = SecureKeystoreDataSource(context, LocalCryptoManager(context))
     }
 
     @After
@@ -54,39 +53,39 @@ class KeystoreDataSourceTest {
     }
 
     @Test
-    fun saveSharedKey_and_getSharedKey() {
+    fun saveKA_and_getKA() {
         val key = Random.nextBytes(16)
-        keystoreDataSource.saveSharedKey(key)
+        keystoreDataSource.kA = key
 
         val storedString = ApplicationProvider.getApplicationContext<Context>()
             .getSharedPreferences("robert_prefs", Context.MODE_PRIVATE)
-            .getString("shared.pref.shared_key", null)
+            .getString("shared.pref.ka", null)
 
         assertThat(storedString).isNotNull()
         assertThat(storedString).isNotEqualTo(key)
 
-        val decryptedKey = (keystoreDataSource.getSharedKey() as? RobertResultData.Success)?.data
+        val decryptedKey = keystoreDataSource.kA
 
         assertThat(decryptedKey).isNotNull()
         assert(key.contentEquals(decryptedKey!!))
     }
 
     @Test
-    fun saveSharedKey_and_removeKey() {
+    fun saveKA_and_removeKA() {
         val key = Random.nextBytes(16)
-        keystoreDataSource.saveSharedKey(key)
+        keystoreDataSource.kA = key
 
         var storedString = ApplicationProvider.getApplicationContext<Context>()
             .getSharedPreferences("robert_prefs", Context.MODE_PRIVATE)
-            .getString("shared.pref.shared_key", null)
+            .getString("shared.pref.ka", null)
 
         assertThat(storedString).isNotNull()
 
-        keystoreDataSource.removeSharedKey()
+        keystoreDataSource.kA = null
 
         storedString = ApplicationProvider.getApplicationContext<Context>()
             .getSharedPreferences("robert_prefs", Context.MODE_PRIVATE)
-            .getString("shared.pref.shared_key", null)
+            .getString("shared.pref.ka", null)
 
         assertThat(storedString).isNull()
     }

@@ -12,15 +12,23 @@ package com.lunabeestudio.stopcovid.manager
 
 import android.view.Gravity
 import com.lunabeestudio.stopcovid.R
-import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
-import com.lunabeestudio.stopcovid.fastitem.logoBodyItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
+import com.lunabeestudio.stopcovid.fastitem.logoBodyItem
 import com.mikepenz.fastadapter.GenericItem
 
 object GestureManager {
 
     fun fillItems(items: MutableList<GenericItem>, strings: Map<String, String>) {
+        items += spaceItem {
+            spaceRes = R.dimen.spacing_xlarge
+            identifier = items.size.toLong()
+        }
+        items += titleItem {
+            text = strings["onboarding.gesturesController.mainMessage.title"]
+            gravity = Gravity.CENTER
+            identifier = items.size.toLong()
+        }
         items += spaceItem {
             spaceRes = R.dimen.spacing_xlarge
             identifier = items.size.toLong()
@@ -76,13 +84,14 @@ object GestureManager {
             identifier = items.size.toLong()
         }
         items += spaceItem {
-            spaceRes = R.dimen.spacing_xlarge
+            spaceRes = R.dimen.spacing_medium
             identifier = items.size.toLong()
         }
-        items += titleItem {
-            text = strings["onboarding.gesturesController.mainMessage.title"]
-            gravity = Gravity.CENTER
+        items += logoBodyItem {
+            imageRes = R.drawable.mask
+            text = strings["onboarding.gesturesController.gesture7"]
             identifier = items.size.toLong()
         }
+
     }
 }

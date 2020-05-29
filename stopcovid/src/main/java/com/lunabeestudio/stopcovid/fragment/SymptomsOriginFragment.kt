@@ -15,12 +15,12 @@ import android.view.View
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.lunabeestudio.stopcovid.R
-import com.lunabeestudio.stopcovid.fastitem.bigTitleItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.dividerItem
-import com.lunabeestudio.stopcovid.fastitem.doubleTextItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
+import com.lunabeestudio.stopcovid.fastitem.bigTitleItem
+import com.lunabeestudio.stopcovid.fastitem.doubleTextItem
 import com.mikepenz.fastadapter.GenericItem
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -60,8 +60,7 @@ class SymptomsOriginFragment : MainFragment() {
             title = strings["symptomsOriginController.noSymptoms"]
             onClickListener = View.OnClickListener {
                 findNavController()
-                    .navigate(SymptomsOriginFragmentDirections.actionSymptomsOriginFragmentToSendHistoryFragment(args.code,
-                        -1L))
+                    .navigate(SymptomsOriginFragmentDirections.actionSymptomsOriginFragmentToSendHistoryFragment(args.code, -1))
             }
         }
         items += dividerItem { }
@@ -78,8 +77,7 @@ class SymptomsOriginFragment : MainFragment() {
                 caption = dateFormat.format(currentDate)
                 onClickListener = View.OnClickListener {
                     findNavController()
-                        .navigate(SymptomsOriginFragmentDirections.actionSymptomsOriginFragmentToSendHistoryFragment(args.code,
-                            currentDate.time))
+                        .navigate(SymptomsOriginFragmentDirections.actionSymptomsOriginFragmentToSendHistoryFragment(args.code, index))
                 }
             }
             items += dividerItem { }
@@ -89,8 +87,7 @@ class SymptomsOriginFragment : MainFragment() {
             title = strings["common.iDontKnow"]
             onClickListener = View.OnClickListener {
                 findNavController()
-                    .navigate(SymptomsOriginFragmentDirections.actionSymptomsOriginFragmentToSendHistoryFragment(args.code,
-                        0L))
+                    .navigate(SymptomsOriginFragmentDirections.actionSymptomsOriginFragmentToSendHistoryFragment(args.code, -1))
             }
         }
         return items

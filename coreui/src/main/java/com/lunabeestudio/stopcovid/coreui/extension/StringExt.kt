@@ -17,6 +17,7 @@ import android.net.Uri
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.StyleSpan
+import androidx.annotation.WorkerThread
 import androidx.emoji.text.EmojiCompat
 import com.lunabeestudio.stopcovid.coreui.BuildConfig
 import com.lunabeestudio.stopcovid.coreui.network.OkHttpClient
@@ -26,8 +27,24 @@ import java.io.File
 import java.text.Normalizer
 import java.util.Locale
 
-fun String.saveTo(file: File) {
-    val okHttpClient = OkHttpClient.getDefaultOKHttpClient(this, BuildConfig.SERVER_CERTIFICATE_SHA256)
+@WorkerThread
+fun String.download(context: Context): String {
+    val okHttpClient = OkHttpClient.getDefaultOKHttpClient(context, this, BuildConfig.SERVER_CERTIFICATE_SHA256)
+    val request: Request = Request.Builder()
+        .url(this)
+        .build()
+    val response = okHttpClient.newCall(request).execute()
+    return if (response.isSuccessful && response.body != null) {
+        response.body!!.string()
+    } else {
+        Timber.d(response.body?.string())
+        throw Exception()
+    }
+}
+
+@WorkerThread
+fun String.saveTo(context: Context, file: File) {
+    val okHttpClient = OkHttpClient.getDefaultOKHttpClient(context, this, BuildConfig.SERVER_CERTIFICATE_SHA256)
     val request: Request = Request.Builder()
         .url(this)
         .build()

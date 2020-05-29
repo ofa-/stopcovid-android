@@ -22,3 +22,8 @@
 
 -dontobfuscate
 -keep public class com.lunabeestudio.** { *; }
+
+# Bouncy Castle -- Keep ECDH
+-keep class org.bouncycastle.jcajce.provider.asymmetric.EC$* { *; }
+-keep class org.bouncycastle.jcajce.provider.asymmetric.ec.KeyPairGeneratorSpi$ECDH { *; }
+-keep class org.bouncycastle.jcajce.provider.asymmetric.ec.KeyFactorySpi$ECDH { *; }

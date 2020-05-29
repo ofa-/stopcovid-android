@@ -11,42 +11,44 @@
 package com.lunabeestudio.stopcovid
 
 import android.app.Application
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.content.Context
-import android.os.Build
-import androidx.core.app.NotificationCompat
 import androidx.emoji.bundled.BundledEmojiCompatConfig
 import androidx.emoji.text.EmojiCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.ProcessLifecycleOwner
-import androidx.navigation.NavDeepLinkBuilder
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import com.lunabeestudio.framework.local.LocalCryptoManager
 import com.lunabeestudio.framework.local.datasource.SecureFileEphemeralBluetoothIdentifierDataSource
 import com.lunabeestudio.framework.local.datasource.SecureFileLocalProximityDataSource
 import com.lunabeestudio.framework.local.datasource.SecureKeystoreDataSource
 import com.lunabeestudio.framework.remote.datasource.ServiceDataSource
-import com.lunabeestudio.framework.utils.CryptoManager
+import com.lunabeestudio.framework.sharedcrypto.BouncyCastleCryptoDataSource
 import com.lunabeestudio.robert.RobertApplication
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.robert.RobertManagerImpl
 import com.lunabeestudio.stopcovid.BuildConfig.APP_MAINTENANCE_URL
-import com.lunabeestudio.stopcovid.activity.MainActivity
-import com.lunabeestudio.stopcovid.coreui.BuildConfig
-import com.lunabeestudio.stopcovid.coreui.UiConstants
 import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
+import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.manager.AppMaintenanceManager
+import com.lunabeestudio.stopcovid.manager.ConfigDataSource
 import com.lunabeestudio.stopcovid.manager.PrivacyManager
 import com.lunabeestudio.stopcovid.manager.ProximityManager
 import com.lunabeestudio.stopcovid.service.ProximityService
+import com.lunabeestudio.stopcovid.worker.AtRiskNotificationWorker
 import timber.log.Timber
 import java.io.File
+import java.util.Calendar
+import java.util.Date
+import java.util.concurrent.TimeUnit
+import kotlin.random.Random
 
 class StopCovid : Application(), LifecycleObserver, RobertApplication {
 
-    private val cryptoManager: CryptoManager by lazy {
-        CryptoManager(this)
+    private val cryptoManager: LocalCryptoManager by lazy {
+        LocalCryptoManager(this)
     }
 
     override val robertManager: RobertManager by lazy {
@@ -55,12 +57,10 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication {
             SecureFileEphemeralBluetoothIdentifierDataSource(this, cryptoManager),
             SecureKeystoreDataSource(this, cryptoManager),
             SecureFileLocalProximityDataSource(File(filesDir, LOCAL_PROXIMITY_DIR), cryptoManager),
-            ServiceDataSource(this)
+            ServiceDataSource(this),
+            BouncyCastleCryptoDataSource(),
+            ConfigDataSource
         )
-    }
-
-    private val strings: HashMap<String, String> by lazy {
-        StringsManager.getStrings()
     }
 
     init {
@@ -101,36 +101,39 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication {
     }
 
     override fun atRiskDetected() {
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val minHour = robertManager().atRiskMinHourContactNotif
+        val maxHour = robertManager().atRiskMaxHourContactNotif
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                UiConstants.Notification.AT_RISK.channelId,
-                strings["notification.channel.atRisk.title"] ?: "At risk",
-                NotificationManager.IMPORTANCE_HIGH
-            )
-            notificationManager.createNotificationChannel(channel)
+        val currentCal = Calendar.getInstance()
+        val hours = currentCal.get(Calendar.HOUR_OF_DAY)
+
+        val targetCalendar = Calendar.getInstance()
+        targetCalendar.set(Calendar.MINUTE, 0)
+
+        val statusWorkRequest = if (hours in minHour..maxHour) {
+            OneTimeWorkRequestBuilder<AtRiskNotificationWorker>().build()
+        } else {
+            if (hours > maxHour) {
+                targetCalendar.add(Calendar.DAY_OF_YEAR, 1)
+            }
+
+            targetCalendar.set(Calendar.HOUR_OF_DAY, minHour)
+            val minTime = targetCalendar.time.time
+            targetCalendar.set(Calendar.HOUR_OF_DAY, maxHour)
+            val maxTime = targetCalendar.time.time
+
+            val currentTime = currentCal.time.time
+            val randomTime = Random.nextLong(maxOf(currentTime, minTime), maxOf(currentTime, maxTime))
+            val delay = (randomTime - currentTime).coerceAtLeast(0)
+
+            Timber.d("Delay notification of ${delay / 1000}sec (trigger at ${Date(randomTime)})")
+
+            OneTimeWorkRequestBuilder<AtRiskNotificationWorker>()
+                .setInitialDelay(delay, TimeUnit.MILLISECONDS)
+                .build()
         }
 
-        val pendingIntent = NavDeepLinkBuilder(this)
-            .setComponentName(MainActivity::class.java)
-            .setGraph(R.navigation.nav_main)
-            .setDestination(R.id.informationFragment)
-            .createPendingIntent()
-
-        val notification = NotificationCompat.Builder(this,
-            UiConstants.Notification.AT_RISK.channelId
-        )
-            .setContentTitle(strings["notification.atRisk.title"])
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setVisibility(NotificationCompat.VISIBILITY_SECRET)
-            .setAutoCancel(true)
-            .setSmallIcon(R.drawable.ic_notification_bar)
-            .setStyle(NotificationCompat.BigTextStyle()
-                .bigText(strings["notification.atRisk.message"]))
-            .setContentIntent(pendingIntent)
-            .build()
-        notificationManager.notify(UiConstants.Notification.AT_RISK.notificationId, notification)
+        WorkManager.getInstance(applicationContext).enqueue(statusWorkRequest)
     }
 
     override fun getAppContext(): Context = this

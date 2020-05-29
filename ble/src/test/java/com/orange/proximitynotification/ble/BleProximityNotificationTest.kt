@@ -13,8 +13,20 @@ package com.orange.proximitynotification.ble
 import android.bluetooth.BluetoothDevice
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.nhaarman.mockitokotlin2.*
-import com.orange.proximitynotification.*
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.atLeastOnce
+import com.nhaarman.mockitokotlin2.doReturn
+import com.nhaarman.mockitokotlin2.eq
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.never
+import com.nhaarman.mockitokotlin2.times
+import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.whenever
+import com.orange.proximitynotification.CoroutineTestRule
+import com.orange.proximitynotification.ProximityInfo
+import com.orange.proximitynotification.ProximityNotificationCallback
+import com.orange.proximitynotification.ProximityNotificationError
+import com.orange.proximitynotification.ProximityPayloadProvider
 import com.orange.proximitynotification.ble.advertiser.BleAdvertiser
 import com.orange.proximitynotification.ble.calibration.BleRssiCalibration
 import com.orange.proximitynotification.ble.gatt.BleGattManager
@@ -25,7 +37,7 @@ import org.junit.Assert
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.util.*
+import java.util.Date
 
 @RunWith(AndroidJUnit4::class)
 class BleProximityNotificationTest {
@@ -95,7 +107,6 @@ class BleProximityNotificationTest {
             assertThat(callbackSucceed).isTrue()
         }
 
-
     @Test
     fun scanner_with_bad_result_should_never_call_onProximity() =
         testCoroutineRule.runBlockingTest {
@@ -120,7 +131,6 @@ class BleProximityNotificationTest {
 
             // Then
         }
-
 
     @Test
     fun scanner_on_error_should_call_onError() = testCoroutineRule.runBlockingTest {
@@ -220,7 +230,7 @@ class BleProximityNotificationTest {
                 bleScannedDevice(device = bluetoothDevice, serviceData = null, rssi = 6)
 
             // Ensure gattCallback is called after scan callback
-            lateinit var gattCallback : BleGattManager.Callback
+            lateinit var gattCallback: BleGattManager.Callback
             whenever(bleGattManager.start(any())).thenAnswer {
                 gattCallback = it.arguments[0] as BleGattManager.Callback
                 null

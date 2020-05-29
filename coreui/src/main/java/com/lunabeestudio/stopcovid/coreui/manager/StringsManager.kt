@@ -13,8 +13,8 @@ package com.lunabeestudio.stopcovid.coreui.manager
 import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.reflect.TypeToken
-import com.lunabeestudio.stopcovid.coreui.UiConstants
 import com.lunabeestudio.stopcovid.coreui.R
+import com.lunabeestudio.stopcovid.coreui.UiConstants
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

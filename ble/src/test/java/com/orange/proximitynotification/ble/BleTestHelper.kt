@@ -17,13 +17,13 @@ import com.orange.proximitynotification.ProximityInfo
 import com.orange.proximitynotification.ProximityMetadata
 import com.orange.proximitynotification.ProximityPayload
 import com.orange.proximitynotification.ble.scanner.BleScannedDevice
-import java.util.*
+import java.util.Date
 
 internal fun proximityPayload() = ProximityPayload((1..16).map { it.toByte() }.toByteArray())
 
 internal fun record(
     payload: BlePayload = payload(),
-    scannedDevice : BleScannedDevice
+    scannedDevice: BleScannedDevice
 ) = record(payload = payload, rssi = scannedDevice.rssi, timestamp = scannedDevice.timestamp)
 
 internal fun record(

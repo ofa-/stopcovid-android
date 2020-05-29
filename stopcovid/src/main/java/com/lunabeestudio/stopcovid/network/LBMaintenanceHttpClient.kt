@@ -48,10 +48,15 @@ object LBMaintenanceHttpClient {
                     onSuccess(string)
                 }
             } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    onFailure(e)
-                }
+                // FIXME workaround coroutine 1.3.7 https://github.com/Kotlin/kotlinx.coroutines/issues/2049#issuecomment-633270075
+                dispatchFailure(onFailure, e)
             }
+        }
+    }
+
+    private suspend fun dispatchFailure(onFailure: (e: Exception) -> Unit, e: Exception) {
+        withContext(Dispatchers.Main) {
+            onFailure(e)
         }
     }
 

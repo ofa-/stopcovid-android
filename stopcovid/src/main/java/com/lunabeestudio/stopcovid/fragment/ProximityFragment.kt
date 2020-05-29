@@ -118,9 +118,7 @@ class ProximityFragment : AboutMainFragment() {
             boundedService.onError = handleError
         }
 
-        override fun onServiceDisconnected(name: ComponentName?) {
-        }
-
+        override fun onServiceDisconnected(name: ComponentName?) {}
     }
 
     override fun getTitleKey(): String {
@@ -168,7 +166,6 @@ class ProximityFragment : AboutMainFragment() {
             refreshItems()
         }
         viewModel.activateProximitySuccess.observe(viewLifecycleOwner) {
-            bindToProximityService()
             refreshItems()
         }
     }
@@ -227,23 +224,26 @@ class ProximityFragment : AboutMainFragment() {
         items += dividerItem {
             identifier = items.count().toLong()
         }
-        items += linkItem {
-            text = strings["proximityController.manageData"]
-            onClickListener = View.OnClickListener {
-                findNavController().navigate(ProximityFragmentDirections.actionProximityFragmentToManageDataFragment())
-            }
-            iconRes = R.drawable.ic_manage_data
-            identifier = items.count().toLong()
-        }
-        items += dividerItem {
-            identifier = items.count().toLong()
-        }
+
         items += linkItem {
             text = strings["privacyController.tabBar.title"]
             onClickListener = View.OnClickListener {
                 findNavController().navigate(ProximityFragmentDirections.actionProximityFragmentToPrivacyFragment())
             }
             iconRes = R.drawable.ic_privacy
+            identifier = items.count().toLong()
+        }
+
+        items += dividerItem {
+            identifier = items.count().toLong()
+        }
+
+        items += linkItem {
+            text = strings["proximityController.manageData"]
+            onClickListener = View.OnClickListener {
+                findNavController().navigate(ProximityFragmentDirections.actionProximityFragmentToManageDataFragment())
+            }
+            iconRes = R.drawable.ic_manage_data
             identifier = items.count().toLong()
         }
 
@@ -256,6 +256,7 @@ class ProximityFragment : AboutMainFragment() {
         if (!robertManager.isRegistered) {
             injectWebView()
         } else {
+            bindToProximityService()
             viewModel.activateProximity(requireContext().applicationContext as RobertApplication)
         }
     }
@@ -335,19 +336,21 @@ class ProximityFragment : AboutMainFragment() {
 
     private fun showErrorLayout(errorLayout: FrameLayout) {
         errorLayout.post {
-            errorLayout.isVisible = true
-            errorLayout.animate().apply {
-                duration = resources.getInteger(android.R.integer.config_mediumAnimTime).toLong()
-                interpolator = this@ProximityFragment.interpolator
-                setUpdateListener { valueAnimator ->
-                    binding?.recyclerView
-                        ?.updatePadding(bottom = (errorLayout.height.toFloat() * valueAnimator.animatedValue as Float).toInt())
+            context?.let {
+                errorLayout.isVisible = true
+                errorLayout.animate().apply {
+                    duration = resources.getInteger(android.R.integer.config_mediumAnimTime).toLong()
+                    interpolator = this@ProximityFragment.interpolator
+                    setUpdateListener { valueAnimator ->
+                        binding?.recyclerView
+                            ?.updatePadding(bottom = (errorLayout.height.toFloat() * valueAnimator.animatedValue as Float).toInt())
+                    }
+                    translationY(0f)
+                    withEndAction {
+                        errorLayout.errorTextView.isClickable = true
+                    }
+                    start()
                 }
-                translationY(0f)
-                withEndAction {
-                    errorLayout.errorTextView.isClickable = true
-                }
-                start()
             }
         }
     }
@@ -423,7 +426,10 @@ class ProximityFragment : AboutMainFragment() {
             fun token(message: String) {
                 lifecycleScope.launch {
                     removeWebView()
-                    viewModel.register(requireContext().applicationContext as RobertApplication, message)
+                    context?.let {
+                        bindToProximityService()
+                        viewModel.register(requireContext().applicationContext as RobertApplication, message)
+                    }
                 }
             }
 
@@ -463,7 +469,7 @@ class ProximityFragment : AboutMainFragment() {
             script,
             scriptSha256,
             Locale.getDefault().language)
-        webView?.loadDataWithBaseURL(com.lunabeestudio.framework.BuildConfig.CAPTCHA_URL,
+        webView?.loadDataWithBaseURL(BuildConfig.CAPTCHA_URL,
             html,
             "text/html",
             "utf-8",

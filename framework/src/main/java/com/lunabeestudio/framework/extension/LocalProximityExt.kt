@@ -35,10 +35,10 @@ fun List<LocalProximity>.toProto(): ProtoStorage.LocalProximityProtoList {
     return builder.build()
 }
 
-fun ProtoStorage.LocalProximityProto.toDomain() =
+fun ProtoStorage.LocalProximityProto.toDomain(): LocalProximity =
     LocalProximity(eccBase64, ebidBase64, macBase64, helloTime, collectedTime, rawRssi, calibratedRssi)
 
-fun ProtoStorage.LocalProximityProtoList.toDomain() =
+fun ProtoStorage.LocalProximityProtoList.toDomain(): List<LocalProximity> =
     localProximityProtoListList.map {
         it.toDomain()
     }

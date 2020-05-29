@@ -84,7 +84,7 @@ class BlePayloadTest {
 
         // Given
         val proximityPayload = ProximityPayload((1..16).map { it.toByte() }.toByteArray())
-        val payload = payload(proximityPayload= proximityPayload, version = 2, txPowerLevel = -1)
+        val payload = payload(proximityPayload = proximityPayload, version = 2, txPowerLevel = -1)
         val expected: ByteArray =
             byteArrayOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 2, -1)
 

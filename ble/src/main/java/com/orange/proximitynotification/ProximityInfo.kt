@@ -10,7 +10,7 @@
 
 package com.orange.proximitynotification
 
-import java.util.*
+import java.util.Date
 
 interface ProximityMetadata
 

@@ -10,6 +10,7 @@
 
 package com.lunabeestudio.stopcovid.coreui.network
 
+import android.content.Context
 import android.os.Build
 import com.lunabeestudio.stopcovid.coreui.BuildConfig
 import okhttp3.CertificatePinner
@@ -20,11 +21,15 @@ import okhttp3.OkHttpClient
 import okhttp3.Response
 import okhttp3.TlsVersion
 import okhttp3.logging.HttpLoggingInterceptor
+import okhttp3.tls.HandshakeCertificates
 import timber.log.Timber
+import java.security.cert.CertificateFactory
+import java.security.cert.X509Certificate
+import java.util.concurrent.TimeUnit
 
 object OkHttpClient {
 
-    fun getDefaultOKHttpClient(url: String, certificateSHA256: String): OkHttpClient {
+    fun getDefaultOKHttpClient(context: Context, url: String, certificateSHA256: String): OkHttpClient {
         val requireTls12 = ConnectionSpec.Builder(ConnectionSpec.RESTRICTED_TLS)
             .tlsVersions(TlsVersion.TLS_1_2)
             .build()
@@ -36,10 +41,26 @@ object OkHttpClient {
                 certificatePinner(CertificatePinner.Builder()
                     .add(url.toHttpUrl().host, certificateSHA256)
                     .build())
+                val certificates: HandshakeCertificates = HandshakeCertificates.Builder()
+                    .addTrustedCertificate(certificateFromString(context, "app_stopcovid_gouv_fr"))
+                    .build()
+                sslSocketFactory(certificates.sslSocketFactory(), certificates.trustManager)
             }
             addInterceptor(getDefaultHeaderInterceptor())
             addInterceptor(getLogInterceptor())
+            callTimeout(1L, TimeUnit.MINUTES)
+            connectTimeout(1L, TimeUnit.MINUTES)
+            readTimeout(1L, TimeUnit.MINUTES)
+            writeTimeout(1L, TimeUnit.MINUTES)
         }.build()
+    }
+
+    private fun certificateFromString(context: Context, fileName: String): X509Certificate {
+        return CertificateFactory.getInstance("X.509").generateCertificate(
+            context.resources.openRawResource(
+                context.resources.getIdentifier(fileName,
+                    "raw", context.packageName)
+            )) as X509Certificate
     }
 
     private fun getDefaultHeaderInterceptor(): Interceptor = object : Interceptor {

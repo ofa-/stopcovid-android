@@ -20,7 +20,7 @@ import com.lunabeestudio.robert.model.RobertResult
 import com.lunabeestudio.stopcovid.extension.toCovidException
 import com.lunabeestudio.stopcovid.model.CovidException
 import com.lunabeestudio.stopcovid.model.NeedRegisterException
-import com.lunabeestudio.stopcovid.utils.SingleLiveEvent
+import com.lunabeestudio.stopcovid.coreui.utils.SingleLiveEvent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -38,7 +38,11 @@ class ManageDataViewModel(private val robertManager: RobertManager) : ViewModel(
     }
 
     fun eraseRemoteExposureHistory() {
-        callWS(robertManager::eraseRemoteExposureHistory, eraseRemoteSuccess)
+        if (robertManager.isRegistered) {
+            callWS(robertManager::eraseRemoteExposureHistory, eraseRemoteSuccess)
+        } else {
+            covidException.postValue(NeedRegisterException())
+        }
     }
 
     fun eraseRemoteAlert() {

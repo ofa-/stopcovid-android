@@ -20,7 +20,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.shadows.ShadowSystemClock
 import java.time.Duration
-import java.util.*
+import java.util.Date
 
 @RunWith(AndroidJUnit4::class)
 class RecordProviderForScanWithoutPayloadTest {
@@ -32,7 +32,7 @@ class RecordProviderForScanWithoutPayloadTest {
 
     private val bleRecordProvider = RecordProviderForScanWithoutPayload(mock {
         on { cacheTimeout } doReturn CACHE_TIMEOUT
-    }, maxCacheSize =  MAX_CACHE_SIZE)
+    }, maxCacheSize = MAX_CACHE_SIZE)
 
     @Test
     fun fromScan_with_payload_should_return_new_record() {
@@ -256,7 +256,6 @@ class RecordProviderForScanWithoutPayloadTest {
         assertThat(result).isEqualTo(expected)
         assertThat(bleRecordProvider.lastPayloadByDeviceId.size()).isEqualTo(2)
     }
-
 
     private fun givenScanAndPayload(scannedDevices: BleScannedDevice, payload: BlePayload) {
         bleRecordProvider.fromScan(scannedDevices, payload)

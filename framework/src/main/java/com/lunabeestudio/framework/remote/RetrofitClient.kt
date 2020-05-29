@@ -29,6 +29,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import timber.log.Timber
 import java.security.cert.CertificateFactory
 import java.security.cert.X509Certificate
+import java.util.concurrent.TimeUnit
 
 object RetrofitClient {
 
@@ -53,8 +54,9 @@ object RetrofitClient {
                 certificatePinner(CertificatePinner.Builder()
                     .add(url.toHttpUrl().host, certificateSHA256)
                     .build())
-                // TODO add certificate for Prod server
                 val certificates: HandshakeCertificates = HandshakeCertificates.Builder()
+                    .addTrustedCertificate(certificateFromString(context, "api_stopcovid_gouv_fr"))
+                    .addTrustedCertificate(certificateFromString(context, "app_stopcovid_gouv_fr"))
                     .addTrustedCertificate(certificateFromString(context, "giag4"))
                     .addTrustedCertificate(certificateFromString(context, "giag4ecc"))
                     .addTrustedCertificate(certificateFromString(context, "googleca1"))
@@ -78,6 +80,10 @@ object RetrofitClient {
             }
             addInterceptor(getDefaultHeaderInterceptor())
             addInterceptor(getLogInterceptor())
+            callTimeout(1L, TimeUnit.MINUTES)
+            connectTimeout(1L, TimeUnit.MINUTES)
+            readTimeout(1L, TimeUnit.MINUTES)
+            writeTimeout(1L, TimeUnit.MINUTES)
         }.build()
     }
 

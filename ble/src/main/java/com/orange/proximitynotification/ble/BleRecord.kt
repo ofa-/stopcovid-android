@@ -10,7 +10,7 @@
 
 package com.orange.proximitynotification.ble
 
-import java.util.*
+import java.util.Date
 
 internal data class BleRecord(
     val payload: BlePayload,

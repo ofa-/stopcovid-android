@@ -19,8 +19,8 @@ internal class LocalProximityRepository(private val localLocalProximityDataSourc
         localLocalProximityDataSource.saveAll(*localProximity)
     }
 
-    fun getAll(): List<LocalProximity> {
-        return localLocalProximityDataSource.getAll()
+    fun getUntilTime(ntpTimeS: Long): List<LocalProximity> {
+        return localLocalProximityDataSource.getUntilTime(ntpTimeS)
     }
 
     fun removeUntilTime(ntpTimeS: Long) {

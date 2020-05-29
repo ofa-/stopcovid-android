@@ -17,6 +17,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
+import com.github.razir.progressbutton.DrawableButton
 import com.github.razir.progressbutton.bindProgressButton
 import com.github.razir.progressbutton.cleanUpDrawable
 import com.github.razir.progressbutton.showProgress
@@ -41,6 +42,7 @@ class ProgressButtonItem(lifecycleOwner: LifecycleOwner) : BaseItem<ProgressButt
             if (startInProgress) {
                 showProgress {
                     progressColor = ContextCompat.getColor(context, R.color.color_on_primary)
+                    gravity = DrawableButton.GRAVITY_CENTER
                 }
             }
             getProgressButton?.invoke(this)

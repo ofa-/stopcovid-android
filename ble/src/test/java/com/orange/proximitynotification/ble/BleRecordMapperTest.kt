@@ -11,11 +11,15 @@
 package com.orange.proximitynotification.ble
 
 import com.google.common.truth.Truth.assertThat
-import com.nhaarman.mockitokotlin2.*
+import com.nhaarman.mockitokotlin2.atLeastOnce
+import com.nhaarman.mockitokotlin2.doReturn
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.whenever
 import com.orange.proximitynotification.ProximityInfo
 import com.orange.proximitynotification.ble.calibration.BleRssiCalibration
 import org.junit.Test
-import java.util.*
+import java.util.Date
 
 class BleRecordMapperTest {
 

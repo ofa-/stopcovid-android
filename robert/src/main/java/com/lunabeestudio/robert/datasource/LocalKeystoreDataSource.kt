@@ -10,14 +10,27 @@
 
 package com.lunabeestudio.robert.datasource
 
-import com.lunabeestudio.domain.model.ClientFilteringAlgorithmConfiguration
+import com.lunabeestudio.domain.model.DeviceParameterCorrection
 
 interface LocalKeystoreDataSource {
-    var sharedKey: ByteArray?
+    var kA: ByteArray?
+    var kEA: ByteArray?
     var timeStart: Long?
     var atRisk: Boolean?
+    var atRiskLastRefresh: Long?
+    var atRiskMinHourContactNotif: Int?
+    var atRiskMaxHourContactNotif: Int?
     var lastExposureTimeframe: Int?
     var proximityActive: Boolean?
     var isSick: Boolean?
-    var filteringInfo: List<ClientFilteringAlgorithmConfiguration>?
+    var calibration: List<DeviceParameterCorrection>?
+    var serviceUUID: String?
+    var characteristicUUID: String?
+    var backgroundServiceManufacturerData: String?
+    var dataRetentionPeriod: Int?
+    var quarantinePeriod: Int?
+    var checkStatusFrequency: Int?
+    var randomStatusHour: Int?
+    var preSymptomsSpan: Int?
+    var appAvailability: Boolean?
 }

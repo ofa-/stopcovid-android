@@ -23,8 +23,8 @@ import com.mikepenz.fastadapter.GenericItem
 class OnBoardingExplanationFragment : OnBoardingFragment() {
 
     override fun getTitleKey(): String = "onboarding.explanationsController.title"
-    override fun getButtonTitle(): String? = strings["onboarding.explanationsController.dataPrivacy"]
-    override fun getOnButtonClickListener(): View.OnClickListener = View.OnClickListener {
+    override fun getButtonTitleKey(): String? = "onboarding.explanationsController.dataPrivacy"
+    override fun getOnButtonClick(): () -> Unit = {
         findNavController()
             .navigate(OnBoardingExplanationFragmentDirections.actionOnBoardingExplanationFragmentToOnBoardingPrivacyFragment())
     }

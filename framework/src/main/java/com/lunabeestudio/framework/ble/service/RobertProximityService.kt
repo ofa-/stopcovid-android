@@ -11,12 +11,14 @@
 package com.lunabeestudio.framework.ble.service
 
 import androidx.annotation.WorkerThread
-import com.lunabeestudio.domain.RobertConstant
 import com.lunabeestudio.domain.extension.ntpTimeSToUnixTimeMs
-import com.lunabeestudio.framework.ble.RobertBleSettings
-import com.lunabeestudio.framework.ble.extension.toBleSettings
+import com.lunabeestudio.domain.model.DeviceParameterCorrection
 import com.lunabeestudio.framework.ble.extension.toLocalProximity
 import com.lunabeestudio.robert.RobertManager
+import com.lunabeestudio.robert.extension.splitToByteArray
+import com.lunabeestudio.robert.model.BLEAdvertiserException
+import com.lunabeestudio.robert.model.BLEProximityNotificationException
+import com.lunabeestudio.robert.model.BLEScannerException
 import com.lunabeestudio.robert.model.NoEphemeralBluetoothIdentifierFound
 import com.lunabeestudio.robert.model.NoEphemeralBluetoothIdentifierFoundForEpoch
 import com.lunabeestudio.robert.model.ProximityException
@@ -35,6 +37,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.util.UUID
 
 abstract class RobertProximityService : ProximityNotificationService() {
 
@@ -69,10 +72,24 @@ abstract class RobertProximityService : ProximityNotificationService() {
         payloadUpdateSchedulerScope.cancel("Proximity service has been stopped")
     }
 
-    abstract val appBleSettings: RobertBleSettings
-
     override val bleSettings: BleSettings
-        get() = appBleSettings.toBleSettings(applicationContext)
+        get() {
+            Timber.d("Fetch new BLE settings")
+
+            val deviceParameterCorrection = robertManager.calibration.firstOrNull {
+                it.device_handset_model == android.os.Build.MODEL
+            } ?: robertManager.calibration.firstOrNull {
+                it.device_handset_model == "DEFAULT"
+            } ?: DeviceParameterCorrection("", FALLBACK_TX, FALLBACK_RX)
+
+            return BleSettings(
+                serviceUuid = UUID.fromString(robertManager.serviceUUID),
+                servicePayloadCharacteristicUuid = UUID.fromString(robertManager.characteristicUUID),
+                backgroundServiceManufacturerDataIOS = robertManager.backgroundServiceManufacturerData.splitToByteArray(),
+                txCompensationGain = deviceParameterCorrection.tx_RSS_correction_factor.toInt(),
+                rxCompensationGain = deviceParameterCorrection.rx_RSS_correction_factor.toInt()
+            )
+        }
 
     @WorkerThread
     private fun getProximityPayload(): ProximityPayload {
@@ -80,13 +97,15 @@ abstract class RobertProximityService : ProximityNotificationService() {
         return when (result) {
             is RobertResultData.Success -> {
                 val helloBuilder = result.data
-                scheduleNextUpdate(helloBuilder.isValidUntil.ntpTimeSToUnixTimeMs())
-                try {
+                val proximityPayload = try {
                     ProximityPayload(helloBuilder.build().data)
                 } catch (e: IllegalArgumentException) {
                     val exception = NoEphemeralBluetoothIdentifierFound(e.localizedMessage)
                     throw exception
                 }
+
+                scheduleNextUpdate(helloBuilder.isValidUntil.ntpTimeSToUnixTimeMs())
+                proximityPayload
             }
             is RobertResultData.Failure -> {
                 val exception = NoEphemeralBluetoothIdentifierFoundForEpoch()
@@ -99,7 +118,7 @@ abstract class RobertProximityService : ProximityNotificationService() {
         val nextPayloadUpdateDelay =
             (validUntilTimeMs - System.currentTimeMillis())
                 .coerceAtLeast(0)
-                .coerceAtMost(RobertConstant.HELLO_REFRESH_MAX_DELAY_MS)
+                .coerceAtMost(HELLO_REFRESH_MAX_DELAY_MS)
 
         payloadUpdateSchedulerScope.launch {
             Timber.d("Next payload update in ${nextPayloadUpdateDelay}ms")
@@ -121,9 +140,19 @@ abstract class RobertProximityService : ProximityNotificationService() {
     }
 
     final override fun onError(error: ProximityNotificationError) {
-        onError(ProximityException(message = error.toString()))
+        onError(when (error.type) {
+            ProximityNotificationError.Type.BLE_ADVERTISER -> BLEAdvertiserException("(${error.rootErrorCode})")
+            ProximityNotificationError.Type.BLE_SCANNER -> BLEScannerException("(${error.rootErrorCode})")
+            ProximityNotificationError.Type.BLE_PROXIMITY_NOTIFICATION -> BLEProximityNotificationException("(${error.cause})")
+        })
     }
 
     abstract fun onError(error: RobertException)
+
+    companion object {
+        private const val HELLO_REFRESH_MAX_DELAY_MS: Long = 30 * 1000
+        private const val FALLBACK_TX: Double = -6.52
+        private const val FALLBACK_RX: Double = -19.71
+    }
 }
 

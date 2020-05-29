@@ -23,8 +23,8 @@ import com.mikepenz.fastadapter.GenericItem
 class OnBoardingNotificationFragment : OnBoardingFragment() {
 
     override fun getTitleKey(): String = "onboarding.beAwareController.title"
-    override fun getButtonTitle(): String? = strings["onboarding.beAwareController.allowNotifications"]
-    override fun getOnButtonClickListener(): View.OnClickListener = View.OnClickListener {
+    override fun getButtonTitleKey(): String? = "onboarding.beAwareController.allowNotifications"
+    override fun getOnButtonClick(): () -> Unit = {
         findNavController()
             .navigate(OnBoardingNotificationFragmentDirections.actionOnBoardingNotificationFragmentToOnBoardingGestureFragment())
     }

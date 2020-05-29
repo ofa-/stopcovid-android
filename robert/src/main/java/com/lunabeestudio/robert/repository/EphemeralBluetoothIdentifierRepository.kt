@@ -11,16 +11,38 @@
 package com.lunabeestudio.robert.repository
 
 import androidx.annotation.WorkerThread
+import com.lunabeestudio.robert.RobertConstant
 import com.lunabeestudio.domain.extension.unixTimeMsToNtpTimeS
 import com.lunabeestudio.domain.model.EphemeralBluetoothIdentifier
 import com.lunabeestudio.robert.datasource.LocalEphemeralBluetoothIdentifierDataSource
+import com.lunabeestudio.robert.datasource.LocalKeystoreDataSource
+import com.lunabeestudio.robert.datasource.SharedCryptoDataSource
+import com.lunabeestudio.robert.model.NoKeyException
+import com.lunabeestudio.robert.model.ServerDecryptException
+import javax.crypto.AEADBadTagException
 
 @WorkerThread
 internal class EphemeralBluetoothIdentifierRepository(
-    private val localEphemeralBluetoothIdentifierDataSource: LocalEphemeralBluetoothIdentifierDataSource
+    private val localEphemeralBluetoothIdentifierDataSource: LocalEphemeralBluetoothIdentifierDataSource,
+    private val sharedCryptoDataSource: SharedCryptoDataSource,
+    private val localKeystoreDataSource: LocalKeystoreDataSource
 ) {
-    fun save(vararg ephemeralBluetoothIdentifiers: EphemeralBluetoothIdentifier) {
-        localEphemeralBluetoothIdentifierDataSource.saveAll(*ephemeralBluetoothIdentifiers)
+    @OptIn(ExperimentalStdlibApi::class)
+    @Throws(NullPointerException::class, NoKeyException::class)
+    fun save(tuples: ByteArray) {
+        val rawEbid = localKeystoreDataSource.kEA?.let {
+            try {
+                sharedCryptoDataSource.decrypt(it, tuples).decodeToString()
+            } catch (e: AEADBadTagException) {
+                throw ServerDecryptException()
+            }
+        } ?: throw NoKeyException("Failed to retrieve kEA")
+
+        val ebids = EphemeralBluetoothIdentifier.createFromTuples(localKeystoreDataSource.timeStart!!,
+            RobertConstant.EPOCH_DURATION_S,
+            rawEbid)
+
+        localEphemeralBluetoothIdentifierDataSource.saveAll(*ebids.toTypedArray())
     }
 
     fun getAll(): List<EphemeralBluetoothIdentifier> {

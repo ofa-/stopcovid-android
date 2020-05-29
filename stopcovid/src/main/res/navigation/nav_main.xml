@@ -39,25 +39,25 @@
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
     </fragment>
     <fragment
-        android:id="@+id/sickFragment"
-        android:name="com.lunabeestudio.stopcovid.fragment.SickFragment"
+        android:id="@+id/reportFragment"
+        android:name="com.lunabeestudio.stopcovid.fragment.ReportFragment"
         tools:layout="@layout/fragment_recycler_view">
         <action
-            android:id="@+id/action_sickFragment_to_codeFragment"
+            android:id="@+id/action_reportFragment_to_codeFragment"
             app:destination="@id/codeFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
         <action
-            android:id="@+id/action_sickFragment_to_qrCodeFragment"
+            android:id="@+id/action_reportFragment_to_qrCodeFragment"
             app:destination="@id/qrCodeFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
         <action
-            android:id="@+id/action_sickFragment_to_informationFragment"
+            android:id="@+id/action_reportFragment_to_informationFragment"
             app:destination="@id/informationFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
@@ -111,16 +111,16 @@
             android:name="code"
             app:argType="string" />
         <argument
-            android:name="date"
-            app:argType="long" />
+            android:name="firstSymptoms"
+            app:argType="integer" />
         <action
-            android:id="@+id/action_sendHistoryFragment_to_sickFragment"
-            app:destination="@id/sickFragment"
+            android:id="@+id/action_sendHistoryFragment_to_isSickFragment"
+            app:destination="@id/isSickFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim"
-            app:popUpTo="@id/sickFragment"
+            app:popUpTo="@id/nav_main"
             app:popUpToInclusive="true" />
     </fragment>
     <fragment
@@ -159,4 +159,25 @@
             android:name="com.lunabeestudio.stopcovid.fragment.AboutFragment"
             tools:layout="@layout/fragment_recycler_view" />
     </navigation>
+    <action
+        android:id="@+id/action_global_onBoardingActivity"
+        app:destination="@id/onBoardingActivity"
+        app:enterAnim="@anim/nav_default_enter_anim"
+        app:exitAnim="@anim/nav_default_exit_anim"
+        app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+        app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+    <fragment
+        android:id="@+id/isSickFragment"
+        android:name="com.lunabeestudio.stopcovid.fragment.IsSickFragment"
+        android:label="IsSickFragment"
+        tools:layout="@layout/fragment_recycler_view" />
+    <action
+        android:id="@+id/action_global_isSickFragment"
+        app:destination="@id/isSickFragment"
+        app:enterAnim="@anim/nav_default_enter_anim"
+        app:exitAnim="@anim/nav_default_exit_anim"
+        app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+        app:popExitAnim="@anim/nav_default_pop_exit_anim"
+        app:popUpTo="@id/nav_main"
+        app:popUpToInclusive="true" />
 </navigation>

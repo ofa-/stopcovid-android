@@ -39,15 +39,6 @@ class InformationFragment : MainFragment() {
             spaceRes = R.dimen.spacing_xlarge
             identifier = items.count().toLong()
         }
-        items += iconTitleItem {
-            text = strings["informationController.subtitle"]
-            iconRes = R.drawable.republic_fr
-            identifier = items.count().toLong()
-        }
-        items += spaceItem {
-            spaceRes = R.dimen.spacing_large
-            identifier = items.count().toLong()
-        }
         if (robertManager.isAtRisk) {
             items += titleItem {
                 text = strings["informationController.mainMessage.atRisk.title"]

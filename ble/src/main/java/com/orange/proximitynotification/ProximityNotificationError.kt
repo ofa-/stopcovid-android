@@ -10,12 +10,12 @@
 
 package com.orange.proximitynotification
 
-data class ProximityNotificationError(val type: Type, val rootErrorCode: Int? = null, val cause : String? = null) {
+data class ProximityNotificationError(val type: Type, val rootErrorCode: Int? = null, val cause: String? = null) {
 
     enum class Type {
         /**
          * BLE advertising error
-          */
+         */
         BLE_ADVERTISER,
 
         /**

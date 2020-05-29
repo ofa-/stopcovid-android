@@ -10,18 +10,28 @@
 
 package com.orange.proximitynotification.ble.gatt
 
-import android.bluetooth.*
+import android.bluetooth.BluetoothDevice
+import android.bluetooth.BluetoothGatt
+import android.bluetooth.BluetoothGattCharacteristic
+import android.bluetooth.BluetoothGattServer
+import android.bluetooth.BluetoothGattServerCallback
+import android.bluetooth.BluetoothGattService
+import android.bluetooth.BluetoothManager
 import android.content.Context
 import android.util.Log
 import com.orange.proximitynotification.ble.BleSettings
 import com.orange.proximitynotification.tools.CoroutineContextProvider
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.Channel.Factory.UNLIMITED
 import kotlinx.coroutines.channels.receiveOrNull
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeout
 
 internal class BleGattManagerImpl(
     override val settings: BleSettings,
@@ -150,10 +160,7 @@ internal class BleGattManagerImpl(
                 value
             )
 
-            Log.d(
-                TAG,
-                "onCharacteristicWriteRequest device=$device, characteristic=${characteristic.uuid}"
-            )
+            Log.d(TAG, "onCharacteristicWriteRequest")
 
             val result = when (characteristic.uuid) {
                 payloadCharacteristic.uuid -> {
@@ -168,16 +175,12 @@ internal class BleGattManagerImpl(
 
             }
 
-            Log.d(
-                TAG,
-                "onCharacteristicWriteRequest result=$result device=$device requestId=$requestId characteristic=${characteristic.uuid} preparedWrite=$preparedWrite responseNeeded=$responseNeeded offset=$offset value=$value"
-            )
+            Log.d(TAG, "onCharacteristicWriteRequest result=$result")
             if (responseNeeded) {
                 bluetoothGattServer?.sendResponse(device, requestId, result, offset, null)
             }
         }
 
     }
-
 
 }

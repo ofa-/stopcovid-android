@@ -10,27 +10,36 @@
 
 package com.lunabeestudio.stopcovid.fragment
 
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
+import androidx.core.content.edit
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
+import androidx.navigation.fragment.findNavController
+import androidx.preference.PreferenceManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.lunabeestudio.robert.RobertApplication
+import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.activity.MainActivity
-import com.lunabeestudio.stopcovid.extension.getString
-import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
-import com.lunabeestudio.stopcovid.fastitem.dangerButtonItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.dividerItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.lightButtonItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
+import com.lunabeestudio.stopcovid.extension.getString
+import com.lunabeestudio.stopcovid.extension.robertManager
+import com.lunabeestudio.stopcovid.fastitem.dangerButtonItem
 import com.lunabeestudio.stopcovid.viewmodel.ManageDataViewModel
 import com.lunabeestudio.stopcovid.viewmodel.ManageDataViewModelFactory
 import com.mikepenz.fastadapter.GenericItem
 
 class ManageDataFragment : MainFragment() {
+
+    private val sharedPreferences: SharedPreferences by lazy {
+        PreferenceManager.getDefaultSharedPreferences(requireContext())
+    }
 
     private val viewModel: ManageDataViewModel by viewModels { ManageDataViewModelFactory(requireContext().robertManager()) }
 
@@ -59,6 +68,16 @@ class ManageDataFragment : MainFragment() {
         }
         viewModel.quitStopCovidSuccess.observe(viewLifecycleOwner) {
             showSnackBar(strings["manageDataController.quitStopCovid.success"] ?: "")
+            sharedPreferences.edit {
+                remove(Constants.SharedPrefs.ON_BOARDING_DONE)
+            }
+            try {
+                findNavController()
+                    .navigate(ManageDataFragmentDirections.actionGlobalOnBoardingActivity())
+                activity?.finish()
+            } catch (e: IllegalArgumentException) {
+                // If user leave the screen before logout is done
+            }
         }
     }
 

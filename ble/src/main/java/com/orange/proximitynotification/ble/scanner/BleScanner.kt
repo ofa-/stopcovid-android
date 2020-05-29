@@ -12,7 +12,7 @@ package com.orange.proximitynotification.ble.scanner
 
 import android.bluetooth.BluetoothDevice
 import com.orange.proximitynotification.ble.BleSettings
-import java.util.*
+import java.util.Date
 
 data class BleScannedDevice(
     val device: BluetoothDevice,
