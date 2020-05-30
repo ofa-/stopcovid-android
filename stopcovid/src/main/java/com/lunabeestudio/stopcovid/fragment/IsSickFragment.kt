@@ -70,7 +70,7 @@ class IsSickFragment : AboutMainFragment() {
             try {
                 findNavController()
                     .navigate(ManageDataFragmentDirections.actionGlobalOnBoardingActivity())
-                activity?.finish()
+                activity?.finishAndRemoveTask()
             } catch (e: IllegalArgumentException) {
                 // If user leave the screen before logout is done
             }

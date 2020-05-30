@@ -33,7 +33,7 @@ class OnBoardingGestureFragment : OnBoardingFragment() {
         }
         findNavController()
             .navigate(OnBoardingGestureFragmentDirections.actionOnBoardingGestureFragmentToMainActivity())
-        activity?.finish()
+        activity?.finishAndRemoveTask()
     }
 
     override fun getItems(): List<GenericItem> {

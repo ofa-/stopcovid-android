@@ -18,6 +18,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
+import androidx.work.WorkManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.lunabeestudio.robert.RobertApplication
 import com.lunabeestudio.stopcovid.Constants
@@ -71,10 +72,11 @@ class ManageDataFragment : MainFragment() {
             sharedPreferences.edit {
                 remove(Constants.SharedPrefs.ON_BOARDING_DONE)
             }
+            WorkManager.getInstance(requireContext().applicationContext).cancelUniqueWork(Constants.WorkerNames.NOTIFICATION)
             try {
                 findNavController()
                     .navigate(ManageDataFragmentDirections.actionGlobalOnBoardingActivity())
-                activity?.finish()
+                activity?.finishAndRemoveTask()
             } catch (e: IllegalArgumentException) {
                 // If user leave the screen before logout is done
             }

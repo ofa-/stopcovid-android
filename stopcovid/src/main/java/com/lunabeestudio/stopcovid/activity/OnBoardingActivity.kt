@@ -66,7 +66,7 @@ class OnBoardingActivity : AppCompatActivity() {
             sharedPreferences.isOnBoardingDone() -> {
                 try {
                     navController.navigate(OnBoardingWelcomeFragmentDirections.actionOnBoardingWelcomeFragmentToMainActivity())
-                    finish()
+                    finishAndRemoveTask()
                 } catch (e: IllegalArgumentException) {
                     Timber.e(e)
                 }

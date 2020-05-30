@@ -43,7 +43,6 @@ import com.lunabeestudio.robert.model.RobertException
 import com.lunabeestudio.robert.model.RobertResult
 import com.lunabeestudio.robert.model.RobertResultData
 import com.lunabeestudio.robert.model.RobertUnknownException
-import com.lunabeestudio.robert.model.ServerDecryptException
 import com.lunabeestudio.robert.model.UnknownException
 import com.lunabeestudio.robert.repository.EphemeralBluetoothIdentifierRepository
 import com.lunabeestudio.robert.repository.KeystoreRepository
@@ -53,7 +52,6 @@ import com.lunabeestudio.robert.worker.StatusWorker
 import timber.log.Timber
 import java.util.Date
 import java.util.concurrent.TimeUnit
-import javax.crypto.AEADBadTagException
 import kotlin.random.Random
 
 class RobertManagerImpl(
@@ -158,8 +156,8 @@ class RobertManagerImpl(
             RobertResult.Success()
         } catch (e: Exception) {
             clearLocalData(application)
-            if (e is AEADBadTagException) {
-                RobertResult.Failure(ServerDecryptException())
+            if (e is RobertException) {
+                RobertResult.Failure(e)
             } else {
                 RobertResult.Failure(RobertUnknownException())
             }

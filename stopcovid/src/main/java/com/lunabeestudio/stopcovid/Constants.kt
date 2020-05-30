@@ -15,6 +15,10 @@ object Constants {
         const val ON_BOARDING_DONE: String = "On.Boarding.Done"
     }
 
+    object WorkerNames {
+        const val NOTIFICATION: String = "StopCovid.Notification.Worker"
+    }
+
     object ServerConstant {
         val ACCEPTED_REPORT_CODE_LENGTH: List<Int> = listOf(6, 36)
     }

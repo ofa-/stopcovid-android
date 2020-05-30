@@ -18,6 +18,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.ProcessLifecycleOwner
+import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.lunabeestudio.framework.local.LocalCryptoManager
@@ -133,7 +134,8 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication {
                 .build()
         }
 
-        WorkManager.getInstance(applicationContext).enqueue(statusWorkRequest)
+        WorkManager.getInstance(applicationContext)
+            .enqueueUniqueWork(Constants.WorkerNames.NOTIFICATION, ExistingWorkPolicy.KEEP, statusWorkRequest)
     }
 
     override fun getAppContext(): Context = this
