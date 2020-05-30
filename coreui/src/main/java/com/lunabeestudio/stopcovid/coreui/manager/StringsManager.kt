@@ -56,6 +56,8 @@ class StringsManager : ServerManager() {
     override fun prefix(context: Context): String = context.getString(R.string.string_prefix)
     override fun fallbackFileName(context: Context): String = "${prefix(context)}${UiConstants.DEFAULT_LANGUAGE}${extension()}"
     override fun type(): Type = object : TypeToken<HashMap<String, String>>() {}.type
+    override fun lastRefreshSharedPrefsKey(): String = UiConstants.SharePrefs.LAST_STRINGS_REFRESH
+
     override fun transform(input: String): String = input.fixFormatter()
 }
 

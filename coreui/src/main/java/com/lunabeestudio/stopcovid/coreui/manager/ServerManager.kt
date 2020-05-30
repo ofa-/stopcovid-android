@@ -12,6 +12,8 @@ package com.lunabeestudio.stopcovid.coreui.manager
 
 import android.content.Context
 import androidx.annotation.WorkerThread
+import androidx.core.content.edit
+import androidx.preference.PreferenceManager
 import com.google.gson.Gson
 import com.lunabeestudio.stopcovid.coreui.BuildConfig
 import com.lunabeestudio.stopcovid.coreui.UiConstants
@@ -20,6 +22,7 @@ import timber.log.Timber
 import java.io.File
 import java.lang.reflect.Type
 import java.util.Locale
+import java.util.concurrent.TimeUnit
 
 abstract class ServerManager {
 
@@ -29,6 +32,7 @@ abstract class ServerManager {
     protected abstract fun prefix(context: Context): String
     protected abstract fun fallbackFileName(context: Context): String
     protected abstract fun type(): Type
+    protected abstract fun lastRefreshSharedPrefsKey(): String
     protected open fun transform(input: String): String = input
     protected open fun extension(): String = ".json"
     protected open fun url(): String = BuildConfig.SERVER_URL
@@ -36,10 +40,11 @@ abstract class ServerManager {
     @WorkerThread
     protected fun fetchLast(context: Context, languageCode: String): Boolean {
         return try {
-            if (!BuildConfig.USE_LOCAL_DATA) {
+            if (shouldRefresh(context)) {
                 val filename = "${prefix(context)}${languageCode}${extension()}"
                 Timber.d("Fetching remote data at ${url()}$filename")
                 "${url()}$filename".saveTo(context, File(context.filesDir, filename))
+                saveLastRefresh(context)
                 true
             } else {
                 Timber.d("Only use local data")
@@ -84,5 +89,17 @@ abstract class ServerManager {
         return gson.fromJson(context.assets.open("${folderName()}/$fileName").use {
             transform(it.readBytes().toString(Charsets.UTF_8))
         }, type())
+    }
+
+    private fun shouldRefresh(context: Context): Boolean {
+        return !BuildConfig.USE_LOCAL_DATA
+            && System.currentTimeMillis() - TimeUnit.HOURS.toMillis(1L) > PreferenceManager.getDefaultSharedPreferences(context)
+            .getLong(lastRefreshSharedPrefsKey(), 0L)
+    }
+
+    private fun saveLastRefresh(context: Context) {
+        PreferenceManager.getDefaultSharedPreferences(context).edit {
+            putLong(lastRefreshSharedPrefsKey(), System.currentTimeMillis())
+        }
     }
 }

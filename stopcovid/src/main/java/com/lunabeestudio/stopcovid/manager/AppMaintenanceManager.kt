@@ -15,11 +15,15 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Build
 import androidx.annotation.DrawableRes
+import androidx.core.content.edit
+import androidx.preference.PreferenceManager
 import com.google.gson.Gson
+import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.model.Info
 import com.lunabeestudio.stopcovid.network.LBMaintenanceHttpClient
 import org.json.JSONObject
 import timber.log.Timber
+import java.util.concurrent.TimeUnit
 
 /**
  * Main class of this lib. The singleton manager which do the work to block the app or not
@@ -72,12 +76,20 @@ object AppMaintenanceManager {
      * Call this to check if the app needs to be blocked or not
      */
     fun checkForMaintenanceUpgrade(context: Context) {
-        if (isActivityOpened) {
-            return
-        } else {
-            updateCheckForMaintenanceUpgrade(context,
-                null,
-                null)
+        when {
+            isActivityOpened -> {
+                return
+            }
+            shouldRefresh(context) -> {
+                updateCheckForMaintenanceUpgrade(context,
+                    null,
+                    null)
+            }
+            else -> {
+                useLastResult(context,
+                    null,
+                    null)
+            }
         }
     }
 
@@ -97,6 +109,7 @@ object AppMaintenanceManager {
                         info,
                         appIsFreeCompletion,
                         appIsBlockedCompletion)
+                    saveLastRefresh(context)
                 } catch (e: Exception) {
                     // In case of a malformed JSON we don't safe it and use the last one instead
                     useLastResult(context,
@@ -173,6 +186,17 @@ object AppMaintenanceManager {
      */
     private fun retrieveLastMaintenanceJson(): String? {
         return sharedPrefs.getString(JSON_STRING_SHARED_PREFS_KEY, null)
+    }
+
+    private fun shouldRefresh(context: Context): Boolean {
+        return System.currentTimeMillis() - TimeUnit.MINUTES.toMillis(5L) > PreferenceManager.getDefaultSharedPreferences(context)
+            .getLong(Constants.SharedPrefs.LAST_MAINTENANCE_REFRESH, 0L)
+    }
+
+    private fun saveLastRefresh(context: Context) {
+        PreferenceManager.getDefaultSharedPreferences(context).edit {
+            putLong(Constants.SharedPrefs.LAST_MAINTENANCE_REFRESH, System.currentTimeMillis())
+        }
     }
 
     private const val SHARED_PREFS_NAME: String = "AppMaintenanceManagerPrefNames"

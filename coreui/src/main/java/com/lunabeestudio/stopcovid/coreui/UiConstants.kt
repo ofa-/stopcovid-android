@@ -19,6 +19,10 @@ object UiConstants {
         CAMERA, LOCATION
     }
 
+    object SharePrefs {
+        const val LAST_STRINGS_REFRESH: String = "Last.Strings.Refresh"
+    }
+
     enum class Notification(val channelId: String, val notificationId: Int) {
         AT_RISK("atRisk", 1),
         PROXIMITY("proximity", 2),

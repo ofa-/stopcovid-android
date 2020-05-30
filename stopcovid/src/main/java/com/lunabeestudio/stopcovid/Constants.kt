@@ -13,6 +13,8 @@ package com.lunabeestudio.stopcovid
 object Constants {
     object SharedPrefs {
         const val ON_BOARDING_DONE: String = "On.Boarding.Done"
+        const val LAST_PRIVACY_REFRESH: String = "Last.Privacy.Refresh"
+        const val LAST_MAINTENANCE_REFRESH: String = "Last.Maintenance.Refresh"
     }
 
     object WorkerNames {

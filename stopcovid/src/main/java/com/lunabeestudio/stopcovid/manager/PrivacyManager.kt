@@ -13,6 +13,7 @@ package com.lunabeestudio.stopcovid.manager
 import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.reflect.TypeToken
+import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.coreui.manager.ServerManager
 import com.lunabeestudio.stopcovid.model.PrivacySection
 import kotlinx.coroutines.CoroutineScope
@@ -56,4 +57,5 @@ class PrivacyManager : ServerManager() {
     override fun prefix(context: Context): String = "privacy-"
     override fun fallbackFileName(context: Context): String = "privacy-en.json"
     override fun type(): Type = object : TypeToken<List<PrivacySection>>() {}.type
+    override fun lastRefreshSharedPrefsKey(): String = Constants.SharedPrefs.LAST_PRIVACY_REFRESH
 }
