@@ -20,6 +20,18 @@ apply from: 'test.gradle'
 android {
     compileSdkVersion 29
     buildToolsVersion "29.0.3"
+
+    signingConfigs {
+        release {
+            // You need to specify either an absolute path or include the
+            // keystore file in the same directory as the build.gradle file.
+            storeFile file("my-release-key.jks")
+            storePassword "password"
+            keyAlias "my-alias"
+            keyPassword "password"
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled true
@@ -29,6 +41,7 @@ android {
             packagingOptions {
                 exclude 'DebugProbesKt.bin'
             }
+            signingConfig signingConfigs.release
         }
     }
 
