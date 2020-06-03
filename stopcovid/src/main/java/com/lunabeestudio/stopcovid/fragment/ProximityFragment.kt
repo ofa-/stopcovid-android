@@ -211,6 +211,7 @@ class ProximityFragment : AboutMainFragment() {
             } else {
                 strings["proximityController.mainMessage.subtitle.off"]
             }
+            gravity = Gravity.CENTER
             identifier = items.count().toLong()
         }
         items += captionItem
