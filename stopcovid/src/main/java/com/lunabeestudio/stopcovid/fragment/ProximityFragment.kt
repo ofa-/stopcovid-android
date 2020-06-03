@@ -122,11 +122,7 @@ class ProximityFragment : AboutMainFragment() {
     }
 
     override fun getTitleKey(): String {
-        return if (robertManager.isProximityActive) {
-            "common.bravo"
-        } else {
-            "common.warning"
-        }
+        return "proximityController.tabBar.title"
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
