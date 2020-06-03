@@ -183,7 +183,7 @@ class ProximityFragment : AboutMainFragment() {
         val items = ArrayList<GenericItem>()
 
         subTitleItem = titleItem {
-            gravity = Gravity.START
+            gravity = Gravity.CENTER
             identifier = items.count().toLong()
         }
         items += subTitleItem
