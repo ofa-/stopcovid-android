@@ -182,12 +182,12 @@ class ProximityFragment : AboutMainFragment() {
             gravity = Gravity.CENTER
             identifier = items.count().toLong()
         }
-        items += subTitleItem
-
         logoItem = logoItem {
             identifier = items.count().toLong()
         }
         items += logoItem
+        items += subTitleItem
+
         proximityButtonItem = proximityButtonItem {
             mainText = strings["proximityController.button.activateProximity"]
             lightText = strings["proximityController.button.deactivateProximity"]
