@@ -76,7 +76,7 @@
     "aboutController.appVersion": "Version %@ #%@",
     "proximityController.title": "Proximité",
     "proximityController.switch.title": "StopCovid",
-    "proximityController.mainMessage.subtitle": "Activer StopCovid permet d’être informé et d’informer les autres d’un risque de contamination, et de contribuer activement à la lutte contre le COVID-19.",
+    "proximityController.mainMessage.subtitle": "Activez StopCovid pour être informé et informer les autres d’un risque de contamination. Contribuez activement à la lutte contre le COVID-19.",
     "proximityController.mainMessage.subtitle.off": "Activer StopCovid permet d’être informé et d’informer les autres d’un risque de contamination, et de contribuer activement à la lutte contre le COVID-19.\nVous pouvez à tout moment activer et désactiver StopCovid.",
     "proximityController.mainMessage.subtitle.on": "Merci d’avoir activé StopCovid.\nVous pouvez continuer à utiliser votre téléphone normalement, mais ne désactivez pas le Bluetooth !\nVous pouvez à tout moment activer et désactiver StopCovid.",
     "proximityController.manageData": "Gérer mes données",
