@@ -66,19 +66,7 @@ abstract class ServerManager {
         if (!File(context.filesDir, fileName).exists()) {
             fileName = fallbackFileName(context)
         }
-        return if (!File(context.filesDir, fileName).exists()) {
-            Timber.d("Loading default file to object")
-            getDefaultAssetFile<T>(context)
-        } else {
-            try {
-                Timber.d("Loading file to object")
-                gson.fromJson<T>(transform(File(context.filesDir, fileName).readText()), type())
-            } catch (e: java.lang.Exception) {
-                Timber.e(e)
-                Timber.d("Loading default file to object")
-                getDefaultAssetFile<T>(context)
-            }
-        }
+        return getDefaultAssetFile<T>(context)
     }
 
     private fun <T> getDefaultAssetFile(context: Context): T {
