@@ -1,9 +1,9 @@
 StopCovid Android
 =================
 
-This repository is a fork of [upstream gitlab.inria.fr](upstream)
+This repository is a fork of [upstream gitlab.inria.fr][upstream]
 repo `stopcovid-android`, the Android mobile application component
-of [StopCovid](StopCovid).
+of [StopCovid][StopCovid].
 
 
 
