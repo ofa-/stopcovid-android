@@ -27,7 +27,7 @@ Building the app
 Building the release (signed) apk
 ---------------------------------
 
-1. create local keystore in stopcovid/
+1. create local keystore in stopcovid/ (use _password_ as password)
    ```
 	keytool -genkey -v -keystore my-release-key.jks \
 		-keyalg RSA -keysize 2048 -validity 10000 -alias my-alias
