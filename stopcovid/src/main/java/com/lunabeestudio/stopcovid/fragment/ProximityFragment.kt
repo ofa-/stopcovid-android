@@ -79,6 +79,8 @@ import java.net.URL
 import java.security.MessageDigest
 import java.util.Locale
 
+import androidx.appcompat.app.AppCompatActivity
+
 class ProximityFragment : AboutMainFragment() {
 
     private val robertManager by lazy {
@@ -266,6 +268,7 @@ class ProximityFragment : AboutMainFragment() {
             } else {
                 R.drawable.status_inactive
             }
+            (activity as AppCompatActivity).supportActionBar?.title = strings[getTitleKey()]
 
             proximityButtonItem.showMainButton = !isProximityOn
             proximityButtonItem.isButtonEnabled = ProximityManager.isPhoneSetup(context)
