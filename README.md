@@ -12,16 +12,19 @@ Building the app
 
 0. install `gradle`
 1. install `android-sdk` for your dev env
-2. make sure the sdk dir user-writable (gradle might try to update it)
+2. make sure the sdk dir is user-writable (gradle might try to update it)
 3. tell gradle where the sdk is
    ```
 	cp local.properties.sample local.properties  # (and set sdk.dir)
    ```
-4. build the app (default = debug, for gradle 1.3.71)
+4. build the (debug) app
    ```
-	gradle assemble
+	gradle assembleDebug
    ```
 5. output: `./stopcovid/build/outputs/apk/debug/stopcovid-debug.apk`
+
+
+note: alternatively, skip step 0. above and use `./gradlew assembleDebug`
 
 
 Building the release (signed) apk
@@ -43,8 +46,15 @@ Building the release (signed) apk
 Installing the app
 ------------------
 
+1. switch your phone to `developer mode`
+   ```
+	Parameters > About this phone > build number: tap 7 times
+	Parameters > System > Advanced > Developers > USB Debugging: enable
+   ```
+2. install the app
+   ```
 	gradle installRelease
-
+   ```
 
 Checking the log live with adb
 ------------------------------
