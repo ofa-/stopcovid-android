@@ -11,7 +11,6 @@
 package com.lunabeestudio.framework.sharedcrypto
 
 import android.util.Base64
-import android.util.Log
 import com.google.common.truth.Truth.assertThat
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.junit.Before
@@ -22,7 +21,7 @@ import java.security.PublicKey
 import java.security.spec.PKCS8EncodedKeySpec
 import java.security.spec.X509EncodedKeySpec
 
-class BouncyCastleCryptoDataSourceTest() {
+class BouncyCastleCryptoDataSourceTest {
     private lateinit var bcCryptoDataSource: BouncyCastleCryptoDataSource
     private lateinit var serverPublicKey: PublicKey
     private lateinit var localPrivateKey: PrivateKey

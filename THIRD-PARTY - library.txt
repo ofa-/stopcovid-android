@@ -6,6 +6,10 @@ Component: Kotlinx Coroutines
 License Text URL: https://github.com/Kotlin/kotlinx.coroutines/blob/master/LICENSE.txt
 Source Code: https://github.com/Kotlin/kotlinx.coroutines
 
+Component: Timber
+License Text URL: https://github.com/JakeWharton/timber/blob/master/LICENSE.txt
+Source Code: https://github.com/JakeWharton/timber
+
 ================================================================================
 BSD 3-Clause
 ================================================================================

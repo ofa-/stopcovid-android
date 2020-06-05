@@ -23,6 +23,7 @@
         android:layout_marginHorizontal="@dimen/spacing_xlarge"
         android:layout_marginTop="@dimen/spacing_large"
         android:gravity="center"
+        android:textIsSelectable="false"
         app:layout_constraintBottom_toTopOf="@id/mainButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

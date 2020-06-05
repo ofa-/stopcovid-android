@@ -19,19 +19,15 @@ import android.bluetooth.BluetoothProfile
 import android.content.Context
 import android.os.Build.VERSION.SDK_INT
 import android.os.Build.VERSION_CODES.M
-import android.util.Log
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.Channel.Factory.CONFLATED
 import kotlinx.coroutines.channels.SendChannel
+import timber.log.Timber
 
 internal class BleGattClientImpl(
     override val bluetoothDevice: BluetoothDevice,
     private val context: Context
 ) : BleGattClient {
-
-    companion object {
-        private val TAG = BleGattClientImpl::class.java.simpleName
-    }
 
     private val remoteRssiChannel = Channel<ValueWithStatus<Int>>(CONFLATED)
     private val connectionStateChannel = Channel<ValueWithStatus<Int>>(CONFLATED)
@@ -79,7 +75,7 @@ internal class BleGattClientImpl(
 
     private inner class Callback : BluetoothGattCallback() {
         override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
-            Log.d(TAG, "onConnectionStateChange status=$status, newState=$newState")
+            Timber.d("onConnectionStateChange status=$status, newState=$newState")
             _isConnected = status == GATT_SUCCESS && newState == BluetoothProfile.STATE_CONNECTED
 
             when (status) {
@@ -89,7 +85,7 @@ internal class BleGattClientImpl(
         }
 
         override fun onReadRemoteRssi(gatt: BluetoothGatt, rssi: Int, status: Int) {
-            Log.d(TAG, "onReadRemoteRssi status=$status, rssi=$rssi")
+            Timber.d("onReadRemoteRssi status=$status, rssi=$rssi")
             remoteRssiChannel.safeOffer(ValueWithStatus(status = status, value = rssi))
         }
     }

@@ -12,10 +12,6 @@ package com.lunabeestudio.robert
 
 import android.content.Context
 import android.util.Base64
-import androidx.work.Constraints
-import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.NetworkType
-import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -78,6 +74,12 @@ class RobertManagerImpl(
         }
     }
 
+    override var shouldReloadBleSettings: Boolean
+        get() = keystoreRepository.shouldReloadBleSettings
+        set(value) {
+            keystoreRepository.shouldReloadBleSettings = value
+        }
+
     override val isRegistered: Boolean
         get() = keystoreRepository.kA != null && keystoreRepository.kEA != null
 
@@ -116,6 +118,12 @@ class RobertManagerImpl(
 
     override val backgroundServiceManufacturerData: String
         get() = keystoreRepository.backgroundServiceManufacturerData ?: RobertConstant.BLE_BACKGROUND_SERVICE_MANUFACTURER_DATA_IOS
+
+    override val checkStatusFrequencyHour: Int
+        get() = keystoreRepository.checkStatusFrequencyHour ?: RobertConstant.CHECK_STATUS_FREQUENCY_HOURS
+
+    override val randomStatusHour: Int
+        get() = keystoreRepository.randomStatusHour ?: RobertConstant.RANDOM_STATUS_HOUR
 
     override suspend fun register(application: RobertApplication, captcha: String): RobertResult {
         val result = remoteServiceRepository.register(captcha)
@@ -200,7 +208,7 @@ class RobertManagerImpl(
         (configuration?.firstOrNull {
             it.name == RobertConstant.CONFIG.CHECK_STATUS_FREQUENCY
         }?.value as? Number)?.let { checkStatusFrequency ->
-            keystoreRepository.checkStatusFrequency = checkStatusFrequency.toInt()
+            keystoreRepository.checkStatusFrequencyHour = checkStatusFrequency.toInt()
         }
         (configuration?.firstOrNull {
             it.name == RobertConstant.CONFIG.RANDOM_STATUS_HOUR
@@ -276,6 +284,7 @@ class RobertManagerImpl(
                         keystoreRepository.atRisk = result.data.atRisk
                         keystoreRepository.atRiskLastRefresh = Date().time
                         keystoreRepository.lastExposureTimeframe = result.data.lastExposureTimeframe
+                        keystoreRepository.shouldReloadBleSettings = true
                         RobertResult.Success()
                     } catch (e: Exception) {
                         when (e) {
@@ -414,21 +423,12 @@ class RobertManagerImpl(
 
     private fun startStatusWorker(context: Context) {
         Timber.d("Create worker status")
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .build()
-        val minDelay: Long = (keystoreRepository.checkStatusFrequency ?: RobertConstant.CHECK_STATUS_FREQUENCY_HOURS).toLong()
-        val maxDelay = minDelay + (keystoreRepository.randomStatusHour?.toLong() ?: RobertConstant.RANDOM_STATUS_SEC) * 60 * 60
-        val randomDelaySec: Long = Random.nextLong(minDelay, maxDelay)
 
-        Timber.d("Add random delay of ${randomDelaySec}sec")
+        val minDelaySec = TimeUnit.HOURS.toSeconds(checkStatusFrequencyHour.toLong())
+        val maxDelaySec = minDelaySec + TimeUnit.HOURS.toSeconds(randomStatusHour.toLong())
+        val randomDelaySec = Random.nextLong(minDelaySec, maxDelaySec)
 
-        val statusWorkRequest = PeriodicWorkRequestBuilder<StatusWorker>(minDelay, TimeUnit.HOURS)
-            .setConstraints(constraints)
-            .setInitialDelay(randomDelaySec, TimeUnit.SECONDS)
-            .build()
-        WorkManager.getInstance(context)
-            .enqueueUniquePeriodicWork(RobertConstant.STATUS_WORKER_NAME, ExistingPeriodicWorkPolicy.KEEP, statusWorkRequest)
+        StatusWorker.scheduleStatusWorker(context, minDelaySec, randomDelaySec)
     }
 
     private fun stopStatusWorker(context: Context) {

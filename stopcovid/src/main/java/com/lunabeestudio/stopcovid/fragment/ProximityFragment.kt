@@ -132,8 +132,10 @@ class ProximityFragment : AboutMainFragment() {
         val filter = IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED)
         activity?.registerReceiver(receiver, filter)
 
-        getActivityBinding().errorLayout.post {
-            getActivityBinding().errorLayout.translationY = getActivityBinding().errorLayout.height.toFloat()
+        getActivityBinding()?.errorLayout?.let { errorLayout ->
+            errorLayout.post {
+                errorLayout.translationY = errorLayout.height.toFloat()
+            }
         }
         return view
     }
@@ -285,7 +287,7 @@ class ProximityFragment : AboutMainFragment() {
                 strings["proximityController.switch.subtitle.deactivated"]
             }
 
-            updateErrorLayout(getActivityBinding().errorLayout)
+            updateErrorLayout(getActivityBinding()?.errorLayout)
 
             if (binding?.recyclerView?.isComputingLayout == false) {
                 binding?.recyclerView?.adapter?.notifyDataSetChanged()
@@ -293,19 +295,19 @@ class ProximityFragment : AboutMainFragment() {
         }
     }
 
-    private fun updateErrorLayout(errorLayout: FrameLayout) {
-        getActivityBinding().errorTextView.text = ProximityManager.getErrorText(this, robertManager, strings)
+    private fun updateErrorLayout(errorLayout: FrameLayout?) {
+        getActivityBinding()?.errorTextView?.text = ProximityManager.getErrorText(this, robertManager, strings)
         val clickListener = ProximityManager.getErrorClickListener(this) {
             if (System.currentTimeMillis() > proximityClickThreshold) {
                 proximityClickThreshold = System.currentTimeMillis() + PROXIMITY_BUTTON_DELAY
                 activateProximity()
             }
         }
-        getActivityBinding().errorTextView.setOnClickListener(clickListener)
+        getActivityBinding()?.errorTextView?.setOnClickListener(clickListener)
         if (clickListener != null) {
-            getActivityBinding().errorTextView.addRipple()
+            getActivityBinding()?.errorTextView?.addRipple()
         } else {
-            getActivityBinding().errorTextView.background = null
+            getActivityBinding()?.errorTextView?.background = null
         }
         if (webView?.isVisible == true || ProximityManager.isProximityOn(requireContext(), robertManager)) {
             hideErrorLayout(errorLayout)
@@ -314,9 +316,9 @@ class ProximityFragment : AboutMainFragment() {
         }
     }
 
-    private fun hideErrorLayout(errorLayout: FrameLayout) {
-        errorLayout.errorTextView.isClickable = false
-        errorLayout.animate().apply {
+    private fun hideErrorLayout(errorLayout: FrameLayout?) {
+        errorLayout?.errorTextView?.isClickable = false
+        errorLayout?.animate()?.apply {
             duration = resources.getInteger(android.R.integer.config_mediumAnimTime).toLong()
             interpolator = this@ProximityFragment.interpolator
             setUpdateListener { valueAnimator ->
@@ -334,8 +336,8 @@ class ProximityFragment : AboutMainFragment() {
         }
     }
 
-    private fun showErrorLayout(errorLayout: FrameLayout) {
-        errorLayout.post {
+    private fun showErrorLayout(errorLayout: FrameLayout?) {
+        errorLayout?.post {
             context?.let {
                 errorLayout.isVisible = true
                 errorLayout.animate().apply {

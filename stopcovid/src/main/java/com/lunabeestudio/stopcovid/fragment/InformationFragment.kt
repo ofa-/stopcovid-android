@@ -21,7 +21,6 @@ import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
 import com.lunabeestudio.stopcovid.extension.openInChromeTab
 import com.lunabeestudio.stopcovid.extension.robertManager
-import com.lunabeestudio.stopcovid.fastitem.iconTitleItem
 import com.mikepenz.fastadapter.GenericItem
 
 class InformationFragment : MainFragment() {

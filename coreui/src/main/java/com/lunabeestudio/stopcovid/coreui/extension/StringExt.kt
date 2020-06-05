@@ -22,6 +22,8 @@ import androidx.emoji.text.EmojiCompat
 import com.lunabeestudio.stopcovid.coreui.BuildConfig
 import com.lunabeestudio.stopcovid.coreui.network.OkHttpClient
 import okhttp3.Request
+import retrofit2.HttpException
+import retrofit2.Response
 import timber.log.Timber
 import java.io.File
 import java.text.Normalizer
@@ -38,7 +40,7 @@ fun String.download(context: Context): String {
         response.body!!.string()
     } else {
         Timber.d(response.body?.string())
-        throw Exception()
+        throw HttpException(Response.error<Any>(response.body!!, response))
     }
 }
 
@@ -57,7 +59,7 @@ fun String.saveTo(context: Context, file: File) {
         }
     } else {
         Timber.d(response.body?.string())
-        throw Exception()
+        throw HttpException(Response.error<Any>(response.body!!, response))
     }
 }
 

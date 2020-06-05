@@ -48,6 +48,10 @@ android {
             }
         }
     }
+
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
 }
 
 dependencies {
@@ -64,7 +68,7 @@ dependencies {
     implementation 'com.jakewharton.timber:timber:4.7.1'
     implementation 'com.google.code.gson:gson:2.8.6'
 
-    implementation 'com.google.protobuf:protobuf-javalite:3.12.1'
+    implementation 'com.google.protobuf:protobuf-javalite:3.12.2'
     implementation 'org.bouncycastle:bcprov-jdk15on:1.65.01'
 
     implementation project(path: ':domain')

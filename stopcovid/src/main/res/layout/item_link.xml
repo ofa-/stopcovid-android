@@ -26,11 +26,11 @@
         android:layout_height="@dimen/icon_size"
         android:layout_marginEnd="@dimen/spacing_medium"
         android:scaleType="center"
-        android:tint="?colorPrimary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/textView"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:tint="?colorPrimary"
         tools:ignore="ContentDescription"
         tools:src="@drawable/ic_manage_data" />
 
@@ -40,6 +40,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/spacing_large"
+        android:textIsSelectable="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/imageView"
         app:layout_constraintStart_toEndOf="@id/leftIconImageView"

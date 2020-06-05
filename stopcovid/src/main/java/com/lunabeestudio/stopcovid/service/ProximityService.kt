@@ -16,15 +16,19 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Binder
 import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.edit
+import androidx.preference.PreferenceManager
 import com.lunabeestudio.framework.ble.service.RobertProximityService
 import com.lunabeestudio.robert.RobertApplication
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.robert.model.RobertException
+import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.R
 import com.lunabeestudio.stopcovid.coreui.UiConstants
@@ -40,7 +44,13 @@ class ProximityService : RobertProximityService() {
 
     private val binder = ProximityBinder()
 
-    private var strings: HashMap<String, String> = StringsManager.getStrings()
+    private val strings: HashMap<String, String> by lazy {
+        StringsManager.getStrings()
+    }
+
+    private val sharedPreferences: SharedPreferences by lazy {
+        PreferenceManager.getDefaultSharedPreferences(this)
+    }
 
     override val robertManager: RobertManager by lazy {
         robertManager()
@@ -77,6 +87,10 @@ class ProximityService : RobertProximityService() {
                 .bigText(strings["notification.proximityServiceRunning.message"]))
             .setContentIntent(pendingIntent)
             .build()
+    }
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        return START_STICKY
     }
 
     override fun onDestroy() {

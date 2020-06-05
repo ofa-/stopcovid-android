@@ -18,7 +18,7 @@ import timber.log.Timber
 
 object ConfigManager {
 
-    private const val URL: String = BuildConfig.SERVER_URL + "config.json"
+    private const val URL: String = BuildConfig.SERVER_URL + BuildConfig.CONFIG_JSON
 
     @WorkerThread
     fun fetchLast(context: Context): String {

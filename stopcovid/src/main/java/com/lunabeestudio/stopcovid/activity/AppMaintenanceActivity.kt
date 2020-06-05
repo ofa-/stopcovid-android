@@ -41,9 +41,8 @@ class AppMaintenanceActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         binding = ActivityAppMaintenanceBinding.inflate(layoutInflater)
-        AppMaintenanceManager.isActivityOpened = true
         setContentView(binding.root)
-        val info = Gson().fromJson<Info>(intent.getStringExtra(EXTRA_INFO), Info::class.java)
+        val info = Gson().fromJson(intent.getStringExtra(EXTRA_INFO), Info::class.java)
         fillScreen(info)
         bindProgressButton(binding.refreshButton)
     }
@@ -89,7 +88,11 @@ class AppMaintenanceActivity : AppCompatActivity() {
                 gravity = DrawableButton.GRAVITY_CENTER
             }
             AppMaintenanceManager.updateCheckForMaintenanceUpgrade(this,
-                appIsFreeCompletion = this@AppMaintenanceActivity::finish,
+                appIsFreeCompletion = {
+                    startActivity(Intent(this, OnBoardingActivity::class.java))
+                    finishAndRemoveTask()
+
+                },
                 appIsBlockedCompletion = { info ->
                     binding.refreshButton.hideProgress(strings["common.tryAgain"])
                     binding.swipeRefreshLayout.isRefreshing = false
@@ -98,7 +101,11 @@ class AppMaintenanceActivity : AppCompatActivity() {
         }
         binding.swipeRefreshLayout.setOnRefreshListener {
             AppMaintenanceManager.updateCheckForMaintenanceUpgrade(this,
-                appIsFreeCompletion = this@AppMaintenanceActivity::finish,
+                appIsFreeCompletion = {
+                    startActivity(Intent(this, OnBoardingActivity::class.java))
+                    finishAndRemoveTask()
+
+                },
                 appIsBlockedCompletion = { info ->
                     binding.swipeRefreshLayout.isRefreshing = false
                     fillScreen(info)
@@ -115,14 +122,6 @@ class AppMaintenanceActivity : AppCompatActivity() {
         intent.addCategory(Intent.CATEGORY_HOME)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         startActivity(intent)
-    }
-
-    /**
-     * Inform the AppMaintenanceManager that the screen is not opened anymore
-     */
-    override fun onDestroy() {
-        AppMaintenanceManager.isActivityOpened = false
-        super.onDestroy()
     }
 
     companion object {

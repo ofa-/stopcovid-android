@@ -36,10 +36,8 @@ class StringsManager : ServerManager() {
         fun getStrings(): HashMap<String, String> = _strings
 
         fun init(context: Context) {
-            CoroutineScope(Dispatchers.IO).launch {
-                prevLanguage = Locale.getDefault().language
-                _strings = StringsManager().loadLocal(context)
-            }
+            prevLanguage = Locale.getDefault().language
+            _strings = StringsManager().loadLocal(context)
         }
 
         fun appForeground(context: Context) {

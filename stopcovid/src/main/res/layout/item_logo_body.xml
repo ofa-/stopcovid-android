@@ -34,6 +34,7 @@
         android:layout_marginVertical="@dimen/spacing_small"
         android:layout_marginEnd="@dimen/spacing_xlarge"
         android:textAppearance="?textAppearanceBody1"
+        android:textIsSelectable="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/imageView"

@@ -31,7 +31,7 @@ import com.lunabeestudio.stopcovid.viewmodel.OnBoardingViewModel
 import com.lunabeestudio.stopcovid.viewmodel.OnBoardingViewModelFactory
 import timber.log.Timber
 
-class OnBoardingActivity : AppCompatActivity() {
+class OnBoardingActivity : BaseActivity() {
 
     private val sharedPreferences: SharedPreferences by lazy {
         PreferenceManager.getDefaultSharedPreferences(this)

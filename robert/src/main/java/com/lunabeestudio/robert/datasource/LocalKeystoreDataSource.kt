@@ -13,6 +13,7 @@ package com.lunabeestudio.robert.datasource
 import com.lunabeestudio.domain.model.DeviceParameterCorrection
 
 interface LocalKeystoreDataSource {
+    var shouldReloadBleSettings: Boolean?
     var kA: ByteArray?
     var kEA: ByteArray?
     var timeStart: Long?

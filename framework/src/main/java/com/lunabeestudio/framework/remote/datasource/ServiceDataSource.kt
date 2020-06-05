@@ -11,7 +11,6 @@
 package com.lunabeestudio.framework.remote.datasource
 
 import android.content.Context
-import com.lunabeestudio.domain.model.Configuration
 import com.lunabeestudio.domain.model.LocalProximity
 import com.lunabeestudio.domain.model.RegisterReport
 import com.lunabeestudio.domain.model.ServerStatusUpdate
@@ -31,12 +30,10 @@ import com.lunabeestudio.robert.datasource.RemoteServiceDataSource
 import com.lunabeestudio.robert.model.BackendException
 import com.lunabeestudio.robert.model.RobertResult
 import com.lunabeestudio.robert.model.RobertResultData
-import kotlinx.coroutines.delay
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import retrofit2.HttpException
 import retrofit2.Response
 import timber.log.Timber
-import java.util.concurrent.TimeUnit
 
 class ServiceDataSource(context: Context, baseUrl: String = BuildConfig.BASE_URL) : RemoteServiceDataSource {
 

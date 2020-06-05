@@ -15,29 +15,25 @@ import android.bluetooth.le.AdvertiseData
 import android.bluetooth.le.AdvertiseSettings
 import android.bluetooth.le.BluetoothLeAdvertiser
 import android.os.ParcelUuid
-import android.util.Log
 import com.orange.proximitynotification.ble.BleSettings
+import timber.log.Timber
 
 class BleAdvertiserImpl(
     override val settings: BleSettings,
     private val bluetoothAdvertiser: BluetoothLeAdvertiser
 ) : BleAdvertiser {
 
-    companion object {
-        private val TAG: String = BleAdvertiserImpl::class.java.simpleName
-    }
-
     private var advertiseCallback: InnerAdvertiseCallback? = null
 
     override fun start(data: ByteArray, callback: BleAdvertiser.Callback) {
-        Log.d(TAG, "Starting Advertising")
+        Timber.d("Starting Advertising")
 
         doStop()
         doStart(data, callback)
     }
 
     override fun stop() {
-        Log.d(TAG, "Stopping Advertising")
+        Timber.d("Stopping Advertising")
         doStop()
     }
 
@@ -80,13 +76,13 @@ class BleAdvertiserImpl(
         AdvertiseCallback() {
         override fun onStartFailure(errorCode: Int) {
             super.onStartFailure(errorCode)
-            Log.w(TAG, "Advertising failed errorCode=$errorCode")
+            Timber.w("Advertising failed errorCode=$errorCode")
             callback.onError(errorCode)
         }
 
         override fun onStartSuccess(settingsInEffect: AdvertiseSettings) {
             super.onStartSuccess(settingsInEffect)
-            Log.d(TAG, "Advertising successfully started")
+            Timber.d("Advertising successfully started")
         }
     }
 

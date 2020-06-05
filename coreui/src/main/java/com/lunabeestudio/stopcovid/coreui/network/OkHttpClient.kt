@@ -48,10 +48,10 @@ object OkHttpClient {
             }
             addInterceptor(getDefaultHeaderInterceptor())
             addInterceptor(getLogInterceptor())
-            callTimeout(1L, TimeUnit.MINUTES)
-            connectTimeout(1L, TimeUnit.MINUTES)
-            readTimeout(1L, TimeUnit.MINUTES)
-            writeTimeout(1L, TimeUnit.MINUTES)
+            callTimeout(30L, TimeUnit.SECONDS)
+            connectTimeout(30L, TimeUnit.SECONDS)
+            readTimeout(30L, TimeUnit.SECONDS)
+            writeTimeout(30L, TimeUnit.SECONDS)
         }.build()
     }
 

@@ -22,6 +22,25 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
 
     private val sharedPreferences: SharedPreferences = context.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE)
 
+    override var shouldReloadBleSettings: Boolean?
+        get() {
+            val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_SHOULD_RELOAD_BLE_SETTINGS, null)
+            return if (encryptedText != null) {
+                cryptoManager.decryptToString(encryptedText).toBoolean()
+            } else {
+                null
+            }
+        }
+        set(value) {
+            if (value != null) {
+                sharedPreferences.edit()
+                    .putString(SHARED_PREF_KEY_SHOULD_RELOAD_BLE_SETTINGS, cryptoManager.encryptToString(value.toString()))
+                    .apply()
+            } else {
+                sharedPreferences.edit().remove(SHARED_PREF_KEY_SHOULD_RELOAD_BLE_SETTINGS).apply()
+            }
+        }
+
     override var kA: ByteArray?
         get() {
             val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_KA, null)
@@ -398,6 +417,7 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
 
     companion object {
         private const val SHARED_PREF_NAME = "robert_prefs"
+        private const val SHARED_PREF_KEY_SHOULD_RELOAD_BLE_SETTINGS = "shared.pref.should_reload_ble_settings"
         private const val SHARED_PREF_KEY_KA = "shared.pref.ka"
         private const val SHARED_PREF_KEY_KEA = "shared.pref.kea"
         private const val SHARED_PREF_KEY_TIME_START = "shared.pref.time_start"

@@ -18,7 +18,7 @@ internal object RobertConstant {
     const val DATA_RETENTION_PERIOD: Int = 14
     const val QUARANTINE_PERIOD: Int = 14
     const val CHECK_STATUS_FREQUENCY_HOURS: Int = 24
-    const val RANDOM_STATUS_SEC: Long = 60 * 60 * 12
+    const val RANDOM_STATUS_HOUR: Int = 12
     const val PRE_SYMPTOMS_SPAN: Int = 2
     const val MIN_HOUR_CONTACT_NOTIF: Int = 7
     const val MAX_HOUR_CONTACT_NOTIF: Int = 19
