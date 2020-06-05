@@ -68,6 +68,7 @@
                 android:paddingHorizontal="@dimen/spacing_xlarge"
                 android:paddingVertical="@dimen/spacing_medium"
                 android:textAppearance="@style/TextAppearance.StopCovid.Alert"
+                android:textIsSelectable="false"
                 tools:text="@tools:sample/lorem[14]" />
         </FrameLayout>
 

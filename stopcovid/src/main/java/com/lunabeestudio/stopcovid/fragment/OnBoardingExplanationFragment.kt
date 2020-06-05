@@ -11,13 +11,12 @@
 package com.lunabeestudio.stopcovid.fragment
 
 import android.view.Gravity
-import android.view.View
 import androidx.navigation.fragment.findNavController
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
-import com.lunabeestudio.stopcovid.fastitem.numberItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
+import com.lunabeestudio.stopcovid.fastitem.numberItem
 import com.mikepenz.fastadapter.GenericItem
 
 class OnBoardingExplanationFragment : OnBoardingFragment() {

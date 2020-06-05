@@ -14,8 +14,8 @@ import android.os.Bundle
 import android.view.View
 import androidx.lifecycle.Observer
 import com.lunabeestudio.stopcovid.R
-import com.lunabeestudio.stopcovid.extension.fillItems
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
+import com.lunabeestudio.stopcovid.extension.fillItems
 import com.lunabeestudio.stopcovid.manager.PrivacyManager
 import com.lunabeestudio.stopcovid.model.PrivacySection
 import com.mikepenz.fastadapter.GenericItem

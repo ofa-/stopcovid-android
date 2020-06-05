@@ -37,6 +37,7 @@
             android:layout_marginBottom="@dimen/spacing_xlarge"
             android:gravity="center"
             android:textAppearance="?textAppearanceBody1"
+            android:textIsSelectable="false"
             tools:text="@tools:sample/lorem[22]" />
 
         <com.google.android.material.button.MaterialButton

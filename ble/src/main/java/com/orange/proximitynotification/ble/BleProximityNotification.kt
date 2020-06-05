@@ -35,8 +35,6 @@ class BleProximityNotification(
 ) : ProximityNotification {
 
     companion object {
-        private val TAG: String = BleProximityNotification::class.java.simpleName
-
         private const val VERSION = 1
     }
 

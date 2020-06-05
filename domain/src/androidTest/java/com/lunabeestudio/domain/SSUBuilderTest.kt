@@ -20,7 +20,7 @@ import org.junit.Test
 class SSUBuilderTest {
 
     @Test
-    fun `build_given_ecc64_ebid64_key64_and_time_should_return_expected_mac64`() {
+    fun build_given_ecc64_ebid64_key64_and_time_should_return_expected_mac64() {
         val ecc64 = "eg=="
         val ebid64 = "HivsWMEbkHo="
         val key64 = "I5lqt1XfQKstC8TYw6YOVhzfwvsTnJPfHLbwj3HZzTw="

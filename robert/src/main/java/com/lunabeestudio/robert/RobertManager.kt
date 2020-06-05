@@ -10,7 +10,6 @@
 
 package com.lunabeestudio.robert
 
-import android.content.Context
 import com.lunabeestudio.domain.model.DeviceParameterCorrection
 import com.lunabeestudio.domain.model.HelloBuilder
 import com.lunabeestudio.domain.model.LocalProximity
@@ -18,6 +17,7 @@ import com.lunabeestudio.robert.model.RobertResult
 import com.lunabeestudio.robert.model.RobertResultData
 
 interface RobertManager {
+    var shouldReloadBleSettings: Boolean
 
     val isRegistered: Boolean
 
@@ -44,6 +44,10 @@ interface RobertManager {
     val characteristicUUID: String
 
     val backgroundServiceManufacturerData: String
+
+    val checkStatusFrequencyHour: Int
+
+    val randomStatusHour: Int
 
     suspend fun register(application: RobertApplication, captcha: String): RobertResult
 

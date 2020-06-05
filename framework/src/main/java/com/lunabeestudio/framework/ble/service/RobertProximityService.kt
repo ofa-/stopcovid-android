@@ -82,13 +82,17 @@ abstract class RobertProximityService : ProximityNotificationService() {
                 it.device_handset_model == "DEFAULT"
             } ?: DeviceParameterCorrection("", FALLBACK_TX, FALLBACK_RX)
 
-            return BleSettings(
+            val settings = BleSettings(
                 serviceUuid = UUID.fromString(robertManager.serviceUUID),
                 servicePayloadCharacteristicUuid = UUID.fromString(robertManager.characteristicUUID),
                 backgroundServiceManufacturerDataIOS = robertManager.backgroundServiceManufacturerData.splitToByteArray(),
                 txCompensationGain = deviceParameterCorrection.tx_RSS_correction_factor.toInt(),
                 rxCompensationGain = deviceParameterCorrection.rx_RSS_correction_factor.toInt()
             )
+
+            robertManager.shouldReloadBleSettings = false
+
+            return settings
         }
 
     @WorkerThread
@@ -124,7 +128,11 @@ abstract class RobertProximityService : ProximityNotificationService() {
             Timber.d("Next payload update in ${nextPayloadUpdateDelay}ms")
             delay(nextPayloadUpdateDelay)
             try {
-                notifyProximityPayloadUpdated()
+                if (robertManager.shouldReloadBleSettings) {
+                    notifyBleSettingsUpdate()
+                } else {
+                    notifyProximityPayloadUpdated()
+                }
             } catch (e: Exception) {
                 if (e is RobertException) {
                     onError(e)

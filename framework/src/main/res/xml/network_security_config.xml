@@ -7,10 +7,10 @@
   ~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   ~ Created by Lunabee Studio / Date - 2020/19/05 - for the STOP-COVID project
   -->
-<network-security-config>
+<network-security-config xmlns:tools="http://schemas.android.com/tools">
     <domain-config cleartextTrafficPermitted="false">
         <domain includeSubdomains="true">api.stopcovid.gouv.fr</domain>
-        <pin-set>
+        <pin-set tools:ignore="MissingBackupPin">
             <pin digest="SHA-256">Up+TDyVDu8vKvd22TeAnXYxQqfPd2oNOU9Y04JahHpQ=</pin>
         </pin-set>
         <trust-anchors>
@@ -19,7 +19,7 @@
     </domain-config>
     <domain-config cleartextTrafficPermitted="false">
         <domain includeSubdomains="true">app.stopcovid.gouv.fr</domain>
-        <pin-set>
+        <pin-set tools:ignore="MissingBackupPin">
             <pin digest="SHA-256">sXQojvwsiyblrpMQIVRXGC5u7AgknzTJm+VIK1kQmD8=</pin>
         </pin-set>
         <trust-anchors>

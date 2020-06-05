@@ -8,11 +8,9 @@
  * Created by Lunabee Studio / Date - 2020/04/05 - for the STOP-COVID project
  */
 
-package com.lunabeestudio.framework.remote.extension
+package com.lunabeestudio.stopcovid.extension
 
 import android.util.MalformedJsonException
-import com.google.gson.Gson
-import com.lunabeestudio.framework.remote.model.ServerException
 import com.lunabeestudio.robert.model.BackendException
 import com.lunabeestudio.robert.model.NoInternetException
 import com.lunabeestudio.robert.model.RobertException
@@ -32,13 +30,7 @@ internal fun Exception.remoteToRobertException(): RobertException = when (this) 
         try {
             when (code()) {
                 401 -> UnauthorizedException()
-                else -> {
-                    val robertServerError =
-                        Gson().fromJson(this.response()?.errorBody()?.string() ?: "", ServerException::class.java)
-                    robertServerError.message?.let { message ->
-                        BackendException(message)
-                    } ?: BackendException()
-                }
+                else -> BackendException()
             }
         } catch (e: Exception) {
             BackendException()

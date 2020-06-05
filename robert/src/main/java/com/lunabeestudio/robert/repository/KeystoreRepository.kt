@@ -16,6 +16,12 @@ import com.lunabeestudio.robert.datasource.LocalKeystoreDataSource
 internal class KeystoreRepository(
     private val keystoreDataSource: LocalKeystoreDataSource) {
 
+    var shouldReloadBleSettings: Boolean
+        get() = keystoreDataSource.shouldReloadBleSettings ?: false
+        set(value) {
+            keystoreDataSource.shouldReloadBleSettings = value
+        }
+
     var kA: ByteArray?
         get() = keystoreDataSource.kA
         set(value) {
@@ -112,7 +118,7 @@ internal class KeystoreRepository(
             keystoreDataSource.quarantinePeriod = value
         }
 
-    var checkStatusFrequency: Int?
+    var checkStatusFrequencyHour: Int?
         get() = keystoreDataSource.checkStatusFrequency
         set(value) {
             keystoreDataSource.checkStatusFrequency = value

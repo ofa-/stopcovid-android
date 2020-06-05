@@ -37,7 +37,6 @@ object AppMaintenanceManager {
     @DrawableRes
     var maintenanceIconRes: Int = 0
     var upgradeIconRes: Int = 0
-    var isActivityOpened: Boolean = false
     var infoFreeCompletion: (() -> Unit)? = null
     var infoBlockedCompletion: ((info: Info) -> Unit)? = null
 
@@ -77,9 +76,6 @@ object AppMaintenanceManager {
      */
     fun checkForMaintenanceUpgrade(context: Context) {
         when {
-            isActivityOpened -> {
-                return
-            }
             shouldRefresh(context) -> {
                 updateCheckForMaintenanceUpgrade(context,
                     null,
@@ -147,11 +143,9 @@ object AppMaintenanceManager {
         appIsBlockedCompletion: ((Info) -> Unit)?) {
         if (info.isActive == true && (info.minRequiredBuildNumber
                 ?: 0) > buildNumber) {
-            if (isActivityOpened) {
-                appIsBlockedCompletion?.invoke(info)
-            } else {
-                startAppMaintenanceActivity(context, info)
-            }
+            startAppMaintenanceActivity(context, info)
+            appIsBlockedCompletion?.invoke(info)
+            context.sendBroadcast(Intent(Constants.Notification.APP_IN_MAINTENANCE))
             infoBlockedCompletion?.invoke(info)
         } else {
             appIsFreeCompletion?.invoke()
@@ -167,7 +161,8 @@ object AppMaintenanceManager {
         context.startActivity(
             Intent(context, com.lunabeestudio.stopcovid.activity.AppMaintenanceActivity::class.java).apply {
                 putExtra(com.lunabeestudio.stopcovid.activity.AppMaintenanceActivity.EXTRA_INFO, Gson().toJson(info))
-            }.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+            }.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP))
+        context.sendBroadcast(Intent(Constants.Notification.APP_IN_MAINTENANCE))
     }
 
     /* SHARED PREFS */

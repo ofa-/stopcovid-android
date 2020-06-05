@@ -16,7 +16,6 @@ import android.bluetooth.BluetoothAdapter
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.IBinder
-import android.util.Log
 import com.orange.proximitynotification.ble.BleProximityNotification
 import com.orange.proximitynotification.ble.BleProximityNotificationFactory
 import com.orange.proximitynotification.ble.BleSettings
@@ -25,6 +24,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import timber.log.Timber
 import kotlin.coroutines.CoroutineContext
 
 /**
@@ -32,10 +32,6 @@ import kotlin.coroutines.CoroutineContext
  */
 abstract class ProximityNotificationService : Service(),
     ProximityNotificationCallback, ProximityPayloadProvider, CoroutineScope {
-
-    companion object {
-        private val TAG = ProximityNotificationService::class.java.simpleName
-    }
 
     private var bleProximityNotification: BleProximityNotification? = null
     private var bluetoothStateBroadcastReceiver: BluetoothStateBroadcastReceiver? = null
@@ -86,6 +82,17 @@ abstract class ProximityNotificationService : Service(),
      */
     fun notifyProximityPayloadUpdated() {
         bleProximityNotification?.notifyPayloadUpdated()
+    }
+
+    /**
+     * Notify that [BleSettings] have changed
+     * It will restart [BleProximityNotification]
+     */
+    fun notifyBleSettingsUpdate() {
+        if (isRunning()) {
+            stopBleProximityNotification()
+            startBleProximityNotification()
+        }
     }
 
     /**
@@ -157,7 +164,7 @@ abstract class ProximityNotificationService : Service(),
      * @see ProximityNotification#stop
      */
     protected open fun onBluetoothDisabled() {
-        Log.d(TAG, "Bluetooth disabled")
+        Timber.d("Bluetooth disabled")
 
         doStop()
     }
@@ -169,7 +176,7 @@ abstract class ProximityNotificationService : Service(),
      * @see ProximityNotification#start
      */
     protected open fun onBluetoothEnabled() {
-        Log.d(TAG, "Bluetooth enabled")
+        Timber.d("Bluetooth enabled")
 
         doStart()
     }

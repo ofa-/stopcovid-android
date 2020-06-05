@@ -17,6 +17,10 @@ object Constants {
         const val LAST_MAINTENANCE_REFRESH: String = "Last.Maintenance.Refresh"
     }
 
+    object Notification {
+        const val APP_IN_MAINTENANCE: String = "App.In.Maintenance"
+    }
+
     object WorkerNames {
         const val NOTIFICATION: String = "StopCovid.Notification.Worker"
     }

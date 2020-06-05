@@ -21,10 +21,9 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
+
     testOptions {
-        unitTests {
-            unitTests.returnDefaultValues = true
-        }
+        unitTests.returnDefaultValues = true
     }
 }
 

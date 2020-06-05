@@ -29,9 +29,8 @@
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:src="@drawable/republic_fr"
-        tools:text="@tools:sample/lorem[5]"
-        tools:ignore="ContentDescription" />
+        tools:ignore="ContentDescription"
+        tools:text="@tools:sample/lorem[5]" />
 
     <TextView
         android:id="@+id/textView"
@@ -39,6 +38,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/spacing_small"
         android:textAppearance="@style/TextAppearance.StopCovid.Title.Small"
+        android:textIsSelectable="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/imageView"

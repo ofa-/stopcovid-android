@@ -15,8 +15,8 @@ import com.google.gson.Gson
 import com.lunabeestudio.domain.model.Configuration
 import com.lunabeestudio.robert.datasource.ConfigurationDataSource
 import com.lunabeestudio.robert.model.RobertResultData
-import com.lunabeestudio.robert.model.UnknownException
 import com.lunabeestudio.stopcovid.coreui.manager.ConfigManager
+import com.lunabeestudio.stopcovid.extension.remoteToRobertException
 import com.lunabeestudio.stopcovid.model.ConfigurationWrapper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -33,7 +33,7 @@ object ConfigDataSource : ConfigurationDataSource {
                 RobertResultData.Success(gson.fromJson(response, ConfigurationWrapper::class.java).config)
             } catch (e: Exception) {
                 Timber.e(e)
-                RobertResultData.Failure<List<Configuration>?>(UnknownException(e.localizedMessage ?: ""))
+                RobertResultData.Failure<List<Configuration>?>(e.remoteToRobertException())
             }
         }
     }

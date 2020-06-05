@@ -22,6 +22,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAppearance="@style/TextAppearance.StopCovid.Title"
+        android:textIsSelectable="false"
         tools:text="@tools:sample/lorem[5]" />
 
     <TextView
@@ -29,5 +30,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAppearance="@style/TextAppearance.StopCovid.Title"
+        android:textIsSelectable="false"
         tools:text="@tools:sample/lorem[5]" />
 </TextSwitcher>

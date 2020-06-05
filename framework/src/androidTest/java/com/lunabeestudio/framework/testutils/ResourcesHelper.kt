@@ -10,8 +10,6 @@
 
 package com.lunabeestudio.framework.testutils
 
-import java.io.InputStream
-
 object ResourcesHelper {
     fun readTestFileAsString(filename: String): String =
         this.javaClass.classLoader!!.getResourceAsStream(filename).use {

@@ -11,7 +11,6 @@
 package com.lunabeestudio.stopcovid.fragment
 
 import android.content.SharedPreferences
-import android.view.View
 import androidx.core.content.edit
 import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager

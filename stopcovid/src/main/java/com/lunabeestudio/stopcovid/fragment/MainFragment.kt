@@ -23,13 +23,15 @@ abstract class MainFragment : FastAdapterFragment() {
 
     abstract fun getTitleKey(): String
 
-    protected fun getActivityBinding(): ActivityMainBinding = (activity as MainActivity).binding
+    protected fun getActivityBinding(): ActivityMainBinding? = (activity as? MainActivity)?.binding
 
-    override fun getAppBarLayout(): AppBarLayout? = getActivityBinding().appBarLayout
+    override fun getAppBarLayout(): AppBarLayout? = getActivityBinding()?.appBarLayout
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding?.recyclerView?.registerToAppBarLayoutForLiftOnScroll(getActivityBinding().appBarLayout)
+        getActivityBinding()?.appBarLayout?.let { appBarLayout ->
+            binding?.recyclerView?.registerToAppBarLayoutForLiftOnScroll(appBarLayout)
+        }
     }
 
     override fun refreshScreen() {
