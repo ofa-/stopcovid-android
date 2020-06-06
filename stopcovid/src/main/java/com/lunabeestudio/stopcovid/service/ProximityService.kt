@@ -34,6 +34,8 @@ import com.lunabeestudio.stopcovid.coreui.R
 import com.lunabeestudio.stopcovid.coreui.UiConstants
 import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
 import com.lunabeestudio.stopcovid.extension.robertManager
+import com.orange.proximitynotification.ProximityInfo
+import com.orange.proximitynotification.ble.BleProximityMetadata
 import timber.log.Timber
 
 class ProximityService : RobertProximityService() {
@@ -54,6 +56,13 @@ class ProximityService : RobertProximityService() {
 
     override val robertManager: RobertManager by lazy {
         robertManager()
+    }
+
+    override fun onProximity(proximityInfo: ProximityInfo) {
+        var calibratedRssi = (proximityInfo.metadata as BleProximityMetadata).calibratedRssi
+        Timber.d("proximityInfo", "calibratedRssi=" + calibratedRssi)
+        sendNotification("calibratedRssi=" + calibratedRssi)
+        super.onProximity(proximityInfo)
     }
 
     override val foregroundNotificationId: Int = UiConstants.Notification.PROXIMITY.notificationId
@@ -117,6 +126,27 @@ class ProximityService : RobertProximityService() {
 
     inner class ProximityBinder : Binder() {
         fun getService(): ProximityService = this@ProximityService
+    }
+
+    fun sendNotification(message: String) {
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notificationIntent = Intent(this, MainActivity::class.java)
+        val pendingIntent = PendingIntent.getActivity(
+            this, 0,
+            notificationIntent, 0
+        )
+        val notification = NotificationCompat.Builder(this,
+            UiConstants.Notification.PROXIMITY.channelId
+        )
+            .setContentTitle(message)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setVisibility(NotificationCompat.VISIBILITY_SECRET)
+            .setAutoCancel(true)
+            .setSmallIcon(R.drawable.ic_notification_bar)
+            .setContentIntent(pendingIntent)
+            .build()
+
+        notificationManager.notify(UiConstants.Notification.PROXIMITY.notificationId, notification)
     }
 
     private fun sendErrorNotification() {
