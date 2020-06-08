@@ -61,7 +61,13 @@ class ProximityService : RobertProximityService() {
     override fun onProximity(proximityInfo: ProximityInfo) {
         var calibratedRssi = (proximityInfo.metadata as BleProximityMetadata).calibratedRssi
         Timber.d("proximityInfo", "calibratedRssi=" + calibratedRssi)
-        sendNotification("calibratedRssi=" + calibratedRssi)
+        val rssi_1m = -35
+        val ble_att = 2.2
+        val estimatedDistance = Math.pow(10.0, (rssi_1m - calibratedRssi) / Math.pow(10.0, ble_att))
+
+        val message = "rssi: " + calibratedRssi + "dBm, dist: %.1f".format(estimatedDistance) +"m"
+
+        sendNotification(message)
         super.onProximity(proximityInfo)
     }
 
