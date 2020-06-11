@@ -248,6 +248,15 @@ class ProximityFragment : AboutMainFragment() {
             identifier = items.count().toLong()
         }
 
+        items += linkItem {
+            text = strings["proximityController.tuneProximity"]
+            onClickListener = View.OnClickListener {
+                findNavController().navigate(ProximityFragmentDirections.actionProximityFragmentToTuneProximityFragment())
+            }
+            iconRes = R.drawable.ic_manage_data
+            identifier = items.count().toLong()
+        }
+
         refreshItems()
 
         return items

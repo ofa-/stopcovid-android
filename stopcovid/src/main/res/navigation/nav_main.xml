@@ -24,6 +24,13 @@
         android:name="com.lunabeestudio.stopcovid.fragment.ProximityFragment"
         tools:layout="@layout/fragment_recycler_view">
         <action
+            android:id="@+id/action_proximityFragment_to_tuneProximityFragment"
+            app:destination="@id/tuneProximityFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
             android:id="@+id/action_proximityFragment_to_manageDataFragment"
             app:destination="@id/manageDataFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
@@ -134,6 +141,10 @@
     <fragment
         android:id="@+id/manageDataFragment"
         android:name="com.lunabeestudio.stopcovid.fragment.ManageDataFragment"
+        tools:layout="@layout/fragment_recycler_view" />
+    <fragment
+        android:id="@+id/tuneProximityFragment"
+        android:name="com.lunabeestudio.stopcovid.fragment.TuneProximityFragment"
         tools:layout="@layout/fragment_recycler_view" />
     <fragment
         android:id="@+id/informationFragment"
