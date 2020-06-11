@@ -421,6 +421,10 @@ class RobertManagerImpl(
         keystoreRepository.isSick = null
     }
 
+    /*suspend*/ fun getLocalProximityItems(timeMs : Long = 0): List<LocalProximity> {
+        return localProximityRepository.getUntilTime(timeMs)
+    }
+
     private fun startStatusWorker(context: Context) {
         Timber.d("Create worker status")
 
