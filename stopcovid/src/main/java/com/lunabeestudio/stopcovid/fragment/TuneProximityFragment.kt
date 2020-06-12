@@ -45,6 +45,7 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
         localProximityItems = (requireContext().robertManager() as RobertManagerImpl)
             .getLocalProximityItems(0)
             .toMutableList()
+        localProximityItems.sortByDescending({ it.collectedTime})
     }
 
     override fun getTitleKey(): String = "tuneProximityController.title"
@@ -84,7 +85,6 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
 
     private fun localProximityItemsToString(): String {
         return localProximityItems
-            .reversed()
             .slice(0..99)
             .map { it -> listOf(
                 Date((it.collectedTime - 2208988800) * 1000),
