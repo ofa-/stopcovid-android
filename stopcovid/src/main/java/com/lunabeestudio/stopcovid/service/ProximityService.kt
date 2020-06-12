@@ -68,6 +68,7 @@ class ProximityService : RobertProximityService() {
         val message = "rssi: " + calibratedRssi + "dBm, dist: %.1f".format(estimatedDistance) +"m"
 
         sendNotification(message)
+        (applicationContext as RobertApplication).notifyListener(proximityInfo)
         super.onProximity(proximityInfo)
     }
 
