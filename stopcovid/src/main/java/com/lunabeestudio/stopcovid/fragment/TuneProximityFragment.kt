@@ -26,6 +26,7 @@ import com.lunabeestudio.robert.RobertApplication
 import com.lunabeestudio.robert.RobertManagerImpl
 import com.lunabeestudio.domain.model.LocalProximity
 import com.lunabeestudio.stopcovid.extension.robertManager
+import com.lunabeestudio.framework.ble.extension.toLocalProximity
 
 import android.util.Log
 
@@ -37,11 +38,12 @@ import kotlinx.coroutines.launch
 
 class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
 
-    lateinit var localProximityItems: List<LocalProximity>
+    lateinit var localProximityItems: MutableList<LocalProximity>
 
     fun initLocalProximityItems() {
         localProximityItems = (requireContext().robertManager() as RobertManagerImpl)
             .getLocalProximityItems(0)
+            .toMutableList()
     }
 
     override fun getTitleKey(): String = "tuneProximityController.title"
@@ -87,6 +89,10 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
 
     override fun notify(notification: Any) {
         (notification as com.orange.proximitynotification.ProximityInfo)
+        .toLocalProximity()?.let {
+            localProximityItems.add(it)
+            refreshItems()
+        }
     }
 
     override fun getItems(): List<GenericItem> {
