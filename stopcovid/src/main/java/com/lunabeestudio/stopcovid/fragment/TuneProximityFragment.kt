@@ -99,12 +99,18 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
             gravity = Gravity.CENTER
     }
 
+    val lastNotificationCaption = captionItem {
+        gravity = Gravity.CENTER
+        text = "-"
+    }
+
     val proximityInfoList = captionItem {
     }
 
     override fun notify(notification: Any) {
         (notification as com.orange.proximitynotification.ProximityInfo)
         .toLocalProximity()?.let {
+            lastNotificationCaption.text = "rssi: " + it.calibratedRssi + "dBm"
             localProximityItems.add(it)
             refreshItems()
         }
@@ -117,6 +123,8 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
 
         items += nbItemsCaption
 
+        items += dividerItem {}
+        items += lastNotificationCaption
         items += dividerItem {}
         items += proximityInfoList
         items += dividerItem {}
