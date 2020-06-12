@@ -22,6 +22,7 @@ import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
 import com.mikepenz.fastadapter.GenericItem
 
+import com.lunabeestudio.robert.RobertApplication
 import com.lunabeestudio.robert.RobertManagerImpl
 import com.lunabeestudio.domain.model.LocalProximity
 import com.lunabeestudio.stopcovid.extension.robertManager
@@ -33,7 +34,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 
-class TuneProximityFragment : MainFragment() {
+
+class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
 
     lateinit var localProximityItems: List<LocalProximity>
 
@@ -53,6 +55,20 @@ class TuneProximityFragment : MainFragment() {
             refreshItems()
             Log.d("OFA", "initLocalProximityItems - end")
         }
+
+        application.registerListener(this)
+    }
+
+    private val application: RobertApplication
+        get() = (requireContext().applicationContext as RobertApplication)
+
+    override fun onDestroyView() {
+        application.registerListener(NullListener())
+        super.onDestroyView()
+    }
+
+    class NullListener: RobertApplication.Listener {
+        override fun notify(notification: Any) {}
     }
 
     private fun refreshItems() {
@@ -67,6 +83,10 @@ class TuneProximityFragment : MainFragment() {
     val nbItemsCaption = captionItem {
             text = "nb stored proximity items: ..."
             gravity = Gravity.CENTER
+    }
+
+    override fun notify(notification: Any) {
+        (notification as com.orange.proximitynotification.ProximityInfo)
     }
 
     override fun getItems(): List<GenericItem> {
