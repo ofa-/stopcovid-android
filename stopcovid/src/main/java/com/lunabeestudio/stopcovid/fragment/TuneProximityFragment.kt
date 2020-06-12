@@ -52,10 +52,8 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         CoroutineScope(Dispatchers.Default).launch {
-	    Log.d("OFA", "initLocalProximityItems - begin")
             initLocalProximityItems()
             refreshItems()
-            Log.d("OFA", "initLocalProximityItems - end")
         }
 
         application.registerListener(this)
@@ -96,7 +94,6 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
     }
 
     override fun getItems(): List<GenericItem> {
-            Log.d("OFA", "getItems")
         val items = ArrayList<GenericItem>()
 
         items += dividerItem {}
