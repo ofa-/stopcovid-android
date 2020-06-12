@@ -13,6 +13,8 @@ package com.lunabeestudio.stopcovid.network
 import android.content.Context
 import com.lunabeestudio.framework.remote.RetrofitClient
 import com.lunabeestudio.stopcovid.BuildConfig
+import com.lunabeestudio.stopcovid.StopCovid
+import com.lunabeestudio.stopcovid.manager.TimeCheckManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -43,6 +45,12 @@ object LBMaintenanceHttpClient {
                     .build()
 
                 val response = okHttpClient.newCall(request).execute()
+                val isClockAligned = TimeCheckManager.isTimeAlignedWithServer(response)
+                if (isClockAligned == false) {
+                    (context.applicationContext as? StopCovid)?.sendClockNotAlignedNotification()
+                } else if (isClockAligned == true) {
+                    (context.applicationContext as? StopCovid)?.cancelClockNotAlignedNotification()
+                }
                 val string = response.body!!.string()
                 withContext(Dispatchers.Main) {
                     onSuccess(string)

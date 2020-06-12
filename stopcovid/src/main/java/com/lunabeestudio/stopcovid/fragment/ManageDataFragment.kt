@@ -72,7 +72,6 @@ class ManageDataFragment : MainFragment() {
             sharedPreferences.edit {
                 remove(Constants.SharedPrefs.ON_BOARDING_DONE)
             }
-            WorkManager.getInstance(requireContext().applicationContext).cancelUniqueWork(Constants.WorkerNames.NOTIFICATION)
             try {
                 findNavController()
                     .navigate(ManageDataFragmentDirections.actionGlobalOnBoardingActivity())
@@ -134,7 +133,7 @@ class ManageDataFragment : MainFragment() {
                     .setMessage(strings["manageDataController.eraseRemoteContact.confirmationDialog.message"])
                     .setNegativeButton(strings["common.cancel"], null)
                     .setPositiveButton(strings["common.confirm"]) { _, _ ->
-                        viewModel.eraseRemoteExposureHistory()
+                        viewModel.eraseRemoteExposureHistory(requireContext().applicationContext as RobertApplication)
                     }
                     .show()
             }
@@ -163,7 +162,7 @@ class ManageDataFragment : MainFragment() {
                     .setMessage(strings["manageDataController.eraseRemoteAlert.confirmationDialog.message"])
                     .setNegativeButton(strings["common.cancel"], null)
                     .setPositiveButton(strings["common.confirm"]) { _, _ ->
-                        viewModel.eraseRemoteAlert()
+                        viewModel.eraseRemoteAlert(requireContext().applicationContext as RobertApplication)
                     }
                     .show()
             }

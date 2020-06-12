@@ -15,7 +15,7 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/button"
-        style="@style/Theme.StopCovid.Button.Danger"
+        style="@style/Widget.StopCovid.Button.Danger"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/spacing_large"

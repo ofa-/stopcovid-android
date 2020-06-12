@@ -23,9 +23,11 @@ object Constants {
 
     object WorkerNames {
         const val NOTIFICATION: String = "StopCovid.Notification.Worker"
+        const val TIME_CHANGED: String = "StopCovid.TimeChanged.Worker"
     }
 
     object ServerConstant {
         val ACCEPTED_REPORT_CODE_LENGTH: List<Int> = listOf(6, 36)
+        const val MAX_GAP_DEVICE_SERVER: Long = 30000L
     }
 }

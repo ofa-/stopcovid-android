@@ -25,10 +25,13 @@ import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
 
 class AtRiskNotificationWorker(context: Context, workerParams: WorkerParameters) : Worker(context, workerParams) {
 
-    private var strings: HashMap<String, String> = StringsManager.getStrings()
-
     override fun doWork(): Result {
         val notificationManager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        if (StringsManager.getStrings().isEmpty()) {
+            StringsManager.init(applicationContext)
+        }
+        val strings = StringsManager.getStrings()
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(

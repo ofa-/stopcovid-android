@@ -32,7 +32,7 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/mainButton"
-        style="@style/Theme.StopCovid.Button"
+        style="@style/Widget.StopCovid.Button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/spacing_large"
@@ -43,7 +43,7 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/dangerButton"
-        style="@style/Theme.StopCovid.Button.Danger"
+        style="@style/Widget.StopCovid.Button.Danger"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/spacing_large"
@@ -53,7 +53,7 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/lightButton"
-        style="@style/Theme.StopCovid.Button.Light"
+        style="@style/Widget.StopCovid.Button.Light"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/spacing_large"

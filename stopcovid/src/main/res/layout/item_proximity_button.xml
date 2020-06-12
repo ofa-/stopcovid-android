@@ -16,7 +16,7 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/mainButton"
-        style="@style/Theme.StopCovid.Button"
+        style="@style/Widget.StopCovid.Button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
@@ -27,7 +27,7 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/lightButton"
-        style="@style/Theme.StopCovid.Button.Light"
+        style="@style/Widget.StopCovid.Button.Light"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"

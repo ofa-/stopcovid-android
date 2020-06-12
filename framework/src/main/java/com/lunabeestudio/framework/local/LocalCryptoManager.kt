@@ -18,14 +18,15 @@ import android.security.KeyPairGeneratorSpec
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.util.Base64
-import com.lunabeestudio.domain.extension.safeUse
 import com.lunabeestudio.framework.utils.SelfDestroyCipherInputStream
 import com.lunabeestudio.framework.utils.SelfDestroyCipherOutputStream
 import com.lunabeestudio.robert.extension.randomize
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
+import java.io.StringWriter
 import java.math.BigInteger
 import java.security.InvalidAlgorithmParameterException
 import java.security.InvalidKeyException
@@ -75,7 +76,7 @@ class LocalCryptoManager(private val appContext: Context) {
         val tmpFile = createTempFile(directory = targetFile.parentFile)
         createCipherOutputStream(tmpFile.outputStream()).use { output ->
             clearText.byteInputStream().use { input ->
-                input.copyTo(output)
+                input.copyTo(output, BUFFER_SIZE)
             }
         }
         tmpFile.renameTo(targetFile)
@@ -83,31 +84,20 @@ class LocalCryptoManager(private val appContext: Context) {
 
     @Synchronized
     fun encrypt(passphrase: ByteArray, clearPassphrase: Boolean = true): ByteArray {
-
-        val iv = ByteArray(AES_GCM_IV_LENGTH)
-        val cipher = Cipher.getInstance(AES_GCM_CIPHER_TYPE)
-
-        val ciphertext = localProtectionKey.safeUse { secretKey ->
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                cipher.init(Cipher.ENCRYPT_MODE, secretKey)
-                cipher.iv.copyInto(iv)
-            } else {
-                prng.nextBytes(iv)
-                cipher.init(Cipher.ENCRYPT_MODE, secretKey, IvParameterSpec(iv))
+        val bos = ByteArrayOutputStream()
+        createCipherOutputStream(bos, false).use { cos ->
+            passphrase.inputStream().use { input ->
+                input.copyTo(cos, BUFFER_SIZE)
             }
-
-            cipher.doFinal(passphrase)
         }
+
+        val ciphertext = bos.toByteArray()
 
         if (clearPassphrase) {
             passphrase.randomize()
         }
 
-        val encrypted = ByteArray(iv.size + ciphertext.size)
-        System.arraycopy(iv, 0, encrypted, 0, iv.size)
-        System.arraycopy(ciphertext, 0, encrypted, iv.size, ciphertext.size)
-
-        return encrypted
+        return ciphertext
     }
 
     fun decrypt(encryptedText: String): ByteArray {
@@ -120,25 +110,22 @@ class LocalCryptoManager(private val appContext: Context) {
         val fis = file.inputStream()
         val cis = createCipherInputStream(fis)
 
-        return cis.reader().use {
-            it.readText()
+        return cis.reader().use { reader ->
+            val buffer = StringWriter()
+            reader.copyTo(buffer, BUFFER_SIZE)
+            buffer.toString()
         }
     }
 
     @Synchronized
     fun decrypt(encryptedData: ByteArray): ByteArray {
-
-        val iv: ByteArray = encryptedData.copyOfRange(0,
-            AES_GCM_IV_LENGTH)
-
-        val cipher = Cipher.getInstance(AES_GCM_CIPHER_TYPE)
-        val ivSpec = GCMParameterSpec(AES_GCM_KEY_SIZE_IN_BITS, iv)
-
-        return localProtectionKey.safeUse { secretKey ->
-            cipher.init(Cipher.DECRYPT_MODE, secretKey, ivSpec)
-            cipher.doFinal(encryptedData,
-                AES_GCM_IV_LENGTH, encryptedData.size - AES_GCM_IV_LENGTH)
+        val bos = ByteArrayOutputStream()
+        bos.use { output ->
+            createCipherInputStream(encryptedData.inputStream(), AES_GCM_IV_LENGTH).use { cis ->
+                cis.copyTo(output, BUFFER_SIZE)
+            }
         }
+        return bos.toByteArray()
     }
 
     /**
@@ -237,7 +224,7 @@ class LocalCryptoManager(private val appContext: Context) {
         NoSuchProviderException::class,
         KeyStoreException::class,
         IllegalBlockSizeException::class)
-    fun createCipherOutputStream(outputStream: OutputStream): OutputStream {
+    fun createCipherOutputStream(outputStream: OutputStream, writeIvSize: Boolean = true): OutputStream {
         val cipher = Cipher.getInstance(AES_GCM_CIPHER_TYPE)
         val iv: ByteArray = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             cipher.init(Cipher.ENCRYPT_MODE, localProtectionKey)
@@ -249,7 +236,9 @@ class LocalCryptoManager(private val appContext: Context) {
             iv
         }
 
-        outputStream.write(iv.size)
+        if (writeIvSize) {
+            outputStream.write(iv.size)
+        }
         outputStream.write(iv)
 
         return SelfDestroyCipherOutputStream(outputStream, cipher, localProtectionKey)
@@ -259,6 +248,7 @@ class LocalCryptoManager(private val appContext: Context) {
      * Create a CipherInputStream instance.
      *
      * @param inputStream the input stream
+     * @param pIvLength the length of the IV of null if it should be read at the beginning of the stream
      * @return the created InputStream
      */
     @Throws(NoSuchPaddingException::class,
@@ -271,9 +261,9 @@ class LocalCryptoManager(private val appContext: Context) {
         NoSuchProviderException::class,
         InvalidAlgorithmParameterException::class,
         IOException::class)
-    fun createCipherInputStream(inputStream: InputStream): InputStream {
+    fun createCipherInputStream(inputStream: InputStream, pIvLength: Int? = null): InputStream {
         inputStream.mark(4 + AES_GCM_IV_LENGTH)
-        val ivLen: Int = inputStream.read()
+        val ivLen: Int = pIvLength ?: inputStream.read()
         val iv = ByteArray(ivLen)
         inputStream.read(iv)
         val cipher = Cipher.getInstance(AES_GCM_CIPHER_TYPE)
@@ -301,6 +291,8 @@ class LocalCryptoManager(private val appContext: Context) {
         private const val RSA_WRAP_LOCAL_PROTECTION_KEY_ALIAS = "rsa_wrap_local_protection"
         private const val RSA_WRAP_CIPHER_TYPE = "RSA/NONE/PKCS1Padding"
         private const val AES_WRAPPED_PROTECTION_KEY_SHARED_PREFERENCE = "aes_wrapped_local_protection"
+
+        private const val BUFFER_SIZE = 4 * 1024
 
         private val prng: SecureRandom = SecureRandom()
     }

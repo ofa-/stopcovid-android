@@ -9,13 +9,13 @@
   -->
 <resources>
 
-    <style name="Theme.StopCovid.Button.Light">
+    <style name="Widget.StopCovid.Button.Light">
         <item name="backgroundTint">@color/color_primary_light</item>
         <item name="android:textColor">@color/color_on_primary_light</item>
         <item name="rippleColor">@color/color_primary</item>
     </style>
 
-    <style name="Theme.StopCovid.Button.Danger" parent="Theme.StopCovid.Button.Light">
+    <style name="Widget.StopCovid.Button.Danger" parent="Widget.StopCovid.Button.Light">
         <item name="backgroundTint">@color/color_error_light</item>
         <item name="rippleColor">@color/color_error</item>
         <item name="android:textColor">@color/color_error</item>

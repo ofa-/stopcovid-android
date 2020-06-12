@@ -16,25 +16,29 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Binder
 import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
-import androidx.core.content.edit
-import androidx.preference.PreferenceManager
 import com.lunabeestudio.framework.ble.service.RobertProximityService
 import com.lunabeestudio.robert.RobertApplication
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.robert.model.RobertException
-import com.lunabeestudio.stopcovid.Constants
+import com.lunabeestudio.stopcovid.StopCovid
 import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.R
 import com.lunabeestudio.stopcovid.coreui.UiConstants
 import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
 import com.lunabeestudio.stopcovid.extension.robertManager
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.util.concurrent.TimeUnit
 
 class ProximityService : RobertProximityService() {
 
@@ -45,12 +49,13 @@ class ProximityService : RobertProximityService() {
     private val binder = ProximityBinder()
 
     private val strings: HashMap<String, String> by lazy {
+        if (StringsManager.getStrings().isEmpty()) {
+            StringsManager.init(this)
+        }
         StringsManager.getStrings()
     }
 
-    private val sharedPreferences: SharedPreferences by lazy {
-        PreferenceManager.getDefaultSharedPreferences(this)
-    }
+    private var statusUpdateSchedulerScope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 
     override val robertManager: RobertManager by lazy {
         robertManager()
@@ -83,6 +88,7 @@ class ProximityService : RobertProximityService() {
             .setOngoing(true)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setSmallIcon(R.drawable.ic_notification_bar)
+            .setNotificationSilent()
             .setStyle(NotificationCompat.BigTextStyle()
                 .bigText(strings["notification.proximityServiceRunning.message"]))
             .setContentIntent(pendingIntent)
@@ -90,11 +96,28 @@ class ProximityService : RobertProximityService() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        scheduleNextStatusUpdate()
         return START_STICKY
+    }
+
+    private fun scheduleNextStatusUpdate() {
+        statusUpdateSchedulerScope.launch {
+            val nextStatusUpdateDelay = TimeUnit.HOURS.toMillis(1L)
+            Timber.d("Next status update in ${nextStatusUpdateDelay}ms")
+            delay(nextStatusUpdateDelay)
+            if (isActive) {
+                (applicationContext as StopCovid).refreshStatusIfNeeded()
+            }
+        }.invokeOnCompletion {
+            if (isActive) {
+                scheduleNextStatusUpdate()
+            }
+        }
     }
 
     override fun onDestroy() {
         robertManager.deactivateProximity(applicationContext as RobertApplication)
+        statusUpdateSchedulerScope.cancel()
         super.onDestroy()
     }
 
@@ -104,6 +127,7 @@ class ProximityService : RobertProximityService() {
         robertManager.deactivateProximity(applicationContext as RobertApplication)
         lastError = error
         onError?.invoke(error)
+        statusUpdateSchedulerScope.cancel()
     }
 
     fun consumeLastError(): RobertException? {
@@ -143,7 +167,6 @@ class ProximityService : RobertProximityService() {
         )
             .setContentTitle(strings["notification.error.title"])
             .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setVisibility(NotificationCompat.VISIBILITY_SECRET)
             .setAutoCancel(true)
             .setSmallIcon(R.drawable.ic_notification_bar)
             .setStyle(NotificationCompat.BigTextStyle()

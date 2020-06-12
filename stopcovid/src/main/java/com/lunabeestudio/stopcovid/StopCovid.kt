@@ -11,15 +11,25 @@
 package com.lunabeestudio.stopcovid
 
 import android.app.Application
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
+import android.os.Build
+import androidx.core.app.NotificationCompat
 import androidx.emoji.bundled.BundledEmojiCompatConfig
 import androidx.emoji.text.EmojiCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.ProcessLifecycleOwner
+import androidx.work.Constraints
+import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.ExistingWorkPolicy
+import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.lunabeestudio.framework.local.LocalCryptoManager
 import com.lunabeestudio.framework.local.datasource.SecureFileEphemeralBluetoothIdentifierDataSource
@@ -31,6 +41,8 @@ import com.lunabeestudio.robert.RobertApplication
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.robert.RobertManagerImpl
 import com.lunabeestudio.stopcovid.BuildConfig.APP_MAINTENANCE_URL
+import com.lunabeestudio.stopcovid.activity.MainActivity
+import com.lunabeestudio.stopcovid.coreui.UiConstants
 import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.manager.AppMaintenanceManager
@@ -39,6 +51,10 @@ import com.lunabeestudio.stopcovid.manager.PrivacyManager
 import com.lunabeestudio.stopcovid.manager.ProximityManager
 import com.lunabeestudio.stopcovid.service.ProximityService
 import com.lunabeestudio.stopcovid.worker.AtRiskNotificationWorker
+import com.lunabeestudio.stopcovid.worker.MaintenanceWorker
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.io.File
 import java.util.Calendar
@@ -47,6 +63,8 @@ import java.util.concurrent.TimeUnit
 import kotlin.random.Random
 
 class StopCovid : Application(), LifecycleObserver, RobertApplication {
+
+    var isAppInForeground: Boolean = false
 
     private val cryptoManager: LocalCryptoManager by lazy {
         LocalCryptoManager(this)
@@ -83,14 +101,22 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication {
             APP_MAINTENANCE_URL)
         val config = BundledEmojiCompatConfig(this)
         EmojiCompat.init(config)
+        startAppMaintenanceWorker(false)
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     fun onAppResume() {
+        isAppInForeground = true
         PrivacyManager.appForeground(this)
         StringsManager.appForeground(this)
         AppMaintenanceManager.checkForMaintenanceUpgrade(this)
         refreshProximityService()
+        refreshStatusIfNeeded()
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
+    fun onAppPause() {
+        isAppInForeground = false
     }
 
     override fun refreshProximityService() {
@@ -136,6 +162,114 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication {
 
         WorkManager.getInstance(applicationContext)
             .enqueueUniqueWork(Constants.WorkerNames.NOTIFICATION, ExistingWorkPolicy.KEEP, statusWorkRequest)
+    }
+
+    override fun sendClockNotAlignedNotification() {
+        val notificationManager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        if (StringsManager.getStrings().isEmpty()) {
+            StringsManager.init(applicationContext)
+        }
+        val strings = StringsManager.getStrings()
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                UiConstants.Notification.TIME.channelId,
+                strings["notification.channel.error.title"] ?: "Erreur",
+                NotificationManager.IMPORTANCE_HIGH
+            )
+            notificationManager.createNotificationChannel(channel)
+        }
+
+        val notificationIntent = Intent(this, MainActivity::class.java)
+        val pendingIntent = PendingIntent.getActivity(
+            this, 0,
+            notificationIntent, 0
+        )
+        val notification = NotificationCompat.Builder(this,
+            UiConstants.Notification.TIME.channelId
+        )
+            .setContentTitle(strings["common.error.clockNotAligned.title"])
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setAutoCancel(true)
+            .setSmallIcon(com.lunabeestudio.stopcovid.coreui.R.drawable.ic_notification_bar)
+            .setStyle(NotificationCompat.BigTextStyle()
+                .bigText(strings["common.error.clockNotAligned.message"]))
+            .setContentIntent(pendingIntent)
+            .build()
+        notificationManager.notify(UiConstants.Notification.TIME.notificationId, notification)
+    }
+
+    fun cancelClockNotAlignedNotification() {
+        val notificationManager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.cancel(UiConstants.Notification.TIME.notificationId)
+    }
+
+    fun sendUpgradeNotification() {
+        val notificationManager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        if (StringsManager.getStrings().isEmpty()) {
+            StringsManager.init(applicationContext)
+        }
+        val strings = StringsManager.getStrings()
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                UiConstants.Notification.UPGRADE.channelId,
+                strings["notification.channel.upgrade.title"] ?: "Upgrade",
+                NotificationManager.IMPORTANCE_HIGH
+            )
+            notificationManager.createNotificationChannel(channel)
+        }
+
+        val notificationIntent = Intent(this, MainActivity::class.java)
+        val pendingIntent = PendingIntent.getActivity(
+            this, 0,
+            notificationIntent, 0
+        )
+        val notification = NotificationCompat.Builder(this,
+            UiConstants.Notification.UPGRADE.channelId
+        )
+            .setContentTitle(strings["notification.upgrade.title"])
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setVisibility(NotificationCompat.VISIBILITY_SECRET)
+            .setAutoCancel(true)
+            .setSmallIcon(com.lunabeestudio.stopcovid.coreui.R.drawable.ic_notification_bar)
+            .setStyle(NotificationCompat.BigTextStyle()
+                .bigText(strings["notification.upgrade.message"]))
+            .setContentIntent(pendingIntent)
+            .build()
+        notificationManager.notify(UiConstants.Notification.UPGRADE.notificationId, notification)
+    }
+
+    fun startAppMaintenanceWorker(now: Boolean) {
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+        val timeChangedWorkRequest = PeriodicWorkRequestBuilder<MaintenanceWorker>(6L, TimeUnit.HOURS)
+            .setConstraints(constraints)
+            .apply {
+                if (!now) {
+                    setInitialDelay(6L, TimeUnit.HOURS)
+                }
+            }
+            .build()
+        val policy = if (now) {
+            ExistingPeriodicWorkPolicy.REPLACE
+        } else {
+            ExistingPeriodicWorkPolicy.KEEP
+        }
+        WorkManager.getInstance(this)
+            .enqueueUniquePeriodicWork(Constants.WorkerNames.TIME_CHANGED, policy, timeChangedWorkRequest)
+    }
+
+    fun refreshStatusIfNeeded() {
+        if (System.currentTimeMillis() - (robertManager.atRiskLastRefresh
+                ?: 0L) > TimeUnit.HOURS.toMillis(robertManager.checkStatusFrequencyHour.toLong())) {
+            CoroutineScope(Dispatchers.IO).launch {
+                robertManager.updateStatus(this@StopCovid)
+            }
+        }
     }
 
     override fun getAppContext(): Context = this

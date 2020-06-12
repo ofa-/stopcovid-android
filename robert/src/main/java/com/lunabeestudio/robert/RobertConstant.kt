@@ -25,6 +25,7 @@ internal object RobertConstant {
     const val BLE_SERVICE_UUID: String = "0000fd64-0000-1000-8000-00805f9b34fb"
     const val BLE_CHARACTERISTIC_UUID: String = "a8f12d00-ee67-478b-b95f-65d599407756"
     const val BLE_BACKGROUND_SERVICE_MANUFACTURER_DATA_IOS: String = "1.0.0.0.0.0.0.0.0.0.0.8.0.0.0.0.0"
+    const val MIN_GAP_SUCCESS_STATUS: Long = 30L * 60L * 1000L
 
     object CONFIG {
         const val DATA_RETENTION_PERIOD: String = "app.dataRetentionPeriod"
