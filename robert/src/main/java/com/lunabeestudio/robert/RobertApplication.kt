@@ -17,4 +17,10 @@ interface RobertApplication {
     fun getAppContext(): Context
     fun refreshProximityService()
     fun atRiskDetected()
+
+    interface Listener {
+        fun notify(notification: Any)
+    }
+    fun registerListener(listener: Listener)
+    fun notifyListener(notification: Any)
 }

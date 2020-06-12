@@ -101,6 +101,17 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication {
         }
     }
 
+    private lateinit var listener: RobertApplication.Listener
+
+    override fun notifyListener(notification: Any) {
+        if (listener != null)
+            listener.notify(notification)
+    }
+
+    override fun registerListener(_listener: RobertApplication.Listener) {
+        listener = _listener
+    }
+
     override fun atRiskDetected() {
         val minHour = robertManager().atRiskMinHourContactNotif
         val maxHour = robertManager().atRiskMaxHourContactNotif
