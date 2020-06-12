@@ -73,15 +73,16 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
 
     private fun refreshItems() {
     CoroutineScope(Dispatchers.Main).launch {
-            nbItemsCaption.text = "nb local proximity items: " + localProximityItems.count()
+            nbItemsCaption.text = nbItemsTxt + localProximityItems.count()
 
             if (binding?.recyclerView?.isComputingLayout == false)
                 binding?.recyclerView?.adapter?.notifyDataSetChanged()
         }
     }
 
+    val nbItemsTxt = "nb local proximity items: "
     val nbItemsCaption = captionItem {
-            text = "nb stored proximity items: ..."
+            text = nbItemsTxt + "..."
             gravity = Gravity.CENTER
     }
 
