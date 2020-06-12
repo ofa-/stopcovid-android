@@ -34,6 +34,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+import java.util.Date
 
 
 class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
@@ -74,16 +75,31 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
     private fun refreshItems() {
     CoroutineScope(Dispatchers.Main).launch {
             nbItemsCaption.text = nbItemsTxt + localProximityItems.count()
+            proximityInfoList.text = localProximityItemsToString()
 
             if (binding?.recyclerView?.isComputingLayout == false)
                 binding?.recyclerView?.adapter?.notifyDataSetChanged()
         }
     }
 
+    private fun localProximityItemsToString(): String {
+        return localProximityItems
+            .reversed()
+            .slice(0..99)
+            .map { it -> listOf(
+                Date((it.collectedTime - 2208988800) * 1000),
+                it.calibratedRssi
+              ).joinToString(", ") }
+            .joinToString("\n")
+    }
+
     val nbItemsTxt = "nb local proximity items: "
     val nbItemsCaption = captionItem {
             text = nbItemsTxt + "..."
             gravity = Gravity.CENTER
+    }
+
+    val proximityInfoList = captionItem {
     }
 
     override fun notify(notification: Any) {
@@ -101,6 +117,8 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
 
         items += nbItemsCaption
 
+        items += dividerItem {}
+        items += proximityInfoList
         items += dividerItem {}
 
         return items
