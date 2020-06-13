@@ -111,7 +111,7 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
         (notification as com.orange.proximitynotification.ProximityInfo)
         .toLocalProximity()?.let {
             lastNotificationCaption.text = "rssi: " + it.calibratedRssi + "dBm"
-            localProximityItems.add(it)
+            localProximityItems.add(0, it)
             refreshItems()
         }
     }
