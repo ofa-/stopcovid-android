@@ -46,6 +46,7 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
             .getLocalProximityItems(0)
             .toMutableList()
         localProximityItems.sortByDescending({ it.collectedTime})
+        application.registerListener(this)
     }
 
     override fun getTitleKey(): String = "tuneProximityController.title"
@@ -57,8 +58,6 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
             initLocalProximityItems()
             refreshItems()
         }
-
-        application.registerListener(this)
     }
 
     private val application: RobertApplication
