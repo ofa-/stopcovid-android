@@ -101,11 +101,10 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication {
         }
     }
 
-    private lateinit var listener: RobertApplication.Listener
+    private var listener: RobertApplication.Listener? = null
 
     override fun notifyListener(notification: Any) {
-        if (listener != null)
-            listener.notify(notification)
+        listener?.notify(notification)
     }
 
     override fun registerListener(_listener: RobertApplication.Listener) {
