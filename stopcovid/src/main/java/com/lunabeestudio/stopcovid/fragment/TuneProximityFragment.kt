@@ -91,6 +91,7 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
             .map { it -> listOf(
                 dateFormatter.format(
                 Date((it.collectedTime - 2208988800) * 1000)),
+                it.ebidBase64,
                 it.calibratedRssi
               ).joinToString(", ") }
             .joinToString("\n")
