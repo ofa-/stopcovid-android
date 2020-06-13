@@ -82,9 +82,10 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
         }
     }
 
+    private val nbDisplayedItems = 100
     private fun localProximityItemsToString(): String {
         return localProximityItems
-            .slice(0..99)
+            .slice(0..kotlin.math.min(nbDisplayedItems, localProximityItems.size) - 1)
             .map { it -> listOf(
                 Date((it.collectedTime - 2208988800) * 1000),
                 it.calibratedRssi
