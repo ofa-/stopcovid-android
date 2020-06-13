@@ -35,6 +35,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 import java.util.Date
+import java.text.SimpleDateFormat
 
 
 class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
@@ -83,11 +84,13 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
     }
 
     private val nbDisplayedItems = 100
+    private val dateFormatter = SimpleDateFormat("E d MMM HH:mm:ss")
     private fun localProximityItemsToString(): String {
         return localProximityItems
             .slice(0..kotlin.math.min(nbDisplayedItems, localProximityItems.size) - 1)
             .map { it -> listOf(
-                Date((it.collectedTime - 2208988800) * 1000),
+                dateFormatter.format(
+                Date((it.collectedTime - 2208988800) * 1000)),
                 it.calibratedRssi
               ).joinToString(", ") }
             .joinToString("\n")
