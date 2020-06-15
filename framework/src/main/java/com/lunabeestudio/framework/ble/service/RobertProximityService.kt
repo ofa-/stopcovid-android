@@ -134,6 +134,7 @@ abstract class RobertProximityService : ProximityNotificationService() {
                     notifyProximityPayloadUpdated()
                 }
             } catch (e: Exception) {
+                Timber.e(e)
                 if (e is RobertException) {
                     onError(e)
                 } else {

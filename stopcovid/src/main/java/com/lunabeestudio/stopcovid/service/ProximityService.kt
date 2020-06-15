@@ -25,20 +25,12 @@ import com.lunabeestudio.framework.ble.service.RobertProximityService
 import com.lunabeestudio.robert.RobertApplication
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.robert.model.RobertException
-import com.lunabeestudio.stopcovid.StopCovid
 import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.R
 import com.lunabeestudio.stopcovid.coreui.UiConstants
 import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
 import com.lunabeestudio.stopcovid.extension.robertManager
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.util.concurrent.TimeUnit
 
 class ProximityService : RobertProximityService() {
 
@@ -54,8 +46,6 @@ class ProximityService : RobertProximityService() {
         }
         StringsManager.getStrings()
     }
-
-    private var statusUpdateSchedulerScope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 
     override val robertManager: RobertManager by lazy {
         robertManager()
@@ -96,28 +86,11 @@ class ProximityService : RobertProximityService() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        scheduleNextStatusUpdate()
         return START_STICKY
-    }
-
-    private fun scheduleNextStatusUpdate() {
-        statusUpdateSchedulerScope.launch {
-            val nextStatusUpdateDelay = TimeUnit.HOURS.toMillis(1L)
-            Timber.d("Next status update in ${nextStatusUpdateDelay}ms")
-            delay(nextStatusUpdateDelay)
-            if (isActive) {
-                (applicationContext as StopCovid).refreshStatusIfNeeded()
-            }
-        }.invokeOnCompletion {
-            if (isActive) {
-                scheduleNextStatusUpdate()
-            }
-        }
     }
 
     override fun onDestroy() {
         robertManager.deactivateProximity(applicationContext as RobertApplication)
-        statusUpdateSchedulerScope.cancel()
         super.onDestroy()
     }
 
@@ -127,7 +100,6 @@ class ProximityService : RobertProximityService() {
         robertManager.deactivateProximity(applicationContext as RobertApplication)
         lastError = error
         onError?.invoke(error)
-        statusUpdateSchedulerScope.cancel()
     }
 
     fun consumeLastError(): RobertException? {
