@@ -18,9 +18,6 @@ apply plugin: 'shot'
 apply from: 'test.gradle'
 
 android {
-    compileSdkVersion 29
-    buildToolsVersion "29.0.3"
-
     signingConfigs {
         release {
             // You need to specify either an absolute path or include the
@@ -53,8 +50,6 @@ android {
 
     defaultConfig {
         applicationId "fr.gouv.android.stopcovid"
-        minSdkVersion 21
-        targetSdkVersion 29
         versionCode 32
         versionName "1.0.1"
 

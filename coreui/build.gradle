@@ -13,9 +13,6 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
 android {
-    compileSdkVersion 29
-    buildToolsVersion "29.0.3"
-
     buildTypes {
         debug {
             buildConfigField 'Boolean', 'USE_LOCAL_DATA', 'false'
@@ -25,9 +22,6 @@ android {
         }
     }
     defaultConfig {
-        minSdkVersion 21
-        targetSdkVersion 29
-
         buildConfigField 'String', 'SERVER_URL', '"https://app.stopcovid.gouv.fr/json/version-22/"'
         buildConfigField 'String', 'SERVER_CERTIFICATE_SHA256', '"sha256/sXQojvwsiyblrpMQIVRXGC5u7AgknzTJm+VIK1kQmD8="'
         buildConfigField 'String', 'CONFIG_JSON', '"config.json"'
