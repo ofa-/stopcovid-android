@@ -2,8 +2,8 @@ name: Publish apk
 
 on:
   push:
-    branches:
-      - 'master'
+    tags:
+      - '*'
 
 jobs:
   debug-apk:
