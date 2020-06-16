@@ -1,3 +1,5 @@
+name: Publish apk
+
 on:
   push:
     branches:
@@ -6,6 +8,9 @@ on:
 jobs:
   debug-apk:
     runs-on: ubuntu-18.04
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
     steps:
       - uses: actions/checkout@v1
 
@@ -19,3 +24,18 @@ jobs:
         with:
           name: stopcovid-debug
           path: stopcovid/build/outputs/apk/debug/stopcovid-debug.apk
+
+      - uses: actions/create-release@v1
+        id: create_release
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: stopcovid-debug
+          draft: false
+          prerelease: false
+
+      - uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: stopcovid/build/outputs/apk/debug/stopcovid-debug.apk
+          asset_name: stopcovid-debug.apk
+          asset_content_type: application/vnd.android.package-archive
