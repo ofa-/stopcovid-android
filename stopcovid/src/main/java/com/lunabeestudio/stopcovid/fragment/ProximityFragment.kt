@@ -291,9 +291,11 @@ class ProximityFragment : AboutMainFragment() {
             }
 
             subTitleItem.text = if (isProximityOn) {
-                strings["proximityController.switch.subtitle.activated"]
+                strings["proximityController.switch.subtitle.activated"] + "\n" +
+                strings["accessibility.hint.proximity.buttonState.activated"]
             } else {
-                strings["proximityController.switch.subtitle.deactivated"]
+                strings["proximityController.switch.subtitle.deactivated"] + "\n" +
+                strings["accessibility.hint.proximity.buttonState.deactivated"]
             }
 
             updateErrorLayout(getActivityBinding()?.errorLayout)
