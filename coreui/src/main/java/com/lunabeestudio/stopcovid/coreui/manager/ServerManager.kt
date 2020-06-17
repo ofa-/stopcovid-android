@@ -23,6 +23,7 @@ import java.io.File
 import java.lang.reflect.Type
 import java.util.Locale
 import java.util.concurrent.TimeUnit
+import kotlin.math.abs
 
 abstract class ServerManager {
 
@@ -38,9 +39,9 @@ abstract class ServerManager {
     protected open fun url(): String = BuildConfig.SERVER_URL
 
     @WorkerThread
-    protected fun fetchLast(context: Context, languageCode: String): Boolean {
+    protected fun fetchLast(context: Context, languageCode: String, forceRefresh: Boolean): Boolean {
         return try {
-            if (shouldRefresh(context)) {
+            if (shouldRefresh(context) || forceRefresh) {
                 val filename = "${prefix(context)}${languageCode}${extension()}"
                 Timber.d("Fetching remote data at ${url()}$filename")
                 "${url()}$filename".saveTo(context, File(context.filesDir, filename))
@@ -54,7 +55,7 @@ abstract class ServerManager {
             Timber.d("Fetching fail for $languageCode")
             if (languageCode != UiConstants.DEFAULT_LANGUAGE) {
                 Timber.d("Trying for ${UiConstants.DEFAULT_LANGUAGE}")
-                fetchLast(context, UiConstants.DEFAULT_LANGUAGE)
+                fetchLast(context, UiConstants.DEFAULT_LANGUAGE, forceRefresh)
             } else {
                 false
             }
@@ -81,8 +82,8 @@ abstract class ServerManager {
 
     private fun shouldRefresh(context: Context): Boolean {
         return !BuildConfig.USE_LOCAL_DATA
-            && System.currentTimeMillis() - TimeUnit.HOURS.toMillis(1L) > PreferenceManager.getDefaultSharedPreferences(context)
-            .getLong(lastRefreshSharedPrefsKey(), 0L)
+            && abs(System.currentTimeMillis() - PreferenceManager.getDefaultSharedPreferences(context)
+            .getLong(lastRefreshSharedPrefsKey(), 0L)) > TimeUnit.HOURS.toMillis(1L)
     }
 
     private fun saveLastRefresh(context: Context) {

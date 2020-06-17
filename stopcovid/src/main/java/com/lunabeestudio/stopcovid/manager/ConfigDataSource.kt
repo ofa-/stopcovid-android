@@ -14,6 +14,7 @@ import android.content.Context
 import com.google.gson.Gson
 import com.lunabeestudio.domain.model.Configuration
 import com.lunabeestudio.robert.datasource.ConfigurationDataSource
+import com.lunabeestudio.robert.model.TimeNotAlignedException
 import com.lunabeestudio.robert.model.RobertResultData
 import com.lunabeestudio.stopcovid.coreui.manager.ConfigManager
 import com.lunabeestudio.stopcovid.extension.remoteToRobertException
@@ -30,7 +31,12 @@ object ConfigDataSource : ConfigurationDataSource {
         return withContext(Dispatchers.IO) {
             try {
                 val response = ConfigManager.fetchLast(context)
-                RobertResultData.Success(gson.fromJson(response, ConfigurationWrapper::class.java).config)
+                if (TimeCheckManager.isTimeAlignedWithServer(response) == false) {
+                    Timber.e("Phone time not aligned with server time")
+                    RobertResultData.Failure<List<Configuration>?>(TimeNotAlignedException())
+                } else {
+                    RobertResultData.Success(gson.fromJson(response.body!!.string(), ConfigurationWrapper::class.java).config)
+                }
             } catch (e: Exception) {
                 Timber.e(e)
                 RobertResultData.Failure<List<Configuration>?>(e.remoteToRobertException())

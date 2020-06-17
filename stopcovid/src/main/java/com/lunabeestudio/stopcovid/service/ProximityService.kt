@@ -16,19 +16,15 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Binder
 import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
-import androidx.core.content.edit
-import androidx.preference.PreferenceManager
 import com.lunabeestudio.framework.ble.service.RobertProximityService
 import com.lunabeestudio.robert.RobertApplication
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.robert.model.RobertException
-import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.R
 import com.lunabeestudio.stopcovid.coreui.UiConstants
@@ -47,11 +43,10 @@ class ProximityService : RobertProximityService() {
     private val binder = ProximityBinder()
 
     private val strings: HashMap<String, String> by lazy {
+        if (StringsManager.getStrings().isEmpty()) {
+            StringsManager.init(this)
+        }
         StringsManager.getStrings()
-    }
-
-    private val sharedPreferences: SharedPreferences by lazy {
-        PreferenceManager.getDefaultSharedPreferences(this)
     }
 
     override val robertManager: RobertManager by lazy {
@@ -99,6 +94,7 @@ class ProximityService : RobertProximityService() {
             .setOngoing(true)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setSmallIcon(R.drawable.ic_notification_bar)
+            .setNotificationSilent()
             .setContentIntent(pendingIntent)
             .build()
     }
@@ -178,7 +174,6 @@ class ProximityService : RobertProximityService() {
         )
             .setContentTitle(strings["notification.error.title"])
             .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setVisibility(NotificationCompat.VISIBILITY_SECRET)
             .setAutoCancel(true)
             .setSmallIcon(R.drawable.ic_notification_bar)
             .setStyle(NotificationCompat.BigTextStyle()

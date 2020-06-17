@@ -17,6 +17,7 @@ interface RobertApplication {
     fun getAppContext(): Context
     fun refreshProximityService()
     fun atRiskDetected()
+    fun sendClockNotAlignedNotification()
 
     interface Listener {
         fun notify(notification: Any)

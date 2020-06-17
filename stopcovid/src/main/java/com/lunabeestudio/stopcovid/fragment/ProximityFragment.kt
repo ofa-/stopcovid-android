@@ -21,6 +21,7 @@ import android.content.IntentFilter
 import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
+import android.os.SystemClock
 import android.util.Base64
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -34,6 +35,7 @@ import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.FrameLayout
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
@@ -78,8 +80,6 @@ import timber.log.Timber
 import java.net.URL
 import java.security.MessageDigest
 import java.util.Locale
-
-import androidx.appcompat.app.AppCompatActivity
 
 class ProximityFragment : AboutMainFragment() {
 
@@ -196,8 +196,8 @@ class ProximityFragment : AboutMainFragment() {
             mainText = strings["proximityController.button.activateProximity"]
             lightText = strings["proximityController.button.deactivateProximity"]
             onClickListener = View.OnClickListener {
-                if (System.currentTimeMillis() > proximityClickThreshold) {
-                    proximityClickThreshold = System.currentTimeMillis() + PROXIMITY_BUTTON_DELAY
+                if (SystemClock.elapsedRealtime() > proximityClickThreshold) {
+                    proximityClickThreshold = SystemClock.elapsedRealtime() + PROXIMITY_BUTTON_DELAY
                     if (robertManager.isProximityActive) {
                         robertManager.deactivateProximity(requireContext().applicationContext as RobertApplication)
                         refreshItems()
@@ -307,8 +307,8 @@ class ProximityFragment : AboutMainFragment() {
     private fun updateErrorLayout(errorLayout: FrameLayout?) {
         getActivityBinding()?.errorTextView?.text = ProximityManager.getErrorText(this, robertManager, strings)
         val clickListener = ProximityManager.getErrorClickListener(this) {
-            if (System.currentTimeMillis() > proximityClickThreshold) {
-                proximityClickThreshold = System.currentTimeMillis() + PROXIMITY_BUTTON_DELAY
+            if (SystemClock.elapsedRealtime() > proximityClickThreshold) {
+                proximityClickThreshold = SystemClock.elapsedRealtime() + PROXIMITY_BUTTON_DELAY
                 activateProximity()
             }
         }

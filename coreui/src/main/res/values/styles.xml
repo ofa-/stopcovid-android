@@ -26,6 +26,7 @@
         <item name="appBarLayoutStyle">@style/Widget.MaterialComponents.AppBarLayout.Surface</item>
         <item name="toolbarStyle">@style/Widget.StopCovid.Toolbar.Surface</item>
         <item name="actionMenuTextColor">?colorControlNormal</item>
+        <item name="snackbarTextViewStyle">@style/Widget.StopCovid.Snackbar.TextView</item>
 
         <item name="android:windowTranslucentNavigation">true</item>
     </style>

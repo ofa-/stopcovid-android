@@ -26,7 +26,8 @@ enum class ErrorCode {
     KEYSTORE_NO_KEY,
     BLE_ADVERTISER,
     BLE_SCANNER,
-    BLE_PROXIMITY_NOTIFICATION
+    BLE_PROXIMITY_NOTIFICATION,
+    TIME_NOT_ALIGNED
 }
 
 class UnknownException(message: String = "Unknown error occurred") :
@@ -71,3 +72,6 @@ class BLEScannerException(message: String = "An error occurs in BLE scanner") :
 
 class BLEProximityNotificationException(message: String = "An error occurs in BLE proximity notification") :
     CovidException(ErrorCode.BLE_PROXIMITY_NOTIFICATION, message)
+
+class TimeNotAlignedException(message: String = "Phone time not aligned with server time") :
+    CovidException(ErrorCode.TIME_NOT_ALIGNED, message)

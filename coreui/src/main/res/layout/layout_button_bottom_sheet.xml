@@ -32,7 +32,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/bottomSheetButton"
-                style="@style/Theme.StopCovid.Button"
+                style="@style/Widget.StopCovid.Button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/spacing_xlarge"

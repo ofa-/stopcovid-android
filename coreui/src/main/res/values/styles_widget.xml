@@ -23,7 +23,7 @@
         <item name="android:textColor">?colorOnSurface</item>
     </style>
 
-    <style name="Theme.StopCovid.Button" parent="Widget.MaterialComponents.Button">
+    <style name="Widget.StopCovid.Button" parent="Widget.MaterialComponents.Button">
         <item name="android:padding">@dimen/spacing_large</item>
         <item name="android:textSize">@dimen/button_font_size</item>
         <item name="elevation">0dp</item>
@@ -33,7 +33,7 @@
         <item name="rippleColor">@color/color_primary_light</item>
     </style>
 
-    <style name="Theme.StopCovid.Button.Light" parent="Widget.MaterialComponents.Button.OutlinedButton">
+    <style name="Widget.StopCovid.Button.Light" parent="Widget.MaterialComponents.Button.OutlinedButton">
         <item name="cornerRadius">@dimen/corner_radius</item>
         <item name="android:padding">@dimen/spacing_large</item>
         <item name="strokeColor">@color/color_primary_light</item>
@@ -45,7 +45,7 @@
         <item name="android:letterSpacing">@dimen/button_letter_spacing</item>
     </style>
 
-    <style name="Theme.StopCovid.Button.Danger" parent="Theme.StopCovid.Button.Light">
+    <style name="Widget.StopCovid.Button.Danger" parent="Widget.StopCovid.Button.Light">
         <item name="strokeColor">@color/color_error_light</item>
         <item name="elevation">0dp</item>
         <item name="android:textAllCaps">false</item>
@@ -53,7 +53,7 @@
         <item name="android:textColor">@color/color_error</item>
     </style>
 
-    <style name="Theme.StopCovid.TextInput" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+    <style name="Widget.StopCovid.TextInput" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
         <item name="boxCornerRadiusTopStart">@dimen/corner_radius</item>
         <item name="boxCornerRadiusTopEnd">@dimen/corner_radius</item>
         <item name="boxCornerRadiusBottomStart">@dimen/corner_radius</item>
@@ -62,6 +62,10 @@
         <item name="android:layout_marginEnd">@dimen/spacing_xlarge</item>
         <item name="errorIconDrawable">@null</item>
         <item name="errorEnabled">true</item>
+    </style>
+
+    <style name="Widget.StopCovid.Snackbar.TextView" parent="@style/Widget.MaterialComponents.Snackbar.TextView">
+        <item name="android:maxLines">5</item>
     </style>
 
 </resources>

@@ -30,14 +30,14 @@ import java.text.Normalizer
 import java.util.Locale
 
 @WorkerThread
-fun String.download(context: Context): String {
+fun String.download(context: Context): okhttp3.Response {
     val okHttpClient = OkHttpClient.getDefaultOKHttpClient(context, this, BuildConfig.SERVER_CERTIFICATE_SHA256)
     val request: Request = Request.Builder()
         .url(this)
         .build()
     val response = okHttpClient.newCall(request).execute()
     return if (response.isSuccessful && response.body != null) {
-        response.body!!.string()
+        response
     } else {
         Timber.d(response.body?.string())
         throw HttpException(Response.error<Any>(response.body!!, response))
@@ -54,7 +54,7 @@ fun String.saveTo(context: Context, file: File) {
     if (response.isSuccessful && response.body != null) {
         response.body!!.string().byteInputStream().use { input ->
             file.outputStream().use { output ->
-                input.copyTo(output)
+                input.copyTo(output, 4 * 1024)
             }
         }
     } else {

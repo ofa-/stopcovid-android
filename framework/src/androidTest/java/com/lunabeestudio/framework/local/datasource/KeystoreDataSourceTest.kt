@@ -71,6 +71,24 @@ class KeystoreDataSourceTest {
     }
 
     @Test
+    fun saveLongString_and_getLongString() {
+        val key = Random.nextBytes(8732)
+        keystoreDataSource.kA = key
+
+        val storedString = ApplicationProvider.getApplicationContext<Context>()
+            .getSharedPreferences("robert_prefs", Context.MODE_PRIVATE)
+            .getString("shared.pref.ka", null)
+
+        assertThat(storedString).isNotNull()
+        assertThat(storedString).isNotEqualTo(key)
+
+        val decryptedKey = keystoreDataSource.kA
+
+        assertThat(decryptedKey).isNotNull()
+        assert(key.contentEquals(decryptedKey!!))
+    }
+
+    @Test
     fun saveKA_and_removeKA() {
         val key = Random.nextBytes(16)
         keystoreDataSource.kA = key

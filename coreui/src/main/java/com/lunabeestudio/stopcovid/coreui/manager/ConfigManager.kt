@@ -14,6 +14,7 @@ import android.content.Context
 import androidx.annotation.WorkerThread
 import com.lunabeestudio.stopcovid.coreui.BuildConfig
 import com.lunabeestudio.stopcovid.coreui.extension.download
+import okhttp3.Response
 import timber.log.Timber
 
 object ConfigManager {
@@ -21,7 +22,7 @@ object ConfigManager {
     private const val URL: String = BuildConfig.SERVER_URL + BuildConfig.CONFIG_JSON
 
     @WorkerThread
-    fun fetchLast(context: Context): String {
+    fun fetchLast(context: Context): Response {
         Timber.d("Fetching remote config at $URL")
         return URL.download(context)
     }

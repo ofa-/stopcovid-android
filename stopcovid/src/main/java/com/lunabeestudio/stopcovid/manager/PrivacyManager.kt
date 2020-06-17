@@ -45,7 +45,9 @@ class PrivacyManager : ServerManager() {
 
         fun appForeground(context: Context) {
             CoroutineScope(Dispatchers.IO).launch {
-                if (PrivacyManager().fetchLast(context, Locale.getDefault().language) || prevLanguage != Locale.getDefault().language) {
+                if (PrivacyManager().fetchLast(context,
+                        Locale.getDefault().language,
+                        prevLanguage != Locale.getDefault().language) || prevLanguage != Locale.getDefault().language) {
                     prevLanguage = Locale.getDefault().language
                     _privacySections = PrivacyManager().loadLocal(context)
                 }

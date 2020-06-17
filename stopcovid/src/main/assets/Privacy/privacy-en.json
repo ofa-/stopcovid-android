@@ -1,62 +1,62 @@
 [
-	{
-        "section": "Vos données sont protégées",
-        "description": "StopCovid est conforme à la réglementation qui garantit la protection de vos données.",
+    {
+        "section": "Your privacy is protected",
+        "description": "StopCovid complies with the General Data Protection Regulation.",
         "links": [
-	        {
-                "label": "Plus d'informations sur RGPD",
-                "url": "https://app.stopcovid.gouv.fr/json/version-22/cnil.html"
+            {
+                "label": "More information about the GDPR ",
+                "url": "https://bonjour.stopcovid.gouv.fr/privacy-en.html"
             }
         ]
     },
     {
-        "section": "Comment les données sont échangées ?",
-        "description": "StopCovid utilise uniquement le Bluetooth de votre téléphone. Vos données de géolocalisation ne sont ni enregistrées ni échangées. StopCovid utilise uniquement le Bluetooth de votre téléphone. Vos données de géolocalisation ne sont ni enregistrées ni échangées. Le Bluetooth est utilisé pour obtenir une estimation, sur la base d’un modèle statistique, de la proximité entre deux téléphones."
+        "section": "How the data sharing works",
+        "description": "StopCovid uses your phone’s Bluetooth connection only. It does not record or share your location information. The Bluetooth connection is used to estimate the distance between two phones based on a statistical model."
     },
     {
-        "section": "Quelles données sont échangées et pourquoi ?",
-        "description": "Les données échangées entre deux téléphones via Bluetooth sont des pseudo-identifiants éphémères.\nUn pseudo-identifiant est renouvelé automatiquement toutes les 15 minutes. C’est par exemple une suite de numéros, de lettres ou de signes, qui ne permet pas par elle-même d’identifier une personne.\n\nLes données sont partagées par votre application avec le serveur, géré par le Ministère des Solidarités et de la Santé, seulement si vous êtes testé positif et avec votre accord. Cela permet alors aux applications des autres utilisateurs d’interroger le serveur pour savoir si elles ont été à proximité de votre application. Si c’est le cas, les utilisateurs seront alertés qu’ils ont été exposés à un risque de contamination. Il leur sera alors recommandé de prendre contact avec leur médecin.\n\nLes personnes alertées n’auront aucune information sur le téléphone portable à l’origine de l’alerte ni sur son propriétaire.\n\nL’application ne tient pas compte des contextes spécifiques d’utilisation et il est toujours possible pour l’utilisateur de la désactiver.\n\nL’application ne tient pas compte des contextes spécifiques et notamment des situations où une protection spécifique est mise en place (équipement des personnels de santé, séparation par une vitre par exemple). Il est toujours possible pour l’utilisateur de désactiver temporairement l’application."
+        "section": "What data are shared and why",
+        "description": "The data shared between two phones over their Bluetooth connections are temporary pseudo-identifiers.\nPseudo-identifiers are renewed automatically every 15 minutes. They can be a string of numbers, letters and symbols that cannot be used on their own to identify a person.\n\nThe application shares these data with the server managed by the Ministry for Solidarity and Health, but only if you test positive and only if you give your consent. If you do, then other users’ apps can connect to the server to find out if they have been close to your phone. If they have, the users will receive an alert that they have been exposed to a contamination risk and they will be encouraged to contact their doctors.\n\nThe users receiving the alert will have no information about the phone that triggered the alert or about the owner of the phone.\n\n The app does not take account of special circumstances, such as situations where specific protection measures are in place, including the use of personal protection equipment by healthcare personnel, or separation by a pane of glass. Users can deactivate the app temporarily at any time."
     },
     {
-        "section": "Où sont stockées les données ?",
-        "description": "Les données sont stockées sur votre téléphone portable. En cas de test positif, et avec votre consentement, vous pourrez protéger vos proches et les personnes que vous avez croisées en partageant sur le serveur géré par le Ministère des Solidarités et de la Santé cet historique de proximité."
+        "section": "Where the data are stored",
+        "description": "The data are stored on your mobile phone. If you test positive and if you give your consent, you can protect the people closest to you and people you have met by sharing the history of your close contacts through the server managed by the Ministry for Solidarity and Health."
     },
     {
-        "section": "Combien de temps sont-elles stockées ?",
-        "description": "Les données stockées sur le téléphone et sur le serveur sont automatiquement effacées après 14 jours."
+        "section": "Data storage times",
+        "description": "The data stored on your phone and on the server are automatically deleted after 14 days."
     },
     {
-        "section": "Puis-je supprimer les données ?",
-        "description": "Conformément au règlement général sur la protection des données (RGPD), vous pouvez supprimer : les données stockées sur votre téléphone, les données sur le serveur ainsi que les données liées à votre enregistrement (et vous désinscrire)."
+        "section": "Control of your data",
+        "description": "In compliance with the General Data Protection Regulation (GDPR), you can delete the data stored on your phone, the data stored on the server and the data relating to your registration, and you can cancel your registration."
     },
     {
-        "section": "Vous êtes un mineur de moins de 15 ans ?",
-        "description": "Si vous êtes un mineur de moins de 15 ans, discutez avec vos parents ou vos responsables légaux de l’opportunité d’installer cette application.",
+        "section": "Minors under the age of 15 years",
+        "description": "If you are a minor under the age of 15 years, talk to your parents or your guardians about the appropriateness of installing the app.",
         "links": [
-	        {
-                "label": "Pour plus de détails",
+            {
+                "label": "For more details ",
                 "url": "https://stopcovid.solidarites-sante.gouv.fr/mineurs"
             }
         ]
     },
     {
-        "section": "Qui a créé StopCovid ?",
-        "description": "Cette application a été réalisée par l'équipe StopCovid, sous la supervision du Ministère des Solidarités et de la Santé et du Secrétariat d'Etat chargé du Numérique.\nL'équipe StopCovid : Inria, ANSSI, Capgemini, Dassault Systèmes, Inserm, Lunabee Studio, Ministère des Solidarités et de la Santé, Orange, Santé Publique France et Withings.\nLe code source de cette plateforme est intégralement ouvert et accessible à l’adresse ci-dessous."
+        "section": "StopCovid developers",
+        "description": "This app was developed by the StopCovid team under the supervision of the Ministry for Solidarity and Health and the Ministry of State for Digital Affairs.\nStopCovid team: Inria, ANSSI, Capgemini, Dassault Systèmes, Inserm, Lunabee Studio, Ministry for Solidarity and Health, Orange, Santé Publique France and Withings.\nThe app is entirely open source and the source code is accessible at the following address."
     },
     {
-        "section": "Informations complémentaires",
+        "section": "Further information",
         "links": [
             {
-                "label": "À propos de StopCovid",
+                "label": "About StopCovid",
                 "url": "https://bonjour.stopcovid.gouv.fr/stopcovid.html"
             },
             {
-                "label": "Code source de l'application",
+                "label": "Application source code",
                 "url": "https://gitlab.inria.fr/stopcovid19/accueil"
             },
             {
-                "label": "Politique de protection des données",
-                "url": "https://app.stopcovid.gouv.fr/json/version-22/cnil.html"
+                "label": "Data protection policy",
+                "url": "https://bonjour.stopcovid.gouv.fr/privacy-en.html"
             }
         ]
     }

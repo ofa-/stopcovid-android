@@ -26,7 +26,9 @@ object UiConstants {
     enum class Notification(val channelId: String, val notificationId: Int) {
         AT_RISK("atRisk", 1),
         PROXIMITY("proximity", 2),
-        ERROR("error", 3)
+        ERROR("error", 3),
+        UPGRADE("upgrade", 4),
+        TIME("error", 5)
     }
 
     const val DEFAULT_LANGUAGE: String = "en"

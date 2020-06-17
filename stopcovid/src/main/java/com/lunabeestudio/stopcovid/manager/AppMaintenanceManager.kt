@@ -19,11 +19,13 @@ import androidx.core.content.edit
 import androidx.preference.PreferenceManager
 import com.google.gson.Gson
 import com.lunabeestudio.stopcovid.Constants
+import com.lunabeestudio.stopcovid.StopCovid
 import com.lunabeestudio.stopcovid.model.Info
 import com.lunabeestudio.stopcovid.network.LBMaintenanceHttpClient
 import org.json.JSONObject
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
+import kotlin.math.abs
 
 /**
  * Main class of this lib. The singleton manager which do the work to block the app or not
@@ -158,11 +160,15 @@ object AppMaintenanceManager {
      */
     private fun startAppMaintenanceActivity(context: Context,
         info: Info) {
-        context.startActivity(
-            Intent(context, com.lunabeestudio.stopcovid.activity.AppMaintenanceActivity::class.java).apply {
-                putExtra(com.lunabeestudio.stopcovid.activity.AppMaintenanceActivity.EXTRA_INFO, Gson().toJson(info))
-            }.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP))
-        context.sendBroadcast(Intent(Constants.Notification.APP_IN_MAINTENANCE))
+        if ((context.applicationContext as StopCovid).isAppInForeground) {
+            context.startActivity(
+                Intent(context, com.lunabeestudio.stopcovid.activity.AppMaintenanceActivity::class.java).apply {
+                    putExtra(com.lunabeestudio.stopcovid.activity.AppMaintenanceActivity.EXTRA_INFO, Gson().toJson(info))
+                }.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP))
+            context.sendBroadcast(Intent(Constants.Notification.APP_IN_MAINTENANCE))
+        } else if (info.isActive == true && info.mode == Info.Mode.UPGRADE) {
+            (context.applicationContext as StopCovid).sendUpgradeNotification()
+        }
     }
 
     /* SHARED PREFS */
@@ -184,8 +190,8 @@ object AppMaintenanceManager {
     }
 
     private fun shouldRefresh(context: Context): Boolean {
-        return System.currentTimeMillis() - TimeUnit.MINUTES.toMillis(5L) > PreferenceManager.getDefaultSharedPreferences(context)
-            .getLong(Constants.SharedPrefs.LAST_MAINTENANCE_REFRESH, 0L)
+        return abs(System.currentTimeMillis() - PreferenceManager.getDefaultSharedPreferences(context)
+            .getLong(Constants.SharedPrefs.LAST_MAINTENANCE_REFRESH, 0L)) > TimeUnit.MINUTES.toMillis(5L)
     }
 
     private fun saveLastRefresh(context: Context) {

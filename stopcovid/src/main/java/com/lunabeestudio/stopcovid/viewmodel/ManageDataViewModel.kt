@@ -10,13 +10,18 @@
 
 package com.lunabeestudio.stopcovid.viewmodel
 
+import android.app.NotificationManager
+import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import androidx.work.WorkManager
 import com.lunabeestudio.robert.RobertApplication
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.robert.model.RobertResult
+import com.lunabeestudio.stopcovid.Constants
+import com.lunabeestudio.stopcovid.coreui.UiConstants
 import com.lunabeestudio.stopcovid.coreui.utils.SingleLiveEvent
 import com.lunabeestudio.stopcovid.extension.toCovidException
 import com.lunabeestudio.stopcovid.model.CovidException
@@ -34,28 +39,12 @@ class ManageDataViewModel(private val robertManager: RobertManager) : ViewModel(
     val loadingInProgress: MutableLiveData<Boolean> = MutableLiveData(false)
 
     fun eraseLocalHistory() {
-        callWS(robertManager::eraseLocalHistory, eraseLocalSuccess)
-    }
-
-    fun eraseRemoteExposureHistory() {
-        if (robertManager.isRegistered) {
-            callWS(robertManager::eraseRemoteExposureHistory, eraseRemoteSuccess)
-        } else {
-            covidException.postValue(NeedRegisterException())
-        }
-    }
-
-    fun eraseRemoteAlert() {
-        callWS(robertManager::eraseRemoteAlert, eraseAlertSuccess)
-    }
-
-    fun quitStopCovid(application: RobertApplication) {
         if (robertManager.isRegistered) {
             if (loadingInProgress.value == false) {
                 viewModelScope.launch(Dispatchers.IO) {
                     loadingInProgress.postValue(true)
-                    when (val result = robertManager.quitStopCovid(application)) {
-                        is RobertResult.Success -> quitStopCovidSuccess.postValue(null)
+                    when (val result = robertManager.eraseLocalHistory()) {
+                        is RobertResult.Success -> eraseLocalSuccess.postValue(null)
                         is RobertResult.Failure -> covidException.postValue(result.error.toCovidException())
                     }
                     loadingInProgress.postValue(false)
@@ -66,17 +55,69 @@ class ManageDataViewModel(private val robertManager: RobertManager) : ViewModel(
         }
     }
 
-    private fun callWS(callWS: suspend () -> RobertResult, successLiveEvent: SingleLiveEvent<*>) {
-        if (loadingInProgress.value == false) {
-            viewModelScope.launch(Dispatchers.IO) {
-                loadingInProgress.postValue(true)
-                when (val result = callWS()) {
-                    is RobertResult.Success -> successLiveEvent.postValue(null)
-                    is RobertResult.Failure -> covidException.postValue(result.error.toCovidException())
+    fun eraseRemoteExposureHistory(application: RobertApplication) {
+        if (robertManager.isRegistered) {
+            if (loadingInProgress.value == false) {
+                viewModelScope.launch(Dispatchers.IO) {
+                    loadingInProgress.postValue(true)
+                    when (val result = robertManager.eraseRemoteExposureHistory(application)) {
+                        is RobertResult.Success -> eraseRemoteSuccess.postValue(null)
+                        is RobertResult.Failure -> covidException.postValue(result.error.toCovidException())
+                    }
+                    loadingInProgress.postValue(false)
                 }
-                loadingInProgress.postValue(false)
             }
+        } else {
+            covidException.postValue(NeedRegisterException())
         }
+    }
+
+    fun eraseRemoteAlert(application: RobertApplication) {
+        if (robertManager.isRegistered) {
+            if (loadingInProgress.value == false) {
+                viewModelScope.launch(Dispatchers.IO) {
+                    loadingInProgress.postValue(true)
+                    when (val result = robertManager.eraseRemoteAlert()) {
+                        is RobertResult.Success -> {
+                            clearNotifications(application)
+                            eraseAlertSuccess.postValue(null)
+                        }
+                        is RobertResult.Failure -> covidException.postValue(result.error.toCovidException())
+                    }
+                    loadingInProgress.postValue(false)
+                }
+            }
+        } else {
+            covidException.postValue(NeedRegisterException())
+        }
+    }
+
+    fun quitStopCovid(application: RobertApplication) {
+        if (robertManager.isRegistered) {
+            if (loadingInProgress.value == false) {
+                viewModelScope.launch(Dispatchers.IO) {
+                    loadingInProgress.postValue(true)
+                    when (val result = robertManager.quitStopCovid(application)) {
+                        is RobertResult.Success -> {
+                            WorkManager.getInstance(application.getAppContext()).cancelUniqueWork(Constants.WorkerNames.NOTIFICATION)
+                            clearNotifications(application)
+                            quitStopCovidSuccess.postValue(null)
+                        }
+                        is RobertResult.Failure -> covidException.postValue(result.error.toCovidException())
+                    }
+                    loadingInProgress.postValue(false)
+                }
+            }
+        } else {
+            covidException.postValue(NeedRegisterException())
+        }
+    }
+
+    private fun clearNotifications(application: RobertApplication) {
+        val notificationManager = application.getAppContext().getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.cancel(UiConstants.Notification.ERROR.notificationId)
+        notificationManager.cancel(UiConstants.Notification.TIME.notificationId)
+        notificationManager.cancel(UiConstants.Notification.AT_RISK.notificationId)
     }
 }
 

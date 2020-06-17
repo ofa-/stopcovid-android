@@ -42,7 +42,9 @@ class StringsManager : ServerManager() {
 
         fun appForeground(context: Context) {
             CoroutineScope(Dispatchers.IO).launch {
-                if (StringsManager().fetchLast(context, Locale.getDefault().language) || prevLanguage != Locale.getDefault().language) {
+                if (StringsManager().fetchLast(context,
+                        Locale.getDefault().language,
+                        prevLanguage != Locale.getDefault().language) || prevLanguage != Locale.getDefault().language) {
                     prevLanguage = Locale.getDefault().language
                     _strings = StringsManager().loadLocal(context)
                 }

@@ -69,7 +69,7 @@ interface RobertManager {
 
     suspend fun eraseLocalHistory(): RobertResult
 
-    suspend fun eraseRemoteExposureHistory(): RobertResult
+    suspend fun eraseRemoteExposureHistory(application: RobertApplication): RobertResult
 
     suspend fun eraseRemoteAlert(): RobertResult
 

@@ -42,14 +42,14 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/button"
-            style="@style/Theme.StopCovid.Button"
+            style="@style/Widget.StopCovid.Button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             tools:text="@tools:sample/lorem[3]" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/refreshButton"
-            style="@style/Theme.StopCovid.Button"
+            style="@style/Widget.StopCovid.Button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             tools:text="@tools:sample/lorem[2]" />

@@ -1,62 +1,56 @@
 ﻿[
-	{
-        "section": "Vos données sont protégées",
-        "description": "StopCovid est conforme à la réglementation qui garantit la protection de vos données.",
-        "links": [
-	        {
-                "label": "Plus d'informations sur RGPD",
-                "url": "https://app.stopcovid.gouv.fr/json/version-22/cnil.html"
-            }
-        ]
-    },
     {
-        "section": "Comment les données sont échangées ?",
-        "description": "StopCovid utilise uniquement le Bluetooth de votre téléphone. Vos données de géolocalisation ne sont ni enregistrées ni échangées. StopCovid utilise uniquement le Bluetooth de votre téléphone. Vos données de géolocalisation ne sont ni enregistrées ni échangées. Le Bluetooth est utilisé pour obtenir une estimation, sur la base d’un modèle statistique, de la proximité entre deux téléphones."
-    },
-    {
-        "section": "Quelles données sont échangées et pourquoi ?",
-        "description": "Les données échangées entre deux téléphones via Bluetooth sont des pseudo-identifiants éphémères.\nUn pseudo-identifiant est renouvelé automatiquement toutes les 15 minutes. C’est par exemple une suite de numéros, de lettres ou de signes, qui ne permet pas par elle-même d’identifier une personne.\n\nLes données sont partagées par votre application avec le serveur, géré par le Ministère des Solidarités et de la Santé, seulement si vous êtes testé positif et avec votre accord. Cela permet alors aux applications des autres utilisateurs d’interroger le serveur pour savoir si elles ont été à proximité de votre application. Si c’est le cas, les utilisateurs seront alertés qu’ils ont été exposés à un risque de contamination. Il leur sera alors recommandé de prendre contact avec leur médecin.\n\nLes personnes alertées n’auront aucune information sur le téléphone portable à l’origine de l’alerte ni sur son propriétaire.\n\nL’application ne tient pas compte des contextes spécifiques d’utilisation et il est toujours possible pour l’utilisateur de la désactiver.\n\nL’application ne tient pas compte des contextes spécifiques et notamment des situations où une protection spécifique est mise en place (équipement des personnels de santé, séparation par une vitre par exemple). Il est toujours possible pour l’utilisateur de désactiver temporairement l’application."
-    },
-    {
-        "section": "Où sont stockées les données ?",
-        "description": "Les données sont stockées sur votre téléphone portable. En cas de test positif, et avec votre consentement, vous pourrez protéger vos proches et les personnes que vous avez croisées en partageant sur le serveur géré par le Ministère des Solidarités et de la Santé cet historique de proximité."
-    },
-    {
-        "section": "Combien de temps sont-elles stockées ?",
-        "description": "Les données stockées sur le téléphone et sur le serveur sont automatiquement effacées après 14 jours."
-    },
-    {
-        "section": "Puis-je supprimer les données ?",
-        "description": "Conformément au règlement général sur la protection des données (RGPD), vous pouvez supprimer : les données stockées sur votre téléphone, les données sur le serveur ainsi que les données liées à votre enregistrement (et vous désinscrire)."
-    },
-    {
-        "section": "Vous êtes un mineur de moins de 15 ans ?",
-        "description": "Si vous êtes un mineur de moins de 15 ans, discutez avec vos parents ou vos responsables légaux de l’opportunité d’installer cette application.",
-        "links": [
-	        {
-                "label": "Pour plus de détails",
-                "url": "https://stopcovid.solidarites-sante.gouv.fr/mineurs"
-            }
-        ]
-    },
-    {
-        "section": "Qui a créé StopCovid ?",
-        "description": "Cette application a été réalisée par l'équipe StopCovid, sous la supervision du Ministère des Solidarités et de la Santé et du Secrétariat d'Etat chargé du Numérique.\nL'équipe StopCovid : Inria, ANSSI, Capgemini, Dassault Systèmes, Inserm, Lunabee Studio, Ministère des Solidarités et de la Santé, Orange, Santé Publique France et Withings.\nLe code source de cette plateforme est intégralement ouvert et accessible à l’adresse ci-dessous."
-    },
-    {
-        "section": "Informations complémentaires",
+        "section": "I tuoi dati sono protetti",
+        "description": "StopCovid è conforme alla normativa che garantisce la protezione dei tuoi dati.",
         "links": [
             {
-                "label": "À propos de StopCovid",
+                "label": "Ulteriori informazioni sul GDPR",
+                "url": "https://bonjour.stopcovid.gouv.fr/privacy-en.html"
+            }
+        ]
+    },
+    {
+        "section": "Come sono trasferiti i dati?",
+        "description": "StopCovid utilizza solamente il Bluetooth del tuo smartphone. I tuoi dati di geolocalizzazione non sono né registrati né trasferiti. Il Bluetooth è utilizzato per ottenere una stima, in base ad un modello statistico, della vicinanza tra due smartphone."
+    },
+    {
+        "section": "Quali sono i dati trasferiti e perché?",
+        "description": "I dati trasferiti tra due smartphone tramite il Bluetooth sono degli pseudo-identificatori temporanei.\nUno pseudo-identificatore viene modificato automaticamente ogni 15 minuti. Si tratta per esempio di una stringa di numeri, di lettere o di segni, che non basta in sé per identificare una persona\n\nI dati sono condivisi dalla tua applicazione con il server, gestito dal Ministero della solidarietà e della salute, unicamente se sei testato/a positivo/a, e con il tuo accordo. Ciò consente quindi alle applicazioni degli altri utenti di inviare una richiesta al server per sapere se sono stati vicini alla tua applicazione. Se la risposta è positiva, gli utenti saranno allora avvertiti che sono stati esposti a un rischio di contagio. Sarà raccomandato loro di contattare il medico curante.\n\nLe persone che avranno ricevuto tale avviso non hanno nessuna informazione a proposito del telefono cellulare da cui proviene l’avviso né del suo proprietario.\n\n\n\nL’applicazione non tiene conto dei contesti specifici e in particolare delle situazioni in cui è adottata una protezione specifica (attrezzature del personale sanitario, separazione tramite un vetro, per esempio). L’utente può sempre disattivare temporaneamente l’applicazione."
+    },
+    {
+        "section": "Dove sono registrati i dati?",
+        "description": "I dati sono registrati sul tuo telefono cellulare. Se il test è positivo, e con il tuo accordo, puoi proteggere i tuoi cari e le persone che hai incontrato condividendo sul server gestito dal Ministero della solidarietà e della salute questa cronologia di prossimità."
+    },
+    {
+        "section": "Quanto tempo sono conservati?",
+        "description": "I dati registrati sullo smartphone e sul server sono cancellati automaticamente dopo 14 giorni."
+    },
+    {
+        "section": "Posso cancellare i dati?",
+        "description": "In conformità con il regolamento generale sulla protezione dei dati (GDPR), puoi cancellare: i dati registrati sul tuo smartphone, i dati presenti sul server nonché i dati riguardanti la tua iscrizione (e puoi annullare l’iscrizione)."
+    },
+    {
+        "section": "Sei minorenne e hai meno di 15 anni?",
+        "description": "Se sei minorenne e hai meno di 15 anni, consulta i tuoi genitori o chi ne fa le veci per decidere se è opportuno installare questa applicazione."
+    },
+    {
+        "section": "Chi ha creato StopCovid ?",
+        "description": "Questa applicazione è stata realizzata dal team StopCovid, con la supervisione del Ministero della solidarietà e della salute e del Segretariato di Stato per il Digitale.\nIl team StopCovid: Inria, ANSSI, Capgemini, Dassault Systèmes, Inserm, Lunabee Studio, Ministero della solidarietà e della salute, Orange, Santé Publique France e Withings.\nIl codice sorgente di questa piattaforma è totalmente aperto e accessibile all’indirizzo seguente."
+    },
+    {
+        "section": "Informazioni complementari",
+        "links": [
+            {
+                "label": "A proposito di StopCovid",
                 "url": "https://bonjour.stopcovid.gouv.fr/stopcovid.html"
             },
             {
-                "label": "Code source de l'application",
+                "label": "Codice sorgente dell’applicazione",
                 "url": "https://gitlab.inria.fr/stopcovid19/accueil"
             },
             {
-                "label": "Politique de protection des données",
-                "url": "https://app.stopcovid.gouv.fr/json/version-22/cnil.html"
+                "label": "Politica di protezione dei dati",
+                "url": "https://bonjour.stopcovid.gouv.fr/privacy-en.html"
             }
         ]
     }
