@@ -1,10 +1,16 @@
 StopCovid Android
 =================
 
-This repository is a fork of [upstream gitlab.inria.fr][upstream]
-repo `stopcovid-android`,
+This _extended_ StopCovid features:
 
-the Android mobile application component of [StopCovid][StopCovid].
+- notifications on "ping"
+- proximity info screen
+- ui beautifications
+
+The app is a fork of upstream [gitlab.inria.fr][upstream]
+`stopcovid-android` and is compatible with [StopCovid][StopCovid].
+
+[![download latest][download]][release]
 
 
 Building the app
@@ -65,3 +71,5 @@ Checking the log live with adb
 
 [StopCovid]: https://gitlab.inria.fr/stopcovid19/accueil/
 [upstream]:  https://gitlab.inria.fr/stopcovid19/stopcovid-android/
+[download]:  https://yt3dl.net/images/apk-download-badge.png
+[release]:   ../../releases/latest/download/stopcovid-release.apk
