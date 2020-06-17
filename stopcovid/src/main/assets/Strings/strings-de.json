@@ -80,6 +80,7 @@
     "proximityController.mainMessage.subtitle.off": "Wenn Sie StopCovid aktivieren, werden Sie im Fall eines Ansteckungsrisikos informiert und informieren Ihre Mitmenschen. Auf diese Weise leisten Sie einen Beitrag zur Bekämpfung von COVID-19.\nSie können StopCovid jederzeit aktivieren und deaktivieren.",
     "proximityController.mainMessage.subtitle.on": "Vielen Dank, dass Sie StopCovid aktiviert haben. Sie können Ihr Mobiltelefon weiterhin ganz normal nutzen, allerdings ohne die Bluetooth-Funktion zu deaktivieren!\nSie können StopCovid jederzeit aktivieren und deaktivieren.",
     "proximityController.manageData": "Meine Daten verwalten",
+    "proximityController.tuneProximity": "Nähe",
     "proximityController.error.noBLE": "Wenn Ihr Mobiltelefon nicht über eine Bluetooth Low Energy-Funktion verfügt, ist es leider nicht mit StopCovid kompatibel.",
     "proximityController.error.noNotifications": "Wenn Sie über die Gefahr einer Ansteckung mit COVID-19 informiert werden möchten, müssen Sie die Benachrichtigungen in den Parametern aktivieren. Dazu bitte hier antippen 👉",
     "proximityController.error.noBattery": "Damit StopCovid funktionieren kann, müssen Sie die Ausführung im Hintergrund erlauben. Dazu bitte hier antippen 👉",

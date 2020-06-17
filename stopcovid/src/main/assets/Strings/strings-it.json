@@ -80,6 +80,7 @@
     "proximityController.mainMessage.subtitle.off": "L’attivazione di StopCovid consente di essere informati e di informare gli altri su un possibile rischio di contaminazione, contribuendo attivamente alla lotta contro il COVID-19.\nPuoi in ogni momento attivare e disattivare StopCovid.",
     "proximityController.mainMessage.subtitle.on": "Grazie di avere attivato StopCovid. Puoi continuare a utilizzare normalmente il tuo smartphone, ma non disattivare il Bluetooth!\nPuoi in ogni momento attivare e disattivare StopCovid.",
     "proximityController.manageData": "Gestire i miei dati",
+    "proximityController.tuneProximity": "Prossimità",
     "proximityController.error.noBLE": "Il tuo smartphone non possiede la modalità Bluetooth Low Energy, purtroppo non è compatibile con StopCovid.",
     "proximityController.error.noNotifications": "Per essere informati di un rischio di esposizione al COVID-19, le notifiche devono essere attivate nei parametri premendo qui 👉",
     "proximityController.error.noBattery": "Per far funzionare StopCovid è necessario abilitare l’esecuzione in background premendo qui 👉",
