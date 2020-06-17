@@ -91,8 +91,8 @@
     "proximityController.error.noBluetoothOrLocalisation": "حتى يعمل تطبيق StopCovid بشكل سليم، يجب تفعيل الموقع (لتقنية Bluetooth) والإشعارات في الإعدادات بالنقر على هذه الخانة 👉",
     "proximityController.error.noNotificationsOrBluetoothOrLocalisation": "حتى يعمل تطبيق StopCovid بشكل سليم، يجب تفعيل الموقع (لتقنية Bluetooth) والإشعارات في الإعدادات بالنقر على هذه الخانة 👉",
     "proximityController.error.activateProximity": "تطبيق StopCovid لا يعمل. إضعط على هذا الشريط لتفعيله.",
-    "proximityController.switch.subtitle.activated": "يساهم StopCovid في حمايتك وحماية الآخرين",
-    "proximityController.switch.subtitle.deactivated": "لم تقم بعد بتفعيل تطبيق StopCovid",
+    "proximityController.switch.subtitle.activated":   "💕  🐭   StopCoviiid   🐱  💋",
+    "proximityController.switch.subtitle.deactivated": "💋  🐱   StopCoviiid   🐭  💕",
     "proximityService.error.scanError": "يستحيل تفعيل البحث عن Bluetooth Low Energy.",
     "proximityService.error.captchaError": "يستحيل التحقق من أنك لست آلة.",
     "supportController.tabBar.title": "الدعم",
