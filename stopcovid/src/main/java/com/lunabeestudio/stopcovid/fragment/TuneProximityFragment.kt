@@ -11,31 +11,25 @@
 package com.lunabeestudio.stopcovid.fragment
 
 import android.os.Bundle
-import android.view.View
 import android.view.Gravity
-import androidx.lifecycle.observe
-import androidx.navigation.fragment.findNavController
-import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
-import com.lunabeestudio.stopcovid.coreui.fastitem.dividerItem
-import com.lunabeestudio.stopcovid.coreui.fastitem.lightButtonItem
-import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
-import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
-import com.mikepenz.fastadapter.GenericItem
-
+import android.view.View
+import com.lunabeestudio.domain.extension.ntpTimeSToUnixTimeMs
+import com.lunabeestudio.domain.model.EphemeralBluetoothIdentifier
+import com.lunabeestudio.domain.model.LocalProximity
+import com.lunabeestudio.framework.ble.extension.toLocalProximity
 import com.lunabeestudio.robert.RobertApplication
 import com.lunabeestudio.robert.RobertManagerImpl
-import com.lunabeestudio.domain.model.LocalProximity
+import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
+import com.lunabeestudio.stopcovid.coreui.fastitem.dividerItem
 import com.lunabeestudio.stopcovid.extension.robertManager
-import com.lunabeestudio.framework.ble.extension.toLocalProximity
-
-import android.util.Log
-
+import com.mikepenz.fastadapter.GenericItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-
-import java.util.Date
 import java.text.SimpleDateFormat
+import java.util.Date
+import kotlin.collections.MutableList
+import kotlin.math.min
 
 
 class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
@@ -48,7 +42,7 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
         localProximityItems = robertManager
             .getLocalProximityItems(0)
             .toMutableList()
-        localProximityItems.sortByDescending({ it.collectedTime})
+        localProximityItems.sortByDescending({ it.collectedTime })
         application.registerListener(this)
     }
 
@@ -121,9 +115,7 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
         val items = ArrayList<GenericItem>()
 
         items += dividerItem {}
-
         items += nbItemsCaption
-
         items += dividerItem {}
         items += lastNotificationCaption
         items += dividerItem {}
