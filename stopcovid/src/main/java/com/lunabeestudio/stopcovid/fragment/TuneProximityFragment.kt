@@ -65,12 +65,8 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
         get() = (requireContext().applicationContext as RobertApplication)
 
     override fun onDestroyView() {
-        application.registerListener(NullListener())
+        application.registerListener(null)
         super.onDestroyView()
-    }
-
-    class NullListener: RobertApplication.Listener {
-        override fun notify(notification: Any) {}
     }
 
     private fun refreshItems() {

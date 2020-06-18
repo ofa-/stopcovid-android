@@ -133,7 +133,7 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication {
         listener?.notify(notification)
     }
 
-    override fun registerListener(_listener: RobertApplication.Listener) {
+    override fun registerListener(_listener: RobertApplication.Listener?) {
         listener = _listener
     }
 

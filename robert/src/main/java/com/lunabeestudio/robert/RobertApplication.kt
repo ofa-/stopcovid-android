@@ -22,6 +22,6 @@ interface RobertApplication {
     interface Listener {
         fun notify(notification: Any)
     }
-    fun registerListener(listener: Listener)
+    fun registerListener(listener: Listener?)
     fun notifyListener(notification: Any)
 }
