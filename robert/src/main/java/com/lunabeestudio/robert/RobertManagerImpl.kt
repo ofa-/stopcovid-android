@@ -19,6 +19,7 @@ import com.google.gson.reflect.TypeToken
 import com.lunabeestudio.domain.extension.unixTimeMsToNtpTimeS
 import com.lunabeestudio.domain.model.Configuration
 import com.lunabeestudio.domain.model.DeviceParameterCorrection
+import com.lunabeestudio.domain.model.EphemeralBluetoothIdentifier
 import com.lunabeestudio.domain.model.HelloBuilder
 import com.lunabeestudio.domain.model.HelloSettings
 import com.lunabeestudio.domain.model.LocalProximity
@@ -450,6 +451,10 @@ class RobertManagerImpl(
 
     /*suspend*/ fun getLocalProximityItems(timeMs : Long = 0): List<LocalProximity> {
         return localProximityRepository.getUntilTime(timeMs)
+    }
+
+    /*suspend*/ fun getLocalEbids(): List<EphemeralBluetoothIdentifier> {
+        return ephemeralBluetoothIdentifierRepository.getAll()
     }
 
     private fun startStatusWorker(context: Context) {

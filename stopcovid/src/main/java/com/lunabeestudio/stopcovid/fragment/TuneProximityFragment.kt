@@ -35,10 +35,14 @@ import kotlin.math.min
 class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
 
     private lateinit var localProximityItems: MutableList<LocalProximity>
+    private lateinit var localEbids: MutableList<EphemeralBluetoothIdentifier>
 
     private fun initLocalProximityItems() {
         val robertManager = (requireContext().robertManager() as RobertManagerImpl)
 
+        localEbids = robertManager
+            .getLocalEbids()
+            .toMutableList()
         localProximityItems = robertManager
             .getLocalProximityItems(0)
             .toMutableList()
@@ -67,7 +71,11 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
 
     private fun refreshItems() {
     CoroutineScope(Dispatchers.Main).launch {
-            nbItemsCaption.text = nbItemsTxt + localProximityItems.count()
+            nbItemsCaption.text = "ebids: %d  |  pairs: %d  |  pings: %d"
+                .format(
+                    localEbids.count(),
+                    localProximityItems.groupBy { it.ebidBase64 }.count(),
+                    localProximityItems.count())
             proximityInfoList.text = localProximityItemsToString()
 
             if (binding?.recyclerView?.isComputingLayout == false)
