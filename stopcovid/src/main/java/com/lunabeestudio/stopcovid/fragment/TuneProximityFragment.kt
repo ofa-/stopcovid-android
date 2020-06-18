@@ -40,10 +40,12 @@ import java.text.SimpleDateFormat
 
 class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
 
-    lateinit var localProximityItems: MutableList<LocalProximity>
+    private lateinit var localProximityItems: MutableList<LocalProximity>
 
-    fun initLocalProximityItems() {
-        localProximityItems = (requireContext().robertManager() as RobertManagerImpl)
+    private fun initLocalProximityItems() {
+        val robertManager = (requireContext().robertManager() as RobertManagerImpl)
+
+        localProximityItems = robertManager
             .getLocalProximityItems(0)
             .toMutableList()
         localProximityItems.sortByDescending({ it.collectedTime})
@@ -93,18 +95,17 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
             .joinToString("\n")
     }
 
-    val nbItemsTxt = "nb local proximity items: "
-    val nbItemsCaption = captionItem {
-            text = nbItemsTxt + "..."
+    private val nbItemsCaption = captionItem {
+            text = "..."
             gravity = Gravity.CENTER
     }
 
-    val lastNotificationCaption = captionItem {
+    private val lastNotificationCaption = captionItem {
         gravity = Gravity.CENTER
         text = "-"
     }
 
-    val proximityInfoList = captionItem {
+    private val proximityInfoList = captionItem {
     }
 
     override fun notify(notification: Any) {
