@@ -79,14 +79,15 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
     private val dateFormatter = SimpleDateFormat("E d MMM HH:mm:ss")
     private fun localProximityItemsToString(): String {
         return localProximityItems
-            .slice(0..kotlin.math.min(nbDisplayedItems, localProximityItems.size) - 1)
-            .map { it -> listOf(
-                dateFormatter.format(
-                Date((it.collectedTime - 2208988800) * 1000)),
-                it.ebidBase64,
-                it.calibratedRssi
-              ).joinToString(", ") }
-            .joinToString("\n")
+            .slice(0 until min(nbDisplayedItems, localProximityItems.size))
+            .joinToString("\n") {
+                listOf(
+                    dateFormatter.format(Date(
+                        it.collectedTime.ntpTimeSToUnixTimeMs() )),
+                    it.ebidBase64,
+                    it.calibratedRssi
+                ).joinToString(", ")
+            }
     }
 
     private val nbItemsCaption = captionItem {
