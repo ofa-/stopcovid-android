@@ -21,9 +21,11 @@ import com.lunabeestudio.framework.remote.extension.remoteToRobertException
 import com.lunabeestudio.framework.remote.model.ApiCommonRS
 import com.lunabeestudio.framework.remote.model.ApiDeleteExposureHistoryRQ
 import com.lunabeestudio.framework.remote.model.ApiRegisterRQ
+import com.lunabeestudio.framework.remote.model.ApiRegisterV2RQ
 import com.lunabeestudio.framework.remote.model.ApiReportRQ
 import com.lunabeestudio.framework.remote.model.ApiStatusRQ
 import com.lunabeestudio.framework.remote.model.ApiUnregisterRQ
+import com.lunabeestudio.framework.remote.model.CaptchaRQ
 import com.lunabeestudio.framework.remote.model.toDomain
 import com.lunabeestudio.framework.remote.server.StopCovidApi
 import com.lunabeestudio.robert.datasource.RemoteServiceDataSource
@@ -34,14 +36,50 @@ import okhttp3.HttpUrl.Companion.toHttpUrl
 import retrofit2.HttpException
 import retrofit2.Response
 import timber.log.Timber
+import java.io.File
 
 class ServiceDataSource(context: Context, baseUrl: String = BuildConfig.BASE_URL) : RemoteServiceDataSource {
 
     private var api: StopCovidApi = RetrofitClient.getService(context, StopCovidApi::class.java, baseUrl.toHttpUrl())
+    private var fileApi: StopCovidApi = RetrofitClient.getFileService(context, StopCovidApi::class.java, baseUrl.toHttpUrl())
 
-    override suspend fun register(captcha: String, clientPublicECDHKey: String): RobertResultData<RegisterReport> {
+    override suspend fun generateCaptcha(apiVersion: String, type: String, language: String): RobertResultData<String> {
         val result = tryCatchRequestData {
-            api.register(ApiRegisterRQ(captcha = captcha, clientPublicECDHKey = clientPublicECDHKey))
+            api.captcha(apiVersion, CaptchaRQ(type = type, locale = language))
+        }
+        return when (result) {
+            is RobertResultData.Success -> RobertResultData.Success(result.data.id)
+            is RobertResultData.Failure -> RobertResultData.Failure(result.error)
+        }
+    }
+
+    override suspend fun getCaptcha(apiVersion: String, captchaId: String, type: String, path: String): RobertResult {
+        val result = tryCatchRequestData {
+            fileApi.getCaptcha(apiVersion, captchaId, type)
+        }
+        return when (result) {
+            is RobertResultData.Success -> {
+                try {
+                    result.data.byteStream().use { inputStream ->
+                        File(path).outputStream().use { outputStream ->
+                            inputStream.copyTo(outputStream, 4 * 1024)
+                        }
+                    }
+                    RobertResult.Success()
+                } catch (e: Exception) {
+                    RobertResult.Failure(e.remoteToRobertException())
+                }
+            }
+            is RobertResultData.Failure -> RobertResult.Failure(result.error)
+        }
+    }
+
+    override suspend fun registerV2(apiVersion: String,
+        captcha: String,
+        captchaId: String,
+        clientPublicECDHKey: String): RobertResultData<RegisterReport> {
+        val result = tryCatchRequestData {
+            api.registerV2(apiVersion, ApiRegisterV2RQ(captcha = captcha, captchaId = captchaId, clientPublicECDHKey = clientPublicECDHKey))
         }
         return when (result) {
             is RobertResultData.Success -> RobertResultData.Success(result.data.toDomain())
@@ -49,15 +87,25 @@ class ServiceDataSource(context: Context, baseUrl: String = BuildConfig.BASE_URL
         }
     }
 
-    override suspend fun unregister(ssu: ServerStatusUpdate): RobertResult {
-        return tryCatchRequest {
-            api.unregister(ApiUnregisterRQ(ebid = ssu.ebid, epochId = ssu.epochId, time = ssu.time, mac = ssu.mac))
+    override suspend fun register(apiVersion: String, captcha: String, clientPublicECDHKey: String): RobertResultData<RegisterReport> {
+        val result = tryCatchRequestData {
+            api.register(apiVersion, ApiRegisterRQ(captcha = captcha, clientPublicECDHKey = clientPublicECDHKey))
+        }
+        return when (result) {
+            is RobertResultData.Success -> RobertResultData.Success(result.data.toDomain())
+            is RobertResultData.Failure -> RobertResultData.Failure(result.error)
         }
     }
 
-    override suspend fun status(ssu: ServerStatusUpdate): RobertResultData<StatusReport> {
+    override suspend fun unregister(apiVersion: String, ssu: ServerStatusUpdate): RobertResult {
+        return tryCatchRequest {
+            api.unregister(apiVersion, ApiUnregisterRQ(ebid = ssu.ebid, epochId = ssu.epochId, time = ssu.time, mac = ssu.mac))
+        }
+    }
+
+    override suspend fun status(apiVersion: String, ssu: ServerStatusUpdate): RobertResultData<StatusReport> {
         val result = tryCatchRequestData {
-            api.status(ApiStatusRQ(ebid = ssu.ebid,
+            api.status(apiVersion, ApiStatusRQ(ebid = ssu.ebid,
                 epochId = ssu.epochId,
                 time = ssu.time,
                 mac = ssu.mac))
@@ -68,15 +116,16 @@ class ServiceDataSource(context: Context, baseUrl: String = BuildConfig.BASE_URL
         }
     }
 
-    override suspend fun report(token: String, localProximityList: List<LocalProximity>): RobertResult {
+    override suspend fun report(apiVersion: String, token: String, localProximityList: List<LocalProximity>): RobertResult {
         return tryCatchRequest {
-            api.report(ApiReportRQ.fromLocalProximityList(token, localProximityList))
+            api.report(apiVersion, ApiReportRQ.fromLocalProximityList(token, localProximityList))
         }
     }
 
-    override suspend fun deleteExposureHistory(ssu: ServerStatusUpdate): RobertResult {
+    override suspend fun deleteExposureHistory(apiVersion: String, ssu: ServerStatusUpdate): RobertResult {
         return tryCatchRequest {
-            api.deleteExposureHistory(ApiDeleteExposureHistoryRQ(ebid = ssu.ebid, epochId = ssu.epochId, time = ssu.time, mac = ssu.mac))
+            api.deleteExposureHistory(apiVersion,
+                ApiDeleteExposureHistoryRQ(ebid = ssu.ebid, epochId = ssu.epochId, time = ssu.time, mac = ssu.mac))
         }
     }
 

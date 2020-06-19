@@ -20,30 +20,33 @@ import android.bluetooth.BluetoothManager
 import android.content.Context
 import com.orange.proximitynotification.ble.BleSettings
 import com.orange.proximitynotification.tools.CoroutineContextProvider
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.TimeoutCancellationException
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.Channel.Factory.UNLIMITED
-import kotlinx.coroutines.channels.receiveOrNull
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 import timber.log.Timber
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 
 internal class BleGattManagerImpl(
     override val settings: BleSettings,
     private val context: Context,
     private val bluetoothManager: BluetoothManager,
     private val gattClientProvider: BleGattClientProvider,
-    private val coroutineScope: CoroutineScope,
     private val coroutineContextProvider: CoroutineContextProvider = CoroutineContextProvider.Default()
-) : BleGattManager {
+) : BleGattManager, CoroutineScope {
 
-    private lateinit var executionChannel: Channel<suspend () -> Unit>
-    private var executionJob: Job? = null
+    private var job: Job? = null
+    override val coroutineContext: CoroutineContext
+        get() = coroutineContextProvider.io + (job ?: EmptyCoroutineContext)
+
+    private val bleOperationLock = Mutex()
 
     private var bluetoothGattServer: BluetoothGattServer? = null
 
@@ -54,59 +57,73 @@ internal class BleGattManagerImpl(
         BluetoothGattCharacteristic.PERMISSION_WRITE
     )
 
-    override fun start(callback: BleGattManager.Callback) {
+    override fun start(callback: BleGattManager.Callback): Boolean {
         Timber.d("Starting GATT server")
 
         stop()
 
-        bluetoothGattServer =
-            bluetoothManager.openGattServer(context, GattServerCallback(callback)).apply {
-                clearServices()
-                addService(buildGattService())
-            }
+        job = SupervisorJob()
 
-        executionJob = executionJob()
+        return runCatching {
+            bluetoothGattServer =
+                bluetoothManager.openGattServer(context, GattServerCallback(callback))?.apply {
+                    try {
+                        clearServices()
+                        addService(buildGattService())
+                    } catch (t: Throwable) {
+                        close()
+                        throw t
+                    }
+                }
+            bluetoothGattServer != null
+        }.getOrDefault(false)
     }
 
     override fun stop() {
         Timber.d("Stopping GATT server")
 
-        executionJob?.cancel()
-        executionJob = null
-
-        bluetoothGattServer?.apply {
-            clearServices()
-            close()
-        }
-        bluetoothGattServer = null
-    }
-
-    override suspend fun requestRemoteRssi(device: BluetoothDevice): Int? {
-
-        val rssiChannel = Channel<Int>()
-
-        execute {
-            val client = gattClientProvider.fromDevice(device)
-
-            try {
-                withTimeout(settings.connectionTimeout) {
-                    client.open()
-                }
-
-                val rssi = client.readRemoteRssi()
-                rssiChannel.send(rssi)
-            } catch (e: TimeoutCancellationException) {
-                Timber.d(e, "Request remote rssi failed. Connection timeout")
-                rssiChannel.close()
-            } catch (t: Throwable) {
-                Timber.d(t, "Request remote rssi failed with exception")
-                rssiChannel.close()
-            } finally {
-                client.close()
+        runCatching {
+            bluetoothGattServer?.apply {
+                clearServices()
+                close()
             }
         }
 
-        return rssiChannel.receiveOrNull()
+        bluetoothGattServer = null
+
+        job?.cancel()
+        job = null
+    }
+
+    override suspend fun requestRemoteRssi(device: BluetoothDevice, close: Boolean): Int? {
+        return withContext(coroutineContextProvider.io) {
+            val client = gattClientProvider.fromDevice(device)
+
+            try {
+                withTimeout(settings.connectionTimeout) { client.open() }
+
+                bleOperation { client.readRemoteRssi() }
+            } catch (e: TimeoutCancellationException) {
+                Timber.d(e, "Request remote rssi failed. Connection timeout")
+                null
+            } catch (t: Throwable) {
+                Timber.d(t, "Request remote rssi failed with exception")
+                null
+            } finally {
+                if (close) {
+                    bleOperation { client.close() }
+                }
+            }
+        }
+
+    }
+
+    private suspend fun <T> bleOperation(operation: suspend () -> T): T {
+        return bleOperationLock.withLock {
+            withContext(coroutineContextProvider.main) {
+                operation()
+            }
+        }
     }
 
     private fun buildGattService(): BluetoothGattService {
@@ -115,22 +132,6 @@ internal class BleGattManagerImpl(
             BluetoothGattService.SERVICE_TYPE_PRIMARY
         ).apply {
             addCharacteristic(payloadCharacteristic)
-        }
-    }
-
-    private fun executionJob() = coroutineScope.launch {
-        executionChannel = Channel(UNLIMITED)
-        executionChannel
-            .receiveAsFlow()
-            .flowOn(coroutineContextProvider.io)
-            .collect {
-                it()
-            }
-    }.apply { invokeOnCompletion { executionChannel.close(it) } }
-
-    private fun execute(block: suspend () -> Unit) {
-        runCatching {
-            executionChannel.offer(block)
         }
     }
 
@@ -145,38 +146,58 @@ internal class BleGattManagerImpl(
             responseNeeded: Boolean,
             offset: Int,
             value: ByteArray?
-        ) = execute {
-            super.onCharacteristicWriteRequest(
-                device,
-                requestId,
-                characteristic,
-                preparedWrite,
-                responseNeeded,
-                offset,
-                value
-            )
+        ) {
+            val exceptionHandler = CoroutineExceptionHandler { _, exception ->
+                Timber.e(exception, "Exception caught during onCharacteristicWriteRequest")
+            }
 
-            Timber.d("onCharacteristicWriteRequest")
+            val clonedValue = value?.copyOf()
 
-            val result = when (characteristic.uuid) {
-                payloadCharacteristic.uuid -> {
-                    if (offset != 0) {
-                        BluetoothGatt.GATT_INVALID_OFFSET
-                    } else {
-                        value?.let { callback.onWritePayloadRequest(device, it) }
-                        BluetoothGatt.GATT_SUCCESS
+            launch(coroutineContextProvider.io + exceptionHandler) {
+                super.onCharacteristicWriteRequest(
+                    device,
+                    requestId,
+                    characteristic,
+                    preparedWrite,
+                    responseNeeded,
+                    offset,
+                    value
+                )
+
+                Timber.d("onCharacteristicWriteRequest")
+
+                val result = when (characteristic.uuid) {
+                    payloadCharacteristic.uuid -> {
+                        if (offset != 0) {
+                            BluetoothGatt.GATT_INVALID_OFFSET
+                        } else {
+                            clonedValue?.let { callback.onWritePayloadRequest(device, it) }
+                            BluetoothGatt.GATT_SUCCESS
+                        }
+                    }
+                    else -> BluetoothGatt.GATT_FAILURE
+                }
+
+                Timber.d("onCharacteristicWriteRequest result=$result")
+
+                if (responseNeeded) {
+                    bleOperation {
+                        // It could happen that this call throws NullPointerException
+                        // if client is disconnected
+                        runCatching {
+                            bluetoothGattServer?.sendResponse(
+                                device,
+                                requestId,
+                                result,
+                                offset,
+                                null
+                            )
+                        }
                     }
                 }
-                else -> BluetoothGatt.GATT_FAILURE
 
-            }
-
-            Timber.d("onCharacteristicWriteRequest result=$result")
-            if (responseNeeded) {
-                bluetoothGattServer?.sendResponse(device, requestId, result, offset, null)
             }
         }
-
     }
 
 }

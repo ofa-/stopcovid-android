@@ -30,11 +30,11 @@ class BleScannerImpl(
 
     private var scanCallback: ScanCallback? = null
 
-    override fun start(callback: BleScanner.Callback) {
+    override fun start(callback: BleScanner.Callback): Boolean {
         Timber.d("Starting scanner")
 
         doStop()
-        doStart(callback)
+        return doStart(callback)
     }
 
     override fun stop() {
@@ -43,15 +43,24 @@ class BleScannerImpl(
         doStop()
     }
 
-    private fun doStart(callback: BleScanner.Callback) {
-        scanCallback = InnerScanCallback(callback).also {
-            bluetoothScanner.startScan(buildScanFilter(), buildScanSettings(), it)
+    private fun doStart(callback: BleScanner.Callback): Boolean {
+        InnerScanCallback(callback).also {
+            scanCallback = it
+            return@doStart runCatching {
+                bluetoothScanner.startScan(
+                    buildScanFilter(),
+                    buildScanSettings(),
+                    it
+                )
+            }.isSuccess
         }
     }
 
     private fun doStop() {
         scanCallback?.let {
-            bluetoothScanner.stopScan(it)
+            runCatching {
+                bluetoothScanner.stopScan(it)
+            }
         }
         scanCallback = null
     }
@@ -82,7 +91,8 @@ class BleScannerImpl(
         )
     }
 
-    private inner class InnerScanCallback(private val callback: BleScanner.Callback) : ScanCallback() {
+    private inner class InnerScanCallback(private val callback: BleScanner.Callback) :
+        ScanCallback() {
 
         override fun onBatchScanResults(results: List<ScanResult>) {
             super.onBatchScanResults(results)

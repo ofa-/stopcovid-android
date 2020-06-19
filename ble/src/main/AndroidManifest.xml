@@ -8,7 +8,8 @@
   ~ Created by Orange / Date - 2020/04/27 - for the STOP-COVID project
   -->
 
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.orange.proximitynotification">
 
@@ -28,6 +29,5 @@
             tools:node="remove" />
 
     </application>
-
 
 </manifest>

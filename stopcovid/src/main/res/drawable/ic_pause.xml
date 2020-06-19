@@ -1,0 +1,22 @@
+<!--
+  ~ This Source Code Form is subject to the terms of the Mozilla Public
+  ~ License, v. 2.0. If a copy of the MPL was not distributed with this
+  ~ file, You can obtain one at https://mozilla.org/MPL/2.0/.
+  ~
+  ~ Authors
+  ~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ Created by Lunabee Studio / Date - 2020/17/06 - for the STOP-COVID project
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="62dp"
+    android:height="62dp"
+    android:viewportWidth="62"
+    android:viewportHeight="62">
+  <path
+      android:pathData="M31,62C47.9981,62 62,48.0048 62,31.0148C62,14.0249 47.9684,0 31,0C14.0019,0 0,14.0249 0,31.0148C0,48.0048 14.0019,62 31,62ZM30.9704,55C17.6667,55 7,44.3103 7,31.0148C7,17.7193 17.637,7 30.9704,7C44.2741,7 54.9704,17.7193 55,31.0148C55,44.3103 44.2741,55 30.9704,55ZM25,19L26,19C27.1046,19 28,19.8954 28,21L28,40C28,41.1046 27.1046,42 26,42L25,42C23.8954,42 23,41.1046 23,40L23,21C23,19.8954 23.8954,19 25,19ZM36,19L37,19C38.1046,19 39,19.8954 39,21L39,40C39,41.1046 38.1046,42 37,42L36,42C34.8954,42 34,41.1046 34,40L34,21C34,19.8954 34.8954,19 36,19Z"
+      android:strokeWidth="1"
+      android:fillColor="#000091"
+      android:fillType="evenOdd"
+      android:strokeColor="#00000000"/>
+</vector>

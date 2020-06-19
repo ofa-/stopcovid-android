@@ -32,8 +32,9 @@ import com.lunabeestudio.robert.datasource.LocalKeystoreDataSource
 import com.lunabeestudio.robert.datasource.LocalLocalProximityDataSource
 import com.lunabeestudio.robert.datasource.RemoteServiceDataSource
 import com.lunabeestudio.robert.datasource.SharedCryptoDataSource
+import com.lunabeestudio.robert.extension.safeEnumValueOf
 import com.lunabeestudio.robert.extension.use
-import com.lunabeestudio.robert.model.TimeNotAlignedException
+import com.lunabeestudio.robert.manager.LocalProximityFilter
 import com.lunabeestudio.robert.model.NoEphemeralBluetoothIdentifierFound
 import com.lunabeestudio.robert.model.NoEphemeralBluetoothIdentifierFoundForEpoch
 import com.lunabeestudio.robert.model.NoKeyException
@@ -41,6 +42,7 @@ import com.lunabeestudio.robert.model.RobertException
 import com.lunabeestudio.robert.model.RobertResult
 import com.lunabeestudio.robert.model.RobertResultData
 import com.lunabeestudio.robert.model.RobertUnknownException
+import com.lunabeestudio.robert.model.TimeNotAlignedException
 import com.lunabeestudio.robert.model.UnknownException
 import com.lunabeestudio.robert.repository.EphemeralBluetoothIdentifierRepository
 import com.lunabeestudio.robert.repository.KeystoreRepository
@@ -58,7 +60,8 @@ class RobertManagerImpl(
     localLocalProximityDataSource: LocalLocalProximityDataSource,
     serviceDataSource: RemoteServiceDataSource,
     sharedCryptoDataSource: SharedCryptoDataSource,
-    configurationDataSource: ConfigurationDataSource
+    configurationDataSource: ConfigurationDataSource,
+    private val localProximityFilter: LocalProximityFilter
 ) : RobertManager {
     private val ephemeralBluetoothIdentifierRepository: EphemeralBluetoothIdentifierRepository =
         EphemeralBluetoothIdentifierRepository(localEphemeralBluetoothIdentifierDataSource, sharedCryptoDataSource, localKeystoreDataSource)
@@ -111,6 +114,12 @@ class RobertManagerImpl(
     override val calibration: List<DeviceParameterCorrection>
         get() = keystoreRepository.calibration ?: emptyList()
 
+    override val filteringConfig: String
+        get() = keystoreRepository.filteringConfig ?: RobertConstant.BLE_FILTER_CONFIG
+
+    override val filteringMode: LocalProximityFilter.Mode
+        get() = keystoreRepository.filteringMode?.let { safeEnumValueOf<LocalProximityFilter.Mode>(it) } ?: RobertConstant.BLE_FILTER_MODE
+
     override val serviceUUID: String
         get() = keystoreRepository.serviceUUID ?: RobertConstant.BLE_SERVICE_UUID
 
@@ -126,6 +135,73 @@ class RobertManagerImpl(
     override val randomStatusHour: Int
         get() = keystoreRepository.randomStatusHour ?: RobertConstant.RANDOM_STATUS_HOUR
 
+    override val apiVersion: String
+        get() = keystoreRepository.apiVersion ?: RobertConstant.API_VERSION
+
+    override suspend fun refreshConfig(application: RobertApplication): RobertResult {
+        val configResult = remoteServiceRepository.fetchConfig(application.getAppContext())
+
+        return when (configResult) {
+            is RobertResultData.Success -> {
+                if (configResult.data.isNullOrEmpty()) {
+                    RobertResult.Failure(RobertUnknownException())
+                } else {
+                    try {
+                        handleConfigChange(configResult.data)
+                        RobertResult.Success()
+                    } catch (e: Exception) {
+                        Timber.e(e)
+                        if (e is RobertException) {
+                            RobertResult.Failure(e)
+                        } else {
+                            RobertResult.Failure(RobertUnknownException())
+                        }
+                    }
+                }
+            }
+            is RobertResultData.Failure -> {
+                RobertResult.Failure(configResult.error)
+            }
+        }
+    }
+
+    override suspend fun generateCaptcha(type: String, local: String): RobertResultData<String> =
+        remoteServiceRepository.generateCaptcha(apiVersion, type, local)
+
+    override suspend fun getCaptchaImage(captchaId: String,
+        path: String): RobertResult = remoteServiceRepository.getCaptchaImage(apiVersion, captchaId, path)
+
+    override suspend fun getCaptchaAudio(captchaId: String,
+        path: String): RobertResult = remoteServiceRepository.getCaptchaAudio(apiVersion, captchaId, path)
+
+    override suspend fun registerV2(application: RobertApplication, captcha: String, captchaId: String): RobertResult {
+        val configResult = remoteServiceRepository.fetchConfig(application.getAppContext())
+
+        return when (configResult) {
+            is RobertResultData.Success -> {
+                if (configResult.data.isNullOrEmpty()) {
+                    clearLocalData(application)
+                    RobertResult.Failure(RobertUnknownException())
+                } else {
+                    val registerResult = remoteServiceRepository.registerV2(apiVersion, captcha, captchaId)
+                    when (registerResult) {
+                        is RobertResultData.Success -> {
+                            finishRegister(application, registerResult.data, configResult.data)
+                        }
+                        is RobertResultData.Failure -> {
+                            clearLocalData(application)
+                            RobertResult.Failure(registerResult.error)
+                        }
+                    }
+                }
+            }
+            is RobertResultData.Failure -> {
+                clearLocalData(application)
+                RobertResult.Failure(configResult.error)
+            }
+        }
+    }
+
     override suspend fun register(application: RobertApplication, captcha: String): RobertResult {
         val configResult = remoteServiceRepository.fetchConfig(application.getAppContext())
 
@@ -135,7 +211,7 @@ class RobertManagerImpl(
                     clearLocalData(application)
                     RobertResult.Failure(RobertUnknownException())
                 } else {
-                    val registerResult = remoteServiceRepository.register(captcha)
+                    val registerResult = remoteServiceRepository.register(apiVersion, captcha)
                     when (registerResult) {
                         is RobertResultData.Success -> {
                             finishRegister(application, registerResult.data, configResult.data)
@@ -182,6 +258,16 @@ class RobertManagerImpl(
             val gson = Gson()
             val typeToken = object : TypeToken<List<DeviceParameterCorrection>>() {}.type
             keystoreRepository.calibration = gson.fromJson(gson.toJson(calibrations), typeToken)
+        }
+        (configuration?.firstOrNull {
+            it.name == RobertConstant.CONFIG.FILTER_CONFIG
+        }?.value as? String)?.let { filterConfig ->
+            keystoreRepository.filteringConfig = filterConfig
+        }
+        (configuration?.firstOrNull {
+            it.name == RobertConstant.CONFIG.FILTER_MODE
+        }?.value as? String)?.let { filterMode ->
+            keystoreRepository.filteringMode = filterMode
         }
         (configuration?.firstOrNull {
             it.name == RobertConstant.CONFIG.SERVICE_UUID
@@ -238,6 +324,11 @@ class RobertManagerImpl(
         }?.value as? Number)?.let { maxHourContactNotif ->
             keystoreRepository.atRiskMaxHourContactNotif = maxHourContactNotif.toInt()
         }
+        (configuration?.firstOrNull {
+            it.name == RobertConstant.CONFIG.API_VERSION
+        }?.value as? String)?.let { apiVersion ->
+            keystoreRepository.apiVersion = apiVersion
+        }
     }
 
     override suspend fun activateProximity(application: RobertApplication, statusTried: Boolean): RobertResult {
@@ -280,7 +371,7 @@ class RobertManagerImpl(
 
             if (abs((atRiskLastRefresh ?: 0L) - System.currentTimeMillis()) > RobertConstant.MIN_GAP_SUCCESS_STATUS) {
                 if (ssu is RobertResultData.Success) {
-                    val result = remoteServiceRepository.status(ssu.data)
+                    val result = remoteServiceRepository.status(apiVersion, ssu.data)
                     when (result) {
                         is RobertResultData.Success -> {
                             try {
@@ -326,14 +417,22 @@ class RobertManagerImpl(
         return if (configResult is RobertResultData.Failure && configResult.error is TimeNotAlignedException) {
             RobertResult.Failure(configResult.error)
         } else {
-            val firstProximityToSendTime = (System.currentTimeMillis() - TimeUnit.DAYS.toMillis(firstSymptoms.toLong()) - TimeUnit.DAYS.toMillis(
-                (keystoreRepository.preSymptomsSpan ?: RobertConstant.PRE_SYMPTOMS_SPAN).toLong())).unixTimeMsToNtpTimeS()
-            val result = remoteServiceRepository.report(token, localProximityRepository.getUntilTime(firstProximityToSendTime))
+            val preSymptomsSpan = (keystoreRepository.preSymptomsSpan ?: RobertConstant.PRE_SYMPTOMS_SPAN).toLong()
+            val firstProximityToSendTime =
+                (System.currentTimeMillis() - TimeUnit.DAYS.toMillis(firstSymptoms.toLong()) - TimeUnit.DAYS.toMillis(preSymptomsSpan))
+                    .unixTimeMsToNtpTimeS()
+
+            val localProximityList = localProximityRepository.getUntilTime(firstProximityToSendTime)
+            val filteredLocalProximityList = localProximityFilter.filter(localProximityList,
+                filteringMode,
+                filteringConfig)
+
+            val result = remoteServiceRepository.report(apiVersion, token, filteredLocalProximityList)
             when (result) {
                 is RobertResult.Success -> {
                     val ssu = getSSU(RobertConstant.PREFIX.C3)
                     if (ssu is RobertResultData.Success) {
-                        remoteServiceRepository.unregister(ssu.data)
+                        remoteServiceRepository.unregister(apiVersion, ssu.data)
                     }
                     clearLocalData(application)
                     keystoreRepository.isSick = true
@@ -389,7 +488,7 @@ class RobertManagerImpl(
             val ssu = getSSU(RobertConstant.PREFIX.C4)
             when (ssu) {
                 is RobertResultData.Success -> {
-                    val result = remoteServiceRepository.deleteExposureHistory(ssu.data)
+                    val result = remoteServiceRepository.deleteExposureHistory(apiVersion, ssu.data)
                     when (result) {
                         is RobertResult.Success -> result
                         is RobertResult.Failure -> RobertResult.Failure(result.error)
@@ -417,7 +516,7 @@ class RobertManagerImpl(
             val ssu = getSSU(RobertConstant.PREFIX.C3)
             return when (ssu) {
                 is RobertResultData.Success -> {
-                    val result = remoteServiceRepository.unregister(ssu.data)
+                    val result = remoteServiceRepository.unregister(apiVersion, ssu.data)
                     when (result) {
                         is RobertResult.Success -> {
                             clearLocalData(application)

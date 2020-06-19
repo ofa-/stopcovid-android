@@ -1,6 +1,6 @@
 {
     "message": "The application did register successfully",
-    "tuples": "",
+    "tuples": "test",
     "timeStart": 3796669679,
     "config": [
         {

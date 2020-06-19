@@ -124,7 +124,7 @@ class ProximityFragment : AboutMainFragment() {
     }
 
     override fun getTitleKey(): String {
-        return if (robertManager.isProximityActive) {
+        return if (robertManager.isProximityActive && ProximityManager.isPhoneSetup(requireContext())) {
             "common.bravo"
         } else {
             "common.warning"
@@ -168,6 +168,13 @@ class ProximityFragment : AboutMainFragment() {
                 showErrorSnackBar(it.getString(strings))
             }
             refreshItems()
+        }
+        viewModel.refreshConfigSuccess.observe(viewLifecycleOwner) {
+            if (robertManager.apiVersion == "v1") {
+                injectWebView()
+            } else {
+                findNavController().navigate(ProximityFragmentDirections.actionProximityFragmentToCaptchaFragment())
+            }
         }
         viewModel.activateProximitySuccess.observe(viewLifecycleOwner) {
             refreshItems()
@@ -258,7 +265,7 @@ class ProximityFragment : AboutMainFragment() {
 
     private fun activateProximity() {
         if (!robertManager.isRegistered) {
-            injectWebView()
+            viewModel.refreshConfig(requireContext().applicationContext as RobertApplication)
         } else {
             bindToProximityService()
             viewModel.activateProximity(requireContext().applicationContext as RobertApplication)

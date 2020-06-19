@@ -88,6 +88,18 @@ internal class KeystoreRepository(
             keystoreDataSource.calibration = value
         }
 
+    var filteringConfig: String?
+        get() = keystoreDataSource.filteringConfig
+        set(value) {
+            keystoreDataSource.filteringConfig = value
+        }
+
+    var filteringMode: String?
+        get() = keystoreDataSource.filteringMode
+        set(value) {
+            keystoreDataSource.filteringMode = value
+        }
+
     var serviceUUID: String?
         get() = keystoreDataSource.serviceUUID
         set(value) {
@@ -140,5 +152,11 @@ internal class KeystoreRepository(
         get() = keystoreDataSource.appAvailability
         set(value) {
             keystoreDataSource.appAvailability = value
+        }
+
+    var apiVersion: String?
+        get() = keystoreDataSource.apiVersion
+        set(value) {
+            keystoreDataSource.apiVersion = value
         }
 }

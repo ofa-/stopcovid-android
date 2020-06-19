@@ -17,6 +17,7 @@ import com.lunabeestudio.framework.ble.extension.toLocalProximity
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.robert.extension.splitToByteArray
 import com.lunabeestudio.robert.model.BLEAdvertiserException
+import com.lunabeestudio.robert.model.BLEGattException
 import com.lunabeestudio.robert.model.BLEProximityNotificationException
 import com.lunabeestudio.robert.model.BLEScannerException
 import com.lunabeestudio.robert.model.NoEphemeralBluetoothIdentifierFound
@@ -150,9 +151,10 @@ abstract class RobertProximityService : ProximityNotificationService() {
 
     final override fun onError(error: ProximityNotificationError) {
         onError(when (error.type) {
-            ProximityNotificationError.Type.BLE_ADVERTISER -> BLEAdvertiserException("(${error.rootErrorCode})")
-            ProximityNotificationError.Type.BLE_SCANNER -> BLEScannerException("(${error.rootErrorCode})")
-            ProximityNotificationError.Type.BLE_PROXIMITY_NOTIFICATION -> BLEProximityNotificationException("(${error.cause})")
+            ProximityNotificationError.Type.BLE_ADVERTISER -> BLEAdvertiserException("(${error.cause} [${error.rootErrorCode}])")
+            ProximityNotificationError.Type.BLE_SCANNER -> BLEScannerException("(${error.cause} [${error.rootErrorCode}])")
+            ProximityNotificationError.Type.BLE_PROXIMITY_NOTIFICATION -> BLEProximityNotificationException("(${error.cause} [${error.rootErrorCode}])")
+            ProximityNotificationError.Type.BLE_GATT -> BLEGattException("(${error.cause} [${error.rootErrorCode}])")
         })
     }
 

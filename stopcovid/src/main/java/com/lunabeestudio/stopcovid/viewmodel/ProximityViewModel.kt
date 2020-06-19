@@ -25,9 +25,25 @@ import kotlinx.coroutines.launch
 
 class ProximityViewModel(private val robertManager: RobertManager) : ViewModel() {
 
+    val refreshConfigSuccess: SingleLiveEvent<Unit> = SingleLiveEvent()
     val activateProximitySuccess: SingleLiveEvent<Unit> = SingleLiveEvent()
     val covidException: SingleLiveEvent<CovidException?> = SingleLiveEvent()
     val loadingInProgress: MutableLiveData<Boolean> = MutableLiveData(false)
+
+    fun refreshConfig(application: RobertApplication) {
+        loadingInProgress.postValue(true)
+        viewModelScope.launch(Dispatchers.IO) {
+            when (val result = robertManager.refreshConfig(application)) {
+                is RobertResult.Success -> {
+                    refreshConfigSuccess.postValue(null)
+                }
+                is RobertResult.Failure -> {
+                    covidException.postValue(result.error.toCovidException())
+                }
+            }
+            loadingInProgress.postValue(false)
+        }
+    }
 
     fun register(application: RobertApplication, captcha: String) {
         loadingInProgress.postValue(true)

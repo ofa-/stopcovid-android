@@ -40,11 +40,48 @@ class ServiceTest {
     }
 
     @Test
+    fun captcha() {
+        server.enqueue(MockResponse().setResponseCode(200)
+            .setBody(ResourcesHelper.readTestFileAsString("captchaSuccess")))
+        val result = runBlocking {
+            dataSource.generateCaptcha("", "", "")
+        }
+        assertThat(result).isInstanceOf(RobertResultData.Success::class.java)
+        result as RobertResultData.Success
+        assertThat(result.data).isEqualTo("228482eb770547059425e58ca6652c8a")
+
+        testDataErrors {
+            dataSource.generateCaptcha("", "", "")
+        }
+    }
+
+    @Test
+    fun registerV2Test() {
+        server.enqueue(MockResponse().setResponseCode(200)
+            .setBody(ResourcesHelper.readTestFileAsString("registerV2Success")))
+        val result = runBlocking {
+            dataSource.registerV2("", "", "", "")
+        }
+        assertThat(result).isInstanceOf(RobertResultData.Success::class.java)
+        result as RobertResultData.Success
+        assertThat(result.data.message).isEqualTo("The application did register successfully")
+        assertThat(result.data.timeStart).isEqualTo(3799958400L)
+        assertThat(result.data.configuration?.size).isEqualTo(1)
+        assertThat(result.data.configuration?.get(0)?.name).isEqualTo("distance")
+        assertThat(result.data.configuration?.get(0)?.value).isEqualTo(12.0)
+        assertThat(result.data.tuples).isEqualTo("test")
+
+        testDataErrors {
+            dataSource.registerV2("", "", "", "")
+        }
+    }
+
+    @Test
     fun registerTest() {
         server.enqueue(MockResponse().setResponseCode(200)
             .setBody(ResourcesHelper.readTestFileAsString("registerSuccess")))
         val result = runBlocking {
-            dataSource.register("", "")
+            dataSource.register("", "", "")
         }
         assertThat(result).isInstanceOf(RobertResultData.Success::class.java)
         result as RobertResultData.Success
@@ -55,7 +92,7 @@ class ServiceTest {
         assertThat(result.data.configuration?.get(0)?.value).isEqualTo(12.0)
 
         testDataErrors {
-            dataSource.register("", "")
+            dataSource.register("", "", "")
         }
     }
 
@@ -64,7 +101,7 @@ class ServiceTest {
         server.enqueue(MockResponse().setResponseCode(200)
             .setBody(ResourcesHelper.readTestFileAsString("statusSuccess")))
         val result = runBlocking {
-            dataSource.status(ServerStatusUpdate("", 0L, "", ""))
+            dataSource.status("", ServerStatusUpdate("", 0L, "", ""))
         }
         assertThat(result).isInstanceOf(RobertResultData.Success::class.java)
         assertThat((result as RobertResultData.Success).data.atRisk)
@@ -77,7 +114,7 @@ class ServiceTest {
         assertThat(result.data.config[0].value).isEqualTo(12.0)
 
         testDataErrors {
-            dataSource.status(ServerStatusUpdate("", 0L, "", ""))
+            dataSource.status("", ServerStatusUpdate("", 0L, "", ""))
         }
     }
 
@@ -86,12 +123,12 @@ class ServiceTest {
         server.enqueue(MockResponse().setResponseCode(200)
             .setBody(ResourcesHelper.readTestFileAsString("reportSuccess")))
         val result = runBlocking {
-            dataSource.report("", emptyList())
+            dataSource.report("", "", emptyList())
         }
         assertThat(result).isInstanceOf(RobertResult.Success::class.java)
 
         testErrors {
-            dataSource.report("", emptyList())
+            dataSource.report("", "", emptyList())
         }
     }
 
@@ -100,12 +137,12 @@ class ServiceTest {
         server.enqueue(MockResponse().setResponseCode(200)
             .setBody(ResourcesHelper.readTestFileAsString("unregisterSuccess")))
         val result = runBlocking {
-            dataSource.unregister(ServerStatusUpdate("", 0L, "", ""))
+            dataSource.unregister("", ServerStatusUpdate("", 0L, "", ""))
         }
         assertThat(result).isInstanceOf(RobertResult.Success::class.java)
 
         testErrors {
-            dataSource.unregister(ServerStatusUpdate("", 0L, "", ""))
+            dataSource.unregister("", ServerStatusUpdate("", 0L, "", ""))
         }
     }
 
@@ -114,12 +151,12 @@ class ServiceTest {
         server.enqueue(MockResponse().setResponseCode(200)
             .setBody(ResourcesHelper.readTestFileAsString("deleteExposureHistorySuccess")))
         val result = runBlocking {
-            dataSource.deleteExposureHistory(ServerStatusUpdate("", 0L, "", ""))
+            dataSource.deleteExposureHistory("", ServerStatusUpdate("", 0L, "", ""))
         }
         assertThat(result).isInstanceOf(RobertResult.Success::class.java)
 
         testErrors {
-            dataSource.deleteExposureHistory(ServerStatusUpdate("", 0L, "", ""))
+            dataSource.deleteExposureHistory("", ServerStatusUpdate("", 0L, "", ""))
         }
     }
 

@@ -35,11 +35,20 @@ internal class RemoteServiceRepository(
     private val configurationDataSource: ConfigurationDataSource
 ) {
 
-    suspend fun register(captcha: String): RobertResultData<RegisterReport> {
+    suspend fun generateCaptcha(apiVersion: String, type: String, local: String): RobertResultData<String> =
+        remoteServiceDataSource.generateCaptcha(apiVersion, type, local)
+
+    suspend fun getCaptchaImage(apiVersion: String, captchaId: String, path: String): RobertResult =
+        remoteServiceDataSource.getCaptcha(apiVersion, captchaId, "image", path)
+
+    suspend fun getCaptchaAudio(apiVersion: String, captchaId: String, path: String): RobertResult =
+        remoteServiceDataSource.getCaptcha(apiVersion, captchaId, "audio", path)
+
+    suspend fun register(apiVersion: String, captcha: String): RobertResultData<RegisterReport> {
         val keyPair = sharedCryptoDataSource.createECDHKeyPair()
 
         val publicKey64 = Base64.encodeToString(keyPair.public.encoded, Base64.NO_WRAP)
-        val registerResult = remoteServiceDataSource.register(captcha, publicKey64)
+        val registerResult = remoteServiceDataSource.register(apiVersion, captcha, publicKey64)
 
         if (registerResult is RobertResultData.Success) {
             sharedCryptoDataSource.getEncryptionKeys(
@@ -55,17 +64,37 @@ internal class RemoteServiceRepository(
         return registerResult
     }
 
-    suspend fun unregister(serverStatusUpdate: ServerStatusUpdate): RobertResult =
-        remoteServiceDataSource.unregister(serverStatusUpdate)
+    suspend fun registerV2(apiVersion: String, captcha: String, captchaId: String): RobertResultData<RegisterReport> {
+        val keyPair = sharedCryptoDataSource.createECDHKeyPair()
 
-    suspend fun status(serverStatusUpdate: ServerStatusUpdate): RobertResultData<StatusReport> =
-        remoteServiceDataSource.status(serverStatusUpdate)
+        val publicKey64 = Base64.encodeToString(keyPair.public.encoded, Base64.NO_WRAP)
+        val registerResult = remoteServiceDataSource.registerV2(apiVersion, captcha, captchaId, publicKey64)
 
-    suspend fun report(token: String, localProximityList: List<LocalProximity>): RobertResult =
-        remoteServiceDataSource.report(token, localProximityList)
+        if (registerResult is RobertResultData.Success) {
+            sharedCryptoDataSource.getEncryptionKeys(
+                rawServerPublicKey = Base64.decode(BuildConfig.SERVER_PUBLIC_KEY, Base64.NO_WRAP),
+                rawLocalPrivateKey = keyPair.private.encoded,
+                kADerivation = RobertConstant.KA_STRING_INPUT.toByteArray(),
+                kEADerivation = RobertConstant.KEA_STRING_INPUT.toByteArray()).let {
+                keystoreDataSource.kA = it.first
+                keystoreDataSource.kEA = it.second
+            }
+        }
 
-    suspend fun deleteExposureHistory(serverStatusUpdate: ServerStatusUpdate): RobertResult =
-        remoteServiceDataSource.deleteExposureHistory(serverStatusUpdate)
+        return registerResult
+    }
+
+    suspend fun unregister(apiVersion: String, serverStatusUpdate: ServerStatusUpdate): RobertResult =
+        remoteServiceDataSource.unregister(apiVersion, serverStatusUpdate)
+
+    suspend fun status(apiVersion: String, serverStatusUpdate: ServerStatusUpdate): RobertResultData<StatusReport> =
+        remoteServiceDataSource.status(apiVersion, serverStatusUpdate)
+
+    suspend fun report(apiVersion: String, token: String, localProximityList: List<LocalProximity>): RobertResult =
+        remoteServiceDataSource.report(apiVersion, token, localProximityList)
+
+    suspend fun deleteExposureHistory(apiVersion: String, serverStatusUpdate: ServerStatusUpdate): RobertResult =
+        remoteServiceDataSource.deleteExposureHistory(apiVersion, serverStatusUpdate)
 
     suspend fun fetchConfig(context: Context): RobertResultData<List<Configuration>?> =
         configurationDataSource.fetchConfig(context)

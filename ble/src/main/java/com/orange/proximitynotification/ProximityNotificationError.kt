@@ -24,6 +24,11 @@ data class ProximityNotificationError(val type: Type, val rootErrorCode: Int? = 
         BLE_SCANNER,
 
         /**
+         * BLE gatt error
+         */
+        BLE_GATT,
+
+        /**
          * BLE proximity notification component error
          */
         BLE_PROXIMITY_NOTIFICATION

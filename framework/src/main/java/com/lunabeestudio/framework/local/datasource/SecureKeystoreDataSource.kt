@@ -244,6 +244,44 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
             }
         }
 
+    override var filteringConfig: String?
+        get() {
+            val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_FILTERING_CONFIG, null)
+            return if (encryptedText != null) {
+                cryptoManager.decryptToString(encryptedText)
+            } else {
+                null
+            }
+        }
+        set(value) {
+            if (value != null) {
+                sharedPreferences.edit()
+                    .putString(SHARED_PREF_KEY_FILTERING_CONFIG, cryptoManager.encryptToString(value))
+                    .apply()
+            } else {
+                sharedPreferences.edit().remove(SHARED_PREF_KEY_FILTERING_CONFIG).apply()
+            }
+        }
+
+    override var filteringMode: String?
+        get() {
+            val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_FILTERING_MODE, null)
+            return if (encryptedText != null) {
+                cryptoManager.decryptToString(encryptedText)
+            } else {
+                null
+            }
+        }
+        set(value) {
+            if (value != null) {
+                sharedPreferences.edit()
+                    .putString(SHARED_PREF_KEY_FILTERING_MODE, cryptoManager.encryptToString(value))
+                    .apply()
+            } else {
+                sharedPreferences.edit().remove(SHARED_PREF_KEY_FILTERING_MODE).apply()
+            }
+        }
+
     override var serviceUUID: String?
         get() {
             val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_SERVICE_UUID, null)
@@ -415,6 +453,25 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
             }
         }
 
+    override var apiVersion: String?
+        get() {
+            val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_API_VERSION, null)
+            return if (encryptedText != null) {
+                cryptoManager.decryptToString(encryptedText)
+            } else {
+                null
+            }
+        }
+        set(value) {
+            if (value != null) {
+                sharedPreferences.edit()
+                    .putString(SHARED_PREF_KEY_API_VERSION, cryptoManager.encryptToString(value))
+                    .apply()
+            } else {
+                sharedPreferences.edit().remove(SHARED_PREF_KEY_API_VERSION).apply()
+            }
+        }
+
     companion object {
         private const val SHARED_PREF_NAME = "robert_prefs"
         private const val SHARED_PREF_KEY_SHOULD_RELOAD_BLE_SETTINGS = "shared.pref.should_reload_ble_settings"
@@ -429,6 +486,8 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
         private const val SHARED_PREF_KEY_PROXIMITY_ACTIVE = "shared.pref.proximity_active"
         private const val SHARED_PREF_KEY_IS_SICK = "shared.pref.is_sick"
         private const val SHARED_PREF_KEY_CALIBRATION = "shared.pref.calibration"
+        private const val SHARED_PREF_KEY_FILTERING_CONFIG = "shared.pref.filtering_config"
+        private const val SHARED_PREF_KEY_FILTERING_MODE = "shared.pref.filtering_mode"
         private const val SHARED_PREF_KEY_SERVICE_UUID = "shared.pref.service_uuid"
         private const val SHARED_PREF_KEY_CHARACTERISTIC_UUID = "shared.pref.characteristic_uuid"
         private const val SHARED_PREF_KEY_BACKGROUND_SERVICE_MANUFACTURER_DATA = "shared.pref.background_service_manufacturer_data"
@@ -438,5 +497,6 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
         private const val SHARED_PREF_KEY_RANDOM_STATUS_HOUR = "shared.pref.random_status_hour"
         private const val SHARED_PREF_KEY_PRE_SYMPTOMS_SPAN = "shared.pref.pre_symptoms_span"
         private const val SHARED_PREF_KEY_APP_AVAILABILITY = "shared.pref.app_availability"
+        private const val SHARED_PREF_KEY_API_VERSION = "shared.pref.api_version"
     }
 }
