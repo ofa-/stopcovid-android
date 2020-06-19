@@ -71,6 +71,7 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
 
     private fun refreshItems() {
     CoroutineScope(Dispatchers.Main).launch {
+        synchronized(localProximityItems) {
             nbItemsCaption.text = "ebids: %d  |  pairs: %d  |  pings: %d"
                 .format(
                     localEbids.count(),
@@ -78,7 +79,7 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
                     localProximityItems.count()
                 )
             proximityInfoList.text = localProximityItemsToString()
-
+        }
             if (binding?.recyclerView?.isComputingLayout == false)
                 binding?.recyclerView?.adapter?.notifyDataSetChanged()
         }
@@ -116,7 +117,9 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
         (notification as com.orange.proximitynotification.ProximityInfo)
         .toLocalProximity()?.let {
             lastNotificationCaption.text = "rssi: " + it.calibratedRssi + "dBm"
-            localProximityItems.add(0, it)
+            synchronized(localProximityItems) {
+                localProximityItems.add(0, it)
+            }
             refreshItems()
         }
     }
