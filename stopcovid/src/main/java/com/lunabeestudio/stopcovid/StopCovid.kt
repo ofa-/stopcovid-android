@@ -133,8 +133,8 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication {
         listener?.notify(notification)
     }
 
-    override fun registerListener(_listener: RobertApplication.Listener?) {
-        listener = _listener
+    override fun registerListener(listener: RobertApplication.Listener?) {
+        this.listener = listener
     }
 
     override fun atRiskDetected() {

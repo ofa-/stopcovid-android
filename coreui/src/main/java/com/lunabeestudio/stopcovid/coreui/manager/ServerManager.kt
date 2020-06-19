@@ -63,10 +63,7 @@ abstract class ServerManager {
     }
 
     protected fun <T> loadLocal(context: Context): T {
-        var fileName = "${prefix(context)}${Locale.getDefault().language}${extension()}"
-        if (!File(context.filesDir, fileName).exists()) {
-            fileName = fallbackFileName(context)
-        }
+        // removed cache (commit 9e2feeda0) compare with upstream/master
         return getDefaultAssetFile<T>(context)
     }
 
