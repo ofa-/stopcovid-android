@@ -22,11 +22,15 @@ class CaptionItem : BaseItem<CaptionItem.ViewHolder>(
 ) {
     var text: String? = null
     var gravity: Int = Gravity.NO_GRAVITY
+    var onClick: (() -> Unit) = {}
+    var selectableText: Boolean = false
 
     override fun bindView(holder: ViewHolder, payloads: List<Any>) {
         super.bindView(holder, payloads)
         holder.textView.text = text.safeEmojiSpanify()
         holder.textView.gravity = gravity
+        holder.textView.setOnClickListener { onClick() }
+        holder.textView.setTextIsSelectable(selectableText)
     }
 
     class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {
