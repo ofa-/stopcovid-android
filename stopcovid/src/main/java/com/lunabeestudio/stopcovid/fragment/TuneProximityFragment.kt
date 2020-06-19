@@ -46,7 +46,7 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
         localProximityItems = robertManager
             .getLocalProximityItems(0)
             .toMutableList()
-        localProximityItems.sortByDescending({ it.collectedTime })
+        localProximityItems.sortByDescending { it.collectedTime }
         application.registerListener(this)
     }
 
@@ -75,7 +75,8 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
                 .format(
                     localEbids.count(),
                     localProximityItems.groupBy { it.ebidBase64 }.count(),
-                    localProximityItems.count())
+                    localProximityItems.count()
+                )
             proximityInfoList.text = localProximityItemsToString()
 
             if (binding?.recyclerView?.isComputingLayout == false)
