@@ -88,16 +88,69 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
     private val nbDisplayedItems = 100
     private val dateFormatter = SimpleDateFormat("E d MMM HH:mm:ss")
     private fun localProximityItemsToString(): String {
+        return if (showFullList)
+            fullList()
+        else
+            compactList()
+    }
+
+    private fun fullList(): String {
         return localProximityItems
             .slice(0 until min(nbDisplayedItems, localProximityItems.size))
             .joinToString("\n") {
                 listOf(
-                    dateFormatter.format(Date(
-                        it.collectedTime.ntpTimeSToUnixTimeMs() )),
+                    formatDate(it),
                     it.ebidBase64,
                     it.calibratedRssi
                 ).joinToString(", ")
             }
+    }
+
+    private fun compactList(): String {
+        var prev = LocalProximity("","","",0,0,0,0)
+        var count = 0
+        return localProximityItems
+            .fold(mutableListOf(), {
+                acc: MutableList<String>, it: LocalProximity ->
+                if (prev.ebidBase64 != it.ebidBase64) {
+                    if (count > 1)
+                        acc.add(formatSummary(prev, count))
+                    acc.add(formatMainLine(it))
+                    count = 0
+                }
+                count += 1
+                prev = it
+                acc
+            })
+            .joinToString("\n")
+            .plus(if (count > 1)
+                "\n" + formatSummary(prev, count) else "")
+    }
+
+    private fun formatDate(it: LocalProximity): String {
+        return dateFormatter.format(Date(
+            it.collectedTime.ntpTimeSToUnixTimeMs()
+        ))
+    }
+
+    private fun formatMainLine(it: LocalProximity): String {
+        return "%s, %s".format(
+            formatDate(it),
+            it.ebidBase64
+        )
+    }
+
+    private fun formatSummary(prev: LocalProximity, count: Int): String {
+        return "%s, ... (%d)".format(
+            formatDate(prev),
+            count
+        )
+    }
+
+    private var showFullList = false
+    private fun toggleListDisplay() {
+        showFullList = ! showFullList
+        refreshItems()
     }
 
     private val nbItemsCaption = captionItem {
@@ -111,6 +164,10 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
     }
 
     private val proximityInfoList = captionItem {
+        selectableText = true
+        onClick = {
+            toggleListDisplay()
+        }
     }
 
     override fun notify(notification: Any) {
