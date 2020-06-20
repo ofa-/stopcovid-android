@@ -183,6 +183,9 @@ class ProximityFragment : AboutMainFragment() {
         val items = ArrayList<GenericItem>()
 
         subTitleItem = titleItem {
+            onClick = {
+                findNavController().navigate(ProximityFragmentDirections.actionProximityFragmentToTuneProximityFragment())
+            }
             gravity = Gravity.CENTER
             identifier = items.count().toLong()
         }

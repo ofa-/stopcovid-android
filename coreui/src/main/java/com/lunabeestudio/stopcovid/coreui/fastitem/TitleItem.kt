@@ -23,12 +23,15 @@ class TitleItem : BaseItem<TitleItem.ViewHolder>(
 ) {
     var text: String? = null
     var gravity: Int = Gravity.NO_GRAVITY
+    var onClick: (() -> Unit) = {}
 
     override fun bindView(holder: ViewHolder, payloads: List<Any>) {
         super.bindView(holder, payloads)
         holder.textSwitcher.setText(text.safeEmojiSpanify())
         holder.textView1.gravity = gravity
         holder.textView2.gravity = gravity
+        holder.textView1.setOnClickListener { onClick() }
+        holder.textView2.setOnClickListener { onClick() }
     }
 
     override fun unbindView(holder: ViewHolder) {
