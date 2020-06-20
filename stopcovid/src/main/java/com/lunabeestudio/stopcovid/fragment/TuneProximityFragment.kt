@@ -70,16 +70,17 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
     }
 
     private fun refreshItems() {
-    CoroutineScope(Dispatchers.Main).launch {
-        synchronized(localProximityItems) {
-            nbItemsCaption.text = "ebids: %d  |  pairs: %d  |  pings: %d"
-                .format(
-                    localEbids.count(),
-                    localProximityItems.groupBy { it.ebidBase64 }.count(),
-                    localProximityItems.count()
-                )
-            proximityInfoList.text = localProximityItemsToString()
-        }
+        CoroutineScope(Dispatchers.Main).launch {
+            synchronized(localProximityItems) {
+                nbItemsCaption.text = "ebids: %d  |  pairs: %d  |  pings: %d"
+                    .format(
+                        localEbids.count(),
+                        localProximityItems.groupBy { it.ebidBase64 }.count(),
+                        localProximityItems.count()
+                    )
+                proximityInfoList.text = localProximityItemsToString()
+            }
+
             if (binding?.recyclerView?.isComputingLayout == false)
                 binding?.recyclerView?.adapter?.notifyDataSetChanged()
         }
@@ -154,8 +155,8 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
     }
 
     private val nbItemsCaption = captionItem {
-            text = "..."
-            gravity = Gravity.CENTER
+        text = "..."
+        gravity = Gravity.CENTER
     }
 
     private val lastNotificationCaption = captionItem {
