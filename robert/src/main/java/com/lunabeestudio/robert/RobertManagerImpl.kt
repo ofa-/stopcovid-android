@@ -457,6 +457,10 @@ class RobertManagerImpl(
         return ephemeralBluetoothIdentifierRepository.getAll()
     }
 
+    fun getCurrentEbid(): EphemeralBluetoothIdentifier? {
+        return ephemeralBluetoothIdentifierRepository.getForTime()
+    }
+
     private fun startStatusWorker(context: Context) {
         Timber.d("Create worker status")
         StatusWorker.scheduleStatusWorker(context, this, ExistingPeriodicWorkPolicy.KEEP)

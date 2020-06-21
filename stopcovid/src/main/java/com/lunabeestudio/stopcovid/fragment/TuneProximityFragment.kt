@@ -11,8 +11,12 @@
 package com.lunabeestudio.stopcovid.fragment
 
 import android.os.Bundle
+import android.text.*
+import android.text.style.RelativeSizeSpan
+import android.util.Base64
 import android.view.Gravity
 import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import com.lunabeestudio.domain.extension.ntpTimeSToUnixTimeMs
 import com.lunabeestudio.domain.model.EphemeralBluetoothIdentifier
 import com.lunabeestudio.domain.model.LocalProximity
@@ -79,11 +83,27 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
                         localProximityItems.count()
                     )
                 proximityInfoList.text = localProximityItemsToString()
+                updateTopBar()
             }
 
             if (binding?.recyclerView?.isComputingLayout == false)
                 binding?.recyclerView?.adapter?.notifyDataSetChanged()
         }
+    }
+
+    private fun updateTopBar() {
+        val title = "%s  ".format(strings[getTitleKey()])
+        val ebid = "(%s)".format(getCurrentEbidBase64())
+        (activity as AppCompatActivity).supportActionBar?.title =
+            SpannableString(title + ebid).also {
+                it.setSpan(RelativeSizeSpan(.6f), title.length, it.length,
+                    Spannable.SPAN_EXCLUSIVE_INCLUSIVE)
+            }
+    }
+
+    private fun getCurrentEbidBase64(): String {
+        val currentEbid = (requireContext().robertManager() as RobertManagerImpl).getCurrentEbid()
+        return Base64.encodeToString(currentEbid?.ebid, Base64.NO_WRAP) ?: "no ebid"
     }
 
     private val nbDisplayedItems = 100
