@@ -28,9 +28,7 @@ import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.dividerItem
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.mikepenz.fastadapter.GenericItem
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import java.lang.IllegalStateException
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -78,6 +76,7 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
         get() = (requireContext().applicationContext as RobertApplication)
 
     override fun onDestroyView() {
+        notificationObsoleter?.cancel()
         application.registerListener(null)
         super.onDestroyView()
     }
@@ -192,6 +191,7 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
         val robertManager = requireContext().robertManager()
         if (robertManager.isProximityActive) {
             robertManager.deactivateProximity(requireContext().applicationContext as RobertApplication)
+            notificationObsoleter?.cancel()
             resetLastNotification(deactivated)
         }
         else CoroutineScope(Dispatchers.Default).launch {
@@ -230,6 +230,7 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
                 localProximityItems.add(0, it)
             }
             refreshItems()
+            spawnNotificationObsoleter()
         }
     }
 
@@ -238,6 +239,16 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
             lastNotificationCaption.text = text
         }
         refreshItems()
+    }
+
+    private var notificationObsoleter: Job? = null
+    private fun spawnNotificationObsoleter() {
+        notificationObsoleter?.cancel()
+        notificationObsoleter = CoroutineScope(Dispatchers.Default).launch {
+            try { delay(20000) }
+            catch (e: CancellationException) { return@launch }
+            resetLastNotification()
+        }
     }
 
     override fun getItems(): List<GenericItem> {
