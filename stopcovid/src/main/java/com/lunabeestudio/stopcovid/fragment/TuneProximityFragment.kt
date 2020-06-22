@@ -106,7 +106,7 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
         return Base64.encodeToString(currentEbid?.ebid, Base64.NO_WRAP) ?: "no ebid"
     }
 
-    private val nbDisplayedItems = 100
+    private val nbDisplayedItems = 300
     private val dateFormatter = SimpleDateFormat("E d MMM HH:mm:ss")
     private fun localProximityItemsToString(): String {
         return if (showFullList)
