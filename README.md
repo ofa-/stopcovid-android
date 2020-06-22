@@ -1,13 +1,13 @@
 StopCovid Android
 =================
 
-This _extended_ StopCovid features:
+_Extended_ StopCovid app, featuring:
 
 - notifications on "ping"
 - proximity info screen
 - ui beautifications
 
-The app is a fork of upstream [gitlab.inria.fr][upstream]
+This app is a fork of upstream [gitlab.inria.fr][upstream]
 `stopcovid-android` and is compatible with [StopCovid][StopCovid].
 
 [![download latest][download]][release]
