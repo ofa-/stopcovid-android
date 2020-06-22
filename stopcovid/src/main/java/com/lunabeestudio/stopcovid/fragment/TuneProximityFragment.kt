@@ -11,6 +11,7 @@
 package com.lunabeestudio.stopcovid.fragment
 
 import android.os.Bundle
+import android.os.SystemClock
 import android.text.*
 import android.text.style.RelativeSizeSpan
 import android.util.Base64
@@ -174,6 +175,22 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
         refreshItems()
     }
 
+    private var lastClick = 0L
+    private fun toggleProximityScanner() {
+        if (lastClick + 1000 > SystemClock.elapsedRealtime())
+            return
+        lastClick = SystemClock.elapsedRealtime()
+
+        val robertManager = requireContext().robertManager()
+        if (robertManager.isProximityActive) {
+            robertManager.deactivateProximity(requireContext().applicationContext as RobertApplication)
+            resetLastNotification()
+        }
+        else CoroutineScope(Dispatchers.Default).launch {
+            robertManager.activateProximity(requireContext().applicationContext as RobertApplication, false)
+        }
+    }
+
     private val nbItemsCaption = captionItem {
         text = "..."
         gravity = Gravity.CENTER
@@ -182,6 +199,9 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
     private val lastNotificationCaption = captionItem {
         gravity = Gravity.CENTER
         text = "-"
+        onClick = {
+            toggleProximityScanner()
+        }
     }
 
     private val proximityInfoList = captionItem {
@@ -194,12 +214,21 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
     override fun notify(notification: Any) {
         (notification as com.orange.proximitynotification.ProximityInfo)
         .toLocalProximity()?.let {
-            lastNotificationCaption.text = "rssi: " + it.calibratedRssi + "dBm"
+            synchronized(lastNotificationCaption) {
+                lastNotificationCaption.text = "rssi: " + it.calibratedRssi + "dBm"
+            }
             synchronized(localProximityItems) {
                 localProximityItems.add(0, it)
             }
             refreshItems()
         }
+    }
+
+    private fun resetLastNotification() {
+        synchronized(lastNotificationCaption) {
+            lastNotificationCaption.text = "-"
+        }
+        refreshItems()
     }
 
     override fun getItems(): List<GenericItem> {
