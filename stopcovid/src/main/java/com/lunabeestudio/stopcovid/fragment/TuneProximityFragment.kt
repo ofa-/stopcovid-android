@@ -5,7 +5,7 @@
  *
  * Authors
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Copied by Ofa from Lunabee Studio / Date - 2020/06/11
+ * Created by Ofa (mimicking Lunabee Studio) / 2020-06-11
  */
 
 package com.lunabeestudio.stopcovid.fragment
