@@ -38,8 +38,8 @@ import kotlin.math.min
 
 class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
 
-    private lateinit var localProximityItems: MutableList<LocalProximity>
-    private lateinit var localEbids: MutableList<EphemeralBluetoothIdentifier>
+    private var localProximityItems = mutableListOf<LocalProximity>()
+    private var localEbids = mutableListOf<EphemeralBluetoothIdentifier>()
 
     private fun initLocalProximityItems() {
         val robertManager = (requireContext().robertManager() as RobertManagerImpl)
