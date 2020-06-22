@@ -31,6 +31,7 @@ import com.mikepenz.fastadapter.GenericItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.lang.IllegalStateException
 import java.text.SimpleDateFormat
 import java.util.Date
 import kotlin.collections.MutableList
@@ -61,7 +62,8 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         CoroutineScope(Dispatchers.Default).launch {
-            initLocalProximityItems()
+            try { initLocalProximityItems() }
+            catch (e: IllegalStateException) { return@launch }
             refreshItems()
         }
     }
