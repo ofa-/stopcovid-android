@@ -53,11 +53,17 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
             .getLocalProximityItems(0)
             .toMutableList()
         localProximityItems.sortByDescending { it.collectedTime }
+
+        if (! robertManager.isProximityActive)
+            lastNotificationCaption.text = deactivated
+
         application.registerListener(this)
     }
 
     override fun getTitleKey(): String = "tuneProximityController.title"
 
+    private val deactivated = "(%s)".format(
+        strings["accessibility.hint.proximity.buttonState.deactivated"])
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -186,10 +192,11 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
         val robertManager = requireContext().robertManager()
         if (robertManager.isProximityActive) {
             robertManager.deactivateProximity(requireContext().applicationContext as RobertApplication)
-            resetLastNotification()
+            resetLastNotification(deactivated)
         }
         else CoroutineScope(Dispatchers.Default).launch {
             robertManager.activateProximity(requireContext().applicationContext as RobertApplication, false)
+            resetLastNotification()
         }
     }
 
@@ -226,9 +233,9 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
         }
     }
 
-    private fun resetLastNotification() {
+    private fun resetLastNotification(text: String = "-") {
         synchronized(lastNotificationCaption) {
-            lastNotificationCaption.text = "-"
+            lastNotificationCaption.text = text
         }
         refreshItems()
     }
