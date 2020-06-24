@@ -77,24 +77,17 @@ class ProximityService : RobertProximityService() {
             notificationManager.createNotificationChannel(channel)
         }
 
-        val notificationIntent = Intent(this, MainActivity::class.java)
-        val pendingIntent = PendingIntent.getActivity(
-            this, 0,
-            notificationIntent, 0
-        )
         return NotificationCompat.Builder(this,
-            UiConstants.Notification.PROXIMITY.channelId
-        )
-            .setContentTitle(strings["notification.proximityServiceRunning.title"])
-            .setOngoing(true)
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setSmallIcon(R.drawable.ic_notification_bar)
-            .setNotificationSilent()
-            .setContentIntent(pendingIntent)
+            UiConstants.Notification.PROXIMITY.channelId)
             .build()
     }
 
+    private var notifiedStart = false
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        if (!notifiedStart) {
+            sendNotification(strings["notification.proximityServiceRunning.title"])
+            notifiedStart = true
+        }
         return START_STICKY
     }
 
