@@ -60,6 +60,10 @@ android {
 
         buildConfigField 'String', 'APP_MAINTENANCE_CERTIFICATE_SHA256', '"sha256/sXQojvwsiyblrpMQIVRXGC5u7AgknzTJm+VIK1kQmD8="'
         buildConfigField 'String', 'APP_MAINTENANCE_URL', '"https://app.stopcovid.gouv.fr/maintenance/info-maintenance-v2.json"'
+
+        def gitRev = "git rev-parse HEAD".execute().getText().substring(0, 6)
+
+        buildConfigField 'String', 'BUILD_ID', /"(${gitRev})"/
     }
 
     lintOptions {

@@ -39,6 +39,7 @@ class AboutFragment : MainFragment() {
         }
         items += captionItem {
             text = stringsFormat("aboutController.appVersion", BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE.toString())
+                .plus("\n\n" + BuildConfig.BUILD_ID)
             gravity = Gravity.CENTER
             identifier = items.size.toLong()
         }
