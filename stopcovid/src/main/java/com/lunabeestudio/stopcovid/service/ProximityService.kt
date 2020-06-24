@@ -33,6 +33,7 @@ import com.lunabeestudio.stopcovid.extension.robertManager
 import com.orange.proximitynotification.ProximityInfo
 import com.orange.proximitynotification.ble.BleProximityMetadata
 import timber.log.Timber
+import kotlin.math.pow
 
 class ProximityService : RobertProximityService() {
 
@@ -54,11 +55,10 @@ class ProximityService : RobertProximityService() {
     }
 
     override fun onProximity(proximityInfo: ProximityInfo) {
-        var calibratedRssi = (proximityInfo.metadata as BleProximityMetadata).calibratedRssi
-        Timber.d("proximityInfo", "calibratedRssi=" + calibratedRssi)
-        val rssi_1m = -70
-        val ble_att = 2.2
-        val estimatedDistance = Math.pow(10.0, (rssi_1m - calibratedRssi) / (10.0 * ble_att))
+        val calibratedRssi = (proximityInfo.metadata as BleProximityMetadata).calibratedRssi
+        val rssi1m = -70
+        val bleAtt = 2.2
+        val estimatedDistance = 10.0.pow((rssi1m - calibratedRssi) / (10.0 * bleAtt))
 
         val message = "rssi: " + calibratedRssi + "dBm, dist: %.1f".format(estimatedDistance) +"m"
 
