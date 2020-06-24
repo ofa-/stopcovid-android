@@ -22,7 +22,7 @@ abstract class BaseFragment : Fragment() {
 
     abstract fun refreshScreen()
 
-    protected var strings: HashMap<String, String> = StringsManager.getStrings()
+    protected var strings = StringsManager.getStrings()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
