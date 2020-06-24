@@ -133,6 +133,7 @@ class ProximityService : RobertProximityService() {
             this, 0,
             notificationIntent, 0
         )
+        stopForeground(false)
         val notification = NotificationCompat.Builder(this,
             UiConstants.Notification.PROXIMITY.channelId
         )
@@ -143,6 +144,11 @@ class ProximityService : RobertProximityService() {
             .setSmallIcon(R.drawable.ic_notification_bar)
             .setContentIntent(pendingIntent)
             .build()
+        startForeground(
+            foregroundNotificationId,
+            NotificationCompat.Builder(this, UiConstants.Notification.PROXIMITY.channelId)
+                .build()
+        )
 
         notificationManager.notify(UiConstants.Notification.PROXIMITY.notificationId, notification)
     }
