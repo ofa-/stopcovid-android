@@ -43,12 +43,7 @@ class ProximityService : RobertProximityService() {
 
     private val binder = ProximityBinder()
 
-    private val strings: HashMap<String, String> by lazy {
-        if (StringsManager.getStrings().isEmpty()) {
-            StringsManager.init(this)
-        }
-        StringsManager.getStrings()
-    }
+    private val strings = StringsManager.getStrings(this)
 
     override val robertManager: RobertManager by lazy {
         robertManager()
@@ -75,7 +70,7 @@ class ProximityService : RobertProximityService() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 UiConstants.Notification.PROXIMITY.channelId,
-                strings["notification.channel.title"] ?: "Collecte active",
+                strings["notification.channel.title"],
                 NotificationManager.IMPORTANCE_HIGH
             )
             channel.setShowBadge(false)
@@ -158,7 +153,7 @@ class ProximityService : RobertProximityService() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 UiConstants.Notification.ERROR.channelId,
-                strings["notification.channel.error.title"] ?: "Erreur",
+                strings["notification.channel.error.title"],
                 NotificationManager.IMPORTANCE_HIGH
             )
             notificationManager.createNotificationChannel(channel)

@@ -176,16 +176,12 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication {
 
     override fun sendClockNotAlignedNotification() {
         val notificationManager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
-        if (StringsManager.getStrings().isEmpty()) {
-            StringsManager.init(applicationContext)
-        }
-        val strings = StringsManager.getStrings()
+        val strings = StringsManager.getStrings(applicationContext)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 UiConstants.Notification.TIME.channelId,
-                strings["notification.channel.error.title"] ?: "Erreur",
+                strings["notification.channel.error.title"],
                 NotificationManager.IMPORTANCE_HIGH
             )
             notificationManager.createNotificationChannel(channel)
@@ -217,16 +213,12 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication {
 
     fun sendUpgradeNotification() {
         val notificationManager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
-        if (StringsManager.getStrings().isEmpty()) {
-            StringsManager.init(applicationContext)
-        }
-        val strings = StringsManager.getStrings()
+        val strings = StringsManager.getStrings(applicationContext)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 UiConstants.Notification.UPGRADE.channelId,
-                strings["notification.channel.upgrade.title"] ?: "Upgrade",
+                strings["notification.channel.upgrade.title"],
                 NotificationManager.IMPORTANCE_HIGH
             )
             notificationManager.createNotificationChannel(channel)

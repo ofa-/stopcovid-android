@@ -35,6 +35,18 @@ class StringsManager : ServerManager() {
 
         fun getStrings(): HashMap<String, String> = _strings
 
+        fun getStrings(context: Context): Strings {
+            if (_strings.isEmpty())
+                init(context)
+            return Strings()
+        }
+
+        class Strings : HashMap<String, String>(_strings) {
+            override fun get(key: String): String {
+                return super.get(key) ?: key
+            }
+        }
+
         fun init(context: Context) {
             prevLanguage = Locale.getDefault().language
             _strings = StringsManager().loadLocal(context)

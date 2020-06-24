@@ -27,16 +27,12 @@ class AtRiskNotificationWorker(context: Context, workerParams: WorkerParameters)
 
     override fun doWork(): Result {
         val notificationManager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
-        if (StringsManager.getStrings().isEmpty()) {
-            StringsManager.init(applicationContext)
-        }
-        val strings = StringsManager.getStrings()
+        val strings = StringsManager.getStrings(applicationContext)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 UiConstants.Notification.AT_RISK.channelId,
-                strings["notification.channel.atRisk.title"] ?: "At risk",
+                strings["notification.channel.atRisk.title"],
                 NotificationManager.IMPORTANCE_HIGH
             )
             notificationManager.createNotificationChannel(channel)
