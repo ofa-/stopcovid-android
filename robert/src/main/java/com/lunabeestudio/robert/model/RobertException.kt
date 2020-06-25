@@ -29,6 +29,7 @@ enum class ErrorCode {
     BLE_ADVERTISER,
     BLE_SCANNER,
     BLE_PROXIMITY_NOTIFICATION,
+    BLE_GATT,
     TIME_NOT_ALIGNED
 }
 
@@ -71,6 +72,9 @@ class BLEScannerException(message: String = "An error occurs in BLE scanner") :
 
 class BLEProximityNotificationException(message: String = "An error occurs in BLE proximity notification") :
     RobertException(ErrorCode.BLE_PROXIMITY_NOTIFICATION, message)
+
+class BLEGattException(message: String = "An error occurs in BLE gatt") :
+    RobertException(ErrorCode.BLE_GATT, message)
 
 class TimeNotAlignedException(message: String = "Phone time not aligned with server time") :
     RobertException(ErrorCode.TIME_NOT_ALIGNED, message)

@@ -18,7 +18,7 @@ data class LocalProximity(val eccBase64: String,
     val helloTime: Int,
     val collectedTime: Long,
     val rawRssi: Int,
-    val calibratedRssi: Int) {
+    var calibratedRssi: Int) {
 
     constructor(hello: Hello, collectedNtpTimeS: Long, rawRssi: Int, calibratedRssi: Int) : this(
         eccBase64 = Base64.encodeToString(hello.eccArray, Base64.NO_WRAP),

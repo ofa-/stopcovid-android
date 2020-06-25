@@ -55,6 +55,6 @@ interface BleScanner {
         fun onError(errorCode: Int)
     }
 
-    fun start(callback: Callback)
+    fun start(callback: Callback): Boolean
     fun stop()
 }

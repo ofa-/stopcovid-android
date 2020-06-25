@@ -19,6 +19,6 @@ interface BleAdvertiser {
         fun onError(errorCode: Int)
     }
 
-    fun start(data: ByteArray, callback: Callback)
+    fun start(data: ByteArray, callback: Callback): Boolean
     fun stop()
 }

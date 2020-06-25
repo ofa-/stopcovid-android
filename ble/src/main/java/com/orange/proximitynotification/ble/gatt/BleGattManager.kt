@@ -17,11 +17,11 @@ interface BleGattManager {
     val settings: BleSettings
 
     interface Callback {
-        fun onWritePayloadRequest(device: BluetoothDevice, value: ByteArray)
+        suspend fun onWritePayloadRequest(device: BluetoothDevice, value: ByteArray)
     }
 
-    fun start(callback: Callback)
+    fun start(callback: Callback): Boolean
     fun stop()
 
-    suspend fun requestRemoteRssi(device: BluetoothDevice): Int?
+    suspend fun requestRemoteRssi(device: BluetoothDevice, close: Boolean): Int?
 }

@@ -25,11 +25,11 @@ class BleAdvertiserImpl(
 
     private var advertiseCallback: InnerAdvertiseCallback? = null
 
-    override fun start(data: ByteArray, callback: BleAdvertiser.Callback) {
+    override fun start(data: ByteArray, callback: BleAdvertiser.Callback): Boolean {
         Timber.d("Starting Advertising")
 
         doStop()
-        doStart(data, callback)
+        return doStart(data, callback)
     }
 
     override fun stop() {
@@ -37,19 +37,23 @@ class BleAdvertiserImpl(
         doStop()
     }
 
-    private fun doStart(data: ByteArray, callback: BleAdvertiser.Callback) {
-        advertiseCallback = InnerAdvertiseCallback(callback).also {
+    private fun doStart(data: ByteArray, callback: BleAdvertiser.Callback): Boolean {
+        advertiseCallback = InnerAdvertiseCallback(callback)
+
+        return runCatching {
             bluetoothAdvertiser.startAdvertising(
                 buildAdvertiseSettings(),
                 buildAdvertiseData(data),
-                it
+                advertiseCallback
             )
-        }
+        }.isSuccess
     }
 
     private fun doStop() {
         advertiseCallback?.let {
-            bluetoothAdvertiser.stopAdvertising(advertiseCallback)
+            runCatching {
+                bluetoothAdvertiser.stopAdvertising(advertiseCallback)
+            }
         }
         advertiseCallback = null
     }

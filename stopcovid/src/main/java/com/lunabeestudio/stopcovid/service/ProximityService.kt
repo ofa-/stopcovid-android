@@ -24,12 +24,14 @@ import androidx.core.content.ContextCompat
 import com.lunabeestudio.framework.ble.service.RobertProximityService
 import com.lunabeestudio.robert.RobertApplication
 import com.lunabeestudio.robert.RobertManager
+import com.lunabeestudio.robert.model.BLEAdvertiserException
 import com.lunabeestudio.robert.model.RobertException
 import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.R
 import com.lunabeestudio.stopcovid.coreui.UiConstants
 import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
 import com.lunabeestudio.stopcovid.extension.robertManager
+import com.lunabeestudio.stopcovid.manager.ProximityManager
 import com.orange.proximitynotification.ProximityInfo
 import com.orange.proximitynotification.ble.BleProximityMetadata
 import timber.log.Timber
@@ -77,6 +79,8 @@ class ProximityService : RobertProximityService() {
             notificationManager.createNotificationChannel(channel)
         }
 
+        notificationManager.cancel(UiConstants.Notification.BLUETOOTH.notificationId)
+        notificationManager.cancel(UiConstants.Notification.ERROR.notificationId)
         return NotificationCompat.Builder(this,
             UiConstants.Notification.PROXIMITY.channelId)
             .build()
@@ -97,11 +101,16 @@ class ProximityService : RobertProximityService() {
     }
 
     override fun onError(error: RobertException) {
-        Timber.e(error)
-        sendErrorNotification()
-        robertManager.deactivateProximity(applicationContext as RobertApplication)
-        lastError = error
-        onError?.invoke(error)
+        if (error is BLEAdvertiserException && !ProximityManager.isBluetoothOn(this)) {
+            sendErrorBluetoothNotification()
+            doStop()
+        } else {
+            Timber.e(error)
+            sendErrorNotification()
+            robertManager.deactivateProximity(applicationContext as RobertApplication)
+            lastError = error
+            onError?.invoke(error)
+        }
     }
 
     fun consumeLastError(): RobertException? {
@@ -175,6 +184,37 @@ class ProximityService : RobertProximityService() {
             .setContentIntent(pendingIntent)
             .build()
         notificationManager.notify(UiConstants.Notification.ERROR.notificationId, notification)
+    }
+
+    private fun sendErrorBluetoothNotification() {
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                UiConstants.Notification.BLUETOOTH.channelId,
+                strings["notification.channel.error.title"] ?: "Erreur",
+                NotificationManager.IMPORTANCE_HIGH
+            )
+            notificationManager.createNotificationChannel(channel)
+        }
+
+        val notificationIntent = Intent(this, MainActivity::class.java)
+        val pendingIntent = PendingIntent.getActivity(
+            this, 0,
+            notificationIntent, 0
+        )
+        val notification = NotificationCompat.Builder(this,
+            UiConstants.Notification.BLUETOOTH.channelId
+        )
+            .setContentTitle(strings["notification.error.title"])
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setAutoCancel(true)
+            .setSmallIcon(R.drawable.ic_notification_bar)
+            .setStyle(NotificationCompat.BigTextStyle()
+                .bigText(strings["notification.error.connectivity"]))
+            .setContentIntent(pendingIntent)
+            .build()
+        notificationManager.notify(UiConstants.Notification.BLUETOOTH.notificationId, notification)
     }
 
     companion object {

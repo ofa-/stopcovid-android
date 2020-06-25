@@ -25,6 +25,8 @@ interface LocalKeystoreDataSource {
     var proximityActive: Boolean?
     var isSick: Boolean?
     var calibration: List<DeviceParameterCorrection>?
+    var filteringConfig: String?
+    var filteringMode: String?
     var serviceUUID: String?
     var characteristicUUID: String?
     var backgroundServiceManufacturerData: String?
@@ -34,4 +36,5 @@ interface LocalKeystoreDataSource {
     var randomStatusHour: Int?
     var preSymptomsSpan: Int?
     var appAvailability: Boolean?
+    var apiVersion: String?
 }

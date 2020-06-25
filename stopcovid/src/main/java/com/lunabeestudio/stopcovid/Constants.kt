@@ -10,6 +10,8 @@
 
 package com.lunabeestudio.stopcovid
 
+import java.util.concurrent.TimeUnit
+
 object Constants {
     object SharedPrefs {
         const val ON_BOARDING_DONE: String = "On.Boarding.Done"
@@ -28,6 +30,6 @@ object Constants {
 
     object ServerConstant {
         val ACCEPTED_REPORT_CODE_LENGTH: List<Int> = listOf(6, 36)
-        const val MAX_GAP_DEVICE_SERVER: Long = 30000L
+        val MAX_GAP_DEVICE_SERVER: Long = TimeUnit.MINUTES.toMillis(2L)
     }
 }

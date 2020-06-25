@@ -50,8 +50,8 @@ android {
 
     defaultConfig {
         applicationId "fr.gouv.android.stopcovid"
-        versionCode 36
-        versionName "1.0.4"
+        versionCode 38
+        versionName "1.1.0"
 
         testInstrumentationRunner = 'com.lunabeestudio.stopcovid.TestRunner'
 

@@ -13,6 +13,7 @@ package com.lunabeestudio.robert
 import com.lunabeestudio.domain.model.DeviceParameterCorrection
 import com.lunabeestudio.domain.model.HelloBuilder
 import com.lunabeestudio.domain.model.LocalProximity
+import com.lunabeestudio.robert.manager.LocalProximityFilter
 import com.lunabeestudio.robert.model.RobertResult
 import com.lunabeestudio.robert.model.RobertResultData
 
@@ -39,6 +40,10 @@ interface RobertManager {
 
     val calibration: List<DeviceParameterCorrection>
 
+    val filteringConfig: String
+
+    val filteringMode: LocalProximityFilter.Mode
+
     val serviceUUID: String
 
     val characteristicUUID: String
@@ -48,6 +53,18 @@ interface RobertManager {
     val checkStatusFrequencyHour: Int
 
     val randomStatusHour: Int
+
+    val apiVersion: String
+
+    suspend fun refreshConfig(application: RobertApplication): RobertResult
+
+    suspend fun generateCaptcha(type: String, local: String): RobertResultData<String>
+
+    suspend fun getCaptchaImage(captchaId: String, path: String): RobertResult
+
+    suspend fun getCaptchaAudio(captchaId: String, path: String): RobertResult
+
+    suspend fun registerV2(application: RobertApplication, captcha: String, captchaId: String): RobertResult
 
     suspend fun register(application: RobertApplication, captcha: String): RobertResult
 

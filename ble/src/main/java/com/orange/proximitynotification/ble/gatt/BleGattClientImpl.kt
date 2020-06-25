@@ -42,6 +42,7 @@ internal class BleGattClientImpl(
 
     override suspend fun open() {
         bluetoothGatt = bluetoothDevice.connectGattCompat(context, Callback())
+        checkNotNull(bluetoothGatt)
         connectionStateChannel.receive() // suspends until connectionStateChanged is received
         check(isConnected)
     }
@@ -53,8 +54,10 @@ internal class BleGattClientImpl(
     }
 
     private fun doClose() {
-        bluetoothGatt?.disconnect()
-        bluetoothGatt?.close()
+        bluetoothGatt?.runCatching {
+            disconnect()
+            close()
+        }
 
         isClosed = true
         _isConnected = false
@@ -102,7 +105,7 @@ private fun <E> SendChannel<E>.safeOffer(element: E) {
 private fun BluetoothDevice.connectGattCompat(
     context: Context,
     callback: BluetoothGattCallback
-): BluetoothGatt {
+): BluetoothGatt? {
     return when {
         SDK_INT >= M -> connectGatt(context, false, callback, TRANSPORT_LE)
         else -> connectGatt(context, false, callback)

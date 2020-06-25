@@ -18,9 +18,16 @@ import com.lunabeestudio.robert.model.RobertResult
 import com.lunabeestudio.robert.model.RobertResultData
 
 interface RemoteServiceDataSource {
-    suspend fun register(captcha: String, clientPublicECDHKey: String): RobertResultData<RegisterReport>
-    suspend fun unregister(ssu: ServerStatusUpdate): RobertResult
-    suspend fun status(ssu: ServerStatusUpdate): RobertResultData<StatusReport>
-    suspend fun report(token: String, localProximityList: List<LocalProximity>): RobertResult
-    suspend fun deleteExposureHistory(ssu: ServerStatusUpdate): RobertResult
+    suspend fun generateCaptcha(apiVersion: String, type: String, language: String): RobertResultData<String>
+    suspend fun getCaptcha(apiVersion: String, captchaId: String, type: String, path: String): RobertResult
+    suspend fun register(apiVersion: String, captcha: String, clientPublicECDHKey: String): RobertResultData<RegisterReport>
+    suspend fun registerV2(apiVersion: String,
+        captcha: String,
+        captchaId: String,
+        clientPublicECDHKey: String): RobertResultData<RegisterReport>
+
+    suspend fun unregister(apiVersion: String, ssu: ServerStatusUpdate): RobertResult
+    suspend fun status(apiVersion: String, ssu: ServerStatusUpdate): RobertResultData<StatusReport>
+    suspend fun report(apiVersion: String, token: String, localProximityList: List<LocalProximity>): RobertResult
+    suspend fun deleteExposureHistory(apiVersion: String, ssu: ServerStatusUpdate): RobertResult
 }

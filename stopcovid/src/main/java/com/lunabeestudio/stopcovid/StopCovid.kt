@@ -35,6 +35,7 @@ import com.lunabeestudio.framework.local.LocalCryptoManager
 import com.lunabeestudio.framework.local.datasource.SecureFileEphemeralBluetoothIdentifierDataSource
 import com.lunabeestudio.framework.local.datasource.SecureFileLocalProximityDataSource
 import com.lunabeestudio.framework.local.datasource.SecureKeystoreDataSource
+import com.lunabeestudio.framework.manager.LocalProximityFilterImpl
 import com.lunabeestudio.framework.remote.datasource.ServiceDataSource
 import com.lunabeestudio.framework.sharedcrypto.BouncyCastleCryptoDataSource
 import com.lunabeestudio.robert.RobertApplication
@@ -78,7 +79,8 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication {
             SecureFileLocalProximityDataSource(File(filesDir, LOCAL_PROXIMITY_DIR), cryptoManager),
             ServiceDataSource(this),
             BouncyCastleCryptoDataSource(),
-            ConfigDataSource
+            ConfigDataSource,
+            LocalProximityFilterImpl()
         )
     }
 

@@ -165,6 +165,13 @@ class ProximityFragment : AboutMainFragment() {
             }
             refreshItems()
         }
+        viewModel.refreshConfigSuccess.observe(viewLifecycleOwner) {
+            if (robertManager.apiVersion == "v1") {
+                injectWebView()
+            } else {
+                findNavController().navigate(ProximityFragmentDirections.actionProximityFragmentToCaptchaFragment())
+            }
+        }
         viewModel.activateProximitySuccess.observe(viewLifecycleOwner) {
             refreshItems()
         }
@@ -267,7 +274,7 @@ class ProximityFragment : AboutMainFragment() {
 
     private fun activateProximity() {
         if (!robertManager.isRegistered) {
-            injectWebView()
+            viewModel.refreshConfig(requireContext().applicationContext as RobertApplication)
         } else {
             bindToProximityService()
             viewModel.activateProximity(requireContext().applicationContext as RobertApplication)

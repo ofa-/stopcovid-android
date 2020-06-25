@@ -28,7 +28,8 @@ object UiConstants {
         PROXIMITY("proximity", 2),
         ERROR("error", 3),
         UPGRADE("upgrade", 4),
-        TIME("error", 5)
+        TIME("error", 5),
+        BLUETOOTH("error", 6)
     }
 
     const val DEFAULT_LANGUAGE: String = "en"

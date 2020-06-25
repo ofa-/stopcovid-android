@@ -42,6 +42,14 @@ object RetrofitClient {
             .build().create(clazz)
     }
 
+    internal fun <T> getFileService(context: Context, clazz: Class<T>,
+        httpUrl: HttpUrl): T {
+        return Retrofit.Builder()
+            .baseUrl(httpUrl)
+            .client(getFileOKHttpClient(context, BuildConfig.BASE_URL, BuildConfig.CERTIFICATE_SHA256))
+            .build().create(clazz)
+    }
+
     fun getDefaultOKHttpClient(context: Context, url: String, certificateSHA256: String): OkHttpClient {
         val requireTls12 = ConnectionSpec.Builder(ConnectionSpec.RESTRICTED_TLS)
             .tlsVersions(TlsVersion.TLS_1_2)
@@ -87,6 +95,31 @@ object RetrofitClient {
         }.build()
     }
 
+    private fun getFileOKHttpClient(context: Context, url: String, certificateSHA256: String): OkHttpClient {
+        val requireTls12 = ConnectionSpec.Builder(ConnectionSpec.RESTRICTED_TLS)
+            .tlsVersions(TlsVersion.TLS_1_2)
+            .build()
+        return OkHttpClient.Builder().apply {
+            if (!BuildConfig.DEBUG) {
+                connectionSpecs(listOf(requireTls12))
+            }
+            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N) {
+                certificatePinner(CertificatePinner.Builder()
+                    .add(url.toHttpUrl().host, certificateSHA256)
+                    .build())
+                val certificates: HandshakeCertificates = HandshakeCertificates.Builder()
+                    .addTrustedCertificate(certificateFromString(context, "api_stopcovid_gouv_fr"))
+                    .build()
+                sslSocketFactory(certificates.sslSocketFactory(), certificates.trustManager)
+            }
+            addInterceptor(getFileHeaderInterceptor())
+            callTimeout(30L, TimeUnit.SECONDS)
+            connectTimeout(30L, TimeUnit.SECONDS)
+            readTimeout(30L, TimeUnit.SECONDS)
+            writeTimeout(30L, TimeUnit.SECONDS)
+        }.build()
+    }
+
     private fun certificateFromString(context: Context, fileName: String): X509Certificate {
         return CertificateFactory.getInstance("X.509").generateCertificate(
             context.resources.openRawResource(
@@ -100,6 +133,16 @@ object RetrofitClient {
             val request = chain.request()
                 .newBuilder().apply {
                     addHeader("Accept", "application/json")
+                    addHeader("Content-Type", "application/json")
+                }.build()
+            return chain.proceed(request)
+        }
+    }
+
+    private fun getFileHeaderInterceptor(): Interceptor = object : Interceptor {
+        override fun intercept(chain: Interceptor.Chain): Response {
+            val request = chain.request()
+                .newBuilder().apply {
                     addHeader("Content-Type", "application/json")
                 }.build()
             return chain.proceed(request)
