@@ -78,8 +78,8 @@ android {
         animationsDisabled true
     }
 
-    buildFeatures {
-        viewBinding true
+    viewBinding {
+        enabled = true
     }
 }
 
