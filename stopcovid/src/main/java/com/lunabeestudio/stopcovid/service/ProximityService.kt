@@ -192,7 +192,7 @@ class ProximityService : RobertProximityService() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 UiConstants.Notification.BLUETOOTH.channelId,
-                strings["notification.channel.error.title"] ?: "Erreur",
+                strings["notification.channel.error.title"],
                 NotificationManager.IMPORTANCE_HIGH
             )
             notificationManager.createNotificationChannel(channel)
