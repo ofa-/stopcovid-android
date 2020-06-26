@@ -32,7 +32,6 @@ import kotlinx.coroutines.*
 import java.lang.IllegalStateException
 import java.text.SimpleDateFormat
 import java.util.Date
-import kotlin.collections.MutableList
 import kotlin.math.min
 
 
@@ -136,24 +135,16 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
     }
 
     private fun compactList(): String {
-        var prev = LocalProximity("","","",0,0,0,0)
-        var count = 0
         return localProximityItems
-            .fold(mutableListOf(), {
-                acc: MutableList<String>, it: LocalProximity ->
-                if (prev.ebidBase64 != it.ebidBase64) {
-                    if (count > 1)
-                        acc.add(formatSummary(prev, count))
-                    acc.add(formatMainLine(it))
-                    count = 0
-                }
-                count += 1
-                prev = it
-                acc
-            })
+            .groupBy { it.ebidBase64 }
+            .map { (_, group) ->
+                formatMainLine(group.first()) +
+                if (group.size > 1)
+                    "\n" + formatSummary(group.last(), group.size)
+                else
+                    ""
+            }
             .joinToString("\n")
-            .plus(if (count > 1)
-                "\n" + formatSummary(prev, count) else "")
     }
 
     private fun formatDate(it: LocalProximity): String {
