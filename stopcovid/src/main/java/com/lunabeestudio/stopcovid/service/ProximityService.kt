@@ -81,17 +81,10 @@ class ProximityService : RobertProximityService() {
 
         notificationManager.cancel(UiConstants.Notification.BLUETOOTH.notificationId)
         notificationManager.cancel(UiConstants.Notification.ERROR.notificationId)
-        return NotificationCompat.Builder(this,
-            UiConstants.Notification.PROXIMITY.channelId)
-            .build()
+        return buildNotification(strings["notification.proximityServiceRunning.title"])
     }
 
-    private var notifiedStart = false
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        if (!notifiedStart) {
-            sendNotification(strings["notification.proximityServiceRunning.title"])
-            notifiedStart = true
-        }
         return START_STICKY
     }
 
@@ -128,15 +121,13 @@ class ProximityService : RobertProximityService() {
         fun getService(): ProximityService = this@ProximityService
     }
 
-    fun sendNotification(message: String) {
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    private fun buildNotification(message: String): Notification {
         val notificationIntent = Intent(this, MainActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(
             this, 0,
             notificationIntent, 0
         )
-        stopForeground(false)
-        val notification = NotificationCompat.Builder(this,
+        return NotificationCompat.Builder(this,
             UiConstants.Notification.PROXIMITY.channelId
         )
             .setContentTitle(message)
@@ -146,12 +137,11 @@ class ProximityService : RobertProximityService() {
             .setSmallIcon(R.drawable.ic_notification_bar)
             .setContentIntent(pendingIntent)
             .build()
-        startForeground(
-            foregroundNotificationId,
-            NotificationCompat.Builder(this, UiConstants.Notification.PROXIMITY.channelId)
-                .build()
-        )
+    }
 
+    private fun sendNotification(message: String) {
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notification = buildNotification(message)
         notificationManager.notify(UiConstants.Notification.PROXIMITY.notificationId, notification)
     }
 
