@@ -204,7 +204,6 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
     }
 
     private val proximityInfoList = captionItem {
-        selectableText = true
         onClick = {
             toggleListDisplay()
         }

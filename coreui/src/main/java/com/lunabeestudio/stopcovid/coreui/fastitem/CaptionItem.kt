@@ -23,33 +23,16 @@ class CaptionItem : BaseItem<CaptionItem.ViewHolder>(
     var text: String? = null
     var gravity: Int = Gravity.NO_GRAVITY
     var onClick: (() -> Unit) = {}
-    var selectableText: Boolean = false
 
     override fun bindView(holder: ViewHolder, payloads: List<Any>) {
         super.bindView(holder, payloads)
         holder.textView.text = text.safeEmojiSpanify()
         holder.textView.gravity = gravity
         holder.textView.setOnClickListener { onClick() }
-        holder.textView.setTextIsSelectable(selectableText)
-        if (selectableText && onClick != {})
-            fixClickBehaviour(holder.textView)
     }
 
     class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {
         val textView: TextView = v.findViewById(R.id.textView)
-    }
-}
-
-// https://stackoverflow.com/a/55575523
-fun CaptionItem.fixClickBehaviour(textView: TextView) {
-    textView.run {
-        setOnClickListener(null)
-        setOnTouchListener { _, event ->
-            if (event.action == 1 && !hasSelection()) {
-                onClick()
-            }
-            false
-        }
     }
 }
 
