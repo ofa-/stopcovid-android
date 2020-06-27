@@ -1,0 +1,86 @@
+Third-party components licenses
+===============================
+
+
+Third-party components used in this project are subject to specific licenses.
+A copy of each individual license text can be found under licenses/.
+
+All third-party components are listed below, grouped by usage and license type.
+
+
+
++~~~~~~~~~~~~~~~~~~~~~~~~~+
+|                         |
+|  Third-party Libraries  |
+|                         |
++~~~~~~~~~~~~~~~~~~~~~~~~~+
+
+
+================================================================================
+Apache 2.0
+================================================================================
+
+Component: Kotlinx Coroutines
+License Text URL: https://github.com/Kotlin/kotlinx.coroutines/blob/master/LICENSE.txt
+Source Code: https://github.com/Kotlin/kotlinx.coroutines
+
+Component: Timber
+License Text URL: https://github.com/JakeWharton/timber/blob/master/LICENSE.txt
+Source Code: https://github.com/JakeWharton/timber
+
+================================================================================
+BSD 3-Clause
+================================================================================
+
+Component: Android Scanner Compat Library
+License Text URL: https://github.com/NordicSemiconductor/Android-Scanner-Compat-Library/blob/master/LICENSE
+Source Code: https://github.com/NordicSemiconductor/Android-Scanner-Compat-Library
+
+
+
++~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~+
+|                              |
+|  Third-party Test utilities  |
+|                              |
++~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~+
+
+
+================================================================================
+Apache 2.0
+================================================================================
+
+Component: Truth
+License Text URL: https://github.com/google/truth/blob/master/LICENSE
+Source Code: https://github.com/google/truth
+
+================================================================================
+EPL 1.0
+================================================================================
+
+Component: JUnit 4
+License Text URL: https://github.com/junit-team/junit4/blob/master/LICENSE-junit.txt
+Source Code: https://github.com/junit-team/junit4
+
+================================================================================
+LGPL 3.0
+================================================================================
+
+Component: Zohhak
+License Text URL: https://github.com/piotrturski/zohhak/blob/master/LICENSE-LGPL-3.0.txt
+Source Code: https://github.com/piotrturski/zohhak
+
+================================================================================
+MIT
+================================================================================
+
+Component: Mockito
+License Text URL: https://github.com/mockito/mockito/blob/release/3.x/LICENSE
+Source Code: https://github.com/mockito/mockito
+
+Component: Mockito Kotlin
+License Text URL: https://github.com/nhaarman/mockito-kotlin/blob/2.x/LICENSE
+Source Code: https://github.com/nhaarman/mockito-kotlin
+
+Component: Robolectric
+License Text URL: https://github.com/robolectric/robolectric/blob/master/LICENSE
+Source Code: https://github.com/robolectric/robolectric
