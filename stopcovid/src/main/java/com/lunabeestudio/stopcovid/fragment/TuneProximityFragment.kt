@@ -10,6 +10,9 @@
 
 package com.lunabeestudio.stopcovid.fragment
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.os.Bundle
 import android.os.SystemClock
 import android.text.*
@@ -17,6 +20,7 @@ import android.text.style.RelativeSizeSpan
 import android.util.Base64
 import android.view.Gravity
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.lunabeestudio.domain.extension.ntpTimeSToUnixTimeMs
 import com.lunabeestudio.domain.model.EphemeralBluetoothIdentifier
@@ -190,6 +194,15 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
         }
     }
 
+    private fun copyToClipboard(text: String) {
+        val clipboard = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val clip = ClipData.newPlainText("StopCovid proximity data", text)
+        clipboard.setPrimaryClip(clip)
+        Toast.makeText(context, strings["proximityController.toast.copied"], Toast.LENGTH_SHORT).also {
+            it.setGravity(Gravity.CENTER, 0, 0)
+        }.show()
+    }
+
     private val nbItemsCaption = captionItem {
         text = "..."
         gravity = Gravity.CENTER
@@ -206,6 +219,9 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
     private val proximityInfoList = captionItem {
         onClick = {
             toggleListDisplay()
+        }
+        onLongClick = {
+            copyToClipboard(this.text ?: "")
         }
     }
 
