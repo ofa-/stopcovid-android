@@ -23,12 +23,14 @@ class CaptionItem : BaseItem<CaptionItem.ViewHolder>(
     var text: String? = null
     var gravity: Int = Gravity.NO_GRAVITY
     var onClick: (() -> Unit) = {}
+    var onLongClick: (() -> Unit) = {}
 
     override fun bindView(holder: ViewHolder, payloads: List<Any>) {
         super.bindView(holder, payloads)
         holder.textView.text = text.safeEmojiSpanify()
         holder.textView.gravity = gravity
         holder.textView.setOnClickListener { onClick() }
+        holder.textView.setOnLongClickListener { onLongClick(); true }
     }
 
     class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {
