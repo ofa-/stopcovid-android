@@ -75,6 +75,7 @@
     "aboutController.opinionUrl": "https://voxusagers.numerique.gouv.fr/Demarches/2543?&view-mode=formulaire-avis&nd_mode=en-ligne-enti%C3%A8rement&nd_source=button&key=d209f7b2be0fca3de1df21eaeff49a97",
     "aboutController.appVersion": "Version %@ #%@",
     "proximityController.title": "Nähe",
+    "proximityController.toast.copied": "kopiert",
     "proximityController.switch.title": "StopCovid",
     "proximityController.mainMessage.subtitle": "Wenn Sie StopCovid aktivieren, werden Sie im Fall eines Ansteckungsrisikos informiert und informieren Ihre Mitmenschen. Auf diese Weise leisten Sie einen Beitrag zur Bekämpfung von COVID-19.",
     "proximityController.mainMessage.subtitle.off": "Wenn Sie StopCovid aktivieren, werden Sie im Fall eines Ansteckungsrisikos informiert und informieren Ihre Mitmenschen. Auf diese Weise leisten Sie einen Beitrag zur Bekämpfung von COVID-19.\nSie können StopCovid jederzeit aktivieren und deaktivieren.",
