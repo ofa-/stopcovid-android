@@ -29,7 +29,6 @@ import com.lunabeestudio.stopcovid.coreui.fastitem.dividerItem
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.mikepenz.fastadapter.GenericItem
 import kotlinx.coroutines.*
-import java.lang.IllegalStateException
 import java.text.SimpleDateFormat
 import java.util.Date
 import kotlin.math.min
