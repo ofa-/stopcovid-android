@@ -117,7 +117,6 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
     }
 
     private val nbDisplayedItems = 300
-    private val dateFormatter = SimpleDateFormat("E d MMM HH:mm:ss")
     private fun localProximityItemsToString(): String {
         return if (showFullList)
             fullList()
@@ -130,7 +129,7 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
             .slice(0 until min(nbDisplayedItems, localProximityItems.size))
             .joinToString("\n") {
                 listOf(
-                    formatDate(it),
+                    it.collectedTime.string,
                     it.ebidBase64,
                     it.calibratedRssi
                 ).joinToString(", ")
@@ -150,22 +149,16 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
             .joinToString("\n")
     }
 
-    private fun formatDate(it: LocalProximity): String {
-        return dateFormatter.format(Date(
-            it.collectedTime.ntpTimeSToUnixTimeMs()
-        ))
-    }
-
     private fun formatMainLine(it: LocalProximity): String {
         return "%s, %s".format(
-            formatDate(it),
+            it.collectedTime.string,
             it.ebidBase64
         )
     }
 
     private fun formatSummary(prev: LocalProximity, count: Int): String {
         return "%s, ... (%d)".format(
-            formatDate(prev),
+            prev.collectedTime.string,
             count
         )
     }
@@ -269,3 +262,10 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
         return items
     }
 }
+
+@android.annotation.SuppressLint("SimpleDateFormat")
+val dateFormatter = SimpleDateFormat("E d MMM HH:mm:ss")
+private val Long.string: String
+    get() {
+        return dateFormatter.format(Date(this.ntpTimeSToUnixTimeMs()))
+    }
