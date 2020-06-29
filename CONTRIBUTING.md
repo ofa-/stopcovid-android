@@ -13,6 +13,14 @@ Testing
 [tracker]: ../../issues  
 
 
+Fixing things
+-------------
+
+0. setup a dev environment
+1. hack the code
+2. test it works
+3. create a pull-request
+
 
 Building the app
 ----------------
