@@ -30,7 +30,6 @@ import com.lunabeestudio.robert.RobertApplication
 import com.lunabeestudio.robert.RobertManagerImpl
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.dividerItem
-import com.lunabeestudio.stopcovid.extension.robertManager
 import com.mikepenz.fastadapter.GenericItem
 import kotlinx.coroutines.*
 import java.text.SimpleDateFormat
@@ -44,8 +43,6 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
     private var localEbids = mutableListOf<EphemeralBluetoothIdentifier>()
 
     private fun initLocalProximityItems() {
-        val robertManager = (requireContext().robertManager() as RobertManagerImpl)
-
         localEbids = robertManager
             .getLocalEbids()
             .toMutableList()
@@ -67,6 +64,8 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        application = context?.applicationContext as RobertApplication
+        robertManager = application.robertManager as RobertManagerImpl
         CoroutineScope(Dispatchers.Default).launch {
             try { initLocalProximityItems() }
             catch (e: IllegalStateException) { return@launch }
@@ -74,8 +73,8 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
         }
     }
 
-    private val application: RobertApplication
-        get() = (requireContext().applicationContext as RobertApplication)
+    private lateinit var robertManager: RobertManagerImpl
+    private lateinit var application: RobertApplication
 
     override fun onDestroyView() {
         notificationObsoleter?.cancel()
@@ -112,7 +111,7 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
     }
 
     private fun getCurrentEbidBase64(): String {
-        val currentEbid = (requireContext().robertManager() as RobertManagerImpl).getCurrentEbid()
+        val currentEbid = robertManager.getCurrentEbid()
             ?: return " 🐭 "
         return Base64.encodeToString(currentEbid.ebid, Base64.NO_WRAP)
     }
@@ -183,14 +182,13 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
             return
         lastClick = SystemClock.elapsedRealtime()
 
-        val robertManager = requireContext().robertManager()
         if (robertManager.isProximityActive) {
-            robertManager.deactivateProximity(requireContext().applicationContext as RobertApplication)
+            robertManager.deactivateProximity(application)
             notificationObsoleter?.cancel()
             resetLastNotification(deactivated)
         }
         else CoroutineScope(Dispatchers.Default).launch {
-            robertManager.activateProximity(requireContext().applicationContext as RobertApplication, false)
+            robertManager.activateProximity(application, false)
             resetLastNotification()
         }
     }
