@@ -113,7 +113,8 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
 
     private fun getCurrentEbidBase64(): String {
         val currentEbid = (requireContext().robertManager() as RobertManagerImpl).getCurrentEbid()
-        return Base64.encodeToString(currentEbid?.ebid, Base64.NO_WRAP) ?: "no ebid"
+            ?: return " 🐭 "
+        return Base64.encodeToString(currentEbid.ebid, Base64.NO_WRAP)
     }
 
     private val nbDisplayedItems = 300
