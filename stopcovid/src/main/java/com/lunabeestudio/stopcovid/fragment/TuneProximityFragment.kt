@@ -63,6 +63,7 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setTopBarOnclick()
         application = context?.applicationContext as RobertApplication
         robertManager = application.robertManager as RobertManagerImpl
         CoroutineScope(Dispatchers.Default).launch {
@@ -75,9 +76,16 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
     private lateinit var robertManager: RobertManagerImpl
     private lateinit var application: RobertApplication
 
+    private fun setTopBarOnclick() {
+        getActivityBinding()?.toolbar?.setOnClickListener {
+            binding?.recyclerView?.smoothScrollToPosition(0)
+        }
+    }
+
     override fun onDestroyView() {
         notificationObsoleter?.cancel()
         application.registerListener(null)
+        getActivityBinding()?.toolbar?.setOnClickListener(null)
         super.onDestroyView()
     }
 
