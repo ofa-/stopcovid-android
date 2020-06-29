@@ -21,7 +21,6 @@ import android.util.Base64
 import android.view.Gravity
 import android.view.View
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import com.lunabeestudio.domain.extension.ntpTimeSToUnixTimeMs
 import com.lunabeestudio.domain.model.EphemeralBluetoothIdentifier
 import com.lunabeestudio.domain.model.LocalProximity
@@ -102,8 +101,11 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
 
     private fun updateTopBar() {
         val title = "%s  ".format(strings[getTitleKey()])
-        val ebid = "(%s)".format(getCurrentEbidBase64())
-        (activity as AppCompatActivity).supportActionBar?.title =
+        val ebid = when(robertManager.isProximityActive) {
+            true -> "(%s)".format(getCurrentEbidBase64())
+            false -> ""
+        }
+        getActivityBinding()?.toolbar?.title =
             SpannableString(title + ebid).also {
                 it.setSpan(RelativeSizeSpan(.6f), title.length, it.length,
                     Spannable.SPAN_EXCLUSIVE_INCLUSIVE)
