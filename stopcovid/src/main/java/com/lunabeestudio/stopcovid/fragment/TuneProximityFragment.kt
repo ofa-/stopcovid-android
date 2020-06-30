@@ -41,18 +41,6 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
     private var localProximityItems = mutableListOf<LocalProximity>()
     private var localEbids = mutableListOf<EphemeralBluetoothIdentifier>()
 
-    private fun initLocalProximityItems() {
-        localEbids = robertManager
-            .getLocalEbids()
-            .toMutableList()
-        localProximityItems = robertManager
-            .getLocalProximityItems(0)
-            .toMutableList()
-        localProximityItems.sortByDescending { it.collectedTime }
-
-        application.registerListener(this)
-    }
-
     override fun getTitleKey(): String = "tuneProximityController.title"
 
     private val deactivated = "(%s)".format(
@@ -62,13 +50,22 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
         super.onViewCreated(view, savedInstanceState)
         application = context?.applicationContext as RobertApplication
         robertManager = application.robertManager as RobertManagerImpl
+        localEbids
+            .addAll(robertManager.getLocalEbids())
         setTopBarOnclick()
         updateLastNotification()
         refreshItems()
+        application.registerListener(this)
+        initLocalProximityItems()
+    }
 
+    private fun initLocalProximityItems() {
         CoroutineScope(Dispatchers.Default).launch {
-            try { initLocalProximityItems() }
-            catch (e: IllegalStateException) { return@launch }
+            val items = robertManager
+                .getLocalProximityItems(0)
+                .toMutableList()
+            items.sortByDescending { it.collectedTime }
+            localProximityItems = items
             refreshItems()
         }
     }
