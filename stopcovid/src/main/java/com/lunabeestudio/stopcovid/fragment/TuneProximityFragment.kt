@@ -50,9 +50,6 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
             .toMutableList()
         localProximityItems.sortByDescending { it.collectedTime }
 
-        if (! robertManager.isProximityActive)
-            lastNotificationCaption.text = deactivated
-
         application.registerListener(this)
     }
 
@@ -63,9 +60,12 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setTopBarOnclick()
         application = context?.applicationContext as RobertApplication
         robertManager = application.robertManager as RobertManagerImpl
+        setTopBarOnclick()
+        updateLastNotification()
+        refreshItems()
+
         CoroutineScope(Dispatchers.Default).launch {
             try { initLocalProximityItems() }
             catch (e: IllegalStateException) { return@launch }
@@ -92,18 +92,39 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
     private fun refreshItems() {
         CoroutineScope(Dispatchers.Main).launch {
             synchronized(localProximityItems) {
-                nbItemsCaption.text = "ebids: %d  |  pairs: %d  |  pings: %d"
-                    .format(
-                        localEbids.count(),
-                        localProximityItems.groupBy { it.ebidBase64 }.count(),
-                        localProximityItems.count()
-                    )
-                proximityInfoList.text = localProximityItemsToString()
+                updateNbItems()
+                updateProximityList()
                 updateTopBar()
             }
-
             if (binding?.recyclerView?.isComputingLayout == false)
                 binding?.recyclerView?.adapter?.notifyDataSetChanged()
+        }
+    }
+
+    private fun updateNbItems() {
+        nbItemsCaption.text = "ebids: %d  |  pairs: %d  |  pings: %d"
+            .format(
+                localEbids.count(),
+                localProximityItems.groupBy { it.ebidBase64 }.count(),
+                localProximityItems.count()
+            )
+    }
+
+    private fun updateProximityList() {
+        proximityInfoList.text = when (showCompactList) {
+            true -> compactList()
+            false -> fullList()
+        }
+    }
+
+    private fun updateLastNotification(notification: LocalProximity) {
+        updateLastNotification("rssi: " + notification.calibratedRssi + "dBm")
+    }
+
+    private fun updateLastNotification(text: String = "-") {
+        lastNotificationCaption.text = when (robertManager.isProximityActive) {
+            true -> text
+            false -> deactivated
         }
     }
 
@@ -127,13 +148,6 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
     }
 
     private val nbDisplayedItems = 300
-    private fun localProximityItemsToString(): String {
-        return if (showFullList)
-            fullList()
-        else
-            compactList()
-    }
-
     private fun fullList(): String {
         return localProximityItems
             .slice(0 until min(nbDisplayedItems, localProximityItems.size))
@@ -173,9 +187,9 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
         )
     }
 
-    private var showFullList = false
+    private var showCompactList = true
     private fun toggleListDisplay() {
-        showFullList = ! showFullList
+        showCompactList = ! showCompactList
         refreshItems()
     }
 
@@ -231,7 +245,7 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
         (notification as com.orange.proximitynotification.ProximityInfo)
         .toLocalProximity()?.let {
             synchronized(lastNotificationCaption) {
-                lastNotificationCaption.text = "rssi: " + it.calibratedRssi + "dBm"
+                updateLastNotification(it)
             }
             synchronized(localProximityItems) {
                 localProximityItems.add(0, it)
@@ -243,7 +257,7 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
 
     private fun resetLastNotification(text: String = "-") {
         synchronized(lastNotificationCaption) {
-            lastNotificationCaption.text = text
+            updateLastNotification(text)
         }
         refreshItems()
     }
