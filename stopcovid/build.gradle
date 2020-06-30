@@ -42,8 +42,8 @@ android {
         applicationId "fr.gouv.android.stopcovid"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 38
-        versionName "1.1.0"
+        versionCode 39
+        versionName "1.1.1"
 
         testInstrumentationRunner = 'com.lunabeestudio.stopcovid.TestRunner'
 

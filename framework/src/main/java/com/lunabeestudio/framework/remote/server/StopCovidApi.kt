@@ -33,7 +33,7 @@ internal interface StopCovidApi {
     @POST("/api/{apiVersion}/captcha")
     suspend fun captcha(@Path("apiVersion") apiVersion: String, @Body captchaRQ: CaptchaRQ): Response<ApiCaptchaRS>
 
-    @GET("/api/{apiVersion}/captcha/{captchaId}/{type}}")
+    @GET("/api/{apiVersion}/captcha/{captchaId}/{type}")
     suspend fun getCaptcha(@Path("apiVersion") apiVersion: String,
         @Path("captchaId") captchaId: String,
         @Path("type") type: String): Response<ResponseBody>
