@@ -128,7 +128,7 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
     private fun updateTopBar() {
         val title = "%s  ".format(strings[getTitleKey()])
         val ebid = when(robertManager.isProximityActive) {
-            true -> "(%s)".format(getCurrentEbidBase64())
+            true -> "(%s)".format(getCurrentEbidBase64().substring(0..5))
             false -> ""
         }
         getActivityBinding()?.toolbar?.title =
@@ -173,7 +173,7 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
     private fun formatMainLine(it: LocalProximity): String {
         return "%s, %s".format(
             it.collectedTime.string,
-            it.ebidBase64
+            it.ebidBase64.substring(0..5)
         )
     }
 
