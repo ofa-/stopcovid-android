@@ -22,6 +22,7 @@ import android.view.Gravity
 import android.view.View
 import android.widget.Toast
 import com.lunabeestudio.domain.extension.ntpTimeSToUnixTimeMs
+import com.lunabeestudio.domain.extension.unixTimeMsToNtpTimeS
 import com.lunabeestudio.domain.model.EphemeralBluetoothIdentifier
 import com.lunabeestudio.domain.model.LocalProximity
 import com.lunabeestudio.framework.ble.extension.toLocalProximity
@@ -101,7 +102,7 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
     private fun updateNbItems() {
         nbItemsCaption.text = "ebids: %d  |  pairs: %d  |  pings: %d"
             .format(
-                localEbids.count(),
+                localEbids.filter { it.ntpEndTimeS > ntpNow }.count(),
                 localProximityItems.groupBy { it.ebidBase64 }.count(),
                 localProximityItems.count()
             )
@@ -128,7 +129,7 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
     private fun updateTopBar() {
         val title = "%s  ".format(strings[getTitleKey()])
         val ebid = when(robertManager.isProximityActive) {
-            true -> "(%s)".format(getCurrentEbidBase64().substring(0..5))
+            true -> "(%s)".format(currentEbidAsString())
             false -> ""
         }
         getActivityBinding()?.toolbar?.title =
@@ -138,10 +139,10 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
             }
     }
 
-    private fun getCurrentEbidBase64(): String {
-        val currentEbid = robertManager.getCurrentEbid()
-            ?: return " 🐭 "
-        return Base64.encodeToString(currentEbid.ebid, Base64.NO_WRAP)
+    private fun currentEbidAsString(): String {
+        return robertManager.getCurrentEbid()?.short
+            ?: "❣️ " + localEbids.lastOrNull()?.short
+            ?: " 🐭 "
     }
 
     private val nbDisplayedItems = 300
@@ -184,6 +185,13 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
         )
     }
 
+    private fun showRemainingEbids() {
+        proximityInfoList.text = localEbids
+            .filter { it.ntpEndTimeS > ntpNow }
+            .joinToString("\n") { it.string }
+        binding?.recyclerView?.adapter?.notifyDataSetChanged()
+    }
+
     private var showCompactList = true
     private fun toggleListDisplay() {
         showCompactList = ! showCompactList
@@ -217,13 +225,14 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
     }
 
     private val nbItemsCaption = captionItem {
-        text = "..."
         gravity = Gravity.CENTER
+        onClick = {
+            showRemainingEbids()
+        }
     }
 
     private val lastNotificationCaption = captionItem {
         gravity = Gravity.CENTER
-        text = "-"
         onClick = {
             toggleProximityScanner()
         }
@@ -290,3 +299,20 @@ private val Long.string: String
     get() {
         return dateFormatter.format(Date(this.ntpTimeSToUnixTimeMs()))
     }
+
+private val EphemeralBluetoothIdentifier.string: String
+    get() {
+        return "%s, %s".format(
+            this.ntpStartTimeS.string,
+            this.short
+        )
+    }
+
+private val EphemeralBluetoothIdentifier.base64: String
+    get() { return Base64.encodeToString(this.ebid, Base64.NO_WRAP) }
+
+private val EphemeralBluetoothIdentifier.short: String
+    get() { return this.base64.substring(0..5) }
+
+private val ntpNow: Long
+    get() { return System.currentTimeMillis().unixTimeMsToNtpTimeS() }
