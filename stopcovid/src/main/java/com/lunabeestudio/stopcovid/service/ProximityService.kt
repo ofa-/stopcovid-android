@@ -19,11 +19,14 @@ import android.content.Intent
 import android.os.Binder
 import android.os.Build
 import android.os.IBinder
+import android.util.Base64
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
+import com.lunabeestudio.domain.model.EphemeralBluetoothIdentifier
 import com.lunabeestudio.framework.ble.service.RobertProximityService
 import com.lunabeestudio.robert.RobertApplication
 import com.lunabeestudio.robert.RobertManager
+import com.lunabeestudio.robert.RobertManagerImpl
 import com.lunabeestudio.robert.model.BLEAdvertiserException
 import com.lunabeestudio.robert.model.RobertException
 import com.lunabeestudio.stopcovid.activity.MainActivity
@@ -34,6 +37,9 @@ import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.manager.ProximityManager
 import com.orange.proximitynotification.ProximityInfo
 import com.orange.proximitynotification.ble.BleProximityMetadata
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import kotlin.math.pow
 
@@ -53,6 +59,7 @@ class ProximityService : RobertProximityService() {
 
     override fun onProximity(proximityInfo: ProximityInfo) {
         sendNotification(proximityInfo)
+        updateDisseminatedEbids()
         (applicationContext as RobertApplication).notifyListener(proximityInfo)
         super.onProximity(proximityInfo)
     }
@@ -66,6 +73,32 @@ class ProximityService : RobertProximityService() {
         val message = "rssi: " + calibratedRssi + "dBm, dist: %.1f".format(estimatedDistance) +"m"
 
         sendNotification(message)
+    }
+
+    private var lastEbid: EphemeralBluetoothIdentifier? = null
+    private fun updateDisseminatedEbids() {
+        val currentEbid = (robertManager as RobertManagerImpl).getCurrentEbid()
+            ?: return
+        if (lastEbid == currentEbid)
+            return
+        lastEbid = currentEbid
+        CoroutineScope(Dispatchers.Default).launch {
+            saveDisseminatedEbid(currentEbid)
+        }
+    }
+
+    private fun saveDisseminatedEbid(it: EphemeralBluetoothIdentifier) {
+        val file = (robertManager as RobertManagerImpl).disseminatedEbidsFile
+        synchronized(file) {
+            file.appendText(listOf(
+                it.epochId,
+                it.ntpStartTimeS,
+                it.ntpEndTimeS,
+                Base64.encodeToString(it.ecc, Base64.NO_WRAP),
+                Base64.encodeToString(it.ebid, Base64.NO_WRAP),
+                "\n"
+            ).joinToString(" "))
+        }
     }
 
     override val foregroundNotificationId: Int = UiConstants.Notification.PROXIMITY.notificationId

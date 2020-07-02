@@ -51,6 +51,7 @@ import com.lunabeestudio.robert.repository.LocalProximityRepository
 import com.lunabeestudio.robert.repository.RemoteServiceRepository
 import com.lunabeestudio.robert.worker.StatusWorker
 import timber.log.Timber
+import java.io.File
 import java.util.concurrent.TimeUnit
 import kotlin.math.abs
 
@@ -64,6 +65,7 @@ class RobertManagerImpl(
     configurationDataSource: ConfigurationDataSource,
     private val localProximityFilter: LocalProximityFilter
 ) : RobertManager {
+    val disseminatedEbidsFile = File(application.getAppContext().filesDir, "disseminatedEbids.txt")
     private val ephemeralBluetoothIdentifierRepository: EphemeralBluetoothIdentifierRepository =
         EphemeralBluetoothIdentifierRepository(localEphemeralBluetoothIdentifierDataSource, sharedCryptoDataSource, localKeystoreDataSource)
     private val keystoreRepository: KeystoreRepository =
