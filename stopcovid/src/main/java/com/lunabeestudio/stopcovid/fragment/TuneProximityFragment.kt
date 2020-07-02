@@ -32,6 +32,7 @@ import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.dividerItem
 import com.mikepenz.fastadapter.GenericItem
 import kotlinx.coroutines.*
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import kotlin.math.min
@@ -216,6 +217,37 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
         refresh()
     }
 
+    private var isLoading = false
+    private fun showDisseminatedEbids() {
+        val file = robertManager.disseminatedEbidsFile
+        if (!file.exists()) return toast("no file")
+        if (isLoading) return toast("loading...")
+        isLoading = true
+        CoroutineScope(Dispatchers.Default).launch {
+            proximityInfoList
+                .text = loadDisseminatedEbids(file)
+                    .reversed()
+                    .joinToString("\n") { it.string }
+            refresh()
+            isLoading = false
+        }
+    }
+
+    private fun loadDisseminatedEbids(file: File): List<EphemeralBluetoothIdentifier> {
+        return synchronized(file) {
+            file.readLines().map {
+                val line = it.split(" ")
+                EphemeralBluetoothIdentifier(
+                    epochId = line[0].toLong(),
+                    ntpStartTimeS = line[1].toLong(),
+                    ntpEndTimeS = line[2].toLong(),
+                    ecc = Base64.decode(line[3], Base64.NO_WRAP),
+                    ebid = Base64.decode(line[4], Base64.NO_WRAP)
+                )
+            }
+        }
+    }
+
     private var showCompactList = true
     private fun toggleListDisplay() {
         showCompactList = ! showCompactList
@@ -256,6 +288,9 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
         gravity = Gravity.CENTER
         onClick = {
             showRemainingEbids()
+        }
+        onLongClick = {
+            showDisseminatedEbids()
         }
     }
 
