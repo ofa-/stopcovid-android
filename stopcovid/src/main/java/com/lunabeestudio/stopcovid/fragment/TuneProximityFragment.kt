@@ -61,13 +61,31 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
     }
 
     private fun initLocalProximityItems() {
+        val anim = loadingAnimation()
         CoroutineScope(Dispatchers.Default).launch {
             val items = robertManager
                 .getLocalProximityItems(0)
                 .toMutableList()
             items.sortByDescending { it.collectedTime }
+            anim.cancel()
             localProximityItems = items
             refreshItems()
+        }
+    }
+
+    private fun loadingAnimation(): Job {
+        return CoroutineScope(Dispatchers.Default).launch {
+            val anim = mutableListOf("  .  ", " o ", " O ", "😺", " O ", " o ")
+            while (true) {
+                nbItemsCaption.text = "ebids: %d  |  pairs: %s  |  pings: -"
+                    .format(
+                        localEbids.filter { it.ntpEndTimeS > ntpNow }.count(),
+                        anim.first()
+                    )
+                refresh()
+                delay(200)
+                anim.add(anim.removeAt(0))
+            }
         }
     }
 
