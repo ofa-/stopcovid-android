@@ -52,6 +52,12 @@ class ProximityService : RobertProximityService() {
     }
 
     override fun onProximity(proximityInfo: ProximityInfo) {
+        sendNotification(proximityInfo)
+        (applicationContext as RobertApplication).notifyListener(proximityInfo)
+        super.onProximity(proximityInfo)
+    }
+
+    private fun sendNotification(proximityInfo: ProximityInfo) {
         val calibratedRssi = (proximityInfo.metadata as BleProximityMetadata).calibratedRssi
         val rssi1m = -70
         val bleAtt = 2.2
@@ -60,8 +66,6 @@ class ProximityService : RobertProximityService() {
         val message = "rssi: " + calibratedRssi + "dBm, dist: %.1f".format(estimatedDistance) +"m"
 
         sendNotification(message)
-        (applicationContext as RobertApplication).notifyListener(proximityInfo)
-        super.onProximity(proximityInfo)
     }
 
     override val foregroundNotificationId: Int = UiConstants.Notification.PROXIMITY.notificationId
