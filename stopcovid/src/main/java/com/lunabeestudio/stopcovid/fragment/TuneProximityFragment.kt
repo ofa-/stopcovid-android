@@ -94,8 +94,14 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
                 updateProximityList()
                 updateTopBar()
             }
-            if (binding?.recyclerView?.isComputingLayout == false)
-                binding?.recyclerView?.adapter?.notifyDataSetChanged()
+        }
+        refresh()
+    }
+
+    private fun refresh() {
+        CoroutineScope(Dispatchers.Main).launch {
+            // if (binding?.recyclerView?.isComputingLayout == false)
+            binding?.recyclerView?.adapter?.notifyDataSetChanged()
         }
     }
 
@@ -189,7 +195,7 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
         proximityInfoList.text = localEbids
             .filter { it.ntpEndTimeS > ntpNow }
             .joinToString("\n") { it.string }
-        binding?.recyclerView?.adapter?.notifyDataSetChanged()
+        refresh()
     }
 
     private var showCompactList = true
@@ -219,7 +225,11 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
         val clipboard = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val clip = ClipData.newPlainText("StopCovid proximity data", text)
         clipboard.setPrimaryClip(clip)
-        Toast.makeText(context, strings["proximityController.toast.copied"], Toast.LENGTH_SHORT).also {
+        toast(strings["proximityController.toast.copied"])
+    }
+
+    private fun toast(text: String?) {
+        Toast.makeText(context, text, Toast.LENGTH_SHORT).also {
             it.setGravity(Gravity.CENTER, 0, 0)
         }.show()
     }
