@@ -79,6 +79,7 @@ class BleProximityNotification(
         if (isRunning) {
             stopAdvertiser()
             startAdvertiser()
+            startScanner() // make onProximity fire also while sleeping
         }
     }
 
