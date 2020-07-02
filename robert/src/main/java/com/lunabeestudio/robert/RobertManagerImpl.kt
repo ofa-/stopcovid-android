@@ -175,7 +175,7 @@ class RobertManagerImpl(
     override suspend fun getCaptchaAudio(captchaId: String,
         path: String): RobertResult = remoteServiceRepository.getCaptchaAudio(apiVersion, captchaId, path)
 
-    override suspend fun registerV2(application: RobertApplication, captcha: String, captchaId: String): RobertResult {
+    override suspend fun register(application: RobertApplication, captcha: String, captchaId: String): RobertResult {
         val configResult = remoteServiceRepository.fetchConfig(application.getAppContext())
 
         return when (configResult) {
@@ -185,34 +185,6 @@ class RobertManagerImpl(
                     RobertResult.Failure(RobertUnknownException())
                 } else {
                     val registerResult = remoteServiceRepository.registerV2(apiVersion, captcha, captchaId)
-                    when (registerResult) {
-                        is RobertResultData.Success -> {
-                            finishRegister(application, registerResult.data, configResult.data)
-                        }
-                        is RobertResultData.Failure -> {
-                            clearLocalData(application)
-                            RobertResult.Failure(registerResult.error)
-                        }
-                    }
-                }
-            }
-            is RobertResultData.Failure -> {
-                clearLocalData(application)
-                RobertResult.Failure(configResult.error)
-            }
-        }
-    }
-
-    override suspend fun register(application: RobertApplication, captcha: String): RobertResult {
-        val configResult = remoteServiceRepository.fetchConfig(application.getAppContext())
-
-        return when (configResult) {
-            is RobertResultData.Success -> {
-                if (configResult.data.isNullOrEmpty()) {
-                    clearLocalData(application)
-                    RobertResult.Failure(RobertUnknownException())
-                } else {
-                    val registerResult = remoteServiceRepository.register(apiVersion, captcha)
                     when (registerResult) {
                         is RobertResultData.Success -> {
                             finishRegister(application, registerResult.data, configResult.data)

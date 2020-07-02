@@ -64,9 +64,7 @@ interface RobertManager {
 
     suspend fun getCaptchaAudio(captchaId: String, path: String): RobertResult
 
-    suspend fun registerV2(application: RobertApplication, captcha: String, captchaId: String): RobertResult
-
-    suspend fun register(application: RobertApplication, captcha: String): RobertResult
+    suspend fun register(application: RobertApplication, captcha: String, captchaId: String): RobertResult
 
     suspend fun activateProximity(application: RobertApplication, statusTried: Boolean = false): RobertResult
 

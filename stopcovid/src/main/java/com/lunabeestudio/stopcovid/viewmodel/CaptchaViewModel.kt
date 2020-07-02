@@ -87,7 +87,7 @@ class CaptchaViewModel(private val robertManager: RobertManager) : ViewModel() {
         if (loadingInProgress.value == false) {
             viewModelScope.launch(Dispatchers.IO) {
                 loadingInProgress.postValue(true)
-                val result = robertManager.registerV2(application, code, captchaId)
+                val result = robertManager.register(application, code, captchaId)
                 loadingInProgress.postValue(false)
                 when (result) {
                     is RobertResult.Success -> codeSuccess.postValue(null)
