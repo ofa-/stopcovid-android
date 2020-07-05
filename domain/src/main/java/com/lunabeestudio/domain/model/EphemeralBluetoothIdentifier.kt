@@ -70,5 +70,28 @@ data class EphemeralBluetoothIdentifier(
 
             return ebids
         }
+
+        fun fromString(string: String): EphemeralBluetoothIdentifier {
+            val line = string.split(" ")
+            return EphemeralBluetoothIdentifier(
+                epochId = line[0].toLong(radix),
+                ntpStartTimeS = line[1].toLong(radix),
+                ntpEndTimeS = line[2].toLong(radix),
+                ecc = Base64.decode(line[3], Base64.NO_WRAP),
+                ebid = Base64.decode(line[4], Base64.NO_WRAP)
+            )
+        }
+
+        private const val radix = 10 // could be 36
+    }
+
+    fun asString(): String {
+        return listOf(
+            epochId.toString(radix),
+            ntpStartTimeS.toString(radix),
+            ntpEndTimeS.toString(radix),
+            Base64.encodeToString(ecc, Base64.NO_WRAP),
+            Base64.encodeToString(ebid, Base64.NO_WRAP)
+        ).joinToString(" ")
     }
 }

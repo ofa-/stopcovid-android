@@ -19,7 +19,6 @@ import android.content.Intent
 import android.os.Binder
 import android.os.Build
 import android.os.IBinder
-import android.util.Base64
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.lunabeestudio.domain.model.EphemeralBluetoothIdentifier
@@ -90,14 +89,7 @@ class ProximityService : RobertProximityService() {
     private fun saveDisseminatedEbid(it: EphemeralBluetoothIdentifier) {
         val file = (robertManager as RobertManagerImpl).disseminatedEbidsFile
         synchronized(file) {
-            file.appendText(listOf(
-                it.epochId,
-                it.ntpStartTimeS,
-                it.ntpEndTimeS,
-                Base64.encodeToString(it.ecc, Base64.NO_WRAP),
-                Base64.encodeToString(it.ebid, Base64.NO_WRAP),
-                "\n"
-            ).joinToString(" "))
+            file.appendText(it.asString() + "\n")
         }
     }
 
