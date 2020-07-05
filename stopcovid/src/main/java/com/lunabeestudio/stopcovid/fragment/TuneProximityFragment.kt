@@ -64,13 +64,39 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
     private fun initLocalProximityItems() {
         val anim = loadingAnimation()
         CoroutineScope(Dispatchers.Default).launch {
-            val items = robertManager
-                .getLocalProximityItems(0)
-                .toMutableList()
-            items.sortByDescending { it.collectedTime }
+            val items = getLocalProximityData()
             anim.cancel()
             localProximityItems = items
             refreshItems()
+        }
+    }
+
+    private fun getLocalProximityData(): MutableList<LocalProximity> {
+        return if (robertManager.localProximityFile.exists()) {
+            readFromLocalFile().reversed().toMutableList()
+        }
+        else {
+            val items =
+                robertManager
+                    .getLocalProximityItems(0)
+                    .sortedBy { it.collectedTime }
+            saveToLocalFile(items)
+            items.reversed().toMutableList()
+        }
+    }
+
+    private fun readFromLocalFile(): List<LocalProximity> {
+        return robertManager.localProximityFile.readLines()
+            .map {
+                localProximityFromString(it)
+            }
+    }
+
+    private fun saveToLocalFile(items: List<LocalProximity>) {
+        items.forEach {
+            robertManager.localProximityFile.appendText(
+                localProximityToString(it).plus("\n")
+            )
         }
     }
 
@@ -347,6 +373,31 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
 
         return items
     }
+}
+
+fun localProximityFromString(it: String): LocalProximity {
+    val data = it.split(" ")
+    return LocalProximity(
+        collectedTime = data[0].toLong(36),
+        ebidBase64 = data[1],
+        eccBase64 = data[2],
+        macBase64 = data[3],
+        helloTime = data[4].toInt(36),
+        calibratedRssi = data[5].toInt(36),
+        rawRssi = data[6].toInt(36)
+    )
+}
+
+fun localProximityToString(it: LocalProximity): String {
+    return listOf(
+        it.collectedTime.toString(36),
+        it.ebidBase64,
+        it.eccBase64,
+        it.macBase64,
+        it.helloTime.toString(36),
+        it.calibratedRssi.toString(36),
+        it.rawRssi.toString(36)
+    ).joinToString(" ")
 }
 
 @android.annotation.SuppressLint("SimpleDateFormat")

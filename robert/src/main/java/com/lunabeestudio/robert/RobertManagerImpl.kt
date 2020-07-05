@@ -66,6 +66,8 @@ class RobertManagerImpl(
     private val localProximityFilter: LocalProximityFilter
 ) : RobertManager {
     val disseminatedEbidsFile = File(application.getAppContext().filesDir, "disseminatedEbids.txt")
+    val localProximityFile = File(application.getAppContext().filesDir, "localProximity.txt")
+
     private val ephemeralBluetoothIdentifierRepository: EphemeralBluetoothIdentifierRepository =
         EphemeralBluetoothIdentifierRepository(localEphemeralBluetoothIdentifierDataSource, sharedCryptoDataSource, localKeystoreDataSource)
     private val keystoreRepository: KeystoreRepository =
