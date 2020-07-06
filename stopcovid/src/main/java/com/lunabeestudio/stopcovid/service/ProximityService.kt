@@ -22,6 +22,7 @@ import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.lunabeestudio.domain.model.EphemeralBluetoothIdentifier
+import com.lunabeestudio.framework.ble.extension.toLocalProximity
 import com.lunabeestudio.framework.ble.service.RobertProximityService
 import com.lunabeestudio.robert.RobertApplication
 import com.lunabeestudio.robert.RobertManager
@@ -33,6 +34,7 @@ import com.lunabeestudio.stopcovid.coreui.R
 import com.lunabeestudio.stopcovid.coreui.UiConstants
 import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
 import com.lunabeestudio.stopcovid.extension.robertManager
+import com.lunabeestudio.stopcovid.fragment.localProximityToString
 import com.lunabeestudio.stopcovid.manager.ProximityManager
 import com.orange.proximitynotification.ProximityInfo
 import com.orange.proximitynotification.ble.BleProximityMetadata
@@ -59,6 +61,7 @@ class ProximityService : RobertProximityService() {
     override fun onProximity(proximityInfo: ProximityInfo) {
         sendNotification(proximityInfo)
         updateDisseminatedEbids()
+        storeLocalProximity(proximityInfo)
         (applicationContext as RobertApplication).notifyListener(proximityInfo)
         super.onProximity(proximityInfo)
     }
@@ -90,6 +93,16 @@ class ProximityService : RobertProximityService() {
         val file = (robertManager as RobertManagerImpl).disseminatedEbidsFile
         synchronized(file) {
             file.appendText(it.asString() + "\n")
+        }
+    }
+
+    private fun storeLocalProximity(it: ProximityInfo) {
+        val info = it.toLocalProximity() ?: return
+        val file = (robertManager as RobertManagerImpl).localProximityFile
+        CoroutineScope(Dispatchers.Default).launch {
+            synchronized(file) {
+                file.appendText(localProximityToString(info).plus("\n"))
+            }
         }
     }
 

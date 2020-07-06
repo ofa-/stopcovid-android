@@ -86,10 +86,12 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
     }
 
     private fun readFromLocalFile(): List<LocalProximity> {
-        return robertManager.localProximityFile.readLines()
-            .map {
+        val file = robertManager.localProximityFile
+        synchronized(file) {
+            return file.readLines().map {
                 localProximityFromString(it)
             }
+        }
     }
 
     private fun saveToLocalFile(items: List<LocalProximity>) {
