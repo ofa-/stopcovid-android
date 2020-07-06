@@ -204,7 +204,7 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
             .slice(0 until min(nbDisplayedItems, localProximityItems.size))
             .joinToString("\n") {
                 listOf(
-                    it.collectedTime.string,
+                    it.collectedTime.longDate,
                     it.ebidBase64,
                     it.calibratedRssi
                 ).joinToString(", ")
@@ -226,14 +226,14 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
 
     private fun formatMainLine(it: LocalProximity): String {
         return "%s, %s".format(
-            it.collectedTime.string,
+            it.collectedTime.longDate,
             it.ebidBase64.substring(0..5)
         )
     }
 
     private fun formatSummary(prev: LocalProximity, count: Int): String {
         return "%s, ... (%d)".format(
-            prev.collectedTime.string,
+            prev.collectedTime.longDate,
             count
         )
     }
@@ -404,15 +404,22 @@ fun localProximityToString(it: LocalProximity): String {
 
 @android.annotation.SuppressLint("SimpleDateFormat")
 val dateFormatter = SimpleDateFormat("E d MMM HH:mm:ss")
-private val Long.string: String
+private val Long.longDate: String
     get() {
         return dateFormatter.format(Date(this.ntpTimeSToUnixTimeMs()))
+    }
+
+private val Long.shortDate: String
+    @android.annotation.SuppressLint("SimpleDateFormat")
+    get() {
+        return SimpleDateFormat("E d MMM HH:mm").format(
+            this.ntpTimeSToUnixTimeMs() + if (this % 60 > 30) 30000 else 0)
     }
 
 private val EphemeralBluetoothIdentifier.string: String
     get() {
         return "%s, %s".format(
-            this.ntpStartTimeS.string,
+            this.ntpStartTimeS.longDate,
             this.short
         )
     }
