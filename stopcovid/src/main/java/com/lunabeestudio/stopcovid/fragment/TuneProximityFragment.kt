@@ -215,27 +215,17 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
         return localProximityItems
             .groupBy { it.ebidBase64 }
             .map { (_, group) ->
-                formatMainLine(group.first()) +
-                if (group.size > 1)
-                    "\n" + formatSummary(group.last(), group.size)
-                else
-                    ""
+                val it = group.last()
+                val duration = group.first().collectedTime - it.collectedTime
+                "%s [%d'%02d\"] %s (%d)".format(
+                    it.collectedTime.shortDate,
+                    duration / 60,
+                    duration % 60,
+                    it.ebidBase64.substring(0..5),
+                    group.count()
+                )
             }
             .joinToString("\n")
-    }
-
-    private fun formatMainLine(it: LocalProximity): String {
-        return "%s, %s".format(
-            it.collectedTime.longDate,
-            it.ebidBase64.substring(0..5)
-        )
-    }
-
-    private fun formatSummary(prev: LocalProximity, count: Int): String {
-        return "%s, ... (%d)".format(
-            prev.collectedTime.longDate,
-            count
-        )
     }
 
     private fun showRemainingEbids() {
