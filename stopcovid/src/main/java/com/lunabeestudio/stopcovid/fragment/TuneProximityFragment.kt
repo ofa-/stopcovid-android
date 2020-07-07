@@ -316,7 +316,7 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
 
     private val lastNotificationCaption = captionItem {
         gravity = Gravity.CENTER
-        onClick = {
+        onLongClick = {
             toggleProximityScanner()
         }
     }
