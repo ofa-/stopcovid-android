@@ -38,9 +38,7 @@ import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.manager.ProximityManager
 import com.orange.proximitynotification.ProximityInfo
 import com.orange.proximitynotification.ble.BleProximityMetadata
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import timber.log.Timber
 import kotlin.math.pow
 
@@ -62,6 +60,7 @@ class ProximityService : RobertProximityService() {
         sendNotification(proximityInfo)
         updateDisseminatedEbids()
         storeLocalProximity(proximityInfo)
+        spawnNotificationObsoleter()
         (applicationContext as RobertApplication).notifyListener(proximityInfo)
         super.onProximity(proximityInfo)
     }
@@ -103,6 +102,17 @@ class ProximityService : RobertProximityService() {
             synchronized(file) {
                 file.appendText(localProximityToString(info).plus("\n"))
             }
+        }
+    }
+
+    private var notificationObsoleter: Job? = null
+    private fun spawnNotificationObsoleter() {
+        notificationObsoleter?.cancel()
+        notificationObsoleter = CoroutineScope(Dispatchers.Default).launch {
+            try { delay(20000) }
+            catch (e: CancellationException) { return@launch }
+            if (robertManager.isProximityActive)
+                sendNotification("")
         }
     }
 
@@ -172,7 +182,7 @@ class ProximityService : RobertProximityService() {
         return NotificationCompat.Builder(this,
             UiConstants.Notification.PROXIMITY.channelId
         )
-            .setContentTitle(message)
+            .also { if (message != "") it.setContentTitle(message) }
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setVisibility(NotificationCompat.VISIBILITY_SECRET)
             .setAutoCancel(true)
