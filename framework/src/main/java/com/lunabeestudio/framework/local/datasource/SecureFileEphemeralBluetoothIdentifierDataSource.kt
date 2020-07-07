@@ -41,7 +41,11 @@ class SecureFileEphemeralBluetoothIdentifierDataSource(
     @WorkerThread
     override fun getAll(): List<EphemeralBluetoothIdentifier> {
         return if (epochFile.exists()) {
-            val json = cryptoManager.decryptToString(epochFile)
+            val json = try {
+                cryptoManager.decryptToString(epochFile)
+            } catch (e: Throwable) {
+                return emptyList()
+            }
             gson.fromJson(json, gsonEphemeralBluetoothIdentifierListType)
         } else {
             emptyList()
