@@ -26,6 +26,8 @@ import com.lunabeestudio.domain.extension.unixTimeMsToNtpTimeS
 import com.lunabeestudio.domain.model.EphemeralBluetoothIdentifier
 import com.lunabeestudio.domain.model.LocalProximity
 import com.lunabeestudio.framework.ble.extension.toLocalProximity
+import com.lunabeestudio.framework.extension.localProximityFromString
+import com.lunabeestudio.framework.extension.localProximityToString
 import com.lunabeestudio.robert.RobertApplication
 import com.lunabeestudio.robert.RobertManagerImpl
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
@@ -365,31 +367,6 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
 
         return items
     }
-}
-
-fun localProximityFromString(it: String): LocalProximity {
-    val data = it.split(" ")
-    return LocalProximity(
-        collectedTime = data[0].toLong(36),
-        ebidBase64 = data[1],
-        eccBase64 = data[2],
-        macBase64 = data[3],
-        helloTime = data[4].toInt(36),
-        calibratedRssi = data[5].toInt(36),
-        rawRssi = data[6].toInt(36)
-    )
-}
-
-fun localProximityToString(it: LocalProximity): String {
-    return listOf(
-        it.collectedTime.toString(36),
-        it.ebidBase64,
-        it.eccBase64,
-        it.macBase64,
-        it.helloTime.toString(36),
-        it.calibratedRssi.toString(36),
-        it.rawRssi.toString(36)
-    ).joinToString(" ")
 }
 
 @android.annotation.SuppressLint("SimpleDateFormat")

@@ -42,3 +42,28 @@ fun ProtoStorage.LocalProximityProtoList.toDomain(): List<LocalProximity> =
     localProximityProtoListList.map {
         it.toDomain()
     }
+
+fun localProximityFromString(it: String): LocalProximity {
+    val data = it.split(" ")
+    return LocalProximity(
+        collectedTime = data[0].toLong(36),
+        ebidBase64 = data[1],
+        eccBase64 = data[2],
+        macBase64 = data[3],
+        helloTime = data[4].toInt(36),
+        calibratedRssi = data[5].toInt(36),
+        rawRssi = data[6].toInt(36)
+    )
+}
+
+fun localProximityToString(it: LocalProximity): String {
+    return listOf(
+        it.collectedTime.toString(36),
+        it.ebidBase64,
+        it.eccBase64,
+        it.macBase64,
+        it.helloTime.toString(36),
+        it.calibratedRssi.toString(36),
+        it.rawRssi.toString(36)
+    ).joinToString(" ")
+}

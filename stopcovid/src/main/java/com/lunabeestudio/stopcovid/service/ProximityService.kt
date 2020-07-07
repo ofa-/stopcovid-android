@@ -24,6 +24,7 @@ import androidx.core.content.ContextCompat
 import com.lunabeestudio.domain.model.EphemeralBluetoothIdentifier
 import com.lunabeestudio.framework.ble.extension.toLocalProximity
 import com.lunabeestudio.framework.ble.service.RobertProximityService
+import com.lunabeestudio.framework.extension.localProximityToString
 import com.lunabeestudio.robert.RobertApplication
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.robert.RobertManagerImpl
@@ -34,7 +35,6 @@ import com.lunabeestudio.stopcovid.coreui.R
 import com.lunabeestudio.stopcovid.coreui.UiConstants
 import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
 import com.lunabeestudio.stopcovid.extension.robertManager
-import com.lunabeestudio.stopcovid.fragment.localProximityToString
 import com.lunabeestudio.stopcovid.manager.ProximityManager
 import com.orange.proximitynotification.ProximityInfo
 import com.orange.proximitynotification.ble.BleProximityMetadata
