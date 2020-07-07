@@ -259,8 +259,11 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
 
     private fun loadDisseminatedEbids(file: File): List<EphemeralBluetoothIdentifier> {
         return synchronized(file) {
-            file.readLines().map {
-                EphemeralBluetoothIdentifier.fromString(it)
+            file.readLines().mapNotNull {
+                try {
+                    EphemeralBluetoothIdentifier.fromString(it)
+                }
+                catch (e: Throwable) { null }
             }
         }
     }
