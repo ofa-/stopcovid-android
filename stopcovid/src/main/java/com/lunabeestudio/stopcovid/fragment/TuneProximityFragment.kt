@@ -112,9 +112,8 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
         return CoroutineScope(Dispatchers.Default).launch {
             val anim = mutableListOf("  .  ", " o ", " O ", "😺", " O ", " o ")
             while (true) {
-                nbItemsCaption.text = "ebids: %d  |  pairs: %s  |  pings: -"
+                nbItemsCaption.text = "ebids: -  |  pairs: %s  |  pings: -"
                     .format(
-                        localEbids.filter { it.ntpEndTimeS > ntpNow }.count(),
                         anim.first()
                     )
                 refresh()
