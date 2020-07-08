@@ -311,6 +311,7 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
         onLongClick = {
             showDisseminatedEbids()
         }
+        ripple = true
     }
 
     private val lastNotificationCaption = captionItem {
@@ -318,6 +319,7 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
         onLongClick = {
             toggleProximityScanner()
         }
+        ripple = true
     }
 
     private val proximityInfoList = captionItem {

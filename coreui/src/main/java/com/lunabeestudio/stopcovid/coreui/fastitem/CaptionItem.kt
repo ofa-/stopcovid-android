@@ -15,6 +15,7 @@ import android.view.View
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.lunabeestudio.stopcovid.coreui.R
+import com.lunabeestudio.stopcovid.coreui.extension.addRipple
 import com.lunabeestudio.stopcovid.coreui.extension.safeEmojiSpanify
 
 class CaptionItem : BaseItem<CaptionItem.ViewHolder>(
@@ -24,6 +25,7 @@ class CaptionItem : BaseItem<CaptionItem.ViewHolder>(
     var gravity: Int = Gravity.NO_GRAVITY
     var onClick: (() -> Unit) = {}
     var onLongClick: (() -> Unit) = {}
+    var ripple = false
 
     override fun bindView(holder: ViewHolder, payloads: List<Any>) {
         super.bindView(holder, payloads)
@@ -31,6 +33,7 @@ class CaptionItem : BaseItem<CaptionItem.ViewHolder>(
         holder.textView.gravity = gravity
         holder.textView.setOnClickListener { onClick() }
         holder.textView.setOnLongClickListener { onLongClick(); true }
+        if (ripple) holder.textView.addRipple()
     }
 
     class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {
