@@ -217,13 +217,19 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
     }
 
     private fun compactList(): String {
+        var currentDay = ""
         return localProximityItems
             .groupBy { it.ebidBase64 }
             .map { (_, group) ->
                 val it = group.last()
                 val duration = group.first().collectedTime - it.collectedTime
+                val dayHeader = it.collectedTime.dateHeader
+                if (dayHeader != currentDay) {
+                    currentDay = dayHeader
+                    dayHeader + "\n"
+                } else { "" } +
                 "%s [%d'%02d\"] %s (%d)".format(
-                    it.collectedTime.shortDate,
+                    it.collectedTime.shortTime,
                     duration / 60,
                     duration % 60,
                     it.ebidBase64.substring(0..5),
@@ -384,11 +390,18 @@ private val Long.longDate: String
         return dateFormatter.format(Date(this.ntpTimeSToUnixTimeMs()))
     }
 
-private val Long.shortDate: String
+private val Long.shortTime: String
     @android.annotation.SuppressLint("SimpleDateFormat")
     get() {
-        return SimpleDateFormat("E d MMM HH:mm").format(
+        return SimpleDateFormat("HH:mm").format(
             this.ntpTimeSToUnixTimeMs() + if (this % 60 > 30) 30000 else 0)
+    }
+
+private val Long.dateHeader: String
+    @android.annotation.SuppressLint("SimpleDateFormat")
+    get() {
+        return SimpleDateFormat("___ E d MMM ___").format(
+            this.ntpTimeSToUnixTimeMs())
     }
 
 private val EphemeralBluetoothIdentifier.string: String
