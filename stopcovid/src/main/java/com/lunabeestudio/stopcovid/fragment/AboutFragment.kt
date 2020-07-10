@@ -10,8 +10,18 @@
 
 package com.lunabeestudio.stopcovid.fragment
 
+import android.app.DownloadManager
+import android.app.DownloadManager.*
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.net.Uri
+import android.os.Environment
 import android.view.Gravity
 import android.widget.Toast
+import androidx.core.content.FileProvider
+import androidx.core.net.toUri
 import com.lunabeestudio.stopcovid.BuildConfig
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
@@ -24,17 +34,19 @@ import com.lunabeestudio.stopcovid.fastitem.logoItem
 import com.mikepenz.fastadapter.GenericItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import java.io.File
 
 class AboutFragment : MainFragment() {
 
     override fun getTitleKey(): String = "aboutController.title"
 
-    private val releasesUri = "https://github.com/ofa-/stopcovid-android/releases"
-    private val releaseApk = "stopcovid-release.apk"
+    companion object {
+        const val releasesUri = "https://github.com/ofa-/stopcovid-android/releases"
+        const val downloadUri = "$releasesUri/latest/download/stopcovid-release.apk"
+    }
 
     private fun isLatest() : Boolean {
         "$releasesUri/latest".run {
@@ -61,9 +73,8 @@ class AboutFragment : MainFragment() {
                     toast("💕  🐭   already latest   🐱  💋")
                 } else {
                     toast("⏬ 🐱   downloading latest   🐭 ⏬")
-                    delay(2000)
-                    "$releasesUri/latest/download/$releaseApk"
-                        .openInChromeTab(requireContext())
+                    Downloader(requireContext())
+                        .fetch()
                 }
             }.onFailure {
                 toast("🐰  error fetching updates  🎃")
@@ -141,5 +152,92 @@ class AboutFragment : MainFragment() {
         }
 
         return items
+    }
+
+    class Downloader(
+        private val context: Context,
+        private var uri: Uri = Uri.parse(downloadUri)
+    ) {
+
+        private val downloadManager = context.getSystemService(
+            Context.DOWNLOAD_SERVICE
+        ) as DownloadManager
+
+        private var file = destinationFile(uri)
+
+        fun fetch() {
+            autoDeleteFile()
+            receiver.register()
+            Request(uri)
+                .setDescription("💕 🐱  🐭 💋")
+                .setDestinationUri(file.toUri())
+                .setNotificationVisibility(
+                    DownloadManager.Request
+                        .VISIBILITY_VISIBLE_NOTIFY_COMPLETED
+                )
+                .also {
+                    receiver.id =
+                        downloadManager.enqueue(it)
+                }
+        }
+
+        private fun onComplete() {
+            val uri = FileProvider.getUriForFile(
+                context,
+                context.applicationContext.packageName + ".provider",
+                file
+            )
+            Intent(Intent.ACTION_VIEW)
+                .setDataAndType(uri, "application/vnd.android.package-archive")
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                .also {
+                    context.startActivity(it)
+                }
+        }
+
+        private val receiver = object : BroadcastReceiver() {
+
+            fun register() {
+                context.registerReceiver(
+                    this,
+                    IntentFilter(ACTION_DOWNLOAD_COMPLETE)
+                )
+            }
+
+            fun unregister() {
+                context.unregisterReceiver(this)
+            }
+
+            var id = -2L
+            override fun onReceive(context: Context?, intent: Intent?) {
+                if (id != intent?.getLongExtra(EXTRA_DOWNLOAD_ID, -1))
+                    return
+                unregister()
+                if (! downloadOk())
+                    return
+                onComplete()
+            }
+        }
+
+        private fun downloadOk(): Boolean {
+            downloadManager.query(Query().setFilterById(receiver.id)).run {
+                return moveToFirst() && getInt(
+                    getColumnIndex(COLUMN_STATUS)
+                ) == STATUS_SUCCESSFUL
+            }
+        }
+
+        private fun destinationFile(uri: Uri): File {
+            return File(
+                context
+                    .getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS),
+                uri.lastPathSegment.toString()
+            )
+        }
+
+        fun autoDeleteFile(): Boolean {
+            return file.let { it.exists() && it.delete() }
+        }
     }
 }
