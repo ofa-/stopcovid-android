@@ -46,6 +46,7 @@ import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.UiConstants
 import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
 import com.lunabeestudio.stopcovid.extension.robertManager
+import com.lunabeestudio.stopcovid.fragment.AboutFragment
 import com.lunabeestudio.stopcovid.manager.AppMaintenanceManager
 import com.lunabeestudio.stopcovid.manager.ConfigDataSource
 import com.lunabeestudio.stopcovid.manager.PrivacyManager
@@ -104,6 +105,7 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication {
         val config = BundledEmojiCompatConfig(this)
         EmojiCompat.init(config)
         startAppMaintenanceWorker(false)
+        AboutFragment.Downloader(applicationContext).autoDeleteFile()
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
