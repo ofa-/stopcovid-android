@@ -245,6 +245,7 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
             .filter { it.ntpEndTimeS > ntpNow }
             .joinToString("\n") { it.string }
         refresh()
+        showCompactList = false
     }
 
     private var isLoading = false
@@ -260,6 +261,7 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
                     .joinToString("\n") { it.string }
             refresh()
             isLoading = false
+            showCompactList = false
         }
     }
 
