@@ -47,13 +47,8 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
 
     override fun getTitleKey(): String = "proximityController.tuneProximity"
 
-    private val deactivated = "(%s)".format(
-        strings["accessibility.hint.proximity.buttonState.deactivated"])
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        application = context?.applicationContext as RobertApplication
-        robertManager = application.robertManager as RobertManagerImpl
         localEbids
             .addAll(robertManager.getLocalEbids())
         setTopBarOnclick()
@@ -125,6 +120,12 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
 
     private lateinit var robertManager: RobertManagerImpl
     private lateinit var application: RobertApplication
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        application = context?.applicationContext as RobertApplication
+        robertManager = application.robertManager as RobertManagerImpl
+    }
 
     private fun setTopBarOnclick() {
         getActivityBinding()?.toolbar?.setOnClickListener {
@@ -308,6 +309,15 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
             it.setGravity(Gravity.CENTER, 0, 0)
         }.show()
     }
+
+    override fun refreshScreen() {
+        super.refreshScreen()
+        updateLastNotification()
+    }
+
+    private val deactivated get() = "(%s)".format(
+        strings["accessibility.hint.proximity.buttonState.deactivated"]
+    )
 
     private val nbItemsCaption = captionItem {
         gravity = Gravity.CENTER
