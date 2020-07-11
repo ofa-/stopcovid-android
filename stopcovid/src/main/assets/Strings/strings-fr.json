@@ -196,7 +196,6 @@
     "notification.channel.atRisk.title": "Risque d’exposition au COVID-19",
     "notification.atRisk.title": "Risque d’exposition au COVID-19",
     "notification.atRisk.message": "Vous avez rencontré ces derniers jours un utilisateur testé positif au COVID-19. Si vous êtes un mineur, discutez-en avec vos parents ou vos responsables légaux. Appuyez ici pour la marche à suivre.",
-    "tuneProximityController.title": "Proximité",
     "manageDataController.title": "Mes données",
     "manageDataController.eraseLocalHistory.title": "Mes données sur ce téléphone",
     "manageDataController.eraseLocalHistory.subtitle": "Cette opération effacera toutes les informations de \"contacts Bluetooth\" collectés sur votre téléphone.",

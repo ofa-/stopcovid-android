@@ -45,7 +45,7 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
     private var localProximityItems = mutableListOf<LocalProximity>()
     private var localEbids = mutableListOf<EphemeralBluetoothIdentifier>()
 
-    override fun getTitleKey(): String = "tuneProximityController.title"
+    override fun getTitleKey(): String = "proximityController.tuneProximity"
 
     private val deactivated = "(%s)".format(
         strings["accessibility.hint.proximity.buttonState.deactivated"])
