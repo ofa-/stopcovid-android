@@ -36,7 +36,6 @@ import com.mikepenz.fastadapter.GenericItem
 import kotlinx.coroutines.*
 import java.io.File
 import java.text.SimpleDateFormat
-import java.util.Date
 import kotlin.math.min
 
 
@@ -396,39 +395,31 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
 }
 
 @android.annotation.SuppressLint("SimpleDateFormat")
-val dateFormatter = SimpleDateFormat("E d MMM HH:mm:ss")
-private val Long.longDate: String
-    get() {
-        return dateFormatter.format(Date(this.ntpTimeSToUnixTimeMs()))
-    }
+private fun String.formatDate(date: Long)
+        = SimpleDateFormat(this).format(date)
 
-private val Long.shortTime: String
-    @android.annotation.SuppressLint("SimpleDateFormat")
-    get() {
-        return SimpleDateFormat("HH:mm").format(
-            this.ntpTimeSToUnixTimeMs() + if (this % 60 > 30) 30000 else 0)
-    }
-
-private val Long.dateHeader: String
-    @android.annotation.SuppressLint("SimpleDateFormat")
-    get() {
-        return SimpleDateFormat("___ E d MMM ___").format(
+private val Long.longDate
+    get() = "E d MMM HH:mm:ss".formatDate(
             this.ntpTimeSToUnixTimeMs())
-    }
 
-private val EphemeralBluetoothIdentifier.string: String
-    get() {
-        return "%s, %s".format(
+private val Long.shortTime
+    get() = "HH:mm".formatDate(
+            this.ntpTimeSToUnixTimeMs() + if (this % 60 > 30) 30000 else 0)
+
+private val Long.dateHeader
+    get() = "___ E d MMM ___".formatDate(
+            this.ntpTimeSToUnixTimeMs())
+
+private val EphemeralBluetoothIdentifier.string
+    get() = "%s, %s".format(
             this.ntpStartTimeS.longDate,
-            this.short
-        )
-    }
+            this.short)
 
-private val EphemeralBluetoothIdentifier.base64: String
-    get() { return Base64.encodeToString(this.ebid, Base64.NO_WRAP) }
+private val EphemeralBluetoothIdentifier.base64
+    get() = Base64.encodeToString(this.ebid, Base64.NO_WRAP)
 
-private val EphemeralBluetoothIdentifier.short: String
-    get() { return this.base64.substring(0..5) }
+private val EphemeralBluetoothIdentifier.short
+    get() = this.base64.substring(0..5)
 
-private val ntpNow: Long
-    get() { return System.currentTimeMillis().unixTimeMsToNtpTimeS() }
+private val ntpNow
+    get() = System.currentTimeMillis().unixTimeMsToNtpTimeS()
