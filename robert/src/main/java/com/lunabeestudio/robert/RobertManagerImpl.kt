@@ -452,6 +452,8 @@ class RobertManagerImpl(
     }
 
     override suspend fun eraseLocalHistory(): RobertResult {
+        localProximityFile.run { exists() && delete() }
+        disseminatedEbidsFile.run { exists() && delete() }
         localProximityRepository.removeAll()
         return RobertResult.Success()
     }
