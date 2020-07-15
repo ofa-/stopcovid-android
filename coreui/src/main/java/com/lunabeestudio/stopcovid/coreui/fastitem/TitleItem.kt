@@ -16,6 +16,7 @@ import android.widget.TextSwitcher
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.lunabeestudio.stopcovid.coreui.R
+import com.lunabeestudio.stopcovid.coreui.extension.addRipple
 import com.lunabeestudio.stopcovid.coreui.extension.safeEmojiSpanify
 
 class TitleItem : BaseItem<TitleItem.ViewHolder>(
@@ -23,15 +24,19 @@ class TitleItem : BaseItem<TitleItem.ViewHolder>(
 ) {
     var text: String? = null
     var gravity: Int = Gravity.NO_GRAVITY
-    var onClick: (() -> Unit) = {}
+    var onClick: (() -> Unit)? = null
 
     override fun bindView(holder: ViewHolder, payloads: List<Any>) {
         super.bindView(holder, payloads)
         holder.textSwitcher.setText(text.safeEmojiSpanify())
         holder.textView1.gravity = gravity
         holder.textView2.gravity = gravity
-        holder.textView1.setOnClickListener { onClick() }
-        holder.textView2.setOnClickListener { onClick() }
+        onClick?.let {
+            holder.textSwitcher.run {
+                setOnClickListener { it() }
+                addRipple()
+            }
+        }
     }
 
     override fun unbindView(holder: ViewHolder) {
