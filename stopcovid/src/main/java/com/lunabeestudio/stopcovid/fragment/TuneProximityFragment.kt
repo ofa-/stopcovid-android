@@ -48,8 +48,7 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        localEbids
-            .addAll(robertManager.getLocalEbids())
+        localEbids.addAll(robertManager.getLocalEbids())
         setTopBarOnclick()
         updateLastNotification()
         refreshItems()
