@@ -31,9 +31,11 @@ class CaptionItem : BaseItem<CaptionItem.ViewHolder>(
         super.bindView(holder, payloads)
         holder.textView.text = text.safeEmojiSpanify()
         holder.textView.gravity = gravity
-        holder.textView.setOnClickListener { onClick() }
-        holder.textView.setOnLongClickListener { onLongClick(); true }
-        if (ripple) holder.textView.addRipple()
+        holder.itemView.run {
+            setOnClickListener { onClick() }
+            setOnLongClickListener { onLongClick(); true }
+            if (ripple) addRipple()
+        }
     }
 
     class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {

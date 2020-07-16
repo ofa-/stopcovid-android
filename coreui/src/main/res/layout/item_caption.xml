@@ -7,15 +7,21 @@
   ~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   ~ Created by Lunabee Studio / Date - 2020/04/05 - for the STOP-COVID project
   -->
+<FrameLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 <TextView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/textView"
-    android:layout_width="match_parent"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    android:layout_gravity="center"
     android:layout_marginHorizontal="@dimen/spacing_large"
     android:layout_marginVertical="@dimen/spacing_small"
+    android:clickable="false"
     android:gravity="center"
     android:textAppearance="@style/TextAppearance.StopCovid.Caption"
     android:textIsSelectable="false"
     tools:text="@tools:sample/lorem[5]" />
+</FrameLayout>
