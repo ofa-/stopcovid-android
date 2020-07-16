@@ -286,6 +286,7 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
             return
         lastClick = SystemClock.elapsedRealtime()
 
+        showCompactList = true
         if (robertManager.isProximityActive) {
             robertManager.deactivateProximity(application)
             notificationObsoleter?.cancel()
