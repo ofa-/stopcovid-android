@@ -58,7 +58,7 @@ class AboutFragment : MainFragment() {
         }
     }
 
-    private fun toast(text: String) {
+    private fun toast(text: String?) {
         CoroutineScope(Dispatchers.Main).launch {
             Toast.makeText(requireContext(), text, Toast.LENGTH_SHORT).also {
                 it.setGravity(Gravity.CENTER, 0, 0)
@@ -70,14 +70,14 @@ class AboutFragment : MainFragment() {
         CoroutineScope(Dispatchers.Default).launch {
             runCatching {
                 if (isLatest()) {
-                    toast("💕  🐭   already latest   🐱  💋")
+                    toast(strings["aboutController.toast.alreadyUpToDate"])
                 } else {
-                    toast("⏬ 🐱   downloading latest   🐭 ⏬")
+                    toast(strings["aboutController.toast.downloadingLatest"])
                     Downloader(requireContext())
                         .fetch()
                 }
             }.onFailure {
-                toast("🐰  error fetching updates  🎃")
+                toast(strings["aboutController.toast.errorFetchingUpdates"])
             }
         }
     }
