@@ -26,7 +26,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
-import android.webkit.WebView
 import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isInvisible
@@ -77,7 +76,6 @@ class ProximityFragment : AboutMainFragment() {
     private lateinit var proximityButtonItem: ProximityButtonItem
     private lateinit var captionItem: CaptionItem
     private lateinit var subTitleItem: TitleItem
-    private var webView: WebView? = null
     private val interpolator = DecelerateInterpolator()
     private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent) {
@@ -308,7 +306,7 @@ class ProximityFragment : AboutMainFragment() {
         } else {
             getActivityBinding()?.errorTextView?.background = null
         }
-        if (webView?.isVisible == true || ProximityManager.isProximityOn(requireContext(), robertManager)) {
+        if (ProximityManager.isProximityOn(requireContext(), robertManager)) {
             hideErrorLayout(errorLayout)
         } else {
             showErrorLayout(errorLayout)
