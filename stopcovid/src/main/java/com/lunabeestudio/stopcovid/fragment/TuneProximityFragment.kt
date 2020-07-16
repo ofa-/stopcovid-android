@@ -32,6 +32,7 @@ import com.lunabeestudio.robert.RobertApplication
 import com.lunabeestudio.robert.RobertManagerImpl
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.dividerItem
+import com.lunabeestudio.stopcovid.manager.ProximityManager
 import com.mikepenz.fastadapter.GenericItem
 import kotlinx.coroutines.*
 import java.io.File
@@ -177,7 +178,7 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
     }
 
     private fun updateLastNotification(text: String = "-") {
-        lastNotificationCaption.text = when (robertManager.isProximityActive) {
+        lastNotificationCaption.text = when (isProximityActive) {
             true -> text
             false -> deactivated
         }
@@ -185,7 +186,7 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
 
     private fun updateTopBar() {
         val title = "%s  ".format(strings[getTitleKey()])
-        val ebid = when(robertManager.isProximityActive) {
+        val ebid = when(isProximityActive) {
             true -> "(%s)".format(currentEbidAsString())
             false -> ""
         }
@@ -287,7 +288,7 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
         lastClick = SystemClock.elapsedRealtime()
 
         showCompactList = true
-        if (robertManager.isProximityActive) {
+        if (isProximityActive) {
             robertManager.deactivateProximity(application)
             notificationObsoleter?.cancel()
             resetLastNotification(deactivated)
@@ -297,6 +298,8 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
             resetLastNotification()
         }
     }
+
+    private val isProximityActive get() = ProximityManager.isProximityOn(requireContext(), robertManager)
 
     private fun copyToClipboard(text: String) {
         val clipboard = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
