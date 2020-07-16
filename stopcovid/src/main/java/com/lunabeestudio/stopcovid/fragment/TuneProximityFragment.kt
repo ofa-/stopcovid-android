@@ -226,7 +226,7 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
                 val dayHeader = it.collectedTime.dateHeader
                 if (dayHeader != currentDay) {
                     currentDay = dayHeader
-                    dayHeader + "\n"
+                    "\n" + dayHeader + "\n\n"
                 } else { "" } +
                 "%s [%d'%02d\"] %s (%d)".format(
                     it.collectedTime.shortTime,
@@ -410,7 +410,7 @@ private val Long.shortTime
             this.ntpTimeSToUnixTimeMs() + if (this % 60 > 30) 30000 else 0)
 
 private val Long.dateHeader
-    get() = "___ E d MMM ___".formatDate(
+    get() = "________  E d MMM  ________".formatDate(
             this.ntpTimeSToUnixTimeMs())
 
 private val EphemeralBluetoothIdentifier.string
