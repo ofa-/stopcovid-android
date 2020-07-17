@@ -69,16 +69,14 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
 
     private fun getLocalProximityData(): MutableList<LocalProximity> {
         return if (robertManager.localProximityFile.exists()) {
-            readFromLocalFile().reversed().toMutableList()
+            readFromLocalFile()
         }
         else {
-            val items =
-                robertManager
-                    .getLocalProximityItems(0)
-                    .sortedBy { it.collectedTime }
-            saveToLocalFile(items)
-            items.reversed().toMutableList()
+            robertManager.getLocalProximityItems(0)
+                .sortedBy { it.collectedTime }
+                .also { saveToLocalFile(it) }
         }
+            .reversed().toMutableList()
     }
 
     private fun readFromLocalFile(): List<LocalProximity> {
