@@ -20,6 +20,10 @@ android {
     testOptions {
         unitTests.returnDefaultValues = true
     }
+
+    kotlinOptions {
+        freeCompilerArgs += [ "-Xopt-in=kotlin.RequiresOptIn" ]
+    }
 }
 
 dependencies {
