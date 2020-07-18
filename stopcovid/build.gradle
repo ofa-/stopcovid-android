@@ -66,9 +66,7 @@ android {
     lintOptions {
         disable "InvalidPackage",
                 "ObsoleteLintCustomCheck",
-                "ExpiredTargetSdkVersion",
-                "UnsafeExperimentalUsageError",
-                "UnsafeExperimentalUsageWarning"
+                "ExpiredTargetSdkVersion"
     }
 
     testOptions {
