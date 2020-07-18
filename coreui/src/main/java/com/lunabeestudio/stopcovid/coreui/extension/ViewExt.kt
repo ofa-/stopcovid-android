@@ -13,7 +13,9 @@ package com.lunabeestudio.stopcovid.coreui.extension
 import android.util.TypedValue
 import android.view.View
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.Insets
 import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import com.google.android.material.appbar.AppBarLayout
@@ -26,10 +28,12 @@ import com.lunabeestudio.stopcovid.coreui.R
 fun View.applyAndConsumeWindowInsetBottom() {
     ViewCompat.setOnApplyWindowInsetsListener(this) { view, insets ->
         view.updatePadding(bottom = insets.systemWindowInsetBottom)
-        insets.replaceSystemWindowInsets(insets.systemWindowInsetLeft,
+        WindowInsetsCompat.Builder(insets).setSystemWindowInsets(Insets.of(
+            insets.systemWindowInsetLeft,
             insets.systemWindowInsetTop,
             insets.stableInsetRight,
             0)
+        ).build()
     }
 }
 
