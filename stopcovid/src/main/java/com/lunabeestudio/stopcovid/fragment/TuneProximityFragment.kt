@@ -240,10 +240,26 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
     private fun showRemainingEbids() {
         proximityInfoList.text = localEbids
             .filter { it.ntpEndTimeS > ntpNow }
-            .joinToString("\n") { it.string }
+            .run { ebidsListToString(this) }
         refresh()
         showCompactList = false
     }
+
+    private fun ebidsListToString(list: List<EphemeralBluetoothIdentifier>) =
+        list.groupBy { it.ntpStartTimeS.shortDate }
+            .map { (day, group) ->
+                dayHeader(day) +
+                group.joinToString("\n") {
+                    "%s  %s".format(
+                        it.ntpStartTimeS.shortTime,
+                        it.short
+                    )
+                }
+            }
+            .joinToString("\n")
+
+    private fun dayHeader(day: String, header: String = "____") =
+        "\n%s  %s  %s\n\n".format(header, day, header)
 
     private var isLoading = false
     private fun showDisseminatedEbids() {
@@ -255,7 +271,7 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
             proximityInfoList
                 .text = loadDisseminatedEbids(file)
                     .reversed()
-                    .joinToString("\n") { it.string }
+                    .run { ebidsListToString(this) }
             refresh()
             isLoading = false
             showCompactList = false
@@ -411,10 +427,9 @@ private val Long.dateHeader
     get() = "________  E d MMM  ________".formatDate(
             this.ntpTimeSToUnixTimeMs())
 
-private val EphemeralBluetoothIdentifier.string
-    get() = "%s, %s".format(
-            this.ntpStartTimeS.longDate,
-            this.short)
+private val Long.shortDate
+    get() = "E d MMM".formatDate(
+            this.ntpTimeSToUnixTimeMs())
 
 private val EphemeralBluetoothIdentifier.base64
     get() = Base64.encodeToString(this.ebid, Base64.NO_WRAP)
