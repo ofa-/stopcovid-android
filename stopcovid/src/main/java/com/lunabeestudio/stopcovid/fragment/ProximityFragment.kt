@@ -234,6 +234,10 @@ class ProximityFragment : AboutMainFragment() {
             identifier = items.count().toLong()
         }
 
+        items += dividerItem {
+            identifier = items.count().toLong()
+        }
+
         items += linkItem {
             text = strings["proximityController.tuneProximity"]
             onClickListener = View.OnClickListener {
