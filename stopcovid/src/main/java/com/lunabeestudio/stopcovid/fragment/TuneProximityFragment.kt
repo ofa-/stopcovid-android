@@ -345,10 +345,10 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
     private val nbItemsCaption = captionItem {
         gravity = Gravity.CENTER
         onClick = {
-            showRemainingEbids()
+            showDisseminatedEbids()
         }
         onLongClick = {
-            showDisseminatedEbids()
+            showRemainingEbids()
         }
         ripple = true
     }
