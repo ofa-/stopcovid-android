@@ -205,13 +205,18 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
     private fun fullList(): String {
         return localProximityItems
             .slice(0 until min(nbDisplayedItems, localProximityItems.size))
-            .joinToString("\n") {
-                listOf(
-                    it.collectedTime.longDate,
-                    it.ebidBase64,
-                    it.calibratedRssi
-                ).joinToString(", ")
+            .groupBy { it.collectedTime.shortDate }
+            .map { (day, group) ->
+                dayHeader(day, "_____") +
+                group.joinToString("\n") {
+                    "%s  %s  %d".format(
+                        it.collectedTime.longTime,
+                        it.shortEbid,
+                        it.calibratedRssi
+                    )
+                }
             }
+            .joinToString("\n")
     }
 
     private fun compactList(): String {
@@ -415,8 +420,8 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
 private fun String.formatDate(date: Long)
         = SimpleDateFormat(this).format(date)
 
-private val Long.longDate
-    get() = "E d MMM HH:mm:ss".formatDate(
+private val Long.longTime
+    get() = "HH:mm:ss".formatDate(
             this.ntpTimeSToUnixTimeMs())
 
 private val Long.shortTime
@@ -436,6 +441,9 @@ private val EphemeralBluetoothIdentifier.base64
 
 private val EphemeralBluetoothIdentifier.short
     get() = this.base64.substring(0..5)
+
+private val LocalProximity.shortEbid
+    get() = this.ebidBase64.substring(0..5)
 
 private val ntpNow
     get() = System.currentTimeMillis().unixTimeMsToNtpTimeS()
