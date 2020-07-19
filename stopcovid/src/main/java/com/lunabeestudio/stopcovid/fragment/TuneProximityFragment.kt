@@ -226,16 +226,16 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
             .map { (_, group) ->
                 val it = group.last()
                 val duration = group.first().collectedTime - it.collectedTime
-                val dayHeader = it.collectedTime.dateHeader
-                if (dayHeader != currentDay) {
-                    currentDay = dayHeader
-                    "\n" + dayHeader + "\n\n"
+                val day = it.collectedTime.shortDate
+                if (day != currentDay) {
+                    currentDay = day
+                    dayHeader(day, "________")
                 } else { "" } +
-                "%s [%d'%02d\"] %s (%d)".format(
+                "%s  [%d'%02d\"]  %s  (%d)".format(
                     it.collectedTime.shortTime,
                     duration / 60,
                     duration % 60,
-                    it.ebidBase64.substring(0..5),
+                    it.shortEbid,
                     group.count()
                 )
             }
@@ -427,10 +427,6 @@ private val Long.longTime
 private val Long.shortTime
     get() = "HH:mm".formatDate(
             this.ntpTimeSToUnixTimeMs() + if (this % 60 > 30) 30000 else 0)
-
-private val Long.dateHeader
-    get() = "________  E d MMM  ________".formatDate(
-            this.ntpTimeSToUnixTimeMs())
 
 private val Long.shortDate
     get() = "E d MMM".formatDate(
