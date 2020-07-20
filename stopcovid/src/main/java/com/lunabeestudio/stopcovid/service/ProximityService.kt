@@ -109,7 +109,7 @@ class ProximityService : RobertProximityService() {
     private fun spawnNotificationObsoleter() {
         notificationObsoleter?.cancel()
         notificationObsoleter = CoroutineScope(Dispatchers.Default).launch {
-            try { delay(20000) }
+            try { delay(proximityNotificationTimeout) }
             catch (e: CancellationException) { return@launch }
             if (robertManager.isProximityActive)
                 sendNotification("")
@@ -263,5 +263,6 @@ class ProximityService : RobertProximityService() {
         fun intent(context: Context): Intent = Intent(context, ProximityService::class.java)
         fun start(context: Context): Unit = ContextCompat.startForegroundService(context, intent(context))
         fun stop(context: Context): Boolean = context.stopService(intent(context))
+        const val proximityNotificationTimeout = 20 * 1000L
     }
 }

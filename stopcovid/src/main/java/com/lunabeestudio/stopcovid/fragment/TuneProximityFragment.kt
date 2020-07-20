@@ -33,6 +33,7 @@ import com.lunabeestudio.robert.RobertManagerImpl
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.dividerItem
 import com.lunabeestudio.stopcovid.manager.ProximityManager
+import com.lunabeestudio.stopcovid.service.ProximityService
 import com.mikepenz.fastadapter.GenericItem
 import kotlinx.coroutines.*
 import java.io.File
@@ -395,7 +396,7 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
     private fun spawnNotificationObsoleter() {
         notificationObsoleter?.cancel()
         notificationObsoleter = CoroutineScope(Dispatchers.Default).launch {
-            try { delay(20000) }
+            try { delay(ProximityService.proximityNotificationTimeout) }
             catch (e: CancellationException) { return@launch }
             resetLastNotification()
         }
