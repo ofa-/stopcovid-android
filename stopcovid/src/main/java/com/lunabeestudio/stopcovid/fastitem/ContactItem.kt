@@ -11,8 +11,10 @@
 package com.lunabeestudio.stopcovid.fastitem
 
 import android.view.View
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.safeEmojiSpanify
@@ -33,6 +35,7 @@ class ContactItem : BaseItem<ContactItem.ViewHolder>(
         holder.titleTextView.text = title.safeEmojiSpanify()
         holder.captionTextView.text = caption.safeEmojiSpanify()
         holder.moreTextView.text = more.safeEmojiSpanify()
+        holder.moreImageView.isVisible = false
         holder.moreConstraintLayout.setOnClickListener(moreClickListener)
     }
 
@@ -42,6 +45,7 @@ class ContactItem : BaseItem<ContactItem.ViewHolder>(
         val captionTextView: TextView = v.findViewById(R.id.captionTextView)
         val moreConstraintLayout: ConstraintLayout = v.findViewById(R.id.linkLayout)
         val moreTextView: TextView = v.findViewById(R.id.textView)
+        val moreImageView: ImageView = v.findViewById(R.id.leftIconImageView)
     }
 }
 

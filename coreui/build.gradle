@@ -53,12 +53,12 @@ dependencies {
     api 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0'
     api 'androidx.lifecycle:lifecycle-livedata-ktx:2.2.0'
     api "androidx.lifecycle:lifecycle-viewmodel-savedstate:2.2.0"
-    api "androidx.navigation:navigation-fragment-ktx:2.2.2"
-    api "androidx.navigation:navigation-ui-ktx:2.2.2"
+    api "androidx.navigation:navigation-fragment-ktx:2.3.0"
+    api "androidx.navigation:navigation-ui-ktx:2.3.0"
     api 'androidx.preference:preference:1.1.1'
     api 'androidx.recyclerview:recyclerview:1.1.0'
-    api 'androidx.emoji:emoji-appcompat:1.0.0'
-    api 'androidx.emoji:emoji-bundled:1.0.0'
+    api 'androidx.emoji:emoji-appcompat:1.1.0'
+    api 'androidx.emoji:emoji-bundled:1.1.0'
 
     api 'com.google.android.material:material:1.2.0-beta01'
     api 'com.google.code.gson:gson:2.8.6'

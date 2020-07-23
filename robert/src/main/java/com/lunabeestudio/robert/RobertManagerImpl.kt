@@ -70,7 +70,10 @@ class RobertManagerImpl(
     private val localProximityRepository: LocalProximityRepository =
         LocalProximityRepository(localLocalProximityDataSource)
     private val remoteServiceRepository: RemoteServiceRepository =
-        RemoteServiceRepository(serviceDataSource, sharedCryptoDataSource, localKeystoreDataSource, configurationDataSource)
+        RemoteServiceRepository(serviceDataSource,
+            sharedCryptoDataSource,
+            localKeystoreDataSource,
+            configurationDataSource)
 
     init {
         if (isRegistered) {
@@ -90,8 +93,8 @@ class RobertManagerImpl(
     override val isProximityActive: Boolean
         get() = keystoreRepository.proximityActive ?: false
 
-    override val isAtRisk: Boolean
-        get() = keystoreRepository.atRisk ?: false
+    override val isAtRisk: Boolean?
+        get() = keystoreRepository.atRisk
 
     override val atRiskLastRefresh: Long?
         get() = keystoreRepository.atRiskLastRefresh

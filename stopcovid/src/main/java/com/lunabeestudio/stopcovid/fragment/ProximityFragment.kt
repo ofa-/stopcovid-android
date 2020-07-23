@@ -61,6 +61,7 @@ import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
 import com.lunabeestudio.stopcovid.extension.getString
 import com.lunabeestudio.stopcovid.extension.robertManager
+import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.extension.toCovidException
 import com.lunabeestudio.stopcovid.fastitem.LogoItem
 import com.lunabeestudio.stopcovid.fastitem.ProximityButtonItem
@@ -173,7 +174,7 @@ class ProximityFragment : AboutMainFragment() {
             if (robertManager.apiVersion == "v1") {
                 injectWebView()
             } else {
-                findNavController().navigate(ProximityFragmentDirections.actionProximityFragmentToCaptchaFragment())
+                findNavController().safeNavigate(ProximityFragmentDirections.actionProximityFragmentToCaptchaFragment())
             }
         }
         viewModel.activateProximitySuccess.observe(viewLifecycleOwner) {
@@ -239,7 +240,7 @@ class ProximityFragment : AboutMainFragment() {
         items += linkItem {
             text = strings["privacyController.tabBar.title"]
             onClickListener = View.OnClickListener {
-                findNavController().navigate(ProximityFragmentDirections.actionProximityFragmentToPrivacyFragment())
+                findNavController().safeNavigate(ProximityFragmentDirections.actionProximityFragmentToPrivacyFragment())
             }
             iconRes = R.drawable.ic_privacy
             identifier = items.count().toLong()
@@ -252,7 +253,7 @@ class ProximityFragment : AboutMainFragment() {
         items += linkItem {
             text = strings["proximityController.manageData"]
             onClickListener = View.OnClickListener {
-                findNavController().navigate(ProximityFragmentDirections.actionProximityFragmentToManageDataFragment())
+                findNavController().safeNavigate(ProximityFragmentDirections.actionProximityFragmentToManageDataFragment())
             }
             iconRes = R.drawable.ic_manage_data
             identifier = items.count().toLong()
@@ -387,7 +388,6 @@ class ProximityFragment : AboutMainFragment() {
                 return try {
                     // Let loadDataWithBaseURL intial data load and network-security-config compatible API pass
                     if (request.url.toString() == "data:text/html;charset=utf-8;base64,") {
-                        //                        || Build.VERSION.SDK_INT > Build.VERSION_CODES.N) {
                         super.shouldInterceptRequest(view, request)
                     } else {
                         // validate Trust anchor

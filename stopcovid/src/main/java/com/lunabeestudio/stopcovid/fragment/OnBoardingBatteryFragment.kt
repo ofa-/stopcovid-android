@@ -22,6 +22,7 @@ import com.lunabeestudio.stopcovid.coreui.UiConstants
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
+import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.fastitem.logoItem
 import com.lunabeestudio.stopcovid.manager.ProximityManager
 import com.mikepenz.fastadapter.GenericItem
@@ -38,7 +39,7 @@ class OnBoardingBatteryFragment : OnBoardingFragment() {
             ProximityManager.requestIgnoreBatteryOptimization(this)
         } else {
             findNavController()
-                .navigate(OnBoardingBatteryFragmentDirections.actionOnBoardingBatteryFragmentToOnBoardingNotificationFragment())
+                .safeNavigate(OnBoardingBatteryFragmentDirections.actionOnBoardingBatteryFragmentToOnBoardingNotificationFragment())
         }
     }
 
@@ -70,12 +71,8 @@ class OnBoardingBatteryFragment : OnBoardingFragment() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == UiConstants.Activity.BATTERY.ordinal) {
             if (resultCode == Activity.RESULT_OK) {
-                try {
-                    findNavController()
-                        .navigate(OnBoardingBatteryFragmentDirections.actionOnBoardingBatteryFragmentToOnBoardingNotificationFragment())
-                } catch (e: IllegalArgumentException) {
-                    // back and button pressed quickly can trigger this exception.
-                }
+                findNavController()
+                    .safeNavigate(OnBoardingBatteryFragmentDirections.actionOnBoardingBatteryFragmentToOnBoardingNotificationFragment())
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data)

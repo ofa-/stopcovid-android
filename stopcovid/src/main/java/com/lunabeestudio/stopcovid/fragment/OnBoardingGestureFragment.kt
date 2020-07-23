@@ -15,6 +15,7 @@ import androidx.core.content.edit
 import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
 import com.lunabeestudio.stopcovid.Constants
+import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.manager.GestureManager
 import com.mikepenz.fastadapter.GenericItem
 
@@ -31,7 +32,7 @@ class OnBoardingGestureFragment : OnBoardingFragment() {
             putBoolean(Constants.SharedPrefs.ON_BOARDING_DONE, true)
         }
         findNavController()
-            .navigate(OnBoardingGestureFragmentDirections.actionOnBoardingGestureFragmentToMainActivity())
+            .safeNavigate(OnBoardingGestureFragmentDirections.actionOnBoardingGestureFragmentToMainActivity())
         activity?.finishAndRemoveTask()
     }
 

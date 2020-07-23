@@ -18,7 +18,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
-import androidx.work.WorkManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.lunabeestudio.robert.RobertApplication
 import com.lunabeestudio.stopcovid.Constants
@@ -31,6 +30,7 @@ import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
 import com.lunabeestudio.stopcovid.extension.getString
 import com.lunabeestudio.stopcovid.extension.robertManager
+import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.fastitem.dangerButtonItem
 import com.lunabeestudio.stopcovid.viewmodel.ManageDataViewModel
 import com.lunabeestudio.stopcovid.viewmodel.ManageDataViewModelFactory
@@ -72,13 +72,8 @@ class ManageDataFragment : MainFragment() {
             sharedPreferences.edit {
                 remove(Constants.SharedPrefs.ON_BOARDING_DONE)
             }
-            try {
-                findNavController()
-                    .navigate(ManageDataFragmentDirections.actionGlobalOnBoardingActivity())
-                activity?.finishAndRemoveTask()
-            } catch (e: IllegalArgumentException) {
-                // If user leave the screen before logout is done
-            }
+            findNavController().safeNavigate(ManageDataFragmentDirections.actionGlobalOnBoardingActivity())
+            activity?.finishAndRemoveTask()
         }
     }
 

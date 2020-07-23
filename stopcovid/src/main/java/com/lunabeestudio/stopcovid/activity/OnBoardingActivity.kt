@@ -15,7 +15,6 @@ import android.os.Bundle
 import android.view.accessibility.AccessibilityEvent
 import android.view.animation.DecelerateInterpolator
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.isVisible
 import androidx.navigation.NavController
@@ -26,10 +25,10 @@ import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.applyAndConsumeWindowInsetBottom
 import com.lunabeestudio.stopcovid.databinding.ActivityOnBoardingBinding
 import com.lunabeestudio.stopcovid.extension.isOnBoardingDone
+import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.fragment.OnBoardingWelcomeFragmentDirections
 import com.lunabeestudio.stopcovid.viewmodel.OnBoardingViewModel
 import com.lunabeestudio.stopcovid.viewmodel.OnBoardingViewModelFactory
-import timber.log.Timber
 
 class OnBoardingActivity : BaseActivity() {
 
@@ -64,12 +63,8 @@ class OnBoardingActivity : BaseActivity() {
 
         when {
             sharedPreferences.isOnBoardingDone() -> {
-                try {
-                    navController.navigate(OnBoardingWelcomeFragmentDirections.actionOnBoardingWelcomeFragmentToMainActivity())
-                    finishAndRemoveTask()
-                } catch (e: IllegalArgumentException) {
-                    Timber.e(e)
-                }
+                navController.safeNavigate(OnBoardingWelcomeFragmentDirections.actionOnBoardingWelcomeFragmentToMainActivity())
+                finishAndRemoveTask()
             }
             savedInstanceState == null -> {
                 replaceSplashScreenLogo()

@@ -10,7 +10,7 @@
 <resources>
     <color name="color_primary">#85BBFF</color>
     <color name="color_on_primary">#00285A</color>
-    <color name="color_primary_light">#29394D</color>
+    <color name="color_primary_light">#2685BBFF</color>
     <color name="color_on_primary_light">#FFFFFF</color>
     <color name="color_error">#FF6F4D</color>
     <color name="color_error_light">#331716</color>

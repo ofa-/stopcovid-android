@@ -22,8 +22,8 @@ import androidx.work.WorkerParameters
 import com.lunabeestudio.robert.RobertApplication
 import com.lunabeestudio.robert.RobertConstant
 import com.lunabeestudio.robert.RobertManager
-import com.lunabeestudio.robert.model.TimeNotAlignedException
 import com.lunabeestudio.robert.model.RobertResult
+import com.lunabeestudio.robert.model.TimeNotAlignedException
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import kotlin.random.Random
@@ -35,10 +35,10 @@ internal class StatusWorker(context: Context, workerParams: WorkerParameters) : 
         val robertManager: RobertManager = robertApplication.robertManager
 
         Timber.d("Start updating status")
-        val wasAtRisk = robertManager.isAtRisk
+        val wasAtRisk = robertManager.isAtRisk == true
         val result = robertManager.updateStatus(robertApplication)
 
-        if (!wasAtRisk && robertManager.isAtRisk) {
+        if (!wasAtRisk && robertManager.isAtRisk == true) {
             (applicationContext as RobertApplication).atRiskDetected()
         }
 

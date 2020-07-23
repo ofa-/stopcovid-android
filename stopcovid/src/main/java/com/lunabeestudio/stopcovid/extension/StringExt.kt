@@ -16,6 +16,7 @@ import android.content.pm.ActivityInfo
 import android.net.Uri
 import android.widget.Toast
 import timber.log.Timber
+import java.util.regex.Pattern
 
 fun String.openInChromeTab(context: Context) {
     val intent = Intent(Intent.ACTION_VIEW)
@@ -27,4 +28,8 @@ fun String.openInChromeTab(context: Context) {
         Timber.e("No activity to open url")
         Toast.makeText(context, "Unable to open url", Toast.LENGTH_SHORT).show()
     }
+}
+
+fun String.isCodeValid(): Boolean {
+    return length == 6 || Pattern.matches("[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}", this)
 }

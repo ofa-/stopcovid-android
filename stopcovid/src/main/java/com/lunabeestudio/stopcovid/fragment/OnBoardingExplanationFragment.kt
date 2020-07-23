@@ -16,6 +16,7 @@ import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
+import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.fastitem.numberItem
 import com.mikepenz.fastadapter.GenericItem
 
@@ -25,7 +26,7 @@ class OnBoardingExplanationFragment : OnBoardingFragment() {
     override fun getButtonTitleKey(): String? = "onboarding.explanationsController.dataPrivacy"
     override fun getOnButtonClick(): () -> Unit = {
         findNavController()
-            .navigate(OnBoardingExplanationFragmentDirections.actionOnBoardingExplanationFragmentToOnBoardingPrivacyFragment())
+            .safeNavigate(OnBoardingExplanationFragmentDirections.actionOnBoardingExplanationFragmentToOnBoardingPrivacyFragment())
     }
 
     override fun getItems(): List<GenericItem> {

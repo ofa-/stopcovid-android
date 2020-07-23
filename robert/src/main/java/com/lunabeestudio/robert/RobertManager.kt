@@ -24,7 +24,7 @@ interface RobertManager {
 
     val isProximityActive: Boolean
 
-    val isAtRisk: Boolean
+    val isAtRisk: Boolean?
 
     val atRiskLastRefresh: Long?
 

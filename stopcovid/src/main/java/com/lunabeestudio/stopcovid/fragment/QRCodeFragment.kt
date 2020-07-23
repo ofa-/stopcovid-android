@@ -18,6 +18,9 @@ import androidx.navigation.fragment.findNavController
 import com.journeyapps.barcodescanner.BarcodeResult
 import com.lunabeestudio.stopcovid.coreui.fragment.BaseFragment
 import com.lunabeestudio.stopcovid.databinding.FragmentQrCodeBinding
+import com.lunabeestudio.stopcovid.extension.isCodeValid
+import com.lunabeestudio.stopcovid.extension.safeNavigate
+import com.lunabeestudio.stopcovid.extension.showInvalidCodeAlert
 
 class QRCodeFragment : BaseFragment() {
 
@@ -38,7 +41,12 @@ class QRCodeFragment : BaseFragment() {
         binding?.qrCodeReaderView?.decodeContinuous { result: BarcodeResult? ->
             binding?.qrCodeReaderView?.stopDecoding()
             result?.text?.let { code ->
-                findNavController().navigate(QRCodeFragmentDirections.actionQrCodeFragmentToSymptomsOriginFragment(code))
+                if (!code.isCodeValid()) {
+                    context?.showInvalidCodeAlert(strings)
+                    findNavController().navigateUp()
+                } else {
+                    findNavController().safeNavigate(QRCodeFragmentDirections.actionQrCodeFragmentToSymptomsOriginFragment(code))
+                }
             }
         }
     }

@@ -32,7 +32,6 @@ import com.lunabeestudio.robert.datasource.RemoteServiceDataSource
 import com.lunabeestudio.robert.model.BackendException
 import com.lunabeestudio.robert.model.RobertResult
 import com.lunabeestudio.robert.model.RobertResultData
-import okhttp3.HttpUrl.Companion.toHttpUrl
 import retrofit2.HttpException
 import retrofit2.Response
 import timber.log.Timber
@@ -40,8 +39,8 @@ import java.io.File
 
 class ServiceDataSource(context: Context, baseUrl: String = BuildConfig.BASE_URL) : RemoteServiceDataSource {
 
-    private var api: StopCovidApi = RetrofitClient.getService(context, StopCovidApi::class.java, baseUrl.toHttpUrl())
-    private var fileApi: StopCovidApi = RetrofitClient.getFileService(context, StopCovidApi::class.java, baseUrl.toHttpUrl())
+    private var api: StopCovidApi = RetrofitClient.getService(context, baseUrl, StopCovidApi::class.java)
+    private var fileApi: StopCovidApi = RetrofitClient.getFileService(context, baseUrl, StopCovidApi::class.java)
 
     override suspend fun generateCaptcha(apiVersion: String, type: String, language: String): RobertResultData<String> {
         val result = tryCatchRequestData {

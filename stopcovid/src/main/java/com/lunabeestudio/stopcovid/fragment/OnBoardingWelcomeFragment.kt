@@ -20,6 +20,7 @@ import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
+import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.fastitem.logoItem
 import com.lunabeestudio.stopcovid.viewmodel.OnBoardingViewModel
 import com.lunabeestudio.stopcovid.viewmodel.OnBoardingViewModelFactory
@@ -33,7 +34,7 @@ class OnBoardingWelcomeFragment : OnBoardingFragment() {
     override fun getButtonTitleKey(): String? = "onboarding.welcomeController.howDoesItWork"
     override fun getOnButtonClick(): () -> Unit = {
         findNavController()
-            .navigate(OnBoardingWelcomeFragmentDirections.actionOnBoardingWelcomeFragmentToOnBoardingExplanationFragment())
+            .safeNavigate(OnBoardingWelcomeFragmentDirections.actionOnBoardingWelcomeFragmentToOnBoardingExplanationFragment())
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

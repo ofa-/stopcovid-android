@@ -42,13 +42,13 @@ android {
         applicationId "fr.gouv.android.stopcovid"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 39
-        versionName "1.1.1"
+        versionCode 41
+        versionName "1.1.2"
 
         testInstrumentationRunner = 'com.lunabeestudio.stopcovid.TestRunner'
 
-        buildConfigField 'String', 'CAPTCHA_API_KEY', STOPCOVID_CAPTCHA_API_KEY
-        buildConfigField 'String', 'CAPTCHA_URL', STOPCOVID_CAPTCHA_URL
+        buildConfigField 'String', 'CAPTCHA_API_KEY', '"6LettPsUAAAAAHYaFdRBOilHUgmTMSIPKNZN4D7l"'
+        buildConfigField 'String', 'CAPTCHA_URL', '"https://stopcovid.gouv.fr"'
         buildConfigField 'String', 'APP_MAINTENANCE_CERTIFICATE_SHA256', '"sha256/sXQojvwsiyblrpMQIVRXGC5u7AgknzTJm+VIK1kQmD8="'
         buildConfigField 'String', 'APP_MAINTENANCE_URL', '"https://app.stopcovid.gouv.fr/maintenance/info-maintenance-v2.json"'
     }
@@ -71,7 +71,7 @@ android {
 
 dependencies {
     implementation 'androidx.documentfile:documentfile:1.0.1'
-    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.0.0'
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
     implementation 'androidx.work:work-runtime-ktx:2.3.4'
 
     implementation('com.journeyapps:zxing-android-embedded:4.1.0') { transitive = false }
