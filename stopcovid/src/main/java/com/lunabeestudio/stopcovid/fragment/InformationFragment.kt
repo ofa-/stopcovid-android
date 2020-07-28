@@ -21,6 +21,7 @@ import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
 import com.lunabeestudio.stopcovid.extension.openInChromeTab
 import com.lunabeestudio.stopcovid.extension.robertManager
+import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.mikepenz.fastadapter.GenericItem
 
 class InformationFragment : MainFragment() {
@@ -38,7 +39,7 @@ class InformationFragment : MainFragment() {
             spaceRes = R.dimen.spacing_xlarge
             identifier = items.count().toLong()
         }
-        if (robertManager.isAtRisk) {
+        if (robertManager.isAtRisk == true) {
             items += titleItem {
                 text = strings["informationController.mainMessage.atRisk.title"]
                 gravity = Gravity.CENTER
@@ -66,7 +67,7 @@ class InformationFragment : MainFragment() {
             identifier = items.count().toLong()
         }
         var titleCount = 1
-        if (robertManager.isAtRisk) {
+        if (robertManager.isAtRisk == true) {
             items += titleItem {
                 text = stringsFormat("informationController.step.isolate.atRisk.title", titleCount++)
                 gravity = Gravity.CENTER
@@ -93,11 +94,11 @@ class InformationFragment : MainFragment() {
             text = strings["informationController.step.isolate.buttonTitle"]
             gravity = Gravity.CENTER
             onClickListener = View.OnClickListener {
-                findNavController().navigate(InformationFragmentDirections.actionInformationFragmentToGestureFragment())
+                findNavController().safeNavigate(InformationFragmentDirections.actionInformationFragmentToGestureFragment())
             }
             identifier = items.count().toLong()
         }
-        if (robertManager.isAtRisk) {
+        if (robertManager.isAtRisk == true) {
             items += titleItem {
                 text = stringsFormat("informationController.step.beCareful.atRisk.title", titleCount++)
                 gravity = Gravity.CENTER
@@ -128,7 +129,7 @@ class InformationFragment : MainFragment() {
             }
             identifier = items.count().toLong()
         }
-        if (robertManager.isAtRisk) {
+        if (robertManager.isAtRisk == true) {
             items += titleItem {
                 text = stringsFormat("informationController.step.appointment.title", titleCount++)
                 gravity = Gravity.CENTER

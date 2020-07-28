@@ -16,7 +16,6 @@ import com.google.gson.GsonBuilder
 import com.lunabeestudio.framework.BuildConfig
 import okhttp3.CertificatePinner
 import okhttp3.ConnectionSpec
-import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -33,20 +32,18 @@ import java.util.concurrent.TimeUnit
 
 object RetrofitClient {
 
-    internal fun <T> getService(context: Context, clazz: Class<T>,
-        httpUrl: HttpUrl): T {
+    internal fun <T> getService(context: Context, baseUrl: String, clazz: Class<T>): T {
         return Retrofit.Builder()
-            .baseUrl(httpUrl)
+            .baseUrl(baseUrl.toHttpUrl())
             .addConverterFactory(GsonConverterFactory.create(GsonBuilder().create()))
-            .client(getDefaultOKHttpClient(context, BuildConfig.BASE_URL, BuildConfig.CERTIFICATE_SHA256))
+            .client(getDefaultOKHttpClient(context, baseUrl, BuildConfig.CERTIFICATE_SHA256))
             .build().create(clazz)
     }
 
-    internal fun <T> getFileService(context: Context, clazz: Class<T>,
-        httpUrl: HttpUrl): T {
+    internal fun <T> getFileService(context: Context, baseUrl: String, clazz: Class<T>): T {
         return Retrofit.Builder()
-            .baseUrl(httpUrl)
-            .client(getFileOKHttpClient(context, BuildConfig.BASE_URL, BuildConfig.CERTIFICATE_SHA256))
+            .baseUrl(baseUrl.toHttpUrl())
+            .client(getFileOKHttpClient(context, baseUrl, BuildConfig.CERTIFICATE_SHA256))
             .build().create(clazz)
     }
 

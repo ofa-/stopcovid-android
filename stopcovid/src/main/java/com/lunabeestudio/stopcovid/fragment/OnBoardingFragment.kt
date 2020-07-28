@@ -44,11 +44,7 @@ abstract class OnBoardingFragment : FastAdapterFragment() {
 
     private fun initBottomButton() {
         getActivityBinding().bottomSheetLayout.bottomSheetButton.setOnClickListener {
-            try {
-                getOnButtonClick().invoke()
-            } catch (e: IllegalArgumentException) {
-                // back and button pressed quickly can trigger this exception.
-            }
+            getOnButtonClick().invoke()
         }
         getActivityBinding().bottomSheetLayout.bottomSheetFrameLayout.post {
             binding?.recyclerView?.updatePadding(bottom = getActivityBinding().bottomSheetLayout.bottomSheetFrameLayout.height)

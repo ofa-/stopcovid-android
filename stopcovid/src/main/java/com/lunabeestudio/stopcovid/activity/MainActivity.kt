@@ -13,7 +13,6 @@ package com.lunabeestudio.stopcovid.activity
 import android.os.Bundle
 import android.view.Menu
 import android.view.accessibility.AccessibilityEvent
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.children
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
@@ -25,7 +24,6 @@ import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupActionBarWithNavController
 import com.google.android.material.snackbar.Snackbar
 import com.lunabeestudio.robert.RobertManager
-import com.lunabeestudio.stopcovid.NavMainDirections
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.applyAndConsumeWindowInsetBottom
 import com.lunabeestudio.stopcovid.coreui.extension.hideBottomSheet
@@ -33,6 +31,7 @@ import com.lunabeestudio.stopcovid.coreui.extension.showSnackBar
 import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
 import com.lunabeestudio.stopcovid.databinding.ActivityMainBinding
 import com.lunabeestudio.stopcovid.extension.robertManager
+import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.fragment.IsSickFragmentDirections
 
 class MainActivity : BaseActivity() {
@@ -97,7 +96,7 @@ class MainActivity : BaseActivity() {
         }
 
         if (robertManager.isSick) {
-            navController.navigate(IsSickFragmentDirections.actionGlobalIsSickFragment())
+            navController.safeNavigate(IsSickFragmentDirections.actionGlobalIsSickFragment())
         }
     }
 

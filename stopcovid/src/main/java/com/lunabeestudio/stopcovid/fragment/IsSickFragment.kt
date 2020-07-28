@@ -32,6 +32,7 @@ import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
 import com.lunabeestudio.stopcovid.extension.getString
 import com.lunabeestudio.stopcovid.extension.openInChromeTab
 import com.lunabeestudio.stopcovid.extension.robertManager
+import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.fastitem.logoItem
 import com.lunabeestudio.stopcovid.viewmodel.IsSickViewModel
 import com.lunabeestudio.stopcovid.viewmodel.IsSickViewModelFactory
@@ -67,13 +68,8 @@ class IsSickFragment : AboutMainFragment() {
             sharedPreferences.edit {
                 remove(Constants.SharedPrefs.ON_BOARDING_DONE)
             }
-            try {
-                findNavController()
-                    .navigate(ManageDataFragmentDirections.actionGlobalOnBoardingActivity())
-                activity?.finishAndRemoveTask()
-            } catch (e: IllegalArgumentException) {
-                // If user leave the screen before logout is done
-            }
+            findNavController().safeNavigate(ManageDataFragmentDirections.actionGlobalOnBoardingActivity())
+            activity?.finishAndRemoveTask()
         }
     }
 

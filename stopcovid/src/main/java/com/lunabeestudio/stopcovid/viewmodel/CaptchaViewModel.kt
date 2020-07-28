@@ -43,7 +43,6 @@ class CaptchaViewModel(private val robertManager: RobertManager) : ViewModel() {
             viewModelScope.launch(Dispatchers.IO) {
                 loadingInProgress.postValue(true)
                 val result = robertManager.generateCaptcha(if (isImage) "IMAGE" else "AUDIO", Locale.getDefault().language)
-                loadingInProgress.postValue(false)
                 when (result) {
                     is RobertResultData.Success -> {
                         captchaId = result.data
@@ -53,28 +52,25 @@ class CaptchaViewModel(private val robertManager: RobertManager) : ViewModel() {
                             getCaptchaAudio()
                         }
                     }
-                    is RobertResultData.Failure -> covidException.postValue(result.error.toCovidException())
+                    is RobertResultData.Failure -> {
+                        loadingInProgress.postValue(false)
+                        covidException.postValue(result.error.toCovidException())
+                    }
                 }
             }
         }
     }
 
     private suspend fun getCaptchaImage() {
-        loadingInProgress.postValue(true)
         val result = robertManager.getCaptchaImage(captchaId, imagePath)
         loadingInProgress.postValue(false)
         when (result) {
-            is RobertResult.Success -> {
-                imageSuccess.postValue(null)
-            }
-            is RobertResult.Failure -> {
-                covidException.postValue(result.error.toCovidException())
-            }
+            is RobertResult.Success -> imageSuccess.postValue(null)
+            is RobertResult.Failure -> covidException.postValue(result.error.toCovidException())
         }
     }
 
     private suspend fun getCaptchaAudio() {
-        loadingInProgress.postValue(true)
         val result = robertManager.getCaptchaAudio(captchaId, audioPath)
         loadingInProgress.postValue(false)
         when (result) {

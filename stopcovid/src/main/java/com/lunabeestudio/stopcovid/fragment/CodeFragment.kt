@@ -15,7 +15,6 @@ import android.view.Gravity
 import android.view.View
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.button.MaterialButton
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.hideSoftKeyBoard
@@ -24,6 +23,9 @@ import com.lunabeestudio.stopcovid.coreui.fastitem.buttonItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
+import com.lunabeestudio.stopcovid.extension.isCodeValid
+import com.lunabeestudio.stopcovid.extension.safeNavigate
+import com.lunabeestudio.stopcovid.extension.showInvalidCodeAlert
 import com.lunabeestudio.stopcovid.fastitem.editTextItem
 import com.mikepenz.fastadapter.GenericItem
 import java.lang.ref.WeakReference
@@ -101,14 +103,10 @@ class CodeFragment : MainFragment() {
     }
 
     private fun verifyCode() {
-        if (!Constants.ServerConstant.ACCEPTED_REPORT_CODE_LENGTH.contains(code.length)) {
-            MaterialAlertDialogBuilder(requireContext())
-                .setTitle(strings["enterCodeController.alert.invalidCode.title"])
-                .setMessage(strings["enterCodeController.alert.invalidCode.message"])
-                .setPositiveButton(strings["common.ok"], null)
-                .show()
+        if (!code.isCodeValid()) {
+            context?.showInvalidCodeAlert(strings)
         } else {
-            findNavController().navigate(CodeFragmentDirections.actionCodeFragmentToSymptomsOriginFragment(code))
+            findNavController().safeNavigate(CodeFragmentDirections.actionCodeFragmentToSymptomsOriginFragment(code))
         }
     }
 

@@ -13,15 +13,16 @@ package com.lunabeestudio.stopcovid.receiver
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import com.lunabeestudio.stopcovid.StopCovid
+import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
+import com.lunabeestudio.stopcovid.extension.robertManager
+import com.lunabeestudio.stopcovid.service.ProximityService
 
-class TimeChangeReceiver : BroadcastReceiver() {
+class UpgradeReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
-        val action = intent.action
-        if (action == Intent.ACTION_TIME_CHANGED ||
-            action == Intent.ACTION_TIMEZONE_CHANGED) {
-            (context.applicationContext as StopCovid).startAppMaintenanceWorker(true)
+        if (intent.action == Intent.ACTION_MY_PACKAGE_REPLACED && context.robertManager().isProximityActive) {
+            StringsManager.init(context)
+            ProximityService.start(context)
         }
     }
 }

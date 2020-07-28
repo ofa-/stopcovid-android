@@ -31,9 +31,9 @@ import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
 import com.lunabeestudio.stopcovid.extension.getString
 import com.lunabeestudio.stopcovid.extension.robertManager
+import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.fastitem.logoItem
 import com.lunabeestudio.stopcovid.fastitem.progressButtonItem
-import com.lunabeestudio.stopcovid.model.BackendException
 import com.lunabeestudio.stopcovid.model.UnauthorizedException
 import com.lunabeestudio.stopcovid.viewmodel.CodeViewModel
 import com.lunabeestudio.stopcovid.viewmodel.CodeViewModelFactory
@@ -70,10 +70,10 @@ class SendHistoryFragment : MainFragment() {
             }
         }
         viewModel.codeSuccess.observe(viewLifecycleOwner) {
-            findNavController().navigate(SendHistoryFragmentDirections.actionSendHistoryFragmentToIsSickFragment())
+            findNavController().safeNavigate(SendHistoryFragmentDirections.actionSendHistoryFragmentToIsSickFragment())
         }
         viewModel.covidException.observe(viewLifecycleOwner) { error ->
-            if (error is BackendException || error is UnauthorizedException) {
+            if (error is UnauthorizedException) {
                 MaterialAlertDialogBuilder(requireContext())
                     .setTitle(strings["sendHistoryController.alert.invalidCode.title"])
                     .setMessage(strings["sendHistoryController.alert.invalidCode.message"])

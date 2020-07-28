@@ -29,6 +29,7 @@ import com.lunabeestudio.stopcovid.coreui.extension.showPermissionRationale
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
+import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.fastitem.logoItem
 import com.lunabeestudio.stopcovid.manager.ProximityManager
 import com.mikepenz.fastadapter.GenericItem
@@ -114,21 +115,17 @@ class OnBoardingProximityFragment : OnBoardingFragment() {
 
     private fun startNextController() {
         testAdvertisement { success ->
-            try {
-                if (success) {
-                    if (!ProximityManager.isBatteryOptimizationOn(requireContext())) {
-                        findNavController()
-                            .navigate(OnBoardingProximityFragmentDirections.actionOnBoardingProximityFragmentToOnBoardingBatteryFragment())
-                    } else {
-                        findNavController()
-                            .navigate(OnBoardingProximityFragmentDirections.actionOnBoardingProximityFragmentToOnBoardingNotificationFragment())
-                    }
+            if (success) {
+                if (!ProximityManager.isBatteryOptimizationOn(requireContext())) {
+                    findNavController()
+                        .safeNavigate(OnBoardingProximityFragmentDirections.actionOnBoardingProximityFragmentToOnBoardingBatteryFragment())
                 } else {
                     findNavController()
-                        .navigate(OnBoardingProximityFragmentDirections.actionOnBoardingProximityFragmentToOnBoardingNoBleFragment())
+                        .safeNavigate(OnBoardingProximityFragmentDirections.actionOnBoardingProximityFragmentToOnBoardingNotificationFragment())
                 }
-            } catch (e: IllegalArgumentException) {
-                // back and button pressed quickly can trigger this exception.
+            } else {
+                findNavController()
+                    .safeNavigate(OnBoardingProximityFragmentDirections.actionOnBoardingProximityFragmentToOnBoardingNoBleFragment())
             }
         }
     }

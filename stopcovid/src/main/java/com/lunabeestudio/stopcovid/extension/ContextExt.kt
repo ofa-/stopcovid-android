@@ -11,7 +11,16 @@
 package com.lunabeestudio.stopcovid.extension
 
 import android.content.Context
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.lunabeestudio.robert.RobertApplication
 import com.lunabeestudio.robert.RobertManager
 
 fun Context.robertManager(): RobertManager = (applicationContext as RobertApplication).robertManager
+
+fun Context.showInvalidCodeAlert(strings: Map<String, String>) {
+    MaterialAlertDialogBuilder(this)
+        .setTitle(strings["enterCodeController.alert.invalidCode.title"])
+        .setMessage(strings["enterCodeController.alert.invalidCode.message"])
+        .setPositiveButton(strings["common.ok"], null)
+        .show()
+}

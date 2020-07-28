@@ -24,6 +24,7 @@ import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
 import com.lunabeestudio.stopcovid.extension.robertManager
+import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.fastitem.contactItem
 import com.lunabeestudio.stopcovid.fastitem.doubleButtonItem
 import com.lunabeestudio.stopcovid.fastitem.logoItem
@@ -43,6 +44,7 @@ class ReportFragment : AboutMainFragment() {
     override fun getTitleKey(): String = "sickController.title"
 
     private val dateFormat: DateFormat = SimpleDateFormat("dd LLLL", Locale.getDefault())
+    private val dateTimeFormat: DateFormat = SimpleDateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.SHORT)
 
     override fun getItems(): List<GenericItem> {
         val items = ArrayList<GenericItem>()
@@ -55,7 +57,7 @@ class ReportFragment : AboutMainFragment() {
             spaceRes = R.dimen.spacing_xlarge
             identifier = items.size.toLong()
         }
-        if (robertManager.isAtRisk) {
+        if (robertManager.isAtRisk == true) {
             val exposureCalendar = Calendar.getInstance()
             robertManager.atRiskLastRefresh?.let {
                 exposureCalendar.time = Date(it)
@@ -69,12 +71,35 @@ class ReportFragment : AboutMainFragment() {
                 identifier = items.count().toLong()
             }
             items += contactItem {
-                header = stringsFormat("sickController.state.date", dateFormat.format(exposureDate))
+                header = stringsFormat("sickController.state.date", dateTimeFormat.format(exposureDate))
                 title = strings["sickController.state.contact.title"]
                 caption = stringsFormat("sickController.state.contact.subtitle", dateFormat.format(endExposureDate))
                 more = strings["common.readMore"]
                 moreClickListener = View.OnClickListener {
-                    findNavController().navigate(ReportFragmentDirections.actionReportFragmentToInformationFragment())
+                    findNavController().safeNavigate(ReportFragmentDirections.actionReportFragmentToInformationFragment())
+                }
+            }
+            items += spaceItem {
+                spaceRes = R.dimen.spacing_large
+                identifier = items.count().toLong()
+            }
+        } else if (robertManager.isAtRisk == false) {
+            val refreshCalendar = Calendar.getInstance()
+            robertManager.atRiskLastRefresh?.let {
+                refreshCalendar.time = Date(it)
+            }
+            val refreshDate = refreshCalendar.time
+            items += spaceItem {
+                spaceRes = R.dimen.spacing_large
+                identifier = items.count().toLong()
+            }
+            items += contactItem {
+                header = stringsFormat("sickController.state.date", dateTimeFormat.format(refreshDate))
+                title = strings["sickController.state.nothing.title"]
+                caption = strings["sickController.state.nothing.subtitle"]
+                more = strings["common.readMore"]
+                moreClickListener = View.OnClickListener {
+                    findNavController().safeNavigate(ReportFragmentDirections.actionReportFragmentToInformationFragment())
                 }
             }
             items += spaceItem {
@@ -112,11 +137,11 @@ class ReportFragment : AboutMainFragment() {
                             UiConstants.Permissions.CAMERA.ordinal)
                     }
                 } else {
-                    findNavController().navigate(ReportFragmentDirections.actionReportFragmentToQrCodeFragment())
+                    findNavController().safeNavigate(ReportFragmentDirections.actionReportFragmentToQrCodeFragment())
                 }
             }
             onClickListener2 = View.OnClickListener {
-                findNavController().navigate(ReportFragmentDirections.actionReportFragmentToCodeFragment())
+                findNavController().safeNavigate(ReportFragmentDirections.actionReportFragmentToCodeFragment())
             }
             identifier = items.count().toLong()
         }
@@ -131,11 +156,7 @@ class ReportFragment : AboutMainFragment() {
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         if (requestCode == UiConstants.Permissions.CAMERA.ordinal) {
             if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                try {
-                    findNavController().navigate(ReportFragmentDirections.actionReportFragmentToQrCodeFragment())
-                } catch (e: IllegalArgumentException) {
-                    // Fragment already changed before QRCodeFragment could be shown
-                }
+                findNavController().safeNavigate(ReportFragmentDirections.actionReportFragmentToQrCodeFragment())
             } else if (!shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)) {
                 context?.showPermissionRationale(strings, "common.needCameraAccessToScan", "common.settings") {
                     openAppSettings()

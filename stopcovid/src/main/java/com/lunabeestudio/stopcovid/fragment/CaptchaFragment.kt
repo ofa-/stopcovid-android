@@ -34,7 +34,6 @@ import com.lunabeestudio.stopcovid.fastitem.audioItem
 import com.lunabeestudio.stopcovid.fastitem.editTextItem
 import com.lunabeestudio.stopcovid.fastitem.imageItem
 import com.lunabeestudio.stopcovid.fastitem.linkItem
-import com.lunabeestudio.stopcovid.model.BackendException
 import com.lunabeestudio.stopcovid.model.UnauthorizedException
 import com.lunabeestudio.stopcovid.viewmodel.CaptchaViewModel
 import com.lunabeestudio.stopcovid.viewmodel.CaptchaViewModelFactory
@@ -80,7 +79,7 @@ class CaptchaFragment : MainFragment() {
             findNavController().navigateUp()
         }
         viewModel.covidException.observe(viewLifecycleOwner) { error ->
-            if ((error is BackendException || error is UnauthorizedException) && viewModel.code.isNotBlank()) {
+            if (error is UnauthorizedException && viewModel.code.isNotBlank()) {
                 MaterialAlertDialogBuilder(requireContext())
                     .setTitle(strings["captchaController.alert.invalidCode.title"])
                     .setMessage(strings["captchaController.alert.invalidCode.message"])

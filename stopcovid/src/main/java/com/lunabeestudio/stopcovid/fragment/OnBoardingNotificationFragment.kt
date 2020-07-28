@@ -16,6 +16,7 @@ import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
+import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.fastitem.logoItem
 import com.mikepenz.fastadapter.GenericItem
 
@@ -25,7 +26,7 @@ class OnBoardingNotificationFragment : OnBoardingFragment() {
     override fun getButtonTitleKey(): String? = "onboarding.beAwareController.allowNotifications"
     override fun getOnButtonClick(): () -> Unit = {
         findNavController()
-            .navigate(OnBoardingNotificationFragmentDirections.actionOnBoardingNotificationFragmentToOnBoardingGestureFragment())
+            .safeNavigate(OnBoardingNotificationFragmentDirections.actionOnBoardingNotificationFragmentToOnBoardingGestureFragment())
     }
 
     override fun getItems(): List<GenericItem> {

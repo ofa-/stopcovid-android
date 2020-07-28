@@ -41,7 +41,6 @@ import com.lunabeestudio.framework.sharedcrypto.BouncyCastleCryptoDataSource
 import com.lunabeestudio.robert.RobertApplication
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.robert.RobertManagerImpl
-import com.lunabeestudio.stopcovid.BuildConfig.APP_MAINTENANCE_URL
 import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.UiConstants
 import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
@@ -101,7 +100,7 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication {
         AppMaintenanceManager.init(this,
             R.drawable.maintenance,
             R.drawable.maintenance,
-            APP_MAINTENANCE_URL)
+            BuildConfig.APP_MAINTENANCE_URL)
         val config = BundledEmojiCompatConfig(this)
         EmojiCompat.init(config)
         startAppMaintenanceWorker(false)
@@ -142,8 +141,8 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication {
     }
 
     override fun atRiskDetected() {
-        val minHour = robertManager().atRiskMinHourContactNotif
-        val maxHour = robertManager().atRiskMaxHourContactNotif
+        val minHour = robertManager.atRiskMinHourContactNotif
+        val maxHour = robertManager.atRiskMaxHourContactNotif
 
         val currentCal = Calendar.getInstance()
         val hours = currentCal.get(Calendar.HOUR_OF_DAY)
@@ -269,7 +268,7 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication {
             .enqueueUniquePeriodicWork(Constants.WorkerNames.TIME_CHANGED, policy, timeChangedWorkRequest)
     }
 
-    fun refreshStatusIfNeeded() {
+    private fun refreshStatusIfNeeded() {
         if (System.currentTimeMillis() - (robertManager.atRiskLastRefresh
                 ?: 0L) > TimeUnit.HOURS.toMillis(robertManager.checkStatusFrequencyHour.toLong())) {
             CoroutineScope(Dispatchers.IO).launch {

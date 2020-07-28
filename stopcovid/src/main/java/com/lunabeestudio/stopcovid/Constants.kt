@@ -29,7 +29,6 @@ object Constants {
     }
 
     object ServerConstant {
-        val ACCEPTED_REPORT_CODE_LENGTH: List<Int> = listOf(6, 36)
         val MAX_GAP_DEVICE_SERVER: Long = TimeUnit.MINUTES.toMillis(2L)
     }
 }
