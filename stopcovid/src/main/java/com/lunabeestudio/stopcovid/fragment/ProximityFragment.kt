@@ -43,6 +43,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
+import com.airbnb.lottie.utils.Utils
 import com.lunabeestudio.framework.remote.RetrofitClient
 import com.lunabeestudio.robert.RobertApplication
 import com.lunabeestudio.robert.model.RobertException
@@ -64,9 +65,12 @@ import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.extension.toCovidException
 import com.lunabeestudio.stopcovid.fastitem.LogoItem
+import com.lunabeestudio.stopcovid.fastitem.LottieItem
 import com.lunabeestudio.stopcovid.fastitem.ProximityButtonItem
+import com.lunabeestudio.stopcovid.fastitem.State
 import com.lunabeestudio.stopcovid.fastitem.linkItem
 import com.lunabeestudio.stopcovid.fastitem.logoItem
+import com.lunabeestudio.stopcovid.fastitem.lottieItem
 import com.lunabeestudio.stopcovid.fastitem.proximityButtonItem
 import com.lunabeestudio.stopcovid.manager.ProximityManager
 import com.lunabeestudio.stopcovid.service.ProximityService
@@ -92,10 +96,13 @@ class ProximityFragment : AboutMainFragment() {
         ProximityViewModelFactory(robertManager)
     }
 
+    private lateinit var lottieItem: LottieItem
     private lateinit var logoItem: LogoItem
     private lateinit var proximityButtonItem: ProximityButtonItem
     private lateinit var captionItem: CaptionItem
     private lateinit var subTitleItem: TitleItem
+    private var shouldRefresh: Boolean = false
+    private var isProximityOn: Boolean = false
     private var webView: WebView? = null
     private val interpolator = DecelerateInterpolator()
     private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
@@ -142,6 +149,8 @@ class ProximityFragment : AboutMainFragment() {
                 errorLayout.translationY = errorLayout.height.toFloat()
             }
         }
+        
+        isProximityOn = ProximityManager.isProximityOn(requireContext(), robertManager)
         return view
     }
 
@@ -157,7 +166,10 @@ class ProximityFragment : AboutMainFragment() {
 
     override fun onResume() {
         super.onResume()
-        refreshScreen()
+        if (shouldRefresh) {
+            refreshScreen()
+            shouldRefresh = false
+        }
     }
 
     private fun initViewModelObserver() {
@@ -186,6 +198,11 @@ class ProximityFragment : AboutMainFragment() {
         requireActivity().bindService(ProximityService.intent(requireActivity()), proximityServiceConnection, Context.BIND_ABOVE_CLIENT)
     }
 
+    override fun onPause() {
+        super.onPause()
+        shouldRefresh = true
+    }
+
     override fun onStop() {
         super.onStop()
         requireActivity().unbindService(proximityServiceConnection)
@@ -200,10 +217,17 @@ class ProximityFragment : AboutMainFragment() {
         }
         items += subTitleItem
 
+        lottieItem = lottieItem {
+            identifier = items.count().toLong()
+        }
         logoItem = logoItem {
             identifier = items.count().toLong()
         }
-        items += logoItem
+        if (isAnimationEnabled()) {
+            items += lottieItem
+        } else {
+            items += logoItem
+        }
         proximityButtonItem = proximityButtonItem {
             mainText = strings["proximityController.button.activateProximity"]
             lightText = strings["proximityController.button.deactivateProximity"]
@@ -273,9 +297,24 @@ class ProximityFragment : AboutMainFragment() {
         }
     }
 
+    @SuppressLint("RestrictedApi")
     private fun refreshItems() {
         context?.let { context ->
-            val isProximityOn: Boolean = ProximityManager.isProximityOn(context, robertManager)
+            val wasProximityDifferent: Boolean = isProximityOn != ProximityManager.isProximityOn(context, robertManager)
+            isProximityOn = ProximityManager.isProximityOn(context, robertManager)
+            lottieItem.state = if (wasProximityDifferent) {
+                if (isProximityOn) {
+                    State.OFF_TO_ON
+                } else {
+                    State.ON_TO_OFF
+                }
+            } else {
+                if (isProximityOn) {
+                    State.ON
+                } else {
+                    State.OFF
+                }
+            }
             logoItem.imageRes = if (isProximityOn) {
                 R.drawable.status_active
             } else {
@@ -305,6 +344,8 @@ class ProximityFragment : AboutMainFragment() {
             }
         }
     }
+
+    private fun isAnimationEnabled(): Boolean = Utils.getAnimationScale(getContext()) != 0f
 
     private fun updateErrorLayout(errorLayout: FrameLayout?) {
         getActivityBinding()?.errorTextView?.text = ProximityManager.getErrorText(this, robertManager, strings)
@@ -516,6 +557,6 @@ class ProximityFragment : AboutMainFragment() {
 
     companion object {
         private const val JAVASCRIPT_INTERFACE_NAME: String = "androidJSHandler"
-        private const val PROXIMITY_BUTTON_DELAY: Long = 1000L
+        private const val PROXIMITY_BUTTON_DELAY: Long = 2000L
     }
 }

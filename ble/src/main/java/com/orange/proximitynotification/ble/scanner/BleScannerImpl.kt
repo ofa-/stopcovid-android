@@ -98,7 +98,6 @@ class BleScannerImpl(
             super.onBatchScanResults(results)
 
             results
-                .distinctBy { it.device }
                 .toBleScannedDevices(settings.serviceUuid)
                 .takeIf { it.isNotEmpty() }
                 ?.let { callback.onResult(it) }

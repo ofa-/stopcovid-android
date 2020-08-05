@@ -58,13 +58,15 @@ class ScanResultExtKtTest {
     private fun givenScanResult(
         device: BluetoothDevice = mock(),
         rssi: Int = 0,
-        scanRecord: ScanRecord? = null
+        scanRecord: ScanRecord? = null,
+        timestampNanos: Long = 0L
     ): ScanResult {
 
         val scanResult = mock<ScanResult>()
         whenever(scanResult.device).thenReturn(device)
         whenever(scanResult.rssi).thenReturn(rssi)
         whenever(scanResult.scanRecord).thenReturn(scanRecord)
+        whenever(scanResult.timestampNanos).thenReturn(timestampNanos)
         return scanResult
     }
 
