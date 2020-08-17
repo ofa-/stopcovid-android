@@ -21,6 +21,7 @@
     <item name="item_link" type="id" />
     <item name="item_logo" type="id" />
     <item name="item_logo_body" type="id" />
+    <item name="item_lottie" type="id" />
     <item name="item_number" type="id" />
     <item name="item_progress_button" type="id" />
     <item name="item_proximity_button" type="id" />

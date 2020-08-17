@@ -43,6 +43,7 @@ class BleProximityNotification(
     private val bleRecordProviderForScanWithoutPayload =
         RecordProviderForScanWithoutPayload(settings)
     private val bleRecordMapper = BleRecordMapper(settings)
+    private val bleScannedDeviceFilter = BleScannedDeviceFilter()
 
     private lateinit var proximityPayloadProvider: ProximityPayloadProvider
     private lateinit var callback: ProximityNotificationCallback
@@ -122,7 +123,7 @@ class BleProximityNotification(
                             bleGattManager.requestRemoteRssi(device, false)?.let { rssi ->
                                 val scannedDevice =
                                     BleScannedDevice(device = device, rssi = rssi)
-                                bleRecordProviderForScanWithoutPayload.fromScan(
+                                bleRecordProviderForScanWithPayload.fromScan(
                                     scannedDevice,
                                     payload
                                 )
@@ -150,26 +151,9 @@ class BleProximityNotification(
     private fun startScanner() {
         val status = bleScanner.start(callback = object : BleScanner.Callback {
             override fun onResult(results: List<BleScannedDevice>) {
-
                 if (results.isNotEmpty()) {
                     coroutineScope.launch(coroutineContextProvider.default) {
-                        results.mapNotNull { scannedDevice ->
-                            val serviceData = scannedDevice.serviceData
-
-                            if (serviceData != null) {
-                                // Android case
-                                decodePayload(serviceData)
-                                    ?.let {
-                                        bleRecordProviderForScanWithPayload.fromScan(
-                                            scannedDevice,
-                                            it
-                                        )
-                                    }
-                            } else {
-                                // iOS case
-                                bleRecordProviderForScanWithoutPayload.fromScan(scannedDevice, null)
-                            }
-                        }.forEach { notifyProximity(it) }
+                        handleScanResults(bleScannedDeviceFilter.filter(results))
                     }
                 }
             }
@@ -213,6 +197,24 @@ class BleProximityNotification(
     private fun notifyProximity(proximityInfo: ProximityInfo) {
         callback.onProximity(proximityInfo)
     }
+
+    private suspend fun handleScanResults(results: List<BleScannedDevice>) =
+        withContext(coroutineContextProvider.default) {
+
+            results.mapNotNull { scannedDevice ->
+                val serviceData = scannedDevice.serviceData
+
+                if (serviceData != null) {
+                    // Android case
+                    decodePayload(serviceData)?.let {
+                        bleRecordProviderForScanWithPayload.fromScan(scannedDevice, it)
+                    }
+                } else {
+                    // iOS case
+                    bleRecordProviderForScanWithoutPayload.fromScan(scannedDevice, null)
+                }
+            }.forEach { notifyProximity(it) }
+        }
 
     private fun decodePayload(value: ByteArray) = BlePayload.fromOrNull(value)
 

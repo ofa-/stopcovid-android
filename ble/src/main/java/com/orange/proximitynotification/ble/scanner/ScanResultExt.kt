@@ -11,14 +11,16 @@
 package com.orange.proximitynotification.ble.scanner
 
 import android.os.ParcelUuid
+import com.orange.proximitynotification.tools.nanosTimestampToDate
 import no.nordicsemi.android.support.v18.scanner.ScanResult
 import java.util.UUID
 
 internal fun ScanResult.toBleScannedDevice(serviceUuid: UUID): BleScannedDevice =
     BleScannedDevice(
         device = device,
+        rssi = rssi,
         serviceData = scanRecord?.serviceData?.get(ParcelUuid(serviceUuid)),
-        rssi = rssi
+        timestamp = timestampNanos.nanosTimestampToDate()
     )
 
 internal fun List<ScanResult>.toBleScannedDevices(serviceUuid: UUID): List<BleScannedDevice> =

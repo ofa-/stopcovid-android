@@ -45,11 +45,13 @@ internal fun payload(
 internal fun bleScannedDevice(
     device: BluetoothDevice = bluetoothDevice(),
     rssi: Int = 0,
-    serviceData: ByteArray? = null
+    serviceData: ByteArray? = null,
+    timestamp: Date = Date()
 ) = BleScannedDevice(
     device = device,
     rssi = rssi,
-    serviceData = serviceData
+    serviceData = serviceData,
+    timestamp = timestamp
 )
 
 internal fun bluetoothDevice(address: String = "address"): BluetoothDevice {

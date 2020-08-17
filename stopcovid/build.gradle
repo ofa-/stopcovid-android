@@ -50,8 +50,8 @@ android {
 
     defaultConfig {
         applicationId "fr.gouv.android.stopcovid"
-        versionCode 41
-        versionName "1.1.2"
+        versionCode 43
+        versionName "1.1.3"
 
         testInstrumentationRunner = 'com.lunabeestudio.stopcovid.TestRunner'
 
@@ -73,15 +73,15 @@ android {
         animationsDisabled true
     }
 
-    viewBinding {
-        enabled = true
-    }
+    buildFeatures.viewBinding = true
 }
 
 dependencies {
     implementation 'androidx.documentfile:documentfile:1.0.1'
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
-    implementation 'androidx.work:work-runtime-ktx:2.3.4'
+    implementation 'androidx.work:work-runtime-ktx:2.4.0'
+
+    implementation 'com.airbnb.android:lottie:3.4.1'
 
     implementation('com.journeyapps:zxing-android-embedded:4.1.0') { transitive = false }
     //noinspection NewerVersionAvailable,GradleDependency (New version require minSdk 24)

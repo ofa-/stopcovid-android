@@ -1,0 +1,32 @@
+<!--
+  ~ This Source Code Form is subject to the terms of the Mozilla Public
+  ~ License, v. 2.0. If a copy of the MPL was not distributed with this
+  ~ file, You can obtain one at https://mozilla.org/MPL/2.0/.
+  ~
+  ~ Authors
+  ~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ Created by Lunabee Studio / Date - 2020/04/05 - for the STOP-COVID project
+  -->
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="@dimen/logo_height"
+    android:layout_gravity="center">
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/offLottieAnimationView"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/logo_height"
+        android:importantForAccessibility="no"
+        android:visibility="gone"
+        app:lottie_renderMode="hardware" />
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/onLottieAnimationView"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/logo_height"
+        android:importantForAccessibility="no"
+        android:visibility="gone"
+        app:lottie_renderMode="hardware" />
+</FrameLayout>

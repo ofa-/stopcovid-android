@@ -17,10 +17,15 @@ buildscript {
     }
     dependencies {
         classpath "androidx.navigation:navigation-safe-args-gradle-plugin:2.3.0"
-        classpath 'com.android.tools.build:gradle:3.6.3'
+        classpath 'com.android.tools.build:gradle:4.0.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "com.karumi:shot:4.3.0"
         classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.12'
+
+        // https://issuetracker.google.com/issues/159151549#comment3
+        classpath 'org.ow2.asm:asm:8.0.1'
+        classpath 'org.ow2.asm:asm-util:8.0.1'
+        classpath 'org.ow2.asm:asm-commons:8.0.1'
     }
 }
 
