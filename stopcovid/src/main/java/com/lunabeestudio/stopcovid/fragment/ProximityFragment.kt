@@ -22,37 +22,27 @@ import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
 import android.os.SystemClock
-import android.util.Base64
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
-import android.webkit.JavascriptInterface
-import android.webkit.WebResourceError
-import android.webkit.WebResourceRequest
-import android.webkit.WebResourceResponse
 import android.webkit.WebView
-import android.webkit.WebViewClient
 import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import com.airbnb.lottie.utils.Utils
-import com.lunabeestudio.framework.remote.RetrofitClient
 import com.lunabeestudio.robert.RobertApplication
 import com.lunabeestudio.robert.model.RobertException
-import com.lunabeestudio.stopcovid.BuildConfig
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.UiConstants
 import com.lunabeestudio.stopcovid.coreui.extension.addRipple
-import com.lunabeestudio.stopcovid.coreui.extension.fetchSystemColor
 import com.lunabeestudio.stopcovid.coreui.extension.refreshLift
 import com.lunabeestudio.stopcovid.coreui.fastitem.CaptionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.TitleItem
@@ -78,13 +68,6 @@ import com.lunabeestudio.stopcovid.viewmodel.ProximityViewModel
 import com.lunabeestudio.stopcovid.viewmodel.ProximityViewModelFactory
 import com.mikepenz.fastadapter.GenericItem
 import kotlinx.android.synthetic.main.activity_main.view.*
-import kotlinx.coroutines.launch
-import okhttp3.Request
-import okhttp3.RequestBody.Companion.toRequestBody
-import timber.log.Timber
-import java.net.URL
-import java.security.MessageDigest
-import java.util.Locale
 
 class ProximityFragment : AboutMainFragment() {
 
@@ -149,7 +132,7 @@ class ProximityFragment : AboutMainFragment() {
                 errorLayout.translationY = errorLayout.height.toFloat()
             }
         }
-        
+
         isProximityOn = ProximityManager.isProximityOn(requireContext(), robertManager)
         return view
     }
@@ -183,11 +166,7 @@ class ProximityFragment : AboutMainFragment() {
             refreshItems()
         }
         viewModel.refreshConfigSuccess.observe(viewLifecycleOwner) {
-            if (robertManager.apiVersion == "v1") {
-                injectWebView()
-            } else {
-                findNavController().safeNavigate(ProximityFragmentDirections.actionProximityFragmentToCaptchaFragment())
-            }
+            findNavController().safeNavigate(ProximityFragmentDirections.actionProximityFragmentToCaptchaFragment())
         }
         viewModel.activateProximitySuccess.observe(viewLifecycleOwner) {
             refreshItems()
@@ -345,7 +324,8 @@ class ProximityFragment : AboutMainFragment() {
         }
     }
 
-    private fun isAnimationEnabled(): Boolean = Utils.getAnimationScale(getContext()) != 0f
+    @SuppressLint("RestrictedApi")
+    private fun isAnimationEnabled(): Boolean = Utils.getAnimationScale(context) != 0f
 
     private fun updateErrorLayout(errorLayout: FrameLayout?) {
         getActivityBinding()?.errorTextView?.text = ProximityManager.getErrorText(this, robertManager, strings)
@@ -409,137 +389,6 @@ class ProximityFragment : AboutMainFragment() {
         }
     }
 
-    @Suppress("DEPRECATION")
-    @SuppressLint("SetJavaScriptEnabled")
-    private fun injectWebView() {
-        (activity as? MainActivity)?.showProgress(true)
-        webView = WebView(requireContext())
-        webView?.settings?.javaScriptEnabled = true
-        webView?.settings?.allowFileAccessFromFileURLs = false
-        webView?.settings?.allowUniversalAccessFromFileURLs = false
-        webView?.settings?.allowContentAccess = false
-        webView?.settings?.allowFileAccess = false
-        webView?.settings?.setGeolocationEnabled(false)
-        webView?.settings?.javaScriptCanOpenWindowsAutomatically = false
-        webView?.settings?.saveFormData = false
-        webView?.settings?.savePassword = false
-        webView?.setBackgroundColor(R.attr.colorSurface.fetchSystemColor(requireContext()))
-        webView?.webViewClient = object : WebViewClient() {
-            override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? {
-                return try {
-                    // Let loadDataWithBaseURL intial data load and network-security-config compatible API pass
-                    if (request.url.toString() == "data:text/html;charset=utf-8;base64,") {
-                        super.shouldInterceptRequest(view, request)
-                    } else {
-                        // validate Trust anchor
-                        val url = URL(request.url.toString())
-                        var response = RetrofitClient.getDefaultOKHttpClient(requireContext(),
-                            com.lunabeestudio.framework.BuildConfig.BASE_URL,
-                            com.lunabeestudio.framework.BuildConfig.CERTIFICATE_SHA256)
-                            .newCall(Request.Builder()
-                                .url(url)
-                                .build()).execute()
-                        if (response.isSuccessful) {
-                            // Success
-                            super.shouldInterceptRequest(view, request)
-                        } else {
-                            response = RetrofitClient.getDefaultOKHttpClient(requireContext(),
-                                com.lunabeestudio.framework.BuildConfig.BASE_URL,
-                                com.lunabeestudio.framework.BuildConfig.CERTIFICATE_SHA256)
-                                .newCall(Request.Builder()
-                                    .url(url)
-                                    .post("".toRequestBody())
-                                    .build()).execute()
-                            if (response.isSuccessful) {
-                                // Success
-                                super.shouldInterceptRequest(view, request)
-                            } else {
-                                // Fail
-                                WebResourceResponse(null, null, null)
-                            }
-                        }
-                    }
-                } catch (e: Exception) {
-                    Timber.e(e)
-                    // Fail
-                    WebResourceResponse(null, null, null)
-                }
-            }
-
-            override fun onReceivedError(view: WebView, request: WebResourceRequest, error: WebResourceError) {
-                super.onReceivedError(view, request, error)
-                (activity as? MainActivity)?.showProgress(false)
-                (activity as? MainActivity)?.showErrorSnackBar(strings["common.error.internet"] ?: "")
-                removeWebView()
-                refreshItems()
-            }
-        }
-        webView?.addJavascriptInterface(object {
-            @JavascriptInterface
-            fun token(message: String) {
-                lifecycleScope.launch {
-                    removeWebView()
-                    context?.let {
-                        bindToProximityService()
-                        viewModel.register(requireContext().applicationContext as RobertApplication, message)
-                    }
-                }
-            }
-
-            @JavascriptInterface
-            fun didLoad() {
-                lifecycleScope.launch {
-                    webView?.evaluateJavascript("execute();", null)
-                }
-            }
-
-            @JavascriptInterface
-            fun showReCaptcha() {
-                lifecycleScope.launch {
-                    (activity as? MainActivity)?.showProgress(false)
-                    webView?.isVisible = true
-                    refreshItems()
-                }
-            }
-
-            @JavascriptInterface
-            fun error() {
-                lifecycleScope.launch {
-                    (activity as? MainActivity)?.showProgress(false)
-                    (activity as? MainActivity)?.showErrorSnackBar(strings["proximityService.error.captchaError"] ?: "")
-                    removeWebView()
-                    refreshItems()
-                }
-            }
-        }, JAVASCRIPT_INTERFACE_NAME)
-        val script = getString(R.string.captcha_script,
-            BuildConfig.CAPTCHA_API_KEY,
-            JAVASCRIPT_INTERFACE_NAME)
-        val insideScript = script.split("<script type=\"text/javascript\">")[1].split("</script>")[0]
-        val insideScript256 = MessageDigest.getInstance("SHA-256").digest(insideScript.toByteArray())
-        val scriptSha256 = Base64.encodeToString(insideScript256, Base64.NO_WRAP)
-        val html = getString(R.string.captcha_html,
-            script,
-            scriptSha256,
-            Locale.getDefault().language)
-        webView?.loadDataWithBaseURL(BuildConfig.CAPTCHA_URL,
-            html,
-            "text/html",
-            "utf-8",
-            null)
-        webView?.isInvisible = true
-        (binding?.root as? ViewGroup)?.addView(webView)
-        refreshItems()
-    }
-
-    private fun removeWebView() {
-        webView?.settings?.javaScriptEnabled = false
-        webView?.webViewClient = null
-        webView?.removeJavascriptInterface(JAVASCRIPT_INTERFACE_NAME)
-        (binding?.root as? ViewGroup)?.removeView(webView)
-        webView = null
-    }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == UiConstants.Activity.BATTERY.ordinal) {
             if (resultCode == Activity.RESULT_OK) {
@@ -556,7 +405,6 @@ class ProximityFragment : AboutMainFragment() {
     }
 
     companion object {
-        private const val JAVASCRIPT_INTERFACE_NAME: String = "androidJSHandler"
         private const val PROXIMITY_BUTTON_DELAY: Long = 2000L
     }
 }

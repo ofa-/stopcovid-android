@@ -85,7 +85,5 @@
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent" />
 
-    <include
-        android:id="@+id/bottomSheetLayout"
-        layout="@layout/layout_button_bottom_sheet" />
+    <include layout="@layout/layout_button_bottom_sheet" />
 </androidx.constraintlayout.widget.ConstraintLayout>

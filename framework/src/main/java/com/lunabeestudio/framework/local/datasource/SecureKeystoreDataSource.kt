@@ -91,25 +91,6 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
             }
         }
 
-    override var atRisk: Boolean?
-        get() {
-            val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_AT_RISK, null)
-            return if (encryptedText != null) {
-                cryptoManager.decryptToString(encryptedText).toBoolean()
-            } else {
-                null
-            }
-        }
-        set(value) {
-            if (value != null) {
-                sharedPreferences.edit()
-                    .putString(SHARED_PREF_KEY_AT_RISK, cryptoManager.encryptToString(value.toString()))
-                    .apply()
-            } else {
-                sharedPreferences.edit().remove(SHARED_PREF_KEY_AT_RISK).apply()
-            }
-        }
-
     override var atRiskLastRefresh: Long?
         get() {
             val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_AT_RISK_LAST_REFRESH, null)
@@ -164,6 +145,25 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
                     .apply()
             } else {
                 sharedPreferences.edit().remove(SHARED_PREF_KEY_AT_RISK_MAX_HOUR_CONTACT_NOTIF).apply()
+            }
+        }
+
+    override var lastRiskReceivedDate: Long?
+        get() {
+            val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_LAST_RISK_RECEIVED_DATE, null)
+            return if (encryptedText != null) {
+                cryptoManager.decryptToString(encryptedText).toLongOrNull()
+            } else {
+                null
+            }
+        }
+        set(value) {
+            if (value != null) {
+                sharedPreferences.edit()
+                    .putString(SHARED_PREF_KEY_LAST_RISK_RECEIVED_DATE, cryptoManager.encryptToString(value.toString()))
+                    .apply()
+            } else {
+                sharedPreferences.edit().remove(SHARED_PREF_KEY_LAST_RISK_RECEIVED_DATE).apply()
             }
         }
 
@@ -478,8 +478,8 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
         private const val SHARED_PREF_KEY_KA = "shared.pref.ka"
         private const val SHARED_PREF_KEY_KEA = "shared.pref.kea"
         private const val SHARED_PREF_KEY_TIME_START = "shared.pref.time_start"
-        private const val SHARED_PREF_KEY_AT_RISK = "shared.pref.at_risk"
         private const val SHARED_PREF_KEY_AT_RISK_LAST_REFRESH = "shared.pref.at_risk_last_refresh"
+        private const val SHARED_PREF_KEY_LAST_RISK_RECEIVED_DATE = "shared.pref.last_risk_received_date"
         private const val SHARED_PREF_KEY_AT_RISK_MIN_HOUR_CONTACT_NOTIF = "shared.pref.at_risk_min_hour_contact_notif"
         private const val SHARED_PREF_KEY_AT_RISK_MAX_HOUR_CONTACT_NOTIF = "shared.pref.at_risk_max_hour_contact_notif"
         private const val SHARED_PREF_KEY_LAST_EXPOSURE_TIMEFRAME = "shared.pref.last_exposure_timeframe"

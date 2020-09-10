@@ -25,6 +25,7 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import com.google.android.material.snackbar.Snackbar
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.stopcovid.R
+import com.lunabeestudio.stopcovid.coreui.databinding.LayoutButtonBottomSheetBinding
 import com.lunabeestudio.stopcovid.coreui.extension.applyAndConsumeWindowInsetBottom
 import com.lunabeestudio.stopcovid.coreui.extension.hideBottomSheet
 import com.lunabeestudio.stopcovid.coreui.extension.showSnackBar
@@ -37,6 +38,7 @@ import com.lunabeestudio.stopcovid.fragment.IsSickFragmentDirections
 class MainActivity : BaseActivity() {
 
     lateinit var binding: ActivityMainBinding
+    lateinit var mergeBinding: LayoutButtonBottomSheetBinding
 
     private val navController: NavController by lazy {
         supportFragmentManager.findFragmentById(R.id.navHostFragment)!!.findNavController()
@@ -51,12 +53,13 @@ class MainActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
+        mergeBinding = LayoutButtonBottomSheetBinding.bind(binding.rootView)
 
         setSupportActionBar(binding.toolbar)
         setupNavigation()
 
         binding.rootView.applyAndConsumeWindowInsetBottom()
-        binding.bottomSheetLayout.bottomSheetFrameLayout.hideBottomSheet()
+        mergeBinding.bottomSheetFrameLayout.hideBottomSheet()
         binding.toolbar.contentInsetStartWithNavigation = 0
 
         setContentView(binding.root)

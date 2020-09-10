@@ -45,10 +45,10 @@ class ProximityViewModel(private val robertManager: RobertManager) : ViewModel()
         }
     }
 
-    fun register(application: RobertApplication, captcha: String) {
+    fun register(application: RobertApplication, captcha: String, captchaId: String) {
         loadingInProgress.postValue(true)
         viewModelScope.launch(Dispatchers.IO) {
-            when (val result = robertManager.register(application, captcha)) {
+            when (val result = robertManager.registerV2(application, captcha, captchaId)) {
                 is RobertResult.Success -> {
                     activateProximity(application)
                 }

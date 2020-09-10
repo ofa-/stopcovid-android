@@ -94,7 +94,10 @@ class RobertManagerImpl(
         get() = keystoreRepository.proximityActive ?: false
 
     override val isAtRisk: Boolean?
-        get() = keystoreRepository.atRisk
+        get() = keystoreRepository.lastRiskReceivedDate?.let {
+            // if last time we've been notified is older than quarantine period minus the last exposure time frame :
+            System.currentTimeMillis() - it < TimeUnit.DAYS.toMillis((quarantinePeriod - lastExposureTimeframe).toLong())
+        }
 
     override val atRiskLastRefresh: Long?
         get() = keystoreRepository.atRiskLastRefresh
@@ -187,34 +190,6 @@ class RobertManagerImpl(
                     RobertResult.Failure(RobertUnknownException())
                 } else {
                     val registerResult = remoteServiceRepository.registerV2(apiVersion, captcha, captchaId)
-                    when (registerResult) {
-                        is RobertResultData.Success -> {
-                            finishRegister(application, registerResult.data, configResult.data)
-                        }
-                        is RobertResultData.Failure -> {
-                            clearLocalData(application)
-                            RobertResult.Failure(registerResult.error)
-                        }
-                    }
-                }
-            }
-            is RobertResultData.Failure -> {
-                clearLocalData(application)
-                RobertResult.Failure(configResult.error)
-            }
-        }
-    }
-
-    override suspend fun register(application: RobertApplication, captcha: String): RobertResult {
-        val configResult = remoteServiceRepository.fetchConfig(application.getAppContext())
-
-        return when (configResult) {
-            is RobertResultData.Success -> {
-                if (configResult.data.isNullOrEmpty()) {
-                    clearLocalData(application)
-                    RobertResult.Failure(RobertUnknownException())
-                } else {
-                    val registerResult = remoteServiceRepository.register(apiVersion, captcha)
                     when (registerResult) {
                         is RobertResultData.Success -> {
                             finishRegister(application, registerResult.data, configResult.data)
@@ -379,9 +354,12 @@ class RobertManagerImpl(
                         is RobertResultData.Success -> {
                             try {
                                 ephemeralBluetoothIdentifierRepository.save(Base64.decode(result.data.tuples, Base64.NO_WRAP))
-                                keystoreRepository.atRisk = result.data.atRisk
+                                if (result.data.atRisk) {
+                                    keystoreRepository.lastRiskReceivedDate = System.currentTimeMillis()
+                                    keystoreRepository.lastExposureTimeframe = result.data.lastExposureTimeframe
+                                    robertApplication.atRiskDetected()
+                                }
                                 keystoreRepository.atRiskLastRefresh = System.currentTimeMillis()
-                                keystoreRepository.lastExposureTimeframe = result.data.lastExposureTimeframe
                                 keystoreRepository.shouldReloadBleSettings = true
                                 RobertResult.Success()
                             } catch (e: Exception) {
@@ -505,7 +483,7 @@ class RobertManagerImpl(
     }
 
     override suspend fun eraseRemoteAlert(): RobertResult {
-        keystoreRepository.atRisk = null
+        keystoreRepository.lastRiskReceivedDate = null
         keystoreRepository.lastExposureTimeframe = null
         return RobertResult.Success()
     }
@@ -543,7 +521,7 @@ class RobertManagerImpl(
         keystoreRepository.kA = null
         keystoreRepository.kEA = null
         keystoreRepository.timeStart = null
-        keystoreRepository.atRisk = null
+        keystoreRepository.lastRiskReceivedDate = null
         keystoreRepository.atRiskLastRefresh = null
         keystoreRepository.lastExposureTimeframe = null
         keystoreRepository.proximityActive = null

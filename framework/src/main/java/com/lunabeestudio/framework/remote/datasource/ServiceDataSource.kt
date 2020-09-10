@@ -20,7 +20,6 @@ import com.lunabeestudio.framework.remote.RetrofitClient
 import com.lunabeestudio.framework.remote.extension.remoteToRobertException
 import com.lunabeestudio.framework.remote.model.ApiCommonRS
 import com.lunabeestudio.framework.remote.model.ApiDeleteExposureHistoryRQ
-import com.lunabeestudio.framework.remote.model.ApiRegisterRQ
 import com.lunabeestudio.framework.remote.model.ApiRegisterV2RQ
 import com.lunabeestudio.framework.remote.model.ApiReportRQ
 import com.lunabeestudio.framework.remote.model.ApiStatusRQ
@@ -79,16 +78,6 @@ class ServiceDataSource(context: Context, baseUrl: String = BuildConfig.BASE_URL
         clientPublicECDHKey: String): RobertResultData<RegisterReport> {
         val result = tryCatchRequestData {
             api.registerV2(apiVersion, ApiRegisterV2RQ(captcha = captcha, captchaId = captchaId, clientPublicECDHKey = clientPublicECDHKey))
-        }
-        return when (result) {
-            is RobertResultData.Success -> RobertResultData.Success(result.data.toDomain())
-            is RobertResultData.Failure -> RobertResultData.Failure(result.error)
-        }
-    }
-
-    override suspend fun register(apiVersion: String, captcha: String, clientPublicECDHKey: String): RobertResultData<RegisterReport> {
-        val result = tryCatchRequestData {
-            api.register(apiVersion, ApiRegisterRQ(captcha = captcha, clientPublicECDHKey = clientPublicECDHKey))
         }
         return when (result) {
             is RobertResultData.Success -> RobertResultData.Success(result.data.toDomain())

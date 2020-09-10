@@ -39,7 +39,7 @@ abstract class ServerManager {
     protected open fun url(): String = BuildConfig.SERVER_URL
 
     @WorkerThread
-    protected fun fetchLast(context: Context, languageCode: String, forceRefresh: Boolean): Boolean {
+    protected suspend fun fetchLast(context: Context, languageCode: String, forceRefresh: Boolean): Boolean {
         return try {
             if (shouldRefresh(context) || forceRefresh) {
                 val filename = "${prefix(context)}${languageCode}${extension()}"
@@ -95,7 +95,8 @@ abstract class ServerManager {
     private fun shouldRefresh(context: Context): Boolean {
         return !BuildConfig.USE_LOCAL_DATA
             && abs(System.currentTimeMillis() - PreferenceManager.getDefaultSharedPreferences(context)
-            .getLong(lastRefreshSharedPrefsKey(), 0L)) > TimeUnit.HOURS.toMillis(1L)
+            .getLong(lastRefreshSharedPrefsKey(),
+                0L)) > TimeUnit.HOURS.toMillis(BuildConfig.REFRESH_STRING_MIN_DURATION)
     }
 
     private fun saveLastRefresh(context: Context) {

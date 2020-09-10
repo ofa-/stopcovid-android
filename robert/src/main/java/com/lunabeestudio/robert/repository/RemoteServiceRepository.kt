@@ -44,26 +44,6 @@ internal class RemoteServiceRepository(
     suspend fun getCaptchaAudio(apiVersion: String, captchaId: String, path: String): RobertResult =
         remoteServiceDataSource.getCaptcha(apiVersion, captchaId, "audio", path)
 
-    suspend fun register(apiVersion: String, captcha: String): RobertResultData<RegisterReport> {
-        val keyPair = sharedCryptoDataSource.createECDHKeyPair()
-
-        val publicKey64 = Base64.encodeToString(keyPair.public.encoded, Base64.NO_WRAP)
-        val registerResult = remoteServiceDataSource.register(apiVersion, captcha, publicKey64)
-
-        if (registerResult is RobertResultData.Success) {
-            sharedCryptoDataSource.getEncryptionKeys(
-                rawServerPublicKey = Base64.decode(BuildConfig.SERVER_PUBLIC_KEY, Base64.NO_WRAP),
-                rawLocalPrivateKey = keyPair.private.encoded,
-                kADerivation = RobertConstant.KA_STRING_INPUT.toByteArray(),
-                kEADerivation = RobertConstant.KEA_STRING_INPUT.toByteArray()).let {
-                keystoreDataSource.kA = it.first
-                keystoreDataSource.kEA = it.second
-            }
-        }
-
-        return registerResult
-    }
-
     suspend fun registerV2(apiVersion: String, captcha: String, captchaId: String): RobertResultData<RegisterReport> {
         val keyPair = sharedCryptoDataSource.createECDHKeyPair()
 

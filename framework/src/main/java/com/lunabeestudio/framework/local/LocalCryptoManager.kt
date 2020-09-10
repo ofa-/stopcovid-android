@@ -292,7 +292,7 @@ class LocalCryptoManager(private val appContext: Context) {
         private const val RSA_WRAP_CIPHER_TYPE = "RSA/NONE/PKCS1Padding"
         private const val AES_WRAPPED_PROTECTION_KEY_SHARED_PREFERENCE = "aes_wrapped_local_protection"
 
-        private const val BUFFER_SIZE = 4 * 1024
+        private const val BUFFER_SIZE = 4 * 256
 
         private val prng: SecureRandom = SecureRandom()
     }

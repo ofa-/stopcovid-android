@@ -52,12 +52,14 @@ object AppMaintenanceManager {
      * @param infoFreeCompletion : Called when the server doesn't block the app
      * @param infoBlockedCompletion : Called when the server does block the app
      */
-    fun init(context: Context,
+    fun init(
+        context: Context,
         @DrawableRes maintenanceIconRes: Int,
         @DrawableRes upgradeIconRes: Int,
         jsonUrl: String,
         infoFreeCompletion: (() -> Unit)? = null,
-        infoBlockedCompletion: ((info: Info) -> Unit)? = null) {
+        infoBlockedCompletion: ((info: Info) -> Unit)? = null
+    ) {
         AppMaintenanceManager.jsonUrl = jsonUrl
         buildNumber = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             context.packageManager.getPackageInfo(context.packageName, 0).longVersionCode
@@ -66,7 +68,8 @@ object AppMaintenanceManager {
             context.packageManager.getPackageInfo(context.packageName, 0).versionCode.toLong()
         }
         sharedPrefs = context.getSharedPreferences(
-            SHARED_PREFS_NAME, 0)
+            SHARED_PREFS_NAME, 0
+        )
         AppMaintenanceManager.maintenanceIconRes = maintenanceIconRes
         AppMaintenanceManager.upgradeIconRes = upgradeIconRes
         AppMaintenanceManager.infoFreeCompletion = infoFreeCompletion
@@ -79,14 +82,18 @@ object AppMaintenanceManager {
     fun checkForMaintenanceUpgrade(context: Context) {
         when {
             shouldRefresh(context) -> {
-                updateCheckForMaintenanceUpgrade(context,
+                updateCheckForMaintenanceUpgrade(
+                    context,
                     null,
-                    null)
+                    null
+                )
             }
             else -> {
-                useLastResult(context,
+                useLastResult(
+                    context,
                     null,
-                    null)
+                    null
+                )
             }
         }
     }
@@ -94,57 +101,71 @@ object AppMaintenanceManager {
     /**
      * This is called by the blocking activity to "retry" in case of maintenance
      */
-    internal fun updateCheckForMaintenanceUpgrade(context: Context,
+    internal fun updateCheckForMaintenanceUpgrade(
+        context: Context,
         appIsFreeCompletion: (() -> Unit)?,
-        appIsBlockedCompletion: ((info: Info) -> Unit)?) {
+        appIsBlockedCompletion: ((info: Info) -> Unit)?
+    ) {
         LBMaintenanceHttpClient.get(context,
             jsonUrl!!,
             { result ->
                 try {
                     val info = Info(JSONObject(result))
                     saveMaintenanceJson(result)
-                    showAppMaintenanceActivityIfNeeded(context,
+                    showAppMaintenanceActivityIfNeeded(
+                        context,
                         info,
                         appIsFreeCompletion,
-                        appIsBlockedCompletion)
+                        appIsBlockedCompletion
+                    )
                     saveLastRefresh(context)
                 } catch (e: Exception) {
                     // In case of a malformed JSON we don't safe it and use the last one instead
-                    useLastResult(context,
+                    useLastResult(
+                        context,
                         appIsFreeCompletion,
-                        appIsBlockedCompletion)
+                        appIsBlockedCompletion
+                    )
                 }
             },
             { e ->
-                useLastResult(context,
+                useLastResult(
+                    context,
                     appIsFreeCompletion,
-                    appIsBlockedCompletion)
+                    appIsBlockedCompletion
+                )
                 Timber.e(e)
             })
     }
 
-    private fun useLastResult(context: Context,
+    private fun useLastResult(
+        context: Context,
         appIsFreeCompletion: (() -> Unit)?,
-        appIsBlockedCompletion: ((info: Info) -> Unit)?) {
+        appIsBlockedCompletion: ((info: Info) -> Unit)?
+    ) {
         val lastResult = retrieveLastMaintenanceJson()
         lastResult?.let {
             showAppMaintenanceActivityIfNeeded(
                 context,
                 Info(JSONObject(lastResult)),
                 appIsFreeCompletion,
-                appIsBlockedCompletion)
+                appIsBlockedCompletion
+            )
         }
     }
 
     /**
      * Construct the maintenanceInfo object and block the app if needed in showing the LBAppMaintenanceActivity
      */
-    private fun showAppMaintenanceActivityIfNeeded(context: Context,
+    private fun showAppMaintenanceActivityIfNeeded(
+        context: Context,
         info: Info,
         appIsFreeCompletion: (() -> Unit)?,
-        appIsBlockedCompletion: ((Info) -> Unit)?) {
+        appIsBlockedCompletion: ((Info) -> Unit)?
+    ) {
         if (info.isActive == true && (info.minRequiredBuildNumber
-                ?: 0) > buildNumber) {
+                ?: 0) > buildNumber
+        ) {
             startAppMaintenanceActivity(context, info)
             appIsBlockedCompletion?.invoke(info)
             context.sendBroadcast(Intent(Constants.Notification.APP_IN_MAINTENANCE))
@@ -158,13 +179,22 @@ object AppMaintenanceManager {
     /**
      * Launch the LBAppMaintenanceActivity with attributes to display
      */
-    private fun startAppMaintenanceActivity(context: Context,
-        info: Info) {
+    private fun startAppMaintenanceActivity(
+        context: Context,
+        info: Info
+    ) {
         if ((context.applicationContext as StopCovid).isAppInForeground) {
             context.startActivity(
-                Intent(context, com.lunabeestudio.stopcovid.activity.AppMaintenanceActivity::class.java).apply {
-                    putExtra(com.lunabeestudio.stopcovid.activity.AppMaintenanceActivity.EXTRA_INFO, Gson().toJson(info))
-                }.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP))
+                Intent(
+                    context,
+                    com.lunabeestudio.stopcovid.activity.AppMaintenanceActivity::class.java
+                ).apply {
+                    putExtra(
+                        com.lunabeestudio.stopcovid.activity.AppMaintenanceActivity.EXTRA_INFO,
+                        Gson().toJson(info)
+                    )
+                }.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+            )
             context.sendBroadcast(Intent(Constants.Notification.APP_IN_MAINTENANCE))
         } else if (info.isActive == true && info.mode == Info.Mode.UPGRADE) {
             (context.applicationContext as StopCovid).sendUpgradeNotification()
@@ -190,8 +220,10 @@ object AppMaintenanceManager {
     }
 
     private fun shouldRefresh(context: Context): Boolean {
-        return abs(System.currentTimeMillis() - PreferenceManager.getDefaultSharedPreferences(context)
-            .getLong(Constants.SharedPrefs.LAST_MAINTENANCE_REFRESH, 0L)) > TimeUnit.MINUTES.toMillis(5L)
+        return abs(
+            System.currentTimeMillis() - PreferenceManager.getDefaultSharedPreferences(context)
+                .getLong(Constants.SharedPrefs.LAST_MAINTENANCE_REFRESH, 0L)
+        ) > TimeUnit.MINUTES.toMillis(5L)
     }
 
     private fun saveLastRefresh(context: Context) {
