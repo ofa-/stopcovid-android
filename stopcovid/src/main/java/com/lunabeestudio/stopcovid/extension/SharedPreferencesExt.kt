@@ -14,3 +14,4 @@ import android.content.SharedPreferences
 import com.lunabeestudio.stopcovid.Constants
 
 fun SharedPreferences.isOnBoardingDone(): Boolean = getBoolean(Constants.SharedPrefs.ON_BOARDING_DONE, false)
+

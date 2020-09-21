@@ -22,6 +22,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.preference.PreferenceManager
 import com.lunabeestudio.stopcovid.R
+import com.lunabeestudio.stopcovid.coreui.databinding.LayoutButtonBottomSheetBinding
 import com.lunabeestudio.stopcovid.coreui.extension.applyAndConsumeWindowInsetBottom
 import com.lunabeestudio.stopcovid.databinding.ActivityOnBoardingBinding
 import com.lunabeestudio.stopcovid.extension.isOnBoardingDone
@@ -39,6 +40,7 @@ class OnBoardingActivity : BaseActivity() {
     private val viewModel: OnBoardingViewModel by viewModels { OnBoardingViewModelFactory() }
 
     lateinit var binding: ActivityOnBoardingBinding
+    lateinit var mergeBinding: LayoutButtonBottomSheetBinding
     private lateinit var onDestinationChangeListener: NavController.OnDestinationChangedListener
 
     private val navController: NavController by lazy {
@@ -49,6 +51,7 @@ class OnBoardingActivity : BaseActivity() {
         setTheme(R.style.Theme_StopCovid)
         super.onCreate(savedInstanceState)
         binding = ActivityOnBoardingBinding.inflate(layoutInflater)
+        mergeBinding = LayoutButtonBottomSheetBinding.bind(binding.root)
         setContentView(binding.root)
 
         setSupportActionBar(binding.toolbar)

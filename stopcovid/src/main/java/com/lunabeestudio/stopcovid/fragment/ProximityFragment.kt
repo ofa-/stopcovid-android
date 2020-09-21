@@ -126,7 +126,7 @@ class ProximityFragment : AboutMainFragment() {
                 errorLayout.translationY = errorLayout.height.toFloat()
             }
         }
-        
+
         isProximityOn = ProximityManager.isProximityOn(requireContext(), robertManager)
         return view
     }
@@ -338,7 +338,8 @@ class ProximityFragment : AboutMainFragment() {
         }
     }
 
-    private fun isAnimationEnabled(): Boolean = Utils.getAnimationScale(getContext()) != 0f
+    @SuppressLint("RestrictedApi")
+    private fun isAnimationEnabled(): Boolean = Utils.getAnimationScale(context) != 0f
 
     private fun updateErrorLayout(errorLayout: FrameLayout?) {
         getActivityBinding()?.errorTextView?.text = ProximityManager.getErrorText(this, robertManager, strings)

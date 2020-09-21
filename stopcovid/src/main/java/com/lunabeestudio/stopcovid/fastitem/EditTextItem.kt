@@ -30,6 +30,7 @@ class EditTextItem : BaseItem<EditTextItem.ViewHolder>(
     var requestFocus: Boolean = false
     var onTextChange: ((text: Editable?) -> Unit)? = null
     var onDone: (() -> Unit)? = null
+    var isEditTextEnabled: Boolean = true
 
     private var textWatcher: TextWatcher? = null
 
@@ -45,6 +46,7 @@ class EditTextItem : BaseItem<EditTextItem.ViewHolder>(
     private fun initEditText(holder: ViewHolder) {
         holder.editText.setText(text)
         holder.editText.inputType = textInputType
+        holder.editText.isEnabled = isEditTextEnabled
         if (requestFocus) {
             holder.editText.requestFocus()
         }

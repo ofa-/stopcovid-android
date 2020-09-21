@@ -20,7 +20,6 @@ import com.lunabeestudio.robert.model.RobertResultData
 interface RemoteServiceDataSource {
     suspend fun generateCaptcha(apiVersion: String, type: String, language: String): RobertResultData<String>
     suspend fun getCaptcha(apiVersion: String, captchaId: String, type: String, path: String): RobertResult
-    suspend fun register(apiVersion: String, captcha: String, clientPublicECDHKey: String): RobertResultData<RegisterReport>
     suspend fun registerV2(apiVersion: String,
         captcha: String,
         captchaId: String,

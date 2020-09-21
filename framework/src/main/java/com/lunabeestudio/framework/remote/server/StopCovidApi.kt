@@ -13,7 +13,6 @@ package com.lunabeestudio.framework.remote.server
 import com.lunabeestudio.framework.remote.model.ApiCaptchaRS
 import com.lunabeestudio.framework.remote.model.ApiCommonRS
 import com.lunabeestudio.framework.remote.model.ApiDeleteExposureHistoryRQ
-import com.lunabeestudio.framework.remote.model.ApiRegisterRQ
 import com.lunabeestudio.framework.remote.model.ApiRegisterRS
 import com.lunabeestudio.framework.remote.model.ApiRegisterV2RQ
 import com.lunabeestudio.framework.remote.model.ApiReportRQ
@@ -37,9 +36,6 @@ internal interface StopCovidApi {
     suspend fun getCaptcha(@Path("apiVersion") apiVersion: String,
         @Path("captchaId") captchaId: String,
         @Path("type") type: String): Response<ResponseBody>
-
-    @POST("/api/{apiVersion}/register")
-    suspend fun register(@Path("apiVersion") apiVersion: String, @Body registerRQ: ApiRegisterRQ): Response<ApiRegisterRS>
 
     @POST("/api/{apiVersion}/register")
     suspend fun registerV2(@Path("apiVersion") apiVersion: String, @Body registerRQ: ApiRegisterV2RQ): Response<ApiRegisterRS>

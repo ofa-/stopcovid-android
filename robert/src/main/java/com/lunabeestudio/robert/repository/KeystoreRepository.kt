@@ -40,10 +40,10 @@ internal class KeystoreRepository(
             keystoreDataSource.timeStart = value
         }
 
-    var atRisk: Boolean?
-        get() = keystoreDataSource.atRisk
+    var lastRiskReceivedDate: Long?
+        get() = keystoreDataSource.lastRiskReceivedDate
         set(value) {
-            keystoreDataSource.atRisk = value
+            keystoreDataSource.lastRiskReceivedDate = value
         }
 
     var atRiskLastRefresh: Long?

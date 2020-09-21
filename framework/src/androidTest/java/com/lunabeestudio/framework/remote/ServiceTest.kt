@@ -77,26 +77,6 @@ class ServiceTest {
     }
 
     @Test
-    fun registerTest() {
-        server.enqueue(MockResponse().setResponseCode(200)
-            .setBody(ResourcesHelper.readTestFileAsString("registerSuccess")))
-        val result = runBlocking {
-            dataSource.register("", "", "")
-        }
-        assertThat(result).isInstanceOf(RobertResultData.Success::class.java)
-        result as RobertResultData.Success
-        assertThat(result.data.message).isEqualTo("The application did register successfully")
-        assertThat(result.data.timeStart).isEqualTo(3796669679L)
-        assertThat(result.data.configuration?.size).isEqualTo(1)
-        assertThat(result.data.configuration?.get(0)?.name).isEqualTo("distance")
-        assertThat(result.data.configuration?.get(0)?.value).isEqualTo(12.0)
-
-        testDataErrors {
-            dataSource.register("", "", "")
-        }
-    }
-
-    @Test
     fun statusTest() {
         server.enqueue(MockResponse().setResponseCode(200)
             .setBody(ResourcesHelper.readTestFileAsString("statusSuccess")))

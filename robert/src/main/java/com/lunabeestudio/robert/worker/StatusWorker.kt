@@ -35,12 +35,7 @@ internal class StatusWorker(context: Context, workerParams: WorkerParameters) : 
         val robertManager: RobertManager = robertApplication.robertManager
 
         Timber.d("Start updating status")
-        val wasAtRisk = robertManager.isAtRisk == true
         val result = robertManager.updateStatus(robertApplication)
-
-        if (!wasAtRisk && robertManager.isAtRisk == true) {
-            (applicationContext as RobertApplication).atRiskDetected()
-        }
 
         Timber.d("Clear old ebids & local proximities")
         robertManager.clearOldData()

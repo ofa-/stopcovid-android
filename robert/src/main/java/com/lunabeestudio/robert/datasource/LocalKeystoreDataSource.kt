@@ -17,7 +17,6 @@ interface LocalKeystoreDataSource {
     var kA: ByteArray?
     var kEA: ByteArray?
     var timeStart: Long?
-    var atRisk: Boolean?
     var atRiskLastRefresh: Long?
     var atRiskMinHourContactNotif: Int?
     var atRiskMaxHourContactNotif: Int?
@@ -37,4 +36,5 @@ interface LocalKeystoreDataSource {
     var preSymptomsSpan: Int?
     var appAvailability: Boolean?
     var apiVersion: String?
+    var lastRiskReceivedDate: Long?
 }

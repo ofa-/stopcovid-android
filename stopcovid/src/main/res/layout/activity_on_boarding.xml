@@ -60,7 +60,5 @@
         android:visibility="invisible"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
-    <include
-        android:id="@+id/bottomSheetLayout"
-        layout="@layout/layout_button_bottom_sheet" />
+    <include layout="@layout/layout_button_bottom_sheet" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

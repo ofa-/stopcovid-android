@@ -64,9 +64,16 @@ interface RobertManager {
 
     suspend fun getCaptchaAudio(captchaId: String, path: String): RobertResult
 
-    suspend fun register(application: RobertApplication, captcha: String, captchaId: String): RobertResult
+    suspend fun register(
+        application: RobertApplication,
+        captcha: String,
+        captchaId: String
+    ): RobertResult
 
-    suspend fun activateProximity(application: RobertApplication, statusTried: Boolean = false): RobertResult
+    suspend fun activateProximity(
+        application: RobertApplication,
+        statusTried: Boolean = false
+    ): RobertResult
 
     fun deactivateProximity(application: RobertApplication)
 
@@ -76,7 +83,11 @@ interface RobertManager {
 
     fun clearLocalData(application: RobertApplication)
 
-    suspend fun report(token: String, firstSymptoms: Int, application: RobertApplication): RobertResult
+    suspend fun report(
+        token: String,
+        firstSymptoms: Int,
+        application: RobertApplication
+    ): RobertResult
 
     suspend fun storeLocalProximity(vararg localProximity: LocalProximity)
 
@@ -89,4 +100,5 @@ interface RobertManager {
     suspend fun eraseRemoteAlert(): RobertResult
 
     suspend fun quitStopCovid(application: RobertApplication): RobertResult
+
 }

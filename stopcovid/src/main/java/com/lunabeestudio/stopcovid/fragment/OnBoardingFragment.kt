@@ -27,6 +27,7 @@ abstract class OnBoardingFragment : FastAdapterFragment() {
     abstract fun getOnButtonClick(): () -> Unit
 
     private fun getActivityBinding() = (activity as OnBoardingActivity).binding
+    private fun getActivityMergeBinding() = (activity as OnBoardingActivity).mergeBinding
 
     override fun getAppBarLayout(): AppBarLayout? = getActivityBinding().appBarLayout
 
@@ -39,15 +40,15 @@ abstract class OnBoardingFragment : FastAdapterFragment() {
     override fun refreshScreen() {
         super.refreshScreen()
         (activity as AppCompatActivity).supportActionBar?.title = strings[getTitleKey()]
-        getActivityBinding().bottomSheetLayout.bottomSheetButton.text = strings[getButtonTitleKey()].safeEmojiSpanify()
+        getActivityMergeBinding().bottomSheetButton.text = strings[getButtonTitleKey()].safeEmojiSpanify()
     }
 
     private fun initBottomButton() {
-        getActivityBinding().bottomSheetLayout.bottomSheetButton.setOnClickListener {
+        getActivityMergeBinding().bottomSheetButton.setOnClickListener {
             getOnButtonClick().invoke()
         }
-        getActivityBinding().bottomSheetLayout.bottomSheetFrameLayout.post {
-            binding?.recyclerView?.updatePadding(bottom = getActivityBinding().bottomSheetLayout.bottomSheetFrameLayout.height)
+        getActivityMergeBinding().bottomSheetFrameLayout.post {
+            binding?.recyclerView?.updatePadding(bottom = getActivityMergeBinding().bottomSheetFrameLayout.height)
         }
     }
 }

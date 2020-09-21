@@ -15,10 +15,12 @@ apply plugin: 'kotlin-android-extensions'
 android {
     buildTypes {
         debug {
-            buildConfigField 'Boolean', 'USE_LOCAL_DATA', 'false'
+            buildConfigField 'Boolean', 'USE_LOCAL_DATA', 'true'
+            buildConfigField 'long', 'REFRESH_STRING_MIN_DURATION', '(long) 0.01'
         }
         release {
             buildConfigField 'Boolean', 'USE_LOCAL_DATA', 'false'
+            buildConfigField 'long', 'REFRESH_STRING_MIN_DURATION', '1L'
         }
     }
     defaultConfig {
