@@ -61,8 +61,10 @@ class SymptomsOriginFragment : MainFragment() {
             title = strings["symptomsOriginController.noSymptoms"]
             onClickListener = View.OnClickListener {
                 findNavController()
-                    .safeNavigate(SymptomsOriginFragmentDirections
-                        .actionSymptomsOriginFragmentToSendHistoryFragment(args.code, -1))
+                    .safeNavigate(
+                        SymptomsOriginFragmentDirections
+                            .actionSymptomsOriginFragmentToSendHistoryFragment(args.code, -1)
+                    )
             }
         }
         items += dividerItem { }
@@ -79,8 +81,10 @@ class SymptomsOriginFragment : MainFragment() {
                 caption = dateFormat.format(currentDate)
                 onClickListener = View.OnClickListener {
                     findNavController()
-                        .safeNavigate(SymptomsOriginFragmentDirections
-                            .actionSymptomsOriginFragmentToSendHistoryFragment(args.code, index))
+                        .safeNavigate(
+                            SymptomsOriginFragmentDirections
+                                .actionSymptomsOriginFragmentToSendHistoryFragment(args.code, index)
+                        )
                 }
             }
             items += dividerItem { }
@@ -90,8 +94,10 @@ class SymptomsOriginFragment : MainFragment() {
             title = strings["common.iDontKnow"]
             onClickListener = View.OnClickListener {
                 findNavController()
-                    .safeNavigate(SymptomsOriginFragmentDirections
-                        .actionSymptomsOriginFragmentToSendHistoryFragment(args.code, -1))
+                    .safeNavigate(
+                        SymptomsOriginFragmentDirections
+                            .actionSymptomsOriginFragmentToSendHistoryFragment(args.code, -1)
+                    )
             }
         }
         return items

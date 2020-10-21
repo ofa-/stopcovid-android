@@ -1,9 +1,9 @@
 [
-    {
+	{
         "section": "Your privacy is protected",
-        "description": "StopCovid complies with the General Data Protection Regulation.",
+        "description": "TousAntiCovid complies with the General Data Protection Regulation.",
         "links": [
-            {
+	        {
                 "label": "More information about the GDPR ",
                 "url": "https://bonjour.stopcovid.gouv.fr/privacy-en.html"
             }
@@ -11,11 +11,11 @@
     },
     {
         "section": "How the data sharing works",
-        "description": "StopCovid uses your phone’s Bluetooth connection only. It does not record or share your location information. The Bluetooth connection is used to estimate the distance between two phones based on a statistical model."
+        "description": "TousAntiCovid uses your phone’s Bluetooth connection only. It does not record or share your location information. The Bluetooth connection is used to estimate the distance between two phones based on a statistical model."
     },
     {
         "section": "What data are shared and why",
-        "description": "The data shared between two phones over their Bluetooth connections are temporary pseudo-identifiers.\nPseudo-identifiers are renewed automatically every 15 minutes. They can be a string of numbers, letters and symbols that cannot be used on their own to identify a person.\n\nThe application shares these data with the server managed by the Ministry for Solidarity and Health, but only if you test positive and only if you give your consent. If you do, then other users’ apps can connect to the server to find out if they have been close to your phone. If they have, the users will receive an alert that they have been exposed to a contamination risk and they will be encouraged to contact their doctors.\n\nThe users receiving the alert will have no information about the phone that triggered the alert or about the owner of the phone.\n\n The app does not take account of special circumstances, such as situations where specific protection measures are in place, including the use of personal protection equipment by healthcare personnel, or separation by a pane of glass. Users can deactivate the app temporarily at any time."
+        "description": "The data shared between two phones over their Bluetooth connections are temporary pseudo-identifiers.\nPseudo-identifiers are renewed automatically every 15 minutes. They can be a string of numbers, letters and symbols that cannot be used on their own to identify a person.\n\nThe application shares these data with the server managed by the Ministry for Solidarity and Health, only if you have been diagnosed as a COVID-19 case and only if you give your consent. If you do, then other users’ apps can connect to the server to find out if they have been close to your phone. If they have, the users will receive an alert that they have been exposed to a contamination risk and they will be encouraged to contact their doctors.\n\nThe users receiving the alert will have no information about the phone that triggered the alert or about the owner of the phone.\n\n The app does not take account of special circumstances, such as situations where specific protection measures are in place, including the use of personal protection equipment by healthcare personnel, or separation by a pane of glass. Users can deactivate the app temporarily at any time."
     },
     {
         "section": "Where the data are stored",
@@ -31,23 +31,17 @@
     },
     {
         "section": "Minors under the age of 15 years",
-        "description": "If you are a minor under the age of 15 years, talk to your parents or your guardians about the appropriateness of installing the app.",
-        "links": [
-            {
-                "label": "For more details ",
-                "url": "https://stopcovid.solidarites-sante.gouv.fr/mineurs"
-            }
-        ]
+        "description": "If you are a minor under the age of 15 years, talk to your parents or your guardians about the appropriateness of installing the app."
     },
     {
-        "section": "StopCovid developers",
-        "description": "This app was developed by the StopCovid team under the supervision of the Ministry for Solidarity and Health and the Ministry of State for Digital Affairs.\nStopCovid team: Inria, ANSSI, Capgemini, Dassault Systèmes, Inserm, Lunabee Studio, Ministry for Solidarity and Health, Orange, Santé Publique France and Withings.\nThe app is entirely open source and the source code is accessible at the following address."
+        "section": "TousAntiCovid developers",
+        "description": "This app was developed by the TousAntiCovid team under the supervision of the Ministry for Solidarity and Health and the Ministry of State for Digital Affairs.\nTousAntiCovid team: Inria, ANSSI, Capgemini, Dassault Systèmes, Inserm, Lunabee Studio, Ministry for Solidarity and Health, Orange, Santé Publique France and Withings.\nThe app is entirely open source and the source code is accessible at the following address."
     },
     {
         "section": "Further information",
         "links": [
             {
-                "label": "About StopCovid",
+                "label": "About TousAntiCovid",
                 "url": "https://bonjour.stopcovid.gouv.fr/stopcovid.html"
             },
             {
@@ -61,3 +55,4 @@
         ]
     }
 ]
+

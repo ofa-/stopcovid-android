@@ -12,6 +12,8 @@ package com.lunabeestudio.robert
 
 import android.content.Context
 import android.util.Base64
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.WorkManager
 import com.google.gson.Gson
@@ -48,7 +50,10 @@ import com.lunabeestudio.robert.repository.EphemeralBluetoothIdentifierRepositor
 import com.lunabeestudio.robert.repository.KeystoreRepository
 import com.lunabeestudio.robert.repository.LocalProximityRepository
 import com.lunabeestudio.robert.repository.RemoteServiceRepository
+import com.lunabeestudio.robert.utils.Event
 import com.lunabeestudio.robert.worker.StatusWorker
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import kotlin.math.abs
@@ -63,17 +68,20 @@ class RobertManagerImpl(
     configurationDataSource: ConfigurationDataSource,
     private val localProximityFilter: LocalProximityFilter
 ) : RobertManager {
+    private val statusSemaphore: Semaphore = Semaphore(1)
     private val ephemeralBluetoothIdentifierRepository: EphemeralBluetoothIdentifierRepository =
         EphemeralBluetoothIdentifierRepository(localEphemeralBluetoothIdentifierDataSource, sharedCryptoDataSource, localKeystoreDataSource)
     private val keystoreRepository: KeystoreRepository =
-        KeystoreRepository(localKeystoreDataSource)
+        KeystoreRepository(localKeystoreDataSource, this)
     private val localProximityRepository: LocalProximityRepository =
         LocalProximityRepository(localLocalProximityDataSource)
     private val remoteServiceRepository: RemoteServiceRepository =
-        RemoteServiceRepository(serviceDataSource,
+        RemoteServiceRepository(
+            serviceDataSource,
             sharedCryptoDataSource,
             localKeystoreDataSource,
-            configurationDataSource)
+            configurationDataSource
+        )
 
     init {
         if (isRegistered) {
@@ -93,11 +101,14 @@ class RobertManagerImpl(
     override val isProximityActive: Boolean
         get() = keystoreRepository.proximityActive ?: false
 
+    private val isAtRiskMutableLiveData: MutableLiveData<Event<Boolean?>> = MutableLiveData()
+    override val isAtRiskLiveData: LiveData<Event<Boolean?>> = isAtRiskMutableLiveData
+
     override val isAtRisk: Boolean?
         get() = keystoreRepository.lastRiskReceivedDate?.let {
             // if last time we've been notified is older than quarantine period minus the last exposure time frame :
             System.currentTimeMillis() - it < TimeUnit.DAYS.toMillis((quarantinePeriod - lastExposureTimeframe).toLong())
-        }
+        } ?: atRiskLastRefresh?.let { false }
 
     override val atRiskLastRefresh: Long?
         get() = keystoreRepository.atRiskLastRefresh
@@ -135,10 +146,10 @@ class RobertManagerImpl(
     override val backgroundServiceManufacturerData: String
         get() = keystoreRepository.backgroundServiceManufacturerData ?: RobertConstant.BLE_BACKGROUND_SERVICE_MANUFACTURER_DATA_IOS
 
-    override val checkStatusFrequencyHour: Int
+    override val checkStatusFrequencyHour: Float
         get() = keystoreRepository.checkStatusFrequencyHour ?: RobertConstant.CHECK_STATUS_FREQUENCY_HOURS
 
-    override val randomStatusHour: Int
+    override val randomStatusHour: Float
         get() = keystoreRepository.randomStatusHour ?: RobertConstant.RANDOM_STATUS_HOUR
 
     override val apiVersion: String
@@ -214,6 +225,7 @@ class RobertManagerImpl(
         return try {
             handleConfigChange(config)
             keystoreRepository.timeStart = registerReport.timeStart
+            keystoreRepository.atRiskLastRefresh = System.currentTimeMillis()
             ephemeralBluetoothIdentifierRepository.save(Base64.decode(registerReport.tuples, Base64.NO_WRAP))
             startStatusWorker(application.getAppContext())
             activateProximity(application)
@@ -275,12 +287,12 @@ class RobertManagerImpl(
         (configuration?.firstOrNull {
             it.name == RobertConstant.CONFIG.CHECK_STATUS_FREQUENCY
         }?.value as? Number)?.let { checkStatusFrequency ->
-            keystoreRepository.checkStatusFrequencyHour = checkStatusFrequency.toInt()
+            keystoreRepository.checkStatusFrequencyHour = checkStatusFrequency.toFloat()
         }
         (configuration?.firstOrNull {
             it.name == RobertConstant.CONFIG.RANDOM_STATUS_HOUR
         }?.value as? Number)?.let { randomStatusHour ->
-            keystoreRepository.randomStatusHour = randomStatusHour.toInt()
+            keystoreRepository.randomStatusHour = randomStatusHour.toFloat()
         }
         (configuration?.firstOrNull {
             it.name == RobertConstant.CONFIG.PRE_SYMPTOMS_SPAN
@@ -339,45 +351,58 @@ class RobertManagerImpl(
     }
 
     override suspend fun updateStatus(robertApplication: RobertApplication): RobertResult {
-        val configResult = remoteServiceRepository.fetchConfig(robertApplication.getAppContext())
-        handleConfigChange((configResult as? RobertResultData.Success)?.data)
+        statusSemaphore.withPermit {
+            val configResult = remoteServiceRepository.fetchConfig(robertApplication.getAppContext())
+            handleConfigChange((configResult as? RobertResultData.Success)?.data)
 
-        return if (configResult is RobertResultData.Failure && configResult.error is TimeNotAlignedException) {
-            RobertResult.Failure(configResult.error)
-        } else {
-            val ssu = getSSU(RobertConstant.PREFIX.C2)
+            return if (configResult is RobertResultData.Failure && configResult.error is TimeNotAlignedException) {
+                RobertResult.Failure(configResult.error)
+            } else {
+                val ssu = getSSU(RobertConstant.PREFIX.C2)
 
-            if (abs((atRiskLastRefresh ?: 0L) - System.currentTimeMillis()) > RobertConstant.MIN_GAP_SUCCESS_STATUS) {
-                if (ssu is RobertResultData.Success) {
-                    val result = remoteServiceRepository.status(apiVersion, ssu.data)
-                    when (result) {
-                        is RobertResultData.Success -> {
-                            try {
-                                ephemeralBluetoothIdentifierRepository.save(Base64.decode(result.data.tuples, Base64.NO_WRAP))
-                                if (result.data.atRisk) {
-                                    keystoreRepository.lastRiskReceivedDate = System.currentTimeMillis()
-                                    keystoreRepository.lastExposureTimeframe = result.data.lastExposureTimeframe
-                                    robertApplication.atRiskDetected()
-                                }
-                                keystoreRepository.atRiskLastRefresh = System.currentTimeMillis()
-                                keystoreRepository.shouldReloadBleSettings = true
-                                RobertResult.Success()
-                            } catch (e: Exception) {
-                                when (e) {
-                                    is RobertException -> RobertResult.Failure(e)
-                                    else -> RobertResult.Failure(RobertUnknownException())
+                if (abs((atRiskLastRefresh ?: 0L) - System.currentTimeMillis()) > RobertConstant.MIN_GAP_SUCCESS_STATUS) {
+                    if (ssu is RobertResultData.Success) {
+                        val result = remoteServiceRepository.status(apiVersion, ssu.data)
+                        when (result) {
+                            is RobertResultData.Success -> {
+                                try {
+                                    ephemeralBluetoothIdentifierRepository.save(Base64.decode(result.data.tuples, Base64.NO_WRAP))
+                                    // Only notify at risk became true every 24h
+                                    val atRiskDelayOK = keystoreRepository.lastRiskReceivedDate?.let {
+                                        it < System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1L)
+                                    } ?: true
+                                    if (result.data.atRisk && atRiskDelayOK) {
+                                        keystoreRepository.lastRiskReceivedDate = System.currentTimeMillis()
+                                        keystoreRepository.lastExposureTimeframe = result.data.lastExposureTimeframe
+                                        robertApplication.atRiskDetected()
+                                    }
+                                    keystoreRepository.atRiskLastRefresh = System.currentTimeMillis()
+                                    keystoreRepository.shouldReloadBleSettings = true
+                                    RobertResult.Success()
+                                } catch (e: Exception) {
+                                    when (e) {
+                                        is RobertException -> {
+                                            RobertResult.Failure(e)
+                                        }
+                                        else -> {
+                                            RobertResult.Failure(RobertUnknownException())
+                                        }
+                                    }
                                 }
                             }
+                            is RobertResultData.Failure -> {
+                                RobertResult.Failure(result.error)
+                            }
                         }
-                        is RobertResultData.Failure -> RobertResult.Failure(result.error)
+                    } else {
+                        val error = ssu as RobertResultData.Failure
+                        Timber.e("hello or timeStart not found (${error.error?.message})")
+                        RobertResult.Failure(UnknownException())
                     }
                 } else {
-                    Timber.e("hello or timeStart not found")
+                    Timber.d("Previous success Status called too close")
                     RobertResult.Failure(UnknownException())
                 }
-            } else {
-                Timber.e("Previous success Status called too close")
-                RobertResult.Failure(UnknownException())
             }
         }
     }
@@ -387,8 +412,10 @@ class RobertManagerImpl(
         val ephemeralBluetoothIdentifierExpiredTime = System.currentTimeMillis().unixTimeMsToNtpTimeS()
         ephemeralBluetoothIdentifierRepository.removeUntilTimeKeepLast(ephemeralBluetoothIdentifierExpiredTime)
         val localProximityExpiredTime: Long =
-            (System.currentTimeMillis() - TimeUnit.DAYS.toMillis((keystoreRepository.dataRetentionPeriod
-                ?: RobertConstant.DATA_RETENTION_PERIOD).toLong())).unixTimeMsToNtpTimeS()
+            (System.currentTimeMillis() - TimeUnit.DAYS.toMillis(
+                (keystoreRepository.dataRetentionPeriod
+                    ?: RobertConstant.DATA_RETENTION_PERIOD).toLong()
+            )).unixTimeMsToNtpTimeS()
         localProximityRepository.removeUntilTime(localProximityExpiredTime)
     }
 
@@ -404,9 +431,11 @@ class RobertManagerImpl(
                     .unixTimeMsToNtpTimeS()
 
             val localProximityList = localProximityRepository.getUntilTime(firstProximityToSendTime)
-            val filteredLocalProximityList = localProximityFilter.filter(localProximityList,
+            val filteredLocalProximityList = localProximityFilter.filter(
+                localProximityList,
                 filteringMode,
-                filteringConfig)
+                filteringConfig
+            )
 
             val result = remoteServiceRepository.report(apiVersion, token, filteredLocalProximityList)
             when (result) {
@@ -484,6 +513,7 @@ class RobertManagerImpl(
 
     override suspend fun eraseRemoteAlert(): RobertResult {
         keystoreRepository.lastRiskReceivedDate = null
+        keystoreRepository.atRiskLastRefresh = null
         keystoreRepository.lastExposureTimeframe = null
         return RobertResult.Success()
     }
@@ -536,5 +566,11 @@ class RobertManagerImpl(
     private fun stopStatusWorker(context: Context) {
         Timber.d("Stop worker status")
         WorkManager.getInstance(context).cancelUniqueWork(RobertConstant.STATUS_WORKER_NAME)
+    }
+
+    override fun refreshAtRisk() {
+        if (isAtRiskMutableLiveData.value?.peekContent() != isAtRisk) {
+            isAtRiskMutableLiveData.postValue(Event(isAtRisk))
+        }
     }
 }

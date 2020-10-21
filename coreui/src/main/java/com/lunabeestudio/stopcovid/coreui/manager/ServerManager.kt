@@ -22,7 +22,6 @@ import timber.log.Timber
 import java.io.File
 import java.lang.reflect.Type
 import java.util.Locale
-import java.util.concurrent.TimeUnit
 import kotlin.math.abs
 
 abstract class ServerManager {
@@ -39,7 +38,7 @@ abstract class ServerManager {
     protected open fun url(): String = BuildConfig.SERVER_URL
 
     @WorkerThread
-    protected suspend fun fetchLast(context: Context, languageCode: String, forceRefresh: Boolean): Boolean {
+    protected fun fetchLast(context: Context, languageCode: String, forceRefresh: Boolean): Boolean {
         return try {
             if (shouldRefresh(context) || forceRefresh) {
                 val filename = "${prefix(context)}${languageCode}${extension()}"
@@ -93,10 +92,9 @@ abstract class ServerManager {
     }
 
     private fun shouldRefresh(context: Context): Boolean {
-        return !BuildConfig.USE_LOCAL_DATA
-            && abs(System.currentTimeMillis() - PreferenceManager.getDefaultSharedPreferences(context)
-            .getLong(lastRefreshSharedPrefsKey(),
-                0L)) > TimeUnit.HOURS.toMillis(BuildConfig.REFRESH_STRING_MIN_DURATION)
+        val lastRefreshTimeMS = PreferenceManager.getDefaultSharedPreferences(context).getLong(lastRefreshSharedPrefsKey(), 0L)
+        val timeDiffMs = System.currentTimeMillis() - lastRefreshTimeMS
+        return !BuildConfig.USE_LOCAL_DATA && abs(timeDiffMs) > BuildConfig.REFRESH_STRING_MIN_DURATION_MS
     }
 
     private fun saveLastRefresh(context: Context) {

@@ -10,12 +10,14 @@
 
 package com.lunabeestudio.robert
 
+import androidx.lifecycle.LiveData
 import com.lunabeestudio.domain.model.DeviceParameterCorrection
 import com.lunabeestudio.domain.model.HelloBuilder
 import com.lunabeestudio.domain.model.LocalProximity
 import com.lunabeestudio.robert.manager.LocalProximityFilter
 import com.lunabeestudio.robert.model.RobertResult
 import com.lunabeestudio.robert.model.RobertResultData
+import com.lunabeestudio.robert.utils.Event
 
 interface RobertManager {
     var shouldReloadBleSettings: Boolean
@@ -25,6 +27,8 @@ interface RobertManager {
     val isProximityActive: Boolean
 
     val isAtRisk: Boolean?
+
+    val isAtRiskLiveData: LiveData<Event<Boolean?>>
 
     val atRiskLastRefresh: Long?
 
@@ -50,9 +54,9 @@ interface RobertManager {
 
     val backgroundServiceManufacturerData: String
 
-    val checkStatusFrequencyHour: Int
+    val checkStatusFrequencyHour: Float
 
-    val randomStatusHour: Int
+    val randomStatusHour: Float
 
     val apiVersion: String
 
@@ -101,4 +105,5 @@ interface RobertManager {
 
     suspend fun quitStopCovid(application: RobertApplication): RobertResult
 
+    fun refreshAtRisk()
 }

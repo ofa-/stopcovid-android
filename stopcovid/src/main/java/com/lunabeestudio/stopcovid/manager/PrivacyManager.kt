@@ -11,6 +11,7 @@
 package com.lunabeestudio.stopcovid.manager
 
 import android.content.Context
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.reflect.TypeToken
 import com.lunabeestudio.stopcovid.Constants
@@ -25,32 +26,33 @@ import java.util.Locale
 class PrivacyManager : ServerManager() {
 
     companion object {
-        private var _privacySections: List<PrivacySection> = emptyList()
-            set(value) {
-                privacySections.postValue(value)
-                field = value
-            }
-        val privacySections: MutableLiveData<List<PrivacySection>> = MutableLiveData()
+        private val _privacySections: MutableLiveData<List<PrivacySection>> = MutableLiveData()
+        val privacySections: LiveData<List<PrivacySection>>
+            get() = _privacySections
 
         private var prevLanguage: String? = null
-
-        fun getPrivacySections(): List<PrivacySection> = _privacySections
 
         fun init(context: Context) {
             CoroutineScope(Dispatchers.IO).launch {
                 prevLanguage = Locale.getDefault().language
-                _privacySections = PrivacyManager().loadLocal(context)
+                setPrivacySection(PrivacyManager().loadLocal(context))
             }
         }
 
-        fun appForeground(context: Context) {
-            CoroutineScope(Dispatchers.IO).launch {
-                if (PrivacyManager().fetchLast(context,
-                        Locale.getDefault().language,
-                        prevLanguage != Locale.getDefault().language) || prevLanguage != Locale.getDefault().language) {
-                    prevLanguage = Locale.getDefault().language
-                    _privacySections = PrivacyManager().loadLocal(context)
-                }
+        private fun setPrivacySection(privacySections: List<PrivacySection>) {
+            if (this.privacySections.value != privacySections) {
+                _privacySections.postValue(privacySections)
+            }
+        }
+
+        suspend fun appForeground(context: Context) {
+            if (PrivacyManager().fetchLast(
+                    context,
+                    Locale.getDefault().language,
+                    prevLanguage != Locale.getDefault().language
+                ) || prevLanguage != Locale.getDefault().language) {
+                prevLanguage = Locale.getDefault().language
+                setPrivacySection(PrivacyManager().loadLocal(context))
             }
         }
     }

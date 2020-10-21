@@ -31,8 +31,8 @@ interface LocalKeystoreDataSource {
     var backgroundServiceManufacturerData: String?
     var dataRetentionPeriod: Int?
     var quarantinePeriod: Int?
-    var checkStatusFrequency: Int?
-    var randomStatusHour: Int?
+    var checkStatusFrequency: Float?
+    var randomStatusHour: Float?
     var preSymptomsSpan: Int?
     var appAvailability: Boolean?
     var apiVersion: String?

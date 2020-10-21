@@ -112,7 +112,7 @@ open class SecureFileLocalProximityDataSource(
             name.contains(Regex("^$daySinceNtp-\\d+$"))
         }?.map {
             it.name.substringAfterLast("-").toInt()
-        }?.max()?.plus(1) ?: 0
+        }?.maxOrNull()?.plus(1) ?: 0
 
         return File(dailySessionDir, "$daySinceNtp-$sessionNum")
     }
@@ -126,8 +126,8 @@ open class SecureFileLocalProximityDataSource(
 
         dumpRequested = true
 
-        val doDump = suspend {
-            var lastDumpedIndex = 0
+        @Suppress("BlockingMethodInNonBlockingContext") val doDump = suspend {
+            var lastDumpedIndex: Int
             var dumpTime = System.currentTimeMillis()
 
             withContext(Dispatchers.IO) {

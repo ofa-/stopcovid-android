@@ -55,7 +55,8 @@ internal class RemoteServiceRepository(
                 rawServerPublicKey = Base64.decode(BuildConfig.SERVER_PUBLIC_KEY, Base64.NO_WRAP),
                 rawLocalPrivateKey = keyPair.private.encoded,
                 kADerivation = RobertConstant.KA_STRING_INPUT.toByteArray(),
-                kEADerivation = RobertConstant.KEA_STRING_INPUT.toByteArray()).let {
+                kEADerivation = RobertConstant.KEA_STRING_INPUT.toByteArray()
+            ).let {
                 keystoreDataSource.kA = it.first
                 keystoreDataSource.kEA = it.second
             }

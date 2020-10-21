@@ -11,10 +11,12 @@
 package com.lunabeestudio.robert.repository
 
 import com.lunabeestudio.domain.model.DeviceParameterCorrection
+import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.robert.datasource.LocalKeystoreDataSource
 
 internal class KeystoreRepository(
-    private val keystoreDataSource: LocalKeystoreDataSource) {
+    private val keystoreDataSource: LocalKeystoreDataSource,
+    private val robertManager: RobertManager) {
 
     var shouldReloadBleSettings: Boolean
         get() = keystoreDataSource.shouldReloadBleSettings ?: false
@@ -44,12 +46,14 @@ internal class KeystoreRepository(
         get() = keystoreDataSource.lastRiskReceivedDate
         set(value) {
             keystoreDataSource.lastRiskReceivedDate = value
+            robertManager.refreshAtRisk()
         }
 
     var atRiskLastRefresh: Long?
         get() = keystoreDataSource.atRiskLastRefresh
         set(value) {
             keystoreDataSource.atRiskLastRefresh = value
+            robertManager.refreshAtRisk()
         }
 
     var atRiskMinHourContactNotif: Int?
@@ -68,6 +72,7 @@ internal class KeystoreRepository(
         get() = keystoreDataSource.lastExposureTimeframe
         set(value) {
             keystoreDataSource.lastExposureTimeframe = value
+            robertManager.refreshAtRisk()
         }
 
     var proximityActive: Boolean?
@@ -128,15 +133,16 @@ internal class KeystoreRepository(
         get() = keystoreDataSource.quarantinePeriod
         set(value) {
             keystoreDataSource.quarantinePeriod = value
+            robertManager.refreshAtRisk()
         }
 
-    var checkStatusFrequencyHour: Int?
+    var checkStatusFrequencyHour: Float?
         get() = keystoreDataSource.checkStatusFrequency
         set(value) {
             keystoreDataSource.checkStatusFrequency = value
         }
 
-    var randomStatusHour: Int?
+    var randomStatusHour: Float?
         get() = keystoreDataSource.randomStatusHour
         set(value) {
             keystoreDataSource.randomStatusHour = value

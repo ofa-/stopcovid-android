@@ -28,10 +28,10 @@ class AtRiskNotificationWorker(context: Context, workerParams: WorkerParameters)
     override fun doWork(): Result {
         val notificationManager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        if (StringsManager.getStrings().isEmpty()) {
+        if (StringsManager.strings.isEmpty()) {
             StringsManager.init(applicationContext)
         }
-        val strings = StringsManager.getStrings()
+        val strings = StringsManager.strings
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
@@ -48,7 +48,8 @@ class AtRiskNotificationWorker(context: Context, workerParams: WorkerParameters)
             .setDestination(R.id.informationFragment)
             .createPendingIntent()
 
-        val notification = NotificationCompat.Builder(applicationContext,
+        val notification = NotificationCompat.Builder(
+            applicationContext,
             UiConstants.Notification.AT_RISK.channelId
         )
             .setContentTitle(strings["notification.atRisk.title"])
@@ -56,8 +57,10 @@ class AtRiskNotificationWorker(context: Context, workerParams: WorkerParameters)
             .setVisibility(NotificationCompat.VISIBILITY_SECRET)
             .setAutoCancel(true)
             .setSmallIcon(R.drawable.ic_notification_bar)
-            .setStyle(NotificationCompat.BigTextStyle()
-                .bigText(strings["notification.atRisk.message"]))
+            .setStyle(
+                NotificationCompat.BigTextStyle()
+                    .bigText(strings["notification.atRisk.message"])
+            )
             .setContentIntent(pendingIntent)
             .build()
         notificationManager.notify(UiConstants.Notification.AT_RISK.notificationId, notification)

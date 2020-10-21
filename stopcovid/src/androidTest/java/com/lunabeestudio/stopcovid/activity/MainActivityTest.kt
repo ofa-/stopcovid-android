@@ -42,8 +42,10 @@ class MainActivityTest {
     var activityTestRule: ActivityTestRule<MainActivity> = ActivityTestRule(MainActivity::class.java)
 
     @get:Rule
-    var permissionRule: GrantPermissionRule = GrantPermissionRule.grant(android.Manifest.permission.CAMERA,
-        android.Manifest.permission.ACCESS_COARSE_LOCATION)
+    var permissionRule: GrantPermissionRule = GrantPermissionRule.grant(
+        android.Manifest.permission.CAMERA,
+        android.Manifest.permission.ACCESS_COARSE_LOCATION
+    )
 
     @Test
     fun mainActivityTest() {

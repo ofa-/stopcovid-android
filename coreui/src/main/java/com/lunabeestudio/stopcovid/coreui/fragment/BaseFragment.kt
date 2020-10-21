@@ -10,26 +10,34 @@
 
 package com.lunabeestudio.stopcovid.coreui.fragment
 
+import android.content.Context
 import android.os.Bundle
+import android.text.format.DateUtils
 import android.view.View
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
 import timber.log.Timber
 import java.util.IllegalFormatException
+import kotlin.time.Duration
+import kotlin.time.ExperimentalTime
+import kotlin.time.days
+import kotlin.time.milliseconds
+import kotlin.time.minutes
 
 abstract class BaseFragment : Fragment() {
 
     abstract fun refreshScreen()
 
-    protected var strings: HashMap<String, String> = StringsManager.getStrings()
+    protected var strings: HashMap<String, String> = StringsManager.strings
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        StringsManager.strings.observe(viewLifecycleOwner, Observer { strings: HashMap<String, String> ->
-            this.strings = strings
-            refreshScreen()
-        })
+        StringsManager.liveStrings.observe(viewLifecycleOwner) { strings ->
+            if (this.strings != strings) {
+                this.strings = strings
+                refreshScreen()
+            }
+        }
     }
 
     protected fun stringsFormat(key: String, vararg args: Any?): String? {
@@ -40,6 +48,28 @@ abstract class BaseFragment : Fragment() {
                 Timber.e(e)
                 it
             }
+        }
+    }
+
+    @OptIn(ExperimentalTime::class)
+    protected fun Duration.getRelativeDateTimeString(context: Context): String? {
+        val now = System.currentTimeMillis().milliseconds
+
+        return when {
+            now - this <= 1.minutes -> strings["common.justNow"]
+            now - this <= 1.days -> DateUtils.getRelativeTimeSpanString(
+                    this.coerceAtMost(now - 1.minutes).toLongMilliseconds(),
+                    now.toLongMilliseconds(),
+                    DateUtils.MINUTE_IN_MILLIS,
+                    DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_SHOW_YEAR or DateUtils.FORMAT_ABBREV_MONTH,
+            ).toString()
+            else -> DateUtils.getRelativeDateTimeString(
+                    context,
+                    this.toLongMilliseconds(),
+                    DateUtils.DAY_IN_MILLIS,
+                    DateUtils.WEEK_IN_MILLIS,
+                    DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_SHOW_YEAR or DateUtils.FORMAT_ABBREV_MONTH,
+            ).toString()
         }
     }
 }

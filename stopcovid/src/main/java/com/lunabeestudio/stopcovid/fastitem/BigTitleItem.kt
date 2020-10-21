@@ -13,6 +13,7 @@ package com.lunabeestudio.stopcovid.fastitem
 import android.view.Gravity
 import android.view.View
 import android.widget.TextView
+import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.safeEmojiSpanify
@@ -23,9 +24,11 @@ class BigTitleItem : BaseItem<BigTitleItem.ViewHolder>(
 ) {
     var text: String? = null
     var gravity: Int = Gravity.NO_GRAVITY
+    var importantForAccessibility: Int = ViewCompat.IMPORTANT_FOR_ACCESSIBILITY_YES
 
     override fun bindView(holder: ViewHolder, payloads: List<Any>) {
         super.bindView(holder, payloads)
+        holder.itemView.importantForAccessibility = importantForAccessibility
         holder.textView.text = text.safeEmojiSpanify()
         holder.textView.gravity = gravity
     }

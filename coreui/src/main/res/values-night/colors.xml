@@ -12,7 +12,10 @@
     <color name="color_on_primary">#00285A</color>
     <color name="color_primary_light">#2685BBFF</color>
     <color name="color_on_primary_light">#FFFFFF</color>
-    <color name="color_error">#FF6F4D</color>
+    <color name="color_no_risk">#51C495</color>
+    <color name="color_risk">#fd706a</color>
     <color name="color_error_light">#331716</color>
     <color name="color_icon_background">#000000</color>
+
+    <color name="color_east_bay">#B3B8E8</color>
 </resources>

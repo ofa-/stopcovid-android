@@ -12,14 +12,12 @@ package com.lunabeestudio.stopcovid.fragment
 
 import android.os.Bundle
 import android.view.View
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.extension.fillItems
 import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.manager.PrivacyManager
-import com.lunabeestudio.stopcovid.model.PrivacySection
 import com.mikepenz.fastadapter.GenericItem
 
 class OnBoardingPrivacyFragment : OnBoardingFragment() {
@@ -31,15 +29,12 @@ class OnBoardingPrivacyFragment : OnBoardingFragment() {
             .safeNavigate(OnBoardingPrivacyFragmentDirections.actionOnBoardingPrivacyFragmentToOnBoardingProximityFragment())
     }
 
-    private var privacySections: List<PrivacySection> = PrivacyManager.getPrivacySections()
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        PrivacyManager.privacySections.observe(viewLifecycleOwner, Observer { privacySections ->
-            this.privacySections = privacySections
+        PrivacyManager.privacySections.observe(viewLifecycleOwner) {
             refreshScreen()
-        })
+        }
     }
 
     override fun getItems(): List<GenericItem> {
@@ -48,7 +43,7 @@ class OnBoardingPrivacyFragment : OnBoardingFragment() {
         items += spaceItem {
             spaceRes = R.dimen.spacing_xlarge
         }
-        privacySections.fillItems(items)
+        PrivacyManager.privacySections.value?.fillItems(items)
 
         return items
     }

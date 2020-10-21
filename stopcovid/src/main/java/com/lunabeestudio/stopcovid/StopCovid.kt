@@ -46,6 +46,8 @@ import com.lunabeestudio.stopcovid.coreui.UiConstants
 import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
 import com.lunabeestudio.stopcovid.manager.AppMaintenanceManager
 import com.lunabeestudio.stopcovid.manager.ConfigDataSource
+import com.lunabeestudio.stopcovid.manager.InfoCenterManager
+import com.lunabeestudio.stopcovid.manager.KeyFiguresManager
 import com.lunabeestudio.stopcovid.manager.PrivacyManager
 import com.lunabeestudio.stopcovid.manager.ProximityManager
 import com.lunabeestudio.stopcovid.service.ProximityService
@@ -93,12 +95,16 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication {
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
         }
+
         PrivacyManager.init(this)
         StringsManager.init(this)
-        AppMaintenanceManager.init(this,
+        InfoCenterManager.init(this)
+        AppMaintenanceManager.init(
+            this,
             R.drawable.maintenance,
             R.drawable.maintenance,
-            BuildConfig.APP_MAINTENANCE_URL)
+            BuildConfig.APP_MAINTENANCE_URL
+        )
         val config = BundledEmojiCompatConfig(this)
         EmojiCompat.init(config)
         startAppMaintenanceWorker(false)
@@ -107,8 +113,12 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication {
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     fun onAppResume() {
         isAppInForeground = true
-        PrivacyManager.appForeground(this)
-        StringsManager.appForeground(this)
+        CoroutineScope(Dispatchers.IO).launch {
+            PrivacyManager.appForeground(this@StopCovid)
+            StringsManager.appForeground(this@StopCovid)
+            InfoCenterManager.appForeground(this@StopCovid)
+            KeyFiguresManager.appForeground(this@StopCovid)
+        }
         AppMaintenanceManager.checkForMaintenanceUpgrade(this)
         refreshProximityService()
         refreshStatusIfNeeded()
@@ -167,10 +177,10 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication {
     override fun sendClockNotAlignedNotification() {
         val notificationManager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        if (StringsManager.getStrings().isEmpty()) {
+        if (StringsManager.strings.isEmpty()) {
             StringsManager.init(applicationContext)
         }
-        val strings = StringsManager.getStrings()
+        val strings = StringsManager.strings
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
@@ -186,18 +196,27 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication {
             this, 0,
             notificationIntent, 0
         )
-        val notification = NotificationCompat.Builder(this,
+        val notification = NotificationCompat.Builder(
+            this,
             UiConstants.Notification.TIME.channelId
         )
             .setContentTitle(strings["common.error.clockNotAligned.title"])
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
             .setSmallIcon(com.lunabeestudio.stopcovid.coreui.R.drawable.ic_notification_bar)
-            .setStyle(NotificationCompat.BigTextStyle()
-                .bigText(strings["common.error.clockNotAligned.message"]))
+            .setStyle(
+                NotificationCompat.BigTextStyle()
+                    .bigText(strings["common.error.clockNotAligned.message"])
+            )
             .setContentIntent(pendingIntent)
             .build()
         notificationManager.notify(UiConstants.Notification.TIME.notificationId, notification)
+    }
+
+    override fun refreshInfoCenter() {
+        CoroutineScope(Dispatchers.IO).launch {
+            InfoCenterManager.appForeground(this@StopCovid)
+        }
     }
 
     fun cancelClockNotAlignedNotification() {
@@ -208,10 +227,10 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication {
     fun sendUpgradeNotification() {
         val notificationManager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        if (StringsManager.getStrings().isEmpty()) {
+        if (StringsManager.strings.isEmpty()) {
             StringsManager.init(applicationContext)
         }
-        val strings = StringsManager.getStrings()
+        val strings = StringsManager.strings
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
@@ -227,7 +246,8 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication {
             this, 0,
             notificationIntent, 0
         )
-        val notification = NotificationCompat.Builder(this,
+        val notification = NotificationCompat.Builder(
+            this,
             UiConstants.Notification.UPGRADE.channelId
         )
             .setContentTitle(strings["notification.upgrade.title"])
@@ -235,8 +255,10 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication {
             .setVisibility(NotificationCompat.VISIBILITY_SECRET)
             .setAutoCancel(true)
             .setSmallIcon(com.lunabeestudio.stopcovid.coreui.R.drawable.ic_notification_bar)
-            .setStyle(NotificationCompat.BigTextStyle()
-                .bigText(strings["notification.upgrade.message"]))
+            .setStyle(
+                NotificationCompat.BigTextStyle()
+                    .bigText(strings["notification.upgrade.message"])
+            )
             .setContentIntent(pendingIntent)
             .build()
         notificationManager.notify(UiConstants.Notification.UPGRADE.notificationId, notification)
@@ -264,7 +286,8 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication {
     }
 
     private fun refreshStatusIfNeeded() {
-        if (System.currentTimeMillis() - (robertManager.atRiskLastRefresh
+        if (robertManager.isRegistered
+            && System.currentTimeMillis() - (robertManager.atRiskLastRefresh
                 ?: 0L) > TimeUnit.HOURS.toMillis(robertManager.checkStatusFrequencyHour.toLong())) {
             CoroutineScope(Dispatchers.IO).launch {
                 robertManager.updateStatus(this@StopCovid)

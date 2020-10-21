@@ -18,4 +18,5 @@ interface RobertApplication {
     fun refreshProximityService()
     fun atRiskDetected()
     fun sendClockNotAlignedNotification()
+    fun refreshInfoCenter()
 }

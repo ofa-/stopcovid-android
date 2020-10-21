@@ -66,7 +66,7 @@ class OnBoardingActivity : BaseActivity() {
 
         when {
             sharedPreferences.isOnBoardingDone() -> {
-                navController.safeNavigate(OnBoardingWelcomeFragmentDirections.actionOnBoardingWelcomeFragmentToMainActivity())
+                navController.safeNavigate(OnBoardingWelcomeFragmentDirections.actionOnBoardingWelcomeFragmentToMainActivity(intent.data?.toString()))
                 finishAndRemoveTask()
             }
             savedInstanceState == null -> {
@@ -95,8 +95,10 @@ class OnBoardingActivity : BaseActivity() {
                     val scale = binding.animationEndImageView.height.toFloat() / binding.animationImageView.height.toFloat()
                     scaleX(scale)
                     scaleY(scale)
-                    y(binding.animationEndImageView.y
-                        + ((binding.animationEndImageView.height.toFloat() - binding.animationImageView.height.toFloat()) / 2f))
+                    y(
+                        binding.animationEndImageView.y
+                            + ((binding.animationEndImageView.height.toFloat() - binding.animationImageView.height.toFloat()) / 2f)
+                    )
                     duration = resources.getInteger(android.R.integer.config_mediumAnimTime).toLong()
                     interpolator = DecelerateInterpolator()
                     withEndAction {

@@ -62,7 +62,7 @@ class AboutFragment : MainFragment() {
             identifier = items.count().toLong()
         }
         items += linkItem {
-            iconRes = R.drawable.ic_about
+            iconRes = R.drawable.ic_web
             text = strings["aboutController.webpage"]
             url = strings["aboutController.webpageUrl"]
             identifier = items.size.toLong()

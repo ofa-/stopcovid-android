@@ -14,8 +14,8 @@ import android.content.Context
 import com.google.gson.Gson
 import com.lunabeestudio.domain.model.Configuration
 import com.lunabeestudio.robert.datasource.ConfigurationDataSource
-import com.lunabeestudio.robert.model.TimeNotAlignedException
 import com.lunabeestudio.robert.model.RobertResultData
+import com.lunabeestudio.robert.model.TimeNotAlignedException
 import com.lunabeestudio.stopcovid.coreui.manager.ConfigManager
 import com.lunabeestudio.stopcovid.extension.remoteToRobertException
 import com.lunabeestudio.stopcovid.model.ConfigurationWrapper

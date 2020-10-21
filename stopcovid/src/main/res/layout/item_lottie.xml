@@ -11,13 +11,15 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="wrap_content"
-    android:layout_height="@dimen/logo_height"
-    android:layout_gravity="center">
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:minHeight="@dimen/min_logo_height">
 
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/offLottieAnimationView"
         android:layout_width="wrap_content"
-        android:layout_height="@dimen/logo_height"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
         android:importantForAccessibility="no"
         android:visibility="gone"
         app:lottie_renderMode="hardware" />
@@ -25,7 +27,8 @@
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/onLottieAnimationView"
         android:layout_width="wrap_content"
-        android:layout_height="@dimen/logo_height"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
         android:importantForAccessibility="no"
         android:visibility="gone"
         app:lottie_renderMode="hardware" />

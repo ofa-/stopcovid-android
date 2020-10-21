@@ -47,8 +47,10 @@ class OnBoardingProximityFragment : OnBoardingFragment() {
                 .setTitle(strings["common.permissionsNeeded"])
                 .setMessage(strings["onboarding.proximityController.allowProximity.warning"])
                 .setPositiveButton(strings["common.understand"]) { _, _ ->
-                    requestPermissions(arrayOf(ProximityManager.getManifestLocationPermission()),
-                        UiConstants.Permissions.LOCATION.ordinal)
+                    requestPermissions(
+                        arrayOf(ProximityManager.getManifestLocationPermission()),
+                        UiConstants.Permissions.LOCATION.ordinal
+                    )
                 }
                 .show()
         } else if (ProximityManager.hasFeatureBLE(requireContext()) && !ProximityManager.isBluetoothOn(requireContext())) {
@@ -116,7 +118,7 @@ class OnBoardingProximityFragment : OnBoardingFragment() {
     private fun startNextController() {
         testAdvertisement { success ->
             if (success) {
-                if (!ProximityManager.isBatteryOptimizationOn(requireContext())) {
+                if (!ProximityManager.isBatteryOptimizationOff(requireContext())) {
                     findNavController()
                         .safeNavigate(OnBoardingProximityFragmentDirections.actionOnBoardingProximityFragmentToOnBoardingBatteryFragment())
                 } else {

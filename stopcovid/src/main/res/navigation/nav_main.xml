@@ -44,6 +44,34 @@
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_proximityFragment_to_reportFragment"
+            app:destination="@id/reportFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_proximityFragment_to_healthFragment"
+            app:destination="@id/healthFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_proximityFragment_to_infoCenterFragment"
+            app:destination="@id/infoCenterFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_proximityFragment_to_keyFiguresFragment"
+            app:destination="@id/keyFiguresFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
     </fragment>
     <fragment
         android:id="@+id/captchaFragment"
@@ -53,6 +81,12 @@
         android:id="@+id/reportFragment"
         android:name="com.lunabeestudio.stopcovid.fragment.ReportFragment"
         tools:layout="@layout/fragment_recycler_view">
+        <deepLink app:uri="https://bonjour.stopcovid.gouv.fr/app/code/{code}" />
+        <argument
+            android:name="code"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
         <action
             android:id="@+id/action_reportFragment_to_codeFragment"
             app:destination="@id/codeFragment"
@@ -67,8 +101,13 @@
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+    </fragment>
+    <fragment
+        android:id="@+id/healthFragment"
+        android:name="com.lunabeestudio.stopcovid.fragment.HealthFragment"
+        tools:layout="@layout/fragment_recycler_view">
         <action
-            android:id="@+id/action_reportFragment_to_informationFragment"
+            android:id="@+id/action_healthFragment_to_informationFragment"
             app:destination="@id/informationFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
@@ -76,9 +115,22 @@
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
     </fragment>
     <fragment
+        android:id="@+id/infoCenterFragment"
+        android:name="com.lunabeestudio.stopcovid.fragment.InfoCenterFragment"
+        tools:layout="@layout/fragment_recycler_view" />
+    <fragment
+        android:id="@+id/keyFiguresFragment"
+        android:name="com.lunabeestudio.stopcovid.fragment.KeyFiguresFragment"
+        tools:layout="@layout/fragment_recycler_view" />
+    <fragment
         android:id="@+id/codeFragment"
         android:name="com.lunabeestudio.stopcovid.fragment.CodeFragment"
         tools:layout="@layout/fragment_recycler_view">
+        <argument
+            android:name="code"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
         <action
             android:id="@+id/action_codeFragment_to_symptomsOriginFragment"
             app:destination="@id/symptomsOriginFragment"
@@ -137,10 +189,6 @@
     <fragment
         android:id="@+id/privacyFragment"
         android:name="com.lunabeestudio.stopcovid.fragment.PrivacyFragment"
-        tools:layout="@layout/fragment_recycler_view" />
-    <fragment
-        android:id="@+id/sharingFragment"
-        android:name="com.lunabeestudio.stopcovid.fragment.SharingFragment"
         tools:layout="@layout/fragment_recycler_view" />
     <fragment
         android:id="@+id/manageDataFragment"

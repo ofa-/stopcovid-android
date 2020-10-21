@@ -31,7 +31,8 @@ import kotlin.coroutines.CoroutineContext
  * ProximityNotification foreground service.
  */
 abstract class ProximityNotificationService : Service(),
-    ProximityNotificationCallback, ProximityPayloadProvider, CoroutineScope {
+    ProximityNotificationCallback, ProximityPayloadProvider, ProximityNotificationLogger.Listener,
+    CoroutineScope {
 
     private var bleProximityNotification: BleProximityNotification? = null
     private var bluetoothStateBroadcastReceiver: BluetoothStateBroadcastReceiver? = null
@@ -42,8 +43,14 @@ abstract class ProximityNotificationService : Service(),
     abstract val foregroundNotificationId: Int
     abstract val bleSettings: BleSettings
 
+    override fun onCreate() {
+        super.onCreate()
+        ProximityNotificationLogger.registerListener(this)
+    }
+
     override fun onDestroy() {
         stop()
+        ProximityNotificationLogger.unregisterListener()
         super.onDestroy()
 
         cancel()
@@ -60,6 +67,11 @@ abstract class ProximityNotificationService : Service(),
      * @see BluetoothStateBroadcastReceiver
      */
     fun start() {
+        ProximityNotificationLogger.info(
+            ProximityNotificationEventId.PROXIMITY_NOTIFICATION_START,
+            "Start Proximity Notification"
+        )
+
         registerBluetoothBroadcastReceiver()
         doStart()
     }
@@ -71,6 +83,11 @@ abstract class ProximityNotificationService : Service(),
      * @see BluetoothStateBroadcastReceiver
      */
     fun stop() {
+        ProximityNotificationLogger.info(
+            ProximityNotificationEventId.PROXIMITY_NOTIFICATION_STOP,
+            "Stop Proximity Notification"
+        )
+
         doStop()
         unregisterBluetoothBroadcastReceiver()
     }
@@ -81,6 +98,11 @@ abstract class ProximityNotificationService : Service(),
      * @see ProximityPayloadProvider
      */
     fun notifyProximityPayloadUpdated() {
+        ProximityNotificationLogger.info(
+            ProximityNotificationEventId.PROXIMITY_NOTIFICATION_PAYLOAD_UPDATED,
+            "Proximity payload updated"
+        )
+
         bleProximityNotification?.notifyPayloadUpdated()
     }
 
@@ -89,6 +111,11 @@ abstract class ProximityNotificationService : Service(),
      * It will restart [BleProximityNotification]
      */
     fun notifyBleSettingsUpdate() {
+        ProximityNotificationLogger.info(
+            ProximityNotificationEventId.PROXIMITY_NOTIFICATION_BLE_SETTINGS_UPDATED,
+            "BLE settings updated"
+        )
+
         if (isRunning()) {
             stopBleProximityNotification()
             startBleProximityNotification()
@@ -134,12 +161,15 @@ abstract class ProximityNotificationService : Service(),
             stopBleProximityNotification()
         }
 
-        BleProximityNotificationFactory.build(this, bleSettings, this)?.run {
-            bleProximityNotification = this
-            setUp(
-                this@ProximityNotificationService,
-                this@ProximityNotificationService
-            )
+        ProximityNotificationLogger.info(
+            ProximityNotificationEventId.PROXIMITY_NOTIFICATION_START_BLE,
+            "Start BLE Proximity Notification"
+        )
+
+        BleProximityNotificationFactory.build(this, bleSettings, this)?.let {
+            bleProximityNotification = it
+            it.setUp(this, this)
+            it.start()
         } ?: run {
             onError(
                 ProximityNotificationError(
@@ -148,11 +178,14 @@ abstract class ProximityNotificationService : Service(),
                 )
             )
         }
-
-        bleProximityNotification?.start()
     }
 
     private fun stopBleProximityNotification() {
+        ProximityNotificationLogger.info(
+            ProximityNotificationEventId.PROXIMITY_NOTIFICATION_STOP_BLE,
+            "Stop BLE Proximity Notification"
+        )
+
         bleProximityNotification?.stop()
         bleProximityNotification = null
     }
@@ -164,7 +197,10 @@ abstract class ProximityNotificationService : Service(),
      * @see ProximityNotification#stop
      */
     protected open fun onBluetoothDisabled() {
-        Timber.d("Bluetooth disabled")
+        ProximityNotificationLogger.info(
+            ProximityNotificationEventId.PROXIMITY_NOTIFICATION_BLUETOOTH_DISABLED,
+            "Bluetooth disabled"
+        )
 
         doStop()
     }
@@ -176,9 +212,16 @@ abstract class ProximityNotificationService : Service(),
      * @see ProximityNotification#start
      */
     protected open fun onBluetoothEnabled() {
-        Timber.d("Bluetooth enabled")
+        ProximityNotificationLogger.info(
+            ProximityNotificationEventId.PROXIMITY_NOTIFICATION_BLUETOOTH_ENABLED,
+            "Bluetooth enabled"
+        )
 
         doStart()
+    }
+
+    override fun onEvent(event: ProximityNotificationEvent) {
+        Timber.d("onEvent event = $event")
     }
 
     /**

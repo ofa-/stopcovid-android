@@ -15,8 +15,9 @@ import android.bluetooth.le.AdvertiseData
 import android.bluetooth.le.AdvertiseSettings
 import android.bluetooth.le.BluetoothLeAdvertiser
 import android.os.ParcelUuid
+import com.orange.proximitynotification.ProximityNotificationEventId
+import com.orange.proximitynotification.ProximityNotificationLogger
 import com.orange.proximitynotification.ble.BleSettings
-import timber.log.Timber
 
 class BleAdvertiserImpl(
     override val settings: BleSettings,
@@ -26,14 +27,21 @@ class BleAdvertiserImpl(
     private var advertiseCallback: InnerAdvertiseCallback? = null
 
     override fun start(data: ByteArray, callback: BleAdvertiser.Callback): Boolean {
-        Timber.d("Starting Advertising")
+        ProximityNotificationLogger.info(
+            ProximityNotificationEventId.BLE_ADVERTISER_START,
+            "Starting advertising"
+        )
 
         doStop()
         return doStart(data, callback)
     }
 
     override fun stop() {
-        Timber.d("Stopping Advertising")
+        ProximityNotificationLogger.info(
+            ProximityNotificationEventId.BLE_ADVERTISER_STOP,
+            "Stopping advertising"
+        )
+
         doStop()
     }
 
@@ -46,14 +54,29 @@ class BleAdvertiserImpl(
                 buildAdvertiseData(data),
                 advertiseCallback
             )
+        }.onFailure {
+            ProximityNotificationLogger.error(
+                eventId = ProximityNotificationEventId.BLE_ADVERTISER_START_ERROR,
+                message = "Failed to start advertising",
+                cause = it
+            )
         }.isSuccess
     }
 
     private fun doStop() {
-        advertiseCallback?.let {
-            runCatching {
-                bluetoothAdvertiser.stopAdvertising(advertiseCallback)
-            }
+        advertiseCallback?.runCatching {
+            bluetoothAdvertiser.stopAdvertising(advertiseCallback)
+        }?.onFailure {
+            ProximityNotificationLogger.error(
+                eventId = ProximityNotificationEventId.BLE_ADVERTISER_STOP_ERROR,
+                message = "Failed to stop advertising",
+                cause = it
+            )
+        }?.onSuccess {
+            ProximityNotificationLogger.info(
+                eventId = ProximityNotificationEventId.BLE_ADVERTISER_STOP_SUCCESS,
+                message = "Succeed to stop advertising"
+            )
         }
         advertiseCallback = null
     }
@@ -80,13 +103,22 @@ class BleAdvertiserImpl(
         AdvertiseCallback() {
         override fun onStartFailure(errorCode: Int) {
             super.onStartFailure(errorCode)
-            Timber.w("Advertising failed errorCode=$errorCode")
+
+            ProximityNotificationLogger.error(
+                ProximityNotificationEventId.BLE_ADVERTISER_START_ERROR,
+                "Failed to start advertising (errorCode=$errorCode)"
+            )
+
             callback.onError(errorCode)
         }
 
         override fun onStartSuccess(settingsInEffect: AdvertiseSettings) {
             super.onStartSuccess(settingsInEffect)
-            Timber.d("Advertising successfully started")
+
+            ProximityNotificationLogger.info(
+                ProximityNotificationEventId.BLE_ADVERTISER_START_SUCCESS,
+                "Succeed to start advertising"
+            )
         }
     }
 

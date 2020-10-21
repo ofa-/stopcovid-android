@@ -12,10 +12,12 @@ package com.lunabeestudio.stopcovid.fragment
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.os.Bundle
 import android.view.Gravity
 import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.UiConstants
 import com.lunabeestudio.stopcovid.coreui.extension.openAppSettings
@@ -25,129 +27,100 @@ import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
-import com.lunabeestudio.stopcovid.fastitem.contactItem
 import com.lunabeestudio.stopcovid.fastitem.doubleButtonItem
 import com.lunabeestudio.stopcovid.fastitem.logoItem
 import com.mikepenz.fastadapter.GenericItem
-import java.text.DateFormat
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Date
-import java.util.Locale
 
-class ReportFragment : AboutMainFragment() {
+class ReportFragment : MainFragment() {
 
+    private val args: ReportFragmentArgs by navArgs()
+    private var codeUsed: Boolean = false
     private val robertManager by lazy {
         requireContext().robertManager()
     }
 
-    override fun getTitleKey(): String = "sickController.title"
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-    private val dateFormat: DateFormat = SimpleDateFormat("dd LLLL", Locale.getDefault())
-    private val dateTimeFormat: DateFormat = SimpleDateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.SHORT)
+        if (robertManager.isRegistered) {
+            if (args.code != null && !codeUsed) {
+                findNavController().safeNavigate(ReportFragmentDirections.actionReportFragmentToCodeFragment(args.code))
+                codeUsed = true
+            }
+        }
+    }
+
+    override fun getTitleKey(): String = "declareController.title"
 
     override fun getItems(): List<GenericItem> {
         val items = ArrayList<GenericItem>()
 
         items += logoItem {
-            imageRes = R.drawable.diagnosis
+            imageRes = R.drawable.declare
             identifier = items.count().toLong()
         }
         items += spaceItem {
             spaceRes = R.dimen.spacing_xlarge
             identifier = items.size.toLong()
         }
-        if (robertManager.isAtRisk == true) {
-            val exposureCalendar = Calendar.getInstance()
-            robertManager.atRiskLastRefresh?.let {
-                exposureCalendar.time = Date(it)
-            }
-            val exposureDate = exposureCalendar.time
-            val endExposureCalendar = Calendar.getInstance()
-            endExposureCalendar.add(Calendar.DAY_OF_YEAR, robertManager.quarantinePeriod - robertManager.lastExposureTimeframe)
-            val endExposureDate = endExposureCalendar.time
-            items += spaceItem {
-                spaceRes = R.dimen.spacing_large
+        if (robertManager.isRegistered) {
+            items += titleItem {
+                text = strings["sickController.message.testedPositive.title"]
+                gravity = Gravity.CENTER
                 identifier = items.count().toLong()
             }
-            items += contactItem {
-                header = stringsFormat("sickController.state.date", dateTimeFormat.format(exposureDate))
-                title = strings["sickController.state.contact.title"]
-                caption = stringsFormat("sickController.state.contact.subtitle", dateFormat.format(endExposureDate))
-                more = strings["common.readMore"]
-                moreClickListener = View.OnClickListener {
-                    findNavController().safeNavigate(ReportFragmentDirections.actionReportFragmentToInformationFragment())
-                }
-            }
-            items += spaceItem {
-                spaceRes = R.dimen.spacing_large
+            items += captionItem {
+                text = strings["sickController.message.testedPositive.subtitle"]
+                gravity = Gravity.CENTER
                 identifier = items.count().toLong()
             }
-        } else if (robertManager.isAtRisk == false) {
-            val refreshCalendar = Calendar.getInstance()
-            robertManager.atRiskLastRefresh?.let {
-                refreshCalendar.time = Date(it)
-            }
-            val refreshDate = refreshCalendar.time
             items += spaceItem {
-                spaceRes = R.dimen.spacing_large
-                identifier = items.count().toLong()
+                spaceRes = R.dimen.spacing_xlarge
+                identifier = items.size.toLong()
             }
-            items += contactItem {
-                header = stringsFormat("sickController.state.date", dateTimeFormat.format(refreshDate))
-                title = strings["sickController.state.nothing.title"]
-                caption = strings["sickController.state.nothing.subtitle"]
-                more = strings["common.readMore"]
-                moreClickListener = View.OnClickListener {
-                    findNavController().safeNavigate(ReportFragmentDirections.actionReportFragmentToInformationFragment())
-                }
-            }
-            items += spaceItem {
-                spaceRes = R.dimen.spacing_large
-                identifier = items.count().toLong()
-            }
-        }
-        items += titleItem {
-            text = strings["sickController.message.testedPositive.title"]
-            gravity = Gravity.CENTER
-            identifier = items.count().toLong()
-        }
-        items += captionItem {
-            text = strings["sickController.message.testedPositive.subtitle"]
-            gravity = Gravity.CENTER
-            identifier = items.count().toLong()
-        }
-        items += spaceItem {
-            spaceRes = R.dimen.spacing_xlarge
-            identifier = items.size.toLong()
-        }
-        items += doubleButtonItem {
-            text1 = strings["sickController.button.flash"]
-            text2 = strings["sickController.button.tap"]
-            onClickListener1 = View.OnClickListener {
-                if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA)
-                    != PackageManager.PERMISSION_GRANTED) {
-                    if (shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)) {
-                        context?.showPermissionRationale(strings, "common.needCameraAccessToScan", "common.ok") {
-                            requestPermissions(arrayOf(Manifest.permission.CAMERA),
-                                UiConstants.Permissions.CAMERA.ordinal)
+            items += doubleButtonItem {
+                text1 = strings["sickController.button.flash"]
+                text2 = strings["sickController.button.tap"]
+                onClickListener1 = View.OnClickListener {
+                    if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA)
+                        != PackageManager.PERMISSION_GRANTED) {
+                        if (shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)) {
+                            context?.showPermissionRationale(strings, "common.needCameraAccessToScan", "common.ok") {
+                                requestPermissions(
+                                    arrayOf(Manifest.permission.CAMERA),
+                                    UiConstants.Permissions.CAMERA.ordinal
+                                )
+                            }
+                        } else {
+                            requestPermissions(
+                                arrayOf(Manifest.permission.CAMERA),
+                                UiConstants.Permissions.CAMERA.ordinal
+                            )
                         }
                     } else {
-                        requestPermissions(arrayOf(Manifest.permission.CAMERA),
-                            UiConstants.Permissions.CAMERA.ordinal)
+                        findNavController().safeNavigate(ReportFragmentDirections.actionReportFragmentToQrCodeFragment())
                     }
-                } else {
-                    findNavController().safeNavigate(ReportFragmentDirections.actionReportFragmentToQrCodeFragment())
                 }
+                onClickListener2 = View.OnClickListener {
+                    findNavController().safeNavigate(ReportFragmentDirections.actionReportFragmentToCodeFragment())
+                }
+                identifier = items.count().toLong()
             }
-            onClickListener2 = View.OnClickListener {
-                findNavController().safeNavigate(ReportFragmentDirections.actionReportFragmentToCodeFragment())
+            items += spaceItem {
+                spaceRes = R.dimen.spacing_xlarge
+                identifier = items.count().toLong()
             }
-            identifier = items.count().toLong()
-        }
-        items += spaceItem {
-            spaceRes = R.dimen.spacing_xlarge
-            identifier = items.count().toLong()
+        } else {
+            items += titleItem {
+                text = strings["declareController.notRegistered.mainMessage.title"]
+                gravity = Gravity.CENTER
+                identifier = items.count().toLong()
+            }
+            items += captionItem {
+                text = strings["declareController.notRegistered.mainMessage.subtitle"]
+                gravity = Gravity.CENTER
+                identifier = items.count().toLong()
+            }
         }
 
         return items

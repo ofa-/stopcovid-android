@@ -93,10 +93,14 @@ class ServiceDataSource(context: Context, baseUrl: String = BuildConfig.BASE_URL
 
     override suspend fun status(apiVersion: String, ssu: ServerStatusUpdate): RobertResultData<StatusReport> {
         val result = tryCatchRequestData {
-            api.status(apiVersion, ApiStatusRQ(ebid = ssu.ebid,
+            api.status(
+                apiVersion, ApiStatusRQ(
+                ebid = ssu.ebid,
                 epochId = ssu.epochId,
                 time = ssu.time,
-                mac = ssu.mac))
+                mac = ssu.mac
+            )
+            )
         }
         return when (result) {
             is RobertResultData.Success -> RobertResultData.Success(result.data.toDomain())
@@ -112,11 +116,14 @@ class ServiceDataSource(context: Context, baseUrl: String = BuildConfig.BASE_URL
 
     override suspend fun deleteExposureHistory(apiVersion: String, ssu: ServerStatusUpdate): RobertResult {
         return tryCatchRequest {
-            api.deleteExposureHistory(apiVersion,
-                ApiDeleteExposureHistoryRQ(ebid = ssu.ebid, epochId = ssu.epochId, time = ssu.time, mac = ssu.mac))
+            api.deleteExposureHistory(
+                apiVersion,
+                ApiDeleteExposureHistoryRQ(ebid = ssu.ebid, epochId = ssu.epochId, time = ssu.time, mac = ssu.mac)
+            )
         }
     }
 
+    @Suppress("BlockingMethodInNonBlockingContext")
     private suspend fun tryCatchRequest(doRequest: suspend () -> Response<ApiCommonRS>): RobertResult {
         return try {
             val result = doRequest()
@@ -124,8 +131,11 @@ class ServiceDataSource(context: Context, baseUrl: String = BuildConfig.BASE_URL
                 if (result.body()?.success == true) {
                     RobertResult.Success()
                 } else {
-                    RobertResult.Failure(BackendException(
-                        result.body()?.message!!))
+                    RobertResult.Failure(
+                        BackendException(
+                            result.body()?.message!!
+                        )
+                    )
                 }
             } else {
                 RobertResult.Failure(HttpException(result).remoteToRobertException())
@@ -136,6 +146,7 @@ class ServiceDataSource(context: Context, baseUrl: String = BuildConfig.BASE_URL
         }
     }
 
+    @Suppress("BlockingMethodInNonBlockingContext")
     private suspend fun <T> tryCatchRequestData(doRequest: suspend () -> Response<T>): RobertResultData<T> {
         return try {
             val result = doRequest()

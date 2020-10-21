@@ -28,6 +28,12 @@
         <item name="android:textStyle">bold</item>
     </style>
 
+    <style name="TextAppearance.StopCovid.Title.KeyFigure">
+        <item name="fontFamily">@font/marianne_extrabold</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">@dimen/key_figure_font_size</item>
+    </style>
+
     <style name="TextAppearance.StopCovid.Title.Small">
         <item name="android:textSize">@dimen/title_small_font_size</item>
     </style>
@@ -46,6 +52,14 @@
         <item name="android:textSize">@dimen/caption_font_size</item>
     </style>
 
+    <style name="TextAppearance.StopCovid.Caption.Bold">
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TextAppearance.StopCovid.Caption.Small">
+        <item name="android:textSize">@dimen/small_caption_font_size</item>
+    </style>
+
     <style name="TextAppearance.StopCovid.Title.Circle">
         <item name="android:textSize">@dimen/circle_font_size</item>
         <item name="android:textColor">?attr/colorOnPrimary</item>
@@ -57,5 +71,9 @@
         <item name="android:textColor">?colorPrimary</item>
         <item name="android:letterSpacing">@dimen/button_letter_spacing</item>
         <item name="android:textAllCaps">false</item>
+    </style>
+
+    <style name="Theme.StopCovid.Link.Big">
+        <item name="android:textAppearance">@style/TextAppearance.StopCovid.Title</item>
     </style>
 </resources>

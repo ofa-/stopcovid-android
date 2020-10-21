@@ -11,42 +11,42 @@
 package com.lunabeestudio.stopcovid.fastitem
 
 import android.view.View
-import android.widget.ImageView
+import android.widget.ImageButton
 import android.widget.TextView
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.button.MaterialButton
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.safeEmojiSpanify
 import com.lunabeestudio.stopcovid.coreui.fastitem.BaseItem
 
-class ContactItem : BaseItem<ContactItem.ViewHolder>(
-    R.layout.item_contact, ::ViewHolder, R.id.item_contact
+class ContactItem(layoutRes: Int) : BaseItem<ContactItem.ViewHolder>(
+    layoutRes, ::ViewHolder, R.id.item_contact
 ) {
     var header: String? = null
     var title: String? = null
     var caption: String? = null
     var more: String? = null
+    var atRisk: Boolean? = null
     var moreClickListener: View.OnClickListener? = null
+    var actionClickListener: View.OnClickListener? = null
 
     override fun bindView(holder: ViewHolder, payloads: List<Any>) {
         super.bindView(holder, payloads)
         holder.headerTextView.text = header.safeEmojiSpanify()
         holder.titleTextView.text = title.safeEmojiSpanify()
         holder.captionTextView.text = caption.safeEmojiSpanify()
-        holder.moreTextView.text = more.safeEmojiSpanify()
-        holder.moreImageView.isVisible = false
-        holder.moreConstraintLayout.setOnClickListener(moreClickListener)
+        holder.moreButton.text = more.safeEmojiSpanify()
+        holder.moreButton.setOnClickListener(moreClickListener)
+        holder.actionButton.setOnClickListener(actionClickListener)
     }
 
     class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {
         val headerTextView: TextView = v.findViewById(R.id.headerTextView)
         val titleTextView: TextView = v.findViewById(R.id.titleTextView)
         val captionTextView: TextView = v.findViewById(R.id.captionTextView)
-        val moreConstraintLayout: ConstraintLayout = v.findViewById(R.id.linkLayout)
-        val moreTextView: TextView = v.findViewById(R.id.textView)
-        val moreImageView: ImageView = v.findViewById(R.id.leftIconImageView)
+        val moreButton: MaterialButton = v.findViewById(R.id.learnMoreButton)
+        val actionButton: ImageButton = v.findViewById(R.id.actionButton)
     }
 }
 
-fun contactItem(block: (ContactItem.() -> Unit)): ContactItem = ContactItem().apply(block)
+fun contactItem(layoutRes: Int, block: (ContactItem.() -> Unit)): ContactItem = ContactItem(layoutRes).apply(block)

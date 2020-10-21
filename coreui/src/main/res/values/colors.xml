@@ -8,14 +8,26 @@
   ~ Created by Lunabee Studio / Date - 2020/04/05 - for the STOP-COVID project
   -->
 <resources>
-    <color name="color_primary">#000091</color>
+    <color name="color_primary">#5770BE</color>
     <color name="color_on_primary">#FFFFFF</color>
     <color name="color_primary_light">#1A000091</color>
     <color name="color_on_primary_light">#000091</color>
-    <color name="color_error">#E2011C</color>
+    <color name="color_error">#FF5C5C</color>
     <color name="color_error_light">#FACDD2</color>
     <color name="color_on_error">#FFF</color>
     <color name="color_alert">#FED042</color>
     <color name="color_on_alert">#000000</color>
     <color name="color_icon_background">#FFFFFF</color>
+    <color name="color_on_gradient">#FFFFFF</color>
+
+    <color name="color_no_risk">#449976</color>
+    <color name="color_risk">#fd706a</color>
+    <color name="color_on_status_notification">#FFFFFF</color>
+    <color name="color_button_learn_more">#33000000</color>
+    <color name="color_persian_green">#00AC8C</color>
+    <color name="color_mountain_meadow">#169B62</color>
+    <color name="color_persimmon">#FF6F4D</color>
+    <color name="color_monza">#E1000F</color>
+    <color name="color_east_bay">#484D7A</color>
+    <color name="color_neon_carrot">#FF9940</color>
 </resources>

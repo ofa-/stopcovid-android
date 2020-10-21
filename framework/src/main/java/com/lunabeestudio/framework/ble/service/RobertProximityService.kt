@@ -27,6 +27,7 @@ import com.lunabeestudio.robert.model.RobertException
 import com.lunabeestudio.robert.model.RobertResultData
 import com.orange.proximitynotification.ProximityInfo
 import com.orange.proximitynotification.ProximityNotificationError
+import com.orange.proximitynotification.ProximityNotificationEvent
 import com.orange.proximitynotification.ProximityNotificationService
 import com.orange.proximitynotification.ProximityPayload
 import com.orange.proximitynotification.ble.BleSettings
@@ -150,15 +151,31 @@ abstract class RobertProximityService : ProximityNotificationService() {
     }
 
     final override fun onError(error: ProximityNotificationError) {
-        onError(when (error.type) {
-            ProximityNotificationError.Type.BLE_ADVERTISER -> BLEAdvertiserException("(${error.cause} [${error.rootErrorCode}])")
-            ProximityNotificationError.Type.BLE_SCANNER -> BLEScannerException("(${error.cause} [${error.rootErrorCode}])")
-            ProximityNotificationError.Type.BLE_PROXIMITY_NOTIFICATION -> BLEProximityNotificationException("(${error.cause} [${error.rootErrorCode}])")
-            ProximityNotificationError.Type.BLE_GATT -> BLEGattException("(${error.cause} [${error.rootErrorCode}])")
-        })
+        onError(
+            when (error.type) {
+                ProximityNotificationError.Type.BLE_ADVERTISER -> BLEAdvertiserException("(${error.cause} [${error.rootErrorCode}])")
+                ProximityNotificationError.Type.BLE_SCANNER -> BLEScannerException("(${error.cause} [${error.rootErrorCode}])")
+                ProximityNotificationError.Type.BLE_PROXIMITY_NOTIFICATION -> BLEProximityNotificationException("(${error.cause} [${error.rootErrorCode}])")
+                ProximityNotificationError.Type.BLE_GATT -> BLEGattException("(${error.cause} [${error.rootErrorCode}])")
+            }
+        )
     }
 
     abstract fun onError(error: RobertException)
+
+    override fun onEvent(event: ProximityNotificationEvent) {
+        when (event) {
+            is ProximityNotificationEvent.Debug -> {
+                Timber.d("BLE-SDK-${event.id.name}-${event.message}")
+            }
+            is ProximityNotificationEvent.Info -> {
+                Timber.v("BLE-SDK-${event.id.name}-${event.message}")
+            }
+            is ProximityNotificationEvent.Error -> {
+                Timber.e(event.cause, "BLE-SDK-${event.id.name}-${event.message}")
+            }
+        }
+    }
 
     companion object {
         private const val HELLO_REFRESH_MAX_DELAY_MS: Long = 30 * 1000

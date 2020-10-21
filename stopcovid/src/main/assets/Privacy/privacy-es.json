@@ -1,9 +1,9 @@
 [
-    {
+	{
         "section": "Tus datos están protegidos",
-        "description": "StopCovid cumple con la reglamentación que garantiza la protección de tus datos.",
+        "description": "TousAntiCovid cumple con la reglamentación que garantiza la protección de tus datos.",
         "links": [
-            {
+	        {
                 "label": "Más información sobre el Reglamento General de Protección de Datos (RGPD)",
                 "url": "https://bonjour.stopcovid.gouv.fr/privacy-en.html"
             }
@@ -11,7 +11,7 @@
     },
     {
         "section": "Cómo se intercambian los datos",
-        "description": "StopCovid utiliza únicamente el Bluetooth de tu teléfono. Tus datos de geolocalización no quedan registrados ni son intercambiados. El Bluetooth es utilizado para realizar una estimación, basada en un modelo estadístico, de la proximidad entre dos teléfonos."
+        "description": "TousAntiCovid utiliza únicamente el Bluetooth de tu teléfono. Tus datos de geolocalización no quedan registrados ni son intercambiados. El Bluetooth es utilizado para realizar una estimación, basada en un modelo estadístico, de la proximidad entre dos teléfonos."
     },
     {
         "section": "Qué datos son intercambiados y por qué",
@@ -34,14 +34,14 @@
         "description": "Si eres menor de 15 años, consulta con tus padres o con tus responsables legales la conveniencia de instalar esta aplicación."
     },
     {
-        "section": "Quién ha desarrollado StopCovid",
-        "description": "Esta aplicación ha sido desarrollada por el equipo StopCovid bajo la supervisión del Ministerio de Solidaridad y Sanidad y de la Secretaría de Estado del Sector Digital.\nEl equipo StopCovid: Inria, ANSSI, Capgemini, Dassault Systèmes, Inserm, Lunabee Studio, Ministerio francés de Solidaridad y Sanidad, Orange, Santé Publique Francia y Withings.\nEl código fuente de esta plataforma es completamente abierto y accesible a través de la dirección mencionada a continuación."
+        "section": "Quién ha desarrollado TousAntiCovid",
+        "description": "Esta aplicación ha sido desarrollada por el equipo TousAntiCovid bajo la supervisión del Ministerio de Solidaridad y Sanidad y de la Secretaría de Estado del Sector Digital.\nEl equipo TousAntiCovid: Inria, ANSSI, Capgemini, Dassault Systèmes, Inserm, Lunabee Studio, Ministerio francés de Solidaridad y Sanidad, Orange, Santé Publique Francia y Withings.\nEl código fuente de esta plataforma es completamente abierto y accesible a través de la dirección mencionada a continuación."
     },
     {
         "section": "Informaciones complementarias",
         "links": [
             {
-                "label": "Acerca de StopCovid",
+                "label": "Acerca de TousAntiCovid",
                 "url": "https://bonjour.stopcovid.gouv.fr/stopcovid.html"
             },
             {
@@ -55,3 +55,4 @@
         ]
     }
 ]
+
