@@ -34,7 +34,7 @@ class InformationFragment : MainFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        robertManager.isAtRiskLiveData.observe(viewLifecycleOwner, EventObserver {
+        robertManager.atRiskStatus.observe(viewLifecycleOwner, EventObserver(this.javaClass.name.hashCode()) {
             refreshScreen()
         })
     }

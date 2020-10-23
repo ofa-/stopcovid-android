@@ -15,6 +15,7 @@ import com.lunabeestudio.domain.model.DeviceParameterCorrection
 import com.lunabeestudio.domain.model.HelloBuilder
 import com.lunabeestudio.domain.model.LocalProximity
 import com.lunabeestudio.robert.manager.LocalProximityFilter
+import com.lunabeestudio.robert.model.AtRiskStatus
 import com.lunabeestudio.robert.model.RobertResult
 import com.lunabeestudio.robert.model.RobertResultData
 import com.lunabeestudio.robert.utils.Event
@@ -28,7 +29,7 @@ interface RobertManager {
 
     val isAtRisk: Boolean?
 
-    val isAtRiskLiveData: LiveData<Event<Boolean?>>
+    val atRiskStatus: LiveData<Event<AtRiskStatus>>
 
     val atRiskLastRefresh: Long?
 

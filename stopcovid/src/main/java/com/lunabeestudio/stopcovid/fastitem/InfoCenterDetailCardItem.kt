@@ -20,20 +20,20 @@ import com.lunabeestudio.stopcovid.databinding.ItemInfoCenterDetailCardBinding
 import com.lunabeestudio.stopcovid.extension.openInExternalBrowser
 import com.lunabeestudio.stopcovid.extension.setTextOrHide
 import com.lunabeestudio.stopcovid.model.InfoCenterTag
-import com.mikepenz.fastadapter.GenericItem
 import com.mikepenz.fastadapter.adapters.FastItemAdapter
 import com.mikepenz.fastadapter.binding.AbstractBindingItem
+import com.mikepenz.fastadapter.binding.BindingViewHolder
 
 class InfoCenterDetailCardItem : AbstractBindingItem<ItemInfoCenterDetailCardBinding>() {
     var header: String? = null
     var tags: List<InfoCenterTag> = emptyList()
     var strings: Map<String, String> = emptyMap()
     var title: String? = null
-    var subtitle: String? = null
+    var body: String? = null
     var link: String? = null
     var url: String? = null
 
-    private val fastItemAdapter: FastItemAdapter<GenericItem> = FastItemAdapter()
+    var tagRecyclerViewPool: RecyclerView.RecycledViewPool? = null
 
     override val type: Int = R.id.item_info_center_detail_card
 
@@ -41,11 +41,26 @@ class InfoCenterDetailCardItem : AbstractBindingItem<ItemInfoCenterDetailCardBin
         return ItemInfoCenterDetailCardBinding.inflate(inflater, parent, false)
     }
 
+    override fun bindView(holder: BindingViewHolder<ItemInfoCenterDetailCardBinding>, payloads: List<Any>) {
+        super.bindView(holder, payloads)
+
+        val tagItems = tags
+            .filter { strings[it.labelKey]?.isNotEmpty() ?: false }
+            .map { (id, labelKey, colorCode) ->
+                tagItem {
+                    text = strings[labelKey]
+                    color = colorCode
+                    identifier = id.hashCode().toLong()
+                }
+            }
+
+        (holder as InfoCenterDetailCardItemViewHolder).tagAdapter.setNewList(tagItems)
+    }
+
     override fun bindView(binding: ItemInfoCenterDetailCardBinding, payloads: List<Any>) {
-        super.bindView(binding, payloads)
         binding.headerTextView.setTextOrHide(header)
         binding.titleTextView.setTextOrHide(title)
-        binding.subtitleTextView.setTextOrHide(subtitle)
+        binding.bodyTextView.setTextOrHide(body)
         binding.includeLink.textView.setTextOrHide(link)
         binding.includeLink.leftIconImageView.isVisible = false
         binding.space.isVisible = link == null || url == null
@@ -53,24 +68,35 @@ class InfoCenterDetailCardItem : AbstractBindingItem<ItemInfoCenterDetailCardBin
         binding.includeLink.constraintLayout.setOnClickListener {
             url?.openInExternalBrowser(it.context)
         }
-        binding.recyclerView.layoutManager = LinearLayoutManager(
-            binding.root.context,
+        binding.tagRecyclerView.isVisible = tags.isNotEmpty()
+    }
+
+    override fun getViewHolder(viewBinding: ItemInfoCenterDetailCardBinding): BindingViewHolder<ItemInfoCenterDetailCardBinding> {
+        val viewHolder = InfoCenterDetailCardItemViewHolder(viewBinding)
+
+        viewBinding.tagRecyclerView.layoutManager = LinearLayoutManager(
+            viewBinding.root.context,
             RecyclerView.HORIZONTAL,
             false
         )
-        binding.recyclerView.adapter = fastItemAdapter
-        fastItemAdapter.set(
-            tags.map { tag ->
-                tagItem {
-                    text = strings[tag.labelKey]
-                    color = tag.colorCode
-                    identifier = tag.id.hashCode().toLong()
-                }
-            }
-        )
-        binding.recyclerView.isVisible = tags.isNotEmpty()
-    }
+        viewBinding.tagRecyclerView.setHasFixedSize(true)
+        viewBinding.tagRecyclerView.adapter = viewHolder.tagAdapter
 
+        tagRecyclerViewPool?.let {
+            viewBinding.tagRecyclerView.setRecycledViewPool(it)
+        }
+
+        return viewHolder
+    }
+}
+
+class InfoCenterDetailCardItemViewHolder(binding: ItemInfoCenterDetailCardBinding)
+    : BindingViewHolder<ItemInfoCenterDetailCardBinding>(binding) {
+    val tagAdapter: FastItemAdapter<TagItem> = FastItemAdapter()
+
+    init {
+        tagAdapter.setHasStableIds(true)
+    }
 }
 
 fun infoCenterDetailCardItem(block: (InfoCenterDetailCardItem.() -> Unit)): InfoCenterDetailCardItem = InfoCenterDetailCardItem().apply(

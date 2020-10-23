@@ -36,8 +36,10 @@ import com.lunabeestudio.robert.datasource.LocalLocalProximityDataSource
 import com.lunabeestudio.robert.datasource.RemoteServiceDataSource
 import com.lunabeestudio.robert.datasource.SharedCryptoDataSource
 import com.lunabeestudio.robert.extension.safeEnumValueOf
+import com.lunabeestudio.robert.extension.toAtRiskStatus
 import com.lunabeestudio.robert.extension.use
 import com.lunabeestudio.robert.manager.LocalProximityFilter
+import com.lunabeestudio.robert.model.AtRiskStatus
 import com.lunabeestudio.robert.model.NoEphemeralBluetoothIdentifierFound
 import com.lunabeestudio.robert.model.NoEphemeralBluetoothIdentifierFoundForEpoch
 import com.lunabeestudio.robert.model.NoKeyException
@@ -106,8 +108,8 @@ class RobertManagerImpl(
     override val isProximityActive: Boolean
         get() = keystoreRepository.proximityActive ?: false
 
-    private val isAtRiskMutableLiveData: MutableLiveData<Event<Boolean?>> = MutableLiveData()
-    override val isAtRiskLiveData: LiveData<Event<Boolean?>> = isAtRiskMutableLiveData
+    private val atRiskMutableLiveData: MutableLiveData<Event<AtRiskStatus>> = MutableLiveData()
+    override val atRiskStatus: LiveData<Event<AtRiskStatus>> = atRiskMutableLiveData
 
     override val isAtRisk: Boolean?
         get() = keystoreRepository.lastRiskReceivedDate?.let {
@@ -588,8 +590,10 @@ class RobertManagerImpl(
     }
 
     override fun refreshAtRisk() {
-        if (isAtRiskMutableLiveData.value?.peekContent() != isAtRisk) {
-            isAtRiskMutableLiveData.postValue(Event(isAtRisk))
+        isAtRisk.toAtRiskStatus().let { atRisk ->
+            if (atRiskMutableLiveData.value == null || atRiskMutableLiveData.value?.peekContent() != atRisk) {
+                atRiskMutableLiveData.postValue(Event(atRisk))
+            }
         }
     }
 }

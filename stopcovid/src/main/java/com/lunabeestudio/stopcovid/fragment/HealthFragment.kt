@@ -31,7 +31,7 @@ import java.util.Locale
 import kotlin.time.ExperimentalTime
 import kotlin.time.milliseconds
 
-class HealthFragment : TimeMainFragment(), PopupMenu.OnMenuItemClickListener {
+class HealthFragment : TimeMainFragment() {
 
     private val robertManager by lazy {
         requireContext().robertManager()
@@ -58,7 +58,7 @@ class HealthFragment : TimeMainFragment(), PopupMenu.OnMenuItemClickListener {
         viewModel.covidException.observe(viewLifecycleOwner) { covidException ->
             showErrorSnackBar(covidException.getString(strings))
         }
-        robertManager.isAtRiskLiveData.observe(viewLifecycleOwner, EventObserver {
+        robertManager.atRiskStatus.observe(viewLifecycleOwner, EventObserver(this.javaClass.name.hashCode()) {
             refreshScreen()
         })
     }
@@ -73,7 +73,8 @@ class HealthFragment : TimeMainFragment(), PopupMenu.OnMenuItemClickListener {
 
     private fun showMenu(v: View) {
         PopupMenu(requireContext(), v).apply {
-            setOnMenuItemClickListener(this@HealthFragment)
+            setOnMenuItemClickListener(::onMenuItemClick)
+
             inflate(R.menu.notification_menu)
 
             menu.findItem(R.id.notification_menu_delete).title = strings["sickController.state.deleteNotification"]
@@ -83,7 +84,7 @@ class HealthFragment : TimeMainFragment(), PopupMenu.OnMenuItemClickListener {
         }
     }
 
-    override fun onMenuItemClick(item: MenuItem): Boolean {
+    fun onMenuItemClick(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.notification_menu_delete -> {
                 MaterialAlertDialogBuilder(requireContext())

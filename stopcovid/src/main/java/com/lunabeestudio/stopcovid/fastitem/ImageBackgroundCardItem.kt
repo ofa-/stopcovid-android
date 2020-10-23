@@ -25,9 +25,7 @@ class ImageBackgroundCardItem : AbstractBindingItem<ItemImageBackgroundCardBindi
     var title: String? = null
     var subtitle: String? = null
     var onClickListener: View.OnClickListener? = null
-
-    @DrawableRes
-    var backgroundDrawable: Int? = null
+    var isAtRisk: Boolean = false
 
     @DrawableRes
     var iconRes: Int? = null
@@ -44,7 +42,11 @@ class ImageBackgroundCardItem : AbstractBindingItem<ItemImageBackgroundCardBindi
         binding.titleTextView.setTextOrHide(title)
         binding.subtitleTextView.setTextOrHide(subtitle)
         binding.imageView.setImageResourceOrHide(iconRes)
-        backgroundDrawable?.let { binding.constraintLayout.setBackgroundResource(it) }
+        if (isAtRisk) {
+            binding.constraintLayout.setBackgroundResource(R.drawable.bg_risk)
+        } else {
+            binding.constraintLayout.setBackgroundResource(R.drawable.bg_no_risk)
+        }
         binding.root.setOnClickListener(onClickListener)
     }
 

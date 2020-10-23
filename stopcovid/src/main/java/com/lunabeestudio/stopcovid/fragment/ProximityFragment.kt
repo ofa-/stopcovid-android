@@ -43,6 +43,7 @@ import androidx.navigation.navOptions
 import androidx.preference.PreferenceManager
 import com.airbnb.lottie.utils.Utils
 import com.lunabeestudio.robert.RobertApplication
+import com.lunabeestudio.robert.model.AtRiskStatus
 import com.lunabeestudio.robert.model.RobertException
 import com.lunabeestudio.robert.utils.EventObserver
 import com.lunabeestudio.stopcovid.Constants
@@ -116,7 +117,7 @@ class ProximityFragment : TimeMainFragment() {
     private lateinit var proximityButtonItem: ProximityButtonItem
     private lateinit var infoCenterCardItem: InfoCenterCardItem
     private lateinit var numbersCardItem: NumbersCardItem
-    private lateinit var healthItem: ImageBackgroundCardItem
+    private var healthItem: ImageBackgroundCardItem? = null
     private var shouldRefresh: Boolean = false
     private var isProximityOn: Boolean = false
     private val interpolator = DecelerateInterpolator()
@@ -208,8 +209,16 @@ class ProximityFragment : TimeMainFragment() {
         viewModel.activateProximitySuccess.observe(viewLifecycleOwner) {
             refreshItems()
         }
-        robertManager.isAtRiskLiveData.observe(viewLifecycleOwner, EventObserver {
-            refreshScreen()
+        robertManager.atRiskStatus.observe(viewLifecycleOwner, EventObserver(this.javaClass.name.hashCode()) { isAtRisk ->
+            when {
+                isAtRisk == AtRiskStatus.UNKNOWN -> {
+                    healthItem = null
+                    refreshScreen()
+                }
+                healthItem == null -> refreshScreen()
+                isAtRisk == AtRiskStatus.AT_RISK -> refreshHealthItemAsync(true)
+                isAtRisk == AtRiskStatus.NOT_AT_RISK -> refreshHealthItemAsync(false)
+            }
         })
         InfoCenterManager.infos.observe(viewLifecycleOwner, EventObserver(this.javaClass.name.hashCode()) {
             refreshScreen()
@@ -246,7 +255,7 @@ class ProximityFragment : TimeMainFragment() {
         addTopImageItems(items)
         addSubTitleItem(items)
         addActivateButtonItems(items)
-        addHealthItems(items)
+        healthItem?.let { items += it } ?: addHealthItems(items)
         addNewsItems(items)
         addDeclareItems(items)
         addSharingItems(items)
@@ -283,14 +292,13 @@ class ProximityFragment : TimeMainFragment() {
     }
 
     private fun addActivateButtonItems(items: ArrayList<GenericItem>) {
-        val proximityActive = robertManager.isProximityActive
         proximityButtonItem = proximityButtonItem {
             mainText = strings["home.mainButton.activate"]
             lightText = strings["home.mainButton.deactivate"]
             onClickListener = View.OnClickListener {
                 if (SystemClock.elapsedRealtime() > proximityClickThreshold) {
                     proximityClickThreshold = SystemClock.elapsedRealtime() + PROXIMITY_BUTTON_DELAY
-                    if (proximityActive) {
+                    if (robertManager.isProximityActive) {
                         deactivateProximity()
                         refreshItems()
                     } else {
@@ -309,7 +317,7 @@ class ProximityFragment : TimeMainFragment() {
                 onClickListener = View.OnClickListener {
                     if (SystemClock.elapsedRealtime() > proximityClickThreshold) {
                         proximityClickThreshold = SystemClock.elapsedRealtime() + PROXIMITY_BUTTON_DELAY
-                        if (proximityActive) {
+                        if (robertManager.isProximityActive) {
                             deactivateProximity()
                             refreshItems()
                         } else {
@@ -328,27 +336,24 @@ class ProximityFragment : TimeMainFragment() {
     }
 
     private fun addHealthItems(items: ArrayList<GenericItem>) {
-        val atRisk = robertManager.isAtRisk
-        healthItem = imageBackgroundCardItem {
-            iconRes = R.drawable.health_card
-            backgroundDrawable = if (atRisk == true) {
-                R.drawable.bg_risk
-            } else {
-                R.drawable.bg_no_risk
+        robertManager.isAtRisk?.let { atRisk ->
+            healthItem = imageBackgroundCardItem {
+                iconRes = R.drawable.health_card
+                isAtRisk = atRisk
+                onClickListener = View.OnClickListener {
+                    findNavController().navigate(ProximityFragmentDirections.actionProximityFragmentToHealthFragment())
+                }
+                identifier = items.count().toLong()
             }
-            onClickListener = View.OnClickListener {
-                findNavController().navigate(ProximityFragmentDirections.actionProximityFragmentToHealthFragment())
-            }
-            gravity = Gravity.CENTER
-            identifier = items.count().toLong()
-        }
-        if (atRisk != null) {
-            items += healthItem
-        }
 
-        items += spaceItem {
-            spaceRes = R.dimen.spacing_large
-            identifier = items.count().toLong()
+            refreshHealthItemAsync(atRisk)
+
+            healthItem?.let { items += it }
+
+            items += spaceItem {
+                spaceRes = R.dimen.spacing_large
+                identifier = items.count().toLong()
+            }
         }
     }
 
@@ -544,8 +549,6 @@ class ProximityFragment : TimeMainFragment() {
                 R.drawable.status_inactive
             }
 
-            refreshHealthItem()
-
             val infoCenterStrings = InfoCenterManager.strings.value?.peekContent() ?: emptyMap()
 
             InfoCenterManager.infos.value?.peekContent()?.firstOrNull()?.let { info ->
@@ -615,19 +618,28 @@ class ProximityFragment : TimeMainFragment() {
     }
 
     @OptIn(ExperimentalTime::class)
-    private fun refreshHealthItem() {
+    private fun refreshHealthItemAsync(isAtRisk: Boolean) {
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Default) {
-            healthItem.apply {
+            healthItem?.apply {
                 header = stringsFormat(
                     "myHealthController.notification.update",
                     robertManager.atRiskLastRefresh?.milliseconds?.getRelativeDateTimeString(requireContext())
                 )
-                if (robertManager.isAtRisk == true) {
+
+                if (isAtRisk) {
                     title = strings["home.healthSection.contact.cellTitle"]
                     subtitle = strings["home.healthSection.contact.cellSubtitle"]
                 } else {
                     title = strings["home.healthSection.noContact.cellTitle"]
                     subtitle = strings["home.healthSection.noContact.cellSubtitle"]
+                }
+
+                this.isAtRisk = isAtRisk
+            }
+
+            if (binding?.recyclerView?.isComputingLayout == false) {
+                withContext(Dispatchers.Main) {
+                    binding?.recyclerView?.adapter?.notifyDataSetChanged()
                 }
             }
         }
@@ -636,7 +648,7 @@ class ProximityFragment : TimeMainFragment() {
     @OptIn(ExperimentalTime::class)
     override fun timeRefresh() {
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Default) {
-            healthItem.apply {
+            healthItem?.apply {
                 header = stringsFormat(
                     "myHealthController.notification.update",
                     robertManager.atRiskLastRefresh?.milliseconds?.getRelativeDateTimeString(requireContext())
@@ -647,6 +659,7 @@ class ProximityFragment : TimeMainFragment() {
                     subheader = info.timestamp.seconds.getRelativeDateTimeString(requireContext())
                 }
             }
+
             if (binding?.recyclerView?.isComputingLayout == false) {
                 withContext(Dispatchers.Main) {
                     binding?.recyclerView?.adapter?.notifyDataSetChanged()

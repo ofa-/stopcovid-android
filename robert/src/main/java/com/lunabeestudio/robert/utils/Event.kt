@@ -13,18 +13,18 @@ package com.lunabeestudio.robert.utils
 /**
  * Used as a wrapper for data that is exposed via a LiveData that represents an event.
  */
-open class Event<out T>(private val content: T) {
+class Event<out T>(private val content: T) {
 
-    private val hasBeenHandled: MutableSet<Int> = mutableSetOf()
+    private val handledIdSet: MutableSet<Int> = mutableSetOf()
 
     /**
      * Returns the content and prevents its use again.
      */
     fun getContentIfNotHandled(id: Int): T? {
-        return if (hasBeenHandled.contains(id)) {
+        return if (handledIdSet.contains(id)) {
             null
         } else {
-            hasBeenHandled.add(id)
+            handledIdSet.add(id)
             content
         }
     }
