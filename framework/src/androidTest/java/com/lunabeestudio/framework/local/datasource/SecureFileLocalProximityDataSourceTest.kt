@@ -37,8 +37,10 @@ class SecureFileLocalProximityDataSourceTest {
         localStorage = File(context.filesDir, "local_proximity_test")
         localStorage.deleteRecursively()
         localCryptoManager = LocalCryptoManager(context)
-        secureFileLocalProximityDataSource = SecureFileLocalProximityDataSource(localStorage,
-            localCryptoManager)
+        secureFileLocalProximityDataSource = SecureFileLocalProximityDataSource(
+            localStorage,
+            localCryptoManager
+        )
     }
 
     @After

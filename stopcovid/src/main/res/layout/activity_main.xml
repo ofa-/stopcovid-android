@@ -21,7 +21,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:fitsSystemWindows="true"
-        app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <com.google.android.material.appbar.AppBarLayout
@@ -54,8 +54,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             android:background="@color/color_alert"
-            android:visibility="invisible"
-            tools:visibility="visible">
+            android:visibility="invisible">
 
             <TextView
                 android:id="@+id/errorTextView"
@@ -78,12 +77,6 @@
             android:layout_height="match_parent" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
-
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottomNavigationView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent" />
 
     <include layout="@layout/layout_button_bottom_sheet" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -17,7 +17,13 @@
     <activity
         android:id="@+id/mainActivity"
         android:name="com.lunabeestudio.stopcovid.activity.MainActivity"
-        tools:layout="@layout/activity_main" />
+        tools:layout="@layout/activity_main">
+        <argument
+            android:name="data"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
+    </activity>
 
     <fragment
         android:id="@+id/onBoardingWelcomeFragment"

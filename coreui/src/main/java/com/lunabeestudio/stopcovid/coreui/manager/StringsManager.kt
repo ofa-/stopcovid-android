@@ -11,37 +11,39 @@
 package com.lunabeestudio.stopcovid.coreui.manager
 
 import android.content.Context
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.reflect.TypeToken
 import com.lunabeestudio.stopcovid.coreui.R
 import com.lunabeestudio.stopcovid.coreui.UiConstants
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import com.lunabeestudio.stopcovid.coreui.extension.fixFormatter
 import java.lang.reflect.Type
 import java.util.Locale
 
 class StringsManager : ServerManager() {
 
     companion object {
-        private var _strings: HashMap<String, String> = hashMapOf()
-            set(value) {
-                strings.postValue(value)
+        var strings: HashMap<String, String> = hashMapOf()
+            private set(value) {
+                if (field != value) {
+                    _liveStrings.postValue(value)
+                }
                 field = value
             }
-        val strings: MutableLiveData<HashMap<String, String>> = MutableLiveData()
+
+        private val _liveStrings: MutableLiveData<HashMap<String, String>> = MutableLiveData()
+        val liveStrings: LiveData<HashMap<String, String>>
+            get() = _liveStrings
 
         private var prevLanguage: String? = null
 
-        fun getStrings(): HashMap<String, String> = _strings
-
         fun getStrings(context: Context): Strings {
-            if (_strings.isEmpty())
+            if (strings.isEmpty())
                 init(context)
             return Strings()
         }
 
-        class Strings : HashMap<String, String>(_strings) {
+        class Strings : HashMap<String, String>(strings) {
             override fun get(key: String): String {
                 return super.get(key) ?: key
             }
@@ -49,17 +51,15 @@ class StringsManager : ServerManager() {
 
         fun init(context: Context) {
             prevLanguage = Locale.getDefault().language
-            _strings = StringsManager().loadLocal(context)
+            strings = StringsManager().loadLocal(context)
         }
 
-        fun appForeground(context: Context) {
-            CoroutineScope(Dispatchers.IO).launch {
-                if (StringsManager().fetchLast(context,
-                        Locale.getDefault().language,
-                        prevLanguage != Locale.getDefault().language) || prevLanguage != Locale.getDefault().language) {
-                    prevLanguage = Locale.getDefault().language
-                    _strings = StringsManager().loadLocal(context)
-                }
+        suspend fun appForeground(context: Context) {
+            val forceRefresh = prevLanguage != Locale.getDefault().language
+            val hasFetch = StringsManager().fetchLast(context, Locale.getDefault().language, forceRefresh)
+            if (hasFetch || forceRefresh) {
+                prevLanguage = Locale.getDefault().language
+                strings = StringsManager().loadLocal(context)
             }
         }
     }
@@ -72,5 +72,3 @@ class StringsManager : ServerManager() {
 
     override fun transform(input: String): String = input.fixFormatter()
 }
-
-private fun String.fixFormatter() = this.replace("%@", "%s")

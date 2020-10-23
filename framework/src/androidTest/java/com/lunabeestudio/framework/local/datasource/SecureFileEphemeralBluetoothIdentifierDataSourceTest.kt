@@ -27,8 +27,10 @@ class SecureFileEphemeralBluetoothIdentifierDataSourceTest {
     @Before
     fun createDataSource() {
         val context = ApplicationProvider.getApplicationContext<Context>()
-        secureFileEphemeralBluetoothIdentifierDataSource = SecureFileEphemeralBluetoothIdentifierDataSource(context,
-            LocalCryptoManager(context))
+        secureFileEphemeralBluetoothIdentifierDataSource = SecureFileEphemeralBluetoothIdentifierDataSource(
+            context,
+            LocalCryptoManager(context)
+        )
         File(context.filesDir, "epochs").delete()
     }
 

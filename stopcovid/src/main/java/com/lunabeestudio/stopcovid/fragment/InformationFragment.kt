@@ -10,16 +10,18 @@
 
 package com.lunabeestudio.stopcovid.fragment
 
+import android.os.Bundle
 import android.view.Gravity
 import android.view.View
 import androidx.navigation.fragment.findNavController
+import com.lunabeestudio.robert.utils.EventObserver
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.callPhone
 import com.lunabeestudio.stopcovid.coreui.fastitem.buttonItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
-import com.lunabeestudio.stopcovid.extension.openInChromeTab
+import com.lunabeestudio.stopcovid.extension.openInExternalBrowser
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.mikepenz.fastadapter.GenericItem
@@ -28,6 +30,13 @@ class InformationFragment : MainFragment() {
 
     private val robertManager by lazy {
         requireContext().robertManager()
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        robertManager.isAtRiskLiveData.observe(viewLifecycleOwner, EventObserver {
+            refreshScreen()
+        })
     }
 
     override fun getTitleKey(): String = "informationController.title"
@@ -125,7 +134,7 @@ class InformationFragment : MainFragment() {
             text = strings["informationController.step.beCareful.buttonTitle"]
             gravity = Gravity.CENTER
             onClickListener = View.OnClickListener {
-                strings["sickController.button.myConditionInformation.url"]?.openInChromeTab(requireContext())
+                strings["sickController.button.myConditionInformation.url"]?.openInExternalBrowser(requireContext())
             }
             identifier = items.count().toLong()
         }
@@ -163,7 +172,7 @@ class InformationFragment : MainFragment() {
             text = strings["informationController.step.moreInfo.buttonTitle"]
             gravity = Gravity.CENTER
             onClickListener = View.OnClickListener {
-                strings["informationController.step.moreInfo.url"]?.openInChromeTab(requireContext())
+                strings["informationController.step.moreInfo.url"]?.openInExternalBrowser(requireContext())
             }
             identifier = items.count().toLong()
         }

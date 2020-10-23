@@ -139,7 +139,8 @@ class LocalCryptoManager(private val appContext: Context) {
      */
     @SuppressLint("InlinedApi")
     @Synchronized
-    @Throws(KeyStoreException::class,
+    @Throws(
+        KeyStoreException::class,
         CertificateException::class,
         NoSuchAlgorithmException::class,
         IOException::class,
@@ -148,7 +149,8 @@ class LocalCryptoManager(private val appContext: Context) {
         NoSuchPaddingException::class,
         InvalidKeyException::class,
         IllegalBlockSizeException::class,
-        UnrecoverableKeyException::class)
+        UnrecoverableKeyException::class
+    )
     private fun getAesGcmLocalProtectionKey(context: Context): SecretKey {
         val secretKey: SecretKey
 
@@ -156,15 +158,20 @@ class LocalCryptoManager(private val appContext: Context) {
             secretKey = if (keyStore.containsAlias(AES_LOCAL_PROTECTION_KEY_ALIAS)) {
                 keyStore.getKey(AES_LOCAL_PROTECTION_KEY_ALIAS, null) as SecretKey
             } else {
-                val generator: KeyGenerator = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES,
-                    ANDROID_KEY_STORE_PROVIDER)
+                val generator: KeyGenerator = KeyGenerator.getInstance(
+                    KeyProperties.KEY_ALGORITHM_AES,
+                    ANDROID_KEY_STORE_PROVIDER
+                )
                 generator.init(
-                    KeyGenParameterSpec.Builder(AES_LOCAL_PROTECTION_KEY_ALIAS,
-                        KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT)
+                    KeyGenParameterSpec.Builder(
+                        AES_LOCAL_PROTECTION_KEY_ALIAS,
+                        KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
+                    )
                         .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
                         .setKeySize(AES_GCM_KEY_SIZE_IN_BITS)
                         .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
-                        .build())
+                        .build()
+                )
                 generator.generateKey()
             }
         } else {
@@ -176,8 +183,10 @@ class LocalCryptoManager(private val appContext: Context) {
                 cipher.init(Cipher.UNWRAP_MODE, privateKey)
                 secretKey = cipher.unwrap(wrappedAesKey, "AES", Cipher.SECRET_KEY) as SecretKey
             } else {
-                val generator: KeyPairGenerator = KeyPairGenerator.getInstance(KeyProperties.KEY_ALGORITHM_RSA,
-                    ANDROID_KEY_STORE_PROVIDER)
+                val generator: KeyPairGenerator = KeyPairGenerator.getInstance(
+                    KeyProperties.KEY_ALGORITHM_RSA,
+                    ANDROID_KEY_STORE_PROVIDER
+                )
                 val calendar = Calendar.getInstance()
                 calendar.add(Calendar.HOUR_OF_DAY, -26)
                 val start: Date = calendar.time
@@ -192,7 +201,8 @@ class LocalCryptoManager(private val appContext: Context) {
                         .setStartDate(start)
                         .setEndDate(end)
                         .setSerialNumber(BigInteger.ONE)
-                        .build())
+                        .build()
+                )
                 val keyPair: KeyPair = generator.generateKeyPair()
                 val aesKeyRaw = ByteArray(AES_GCM_KEY_SIZE_IN_BITS / java.lang.Byte.SIZE)
                 prng.nextBytes(aesKeyRaw)
@@ -214,7 +224,8 @@ class LocalCryptoManager(private val appContext: Context) {
      *
      * @param outputStream the output stream
      */
-    @Throws(IOException::class,
+    @Throws(
+        IOException::class,
         CertificateException::class,
         NoSuchAlgorithmException::class,
         UnrecoverableKeyException::class,
@@ -223,7 +234,8 @@ class LocalCryptoManager(private val appContext: Context) {
         NoSuchPaddingException::class,
         NoSuchProviderException::class,
         KeyStoreException::class,
-        IllegalBlockSizeException::class)
+        IllegalBlockSizeException::class
+    )
     fun createCipherOutputStream(outputStream: OutputStream, writeIvSize: Boolean = true): OutputStream {
         val cipher = Cipher.getInstance(AES_GCM_CIPHER_TYPE)
         val iv: ByteArray = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -251,7 +263,8 @@ class LocalCryptoManager(private val appContext: Context) {
      * @param pIvLength the length of the IV of null if it should be read at the beginning of the stream
      * @return the created InputStream
      */
-    @Throws(NoSuchPaddingException::class,
+    @Throws(
+        NoSuchPaddingException::class,
         NoSuchAlgorithmException::class,
         CertificateException::class,
         InvalidKeyException::class,
@@ -260,7 +273,8 @@ class LocalCryptoManager(private val appContext: Context) {
         IllegalBlockSizeException::class,
         NoSuchProviderException::class,
         InvalidAlgorithmParameterException::class,
-        IOException::class)
+        IOException::class
+    )
     fun createCipherInputStream(inputStream: InputStream, pIvLength: Int? = null): InputStream {
         inputStream.mark(4 + AES_GCM_IV_LENGTH)
         val ivLen: Int = pIvLength ?: inputStream.read()

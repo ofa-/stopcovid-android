@@ -19,6 +19,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.ServiceConnection
+import android.content.SharedPreferences
+import android.graphics.Color
 import android.os.Bundle
 import android.os.IBinder
 import android.os.SystemClock
@@ -29,46 +31,72 @@ import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
 import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ShareCompat
+import androidx.core.view.ViewCompat
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.observe
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.navOptions
+import androidx.preference.PreferenceManager
 import com.airbnb.lottie.utils.Utils
 import com.lunabeestudio.robert.RobertApplication
 import com.lunabeestudio.robert.model.RobertException
+import com.lunabeestudio.robert.utils.EventObserver
+import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.UiConstants
 import com.lunabeestudio.stopcovid.coreui.extension.addRipple
+import com.lunabeestudio.stopcovid.coreui.extension.isNightMode
 import com.lunabeestudio.stopcovid.coreui.extension.refreshLift
+import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
+import com.lunabeestudio.stopcovid.extension.getString
+import com.lunabeestudio.stopcovid.extension.openInExternalBrowser
+import com.lunabeestudio.stopcovid.extension.robertManager
+import com.lunabeestudio.stopcovid.extension.safeNavigate
+import com.lunabeestudio.stopcovid.extension.toCovidException
+import com.lunabeestudio.stopcovid.fastitem.ImageBackgroundCardItem
+import com.lunabeestudio.stopcovid.fastitem.InfoCenterCardItem
+import com.lunabeestudio.stopcovid.fastitem.LogoItem
+import com.lunabeestudio.stopcovid.fastitem.LottieItem
+import com.lunabeestudio.stopcovid.fastitem.NumbersCardItem
+import com.lunabeestudio.stopcovid.fastitem.ProximityButtonItem
+import com.lunabeestudio.stopcovid.fastitem.State
+import com.lunabeestudio.stopcovid.fastitem.bigTitleItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.CaptionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.TitleItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.dividerItem
-import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
-import com.lunabeestudio.stopcovid.extension.getString
-import com.lunabeestudio.stopcovid.extension.robertManager
-import com.lunabeestudio.stopcovid.extension.safeNavigate
-import com.lunabeestudio.stopcovid.extension.toCovidException
-import com.lunabeestudio.stopcovid.fastitem.LogoItem
-import com.lunabeestudio.stopcovid.fastitem.LottieItem
-import com.lunabeestudio.stopcovid.fastitem.ProximityButtonItem
-import com.lunabeestudio.stopcovid.fastitem.State
 import com.lunabeestudio.stopcovid.fastitem.linkItem
+import com.lunabeestudio.stopcovid.fastitem.buttonCardItem
+import com.lunabeestudio.stopcovid.fastitem.imageBackgroundCardItem
+import com.lunabeestudio.stopcovid.fastitem.imageCardItem
+import com.lunabeestudio.stopcovid.fastitem.infoCenterCardItem
 import com.lunabeestudio.stopcovid.fastitem.logoItem
 import com.lunabeestudio.stopcovid.fastitem.lottieItem
+import com.lunabeestudio.stopcovid.fastitem.moreCardItem
+import com.lunabeestudio.stopcovid.fastitem.numbersCardItem
 import com.lunabeestudio.stopcovid.fastitem.proximityButtonItem
+import com.lunabeestudio.stopcovid.manager.InfoCenterManager
+import com.lunabeestudio.stopcovid.manager.KeyFiguresManager
 import com.lunabeestudio.stopcovid.manager.ProximityManager
 import com.lunabeestudio.stopcovid.service.ProximityService
 import com.lunabeestudio.stopcovid.viewmodel.ProximityViewModel
 import com.lunabeestudio.stopcovid.viewmodel.ProximityViewModelFactory
 import com.mikepenz.fastadapter.GenericItem
 import kotlinx.android.synthetic.main.activity_main.view.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlin.time.ExperimentalTime
+import kotlin.time.milliseconds
+import kotlin.time.seconds
 
-class ProximityFragment : AboutMainFragment() {
+class ProximityFragment : TimeMainFragment() {
 
     private val robertManager by lazy {
         requireContext().robertManager()
@@ -78,11 +106,17 @@ class ProximityFragment : AboutMainFragment() {
         ProximityViewModelFactory(robertManager)
     }
 
+    private val sharedPrefs: SharedPreferences by lazy {
+        PreferenceManager.getDefaultSharedPreferences(requireContext())
+    }
+
     private lateinit var lottieItem: LottieItem
     private lateinit var logoItem: LogoItem
-    private lateinit var proximityButtonItem: ProximityButtonItem
-    private lateinit var captionItem: CaptionItem
     private lateinit var subTitleItem: TitleItem
+    private lateinit var proximityButtonItem: ProximityButtonItem
+    private lateinit var infoCenterCardItem: InfoCenterCardItem
+    private lateinit var numbersCardItem: NumbersCardItem
+    private lateinit var healthItem: ImageBackgroundCardItem
     private var shouldRefresh: Boolean = false
     private var isProximityOn: Boolean = false
     private val interpolator = DecelerateInterpolator()
@@ -116,6 +150,12 @@ class ProximityFragment : AboutMainFragment() {
         return "proximityController.tabBar.title"
     }
 
+    private val sharedPreferenceChangeListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+        if (key == Constants.SharedPrefs.HAS_NEWS) {
+            refreshItems()
+        }
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = super.onCreateView(inflater, container, savedInstanceState)
         val filter = IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED)
@@ -128,12 +168,15 @@ class ProximityFragment : AboutMainFragment() {
         }
 
         isProximityOn = ProximityManager.isProximityOn(requireContext(), robertManager)
+
         return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initViewModelObserver()
+        initHasNewsObserver()
+        shouldRefresh = false
     }
 
     override fun onStart() {
@@ -165,6 +208,22 @@ class ProximityFragment : AboutMainFragment() {
         viewModel.activateProximitySuccess.observe(viewLifecycleOwner) {
             refreshItems()
         }
+        robertManager.isAtRiskLiveData.observe(viewLifecycleOwner, EventObserver {
+            refreshScreen()
+        })
+        InfoCenterManager.infos.observe(viewLifecycleOwner, EventObserver(this.javaClass.name.hashCode()) {
+            refreshScreen()
+        })
+        InfoCenterManager.strings.observe(viewLifecycleOwner, EventObserver(this.javaClass.name.hashCode()) {
+            refreshScreen()
+        })
+        KeyFiguresManager.figures.observe(viewLifecycleOwner, EventObserver(this.javaClass.name.hashCode()) {
+            refreshScreen()
+        })
+    }
+
+    private fun initHasNewsObserver() {
+        sharedPrefs.registerOnSharedPreferenceChangeListener(sharedPreferenceChangeListener)
     }
 
     private fun bindToProximityService() {
@@ -184,6 +243,21 @@ class ProximityFragment : AboutMainFragment() {
     override fun getItems(): List<GenericItem> {
         val items = ArrayList<GenericItem>()
 
+        addTopImageItems(items)
+        addSubTitleItem(items)
+        addActivateButtonItems(items)
+        addHealthItems(items)
+        addNewsItems(items)
+        addDeclareItems(items)
+        addSharingItems(items)
+        addMoreItems(items)
+
+        refreshItems()
+
+        return items
+    }
+
+    fun addSubTitleItem(items: ArrayList<GenericItem>) {
         subTitleItem = titleItem {
             onClick = {
                 findNavController().navigate(ProximityFragmentDirections.actionProximityFragmentToTuneProximityFragment())
@@ -191,7 +265,10 @@ class ProximityFragment : AboutMainFragment() {
             gravity = Gravity.CENTER
             identifier = items.count().toLong()
         }
+        items += subTitleItem
+    }
 
+    private fun addTopImageItems(items: ArrayList<GenericItem>) {
         lottieItem = lottieItem {
             identifier = items.count().toLong()
         }
@@ -203,16 +280,18 @@ class ProximityFragment : AboutMainFragment() {
         } else {
             items += logoItem
         }
-        items += subTitleItem
+    }
 
+    private fun addActivateButtonItems(items: ArrayList<GenericItem>) {
+        val proximityActive = robertManager.isProximityActive
         proximityButtonItem = proximityButtonItem {
-            mainText = strings["proximityController.button.activateProximity"]
-            lightText = strings["proximityController.button.deactivateProximity"]
+            mainText = strings["home.mainButton.activate"]
+            lightText = strings["home.mainButton.deactivate"]
             onClickListener = View.OnClickListener {
                 if (SystemClock.elapsedRealtime() > proximityClickThreshold) {
                     proximityClickThreshold = SystemClock.elapsedRealtime() + PROXIMITY_BUTTON_DELAY
-                    if (robertManager.isProximityActive) {
-                        robertManager.deactivateProximity(requireContext().applicationContext as RobertApplication)
+                    if (proximityActive) {
+                        deactivateProximity()
                         refreshItems()
                     } else {
                         activateProximity()
@@ -221,62 +300,207 @@ class ProximityFragment : AboutMainFragment() {
             }
             identifier = items.count().toLong()
         }
-        items += proximityButtonItem
-        captionItem = captionItem {
-            text = if (robertManager.isProximityActive) {
-                strings["proximityController.mainMessage.subtitle.on"]
+        if (robertManager.isRegistered) {
+            items += proximityButtonItem
+        } else {
+            items += buttonCardItem {
+                text = strings["home.activationExplanation"]
+                buttonText = strings["home.mainButton.activate"]
+                onClickListener = View.OnClickListener {
+                    if (SystemClock.elapsedRealtime() > proximityClickThreshold) {
+                        proximityClickThreshold = SystemClock.elapsedRealtime() + PROXIMITY_BUTTON_DELAY
+                        if (proximityActive) {
+                            deactivateProximity()
+                            refreshItems()
+                        } else {
+                            activateProximity()
+                        }
+                    }
+                }
+                identifier = items.count().toLong()
+            }
+        }
+
+        items += spaceItem {
+            spaceRes = R.dimen.spacing_large
+            identifier = items.count().toLong()
+        }
+    }
+
+    private fun addHealthItems(items: ArrayList<GenericItem>) {
+        val atRisk = robertManager.isAtRisk
+        healthItem = imageBackgroundCardItem {
+            iconRes = R.drawable.health_card
+            backgroundDrawable = if (atRisk == true) {
+                R.drawable.bg_risk
             } else {
-                strings["proximityController.mainMessage.subtitle.off"]
+                R.drawable.bg_no_risk
+            }
+            onClickListener = View.OnClickListener {
+                findNavController().navigate(ProximityFragmentDirections.actionProximityFragmentToHealthFragment())
             }
             gravity = Gravity.CENTER
             identifier = items.count().toLong()
         }
-        items += captionItem
+        if (atRisk != null) {
+            items += healthItem
+        }
+
         items += spaceItem {
-            spaceRes = R.dimen.spacing_medium
-        }
-        items += dividerItem {
+            spaceRes = R.dimen.spacing_large
             identifier = items.count().toLong()
         }
+    }
 
-        items += linkItem {
-            text = strings["privacyController.tabBar.title"]
+    private fun addNewsItems(items: ArrayList<GenericItem>) {
+        items += bigTitleItem {
+            text = strings["home.infoSection.title"]
+            identifier = items.count().toLong()
+            importantForAccessibility = ViewCompat.IMPORTANT_FOR_ACCESSIBILITY_NO
+        }
+
+        numbersCardItem = numbersCardItem {
+            header = strings["home.infoSection.keyFigures"]
+            subheader = strings["keyfigure.dailyUpdates"]
+            link = strings["home.infoSection.seeAll"]
+            contentDescription = strings["home.infoSection.seeAll"]
             onClickListener = View.OnClickListener {
-                findNavController().safeNavigate(ProximityFragmentDirections.actionProximityFragmentToPrivacyFragment())
+                findNavController().navigate(ProximityFragmentDirections.actionProximityFragmentToKeyFiguresFragment())
             }
-            iconRes = R.drawable.ic_privacy
+            identifier = header.hashCode().toLong()
+        }
+        items += numbersCardItem
+
+        items += spaceItem {
+            spaceRes = R.dimen.spacing_large
             identifier = items.count().toLong()
         }
 
-        items += dividerItem {
-            identifier = items.count().toLong()
-        }
-
-        items += linkItem {
-            text = strings["proximityController.manageData"]
+        infoCenterCardItem = infoCenterCardItem {
+            header = strings["home.infoSection.lastInfo"]
+            link = strings["home.infoSection.readAll"]
+            contentDescription = strings["home.infoSection.readAll"]
+            showBadge = sharedPrefs.getBoolean(Constants.SharedPrefs.HAS_NEWS, false)
             onClickListener = View.OnClickListener {
-                findNavController().safeNavigate(ProximityFragmentDirections.actionProximityFragmentToManageDataFragment())
+                findNavController().navigate(ProximityFragmentDirections.actionProximityFragmentToInfoCenterFragment())
             }
-            iconRes = R.drawable.ic_manage_data
+            identifier = header.hashCode().toLong()
+        }
+        items += infoCenterCardItem
+
+        items += spaceItem {
+            spaceRes = R.dimen.spacing_large
             identifier = items.count().toLong()
         }
+    }
 
-        items += dividerItem {
+    private fun addDeclareItems(items: ArrayList<GenericItem>) {
+        items += bigTitleItem {
+            text = strings["home.declareSection.title"]
             identifier = items.count().toLong()
+            importantForAccessibility = ViewCompat.IMPORTANT_FOR_ACCESSIBILITY_NO
         }
 
-        items += linkItem {
-            text = strings["proximityController.tuneProximity"]
+        items += imageCardItem {
+            title = strings["home.declareSection.cellTitle"]
+            subtitle = strings["home.declareSection.cellSubtitle"]
+            iconRes = R.drawable.declare_card
+            contentDescription = strings["home.declareSection.title"]
             onClickListener = View.OnClickListener {
+                findNavController().safeNavigate(ProximityFragmentDirections.actionProximityFragmentToReportFragment())
+            }
+            identifier = title.hashCode().toLong()
+        }
+
+        items += spaceItem {
+            spaceRes = R.dimen.spacing_large
+            identifier = items.count().toLong()
+        }
+    }
+
+    private fun addSharingItems(items: ArrayList<GenericItem>) {
+        items += bigTitleItem {
+            text = strings["home.sharingSection.title"]
+            identifier = items.count().toLong()
+            importantForAccessibility = ViewCompat.IMPORTANT_FOR_ACCESSIBILITY_NO
+        }
+
+        items += imageCardItem {
+            title = strings["home.sharingSection.cellTitle"]
+            subtitle = strings["home.sharingSection.cellSubtitle"]
+            contentDescription = strings["home.sharingSection.title"]
+            iconRes = R.drawable.share_card
+            onClickListener = View.OnClickListener {
+                ShareCompat.IntentBuilder.from(requireActivity())
+                    .setType("text/plain")
+                    .setText(strings["sharingController.appSharingMessage"])
+                    .startChooser()
+            }
+            identifier = title.hashCode().toLong()
+        }
+
+        items += spaceItem {
+            spaceRes = R.dimen.spacing_large
+            identifier = items.count().toLong()
+        }
+    }
+
+    private fun addMoreItems(items: ArrayList<GenericItem>) {
+        items += bigTitleItem {
+            text = strings["home.moreSection.title"]
+            identifier = items.count().toLong()
+            importantForAccessibility = ViewCompat.IMPORTANT_FOR_ACCESSIBILITY_NO
+        }
+
+        items += moreCardItem {
+
+            proximityText = strings["proximityController.tuneProximity"]
+            proximityOnClickListener = View.OnClickListener {
                 findNavController().navigate(ProximityFragmentDirections.actionProximityFragmentToTuneProximityFragment())
             }
-            iconRes = R.drawable.ic_manage_data
+            proximityIconRes = R.drawable.ic_manage_data
+
+            testText = strings["home.moreSection.testingSites"]
+            testOnClickListener = View.OnClickListener {
+                strings["myHealthController.testingSites.url"]?.openInExternalBrowser(requireContext())
+            }
+            testIconRes = R.drawable.ic_search
+
+            documentText = strings["home.moreSection.curfewCertificate"]
+            documentOnClickListener = View.OnClickListener {
+                strings["home.moreSection.curfewCertificate.url"]?.openInExternalBrowser(requireContext())
+            }
+            documentIconRes = R.drawable.ic_document
+
+            privacyText = strings["home.moreSection.privacy"]
+            privacyOnClickListener = View.OnClickListener {
+                findNavController().safeNavigate(ProximityFragmentDirections.actionProximityFragmentToPrivacyFragment())
+            }
+            privacyIconRes = R.drawable.ic_privacy
+            manageDataText = strings["home.moreSection.manageData"]
+            manageDataOnClickListener = View.OnClickListener {
+                findNavController().safeNavigate(ProximityFragmentDirections.actionProximityFragmentToManageDataFragment())
+            }
+            manageDataIconRes = R.drawable.ic_manage_data
+            aboutText = strings["home.moreSection.aboutStopCovid"]
+            aboutOnClickListener = View.OnClickListener {
+                findNavController().safeNavigate(R.id.nav_about, null, navOptions {
+                    anim {
+                        enter = R.anim.nav_default_enter_anim
+                        popEnter = R.anim.nav_default_pop_enter_anim
+                        popExit = R.anim.nav_default_pop_exit_anim
+                        exit = R.anim.nav_default_exit_anim
+                    }
+                })
+            }
+            aboutIconRes = R.drawable.ic_about
             identifier = items.count().toLong()
         }
 
-        refreshItems()
-
-        return items
+        items += spaceItem {
+            spaceRes = R.dimen.spacing_large
+            identifier = items.count().toLong()
+        }
     }
 
     private fun activateProximity() {
@@ -288,11 +512,19 @@ class ProximityFragment : AboutMainFragment() {
         }
     }
 
+    private fun deactivateProximity() {
+        robertManager.deactivateProximity(requireContext().applicationContext as RobertApplication)
+
+        view?.rootView?.announceForAccessibility(strings["notification.proximityServiceNotRunning.title"])
+    }
+
+    @OptIn(ExperimentalTime::class)
     @SuppressLint("RestrictedApi")
     private fun refreshItems() {
         context?.let { context ->
-            val wasProximityDifferent: Boolean = isProximityOn != ProximityManager.isProximityOn(context, robertManager)
-            isProximityOn = ProximityManager.isProximityOn(context, robertManager)
+            val freshProximityOn = ProximityManager.isProximityOn(context, robertManager)
+            val wasProximityDifferent: Boolean = isProximityOn != freshProximityOn
+            isProximityOn = freshProximityOn
             lottieItem.state = if (wasProximityDifferent) {
                 if (isProximityOn) {
                     State.OFF_TO_ON
@@ -311,15 +543,57 @@ class ProximityFragment : AboutMainFragment() {
             } else {
                 R.drawable.status_inactive
             }
-            (activity as AppCompatActivity).supportActionBar?.title = strings[getTitleKey()]
+
+            refreshHealthItem()
+
+            val infoCenterStrings = InfoCenterManager.strings.value?.peekContent() ?: emptyMap()
+
+            InfoCenterManager.infos.value?.peekContent()?.firstOrNull()?.let { info ->
+                infoCenterCardItem.apply {
+                    subheader = info.timestamp.seconds.getRelativeDateTimeString(requireContext())
+                    title = infoCenterStrings[info.titleKey]
+                    subtitle = infoCenterStrings[info.descriptionKey]
+                }
+            }
+
+            KeyFiguresManager.figures.value
+                ?.peekContent()
+                ?.filter { it.isFeatured }
+                ?.takeIf { it.size > 2 }
+                ?.let { keyFigures ->
+                    numbersCardItem.apply {
+                        val mode = if (requireContext().isNightMode()) {
+                            DARK_STRING_KEY
+                        } else {
+                            LIGHT_STRING_KEY
+                        }
+
+                        keyFigures[0].let { (_, labelKey, valueGlobalToDisplay) ->
+                            label1 = strings["${labelKey}.$SHORT_LABEL_STRING_KEY"]
+                            value1 = valueGlobalToDisplay
+                            color1 = strings["${labelKey}.$COLOR_CODE_STRING_KEY.$mode"]?.let { Color.parseColor(it) }
+                        }
+
+                        keyFigures[1].let { (_, labelKey, valueGlobalToDisplay) ->
+                            label2 = strings["${labelKey}.$SHORT_LABEL_STRING_KEY"]
+                            value2 = valueGlobalToDisplay
+                            color2 = strings["${labelKey}.$COLOR_CODE_STRING_KEY.$mode"]?.let { Color.parseColor(it) }
+                        }
+
+                        keyFigures[2].let { (_, labelKey, valueGlobalToDisplay) ->
+                            label3 = strings["${labelKey}.$SHORT_LABEL_STRING_KEY"]
+                            value3 = valueGlobalToDisplay
+                            color3 = strings["${labelKey}.$COLOR_CODE_STRING_KEY.$mode"]?.let { Color.parseColor(it) }
+                        }
+                    }
+                }
 
             proximityButtonItem.showMainButton = !isProximityOn
             proximityButtonItem.isButtonEnabled = ProximityManager.isPhoneSetup(context)
 
-            captionItem.text = if (isProximityOn) {
-                strings["proximityController.mainMessage.subtitle.on"]
-            } else {
-                strings["proximityController.mainMessage.subtitle.off"]
+            if (isAdded && !isHidden) {
+                (activity as AppCompatActivity).supportActionBar?.title = strings[getTitleKey()]
+                updateErrorLayout(getActivityBinding()?.errorLayout, freshProximityOn)
             }
 
             subTitleItem.text = if (isProximityOn) {
@@ -330,10 +604,53 @@ class ProximityFragment : AboutMainFragment() {
                 strings["accessibility.hint.proximity.buttonState.deactivated"]
             }
 
-            updateErrorLayout(getActivityBinding()?.errorLayout)
-
             if (binding?.recyclerView?.isComputingLayout == false) {
                 binding?.recyclerView?.adapter?.notifyDataSetChanged()
+            }
+        }
+    }
+
+    override fun setTitle() {
+        // Handled in refresh item
+    }
+
+    @OptIn(ExperimentalTime::class)
+    private fun refreshHealthItem() {
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Default) {
+            healthItem.apply {
+                header = stringsFormat(
+                    "myHealthController.notification.update",
+                    robertManager.atRiskLastRefresh?.milliseconds?.getRelativeDateTimeString(requireContext())
+                )
+                if (robertManager.isAtRisk == true) {
+                    title = strings["home.healthSection.contact.cellTitle"]
+                    subtitle = strings["home.healthSection.contact.cellSubtitle"]
+                } else {
+                    title = strings["home.healthSection.noContact.cellTitle"]
+                    subtitle = strings["home.healthSection.noContact.cellSubtitle"]
+                }
+            }
+        }
+    }
+
+    @OptIn(ExperimentalTime::class)
+    override fun timeRefresh() {
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Default) {
+            healthItem.apply {
+                header = stringsFormat(
+                    "myHealthController.notification.update",
+                    robertManager.atRiskLastRefresh?.milliseconds?.getRelativeDateTimeString(requireContext())
+                )
+            }
+            InfoCenterManager.infos.value?.peekContent()?.firstOrNull()?.let { info ->
+                infoCenterCardItem.apply {
+                    subheader = info.timestamp.seconds.getRelativeDateTimeString(requireContext())
+                }
+            }
+            if (binding?.recyclerView?.isComputingLayout == false) {
+                withContext(Dispatchers.Main) {
+                    binding?.recyclerView?.adapter?.notifyDataSetChanged()
+                }
             }
         }
     }
@@ -341,7 +658,7 @@ class ProximityFragment : AboutMainFragment() {
     @SuppressLint("RestrictedApi")
     private fun isAnimationEnabled(): Boolean = Utils.getAnimationScale(context) != 0f
 
-    private fun updateErrorLayout(errorLayout: FrameLayout?) {
+    private fun updateErrorLayout(errorLayout: FrameLayout?, freshProximityOn: Boolean) {
         getActivityBinding()?.errorTextView?.text = ProximityManager.getErrorText(this, robertManager, strings)
         val clickListener = ProximityManager.getErrorClickListener(this) {
             if (SystemClock.elapsedRealtime() > proximityClickThreshold) {
@@ -355,7 +672,7 @@ class ProximityFragment : AboutMainFragment() {
         } else {
             getActivityBinding()?.errorTextView?.background = null
         }
-        if (ProximityManager.isProximityOn(requireContext(), robertManager)) {
+        if (freshProximityOn) {
             hideErrorLayout(errorLayout)
         } else {
             showErrorLayout(errorLayout)
@@ -414,11 +731,16 @@ class ProximityFragment : AboutMainFragment() {
     }
 
     override fun onDestroyView() {
+        sharedPrefs.unregisterOnSharedPreferenceChangeListener(sharedPreferenceChangeListener)
         activity?.unregisterReceiver(receiver)
         super.onDestroyView()
     }
 
     companion object {
         private const val PROXIMITY_BUTTON_DELAY: Long = 2000L
+        private const val DARK_STRING_KEY: String = "dark"
+        private const val LIGHT_STRING_KEY: String = "light"
+        private const val SHORT_LABEL_STRING_KEY: String = "shortLabel"
+        private const val COLOR_CODE_STRING_KEY: String = "colorCode"
     }
 }

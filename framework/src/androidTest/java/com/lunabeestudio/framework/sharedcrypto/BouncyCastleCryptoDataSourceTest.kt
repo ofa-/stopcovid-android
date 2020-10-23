@@ -47,10 +47,12 @@ class BouncyCastleCryptoDataSourceTest {
 
     @Test
     fun get_encryption_keys() {
-        val keys = bcCryptoDataSource.getEncryptionKeys(serverPublicKey.encoded,
+        val keys = bcCryptoDataSource.getEncryptionKeys(
+            serverPublicKey.encoded,
             localPrivateKey.encoded,
             "test".toByteArray(),
-            "test2".toByteArray())
+            "test2".toByteArray()
+        )
 
         val kA = Base64.encodeToString(keys.first, Base64.NO_WRAP)
         val kEA = Base64.encodeToString(keys.second, Base64.NO_WRAP)

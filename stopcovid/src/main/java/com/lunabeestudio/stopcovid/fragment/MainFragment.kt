@@ -36,6 +36,10 @@ abstract class MainFragment : FastAdapterFragment() {
 
     override fun refreshScreen() {
         super.refreshScreen()
+        setTitle()
+    }
+
+    protected open fun setTitle() {
         (activity as AppCompatActivity).supportActionBar?.title = strings[getTitleKey()]
     }
 

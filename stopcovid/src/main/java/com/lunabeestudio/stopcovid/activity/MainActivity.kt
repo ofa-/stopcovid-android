@@ -10,18 +10,15 @@
 
 package com.lunabeestudio.stopcovid.activity
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
-import android.view.Menu
 import android.view.accessibility.AccessibilityEvent
-import androidx.core.view.children
 import androidx.core.view.isInvisible
-import androidx.core.view.isVisible
-import androidx.lifecycle.observe
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.NavigationUI
-import androidx.navigation.ui.setupActionBarWithNavController
+import androidx.navigation.navOptions
+import androidx.navigation.ui.NavigationUI.setupActionBarWithNavController
 import com.google.android.material.snackbar.Snackbar
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.stopcovid.R
@@ -38,7 +35,7 @@ import com.lunabeestudio.stopcovid.fragment.IsSickFragmentDirections
 class MainActivity : BaseActivity() {
 
     lateinit var binding: ActivityMainBinding
-    lateinit var mergeBinding: LayoutButtonBottomSheetBinding
+    private lateinit var mergeBinding: LayoutButtonBottomSheetBinding
 
     private val navController: NavController by lazy {
         supportFragmentManager.findFragmentById(R.id.navHostFragment)!!.findNavController()
@@ -48,7 +45,12 @@ class MainActivity : BaseActivity() {
         applicationContext.robertManager()
     }
 
-    private var strings: HashMap<String, String> = StringsManager.getStrings()
+    private var strings: HashMap<String, String> = StringsManager.strings
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        handleIntent(intent)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,50 +65,49 @@ class MainActivity : BaseActivity() {
         binding.toolbar.contentInsetStartWithNavigation = 0
 
         setContentView(binding.root)
+        // invisible in the xml is not working
+        binding.errorLayout.isInvisible = true
 
         initStringsObserver()
+        handleIntent(intent)
+    }
+
+    private fun handleIntent(intent: Intent?) {
+        intent?.getStringExtra("data")?.let { data ->
+            Uri.parse(data)?.let {
+                navController.navigate(Uri.parse(data), navOptions {
+                    anim {
+                        enter = R.anim.nav_default_enter_anim
+                        exit = R.anim.nav_default_exit_anim
+                        popEnter = R.anim.nav_default_pop_enter_anim
+                        popExit = R.anim.nav_default_pop_exit_anim
+                    }
+                })
+            }
+
+            intent.data = null
+            setIntent(intent)
+        }
     }
 
     private fun initStringsObserver() {
-        StringsManager.strings.observe(this) { strings ->
+        StringsManager.liveStrings.observe(this) { strings ->
             this.strings = strings
-            refreshMenuItemTitles(binding.bottomNavigationView.menu)
             invalidateOptionsMenu()
         }
     }
 
     private fun setupNavigation() {
-        binding.bottomNavigationView.run {
-            inflateMenu(R.menu.bottom_menu)
+        setupActionBarWithNavController(this, navController)
 
-            val appBarActivity = AppBarConfiguration(binding.bottomNavigationView.menu)
-            setupActionBarWithNavController(navController, appBarActivity)
-
-            refreshMenuItemTitles(menu)
-
-            navController.addOnDestinationChangedListener { _, destination, _ ->
-                val destinationId = menu.children.find {
-                    destination.id == it.itemId
-                }
-                isVisible = destinationId != null
-                binding.toolbar.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_FOCUSED)
-                if (destinationId != menu.findItem(R.id.proximityFragment)) {
-                    binding.errorLayout.isInvisible = true
-                }
-            }
-
-            NavigationUI.setupWithNavController(this, navController)
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            binding.toolbar.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_FOCUSED)
+            binding.errorLayout.isInvisible = destination.id != R.id.proximityFragment
         }
 
         if (robertManager.isSick) {
             navController.safeNavigate(IsSickFragmentDirections.actionGlobalIsSickFragment())
         }
-    }
-
-    private fun refreshMenuItemTitles(menu: Menu) {
-        menu.findItem(R.id.proximityFragment).title = strings["proximityController.tabBar.title"]
-        menu.findItem(R.id.reportFragment).title = strings["sickController.tabBar.title"]
-        menu.findItem(R.id.sharingFragment).title = strings["sharingController.tabBar.title"]
     }
 
     fun showSnackBar(message: String, duration: Int = Snackbar.LENGTH_LONG) {

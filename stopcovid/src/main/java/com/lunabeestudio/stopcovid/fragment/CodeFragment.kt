@@ -14,8 +14,8 @@ import android.os.Bundle
 import android.view.Gravity
 import android.view.View
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.google.android.material.button.MaterialButton
-import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.hideSoftKeyBoard
 import com.lunabeestudio.stopcovid.coreui.extension.showSoftKeyBoard
@@ -32,13 +32,16 @@ import java.lang.ref.WeakReference
 
 class CodeFragment : MainFragment() {
 
+    private val args: CodeFragmentArgs by navArgs()
     override fun getTitleKey(): String = "enterCodeController.title"
 
     private var materialButton: WeakReference<MaterialButton>? = null
     private var code: String = ""
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        code = savedInstanceState?.getString(SAVE_INSTANCE_CODE, null) ?: ""
+        if (code.isEmpty()) {
+            code = savedInstanceState?.getString(SAVE_INSTANCE_CODE, null) ?: args.code ?: ""
+        }
         super.onViewCreated(view, savedInstanceState)
     }
 

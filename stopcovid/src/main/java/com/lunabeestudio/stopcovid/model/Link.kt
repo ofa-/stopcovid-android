@@ -10,7 +10,7 @@
 
 package com.lunabeestudio.stopcovid.model
 
-class Link(
+data class Link(
     val label: String,
     val url: String
 )

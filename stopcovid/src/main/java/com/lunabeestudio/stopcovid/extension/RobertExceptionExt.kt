@@ -17,7 +17,6 @@ import com.lunabeestudio.stopcovid.model.BLEGattException
 import com.lunabeestudio.stopcovid.model.BLEProximityNotificationException
 import com.lunabeestudio.stopcovid.model.BLEScannerException
 import com.lunabeestudio.stopcovid.model.BackendException
-import com.lunabeestudio.stopcovid.model.TimeNotAlignedException
 import com.lunabeestudio.stopcovid.model.CovidException
 import com.lunabeestudio.stopcovid.model.NoEphemeralBluetoothIdentifierFound
 import com.lunabeestudio.stopcovid.model.NoEphemeralBluetoothIdentifierFoundForEpoch
@@ -26,6 +25,7 @@ import com.lunabeestudio.stopcovid.model.NoKeyException
 import com.lunabeestudio.stopcovid.model.ProximityException
 import com.lunabeestudio.stopcovid.model.RobertUnknownException
 import com.lunabeestudio.stopcovid.model.ServerDecryptException
+import com.lunabeestudio.stopcovid.model.TimeNotAlignedException
 import com.lunabeestudio.stopcovid.model.UnauthorizedException
 import com.lunabeestudio.stopcovid.model.UnknownException
 

@@ -14,6 +14,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.AppBarLayout
@@ -35,6 +36,7 @@ abstract class FastAdapterFragment : BaseFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        adapter.attachDefaultListeners = false
         binding = FragmentRecyclerViewBinding.inflate(inflater, container, false)
         binding?.recyclerView?.layoutManager = LinearLayoutManager(requireContext())
         binding?.recyclerView?.adapter = adapter
@@ -42,8 +44,37 @@ abstract class FastAdapterFragment : BaseFragment() {
         return binding?.root
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        refreshScreen()
+    }
+
     override fun refreshScreen() {
-        adapter.setNewList(getItems())
+        val items = getItems()
+        if (items.isEmpty()) {
+            showEmpty()
+        } else {
+            adapter.setNewList(items)
+            showData()
+        }
+    }
+
+    protected fun showLoading() {
+        binding?.recyclerView?.isVisible = false
+        binding?.emptyLayout?.isVisible = false
+        binding?.loadingLayout?.isVisible = true
+    }
+
+    protected fun showEmpty() {
+        binding?.recyclerView?.isVisible = false
+        binding?.emptyLayout?.isVisible = true
+        binding?.loadingLayout?.isVisible = false
+    }
+
+    protected fun showData() {
+        binding?.recyclerView?.isVisible = true
+        binding?.emptyLayout?.isVisible = false
+        binding?.loadingLayout?.isVisible = false
     }
 
     override fun onDestroyView() {

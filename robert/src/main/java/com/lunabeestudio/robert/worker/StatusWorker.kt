@@ -26,6 +26,7 @@ import com.lunabeestudio.robert.model.RobertResult
 import com.lunabeestudio.robert.model.TimeNotAlignedException
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
+import kotlin.math.roundToLong
 import kotlin.random.Random
 
 internal class StatusWorker(context: Context, workerParams: WorkerParameters) : CoroutineWorker(context, workerParams) {
@@ -33,6 +34,8 @@ internal class StatusWorker(context: Context, workerParams: WorkerParameters) : 
     override suspend fun doWork(): Result {
         val robertApplication: RobertApplication = applicationContext as RobertApplication
         val robertManager: RobertManager = robertApplication.robertManager
+
+        robertApplication.refreshInfoCenter()
 
         Timber.d("Start updating status")
         val result = robertManager.updateStatus(robertApplication)
@@ -63,9 +66,13 @@ internal class StatusWorker(context: Context, workerParams: WorkerParameters) : 
 
     companion object {
         fun scheduleStatusWorker(context: Context, robertManager: RobertManager, policy: ExistingPeriodicWorkPolicy) {
-            val minDelaySec: Long = TimeUnit.HOURS.toSeconds(robertManager.checkStatusFrequencyHour.toLong())
-            val maxDelaySec = minDelaySec + TimeUnit.HOURS.toSeconds(robertManager.randomStatusHour.toLong())
-            val randomDelaySec: Long = Random.nextLong(minDelaySec, maxDelaySec)
+            val minDelaySec: Long = (robertManager.checkStatusFrequencyHour * 3600).roundToLong()
+            val maxDelaySec: Long = minDelaySec + (robertManager.randomStatusHour * 3600).roundToLong()
+            val randomDelaySec: Long = if (minDelaySec != maxDelaySec) {
+                Random.nextLong(minDelaySec, maxDelaySec)
+            } else {
+                minDelaySec
+            }
 
             val constraints = Constraints.Builder()
                 .setRequiredNetworkType(NetworkType.CONNECTED)

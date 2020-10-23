@@ -29,6 +29,11 @@
         <item name="snackbarTextViewStyle">@style/Widget.StopCovid.Snackbar.TextView</item>
 
         <item name="android:windowTranslucentNavigation">true</item>
+
+        <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.App.MediumComponent</item>
+        <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.App.SmallComponent</item>
+
+        <item name="materialCardViewStyle">@style/Widget.App.CardView</item>
     </style>
 
     <!-- Base application theme. -->

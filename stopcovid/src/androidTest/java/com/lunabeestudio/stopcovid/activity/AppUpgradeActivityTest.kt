@@ -30,39 +30,44 @@ class AppUpgradeActivityTest {
     @Rule
     @JvmField
     var activityTestRule: ActivityTestRule<AppMaintenanceActivity> = object : ActivityTestRule<AppMaintenanceActivity>(
-        AppMaintenanceActivity::class.java) {
+        AppMaintenanceActivity::class.java
+    ) {
         override fun getActivityIntent(): Intent {
             val targetContext = InstrumentationRegistry.getInstrumentation().targetContext
-            val info = Info(JSONObject("{\n" +
-                "    \"iOS\": {\n" +
-                "        \"isActive\": true,\n" +
-                "        \"mode\": \"upgrade\",\n" +
-                "        \"minRequiredBuildNumber\": 949,\n" +
-                "        \"buttonTitle\": {\n" +
-                "            \"fr\": \"Télécharger la nouvelle version\"\n" +
-                "        },\n" +
-                "        \"buttonURL\": {\n" +
-                "            \"fr\": \"https://beta.itunes.apple.com/v1/app/1489730268\"\n" +
-                "        },\n" +
-                "        \"message\": {\n" +
-                "            \"fr\":\"Cher client, votre application a été mise à jour. Nous vous invitons à télécharger la nouvelle version directement sur TestFlight.\"\n" +
-                "        }\n" +
-                "    },\n" +
-                "    \"Android\": {\n" +
-                "        \"isActive\": true,\n" +
-                "        \"mode\": \"upgrade\",\n" +
-                "        \"minRequiredBuildNumber\": 3,\n" +
-                "        \"buttonTitle\": {\n" +
-                "            \"fr\": \"Télécharger la nouvelle version\"\n" +
-                "        },\n" +
-                "        \"buttonURL\": {\n" +
-                "            \"fr\": \"https://play.google.com/store/apps/details?id=com.stopcovid.android\"\n" +
-                "        },\n" +
-                "        \"message\": {\n" +
-                "            \"fr\":\"Cher client, votre application a été mise à jour. Nous vous invitons à télécharger la nouvelle version directement sur le Play Store.\"\n" +
-                "        }\n" +
-                "    }\n" +
-                "}"))
+            val info = Info(
+                JSONObject(
+                    "{\n" +
+                        "    \"iOS\": {\n" +
+                        "        \"isActive\": true,\n" +
+                        "        \"mode\": \"upgrade\",\n" +
+                        "        \"minRequiredBuildNumber\": 949,\n" +
+                        "        \"buttonTitle\": {\n" +
+                        "            \"fr\": \"Télécharger la nouvelle version\"\n" +
+                        "        },\n" +
+                        "        \"buttonURL\": {\n" +
+                        "            \"fr\": \"https://beta.itunes.apple.com/v1/app/1489730268\"\n" +
+                        "        },\n" +
+                        "        \"message\": {\n" +
+                        "            \"fr\":\"Cher client, votre application a été mise à jour. Nous vous invitons à télécharger la nouvelle version directement sur TestFlight.\"\n" +
+                        "        }\n" +
+                        "    },\n" +
+                        "    \"Android\": {\n" +
+                        "        \"isActive\": true,\n" +
+                        "        \"mode\": \"upgrade\",\n" +
+                        "        \"minRequiredBuildNumber\": 3,\n" +
+                        "        \"buttonTitle\": {\n" +
+                        "            \"fr\": \"Télécharger la nouvelle version\"\n" +
+                        "        },\n" +
+                        "        \"buttonURL\": {\n" +
+                        "            \"fr\": \"https://play.google.com/store/apps/details?id=com.stopcovid.android\"\n" +
+                        "        },\n" +
+                        "        \"message\": {\n" +
+                        "            \"fr\":\"Cher client, votre application a été mise à jour. Nous vous invitons à télécharger la nouvelle version directement sur le Play Store.\"\n" +
+                        "        }\n" +
+                        "    }\n" +
+                        "}"
+                )
+            )
             val gson = Gson()
             return Intent(targetContext, AppMaintenanceActivity::class.java).apply {
                 putExtra(AppMaintenanceActivity.EXTRA_INFO, gson.toJson(info))

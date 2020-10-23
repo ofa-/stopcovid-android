@@ -16,7 +16,6 @@ import android.view.Gravity
 import android.view.View
 import androidx.core.content.edit
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
 import com.lunabeestudio.robert.RobertApplication
@@ -30,7 +29,7 @@ import com.lunabeestudio.stopcovid.coreui.fastitem.lightButtonItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
 import com.lunabeestudio.stopcovid.extension.getString
-import com.lunabeestudio.stopcovid.extension.openInChromeTab
+import com.lunabeestudio.stopcovid.extension.openInExternalBrowser
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.fastitem.logoItem
@@ -104,7 +103,7 @@ class IsSickFragment : AboutMainFragment() {
             text = strings["sickController.button.recommendations"]
             gravity = Gravity.CENTER
             onClickListener = View.OnClickListener {
-                strings["sickController.button.recommendations.url"]?.openInChromeTab(requireContext())
+                strings["sickController.button.recommendations.url"]?.openInExternalBrowser(requireContext())
             }
             identifier = items.count().toLong()
         }

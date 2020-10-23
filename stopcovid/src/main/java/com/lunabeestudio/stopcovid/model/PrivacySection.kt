@@ -10,7 +10,7 @@
 
 package com.lunabeestudio.stopcovid.model
 
-class PrivacySection(
+data class PrivacySection(
     val section: String,
     val description: String?,
     val links: List<Link>?

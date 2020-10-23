@@ -35,7 +35,7 @@ class OnBoardingBatteryFragment : OnBoardingFragment() {
     @SuppressLint("BatteryLife")
     @RequiresApi(Build.VERSION_CODES.M)
     override fun getOnButtonClick(): () -> Unit = {
-        if (!ProximityManager.isBatteryOptimizationOn(requireContext())) {
+        if (!ProximityManager.isBatteryOptimizationOff(requireContext())) {
             ProximityManager.requestIgnoreBatteryOptimization(this)
         } else {
             findNavController()

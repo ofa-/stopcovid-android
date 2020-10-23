@@ -22,7 +22,8 @@ import com.lunabeestudio.stopcovid.coreui.fastitem.BaseItem
 class ProximityButtonItem : BaseItem<ProximityButtonItem.ViewHolder>(
     R.layout.item_proximity_button,
     ::ViewHolder,
-    R.id.item_proximity_button) {
+    R.id.item_proximity_button
+) {
     var mainText: String? = null
     var lightText: String? = null
     var showMainButton: Boolean = true

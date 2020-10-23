@@ -377,11 +377,11 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
             }
         }
 
-    override var checkStatusFrequency: Int?
+    override var checkStatusFrequency: Float?
         get() {
             val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_CHECK_STATUS_FREQUENCY, null)
             return if (encryptedText != null) {
-                cryptoManager.decryptToString(encryptedText).toIntOrNull()
+                cryptoManager.decryptToString(encryptedText).toFloatOrNull()
             } else {
                 null
             }
@@ -396,11 +396,11 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
             }
         }
 
-    override var randomStatusHour: Int?
+    override var randomStatusHour: Float?
         get() {
             val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_RANDOM_STATUS_HOUR, null)
             return if (encryptedText != null) {
-                cryptoManager.decryptToString(encryptedText).toIntOrNull()
+                cryptoManager.decryptToString(encryptedText).toFloatOrNull()
             } else {
                 null
             }

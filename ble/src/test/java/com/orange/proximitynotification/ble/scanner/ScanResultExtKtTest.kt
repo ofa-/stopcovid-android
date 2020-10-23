@@ -26,9 +26,11 @@ import java.util.UUID
 @RunWith(ZohhakRunner::class)
 class ScanResultExtKtTest {
 
-    @TestWith(value = [
-        "data",
-        "null"])
+    @TestWith(
+        value = [
+            "data",
+            "null"]
+    )
     fun toBleScannedDevice_should_create_BLEScannedDevice(data: String?) {
         // Given
         val uuid = UUID.randomUUID()

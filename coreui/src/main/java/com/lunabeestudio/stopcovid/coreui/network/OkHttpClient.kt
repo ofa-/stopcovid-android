@@ -38,9 +38,11 @@ object OkHttpClient {
                 connectionSpecs(listOf(requireTls12))
             }
             if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N) {
-                certificatePinner(CertificatePinner.Builder()
-                    .add(url.toHttpUrl().host, certificateSHA256)
-                    .build())
+                certificatePinner(
+                    CertificatePinner.Builder()
+                        .add(url.toHttpUrl().host, certificateSHA256)
+                        .build()
+                )
                 val certificates: HandshakeCertificates = HandshakeCertificates.Builder()
                     .addTrustedCertificate(certificateFromString(context, "app_stopcovid_gouv_fr"))
                     .build()
@@ -58,9 +60,12 @@ object OkHttpClient {
     private fun certificateFromString(context: Context, fileName: String): X509Certificate {
         return CertificateFactory.getInstance("X.509").generateCertificate(
             context.resources.openRawResource(
-                context.resources.getIdentifier(fileName,
-                    "raw", context.packageName)
-            )) as X509Certificate
+                context.resources.getIdentifier(
+                    fileName,
+                    "raw", context.packageName
+                )
+            )
+        ) as X509Certificate
     }
 
     private fun getDefaultHeaderInterceptor(): Interceptor = object : Interceptor {

@@ -24,4 +24,6 @@ interface RobertApplication {
     }
     fun registerListener(listener: Listener?)
     fun notifyListener(notification: Any)
+
+    fun refreshInfoCenter()
 }

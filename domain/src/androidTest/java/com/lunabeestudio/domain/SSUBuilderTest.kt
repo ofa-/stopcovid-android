@@ -35,8 +35,10 @@ class SSUBuilderTest {
                 ntpStartTimeS = 0,
                 ntpEndTimeS = 0,
                 ecc = Base64.decode(ecc64, Base64.NO_WRAP),
-                ebid = Base64.decode(ebid64, Base64.NO_WRAP)),
-            key = Base64.decode(key64, Base64.NO_WRAP))
+                ebid = Base64.decode(ebid64, Base64.NO_WRAP)
+            ),
+            key = Base64.decode(key64, Base64.NO_WRAP)
+        )
 
         val mac64 = builder.build(currentTimeMillis).mac
 

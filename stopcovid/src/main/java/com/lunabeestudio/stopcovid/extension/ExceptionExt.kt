@@ -27,13 +27,9 @@ internal fun Exception.remoteToRobertException(): RobertException = when (this) 
     is SocketTimeoutException,
     is IOException -> NoInternetException()
     is HttpException -> {
-        try {
-            when (code()) {
-                401 -> UnauthorizedException()
-                else -> BackendException()
-            }
-        } catch (e: Exception) {
-            BackendException()
+        when (code()) {
+            401 -> UnauthorizedException()
+            else -> BackendException()
         }
     }
     else -> UnknownException()

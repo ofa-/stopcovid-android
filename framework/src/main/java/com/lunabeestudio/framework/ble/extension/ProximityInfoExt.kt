@@ -15,11 +15,13 @@ import com.lunabeestudio.domain.model.Hello
 import com.lunabeestudio.domain.model.LocalProximity
 import com.orange.proximitynotification.ProximityInfo
 import com.orange.proximitynotification.ble.BleProximityMetadata
+import timber.log.Timber
 
 internal fun ProximityInfo.hello(): Hello? {
     return try {
         Hello(payload.data)
     } catch (e: IllegalArgumentException) {
+        Timber.e(e)
         null
     }
 }
@@ -27,10 +29,12 @@ internal fun ProximityInfo.hello(): Hello? {
 fun ProximityInfo.toLocalProximity(): LocalProximity? {
     return hello()?.let { hello ->
         (this.metadata as? BleProximityMetadata)?.let { (rawRssi, calibratedRssi) ->
-            LocalProximity(hello = hello,
+            LocalProximity(
+                hello = hello,
                 collectedNtpTimeS = timestamp.time.unixTimeMsToNtpTimeS(),
                 rawRssi = rawRssi,
-                calibratedRssi = calibratedRssi)
+                calibratedRssi = calibratedRssi
+            )
         }
     }
 }

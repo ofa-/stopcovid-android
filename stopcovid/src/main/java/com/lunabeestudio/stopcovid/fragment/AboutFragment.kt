@@ -28,7 +28,7 @@ import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.dividerItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
-import com.lunabeestudio.stopcovid.extension.openInChromeTab
+import com.lunabeestudio.stopcovid.extension.openInExternalBrowser
 import com.lunabeestudio.stopcovid.fastitem.linkItem
 import com.lunabeestudio.stopcovid.fastitem.logoItem
 import com.mikepenz.fastadapter.GenericItem
@@ -101,7 +101,7 @@ class AboutFragment : MainFragment() {
             identifier = items.size.toLong()
             ripple = true
             onLongClick = {
-                releasesUri.openInChromeTab(requireContext())
+                releasesUri.openInExternalBrowser(requireContext())
             }
             onClick = {
                 checkNewVersion()
@@ -127,7 +127,7 @@ class AboutFragment : MainFragment() {
             identifier = items.count().toLong()
         }
         items += linkItem {
-            iconRes = R.drawable.ic_about
+            iconRes = R.drawable.ic_web
             text = strings["aboutController.webpage"]
             url = strings["aboutController.webpageUrl"]
             identifier = items.size.toLong()

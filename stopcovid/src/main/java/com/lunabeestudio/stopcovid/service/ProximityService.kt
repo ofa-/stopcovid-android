@@ -214,15 +214,18 @@ class ProximityService : RobertProximityService() {
             this, 0,
             notificationIntent, 0
         )
-        val notification = NotificationCompat.Builder(this,
+        val notification = NotificationCompat.Builder(
+            this,
             UiConstants.Notification.ERROR.channelId
         )
             .setContentTitle(strings["notification.error.title"])
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
             .setSmallIcon(R.drawable.ic_notification_bar)
-            .setStyle(NotificationCompat.BigTextStyle()
-                .bigText(strings["notification.error.message"]))
+            .setStyle(
+                NotificationCompat.BigTextStyle()
+                    .bigText(strings["notification.error.message"])
+            )
             .setContentIntent(pendingIntent)
             .build()
         notificationManager.notify(UiConstants.Notification.ERROR.notificationId, notification)
@@ -245,15 +248,18 @@ class ProximityService : RobertProximityService() {
             this, 0,
             notificationIntent, 0
         )
-        val notification = NotificationCompat.Builder(this,
+        val notification = NotificationCompat.Builder(
+            this,
             UiConstants.Notification.BLUETOOTH.channelId
         )
             .setContentTitle(strings["notification.error.title"])
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
             .setSmallIcon(R.drawable.ic_notification_bar)
-            .setStyle(NotificationCompat.BigTextStyle()
-                .bigText(strings["notification.error.connectivity"]))
+            .setStyle(
+                NotificationCompat.BigTextStyle()
+                    .bigText(strings["notification.error.connectivity"])
+            )
             .setContentIntent(pendingIntent)
             .build()
         notificationManager.notify(UiConstants.Notification.BLUETOOTH.notificationId, notification)

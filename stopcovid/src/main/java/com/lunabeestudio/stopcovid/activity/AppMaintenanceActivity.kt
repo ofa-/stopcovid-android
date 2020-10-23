@@ -22,6 +22,7 @@ import com.github.razir.progressbutton.bindProgressButton
 import com.github.razir.progressbutton.hideProgress
 import com.github.razir.progressbutton.showProgress
 import com.google.gson.Gson
+import com.lunabeestudio.stopcovid.BuildConfig
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
 import com.lunabeestudio.stopcovid.databinding.ActivityAppMaintenanceBinding
@@ -35,7 +36,7 @@ class AppMaintenanceActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAppMaintenanceBinding
 
-    private var strings: HashMap<String, String> = StringsManager.getStrings()
+    private var strings: HashMap<String, String> = StringsManager.strings
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,7 +62,7 @@ class AppMaintenanceActivity : AppCompatActivity() {
         if (info.buttonTitle != null && info.buttonUrl != null) {
             binding.button.text = info.buttonTitle
             binding.button.setOnClickListener {
-                startActivity(Intent(Intent.ACTION_VIEW).setData(Uri.parse(info.buttonUrl)))
+                startActivity(Intent(Intent.ACTION_VIEW).setData(Uri.parse(BuildConfig.APP_STORE_URL)))
             }
             binding.button.visibility = View.VISIBLE
         } else {

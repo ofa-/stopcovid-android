@@ -163,9 +163,7 @@ object AppMaintenanceManager {
         appIsFreeCompletion: (() -> Unit)?,
         appIsBlockedCompletion: ((Info) -> Unit)?
     ) {
-        if (info.isActive == true && (info.minRequiredBuildNumber
-                ?: 0) > buildNumber
-        ) {
+        if (info.isActive == true && (info.minRequiredBuildNumber ?: 0) > buildNumber) {
             startAppMaintenanceActivity(context, info)
             appIsBlockedCompletion?.invoke(info)
             context.sendBroadcast(Intent(Constants.Notification.APP_IN_MAINTENANCE))

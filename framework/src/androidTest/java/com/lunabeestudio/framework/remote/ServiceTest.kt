@@ -41,8 +41,10 @@ class ServiceTest {
 
     @Test
     fun captcha() {
-        server.enqueue(MockResponse().setResponseCode(200)
-            .setBody(ResourcesHelper.readTestFileAsString("captchaSuccess")))
+        server.enqueue(
+            MockResponse().setResponseCode(200)
+                .setBody(ResourcesHelper.readTestFileAsString("captchaSuccess"))
+        )
         val result = runBlocking {
             dataSource.generateCaptcha("", "", "")
         }
@@ -57,8 +59,10 @@ class ServiceTest {
 
     @Test
     fun registerV2Test() {
-        server.enqueue(MockResponse().setResponseCode(200)
-            .setBody(ResourcesHelper.readTestFileAsString("registerV2Success")))
+        server.enqueue(
+            MockResponse().setResponseCode(200)
+                .setBody(ResourcesHelper.readTestFileAsString("registerV2Success"))
+        )
         val result = runBlocking {
             dataSource.registerV2("", "", "", "")
         }
@@ -78,8 +82,10 @@ class ServiceTest {
 
     @Test
     fun statusTest() {
-        server.enqueue(MockResponse().setResponseCode(200)
-            .setBody(ResourcesHelper.readTestFileAsString("statusSuccess")))
+        server.enqueue(
+            MockResponse().setResponseCode(200)
+                .setBody(ResourcesHelper.readTestFileAsString("statusSuccess"))
+        )
         val result = runBlocking {
             dataSource.status("", ServerStatusUpdate("", 0L, "", ""))
         }
@@ -100,8 +106,10 @@ class ServiceTest {
 
     @Test
     fun reportTest() {
-        server.enqueue(MockResponse().setResponseCode(200)
-            .setBody(ResourcesHelper.readTestFileAsString("reportSuccess")))
+        server.enqueue(
+            MockResponse().setResponseCode(200)
+                .setBody(ResourcesHelper.readTestFileAsString("reportSuccess"))
+        )
         val result = runBlocking {
             dataSource.report("", "", emptyList())
         }
@@ -114,8 +122,10 @@ class ServiceTest {
 
     @Test
     fun unregisterTest() {
-        server.enqueue(MockResponse().setResponseCode(200)
-            .setBody(ResourcesHelper.readTestFileAsString("unregisterSuccess")))
+        server.enqueue(
+            MockResponse().setResponseCode(200)
+                .setBody(ResourcesHelper.readTestFileAsString("unregisterSuccess"))
+        )
         val result = runBlocking {
             dataSource.unregister("", ServerStatusUpdate("", 0L, "", ""))
         }
@@ -128,8 +138,10 @@ class ServiceTest {
 
     @Test
     fun deleteExposureHistory() {
-        server.enqueue(MockResponse().setResponseCode(200)
-            .setBody(ResourcesHelper.readTestFileAsString("deleteExposureHistorySuccess")))
+        server.enqueue(
+            MockResponse().setResponseCode(200)
+                .setBody(ResourcesHelper.readTestFileAsString("deleteExposureHistorySuccess"))
+        )
         val result = runBlocking {
             dataSource.deleteExposureHistory("", ServerStatusUpdate("", 0L, "", ""))
         }

@@ -10,19 +10,29 @@
 <resources>
     <item name="item_audio" type="id" />
     <item name="item_big_title" type="id" />
+    <item name="item_button_card" type="id" />
     <item name="item_contact" type="id" />
     <item name="item_danger_button" type="id" />
+    <item name="item_date" type="id" />
     <item name="item_double_button" type="id" />
     <item name="item_double_logo" type="id" />
     <item name="item_double_text" type="id" />
     <item name="item_edit_text" type="id" />
     <item name="item_icon_title" type="id" />
     <item name="item_image" type="id" />
+    <item name="item_image_background_card" type="id" />
+    <item name="item_image_card" type="id" />
+    <item name="item_info_center_card" type="id" />
+    <item name="item_info_center_detail_card" type="id" />
+    <item name="item_key_figure_card" type="id" />
     <item name="item_link" type="id" />
     <item name="item_logo" type="id" />
     <item name="item_logo_body" type="id" />
     <item name="item_lottie" type="id" />
+    <item name="item_more_card" type="id" />
     <item name="item_number" type="id" />
+    <item name="item_numbers_card" type="id" />
     <item name="item_progress_button" type="id" />
     <item name="item_proximity_button" type="id" />
+    <item name="item_tag" type="id" />
 </resources>

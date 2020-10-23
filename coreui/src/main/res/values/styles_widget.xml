@@ -53,6 +53,15 @@
         <item name="android:textColor">@color/color_error</item>
     </style>
 
+    <style name="Widget.StopCovid.Button.LearnMore" parent="Widget.MaterialComponents.Button.UnelevatedButton">
+        <item name="android:padding">@dimen/spacing_medium</item>
+        <item name="android:textSize">@dimen/caption_font_size</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="backgroundTint">@color/color_button_learn_more</item>
+        <item name="android:textColor">@color/color_on_status_notification</item>
+        <item name="iconGravity">textStart</item>
+    </style>
+
     <style name="Widget.StopCovid.TextInput" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
         <item name="boxCornerRadiusTopStart">@dimen/corner_radius</item>
         <item name="boxCornerRadiusTopEnd">@dimen/corner_radius</item>
@@ -66,6 +75,21 @@
 
     <style name="Widget.StopCovid.Snackbar.TextView" parent="@style/Widget.MaterialComponents.Snackbar.TextView">
         <item name="android:maxLines">5</item>
+    </style>
+
+
+    <style name="Widget.App.CardView" parent="Widget.MaterialComponents.CardView">
+        <item name="cardElevation">@dimen/cardElevation</item>
+    </style>
+
+    <style name="ShapeAppearance.App.MediumComponent" parent="ShapeAppearance.MaterialComponents.MediumComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@dimen/corner_radius</item>
+    </style>
+
+    <style name="ShapeAppearance.App.SmallComponent" parent="ShapeAppearance.MaterialComponents.SmallComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@dimen/corner_radius</item>
     </style>
 
 </resources>

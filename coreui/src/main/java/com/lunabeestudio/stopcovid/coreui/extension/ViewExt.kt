@@ -28,12 +28,12 @@ import com.lunabeestudio.stopcovid.coreui.R
 fun View.applyAndConsumeWindowInsetBottom() {
     ViewCompat.setOnApplyWindowInsetsListener(this) { view, insets ->
         view.updatePadding(bottom = insets.systemWindowInsetBottom)
-        WindowInsetsCompat.Builder(insets).setSystemWindowInsets(Insets.of(
+        insets.replaceSystemWindowInsets(
             insets.systemWindowInsetLeft,
             insets.systemWindowInsetTop,
             insets.stableInsetRight,
-            0)
-        ).build()
+            0
+        )
     }
 }
 

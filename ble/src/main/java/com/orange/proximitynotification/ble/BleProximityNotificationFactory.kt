@@ -12,6 +12,8 @@ package com.orange.proximitynotification.ble
 
 import android.bluetooth.BluetoothManager
 import android.content.Context
+import com.orange.proximitynotification.ProximityNotificationEventId
+import com.orange.proximitynotification.ProximityNotificationLogger
 import com.orange.proximitynotification.ble.advertiser.BleAdvertiserImpl
 import com.orange.proximitynotification.ble.gatt.BleGattClientProviderImpl
 import com.orange.proximitynotification.ble.gatt.BleGattManagerImpl
@@ -32,13 +34,19 @@ object BleProximityNotificationFactory {
         val bluetoothAdapter = bluetoothManager.adapter
 
         if (bluetoothAdapter.bluetoothLeAdvertiser == null) {
+            ProximityNotificationLogger.error(
+                ProximityNotificationEventId.BLE_PROXIMITY_NOTIFICATION_FACTORY,
+                "bluetoothAdapter.bluetoothLeAdvertiser is null"
+            )
+
             return null
         }
 
         val bleGattClientProvider = BleGattClientProviderImpl(context)
         val bleAdvertiser = BleAdvertiserImpl(settings, bluetoothAdapter.bluetoothLeAdvertiser)
         val bleScanner = BleScannerImpl(settings, BluetoothLeScannerCompat.getScanner())
-        val bleGattManager = BleGattManagerImpl(settings, context, bluetoothManager, bleGattClientProvider)
+        val bleGattManager =
+            BleGattManagerImpl(settings, context, bluetoothManager, bleGattClientProvider)
 
         return BleProximityNotification(
             bleScanner,

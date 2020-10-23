@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="@layout/item_contact">
+
+    <TextView
+        android:id="@+id/headerTextView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/spacing_large"
+        android:textAppearance="@style/TextAppearance.StopCovid.Caption"
+        android:textColor="@color/color_on_status_notification"
+        android:textIsSelectable="false"
+        app:layout_constraintBottom_toTopOf="@id/titleTextView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="@tools:sample/lorem[5]" />
+
+    <ImageButton
+        android:id="@+id/actionButton"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:padding="@dimen/spacing_large"
+        android:src="@drawable/ic_more"
+        android:background="@drawable/ripple_rounded"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:contentDescription="TODO" />
+
+    <TextView
+        android:id="@+id/titleTextView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/spacing_large"
+        android:layout_marginBottom="@dimen/spacing_medium"
+        android:textAppearance="@style/TextAppearance.StopCovid.Title"
+        android:textColor="@color/color_on_status_notification"
+        android:textIsSelectable="false"
+        app:layout_constraintBottom_toTopOf="@id/captionTextView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/headerTextView"
+        tools:text="@tools:sample/lorem[5]" />
+
+    <TextView
+        android:id="@+id/captionTextView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/spacing_large"
+        android:textAppearance="@style/TextAppearance.StopCovid.Caption"
+        android:textColor="@color/color_on_status_notification"
+        android:textIsSelectable="false"
+        app:layout_constraintBottom_toTopOf="@id/learnMoreButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/titleTextView"
+        tools:text="@tools:sample/lorem[15]" />
+
+    <Button
+        android:id="@+id/learnMoreButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/spacing_large"
+        style="@style/Widget.StopCovid.Button.LearnMore"
+        android:drawableEnd="@drawable/ic_info"
+        android:drawableTint="@color/color_on_status_notification"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/captionTextView"
+        tools:text="Learn more"/>
+</merge>

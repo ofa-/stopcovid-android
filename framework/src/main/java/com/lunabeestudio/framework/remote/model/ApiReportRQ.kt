@@ -20,11 +20,13 @@ internal class ApiReportRQ(
         fun fromLocalProximityList(token: String, localProximityList: List<LocalProximity>): ApiReportRQ {
             val contacts = localProximityList.groupBy { it.eccBase64 + it.ebidBase64 }.map { entry ->
                 val apiDistinctiveHelloInfoList = entry.value.map { (_, _, mac, helloTime, collectedTime, rawRssi, calibratedRssi) ->
-                    ApiDistinctiveHelloInfoWithinEpochForSameEBIDRQ(collectedTime,
+                    ApiDistinctiveHelloInfoWithinEpochForSameEBIDRQ(
+                        collectedTime,
                         helloTime,
                         mac,
                         rawRssi,
-                        calibratedRssi)
+                        calibratedRssi
+                    )
                 }
                 ApiGroupedHellosReportRQ(entry.value.first().ebidBase64, entry.value.first().eccBase64, apiDistinctiveHelloInfoList)
             }

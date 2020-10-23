@@ -17,6 +17,8 @@ object Constants {
         const val ON_BOARDING_DONE: String = "On.Boarding.Done"
         const val LAST_PRIVACY_REFRESH: String = "Last.Privacy.Refresh"
         const val LAST_MAINTENANCE_REFRESH: String = "Last.Maintenance.Refresh"
+        const val LAST_INFO_CENTER_REFRESH: String = "Last.Info.Center.Refresh"
+        const val HAS_NEWS: String = "Has.News"
     }
 
     object Notification {

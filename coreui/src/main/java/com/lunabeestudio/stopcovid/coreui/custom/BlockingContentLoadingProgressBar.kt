@@ -23,9 +23,11 @@ import com.lunabeestudio.stopcovid.coreui.utils.LoadingVisibilityDelayDelegate
 import kotlinx.android.synthetic.main.layout_content_loading_progress_bar.view.*
 
 class BlockingContentLoadingProgressBar @JvmOverloads constructor(context: Context,
-    attrs: AttributeSet? = null, defStyleAttr: Int = 0) : FrameLayout(context,
+    attrs: AttributeSet? = null, defStyleAttr: Int = 0) : FrameLayout(
+    context,
     attrs,
-    defStyleAttr) {
+    defStyleAttr
+) {
 
     init {
         val inflater = context

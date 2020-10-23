@@ -12,11 +12,7 @@ package com.lunabeestudio.stopcovid.coreui.extension
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.Typeface
 import android.net.Uri
-import android.text.SpannableString
-import android.text.Spanned
-import android.text.style.StyleSpan
 import androidx.annotation.WorkerThread
 import androidx.emoji.text.EmojiCompat
 import com.lunabeestudio.stopcovid.coreui.BuildConfig
@@ -26,8 +22,6 @@ import retrofit2.HttpException
 import retrofit2.Response
 import timber.log.Timber
 import java.io.File
-import java.text.Normalizer
-import java.util.Locale
 
 @WorkerThread
 fun String.download(context: Context): okhttp3.Response {
@@ -69,38 +63,12 @@ fun String.callPhone(context: Context) {
     context.startActivity(callIntent)
 }
 
-/**
- * Remove all the diacritics from a string.
- *
- * @return A diacritic free String.
- */
-fun String.removeAccents(): String = Normalizer.normalize(this,
-    Normalizer.Form.NFD).replace(Regex("\\p{InCombiningDiacriticalMarks}+"), "")
-
-/**
- * Remove the diacritics from a string and lowercase the result.
- *
- * @return A lowercase diacritic free String.
- */
-fun String.transformForSearch(): String = this.removeAccents().toLowerCase(Locale.getDefault())
-
-fun String.boldSubstringForSearch(treatedString: String,
-    treatedSearchString: String): SpannableString {
-    val spannable = SpannableString(this)
-    if (treatedSearchString.isNotEmpty() && treatedString.contains(treatedSearchString)) {
-        spannable.setSpan(StyleSpan(Typeface.NORMAL), 0, this.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-        spannable.setSpan(StyleSpan(Typeface.BOLD),
-            treatedString.indexOf(treatedSearchString),
-            treatedString.indexOf(treatedSearchString) + treatedSearchString.length,
-            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-    }
-    return spannable
-}
-
 fun String?.safeEmojiSpanify(): CharSequence? {
     return try {
         EmojiCompat.get().process(this ?: "")
-    } catch (_: IllegalStateException) {
+    } catch (e: IllegalStateException) {
         this
     }
 }
+
+fun String.fixFormatter() = this.replace("%@", "%s")

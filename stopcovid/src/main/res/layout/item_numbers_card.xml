@@ -1,0 +1,135 @@
+<!--
+  ~ This Source Code Form is subject to the terms of the Mozilla Public
+  ~ License, v. 2.0. If a copy of the MPL was not distributed with this
+  ~ file, You can obtain one at https://mozilla.org/MPL/2.0/.
+  ~
+  ~ Authors
+  ~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ Created by Lunabee Studio / Date - 2020/04/05 - for the STOP-COVID project
+  -->
+
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="@dimen/spacing_large"
+    android:layout_marginVertical="@dimen/spacing_small"
+    android:foreground="?selectableItemBackground">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/spacing_large">
+
+        <TextView
+            android:id="@+id/headerTextView"
+            style="@style/Theme.StopCovid.Link.Big"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/spacing_large"
+            android:drawablePadding="@dimen/spacing_medium"
+            android:textColor="@color/color_persimmon"
+            android:textIsSelectable="false"
+            app:drawableStartCompat="@drawable/ic_compass"
+            app:drawableTint="@color/color_persimmon"
+            tools:text="@tools:sample/lorem[1]" />
+
+        <TextView
+            android:id="@+id/subheader_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/spacing_small"
+            android:textAppearance="@style/TextAppearance.StopCovid.Caption.Small"
+            android:textIsSelectable="false"
+            tools:text="@tools:sample/lorem[2]" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/spacing_large"
+            android:baselineAligned="false"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/label1TextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/TextAppearance.StopCovid.Caption.Bold"
+                    android:textIsSelectable="false"
+                    tools:text="@tools:sample/lorem[1]" />
+
+                <TextView
+                    android:id="@+id/value1TextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/TextAppearance.StopCovid.Title.Bold"
+                    android:textIsSelectable="false"
+                    tools:text="@tools:sample/lorem[0]" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/label2TextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/TextAppearance.StopCovid.Caption.Bold"
+                    android:textIsSelectable="false"
+                    tools:text="@tools:sample/lorem[1]" />
+
+                <TextView
+                    android:id="@+id/value2TextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/TextAppearance.StopCovid.Title.Bold"
+                    android:textIsSelectable="false"
+                    tools:text="@tools:sample/lorem[0]" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/label3TextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/TextAppearance.StopCovid.Caption.Bold"
+                    android:textIsSelectable="false"
+                    tools:text="@tools:sample/lorem[1]" />
+
+                <TextView
+                    android:id="@+id/value3TextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/TextAppearance.StopCovid.Title.Bold"
+                    android:textIsSelectable="false"
+                    tools:text="@tools:sample/lorem[0]" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/linkTextView"
+            style="@style/Theme.StopCovid.Link"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textIsSelectable="false"
+            tools:text="@tools:sample/lorem[2]" />
+
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

@@ -61,11 +61,13 @@ data class EphemeralBluetoothIdentifier(
                 val ebid = key["ebid"] as String
                 val ecc = key["ecc"] as String
 
-                ebids += EphemeralBluetoothIdentifier(epochId = epochId,
+                ebids += EphemeralBluetoothIdentifier(
+                    epochId = epochId,
                     ntpStartTimeS = ntpInitialTimeS + epochId * epochDurationS,
                     ntpEndTimeS = ntpInitialTimeS + (epochId + 1) * epochDurationS,
                     ecc = Base64.decode(ecc, Base64.NO_WRAP),
-                    ebid = Base64.decode(ebid, Base64.NO_WRAP))
+                    ebid = Base64.decode(ebid, Base64.NO_WRAP)
+                )
             }
 
             return ebids

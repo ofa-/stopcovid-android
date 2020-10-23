@@ -17,6 +17,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.location.LocationManager
 import android.net.Uri
 import android.os.Build
 import android.os.PowerManager
@@ -24,6 +25,7 @@ import android.provider.Settings
 import android.view.View
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
+import androidx.core.location.LocationManagerCompat
 import androidx.fragment.app.Fragment
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.stopcovid.coreui.UiConstants
@@ -38,11 +40,12 @@ object ProximityManager {
         && isLocalisationGranted(context)
         && hasFeatureBLE(context)
         && isBluetoothOn(context)
-        && isBatteryOptimizationOn(context)
+        && isBatteryOptimizationOff(context)
+        && !needLocalisationTurnedOn(context)
 
     fun hasFeatureBLE(context: Context): Boolean = context.packageManager.hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)
 
-    private fun isNotificationOn(context: Context): Boolean =
+    fun isNotificationOn(context: Context): Boolean =
         NotificationManagerCompat.from(context).areNotificationsEnabled()
 
     fun isLocalisationGranted(context: Context): Boolean =
@@ -54,9 +57,17 @@ object ProximityManager {
         Manifest.permission.ACCESS_COARSE_LOCATION
     }
 
+    private fun needLocalisationTurnedOn(context: Context): Boolean {
+        return if (Build.VERSION.SDK_INT == 29 && BluetoothAdapter.getDefaultAdapter()?.isOffloadedScanBatchingSupported != true) {
+            !LocationManagerCompat.isLocationEnabled(context.getSystemService(Context.LOCATION_SERVICE) as LocationManager)
+        } else {
+            false
+        }
+    }
+
     fun isBluetoothOn(context: Context): Boolean = hasFeatureBLE(context) && BluetoothAdapter.getDefaultAdapter()?.isEnabled != false
 
-    fun isBatteryOptimizationOn(context: Context): Boolean {
+    fun isBatteryOptimizationOff(context: Context): Boolean {
         val pm = context.getSystemService(Context.POWER_SERVICE) as? PowerManager
         return Build.VERSION.SDK_INT < Build.VERSION_CODES.M
             || pm?.isIgnoringBatteryOptimizations(context.packageName) == true
@@ -72,8 +83,11 @@ object ProximityManager {
             val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
             fragment.startActivity(enableBtIntent)
         }
-        !isBatteryOptimizationOn(fragment.requireContext()) -> View.OnClickListener {
+        !isBatteryOptimizationOff(fragment.requireContext()) -> View.OnClickListener {
             requestIgnoreBatteryOptimization(fragment)
+        }
+        needLocalisationTurnedOn(fragment.requireContext()) -> View.OnClickListener {
+            fragment.startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
         }
         else -> View.OnClickListener {
             activateProximity()
@@ -83,11 +97,19 @@ object ProximityManager {
     private val powerManagerIntents = arrayOf(
         Intent().setComponent(ComponentName("com.miui.securitycenter", "com.miui.permcenter.autostart.AutoStartManagementActivity")),
         Intent().setComponent(ComponentName("com.letv.android.letvsafe", "com.letv.android.letvsafe.AutobootManageActivity")),
-        Intent().setComponent(ComponentName("com.huawei.systemmanager",
-            "com.huawei.systemmanager.startupmgr.ui.StartupNormalAppListActivity")),
+        Intent().setComponent(
+            ComponentName(
+                "com.huawei.systemmanager",
+                "com.huawei.systemmanager.startupmgr.ui.StartupNormalAppListActivity"
+            )
+        ),
         Intent().setComponent(ComponentName("com.huawei.systemmanager", "com.huawei.systemmanager.optimize.process.ProtectActivity")),
-        Intent().setComponent(ComponentName("com.huawei.systemmanager",
-            "com.huawei.systemmanager.appcontrol.activity.StartupAppControlActivity")),
+        Intent().setComponent(
+            ComponentName(
+                "com.huawei.systemmanager",
+                "com.huawei.systemmanager.appcontrol.activity.StartupAppControlActivity"
+            )
+        ),
         Intent().setComponent(ComponentName("com.coloros.safecenter", "com.coloros.safecenter.permission.startup.StartupAppListActivity")),
         Intent().setComponent(ComponentName("com.coloros.safecenter", "com.coloros.safecenter.startupapp.StartupAppListActivity")),
         Intent().setComponent(ComponentName("com.oppo.safe", "com.oppo.safe.permission.startup.StartupAppListActivity")),
@@ -145,7 +167,8 @@ object ProximityManager {
         !isNotificationOn(fragment.requireContext()) -> strings["proximityController.error.noNotifications"]
         !isLocalisationGranted(fragment.requireContext()) -> strings["proximityController.error.noLocalisation"]
         !isBluetoothOn(fragment.requireContext()) -> strings["proximityController.error.noBluetooth"]
-        !isBatteryOptimizationOn(fragment.requireContext()) -> strings["proximityController.error.noBattery"]
+        !isBatteryOptimizationOff(fragment.requireContext()) -> strings["proximityController.error.noBattery"]
+        needLocalisationTurnedOn(fragment.requireContext()) -> strings["proximityController.error.batchLocalisation"]
         !robertManager.isProximityActive -> strings["proximityController.error.activateProximity"]
         else -> null
     }

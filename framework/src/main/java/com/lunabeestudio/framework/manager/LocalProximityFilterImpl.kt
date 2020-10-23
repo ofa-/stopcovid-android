@@ -42,10 +42,12 @@ class LocalProximityFilterImpl : LocalProximityFilter {
                 )
             }
 
-            val filterOutput = proximityFilter.filter(timestampedRssis = timestampedRssiList,
+            val filterOutput = proximityFilter.filter(
+                timestampedRssis = timestampedRssiList,
                 epochStart = epochStartDate,
                 epochDuration = RobertConstant.EPOCH_DURATION_S.toLong(),
-                mode = mode.toBleMode())
+                mode = mode.toBleMode()
+            )
 
             if (filterOutput is ProximityFilter.Output.Rejected) {
                 mutableLocalProximityList.removeAll(list)

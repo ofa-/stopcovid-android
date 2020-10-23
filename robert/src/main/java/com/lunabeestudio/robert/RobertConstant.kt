@@ -20,8 +20,8 @@ object RobertConstant {
     const val KEA_STRING_INPUT: String = "tuples"
     const val DATA_RETENTION_PERIOD: Int = 14
     const val QUARANTINE_PERIOD: Int = 14
-    const val CHECK_STATUS_FREQUENCY_HOURS: Int = 24
-    const val RANDOM_STATUS_HOUR: Int = 12
+    const val CHECK_STATUS_FREQUENCY_HOURS: Float = 24F
+    const val RANDOM_STATUS_HOUR: Float = 12F
     const val PRE_SYMPTOMS_SPAN: Int = 2
     const val MIN_HOUR_CONTACT_NOTIF: Int = 7
     const val MAX_HOUR_CONTACT_NOTIF: Int = 19

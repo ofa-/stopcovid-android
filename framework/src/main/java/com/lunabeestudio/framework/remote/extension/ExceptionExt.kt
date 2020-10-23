@@ -35,7 +35,7 @@ internal fun Exception.remoteToRobertException(): RobertException = when (this) 
                 else -> {
                     val robertServerError =
                         Gson().fromJson(this.response()?.errorBody()?.string() ?: "", ServerException::class.java)
-                    robertServerError.message?.let { message ->
+                    robertServerError?.message?.let { message ->
                         BackendException(message)
                     } ?: BackendException()
                 }

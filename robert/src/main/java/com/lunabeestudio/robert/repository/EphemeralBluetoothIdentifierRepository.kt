@@ -38,9 +38,11 @@ internal class EphemeralBluetoothIdentifierRepository(
             }
         } ?: throw NoKeyException("Failed to retrieve kEA")
 
-        val ebids = EphemeralBluetoothIdentifier.createFromTuples(localKeystoreDataSource.timeStart!!,
+        val ebids = EphemeralBluetoothIdentifier.createFromTuples(
+            localKeystoreDataSource.timeStart!!,
             RobertConstant.EPOCH_DURATION_S,
-            rawEbid)
+            rawEbid
+        )
 
         localEphemeralBluetoothIdentifierDataSource.saveAll(*ebids.toTypedArray())
     }

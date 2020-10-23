@@ -18,7 +18,7 @@ import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.lightButtonItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
-import com.lunabeestudio.stopcovid.extension.openInChromeTab
+import com.lunabeestudio.stopcovid.extension.openInExternalBrowser
 import com.lunabeestudio.stopcovid.fastitem.logoItem
 import com.mikepenz.fastadapter.GenericItem
 
@@ -59,7 +59,7 @@ class OnBoardingNoBleFragment : OnBoardingFragment() {
             text = strings["onboarding.noBleController.infos"]
             gravity = Gravity.CENTER
             onClickListener = View.OnClickListener {
-                strings["onboarding.noBleController.infosUrl"]?.openInChromeTab(requireContext())
+                strings["onboarding.noBleController.infosUrl"]?.openInExternalBrowser(requireContext())
             }
             identifier = items.size.toLong()
         }

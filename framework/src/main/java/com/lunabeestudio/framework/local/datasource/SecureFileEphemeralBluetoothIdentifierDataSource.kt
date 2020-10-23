@@ -65,7 +65,7 @@ class SecureFileEphemeralBluetoothIdentifierDataSource(
 
     override fun removeUntilTimeKeepLast(ntpTimeS: Long) {
         cache?.let { cache ->
-            val last = cache.maxBy { it.ntpEndTimeS }
+            val last = cache.maxByOrNull { it.ntpEndTimeS }
             val updatedCache = cache
                 .filter {
                     it.ntpEndTimeS > ntpTimeS || it == last

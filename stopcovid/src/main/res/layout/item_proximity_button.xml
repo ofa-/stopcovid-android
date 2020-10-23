@@ -17,21 +17,23 @@
     <com.google.android.material.button.MaterialButton
         android:id="@+id/mainButton"
         style="@style/Widget.StopCovid.Button"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginHorizontal="@dimen/spacing_large"
-        android:layout_marginVertical="@dimen/spacing_medium"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
         android:textAllCaps="false"
         tools:text="@tools:sample/lorem[2]" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/lightButton"
         style="@style/Widget.StopCovid.Button.Light"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginHorizontal="@dimen/spacing_large"
-        android:layout_marginVertical="@dimen/spacing_medium"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
         tools:text="@tools:sample/lorem[2]" />
 </ViewSwitcher>

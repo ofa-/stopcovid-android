@@ -18,17 +18,14 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.lunabeestudio.stopcovid.R
-import com.lunabeestudio.stopcovid.coreui.extension.boldSubstringForSearch
 import com.lunabeestudio.stopcovid.coreui.extension.safeEmojiSpanify
-import com.lunabeestudio.stopcovid.coreui.extension.transformForSearch
 import com.lunabeestudio.stopcovid.coreui.fastitem.BaseItem
-import com.lunabeestudio.stopcovid.extension.openInChromeTab
+import com.lunabeestudio.stopcovid.extension.openInExternalBrowser
 
 class LinkItem : BaseItem<LinkItem.ViewHolder>(
     R.layout.item_link, ::ViewHolder, R.id.item_link
 ) {
     var text: String? = null
-    var searchString: String? = null
     var url: String? = null
     var onClickListener: View.OnClickListener? = null
 
@@ -37,16 +34,9 @@ class LinkItem : BaseItem<LinkItem.ViewHolder>(
 
     override fun bindView(holder: ViewHolder, payloads: List<Any>) {
         super.bindView(holder, payloads)
-        holder.textView.text = if (searchString.isNullOrBlank()) {
-            text.safeEmojiSpanify()
-        } else {
-            text?.boldSubstringForSearch(
-                text?.transformForSearch() ?: "",
-                searchString ?: ""
-            )
-        }
+        holder.textView.text = text.safeEmojiSpanify()
         holder.constraintLayout.setOnClickListener {
-            url?.openInChromeTab(it.context)
+            url?.openInExternalBrowser(it.context)
             onClickListener?.onClick(it)
         }
 

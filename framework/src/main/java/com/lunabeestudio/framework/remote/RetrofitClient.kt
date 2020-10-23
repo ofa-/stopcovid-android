@@ -19,7 +19,6 @@ import okhttp3.ConnectionSpec
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
-import okhttp3.Response
 import okhttp3.TlsVersion
 import okhttp3.logging.HttpLoggingInterceptor
 import okhttp3.tls.HandshakeCertificates
@@ -56,9 +55,11 @@ object RetrofitClient {
                 connectionSpecs(listOf(requireTls12))
             }
             if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N) {
-                certificatePinner(CertificatePinner.Builder()
-                    .add(url.toHttpUrl().host, certificateSHA256)
-                    .build())
+                certificatePinner(
+                    CertificatePinner.Builder()
+                        .add(url.toHttpUrl().host, certificateSHA256)
+                        .build()
+                )
                 val certificates: HandshakeCertificates = HandshakeCertificates.Builder()
                     .addTrustedCertificate(certificateFromString(context, "api_stopcovid_gouv_fr"))
                     .addTrustedCertificate(certificateFromString(context, "app_stopcovid_gouv_fr"))
@@ -83,9 +84,11 @@ object RetrofitClient {
                 connectionSpecs(listOf(requireTls12))
             }
             if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N) {
-                certificatePinner(CertificatePinner.Builder()
-                    .add(url.toHttpUrl().host, certificateSHA256)
-                    .build())
+                certificatePinner(
+                    CertificatePinner.Builder()
+                        .add(url.toHttpUrl().host, certificateSHA256)
+                        .build()
+                )
                 val certificates: HandshakeCertificates = HandshakeCertificates.Builder()
                     .addTrustedCertificate(certificateFromString(context, "api_stopcovid_gouv_fr"))
                     .build()
@@ -102,37 +105,32 @@ object RetrofitClient {
     private fun certificateFromString(context: Context, fileName: String): X509Certificate {
         return CertificateFactory.getInstance("X.509").generateCertificate(
             context.resources.openRawResource(
-                context.resources.getIdentifier(fileName,
-                    "raw", context.packageName)
-            )) as X509Certificate
+                context.resources.getIdentifier(
+                    fileName,
+                    "raw", context.packageName
+                )
+            )
+        ) as X509Certificate
     }
 
-    private fun getDefaultHeaderInterceptor(): Interceptor = object : Interceptor {
-        override fun intercept(chain: Interceptor.Chain): Response {
-            val request = chain.request()
-                .newBuilder().apply {
-                    addHeader("Accept", "application/json")
-                    addHeader("Content-Type", "application/json")
-                }.build()
-            return chain.proceed(request)
-        }
+    private fun getDefaultHeaderInterceptor(): Interceptor = Interceptor { chain ->
+        val request = chain.request()
+            .newBuilder().apply {
+                addHeader("Accept", "application/json")
+                addHeader("Content-Type", "application/json")
+            }.build()
+        chain.proceed(request)
     }
 
-    private fun getFileHeaderInterceptor(): Interceptor = object : Interceptor {
-        override fun intercept(chain: Interceptor.Chain): Response {
-            val request = chain.request()
-                .newBuilder().apply {
-                    addHeader("Content-Type", "application/json")
-                }.build()
-            return chain.proceed(request)
-        }
+    private fun getFileHeaderInterceptor(): Interceptor = Interceptor { chain ->
+        val request = chain.request()
+            .newBuilder().apply {
+                addHeader("Content-Type", "application/json")
+            }.build()
+        chain.proceed(request)
     }
 
-    private fun getLogInterceptor(): HttpLoggingInterceptor = HttpLoggingInterceptor(object : HttpLoggingInterceptor.Logger {
-        override fun log(message: String) {
-            Timber.d(message)
-        }
-    }).apply {
+    private fun getLogInterceptor(): HttpLoggingInterceptor = HttpLoggingInterceptor { message -> Timber.d(message) }.apply {
         level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE
     }
 }

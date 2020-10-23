@@ -9,4 +9,5 @@
   -->
 <resources>
     <dimen name="logo_height">250dp</dimen>
+    <dimen name="min_logo_height">200dp</dimen>
 </resources>

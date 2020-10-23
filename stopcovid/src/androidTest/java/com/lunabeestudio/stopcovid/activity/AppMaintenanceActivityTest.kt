@@ -30,27 +30,32 @@ class AppMaintenanceActivityTest {
     @Rule
     @JvmField
     var activityTestRule: ActivityTestRule<AppMaintenanceActivity> = object : ActivityTestRule<AppMaintenanceActivity>(
-        AppMaintenanceActivity::class.java) {
+        AppMaintenanceActivity::class.java
+    ) {
         override fun getActivityIntent(): Intent {
             val targetContext = InstrumentationRegistry.getInstrumentation().targetContext
-            val info = Info(JSONObject("{\n" +
-                "    \"iOS\": {\n" +
-                "     \"isActive\": false,\n" +
-                "     \"mode\": \"maintenance\",\n" +
-                "     \"minRequiredBuildNumber\": 1,\n" +
-                "     \"message\": {\n" +
-                "              \"fr\":\"Votre application StopCovid est actuellement en maintenance.\\nNos équipes sont mobilisées pour que vous puissiez rapidement profiter à nouveau de votre application\"\n" +
-                "     }\n" +
-                " },\n" +
-                "    \"Android\": {\n" +
-                "          \"isActive\": true,\n" +
-                "          \"mode\": \"maintenance\",\n" +
-                "          \"minRequiredBuildNumber\": 1,\n" +
-                "          \"message\": {\n" +
-                "              \"fr\":\"Votre application StopCovid est actuellement en maintenance.\\nNos équipes sont mobilisées pour que vous puissiez rapidement profiter à nouveau de votre application\"\n" +
-                "          }\n" +
-                "      }\n" +
-                "}"))
+            val info = Info(
+                JSONObject(
+                    "{\n" +
+                        "    \"iOS\": {\n" +
+                        "     \"isActive\": false,\n" +
+                        "     \"mode\": \"maintenance\",\n" +
+                        "     \"minRequiredBuildNumber\": 1,\n" +
+                        "     \"message\": {\n" +
+                        "              \"fr\":\"Votre application StopCovid est actuellement en maintenance.\\nNos équipes sont mobilisées pour que vous puissiez rapidement profiter à nouveau de votre application\"\n" +
+                        "     }\n" +
+                        " },\n" +
+                        "    \"Android\": {\n" +
+                        "          \"isActive\": true,\n" +
+                        "          \"mode\": \"maintenance\",\n" +
+                        "          \"minRequiredBuildNumber\": 1,\n" +
+                        "          \"message\": {\n" +
+                        "              \"fr\":\"Votre application StopCovid est actuellement en maintenance.\\nNos équipes sont mobilisées pour que vous puissiez rapidement profiter à nouveau de votre application\"\n" +
+                        "          }\n" +
+                        "      }\n" +
+                        "}"
+                )
+            )
             val gson = Gson()
             return Intent(targetContext, AppMaintenanceActivity::class.java).apply {
                 putExtra(AppMaintenanceActivity.EXTRA_INFO, gson.toJson(info))

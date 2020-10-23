@@ -1,9 +1,9 @@
 [
-    {
+	{
         "section": "Vos données sont protégées",
-        "description": "StopCovid est conforme à la réglementation qui garantit la protection de vos données.",
+        "description": "TousAntiCovid est conforme à la réglementation qui garantit la protection de vos données.",
         "links": [
-            {
+	        {
                 "label": "Plus d'informations sur RGPD",
                 "url": "https://bonjour.stopcovid.gouv.fr/privacy.html"
             }
@@ -11,11 +11,11 @@
     },
     {
         "section": "Comment les données sont échangées ?",
-        "description": "StopCovid utilise uniquement le Bluetooth de votre téléphone. Vos données de géolocalisation ne sont ni enregistrées ni échangées. Le Bluetooth est utilisé pour obtenir une estimation, sur la base d’un modèle statistique, de la proximité entre deux téléphones."
+        "description": "TousAntiCovid utilise uniquement le Bluetooth de votre téléphone. Vos données de géolocalisation ne sont ni enregistrées ni échangées. Le Bluetooth est utilisé pour obtenir une estimation, sur la base d’un modèle statistique, de la proximité entre deux téléphones."
     },
     {
         "section": "Quelles données sont échangées et pourquoi ?",
-        "description": "Les données échangées entre deux téléphones via Bluetooth sont des pseudo-identifiants.\nUn pseudo-identifiant est renouvelé automatiquement toutes les 15 minutes. C’est par exemple une suite de numéros, de lettres ou de signes, qui ne permet pas par elle-même d’identifier une personne.\n\nLes données sont partagées par votre application avec le serveur, géré par le Ministère des Solidarités et de la Santé, seulement si vous êtes testé positif et avec votre accord. Cela permet alors aux applications des autres utilisateurs d’interroger le serveur pour savoir si elles ont été à proximité de votre application. Si c’est le cas, les utilisateurs seront alertés qu’ils ont été exposés à un risque de contamination. Il leur sera alors recommandé de prendre contact avec leur médecin.\n\nLes personnes alertées n’auront aucune information sur le téléphone portable à l’origine de l’alerte ni sur son propriétaire.\n\nL’application ne tient pas compte des contextes spécifiques et notamment des situations où une protection spécifique est mise en place (équipement des personnels de santé, séparation par une vitre par exemple). Il est toujours possible pour l’utilisateur de désactiver temporairement l’application."
+        "description": "Les données échangées entre deux téléphones via Bluetooth sont des pseudo-identifiants.\nUn pseudo-identifiant est renouvelé automatiquement toutes les 15 minutes. C’est par exemple une suite de numéros, de lettres ou de signes, qui ne permet pas par elle-même d’identifier une personne.\n\nLes données sont partagées par votre application avec le serveur, géré par le Ministère des Solidarités et de la Santé, seulement si vous avez été diagnostiqué comme un cas de COVID-19 et avec votre accord. Cela permet alors aux applications des autres utilisateurs d’interroger le serveur pour savoir si elles ont été à proximité de votre application. Si c’est le cas, les utilisateurs seront alertés qu’ils ont été exposés à un risque de contamination. Il leur sera alors recommandé de prendre contact avec leur médecin.\n\nLes personnes alertées n’auront aucune information sur le téléphone portable à l’origine de l’alerte ni sur son propriétaire.\n\nL’application ne tient pas compte des contextes spécifiques et notamment des situations où une protection spécifique est mise en place (équipement des personnels de santé, séparation par une vitre par exemple). Il est toujours possible pour l’utilisateur de désactiver temporairement l’application."
     },
     {
         "section": "Où sont stockées les données ?",
@@ -34,14 +34,14 @@
         "description": "Si vous êtes un mineur de moins de 15 ans, discutez avec vos parents ou vos responsables légaux de l’opportunité d’installer cette application."
     },
     {
-        "section": "Qui a créé StopCovid ?",
-        "description": "Cette application a été réalisée par l'équipe StopCovid, sous la supervision du Ministère des Solidarités et de la Santé et du Secrétariat d'Etat chargé du Numérique.\nL'équipe StopCovid : Inria, ANSSI, Capgemini, Dassault Systèmes, Inserm, Lunabee Studio, Ministère des Solidarités et de la Santé, Orange, Santé Publique France et Withings.\nLe code source de cette plateforme est intégralement ouvert et accessible à l’adresse ci-dessous."
+        "section": "Qui a créé TousAntiCovid ?",
+        "description": "Cette application a été réalisée par l'équipe TousAntiCovid, sous la supervision du Ministère des Solidarités et de la Santé et du Secrétariat d'Etat chargé du Numérique.\nL'équipe TousAntiCovid : Inria, ANSSI, Capgemini, Dassault Systèmes, Inserm, Lunabee Studio, Ministère des Solidarités et de la Santé, Orange, Santé Publique France et Withings.\nLe code source de cette plateforme est intégralement ouvert et accessible à l’adresse ci-dessous."
     },
     {
         "section": "Informations complémentaires",
         "links": [
             {
-                "label": "À propos de StopCovid",
+                "label": "À propos de TousAntiCovid",
                 "url": "https://bonjour.stopcovid.gouv.fr/stopcovid.html"
             },
             {

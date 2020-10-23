@@ -12,22 +12,12 @@ package com.lunabeestudio.stopcovid.extension
 
 import android.content.Context
 import android.content.Intent
-import android.content.pm.ActivityInfo
 import android.net.Uri
-import android.widget.Toast
-import timber.log.Timber
 import java.util.regex.Pattern
 
-fun String.openInChromeTab(context: Context) {
-    val intent = Intent(Intent.ACTION_VIEW)
-    intent.data = Uri.parse(this)
-    val activityInfo: ActivityInfo? = intent.resolveActivityInfo(context.packageManager, intent.flags)
-    if (activityInfo?.exported == true) {
-        context.startActivity(intent)
-    } else {
-        Timber.e("No activity to open url")
-        Toast.makeText(context, "Unable to open url", Toast.LENGTH_SHORT).show()
-    }
+fun String.openInExternalBrowser(context: Context) {
+    val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(this))
+    context.startActivity(browserIntent)
 }
 
 fun String.isCodeValid(): Boolean {
