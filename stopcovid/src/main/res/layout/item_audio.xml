@@ -13,7 +13,9 @@
     android:id="@+id/imageSwitcher"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:importantForAccessibility="no"
+    android:importantForAccessibility="yes"
+    android:clickable="true"
+    android:focusable="true"
     android:padding="@dimen/spacing_xlarge">
 
     <ImageView
