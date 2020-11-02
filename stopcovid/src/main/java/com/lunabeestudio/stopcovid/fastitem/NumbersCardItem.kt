@@ -5,7 +5,7 @@
  *
  * Authors
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Created by Lunabee Studio / Date - 2020/04/05 - for the STOP-COVID project
+ * Created by Lunabee Studio / Date - 2020/04/05 - for the TOUS-ANTI-COVID project
  */
 
 package com.lunabeestudio.stopcovid.fastitem
@@ -14,6 +14,7 @@ import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.databinding.ItemNumbersCardBinding
 import com.lunabeestudio.stopcovid.extension.setTextOrHide
@@ -22,15 +23,8 @@ import com.mikepenz.fastadapter.binding.AbstractBindingItem
 class NumbersCardItem : AbstractBindingItem<ItemNumbersCardBinding>() {
     var header: String? = null
     var subheader: String? = null
-    var label1: String? = null
-    var value1: String? = null
-    var color1: Int? = null
-    var label2: String? = null
-    var value2: String? = null
-    var color2: Int? = null
-    var label3: String? = null
-    var value3: String? = null
-    var color3: Int? = null
+    var localData: Data? = null
+    var franceData: Data? = null
     var link: String? = null
     var onClickListener: View.OnClickListener? = null
     var contentDescription: String? = null
@@ -46,17 +40,42 @@ class NumbersCardItem : AbstractBindingItem<ItemNumbersCardBinding>() {
         binding.headerTextView.setTextOrHide(header)
         binding.subheaderTextView.setTextOrHide(subheader)
 
-        binding.label1TextView.text = label1
-        binding.value1TextView.text = value1
-        color1?.let { binding.label1TextView.setTextColor(it) }
+        binding.localInclude.root.isVisible = localData != null
+        localData?.let { (localization, dataFigure1, dataFigure2, dataFigure3) ->
+            binding.localInclude.locationTextView.setTextOrHide(localization)
 
-        binding.label2TextView.text = label2
-        binding.value2TextView.text = value2
-        color2?.let { binding.label2TextView.setTextColor(it) }
+            binding.localInclude.label1TextView.setTextOrHide(dataFigure1?.label)
+            binding.localInclude.value1TextView.text = dataFigure1?.value ?: "-"
+            dataFigure1?.color?.let { binding.localInclude.label1TextView.setTextColor(it) }
 
-        binding.label3TextView.text = label3
-        binding.value3TextView.text = value3
-        color3?.let { binding.label3TextView.setTextColor(it) }
+            binding.localInclude.label2TextView.setTextOrHide(dataFigure2?.label)
+            binding.localInclude.value2TextView.text = dataFigure2?.value ?: "-"
+            dataFigure2?.color?.let { binding.localInclude.label2TextView.setTextColor(it) }
+
+            binding.localInclude.label3TextView.setTextOrHide(dataFigure3?.label)
+            binding.localInclude.value3TextView.text = dataFigure3?.value ?: "-"
+            dataFigure3?.color?.let { binding.localInclude.label3TextView.setTextColor(it) }
+        }
+
+        franceData?.let { (localization, dataFigure1, dataFigure2, dataFigure3) ->
+            if (localData == null) {
+                binding.franceInclude.locationTextView.isVisible = false
+            } else {
+                binding.franceInclude.locationTextView.setTextOrHide(localization)
+            }
+
+            binding.franceInclude.label1TextView.setTextOrHide(dataFigure1?.label)
+            binding.franceInclude.value1TextView.text = dataFigure1?.value ?: "-"
+            dataFigure1?.color?.let { binding.franceInclude.label1TextView.setTextColor(it) }
+
+            binding.franceInclude.label2TextView.setTextOrHide(dataFigure2?.label)
+            binding.franceInclude.value2TextView.text = dataFigure2?.value ?: "-"
+            dataFigure2?.color?.let { binding.franceInclude.label2TextView.setTextColor(it) }
+
+            binding.franceInclude.label3TextView.setTextOrHide(dataFigure3?.label)
+            binding.franceInclude.value3TextView.text = dataFigure3?.value ?: "-"
+            dataFigure3?.color?.let { binding.franceInclude.label3TextView.setTextColor(it) }
+        }
 
         binding.linkTextView.setTextOrHide(link)
         binding.root.setOnClickListener(onClickListener)
@@ -66,10 +85,28 @@ class NumbersCardItem : AbstractBindingItem<ItemNumbersCardBinding>() {
 
     override fun unbindView(binding: ItemNumbersCardBinding) {
         super.unbindView(binding)
-        binding.label1TextView.setTextColor(Color.BLACK)
-        binding.label2TextView.setTextColor(Color.BLACK)
-        binding.label3TextView.setTextColor(Color.BLACK)
+        binding.localInclude.root.isVisible = false
+        binding.localInclude.label1TextView.setTextColor(Color.BLACK)
+        binding.localInclude.label2TextView.setTextColor(Color.BLACK)
+        binding.localInclude.label3TextView.setTextColor(Color.BLACK)
+
+        binding.franceInclude.label1TextView.setTextColor(Color.BLACK)
+        binding.franceInclude.label2TextView.setTextColor(Color.BLACK)
+        binding.franceInclude.label3TextView.setTextColor(Color.BLACK)
     }
+
+    data class Data(
+        var localization: String?,
+        var dataFigure1: DataFigure?,
+        var dataFigure2: DataFigure?,
+        var dataFigure3: DataFigure?,
+    )
+
+    data class DataFigure(
+        var label: String? = null,
+        var value: String? = null,
+        var color: Int? = null
+    )
 }
 
 fun numbersCardItem(block: (NumbersCardItem.() -> Unit)): NumbersCardItem = NumbersCardItem().apply(block)

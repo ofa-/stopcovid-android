@@ -5,7 +5,7 @@
  *
  * Authors
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Created by Lunabee Studio / Date - 2020/04/05 - for the STOP-COVID project
+ * Created by Lunabee Studio / Date - 2020/04/05 - for the TOUS-ANTI-COVID project
  */
 
 package com.lunabeestudio.stopcovid.fastitem
@@ -32,6 +32,8 @@ class InfoCenterDetailCardItem : AbstractBindingItem<ItemInfoCenterDetailCardBin
     var body: String? = null
     var link: String? = null
     var url: String? = null
+    var shareContentDescription: String? = null
+    var onShareCard: (() -> Unit)? = null
 
     var tagRecyclerViewPool: RecyclerView.RecycledViewPool? = null
 
@@ -64,11 +66,15 @@ class InfoCenterDetailCardItem : AbstractBindingItem<ItemInfoCenterDetailCardBin
         binding.includeLink.textView.setTextOrHide(link)
         binding.includeLink.leftIconImageView.isVisible = false
         binding.space.isVisible = link == null || url == null
-        binding.includeLink.constraintLayout.isVisible = link != null && url != null
-        binding.includeLink.constraintLayout.setOnClickListener {
+        binding.includeLink.linkRootLayout.isVisible = link != null && url != null
+        binding.includeLink.linkRootLayout.setOnClickListener {
             url?.openInExternalBrowser(it.context)
         }
         binding.tagRecyclerView.isVisible = tags.isNotEmpty()
+        binding.shareButton.contentDescription = shareContentDescription
+        binding.shareButton.setOnClickListener {
+            onShareCard?.invoke()
+        }
     }
 
     override fun getViewHolder(viewBinding: ItemInfoCenterDetailCardBinding): BindingViewHolder<ItemInfoCenterDetailCardBinding> {

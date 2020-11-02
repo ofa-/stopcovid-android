@@ -5,7 +5,7 @@
  *
  * Authors
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Created by Lunabee Studio / Date - 2020/04/05 - for the STOP-COVID project
+ * Created by Lunabee Studio / Date - 2020/04/05 - for the TOUS-ANTI-COVID project
  */
 
 package com.lunabeestudio.stopcovid.manager
@@ -52,7 +52,7 @@ object AppMaintenanceManager {
      * @param infoFreeCompletion : Called when the server doesn't block the app
      * @param infoBlockedCompletion : Called when the server does block the app
      */
-    fun init(
+    fun initialize(
         context: Context,
         @DrawableRes maintenanceIconRes: Int,
         @DrawableRes upgradeIconRes: Int,
@@ -79,7 +79,7 @@ object AppMaintenanceManager {
     /**
      * Call this to check if the app needs to be blocked or not
      */
-    fun checkForMaintenanceUpgrade(context: Context) {
+    suspend fun checkForMaintenanceUpgrade(context: Context) {
         when {
             shouldRefresh(context) -> {
                 updateCheckForMaintenanceUpgrade(
@@ -101,33 +101,31 @@ object AppMaintenanceManager {
     /**
      * This is called by the blocking activity to "retry" in case of maintenance
      */
-    internal fun updateCheckForMaintenanceUpgrade(
+    internal suspend fun updateCheckForMaintenanceUpgrade(
         context: Context,
         appIsFreeCompletion: (() -> Unit)?,
         appIsBlockedCompletion: ((info: Info) -> Unit)?
     ) {
-        LBMaintenanceHttpClient.get(context,
-            jsonUrl!!,
-            { result ->
-                try {
-                    val info = Info(JSONObject(result))
-                    saveMaintenanceJson(result)
-                    showAppMaintenanceActivityIfNeeded(
-                        context,
-                        info,
-                        appIsFreeCompletion,
-                        appIsBlockedCompletion
-                    )
-                    saveLastRefresh(context)
-                } catch (e: Exception) {
-                    // In case of a malformed JSON we don't safe it and use the last one instead
-                    useLastResult(
-                        context,
-                        appIsFreeCompletion,
-                        appIsBlockedCompletion
-                    )
-                }
-            },
+        LBMaintenanceHttpClient.get(context, jsonUrl!!, { result ->
+            try {
+                val info = Info(JSONObject(result))
+                saveMaintenanceJson(result)
+                showAppMaintenanceActivityIfNeeded(
+                    context,
+                    info,
+                    appIsFreeCompletion,
+                    appIsBlockedCompletion
+                )
+                saveLastRefresh(context)
+            } catch (e: Exception) {
+                // In case of a malformed JSON we don't safe it and use the last one instead
+                useLastResult(
+                    context,
+                    appIsFreeCompletion,
+                    appIsBlockedCompletion
+                )
+            }
+        },
             { e ->
                 useLastResult(
                     context,
@@ -138,7 +136,7 @@ object AppMaintenanceManager {
             })
     }
 
-    private fun useLastResult(
+    private suspend fun useLastResult(
         context: Context,
         appIsFreeCompletion: (() -> Unit)?,
         appIsBlockedCompletion: ((info: Info) -> Unit)?
@@ -157,7 +155,7 @@ object AppMaintenanceManager {
     /**
      * Construct the maintenanceInfo object and block the app if needed in showing the LBAppMaintenanceActivity
      */
-    private fun showAppMaintenanceActivityIfNeeded(
+    private suspend fun showAppMaintenanceActivityIfNeeded(
         context: Context,
         info: Info,
         appIsFreeCompletion: (() -> Unit)?,
@@ -177,7 +175,7 @@ object AppMaintenanceManager {
     /**
      * Launch the LBAppMaintenanceActivity with attributes to display
      */
-    private fun startAppMaintenanceActivity(
+    private suspend fun startAppMaintenanceActivity(
         context: Context,
         info: Info
     ) {

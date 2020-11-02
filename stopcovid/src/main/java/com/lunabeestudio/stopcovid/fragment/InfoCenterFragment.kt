@@ -1,3 +1,13 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * Authors
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * Created by Lunabee Studio / Date - 2020/10/29 - for the TOUS-ANTI-COVID project
+ */
+
 package com.lunabeestudio.stopcovid.fragment
 
 import android.os.Bundle
@@ -10,6 +20,7 @@ import com.lunabeestudio.robert.utils.EventObserver
 import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
+import com.lunabeestudio.stopcovid.extension.startTextIntent
 import com.lunabeestudio.stopcovid.fastitem.infoCenterDetailCardItem
 import com.lunabeestudio.stopcovid.manager.InfoCenterManager
 import com.mikepenz.fastadapter.GenericItem
@@ -39,7 +50,7 @@ class InfoCenterFragment : TimeMainFragment() {
         binding?.emptyButton?.setOnClickListener {
             showLoading()
             viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
-                InfoCenterManager.appForeground(requireContext())
+                InfoCenterManager.onAppForeground(requireContext())
                 withContext(Dispatchers.Main) {
                     refreshScreen()
                 }
@@ -51,6 +62,9 @@ class InfoCenterFragment : TimeMainFragment() {
         super.onResume()
         PreferenceManager.getDefaultSharedPreferences(requireContext()).edit {
             putBoolean(Constants.SharedPrefs.HAS_NEWS, false)
+        }
+        viewLifecycleOwner.lifecycleScope.launch {
+            InfoCenterManager.onAppForeground(requireContext())
         }
     }
 
@@ -66,25 +80,35 @@ class InfoCenterFragment : TimeMainFragment() {
 
         if (infoCenterStrings != null) {
             infos.forEach { info ->
-                val filteredTags = info.tagIds?.map { tagIds ->
-                    tags.first { it.id == tagIds }
-                }
+                val infoTitle = infoCenterStrings[info.titleKey]
+                val infoDescription = infoCenterStrings[info.descriptionKey]
 
-                items += infoCenterDetailCardItem {
-                    header = info.timestamp.seconds.getRelativeDateTimeString(requireContext())
-                    title = infoCenterStrings[info.titleKey]
-                    body = infoCenterStrings[info.descriptionKey]
-                    link = infoCenterStrings[info.buttonLabelKey]
-                    this.tags = filteredTags ?: emptyList()
-                    strings = infoCenterStrings
-                    url = infoCenterStrings[info.urlKey]
-                    tagRecyclerViewPool = this@InfoCenterFragment.tagRecyclerPool
-                    identifier = info.titleKey.hashCode().toLong()
-                }
+                // Make sure we have at least the title or description
+                if (infoTitle != null || infoDescription != null) {
+                    val filteredTags = info.tagIds?.mapNotNull { tagIds ->
+                        tags.firstOrNull { it.id == tagIds }
+                    }
 
-                items += spaceItem {
-                    spaceRes = R.dimen.spacing_large
-                    identifier = items.size.toLong()
+                    items += infoCenterDetailCardItem {
+                        header = info.timestamp.seconds.getRelativeDateTimeString(requireContext())
+                        title = infoTitle
+                        body = infoDescription
+                        link = infoCenterStrings[info.buttonLabelKey]
+                        this.tags = filteredTags ?: emptyList()
+                        strings = infoCenterStrings
+                        url = infoCenterStrings[info.urlKey]
+                        tagRecyclerViewPool = this@InfoCenterFragment.tagRecyclerPool
+                        shareContentDescription = strings["accessibility.hint.info.share"]
+                        onShareCard = {
+                            stringsFormat("info.sharing.title", infoTitle)?.let { requireContext().startTextIntent(it) }
+                        }
+                        identifier = info.titleKey.hashCode().toLong()
+                    }
+
+                    items += spaceItem {
+                        spaceRes = R.dimen.spacing_large
+                        identifier = items.size.toLong()
+                    }
                 }
             }
         }

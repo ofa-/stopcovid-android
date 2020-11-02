@@ -5,20 +5,25 @@
  *
  * Authors
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Created by Lunabee Studio / Date - 2020/04/05 - for the STOP-COVID project
+ * Created by Lunabee Studio / Date - 2020/04/05 - for the TOUS-ANTI-COVID project
  */
 
 package com.lunabeestudio.framework.local.datasource
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.lunabeestudio.domain.model.DeviceParameterCorrection
+import com.lunabeestudio.domain.model.FormEntry
 import com.lunabeestudio.framework.local.LocalCryptoManager
 import com.lunabeestudio.robert.datasource.LocalKeystoreDataSource
 
 class SecureKeystoreDataSource(context: Context, private val cryptoManager: LocalCryptoManager) : LocalKeystoreDataSource {
+
+    private val gson: Gson = Gson()
 
     private val sharedPreferences: SharedPreferences = context.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE)
 
@@ -453,6 +458,25 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
             }
         }
 
+    override var displayDepartmentLevel: Boolean?
+        get() {
+            val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_DISPLAY_DEPARTMENT_LEVEL, null)
+            return if (encryptedText != null) {
+                cryptoManager.decryptToString(encryptedText).toBoolean()
+            } else {
+                null
+            }
+        }
+        set(value) {
+            if (value != null) {
+                sharedPreferences.edit()
+                    .putString(SHARED_PREF_KEY_DISPLAY_DEPARTMENT_LEVEL, cryptoManager.encryptToString(value.toString()))
+                    .apply()
+            } else {
+                sharedPreferences.edit().remove(SHARED_PREF_KEY_DISPLAY_DEPARTMENT_LEVEL).apply()
+            }
+        }
+
     override var apiVersion: String?
         get() {
             val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_API_VERSION, null)
@@ -469,6 +493,161 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
                     .apply()
             } else {
                 sharedPreferences.edit().remove(SHARED_PREF_KEY_API_VERSION).apply()
+            }
+        }
+
+    override var qrCodeDeletionHours: Float?
+        get() {
+            val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_QR_CODE_DELETION_HOURS, null)
+            return if (encryptedText != null) {
+                cryptoManager.decryptToString(encryptedText).toFloatOrNull()
+            } else {
+                null
+            }
+        }
+        set(value) {
+            if (value != null) {
+                sharedPreferences.edit()
+                    .putString(SHARED_PREF_KEY_QR_CODE_DELETION_HOURS, cryptoManager.encryptToString(value.toString()))
+                    .apply()
+            } else {
+                sharedPreferences.edit().remove(SHARED_PREF_KEY_QR_CODE_DELETION_HOURS).apply()
+            }
+        }
+
+    override var qrCodeExpiredHours: Float?
+        get() {
+            val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_QR_CODE_EXPIRED_HOURS, null)
+            return if (encryptedText != null) {
+                cryptoManager.decryptToString(encryptedText).toFloatOrNull()
+            } else {
+                null
+            }
+        }
+        set(value) {
+            if (value != null) {
+                sharedPreferences.edit()
+                    .putString(SHARED_PREF_KEY_QR_CODE_EXPIRED_HOURS, cryptoManager.encryptToString(value.toString()))
+                    .apply()
+            } else {
+                sharedPreferences.edit().remove(SHARED_PREF_KEY_QR_CODE_EXPIRED_HOURS).apply()
+            }
+        }
+
+    override var qrCodeFormattedString: String?
+        get() {
+            val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_QR_CODE_FORMATTED_STRING, null)
+            return if (encryptedText != null) {
+                cryptoManager.decryptToString(encryptedText)
+            } else {
+                null
+            }
+        }
+        set(value) {
+            if (value != null) {
+                sharedPreferences.edit()
+                    .putString(SHARED_PREF_KEY_QR_CODE_FORMATTED_STRING, cryptoManager.encryptToString(value))
+                    .apply()
+            } else {
+                sharedPreferences.edit().remove(SHARED_PREF_KEY_QR_CODE_FORMATTED_STRING).apply()
+            }
+        }
+
+    override var qrCodeFooterString: String?
+        get() {
+            val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_QR_CODE_FOOTER_STRING, null)
+            return if (encryptedText != null) {
+                cryptoManager.decryptToString(encryptedText)
+            } else {
+                null
+            }
+        }
+        set(value) {
+            if (value != null) {
+                sharedPreferences.edit()
+                    .putString(SHARED_PREF_KEY_QR_CODE_FOOTER_STRING, cryptoManager.encryptToString(value))
+                    .apply()
+            } else {
+                sharedPreferences.edit().remove(SHARED_PREF_KEY_QR_CODE_FOOTER_STRING).apply()
+            }
+        }
+
+    var saveAttestationData: Boolean?
+        get() {
+            val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_SAVE_ATTESTATION_DATA, null)
+            return if (encryptedText != null) {
+                cryptoManager.decryptToString(encryptedText).toBoolean()
+            } else {
+                null
+            }
+        }
+        set(value) {
+            if (value != null) {
+                sharedPreferences.edit()
+                    .putString(SHARED_PREF_KEY_SAVE_ATTESTATION_DATA, cryptoManager.encryptToString(value.toString()))
+                    .apply()
+            } else {
+                sharedPreferences.edit().remove(SHARED_PREF_KEY_SAVE_ATTESTATION_DATA).apply()
+            }
+        }
+
+    var savedAttestationData: Map<String, FormEntry>?
+        get() {
+            val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_SAVED_ATTESTATION_DATA, null)
+            return if (encryptedText != null) {
+                gson.fromJson(cryptoManager.decryptToString(encryptedText), object : TypeToken<Map<String, FormEntry>>() {}.type)
+            } else {
+                null
+            }
+        }
+        set(value) {
+            if (value != null) {
+                sharedPreferences.edit()
+                    .putString(SHARED_PREF_KEY_SAVED_ATTESTATION_DATA, cryptoManager.encryptToString(gson.toJson(value)))
+                    .apply()
+            } else {
+                sharedPreferences.edit().remove(SHARED_PREF_KEY_SAVED_ATTESTATION_DATA).apply()
+            }
+        }
+
+    private var _attestationsLiveData: MutableLiveData<List<Map<String, FormEntry>>?> = MutableLiveData(attestations)
+    var attestationsLiveData: LiveData<List<Map<String, FormEntry>>?> = _attestationsLiveData
+    var attestations: List<Map<String, FormEntry>>?
+        get() {
+            val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_ATTESTATIONS, null)
+            return if (encryptedText != null) {
+                gson.fromJson(cryptoManager.decryptToString(encryptedText), object : TypeToken<List<Map<String, FormEntry>>>() {}.type)
+            } else {
+                null
+            }
+        }
+        set(value) {
+            if (value != null) {
+                sharedPreferences.edit()
+                    .putString(SHARED_PREF_KEY_ATTESTATIONS, cryptoManager.encryptToString(gson.toJson(value)))
+                    .apply()
+            } else {
+                sharedPreferences.edit().remove(SHARED_PREF_KEY_ATTESTATIONS).apply()
+            }
+            _attestationsLiveData.postValue(value)
+        }
+
+    override var configVersion: Int?
+        get() {
+            val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_CONFIG_VERSION, null)
+            return if (encryptedText != null) {
+                cryptoManager.decryptToString(encryptedText).toIntOrNull()
+            } else {
+                null
+            }
+        }
+        set(value) {
+            if (value != null) {
+                sharedPreferences.edit()
+                    .putString(SHARED_PREF_KEY_CONFIG_VERSION, cryptoManager.encryptToString(value.toString()))
+                    .apply()
+            } else {
+                sharedPreferences.edit().remove(SHARED_PREF_KEY_CONFIG_VERSION).apply()
             }
         }
 
@@ -498,5 +677,14 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
         private const val SHARED_PREF_KEY_PRE_SYMPTOMS_SPAN = "shared.pref.pre_symptoms_span"
         private const val SHARED_PREF_KEY_APP_AVAILABILITY = "shared.pref.app_availability"
         private const val SHARED_PREF_KEY_API_VERSION = "shared.pref.api_version"
+        private const val SHARED_PREF_KEY_QR_CODE_DELETION_HOURS = "shared.pref.qr_code_deletion_hours"
+        private const val SHARED_PREF_KEY_QR_CODE_EXPIRED_HOURS = "shared.pref.qr_code_expired_hours"
+        private const val SHARED_PREF_KEY_QR_CODE_FORMATTED_STRING = "shared.pref.qr_code_formatted_string"
+        private const val SHARED_PREF_KEY_QR_CODE_FOOTER_STRING = "shared.pref.qr_code_footer_string"
+        private const val SHARED_PREF_KEY_SAVE_ATTESTATION_DATA = "shared.pref.save_attestation_data"
+        private const val SHARED_PREF_KEY_SAVED_ATTESTATION_DATA = "shared.pref.saved_attestation_data"
+        private const val SHARED_PREF_KEY_ATTESTATIONS = "shared.pref.attestations"
+        private const val SHARED_PREF_KEY_CONFIG_VERSION = "shared.pref.config_version"
+        private const val SHARED_PREF_KEY_DISPLAY_DEPARTMENT_LEVEL = "shared.pref.display_department_level"
     }
 }

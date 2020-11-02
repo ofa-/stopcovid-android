@@ -5,7 +5,7 @@
  *
  * Authors
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Created by Lunabee Studio / Date - 2020/04/05 - for the STOP-COVID project
+ * Created by Lunabee Studio / Date - 2020/04/05 - for the TOUS-ANTI-COVID project
  */
 
 package com.lunabeestudio.stopcovid
@@ -18,7 +18,12 @@ object Constants {
         const val LAST_PRIVACY_REFRESH: String = "Last.Privacy.Refresh"
         const val LAST_MAINTENANCE_REFRESH: String = "Last.Maintenance.Refresh"
         const val LAST_INFO_CENTER_REFRESH: String = "Last.Info.Center.Refresh"
+        const val LAST_INFO_CENTER_FETCH: String = "Last.Info.Center.Fetch"
         const val HAS_NEWS: String = "Has.News"
+        const val CHOSEN_POSTAL_CODE: String = "Chosen.Postal.Code"
+        const val IS_ADVERTISEMENT_AVAILABLE: String = "Is.Advertisement.Available"
+        const val ARE_INFO_NOTIFICATIONS_ENABLED: String = "Are.Info.Notifications.Enabled"
+        const val LAST_VERSION_CODE: String = "Last.Version.Code"
     }
 
     object Notification {

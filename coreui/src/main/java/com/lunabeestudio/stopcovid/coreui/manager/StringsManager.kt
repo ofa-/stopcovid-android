@@ -5,7 +5,7 @@
  *
  * Authors
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Created by Lunabee Studio / Date - 2020/13/05 - for the STOP-COVID project
+ * Created by Lunabee Studio / Date - 2020/13/05 - for the TOUS-ANTI-COVID project
  */
 
 package com.lunabeestudio.stopcovid.coreui.manager
@@ -20,43 +20,43 @@ import com.lunabeestudio.stopcovid.coreui.extension.fixFormatter
 import java.lang.reflect.Type
 import java.util.Locale
 
-class StringsManager : ServerManager() {
+object StringsManager : ServerManager() {
 
-    companion object {
-        var strings: HashMap<String, String> = hashMapOf()
-            private set(value) {
-                if (field != value) {
-                    _liveStrings.postValue(value)
-                }
-                field = value
+    var strings: HashMap<String, String> = hashMapOf()
+        private set(value) {
+            if (field != value) {
+                _liveStrings.postValue(value)
             }
-
-        private val _liveStrings: MutableLiveData<HashMap<String, String>> = MutableLiveData()
-        val liveStrings: LiveData<HashMap<String, String>>
-            get() = _liveStrings
-
-        private var prevLanguage: String? = null
-
-        fun init(context: Context) {
-            prevLanguage = Locale.getDefault().language
-            strings = StringsManager().loadLocal(context)
+            field = value
         }
 
-        suspend fun appForeground(context: Context) {
-            val forceRefresh = prevLanguage != Locale.getDefault().language
-            val hasFetch = StringsManager().fetchLast(context, Locale.getDefault().language, forceRefresh)
-            if (hasFetch || forceRefresh) {
+    private val _liveStrings: MutableLiveData<HashMap<String, String>> = MutableLiveData()
+    val liveStrings: LiveData<HashMap<String, String>>
+        get() = _liveStrings
+
+    private var prevLanguage: String? = null
+
+    suspend fun initialize(context: Context) {
+        prevLanguage = Locale.getDefault().language
+        loadLocal<HashMap<String, String>>(context, false)?.let {
+            strings = it
+        }
+    }
+
+    suspend fun onAppForeground(context: Context) {
+        val forceRefresh = prevLanguage != Locale.getDefault().language
+        val hasFetch = fetchLast(context, forceRefresh)
+        if (hasFetch || forceRefresh) {
+            loadLocal<HashMap<String, String>>(context, forceRefresh)?.let {
                 prevLanguage = Locale.getDefault().language
-                strings = StringsManager().loadLocal(context)
+                strings = it
             }
         }
     }
 
     override fun folderName(): String = "Strings"
     override fun prefix(context: Context): String = context.getString(R.string.string_prefix)
-    override fun fallbackFileName(context: Context): String = "${prefix(context)}${UiConstants.DEFAULT_LANGUAGE}${extension()}"
     override fun type(): Type = object : TypeToken<HashMap<String, String>>() {}.type
     override fun lastRefreshSharedPrefsKey(): String = UiConstants.SharePrefs.LAST_STRINGS_REFRESH
-
     override fun transform(input: String): String = input.fixFormatter()
 }

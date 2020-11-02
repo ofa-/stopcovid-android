@@ -5,7 +5,7 @@
  *
  * Authors
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Created by Lunabee Studio / Date - 2020/04/05 - for the STOP-COVID project
+ * Created by Lunabee Studio / Date - 2020/04/05 - for the TOUS-ANTI-COVID project
  */
 
 package com.lunabeestudio.stopcovid.fragment
@@ -15,19 +15,23 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
+import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.UiConstants
 import com.lunabeestudio.stopcovid.coreui.extension.openAppSettings
 import com.lunabeestudio.stopcovid.coreui.extension.showPermissionRationale
+import com.lunabeestudio.stopcovid.coreui.fastitem.buttonItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
+import com.lunabeestudio.stopcovid.coreui.fastitem.lightButtonItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
+import com.lunabeestudio.stopcovid.coreui.fastitem.textButtonItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
-import com.lunabeestudio.stopcovid.fastitem.doubleButtonItem
 import com.lunabeestudio.stopcovid.fastitem.logoItem
 import com.mikepenz.fastadapter.GenericItem
 
@@ -60,7 +64,7 @@ class ReportFragment : MainFragment() {
             identifier = items.count().toLong()
         }
         items += spaceItem {
-            spaceRes = R.dimen.spacing_xlarge
+            spaceRes = R.dimen.spacing_large
             identifier = items.size.toLong()
         }
         if (robertManager.isRegistered) {
@@ -75,13 +79,13 @@ class ReportFragment : MainFragment() {
                 identifier = items.count().toLong()
             }
             items += spaceItem {
-                spaceRes = R.dimen.spacing_xlarge
+                spaceRes = R.dimen.spacing_large
                 identifier = items.size.toLong()
             }
-            items += doubleButtonItem {
-                text1 = strings["sickController.button.flash"]
-                text2 = strings["sickController.button.tap"]
-                onClickListener1 = View.OnClickListener {
+            items += buttonItem {
+                width = ViewGroup.LayoutParams.MATCH_PARENT
+                text = strings["sickController.button.flash"]
+                onClickListener = View.OnClickListener {
                     if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA)
                         != PackageManager.PERMISSION_GRANTED) {
                         if (shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)) {
@@ -101,13 +105,26 @@ class ReportFragment : MainFragment() {
                         findNavController().safeNavigate(ReportFragmentDirections.actionReportFragmentToQrCodeFragment())
                     }
                 }
-                onClickListener2 = View.OnClickListener {
+                identifier = items.count().toLong()
+            }
+            items += lightButtonItem {
+                width = ViewGroup.LayoutParams.MATCH_PARENT
+                text = strings["sickController.button.tap"]
+                onClickListener = View.OnClickListener {
                     findNavController().safeNavigate(ReportFragmentDirections.actionReportFragmentToCodeFragment())
                 }
                 identifier = items.count().toLong()
             }
-            items += spaceItem {
-                spaceRes = R.dimen.spacing_xlarge
+            items += textButtonItem {
+                width = ViewGroup.LayoutParams.MATCH_PARENT
+                text = strings["declareController.codeNotReceived.buttonTitle"]
+                onClickListener = View.OnClickListener {
+                    MaterialAlertDialogBuilder(requireContext())
+                        .setTitle(strings["declareController.codeNotReceived.alert.title"])
+                        .setMessage(strings["declareController.codeNotReceived.alert.message"])
+                        .setPositiveButton(strings["common.ok"], null)
+                        .show()
+                }
                 identifier = items.count().toLong()
             }
         } else {

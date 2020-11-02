@@ -1,3 +1,13 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * Authors
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * Created by Lunabee Studio / Date - 2020/10/29 - for the TOUS-ANTI-COVID project
+ */
+
 package com.lunabeestudio.stopcovid.fragment
 
 import android.os.Bundle
@@ -21,6 +31,8 @@ import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.fastitem.contactItem
 import com.lunabeestudio.stopcovid.fastitem.linkItem
 import com.lunabeestudio.stopcovid.fastitem.logoItem
+import com.lunabeestudio.stopcovid.manager.ProximityManager
+import com.lunabeestudio.stopcovid.model.DeviceSetup
 import com.lunabeestudio.stopcovid.viewmodel.HealthViewModel
 import com.lunabeestudio.stopcovid.viewmodel.HealthViewModelFactory
 import com.mikepenz.fastadapter.GenericItem
@@ -35,6 +47,10 @@ class HealthFragment : TimeMainFragment() {
 
     private val robertManager by lazy {
         requireContext().robertManager()
+    }
+
+    private val deviceSetup by lazy {
+        ProximityManager.getDeviceSetup(requireContext())
     }
 
     private val viewModel: HealthViewModel by viewModels { HealthViewModelFactory(robertManager) }
@@ -64,10 +80,10 @@ class HealthFragment : TimeMainFragment() {
     }
 
     override fun getItems(): List<GenericItem> {
-        return if (!robertManager.isRegistered) {
-            notRegisteredItems()
-        } else {
-            registeredItems()
+        return when {
+            deviceSetup == DeviceSetup.NO_BLE -> noBleItems()
+            !robertManager.isRegistered -> notRegisteredItems()
+            else -> registeredItems()
         }
     }
 
@@ -84,7 +100,7 @@ class HealthFragment : TimeMainFragment() {
         }
     }
 
-    fun onMenuItemClick(item: MenuItem): Boolean {
+    private fun onMenuItemClick(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.notification_menu_delete -> {
                 MaterialAlertDialogBuilder(requireContext())
@@ -103,6 +119,85 @@ class HealthFragment : TimeMainFragment() {
             }
             else -> false
         }
+    }
+
+    private fun noBleItems(): List<GenericItem> {
+        val items = ArrayList<GenericItem>()
+
+        items += logoItem {
+            imageRes = R.drawable.diagnosis
+            identifier = items.count().toLong()
+        }
+
+        // Covid Advices
+        items += titleItem {
+            text = strings["myHealthController.covidAdvices.title"]
+            gravity = Gravity.START
+            identifier = items.count().toLong()
+        }
+        items += captionItem {
+            text = strings["myHealthController.covidAdvices.subtitle"]
+            gravity = Gravity.START
+            identifier = items.count().toLong()
+        }
+        items += linkItem {
+            text = strings["myHealthController.alert.atitudeToAdopt"]
+            onClickListener = View.OnClickListener {
+                findNavController().safeNavigate(HealthFragmentDirections.actionHealthFragmentToInformationFragment())
+            }
+            identifier = items.size.toLong()
+        }
+        items += linkItem {
+            text = strings["myHealthController.covidAdvices.buttonTitle"]
+            url = strings["myHealthController.covidAdvices.url"]
+            identifier = items.size.toLong()
+        }
+        items += dividerItem {}
+        items += spaceItem {
+            spaceRes = R.dimen.spacing_large
+            identifier = items.count().toLong()
+        }
+
+        // Testing sites
+        items += titleItem {
+            text = strings["myHealthController.testingSites.title"]
+            gravity = Gravity.START
+            identifier = items.count().toLong()
+        }
+        items += captionItem {
+            text = strings["myHealthController.testingSites.subtitle"]
+            gravity = Gravity.START
+            identifier = items.count().toLong()
+        }
+        items += linkItem {
+            text = strings["myHealthController.testingSites.buttonTitle"]
+            url = strings["myHealthController.testingSites.url"]
+            identifier = items.size.toLong()
+        }
+        items += dividerItem {}
+        items += spaceItem {
+            spaceRes = R.dimen.spacing_large
+            identifier = items.count().toLong()
+        }
+
+        // Your department
+        items += titleItem {
+            text = strings["myHealthController.yourDepartment.title"]
+            gravity = Gravity.START
+            identifier = items.count().toLong()
+        }
+        items += captionItem {
+            text = strings["myHealthController.yourDepartment.subtitle"]
+            gravity = Gravity.START
+            identifier = items.count().toLong()
+        }
+        items += linkItem {
+            text = strings["myHealthController.yourDepartment.buttonTitle"]
+            url = strings["myHealthController.yourDepartment.url"]
+            identifier = items.size.toLong()
+        }
+
+        return items
     }
 
     private fun notRegisteredItems(): ArrayList<GenericItem> {
@@ -156,6 +251,7 @@ class HealthFragment : TimeMainFragment() {
                     actionClickListener = View.OnClickListener {
                         showMenu(it)
                     }
+                    actionContentDescription = strings["accessibility.hint.otherActions"]
                     identifier = items.count().toLong()
                 }
             }
@@ -174,6 +270,7 @@ class HealthFragment : TimeMainFragment() {
                     actionClickListener = View.OnClickListener {
                         showMenu(it)
                     }
+                    actionContentDescription = strings["accessibility.hint.otherActions"]
                     identifier = items.count().toLong()
                 }
 

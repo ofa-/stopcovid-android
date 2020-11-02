@@ -5,7 +5,7 @@
  *
  * Authors
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Created by Lunabee Studio / Date - 2020/04/05 - for the STOP-COVID project
+ * Created by Lunabee Studio / Date - 2020/04/05 - for the TOUS-ANTI-COVID project
  */
 
 package com.lunabeestudio.stopcovid.fragment
@@ -24,6 +24,7 @@ import com.lunabeestudio.stopcovid.fastitem.logoItem
 import com.lunabeestudio.stopcovid.viewmodel.OnBoardingViewModel
 import com.lunabeestudio.stopcovid.viewmodel.OnBoardingViewModelFactory
 import com.mikepenz.fastadapter.GenericItem
+import timber.log.Timber
 
 class OnBoardingWelcomeFragment : OnBoardingFragment() {
 
@@ -39,7 +40,7 @@ class OnBoardingWelcomeFragment : OnBoardingFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel.showLogo.observe(viewLifecycleOwner) {
-            if (binding?.recyclerView?.isComputingLayout == false) {
+            if (binding?.recyclerView?.isComputingLayout == false && it) {
                 refreshScreen()
             }
         }

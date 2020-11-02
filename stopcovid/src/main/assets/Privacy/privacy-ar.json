@@ -5,7 +5,7 @@
       "links":[
          {
             "label":"لمزيد من المعلومات حول اللائحة العامة لحماية البيانات",
-            "url":"https://bonjour.stopcovid.gouv.fr/privacy-en.html"
+            "url":"https://bonjour.tousanticovid.gouv.fr/privacy-en.html"
          }
       ]
    },
@@ -42,7 +42,7 @@
       "links":[
          {
             "label":"تطبيق TousAntiCovid",
-            "url":"https://bonjour.stopcovid.gouv.fr/stopcovid.html"
+            "url":"https://bonjour.tousanticovid.gouv.fr/stopcovid.html"
          },
          {
             "label":"كود مصدر التطبيق",
@@ -50,7 +50,7 @@
          },
          {
             "label":"سياسة حماية البيانات",
-            "url":"https://bonjour.stopcovid.gouv.fr/privacy-en.html"
+            "url":"https://bonjour.tousanticovid.gouv.fr/privacy-en.html"
          }
       ]
    }

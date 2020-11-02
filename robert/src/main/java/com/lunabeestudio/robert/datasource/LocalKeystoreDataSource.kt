@@ -5,7 +5,7 @@
  *
  * Authors
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Created by Lunabee Studio / Date - 2020/04/05 - for the STOP-COVID project
+ * Created by Lunabee Studio / Date - 2020/04/05 - for the TOUS-ANTI-COVID project
  */
 
 package com.lunabeestudio.robert.datasource
@@ -36,5 +36,11 @@ interface LocalKeystoreDataSource {
     var preSymptomsSpan: Int?
     var appAvailability: Boolean?
     var apiVersion: String?
+    var configVersion: Int?
     var lastRiskReceivedDate: Long?
+    var qrCodeDeletionHours: Float?
+    var qrCodeExpiredHours: Float?
+    var qrCodeFormattedString: String?
+    var qrCodeFooterString: String?
+    var displayDepartmentLevel: Boolean?
 }

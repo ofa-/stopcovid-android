@@ -5,39 +5,59 @@
   ~
   ~ Authors
   ~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  ~ Created by Lunabee Studio / Date - 2020/04/05 - for the STOP-COVID project
+  ~ Created by Lunabee Studio / Date - 2020/04/05 - for the TOUS-ANTI-COVID project
   -->
 
 <com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="@dimen/spacing_large"
     android:layout_marginVertical="@dimen/spacing_small">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingTop="@dimen/spacing_large">
+        android:layout_height="wrap_content">
 
         <TextView
             android:id="@+id/header_text_view"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_large"
+            android:layout_marginBottom="@dimen/spacing_small"
+            android:textAppearance="@style/TextAppearance.StopCovid.Caption.Small"
+            app:layout_constraintBottom_toTopOf="@id/titleTextView"
+            app:layout_constraintEnd_toEndOf="@id/endGuideline"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toStartOf="@id/startGuideline"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="@tools:sample/lorem[2]" />
+
+        <ImageButton
+            android:id="@+id/shareButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/spacing_large"
-            android:layout_marginVertical="@dimen/spacing_small"
-            android:textAppearance="@style/TextAppearance.StopCovid.Caption.Small"
-            tools:text="@tools:sample/lorem[2]" />
+            android:background="@drawable/ripple_rounded"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="@dimen/spacing_large"
+            android:src="@drawable/ic_baseline_share_24"
+            app:layout_constraintBottom_toBottomOf="@id/updated_at_text_view"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/updated_at_text_view" />
 
         <TextView
             android:id="@+id/titleTextView"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/spacing_large"
             android:layout_marginTop="@dimen/spacing_small"
             android:textAppearance="@style/TextAppearance.StopCovid.Title.Big"
+            app:layout_constraintBottom_toTopOf="@id/tagRecyclerView"
+            app:layout_constraintEnd_toEndOf="@id/endGuideline"
+            app:layout_constraintStart_toStartOf="@id/startGuideline"
+            app:layout_constraintTop_toBottomOf="@id/header_text_view"
             tools:text="@tools:sample/lorem[14]" />
 
         <androidx.recyclerview.widget.RecyclerView
@@ -46,24 +66,52 @@
             android:layout_height="wrap_content"
             android:clipToPadding="false"
             android:paddingStart="@dimen/recycler_tag_padding_start"
-            android:paddingEnd="@dimen/spacing_large" />
+            android:paddingEnd="@dimen/spacing_large"
+            app:layout_constraintBottom_toTopOf="@id/bodyTextView"
+            app:layout_constraintTop_toBottomOf="@id/titleTextView" />
 
         <TextView
             android:id="@+id/bodyTextView"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/spacing_large"
             android:layout_marginBottom="@dimen/spacing_medium"
             android:textAppearance="@style/TextAppearance.StopCovid.Caption"
+            app:layout_constraintBottom_toTopOf="@id/space"
+            app:layout_constraintEnd_toEndOf="@id/endGuideline"
+            app:layout_constraintStart_toStartOf="@id/startGuideline"
+            app:layout_constraintTop_toBottomOf="@id/tagRecyclerView"
             tools:text="@tools:sample/lorem[43]" />
 
         <Space
             android:id="@+id/space"
-            android:layout_width="0dp"
-            android:layout_height="@dimen/spacing_large" />
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/spacing_large"
+            app:layout_constraintBottom_toTopOf="@id/include_link"
+            app:layout_constraintTop_toBottomOf="@id/bodyTextView" />
 
         <include
             android:id="@+id/include_link"
-            layout="@layout/item_link" />
-    </LinearLayout>
+            layout="@layout/item_link"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@id/endGuideline"
+            app:layout_constraintStart_toStartOf="@id/startGuideline"
+            app:layout_constraintTop_toBottomOf="@id/space" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/startGuideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_begin="@dimen/spacing_large" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/endGuideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_end="@dimen/spacing_large" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

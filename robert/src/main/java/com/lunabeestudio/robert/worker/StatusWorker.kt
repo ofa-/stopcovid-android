@@ -5,7 +5,7 @@
  *
  * Authors
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Created by Lunabee Studio / Date - 2020/04/05 - for the STOP-COVID project
+ * Created by Lunabee Studio / Date - 2020/04/05 - for the TOUS-ANTI-COVID project
  */
 
 package com.lunabeestudio.robert.worker
@@ -37,31 +37,25 @@ internal class StatusWorker(context: Context, workerParams: WorkerParameters) : 
 
         robertApplication.refreshInfoCenter()
 
-        Timber.d("Start updating status")
+        Timber.v("Start updating status")
         val result = robertManager.updateStatus(robertApplication)
 
-        Timber.d("Clear old ebids & local proximities")
+        Timber.v("Clear old ebids & local proximities")
         robertManager.clearOldData()
 
         return when (result) {
             is RobertResult.Success -> {
-                Timber.d("Update status success")
-                updateStatusWorker(robertManager)
+                Timber.v("Update status success")
                 Result.success()
             }
             is RobertResult.Failure -> {
-                Timber.d("Update status failed")
+                Timber.e(result.error, "Update status failed")
                 if (result.error is TimeNotAlignedException) {
                     (applicationContext as RobertApplication).sendClockNotAlignedNotification()
                 }
                 Result.retry()
             }
         }
-    }
-
-    private fun updateStatusWorker(robertManager: RobertManager) {
-        Timber.d("Update worker status to new random date")
-        scheduleStatusWorker(applicationContext, robertManager, ExistingPeriodicWorkPolicy.REPLACE)
     }
 
     companion object {
@@ -78,7 +72,7 @@ internal class StatusWorker(context: Context, workerParams: WorkerParameters) : 
                 .setRequiredNetworkType(NetworkType.CONNECTED)
                 .build()
 
-            Timber.d("Add random delay of ${randomDelaySec}sec")
+            Timber.v("Add random delay of ${randomDelaySec}sec")
 
             val statusWorkRequest = PeriodicWorkRequestBuilder<StatusWorker>(minDelaySec, TimeUnit.SECONDS)
                 .setConstraints(constraints)

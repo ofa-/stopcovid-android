@@ -5,7 +5,7 @@
  *
  * Authors
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Created by Lunabee Studio / Date - 2020/04/05 - for the STOP-COVID project
+ * Created by Lunabee Studio / Date - 2020/04/05 - for the TOUS-ANTI-COVID project
  */
 
 package com.lunabeestudio.stopcovid.fragment
@@ -15,6 +15,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.core.content.edit
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -26,11 +27,16 @@ import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.dividerItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.lightButtonItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
+import com.lunabeestudio.stopcovid.coreui.fastitem.switchItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
+import com.lunabeestudio.stopcovid.extension.areInfoNotificationsEnabled
 import com.lunabeestudio.stopcovid.extension.getString
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
+import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
 import com.lunabeestudio.stopcovid.fastitem.dangerButtonItem
+import com.lunabeestudio.stopcovid.manager.ProximityManager
+import com.lunabeestudio.stopcovid.model.DeviceSetup
 import com.lunabeestudio.stopcovid.viewmodel.ManageDataViewModel
 import com.lunabeestudio.stopcovid.viewmodel.ManageDataViewModelFactory
 import com.mikepenz.fastadapter.GenericItem
@@ -41,7 +47,14 @@ class ManageDataFragment : MainFragment() {
         PreferenceManager.getDefaultSharedPreferences(requireContext())
     }
 
-    private val viewModel: ManageDataViewModel by viewModels { ManageDataViewModelFactory(requireContext().robertManager()) }
+    private val deviceSetup by lazy {
+        ProximityManager.getDeviceSetup(requireContext())
+    }
+
+    private val viewModel: ManageDataViewModel by viewModels {
+        ManageDataViewModelFactory(requireContext().secureKeystoreDataSource(),
+            requireContext().robertManager())
+    }
 
     override fun getTitleKey(): String = "manageDataController.title"
 
@@ -57,6 +70,9 @@ class ManageDataFragment : MainFragment() {
         viewModel.covidException.observe(viewLifecycleOwner) { covidException ->
             showErrorSnackBar(covidException.getString(strings))
         }
+        viewModel.eraseAttestationsSuccess.observe(viewLifecycleOwner) {
+            showSnackBar(strings["manageDataController.eraseLocalHistory.success"] ?: "")
+        }
         viewModel.eraseLocalSuccess.observe(viewLifecycleOwner) {
             showSnackBar(strings["manageDataController.eraseLocalHistory.success"] ?: "")
         }
@@ -70,6 +86,7 @@ class ManageDataFragment : MainFragment() {
             showSnackBar(strings["manageDataController.quitStopCovid.success"] ?: "")
             sharedPreferences.edit {
                 remove(Constants.SharedPrefs.ON_BOARDING_DONE)
+                remove(Constants.SharedPrefs.IS_ADVERTISEMENT_AVAILABLE)
             }
             findNavController().safeNavigate(ManageDataFragmentDirections.actionGlobalOnBoardingActivity())
             activity?.finishAndRemoveTask()
@@ -79,6 +96,82 @@ class ManageDataFragment : MainFragment() {
     override fun getItems(): List<GenericItem> {
         val items = ArrayList<GenericItem>()
 
+        manageNotificationsItems(items)
+        spaceDividerItems(items)
+        eraseAttestationItems(items)
+        spaceDividerItems(items)
+
+        if (deviceSetup != DeviceSetup.NO_BLE) {
+            eraseLocalHistoryItems(items)
+            spaceDividerItems(items)
+            eraseRemoteContactItems(items)
+            spaceDividerItems(items)
+            eraseRemoteAlertItems(items)
+            spaceDividerItems(items)
+            quitStopCovidItems(items)
+        }
+
+        return items
+    }
+
+    private fun spaceDividerItems(items: MutableList<GenericItem>) {
+        items += dividerItem {}
+        items += spaceItem {
+            spaceRes = R.dimen.spacing_medium
+        }
+    }
+
+    private fun manageNotificationsItems(items: MutableList<GenericItem>) {
+        items += titleItem {
+            text = strings["manageDataController.showInfoNotifications.title"]
+            identifier = items.count().toLong()
+        }
+        items += spaceItem {
+            spaceRes = R.dimen.spacing_medium
+        }
+        items += captionItem {
+            text = strings["manageDataController.showInfoNotifications.subtitle"]
+            identifier = items.count().toLong()
+        }
+        items += switchItem {
+            title = strings["manageDataController.showInfoNotifications.button"]
+            isChecked = sharedPreferences.areInfoNotificationsEnabled
+            onCheckChange = { isChecked ->
+                sharedPreferences.areInfoNotificationsEnabled = isChecked
+            }
+            identifier = items.count().toLong()
+        }
+    }
+
+    private fun eraseAttestationItems(items: MutableList<GenericItem>) {
+        items += titleItem {
+            text = strings["manageDataController.attestationsData.title"]
+            identifier = items.count().toLong()
+        }
+        items += spaceItem {
+            spaceRes = R.dimen.spacing_medium
+        }
+        items += captionItem {
+            text = strings["manageDataController.attestationsData.subtitle"]
+            identifier = items.count().toLong()
+        }
+        items += lightButtonItem {
+            text = strings["manageDataController.attestationsData.button"]
+            onClickListener = View.OnClickListener {
+                MaterialAlertDialogBuilder(requireContext())
+                    .setTitle(strings["manageDataController.attestationsData.confirmationDialog.title"])
+                    .setMessage(strings["manageDataController.attestationsData.confirmationDialog.message"])
+                    .setNegativeButton(strings["common.cancel"], null)
+                    .setPositiveButton(strings["common.confirm"]) { _, _ ->
+                        viewModel.eraseAttestations()
+                    }
+                    .show()
+            }
+            identifier = items.count().toLong()
+        }
+    }
+
+    private fun eraseLocalHistoryItems(items: MutableList<GenericItem>) {
         items += titleItem {
             text = strings["manageDataController.eraseLocalHistory.title"]
             identifier = items.count().toLong()
@@ -104,10 +197,9 @@ class ManageDataFragment : MainFragment() {
             }
             identifier = items.count().toLong()
         }
-        items += dividerItem {}
-        items += spaceItem {
-            spaceRes = R.dimen.spacing_medium
-        }
+    }
+
+    private fun eraseRemoteContactItems(items: MutableList<GenericItem>) {
         items += titleItem {
             text = strings["manageDataController.eraseRemoteContact.title"]
             identifier = items.count().toLong()
@@ -133,10 +225,9 @@ class ManageDataFragment : MainFragment() {
             }
             identifier = items.count().toLong()
         }
-        items += dividerItem {}
-        items += spaceItem {
-            spaceRes = R.dimen.spacing_medium
-        }
+    }
+
+    private fun eraseRemoteAlertItems(items: MutableList<GenericItem>) {
         items += titleItem {
             text = strings["manageDataController.eraseRemoteAlert.title"]
             identifier = items.count().toLong()
@@ -162,10 +253,9 @@ class ManageDataFragment : MainFragment() {
             }
             identifier = items.count().toLong()
         }
-        items += dividerItem {}
-        items += spaceItem {
-            spaceRes = R.dimen.spacing_medium
-        }
+    }
+
+    private fun quitStopCovidItems(items: MutableList<GenericItem>) {
         items += titleItem {
             text = strings["manageDataController.quitStopCovid.title"]
             identifier = items.count().toLong()
@@ -191,8 +281,5 @@ class ManageDataFragment : MainFragment() {
             }
             identifier = items.count().toLong()
         }
-        items += dividerItem {}
-
-        return items
     }
 }

@@ -5,7 +5,7 @@
  *
  * Authors
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Created by Lunabee Studio / Date - 2020/11/05 - for the STOP-COVID project
+ * Created by Lunabee Studio / Date - 2020/11/05 - for the TOUS-ANTI-COVID project
  */
 
 package com.lunabeestudio.robert
@@ -60,6 +60,16 @@ interface RobertManager {
     val randomStatusHour: Float
 
     val apiVersion: String
+
+    val qrCodeDeletionHours: Float
+
+    val qrCodeExpiredHours: Float
+
+    val qrCodeFormattedString: String
+
+    val qrCodeFooterString: String
+
+    val displayDepartmentLevel: Boolean
 
     suspend fun refreshConfig(application: RobertApplication): RobertResult
 

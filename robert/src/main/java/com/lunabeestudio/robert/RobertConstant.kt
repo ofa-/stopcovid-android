@@ -5,7 +5,7 @@
  *
  * Authors
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Created by Lunabee Studio / Date - 2020/04/05 - for the STOP-COVID project
+ * Created by Lunabee Studio / Date - 2020/04/05 - for the TOUS-ANTI-COVID project
  */
 
 package com.lunabeestudio.robert
@@ -31,8 +31,13 @@ object RobertConstant {
     const val BLE_FILTER_CONFIG: String = "{\"a\":4.3429448190325175,\"b\":0.1,\"deltas\":[39.0,27.0,23.0,21.0,20.0,19.0,18.0,17.0,16.0,15.0],\"durationThreshold\":120,\"p0\":-66.0,\"rssiThreshold\":-25,\"timeOverlap\":60,\"timeWindow\":120,\"riskThreshold\":0.1}"
     val BLE_FILTER_MODE: LocalProximityFilter.Mode = LocalProximityFilter.Mode.RISKS
     const val MIN_GAP_SUCCESS_STATUS: Long = 30L * 60L * 1000L
+    const val QR_CODE_DELETION_HOURS: Float = 24F
+    const val QR_CODE_EXPIRED_HOURS: Float = 1F
+    const val QR_CODE_FORMATTED_STRING: String = "Cree le: <creationDate> a <creationHour>;\nNom: <lastname>;\nPrenom: <firstname>;\nNaissance: <dob> a <cityofbirth>;\nAdresse: <address> <zip> <city>;\nSortie: <datetime-day> a <datetime-hour>;\nMotif: <reason-code>"
+    const val QR_CODE_FOOTER_STRING: String = "<firstname> - <datetime-day>, <datetime-hour>\n<reason-shortlabel>"
 
     object CONFIG {
+        const val CONFIG_VERSION: String = "version"
         const val API_VERSION: String = "app.apiVersion"
         const val DATA_RETENTION_PERIOD: String = "app.dataRetentionPeriod"
         const val QUARANTINE_PERIOD: String = "app.quarantinePeriod"
@@ -42,12 +47,17 @@ object RobertConstant {
         const val APP_AVAILABILITY: String = "app.appAvailability"
         const val MIN_HOUR_CONTACT_NOTIF: String = "app.minHourContactNotif"
         const val MAX_HOUR_CONTACT_NOTIF: String = "app.maxHourContactNotif"
+        const val DISPLAY_DEPARTMENT_LEVEL: String = "app.keyfigures.displayDepartmentLevel"
         const val CALIBRATION: String = "ble.calibration"
         const val FILTER_CONFIG: String = "ble.filterConfig"
         const val FILTER_MODE: String = "ble.filterMode"
         const val SERVICE_UUID: String = "ble.serviceUUID"
         const val CHARACTERISTIC_UUID: String = "ble.characteristicUUID"
         const val BACKGROUND_SERVICE_MANUFACTURER_DATA: String = "ble.backgroundServiceManufacturerData"
+        const val QR_CODE_DELETION_HOURS: String = "app.qrCode.deletionHours"
+        const val QR_CODE_EXPIRED_HOURS: String = "app.qrCode.expiredHours"
+        const val QR_CODE_FORMATTED_STRING: String = "app.qrCode.formattedString"
+        const val QR_CODE_FOOTER_STRING: String = "app.qrCode.footerString"
     }
 
     object PREFIX {

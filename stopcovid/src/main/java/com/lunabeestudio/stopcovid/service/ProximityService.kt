@@ -5,7 +5,7 @@
  *
  * Authors
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Created by Lunabee Studio / Date - 2020/13/05 - for the STOP-COVID project
+ * Created by Lunabee Studio / Date - 2020/13/05 - for the TOUS-ANTI-COVID project
  */
 
 package com.lunabeestudio.stopcovid.service
@@ -42,12 +42,8 @@ class ProximityService : RobertProximityService() {
 
     private val binder = ProximityBinder()
 
-    private val strings: HashMap<String, String> by lazy {
-        if (StringsManager.strings.isEmpty()) {
-            StringsManager.init(this)
-        }
-        StringsManager.strings
-    }
+    private val strings: HashMap<String, String>
+        get() = StringsManager.strings
 
     override val robertManager: RobertManager by lazy {
         robertManager()

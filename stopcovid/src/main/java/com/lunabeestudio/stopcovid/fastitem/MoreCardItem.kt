@@ -5,7 +5,7 @@
  *
  * Authors
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Created by Lunabee Studio / Date - 2020/04/05 - for the STOP-COVID project
+ * Created by Lunabee Studio / Date - 2020/04/05 - for the TOUS-ANTI-COVID project
  */
 
 package com.lunabeestudio.stopcovid.fastitem
@@ -58,28 +58,33 @@ class MoreCardItem : AbstractBindingItem<ItemMoreCardBinding>() {
 
         binding.test.textView.text = testText.safeEmojiSpanify()
         testIconRes?.let(binding.test.leftIconImageView::setImageResource)
-        binding.test.constraintLayout.setOnClickListener(testOnClickListener)
-        binding.test.imageView.isVisible = false
+        binding.test.linkRootLayout.setOnClickListener(testOnClickListener)
+        binding.test.linkRootLayout.isVisible = !testText.isNullOrEmpty()
+        binding.test.arrowImageView.isVisible = false
 
         binding.document.textView.text = documentText.safeEmojiSpanify()
         documentIconRes?.let(binding.document.leftIconImageView::setImageResource)
-        binding.document.constraintLayout.setOnClickListener(documentOnClickListener)
-        binding.document.imageView.isVisible = false
+        binding.document.linkRootLayout.setOnClickListener(documentOnClickListener)
+        binding.document.linkRootLayout.isVisible = !documentText.isNullOrEmpty()
+        binding.document.arrowImageView.isVisible = false
 
         binding.managerData.textView.text = manageDataText.safeEmojiSpanify()
         manageDataIconRes?.let(binding.managerData.leftIconImageView::setImageResource)
-        binding.managerData.constraintLayout.setOnClickListener(manageDataOnClickListener)
-        binding.managerData.imageView.isVisible = false
+        binding.managerData.linkRootLayout.setOnClickListener(manageDataOnClickListener)
+        binding.managerData.linkRootLayout.isVisible = !manageDataText.isNullOrEmpty()
+        binding.managerData.arrowImageView.isVisible = false
 
         binding.privacy.textView.text = privacyText.safeEmojiSpanify()
         privacyIconRes?.let(binding.privacy.leftIconImageView::setImageResource)
-        binding.privacy.constraintLayout.setOnClickListener(privacyOnClickListener)
-        binding.privacy.imageView.isVisible = false
+        binding.privacy.linkRootLayout.setOnClickListener(privacyOnClickListener)
+        binding.privacy.linkRootLayout.isVisible = !privacyText.isNullOrEmpty()
+        binding.privacy.arrowImageView.isVisible = false
 
         binding.about.textView.text = aboutText.safeEmojiSpanify()
         aboutIconRes?.let(binding.about.leftIconImageView::setImageResource)
-        binding.about.constraintLayout.setOnClickListener(aboutOnClickListener)
-        binding.about.imageView.isVisible = false
+        binding.about.linkRootLayout.setOnClickListener(aboutOnClickListener)
+        binding.about.linkRootLayout.isVisible = !aboutText.isNullOrEmpty()
+        binding.about.arrowImageView.isVisible = false
     }
 }
 

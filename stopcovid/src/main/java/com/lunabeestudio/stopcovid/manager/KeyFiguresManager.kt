@@ -5,13 +5,12 @@
  *
  * Authors
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Created by Lunabee Studio / Date - 2020/04/05 - for the STOP-COVID project
+ * Created by Lunabee Studio / Date - 2020/04/05 - for the TOUS-ANTI-COVID project
  */
 
 package com.lunabeestudio.stopcovid.manager
 
 import android.content.Context
-import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
@@ -20,9 +19,8 @@ import com.lunabeestudio.robert.utils.Event
 import com.lunabeestudio.stopcovid.BuildConfig
 import com.lunabeestudio.stopcovid.coreui.extension.saveTo
 import com.lunabeestudio.stopcovid.model.KeyFigure
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.File
 import java.lang.reflect.Type
@@ -39,15 +37,15 @@ object KeyFiguresManager {
     val figures: LiveData<Event<List<KeyFigure>>>
         get() = _figures
 
-    fun init(context: Context) {
-        CoroutineScope(Dispatchers.IO).launch {
-            loadLocal(context)
+    suspend fun initialize(context: Context) {
+        loadLocal(context)?.let { figures ->
+            if (_figures.value?.peekContent() != figures) {
+                _figures.postValue(Event(figures))
+            }
         }
     }
 
-    @Suppress("RedundantSuspendModifier")
-    @WorkerThread
-    suspend fun appForeground(context: Context) {
+    suspend fun onAppForeground(context: Context) {
         if (fetchLast(context)) {
             loadLocal(context)?.let { figures ->
                 if (_figures.value?.peekContent() != figures) {
@@ -57,26 +55,28 @@ object KeyFiguresManager {
         }
     }
 
-    private fun loadLocal(context: Context): List<KeyFigure>? {
-        return if (File(context.filesDir, cacheFileName).exists()) {
-            try {
-                Timber.d("Loading file to object")
-                gson.fromJson<List<KeyFigure>>(File(context.filesDir, cacheFileName).readText(), typeKeyFigure)
-            } catch (e: java.lang.Exception) {
-                Timber.e(e)
-                null
+    private suspend fun loadLocal(context: Context): List<KeyFigure>? {
+        val keyFiguresFile = File(context.filesDir, cacheFileName)
+        return if (keyFiguresFile.exists()) {
+            withContext(Dispatchers.IO) {
+                try {
+                    Timber.v("Loading $keyFiguresFile to object")
+                    gson.fromJson<List<KeyFigure>>(keyFiguresFile.readText(), typeKeyFigure)
+                } catch (e: Exception) {
+                    Timber.e(e)
+                    null
+                }
             }
         } else {
-            Timber.d("Nothing to load")
+            Timber.v("Nothing to load")
             null
         }
     }
 
-    @WorkerThread
-    private fun fetchLast(context: Context): Boolean {
+    private suspend fun fetchLast(context: Context): Boolean {
         return try {
             val filename: String = cacheFileName
-            Timber.d("Fetching remote data at $url")
+            Timber.v("Fetching remote data at $url")
             url.saveTo(context, File(context.filesDir, filename))
             true
         } catch (e: Exception) {

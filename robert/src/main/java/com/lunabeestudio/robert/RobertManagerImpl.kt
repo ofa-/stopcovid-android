@@ -5,7 +5,7 @@
  *
  * Authors
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Created by Lunabee Studio / Date - 2020/04/05 - for the STOP-COVID project
+ * Created by Lunabee Studio / Date - 2020/04/05 - for the TOUS-ANTI-COVID project
  */
 
 package com.lunabeestudio.robert
@@ -46,7 +46,6 @@ import com.lunabeestudio.robert.model.RobertException
 import com.lunabeestudio.robert.model.RobertResult
 import com.lunabeestudio.robert.model.RobertResultData
 import com.lunabeestudio.robert.model.RobertUnknownException
-import com.lunabeestudio.robert.model.TimeNotAlignedException
 import com.lunabeestudio.robert.model.UnknownException
 import com.lunabeestudio.robert.repository.EphemeralBluetoothIdentifierRepository
 import com.lunabeestudio.robert.repository.KeystoreRepository
@@ -54,8 +53,10 @@ import com.lunabeestudio.robert.repository.LocalProximityRepository
 import com.lunabeestudio.robert.repository.RemoteServiceRepository
 import com.lunabeestudio.robert.utils.Event
 import com.lunabeestudio.robert.worker.StatusWorker
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import kotlin.math.abs
@@ -157,9 +158,23 @@ class RobertManagerImpl(
     override val apiVersion: String
         get() = keystoreRepository.apiVersion ?: RobertConstant.API_VERSION
 
-    override suspend fun refreshConfig(application: RobertApplication): RobertResult {
-        val configResult = remoteServiceRepository.fetchConfig(application.getAppContext())
+    override val qrCodeDeletionHours: Float
+        get() = keystoreRepository.qrCodeDeletionHours ?: RobertConstant.QR_CODE_DELETION_HOURS
 
+    override val qrCodeExpiredHours: Float
+        get() = keystoreRepository.qrCodeExpiredHours ?: RobertConstant.QR_CODE_EXPIRED_HOURS
+
+    override val qrCodeFormattedString: String
+        get() = keystoreRepository.qrCodeFormattedString ?: RobertConstant.QR_CODE_FORMATTED_STRING
+
+    override val qrCodeFooterString: String
+        get() = keystoreRepository.qrCodeFooterString ?: RobertConstant.QR_CODE_FOOTER_STRING
+
+    override val displayDepartmentLevel: Boolean
+        get() = keystoreRepository.displayDepartmentLevel ?: false
+
+    override suspend fun refreshConfig(application: RobertApplication): RobertResult {
+        val configResult = remoteServiceRepository.fetchOrLoadConfig(application.getAppContext())
         return when (configResult) {
             is RobertResultData.Success -> {
                 if (configResult.data.isNullOrEmpty()) {
@@ -194,38 +209,20 @@ class RobertManagerImpl(
         path: String): RobertResult = remoteServiceRepository.getCaptchaAudio(apiVersion, captchaId, path)
 
     override suspend fun registerV2(application: RobertApplication, captcha: String, captchaId: String): RobertResult {
-        val configResult = remoteServiceRepository.fetchConfig(application.getAppContext())
-
-        return when (configResult) {
+        val registerResult = remoteServiceRepository.registerV2(apiVersion, captcha, captchaId)
+        return when (registerResult) {
             is RobertResultData.Success -> {
-                if (configResult.data.isNullOrEmpty()) {
-                    clearLocalData(application)
-                    RobertResult.Failure(RobertUnknownException())
-                } else {
-                    val registerResult = remoteServiceRepository.registerV2(apiVersion, captcha, captchaId)
-                    when (registerResult) {
-                        is RobertResultData.Success -> {
-                            finishRegister(application, registerResult.data, configResult.data)
-                        }
-                        is RobertResultData.Failure -> {
-                            clearLocalData(application)
-                            RobertResult.Failure(registerResult.error)
-                        }
-                    }
-                }
+                finishRegister(application, registerResult.data)
             }
             is RobertResultData.Failure -> {
                 clearLocalData(application)
-                RobertResult.Failure(configResult.error)
+                RobertResult.Failure(registerResult.error)
             }
         }
     }
 
-    private suspend fun finishRegister(application: RobertApplication,
-        registerReport: RegisterReport,
-        config: List<Configuration>?): RobertResult {
+    private suspend fun finishRegister(application: RobertApplication, registerReport: RegisterReport): RobertResult {
         return try {
-            handleConfigChange(config)
             keystoreRepository.timeStart = registerReport.timeStart
             keystoreRepository.atRiskLastRefresh = System.currentTimeMillis()
             ephemeralBluetoothIdentifierRepository.save(Base64.decode(registerReport.tuples, Base64.NO_WRAP))
@@ -244,6 +241,16 @@ class RobertManagerImpl(
     }
 
     private fun handleConfigChange(configuration: List<Configuration>?) {
+        val newConfigVersion = (configuration?.firstOrNull {
+            it.name == RobertConstant.CONFIG.CONFIG_VERSION
+        }?.value as? Number ?: 0).toInt()
+
+        if (newConfigVersion <= keystoreRepository.configVersion ?: -1) {
+            return
+        }
+
+        keystoreRepository.configVersion = newConfigVersion
+
         (configuration?.firstOrNull {
             it.name == RobertConstant.CONFIG.CALIBRATION
         }?.value as? List<*>)?.let { calibrations ->
@@ -321,6 +328,31 @@ class RobertManagerImpl(
         }?.value as? String)?.let { apiVersion ->
             keystoreRepository.apiVersion = apiVersion
         }
+        (configuration?.firstOrNull {
+            it.name == RobertConstant.CONFIG.QR_CODE_DELETION_HOURS
+        }?.value as? Float)?.let { deletionHours ->
+            keystoreRepository.qrCodeDeletionHours = deletionHours
+        }
+        (configuration?.firstOrNull {
+            it.name == RobertConstant.CONFIG.QR_CODE_EXPIRED_HOURS
+        }?.value as? Float)?.let { expiredHours ->
+            keystoreRepository.qrCodeExpiredHours = expiredHours
+        }
+        (configuration?.firstOrNull {
+            it.name == RobertConstant.CONFIG.QR_CODE_FORMATTED_STRING
+        }?.value as? String)?.let { formattedString ->
+            keystoreRepository.qrCodeFormattedString = formattedString
+        }
+        (configuration?.firstOrNull {
+            it.name == RobertConstant.CONFIG.QR_CODE_FOOTER_STRING
+        }?.value as? String)?.let { footerString ->
+            keystoreRepository.qrCodeFooterString = footerString
+        }
+        (configuration?.firstOrNull {
+            it.name == RobertConstant.CONFIG.DISPLAY_DEPARTMENT_LEVEL
+        }?.value as? Boolean)?.let { displayDepartmentLevel ->
+            keystoreRepository.displayDepartmentLevel = displayDepartmentLevel
+        }
     }
 
     override suspend fun activateProximity(application: RobertApplication, statusTried: Boolean): RobertResult {
@@ -353,13 +385,9 @@ class RobertManagerImpl(
     }
 
     override suspend fun updateStatus(robertApplication: RobertApplication): RobertResult {
-        statusSemaphore.withPermit {
-            val configResult = remoteServiceRepository.fetchConfig(robertApplication.getAppContext())
-            handleConfigChange((configResult as? RobertResultData.Success)?.data)
-
-            return if (configResult is RobertResultData.Failure && configResult.error is TimeNotAlignedException) {
-                RobertResult.Failure(configResult.error)
-            } else {
+        return withContext(Dispatchers.IO) {
+            refreshConfig(robertApplication)
+            statusSemaphore.withPermit {
                 val ssu = getSSU(RobertConstant.PREFIX.C2)
 
                 if (abs((atRiskLastRefresh ?: 0L) - System.currentTimeMillis()) > RobertConstant.MIN_GAP_SUCCESS_STATUS) {
@@ -380,6 +408,14 @@ class RobertManagerImpl(
                                     }
                                     keystoreRepository.atRiskLastRefresh = System.currentTimeMillis()
                                     keystoreRepository.shouldReloadBleSettings = true
+
+                                    Timber.v("Updating worker status to new random date")
+                                    StatusWorker.scheduleStatusWorker(
+                                        robertApplication.getAppContext(),
+                                        this@RobertManagerImpl,
+                                        ExistingPeriodicWorkPolicy.REPLACE
+                                    )
+
                                     RobertResult.Success()
                                 } catch (e: Exception) {
                                     when (e) {
@@ -402,7 +438,7 @@ class RobertManagerImpl(
                         RobertResult.Failure(UnknownException())
                     }
                 } else {
-                    Timber.d("Previous success Status called too close")
+                    Timber.v("Previous success Status called too close")
                     RobertResult.Failure(UnknownException())
                 }
             }
@@ -410,7 +446,7 @@ class RobertManagerImpl(
     }
 
     override fun clearOldData() {
-        Timber.d("clear old data")
+        Timber.v("clear old data")
         val ephemeralBluetoothIdentifierExpiredTime = System.currentTimeMillis().unixTimeMsToNtpTimeS()
         ephemeralBluetoothIdentifierRepository.removeUntilTimeKeepLast(ephemeralBluetoothIdentifierExpiredTime)
         val localProximityExpiredTime: Long =
@@ -422,36 +458,30 @@ class RobertManagerImpl(
     }
 
     override suspend fun report(token: String, firstSymptoms: Int, application: RobertApplication): RobertResult {
-        val configResult = remoteServiceRepository.fetchConfig(application.getAppContext())
+        val preSymptomsSpan = (keystoreRepository.preSymptomsSpan ?: RobertConstant.PRE_SYMPTOMS_SPAN).toLong()
+        val firstProximityToSendTime =
+            (System.currentTimeMillis() - TimeUnit.DAYS.toMillis(firstSymptoms.toLong()) - TimeUnit.DAYS.toMillis(preSymptomsSpan))
+                .unixTimeMsToNtpTimeS()
 
-        return if (configResult is RobertResultData.Failure && configResult.error is TimeNotAlignedException) {
-            RobertResult.Failure(configResult.error)
-        } else {
-            val preSymptomsSpan = (keystoreRepository.preSymptomsSpan ?: RobertConstant.PRE_SYMPTOMS_SPAN).toLong()
-            val firstProximityToSendTime =
-                (System.currentTimeMillis() - TimeUnit.DAYS.toMillis(firstSymptoms.toLong()) - TimeUnit.DAYS.toMillis(preSymptomsSpan))
-                    .unixTimeMsToNtpTimeS()
+        val localProximityList = localProximityRepository.getUntilTime(firstProximityToSendTime)
+        val filteredLocalProximityList = localProximityFilter.filter(
+            localProximityList,
+            filteringMode,
+            filteringConfig
+        )
 
-            val localProximityList = localProximityRepository.getUntilTime(firstProximityToSendTime)
-            val filteredLocalProximityList = localProximityFilter.filter(
-                localProximityList,
-                filteringMode,
-                filteringConfig
-            )
-
-            val result = remoteServiceRepository.report(apiVersion, token, filteredLocalProximityList)
-            when (result) {
-                is RobertResult.Success -> {
-                    val ssu = getSSU(RobertConstant.PREFIX.C3)
-                    if (ssu is RobertResultData.Success) {
-                        remoteServiceRepository.unregister(apiVersion, ssu.data)
-                    }
-                    clearLocalData(application)
-                    keystoreRepository.isSick = true
-                    result
+        val result = remoteServiceRepository.report(apiVersion, token, filteredLocalProximityList)
+        return when (result) {
+            is RobertResult.Success -> {
+                val ssu = getSSU(RobertConstant.PREFIX.C3)
+                if (ssu is RobertResultData.Success) {
+                    remoteServiceRepository.unregister(apiVersion, ssu.data)
                 }
-                else -> result
+                clearLocalData(application)
+                keystoreRepository.isSick = true
+                result
             }
+            else -> result
         }
     }
 
@@ -492,23 +522,17 @@ class RobertManagerImpl(
     }
 
     override suspend fun eraseRemoteExposureHistory(application: RobertApplication): RobertResult {
-        val configResult = remoteServiceRepository.fetchConfig(application.getAppContext())
-
-        return if (configResult is RobertResultData.Failure && configResult.error is TimeNotAlignedException) {
-            RobertResult.Failure(configResult.error)
-        } else {
-            val ssu = getSSU(RobertConstant.PREFIX.C4)
-            when (ssu) {
-                is RobertResultData.Success -> {
-                    val result = remoteServiceRepository.deleteExposureHistory(apiVersion, ssu.data)
-                    when (result) {
-                        is RobertResult.Success -> result
-                        is RobertResult.Failure -> RobertResult.Failure(result.error)
-                    }
+        val ssu = getSSU(RobertConstant.PREFIX.C4)
+        return when (ssu) {
+            is RobertResultData.Success -> {
+                val result = remoteServiceRepository.deleteExposureHistory(apiVersion, ssu.data)
+                when (result) {
+                    is RobertResult.Success -> result
+                    is RobertResult.Failure -> RobertResult.Failure(result.error)
                 }
-                is RobertResultData.Failure -> {
-                    RobertResult.Failure(ssu.error)
-                }
+            }
+            is RobertResultData.Failure -> {
+                RobertResult.Failure(ssu.error)
             }
         }
     }
@@ -521,26 +545,20 @@ class RobertManagerImpl(
     }
 
     override suspend fun quitStopCovid(application: RobertApplication): RobertResult {
-        val configResult = remoteServiceRepository.fetchConfig(application.getAppContext())
-
-        return if (configResult is RobertResultData.Failure && configResult.error is TimeNotAlignedException) {
-            RobertResult.Failure(configResult.error)
-        } else {
-            val ssu = getSSU(RobertConstant.PREFIX.C3)
-            return when (ssu) {
-                is RobertResultData.Success -> {
-                    val result = remoteServiceRepository.unregister(apiVersion, ssu.data)
-                    when (result) {
-                        is RobertResult.Success -> {
-                            clearLocalData(application)
-                            RobertResult.Success()
-                        }
-                        is RobertResult.Failure -> RobertResult.Failure(result.error)
+        val ssu = getSSU(RobertConstant.PREFIX.C3)
+        return when (ssu) {
+            is RobertResultData.Success -> {
+                val result = remoteServiceRepository.unregister(apiVersion, ssu.data)
+                when (result) {
+                    is RobertResult.Success -> {
+                        clearLocalData(application)
+                        RobertResult.Success()
                     }
+                    is RobertResult.Failure -> RobertResult.Failure(result.error)
                 }
-                is RobertResultData.Failure -> {
-                    RobertResult.Failure(ssu.error)
-                }
+            }
+            is RobertResultData.Failure -> {
+                RobertResult.Failure(ssu.error)
             }
         }
     }
@@ -561,12 +579,12 @@ class RobertManagerImpl(
     }
 
     private fun startStatusWorker(context: Context) {
-        Timber.d("Create worker status")
+        Timber.i("Create worker status")
         StatusWorker.scheduleStatusWorker(context, this, ExistingPeriodicWorkPolicy.KEEP)
     }
 
     private fun stopStatusWorker(context: Context) {
-        Timber.d("Stop worker status")
+        Timber.i("Stop worker status")
         WorkManager.getInstance(context).cancelUniqueWork(RobertConstant.STATUS_WORKER_NAME)
     }
 

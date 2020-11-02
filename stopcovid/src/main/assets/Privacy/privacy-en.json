@@ -5,7 +5,7 @@
         "links": [
 	        {
                 "label": "More information about the GDPR ",
-                "url": "https://bonjour.stopcovid.gouv.fr/privacy-en.html"
+                "url": "https://bonjour.tousanticovid.gouv.fr/privacy-en.html"
             }
         ]
     },
@@ -42,7 +42,7 @@
         "links": [
             {
                 "label": "About TousAntiCovid",
-                "url": "https://bonjour.stopcovid.gouv.fr/stopcovid.html"
+                "url": "https://bonjour.tousanticovid.gouv.fr/stopcovid.html"
             },
             {
                 "label": "Application source code",
@@ -50,7 +50,7 @@
             },
             {
                 "label": "Data protection policy",
-                "url": "https://bonjour.stopcovid.gouv.fr/privacy-en.html"
+                "url": "https://bonjour.tousanticovid.gouv.fr/privacy-en.html"
             }
         ]
     }

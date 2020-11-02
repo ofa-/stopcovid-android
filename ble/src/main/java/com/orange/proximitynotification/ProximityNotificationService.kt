@@ -5,7 +5,7 @@
  *
  * Authors
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Created by Orange / Date - 2020/04/27 - for the STOP-COVID project
+ * Created by Orange / Date - 2020/04/27 - for the TOUS-ANTI-COVID project
  */
 
 package com.orange.proximitynotification
@@ -221,7 +221,7 @@ abstract class ProximityNotificationService : Service(),
     }
 
     override fun onEvent(event: ProximityNotificationEvent) {
-        Timber.d("onEvent event = $event")
+        Timber.v("onEvent event = $event")
     }
 
     /**

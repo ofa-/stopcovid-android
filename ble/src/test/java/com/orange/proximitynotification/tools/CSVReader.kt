@@ -5,7 +5,7 @@
  *
  * Authors
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Created by Orange / Date - 2020/06/04 - for the STOP-COVID project
+ * Created by Orange / Date - 2020/06/04 - for the TOUS-ANTI-COVID project
  */
 
 package com.orange.proximitynotification.tools

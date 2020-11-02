@@ -5,18 +5,20 @@
   ~
   ~ Authors
   ~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  ~ Created by Lunabee Studio / Date - 2020/04/05 - for the STOP-COVID project
+  ~ Created by Lunabee Studio / Date - 2020/04/05 - for the TOUS-ANTI-COVID project
   -->
-<androidx.constraintlayout.widget.ConstraintLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/constraintLayout"
+    android:id="@+id/linkRootLayout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?selectableItemBackground"
     android:clickable="true"
     android:focusable="true"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
     android:padding="@dimen/spacing_large"
     tools:ignore="Overdraw">
 
@@ -26,10 +28,6 @@
         android:layout_height="@dimen/icon_size"
         android:layout_marginEnd="@dimen/spacing_medium"
         android:scaleType="center"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/textView"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
         app:tint="?colorPrimary"
         tools:ignore="ContentDescription"
         tools:src="@drawable/ic_manage_data" />
@@ -40,21 +38,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textIsSelectable="false"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/imageView"
-        app:layout_constraintStart_toEndOf="@id/leftIconImageView"
-        app:layout_constraintTop_toTopOf="parent"
         tools:text="@tools:sample/lorem[5]" />
 
     <ImageView
-        android:id="@+id/imageView"
+        android:id="@+id/arrowImageView"
         android:layout_width="@dimen/link_icon_size"
         android:layout_height="@dimen/link_icon_size"
-        android:src="@drawable/ic_arrow_right"
         android:layout_marginStart="@dimen/spacing_small"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@id/textView"
-        app:layout_constraintTop_toTopOf="parent"
+        android:src="@drawable/ic_arrow_right"
         app:tint="?colorControlNormal"
         tools:ignore="ContentDescription" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

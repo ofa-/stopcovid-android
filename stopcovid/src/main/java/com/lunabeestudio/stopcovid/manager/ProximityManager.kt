@@ -5,7 +5,7 @@
  *
  * Authors
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Created by Lunabee Studio / Date - 2020/13/05 - for the STOP-COVID project
+ * Created by Lunabee Studio / Date - 2020/13/05 - for the TOUS-ANTI-COVID project
  */
 
 package com.lunabeestudio.stopcovid.manager
@@ -27,23 +27,34 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.core.location.LocationManagerCompat
 import androidx.fragment.app.Fragment
+import androidx.preference.PreferenceManager
 import com.lunabeestudio.robert.RobertManager
+import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.coreui.UiConstants
 import com.lunabeestudio.stopcovid.coreui.extension.openAppSettings
+import com.lunabeestudio.stopcovid.extension.isAdvertisementAvailable
+import com.lunabeestudio.stopcovid.model.DeviceSetup
 
 object ProximityManager {
 
     fun isProximityOn(context: Context, robertManager: RobertManager): Boolean =
-        robertManager.isProximityActive && isPhoneSetup(context)
+        robertManager.isProximityActive && getDeviceSetup(context) == DeviceSetup.BLE
 
-    fun isPhoneSetup(context: Context): Boolean = isNotificationOn(context)
-        && isLocalisationGranted(context)
-        && hasFeatureBLE(context)
-        && isBluetoothOn(context)
-        && isBatteryOptimizationOff(context)
-        && !needLocalisationTurnedOn(context)
+    fun getDeviceSetup(context: Context): DeviceSetup = when {
+        isNotificationOn(context)
+            && isLocalisationGranted(context)
+            && hasFeatureBLE(context)
+            && isBluetoothOn(context)
+            && isBatteryOptimizationOff(context)
+            && !needLocalisationTurnedOn(context) -> DeviceSetup.BLE
+        !hasFeatureBLE(context) -> DeviceSetup.NO_BLE
+        else -> DeviceSetup.NOT_SETUP
+    }
 
-    fun hasFeatureBLE(context: Context): Boolean = context.packageManager.hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)
+    fun hasFeatureBLE(context: Context): Boolean {
+        val hasBLESystemFeature = context.packageManager.hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)
+        return PreferenceManager.getDefaultSharedPreferences(context).isAdvertisementAvailable(hasBLESystemFeature) && hasBLESystemFeature
+    }
 
     fun isNotificationOn(context: Context): Boolean =
         NotificationManagerCompat.from(context).areNotificationsEnabled()

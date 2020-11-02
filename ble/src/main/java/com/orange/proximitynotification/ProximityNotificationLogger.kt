@@ -5,7 +5,7 @@
  *
  * Authors
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Created by Orange / Date - 2020/09/14 - for the STOP-COVID project
+ * Created by Orange / Date - 2020/09/14 - for the TOUS-ANTI-COVID project
  */
 
 package com.orange.proximitynotification
@@ -30,6 +30,10 @@ object ProximityNotificationLogger {
 
     @Synchronized
     fun log(event: ProximityNotificationEvent) = listener?.onEvent(event)
+
+    fun verbose(eventId: ProximityNotificationEventId, message: String) = log(
+        ProximityNotificationEvent.Verbose(eventId, message)
+    )
 
     fun debug(eventId: ProximityNotificationEventId, message: String) = log(
         ProximityNotificationEvent.Debug(eventId, message)

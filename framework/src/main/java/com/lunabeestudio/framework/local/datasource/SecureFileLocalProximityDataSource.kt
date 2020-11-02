@@ -5,7 +5,7 @@
  *
  * Authors
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Created by Lunabee Studio / Date - 2020/09/05 - for the STOP-COVID project
+ * Created by Lunabee Studio / Date - 2020/09/05 - for the TOUS-ANTI-COVID project
  */
 
 package com.lunabeestudio.framework.local.datasource
@@ -120,7 +120,7 @@ open class SecureFileLocalProximityDataSource(
     private suspend fun dumpCache() {
         if (dumpDelayRunning) {
             dumpRequested = true
-            Timber.d("Dump delay running.")
+            Timber.v("Dump delay running.")
             return
         }
 
@@ -134,7 +134,7 @@ open class SecureFileLocalProximityDataSource(
                 val tmpFile = createTempFile(directory = encryptedFile.parentFile)
                 cryptoManager.createCipherOutputStream(tmpFile.outputStream()).use { cos ->
                     val proto = cacheMtx.withLock {
-                        Timber.d("Start dumping ${localProximityList.size} items to ${encryptedFile.absolutePath}")
+                        Timber.v("Start dumping ${localProximityList.size} items to ${encryptedFile.absolutePath}")
                         lastDumpedIndex = (localProximityList.size - 1).coerceAtLeast(0)
                         localProximityList.toProto()
                     }
@@ -143,7 +143,7 @@ open class SecureFileLocalProximityDataSource(
                 tmpFile.renameTo(encryptedFile)
 
                 dumpTime = System.currentTimeMillis() - dumpTime
-                Timber.d("Dumping cache to ${encryptedFile.absolutePath} done in ${dumpTime}ms")
+                Timber.v("Dumping cache to ${encryptedFile.absolutePath} done in ${dumpTime}ms")
             }
 
             Pair(lastDumpedIndex, dumpTime)
@@ -155,7 +155,7 @@ open class SecureFileLocalProximityDataSource(
             val dumpResult = doDump()
             updateEncryptedFolderIfNeeded(dumpResult.first)
             val delayMillis = max(dumpResult.second * DUMP_DELAY_FACTOR, DUMP_MIN_DELAY_MS)
-            Timber.d("Delaying dumps for ${delayMillis}ms")
+            Timber.v("Delaying dumps for ${delayMillis}ms")
             delay(delayMillis)
             dumpDelayRunning = false
         }
@@ -168,7 +168,7 @@ open class SecureFileLocalProximityDataSource(
                 // Change folder
                 _encryptedFile = getDailySessionFile()
                 // Flush cache
-                Timber.d("Change dump session file & flush cache")
+                Timber.v("Change dump session file & flush cache")
                 localProximityList.subList(0, lastDumpedIndex + 1).clear()
             }
         }

@@ -5,7 +5,7 @@
  *
  * Authors
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Created by Lunabee Studio / Date - 2020/10/05 - for the STOP-COVID project
+ * Created by Lunabee Studio / Date - 2020/10/05 - for the TOUS-ANTI-COVID project
  */
 
 package com.lunabeestudio.stopcovid.manager
@@ -34,7 +34,7 @@ object GestureManager {
             identifier = items.size.toLong()
         }
         items += logoBodyItem {
-            imageRes = R.drawable.hands
+            imageRes = R.drawable.ic_gesture_hands
             text = strings["onboarding.gesturesController.gesture1"]
             identifier = items.size.toLong()
         }
@@ -43,7 +43,7 @@ object GestureManager {
             identifier = items.size.toLong()
         }
         items += logoBodyItem {
-            imageRes = R.drawable.cough
+            imageRes = R.drawable.ic_gesture_cough
             text = strings["onboarding.gesturesController.gesture2"]
             identifier = items.size.toLong()
         }
@@ -52,7 +52,7 @@ object GestureManager {
             identifier = items.size.toLong()
         }
         items += logoBodyItem {
-            imageRes = R.drawable.tissue
+            imageRes = R.drawable.ic_gesture_tissue
             text = strings["onboarding.gesturesController.gesture3"]
             identifier = items.size.toLong()
         }
@@ -61,7 +61,7 @@ object GestureManager {
             identifier = items.size.toLong()
         }
         items += logoBodyItem {
-            imageRes = R.drawable.face
+            imageRes = R.drawable.ic_gesture_face
             text = strings["onboarding.gesturesController.gesture5"]
             identifier = items.size.toLong()
         }
@@ -70,7 +70,7 @@ object GestureManager {
             identifier = items.size.toLong()
         }
         items += logoBodyItem {
-            imageRes = R.drawable.distance
+            imageRes = R.drawable.ic_gesture_distance
             text = strings["onboarding.gesturesController.gesture6"]
             identifier = items.size.toLong()
         }
@@ -79,7 +79,7 @@ object GestureManager {
             identifier = items.size.toLong()
         }
         items += logoBodyItem {
-            imageRes = R.drawable.air_check
+            imageRes = R.drawable.ic_gesture_aircheck
             text = strings["onboarding.gesturesController.gesture4"]
             identifier = items.size.toLong()
         }
@@ -88,10 +88,36 @@ object GestureManager {
             identifier = items.size.toLong()
         }
         items += logoBodyItem {
-            imageRes = R.drawable.mask
+            imageRes = R.drawable.ic_gesture_mask
             text = strings["onboarding.gesturesController.gesture7"]
             identifier = items.size.toLong()
         }
-
+        items += spaceItem {
+            spaceRes = R.dimen.spacing_medium
+            identifier = items.size.toLong()
+        }
+        items += logoBodyItem {
+            imageRes = R.drawable.ic_gesture_6
+            text = strings["onboarding.gesturesController.gesture8"]
+            identifier = items.size.toLong()
+        }
+        items += spaceItem {
+            spaceRes = R.dimen.spacing_medium
+            identifier = items.size.toLong()
+        }
+        items += logoBodyItem {
+            imageRes = R.drawable.ic_gesture_air
+            text = strings["onboarding.gesturesController.gesture9"]
+            identifier = items.size.toLong()
+        }
+        items += spaceItem {
+            spaceRes = R.dimen.spacing_medium
+            identifier = items.size.toLong()
+        }
+        items += logoBodyItem {
+            imageRes = R.drawable.ic_gesture_app
+            text = strings["onboarding.gesturesController.gesture10"]
+            identifier = items.size.toLong()
+        }
     }
 }

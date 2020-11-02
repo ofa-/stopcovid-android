@@ -5,7 +5,7 @@
  *
  * Authors
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Created by Lunabee Studio / Date - 2020/13/05 - for the STOP-COVID project
+ * Created by Lunabee Studio / Date - 2020/13/05 - for the TOUS-ANTI-COVID project
  */
 
 package com.lunabeestudio.stopcovid.coreui.fragment
@@ -28,15 +28,13 @@ abstract class BaseFragment : Fragment() {
 
     abstract fun refreshScreen()
 
-    protected var strings: HashMap<String, String> = StringsManager.strings
+    protected val strings: HashMap<String, String>
+        get() = StringsManager.strings
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        StringsManager.liveStrings.observe(viewLifecycleOwner) { strings ->
-            if (this.strings != strings) {
-                this.strings = strings
-                refreshScreen()
-            }
+        StringsManager.liveStrings.observe(viewLifecycleOwner) {
+            refreshScreen()
         }
     }
 

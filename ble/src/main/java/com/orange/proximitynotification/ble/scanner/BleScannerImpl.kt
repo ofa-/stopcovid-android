@@ -5,7 +5,7 @@
  *
  * Authors
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Created by Orange / Date - 2020/04/27 - for the STOP-COVID project
+ * Created by Orange / Date - 2020/04/27 - for the TOUS-ANTI-COVID project
  */
 
 package com.orange.proximitynotification.ble.scanner
@@ -119,7 +119,7 @@ class BleScannerImpl(
 
             logStartStatus { logStartSuccess() }
 
-            ProximityNotificationLogger.debug(
+            ProximityNotificationLogger.verbose(
                 ProximityNotificationEventId.BLE_SCANNER_ON_BATCH_SCAN_RESULT,
                 "onBatchScanResults with result count = ${results.size}"
             )
