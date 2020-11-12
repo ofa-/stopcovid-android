@@ -36,6 +36,7 @@ abstract class ServerManager {
     protected open fun transform(input: String): String = input
     protected open fun extension(): String = ".json"
     protected open fun url(): String = BuildConfig.SERVER_URL
+    protected open fun urlFolderName(): String = ""
 
     protected suspend fun fetchLast(context: Context, forceRefresh: Boolean): Boolean {
         return if (shouldRefresh(context) || forceRefresh) {
@@ -58,7 +59,7 @@ abstract class ServerManager {
     private suspend fun fetchLast(context: Context, languageCode: String): Boolean {
         return try {
             val filename = "${prefix(context)}${languageCode}${extension()}"
-            "${url()}$filename".saveTo(context, File(context.filesDir, filename))
+            "${url()}${urlFolderName()}$filename".saveTo(context, File(context.filesDir, filename))
             saveLastRefresh(context)
             true
         } catch (e: Exception) {

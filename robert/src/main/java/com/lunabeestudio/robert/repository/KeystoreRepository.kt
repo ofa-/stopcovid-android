@@ -56,6 +56,13 @@ internal class KeystoreRepository(
             robertManager.refreshAtRisk()
         }
 
+    var atRiskLastError: Long?
+        get() = keystoreDataSource.atRiskLastError
+        set(value) {
+            keystoreDataSource.atRiskLastError = value
+            robertManager.refreshAtRisk()
+        }
+
     var atRiskMinHourContactNotif: Int?
         get() = keystoreDataSource.atRiskMinHourContactNotif
         set(value) {
@@ -142,6 +149,12 @@ internal class KeystoreRepository(
             keystoreDataSource.checkStatusFrequency = value
         }
 
+    var minStatusRetryDuration: Float?
+        get() = keystoreDataSource.minStatusRetryDuraction
+        set(value) {
+            keystoreDataSource.minStatusRetryDuraction = value
+        }
+
     var randomStatusHour: Float?
         get() = keystoreDataSource.randomStatusHour
         set(value) {
@@ -152,6 +165,12 @@ internal class KeystoreRepository(
         get() = keystoreDataSource.preSymptomsSpan
         set(value) {
             keystoreDataSource.preSymptomsSpan = value
+        }
+
+    var positiveSampleSpan: Int?
+        get() = keystoreDataSource.positiveSampleSpan
+        set(value) {
+            keystoreDataSource.positiveSampleSpan = value
         }
 
     var appAvailability: Boolean?
@@ -206,5 +225,11 @@ internal class KeystoreRepository(
         get() = keystoreDataSource.displayDepartmentLevel
         set(value) {
             keystoreDataSource.displayDepartmentLevel = value
+        }
+
+    var proximityReactivationReminderHours: List<Int>?
+        get() = keystoreDataSource.proximityReactivationReminderHours
+        set(value) {
+            keystoreDataSource.proximityReactivationReminderHours = value
         }
 }

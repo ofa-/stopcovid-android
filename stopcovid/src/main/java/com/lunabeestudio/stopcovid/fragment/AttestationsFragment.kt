@@ -17,7 +17,6 @@ import androidx.navigation.fragment.findNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.zxing.BarcodeFormat
 import com.journeyapps.barcodescanner.BarcodeEncoder
-import com.lunabeestudio.domain.model.FormEntry
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.toDimensSize
@@ -25,6 +24,7 @@ import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.extension.attestationLongLabelFromKey
 import com.lunabeestudio.stopcovid.extension.attestationShortLabelFromKey
+import com.lunabeestudio.stopcovid.extension.isExpired
 import com.lunabeestudio.stopcovid.extension.openInExternalBrowser
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
@@ -34,6 +34,7 @@ import com.lunabeestudio.stopcovid.fastitem.bigTitleItem
 import com.lunabeestudio.stopcovid.fastitem.linkCardItem
 import com.lunabeestudio.stopcovid.fastitem.linkItem
 import com.lunabeestudio.stopcovid.manager.ShareManager
+import com.lunabeestudio.stopcovid.model.AttestationMap
 import com.lunabeestudio.stopcovid.viewmodel.AttestationsViewModel
 import com.lunabeestudio.stopcovid.viewmodel.AttestationsViewModelFactory
 import com.mikepenz.fastadapter.GenericItem
@@ -43,6 +44,7 @@ import java.util.Date
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
+import kotlin.time.hours
 
 class AttestationsFragment : MainFragment() {
 
@@ -106,12 +108,7 @@ class AttestationsFragment : MainFragment() {
             attestation["datetime"]?.value?.toLongOrNull() ?: 0L
         }
         val expiredAttestations = viewModel.attestations.value?.filter { attestation ->
-            val expiredMilliSeconds = System.currentTimeMillis() - Duration.convert(
-                robertManager.qrCodeExpiredHours.toDouble(),
-                DurationUnit.HOURS,
-                DurationUnit.MILLISECONDS
-            )
-            (attestation["datetime"]?.value?.toLongOrNull() ?: 0L) <= expiredMilliSeconds
+            attestation.isExpired(robertManager.qrCodeExpiredHours.toDouble().hours)
         }?.sortedBy { attestation ->
             attestation["datetime"]?.value?.toLongOrNull() ?: 0L
         }
@@ -161,7 +158,7 @@ class AttestationsFragment : MainFragment() {
         return items
     }
 
-    private fun qrCodeItemFromAttestation(attestation: Map<String, FormEntry>, allowShare: Boolean): AttestationQrCodeItem {
+    private fun qrCodeItemFromAttestation(attestation: AttestationMap, allowShare: Boolean): AttestationQrCodeItem {
         val bitmap = barcodeEncoder.encodeBitmap(
             attestationToFormattedString(attestation),
             BarcodeFormat.QR_CODE,
@@ -176,8 +173,10 @@ class AttestationsFragment : MainFragment() {
             this.allowShare = allowShare
             onShare = {
                 val uri = ShareManager.getShareCaptureUriFromBitmap(requireContext(), bitmap, "qrCode")
-                val text = listOf(attestationToFormattedStringDisplayed(attestation),
-                    strings["attestationsController.menu.share.text"]).joinToString("\n\n")
+                val text = listOf(
+                    attestationToFormattedStringDisplayed(attestation),
+                    strings["attestationsController.menu.share.text"]
+                ).joinToString("\n\n")
                 ShareManager.shareImageAndText(requireContext(), uri, text) {
                     strings["common.error.unknown"]?.let { showErrorSnackBar(it) }
                 }
@@ -206,25 +205,25 @@ class AttestationsFragment : MainFragment() {
         }
     }
 
-    private fun attestationToFormattedString(attestation: Map<String, FormEntry>): String {
+    private fun attestationToFormattedString(attestation: AttestationMap): String {
         return robertManager.qrCodeFormattedString
             .attestationReplaceKnownValue(attestation)
             .attestationReplaceUnknownValues()
     }
 
-    private fun attestationToFormattedStringDisplayed(attestation: Map<String, FormEntry>): String {
+    private fun attestationToFormattedStringDisplayed(attestation: AttestationMap): String {
         return robertManager.qrCodeFormattedStringDisplayed
             .attestationReplaceKnownValue(attestation)
             .attestationReplaceUnknownValues()
     }
 
-    private fun attestationToFooterString(attestation: Map<String, FormEntry>): String {
+    private fun attestationToFooterString(attestation: AttestationMap): String {
         return robertManager.qrCodeFooterString
             .attestationReplaceKnownValue(attestation)
             .attestationReplaceUnknownValues()
     }
 
-    private fun String.attestationReplaceKnownValue(attestation: Map<String, FormEntry>): String {
+    private fun String.attestationReplaceKnownValue(attestation: AttestationMap): String {
         var result = this
         attestation.keys.forEach { key ->
             when (attestation[key]?.type) {

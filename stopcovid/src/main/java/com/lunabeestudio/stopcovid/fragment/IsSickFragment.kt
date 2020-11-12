@@ -10,70 +10,23 @@
 
 package com.lunabeestudio.stopcovid.fragment
 
-import android.content.SharedPreferences
-import android.os.Bundle
 import android.view.Gravity
 import android.view.View
-import androidx.core.content.edit
-import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import androidx.preference.PreferenceManager
-import com.lunabeestudio.robert.RobertApplication
-import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.R
-import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.extension.callPhone
 import com.lunabeestudio.stopcovid.coreui.fastitem.buttonItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
-import com.lunabeestudio.stopcovid.coreui.fastitem.lightButtonItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
-import com.lunabeestudio.stopcovid.extension.getString
 import com.lunabeestudio.stopcovid.extension.openInExternalBrowser
-import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.fastitem.logoItem
-import com.lunabeestudio.stopcovid.viewmodel.IsSickViewModel
-import com.lunabeestudio.stopcovid.viewmodel.IsSickViewModelFactory
 import com.mikepenz.fastadapter.GenericItem
 
 class IsSickFragment : AboutMainFragment() {
 
-    private val sharedPreferences: SharedPreferences by lazy {
-        PreferenceManager.getDefaultSharedPreferences(requireContext())
-    }
-
-    private val robertManager by lazy {
-        requireContext().robertManager()
-    }
-
-    private val viewModel: IsSickViewModel by viewModels { IsSickViewModelFactory(robertManager) }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        initViewModelObserver()
-        (activity as MainActivity).supportActionBar?.setDisplayHomeAsUpEnabled(false)
-    }
-
-    private fun initViewModelObserver() {
-        viewModel.loadingInProgress.observe(viewLifecycleOwner) { loadingInProgress ->
-            (activity as? MainActivity)?.showProgress(loadingInProgress)
-        }
-        viewModel.covidException.observe(viewLifecycleOwner) { covidException ->
-            showErrorSnackBar(covidException.getString(strings))
-        }
-        viewModel.quitStopCovidSuccess.observe(viewLifecycleOwner) {
-            showSnackBar(strings["manageDataController.quitStopCovid.success"] ?: "")
-            sharedPreferences.edit {
-                remove(Constants.SharedPrefs.ON_BOARDING_DONE)
-                remove(Constants.SharedPrefs.IS_ADVERTISEMENT_AVAILABLE)
-            }
-            findNavController().safeNavigate(ManageDataFragmentDirections.actionGlobalOnBoardingActivity())
-            activity?.finishAndRemoveTask()
-        }
-    }
-
-    override fun getTitleKey(): String = "sickController.sick.title"
+    override fun getTitleKey(): String = "myHealthController.sick.title"
 
     override fun getItems(): List<GenericItem> {
         val items = ArrayList<GenericItem>()
@@ -116,11 +69,11 @@ class IsSickFragment : AboutMainFragment() {
             }
             identifier = items.count().toLong()
         }
-        items += lightButtonItem {
-            text = strings["manageDataController.quitStopCovid.button"]
+        items += buttonItem {
+            text = strings["sickController.button.cautionMeasures"]
             gravity = Gravity.CENTER
             onClickListener = View.OnClickListener {
-                viewModel.quitStopCovid(requireContext().applicationContext as RobertApplication)
+                findNavController().safeNavigate(IsSickFragmentDirections.actionIsSickFragmentToGestureFragment())
             }
             identifier = items.count().toLong()
         }

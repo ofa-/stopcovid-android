@@ -12,7 +12,9 @@ package com.lunabeestudio.stopcovid.extension
 
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.net.Uri
+import android.widget.Toast
 import androidx.core.text.isDigitsOnly
 import timber.log.Timber
 import java.text.NumberFormat
@@ -20,24 +22,32 @@ import java.util.regex.Pattern
 
 fun String.openInExternalBrowser(context: Context) {
     val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(this))
-    context.startActivity(browserIntent)
+    val activityInfo: ActivityInfo? = browserIntent.resolveActivityInfo(context.packageManager, browserIntent.flags)
+    if (activityInfo?.exported == true) {
+        context.startActivity(browserIntent)
+    } else {
+        Timber.e("No activity to open url")
+        Toast.makeText(context, "Unable to open url", Toast.LENGTH_SHORT).show()
+    }
 }
 
 fun String.isCodeValid(): Boolean {
-    return length == 6 || Pattern.matches("[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}", this)
+    val uuidCodeRegex = "^[A-Za-z0-9]{8}-[A-Za-z0-9]{4}-[A-Za-z0-9]{4}-[A-Za-z0-9]{4}-[A-Za-z0-9]{12}$"
+    val shortCodeRegex = "^[A-Za-z0-9]{6}$"
+    return Pattern.matches(shortCodeRegex, this) || Pattern.matches(uuidCodeRegex, this)
 }
 
 fun String.isPostalCode(): Boolean {
     return length == 5 && this.isDigitsOnly()
 }
 
-fun String.attestationLabelFromKey() = "attestation.form.$this.label"
+fun String.attestationLabelFromKey(): String = "attestation.form.$this.label"
 
-fun String.attestationPlaceholderFromKey() = "attestation.form.$this.placeholder"
+fun String.attestationPlaceholderFromKey(): String = "attestation.form.$this.placeholder"
 
-fun String.attestationShortLabelFromKey() = "attestation.form.$this.shortLabel"
+fun String.attestationShortLabelFromKey(): String = "attestation.form.$this.shortLabel"
 
-fun String.attestationLongLabelFromKey() = "attestation.form.$this.longLabel"
+fun String.attestationLongLabelFromKey(): String = "attestation.form.$this.longLabel"
 
 fun String.formatNumberIfNeeded(numberFormat: NumberFormat): String {
     return try {

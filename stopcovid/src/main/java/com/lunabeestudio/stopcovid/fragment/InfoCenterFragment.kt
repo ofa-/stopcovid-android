@@ -50,7 +50,7 @@ class InfoCenterFragment : TimeMainFragment() {
         binding?.emptyButton?.setOnClickListener {
             showLoading()
             viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
-                InfoCenterManager.onAppForeground(requireContext())
+                InfoCenterManager.refreshIfNeeded(requireContext())
                 withContext(Dispatchers.Main) {
                     refreshScreen()
                 }
@@ -64,7 +64,7 @@ class InfoCenterFragment : TimeMainFragment() {
             putBoolean(Constants.SharedPrefs.HAS_NEWS, false)
         }
         viewLifecycleOwner.lifecycleScope.launch {
-            InfoCenterManager.onAppForeground(requireContext())
+            InfoCenterManager.refreshIfNeeded(requireContext())
         }
     }
 

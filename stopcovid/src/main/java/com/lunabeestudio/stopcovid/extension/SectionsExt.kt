@@ -16,30 +16,30 @@ import com.lunabeestudio.stopcovid.coreui.fastitem.dividerItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
 import com.lunabeestudio.stopcovid.fastitem.linkItem
-import com.lunabeestudio.stopcovid.model.PrivacySection
+import com.lunabeestudio.stopcovid.model.Section
 import com.mikepenz.fastadapter.GenericItem
 
-fun List<PrivacySection>.fillItems(items: MutableList<GenericItem>) {
-    forEach { privacySection ->
+fun List<Section>.fillItems(items: MutableList<GenericItem>) {
+    forEach { (section, description, links) ->
         if (items.size > 0) {
             items += spaceItem {
                 spaceRes = R.dimen.spacing_medium
             }
         }
         items += titleItem {
-            text = privacySection.section
-            identifier = privacySection.section.hashCode().toLong()
+            text = section
+            identifier = section.hashCode().toLong()
         }
-        privacySection.description?.let { description ->
+        description?.let { description ->
             items += captionItem {
                 text = description
-                identifier = privacySection.description.hashCode().toLong()
+                identifier = description.hashCode().toLong()
             }
             items += spaceItem {
                 spaceRes = R.dimen.spacing_large
             }
         }
-        privacySection.links?.forEach { link ->
+        links?.forEach { link ->
             items += linkItem {
                 text = link.label
                 url = link.url

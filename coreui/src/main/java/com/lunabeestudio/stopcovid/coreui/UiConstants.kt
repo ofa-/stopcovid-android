@@ -30,7 +30,8 @@ object UiConstants {
         UPGRADE("upgrade", 4),
         TIME("error", 5),
         BLUETOOTH("error", 6),
-        NEWS("news", 7)
+        NEWS("news", 7),
+        REMINDER("reminder", 8)
     }
 
     const val DEFAULT_LANGUAGE: String = "en"

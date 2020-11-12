@@ -20,7 +20,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
 import androidx.navigation.ui.NavigationUI.setupActionBarWithNavController
 import com.google.android.material.snackbar.Snackbar
-import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.databinding.LayoutButtonBottomSheetBinding
 import com.lunabeestudio.stopcovid.coreui.extension.applyAndConsumeWindowInsetBottom
@@ -28,9 +27,6 @@ import com.lunabeestudio.stopcovid.coreui.extension.hideBottomSheet
 import com.lunabeestudio.stopcovid.coreui.extension.showSnackBar
 import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
 import com.lunabeestudio.stopcovid.databinding.ActivityMainBinding
-import com.lunabeestudio.stopcovid.extension.robertManager
-import com.lunabeestudio.stopcovid.extension.safeNavigate
-import com.lunabeestudio.stopcovid.fragment.IsSickFragmentDirections
 
 class MainActivity : BaseActivity() {
 
@@ -39,10 +35,6 @@ class MainActivity : BaseActivity() {
 
     private val navController: NavController by lazy {
         supportFragmentManager.findFragmentById(R.id.navHostFragment)!!.findNavController()
-    }
-
-    private val robertManager: RobertManager by lazy {
-        applicationContext.robertManager()
     }
 
     private var strings: HashMap<String, String> = StringsManager.strings
@@ -118,10 +110,6 @@ class MainActivity : BaseActivity() {
         navController.addOnDestinationChangedListener { _, destination, _ ->
             binding.toolbar.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_FOCUSED)
             binding.errorLayout.isInvisible = destination.id != R.id.proximityFragment
-        }
-
-        if (robertManager.isSick) {
-            navController.safeNavigate(IsSickFragmentDirections.actionGlobalIsSickFragment())
         }
     }
 

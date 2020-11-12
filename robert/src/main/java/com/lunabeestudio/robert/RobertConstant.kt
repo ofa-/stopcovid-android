@@ -21,8 +21,10 @@ object RobertConstant {
     const val DATA_RETENTION_PERIOD: Int = 14
     const val QUARANTINE_PERIOD: Int = 14
     const val CHECK_STATUS_FREQUENCY_HOURS: Float = 24F
+    const val MIN_STATUS_RETRY_DURATION: Float = 0.6F
     const val RANDOM_STATUS_HOUR: Float = 12F
     const val PRE_SYMPTOMS_SPAN: Int = 2
+    const val POSITIVE_SAMPLE_SPAN: Int = 7
     const val MIN_HOUR_CONTACT_NOTIF: Int = 7
     const val MAX_HOUR_CONTACT_NOTIF: Int = 19
     const val BLE_SERVICE_UUID: String = "0000fd64-0000-1000-8000-00805f9b34fb"
@@ -30,7 +32,6 @@ object RobertConstant {
     const val BLE_BACKGROUND_SERVICE_MANUFACTURER_DATA_IOS: String = "1.0.0.0.0.0.0.0.0.0.0.8.0.0.0.0.0"
     const val BLE_FILTER_CONFIG: String = "{\"a\":4.3429448190325175,\"b\":0.1,\"deltas\":[39.0,27.0,23.0,21.0,20.0,19.0,18.0,17.0,16.0,15.0],\"durationThreshold\":120,\"p0\":-66.0,\"rssiThreshold\":-25,\"timeOverlap\":60,\"timeWindow\":120,\"riskThreshold\":0.1}"
     val BLE_FILTER_MODE: LocalProximityFilter.Mode = LocalProximityFilter.Mode.RISKS
-    const val MIN_GAP_SUCCESS_STATUS: Long = 30L * 60L * 1000L
     const val QR_CODE_DELETION_HOURS: Float = 24F
     const val QR_CODE_EXPIRED_HOURS: Float = 1F
     const val QR_CODE_FORMATTED_STRING: String = "Cree le: <creationDate> a <creationHour>;\nNom: <lastname>;\nPrenom: <firstname>;\nNaissance: <dob> a <cityofbirth>;\nAdresse: <address> <zip> <city>;\nSortie: <datetime-day> a <datetime-hour>;\nMotif: <reason-code>"
@@ -43,6 +44,7 @@ object RobertConstant {
         const val DATA_RETENTION_PERIOD: String = "app.dataRetentionPeriod"
         const val QUARANTINE_PERIOD: String = "app.quarantinePeriod"
         const val CHECK_STATUS_FREQUENCY: String = "app.checkStatusFrequency"
+        const val MIN_STATUS_RETRY_DURATION: String = "app.minStatusRetryDuration"
         const val RANDOM_STATUS_HOUR: String = "app.randomStatusHour"
         const val PRE_SYMPTOMS_SPAN: String = "app.preSymptomsSpan"
         const val APP_AVAILABILITY: String = "app.appAvailability"
@@ -60,6 +62,7 @@ object RobertConstant {
         const val QR_CODE_FORMATTED_STRING: String = "app.qrCode.formattedString"
         const val QR_CODE_FORMATTED_STRING_DISPLAYED: String = "app.qrCode.formattedStringDisplayed"
         const val QR_CODE_FOOTER_STRING: String = "app.qrCode.footerString"
+        const val PROXIMITY_REACTICATION_REMINDER_HOURS: String = "app.proximityReactivation.reminderHours"
     }
 
     object PREFIX {

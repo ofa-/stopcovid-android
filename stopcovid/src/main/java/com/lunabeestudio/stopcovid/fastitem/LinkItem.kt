@@ -10,6 +10,7 @@
 
 package com.lunabeestudio.stopcovid.fastitem
 
+import android.view.Gravity
 import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -26,6 +27,7 @@ class LinkItem : BaseItem<LinkItem.ViewHolder>(
     R.layout.item_link, ::ViewHolder, R.id.item_link
 ) {
     var text: String? = null
+    var gravity: Int = Gravity.CENTER_VERTICAL
     var url: String? = null
     var onClickListener: View.OnClickListener? = null
 
@@ -35,6 +37,7 @@ class LinkItem : BaseItem<LinkItem.ViewHolder>(
     override fun bindView(holder: ViewHolder, payloads: List<Any>) {
         super.bindView(holder, payloads)
         holder.textView.text = text.safeEmojiSpanify()
+        holder.rootLayout.gravity = gravity
         holder.rootLayout.setOnClickListener {
             url?.openInExternalBrowser(it.context)
             onClickListener?.onClick(it)

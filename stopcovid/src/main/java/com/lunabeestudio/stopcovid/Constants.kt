@@ -16,6 +16,7 @@ object Constants {
     object SharedPrefs {
         const val ON_BOARDING_DONE: String = "On.Boarding.Done"
         const val LAST_PRIVACY_REFRESH: String = "Last.Privacy.Refresh"
+        const val LAST_LINKS_REFRESH: String = "Last.Links.Refresh"
         const val LAST_MAINTENANCE_REFRESH: String = "Last.Maintenance.Refresh"
         const val LAST_INFO_CENTER_REFRESH: String = "Last.Info.Center.Refresh"
         const val LAST_INFO_CENTER_FETCH: String = "Last.Info.Center.Fetch"
@@ -32,6 +33,7 @@ object Constants {
 
     object WorkerNames {
         const val NOTIFICATION: String = "StopCovid.Notification.Worker"
+        const val REMINDER: String = "StopCovid.Reminder.Worker"
         const val TIME_CHANGED: String = "StopCovid.TimeChanged.Worker"
     }
 

@@ -15,9 +15,8 @@ import android.os.Bundle
 import android.text.format.DateUtils
 import android.view.View
 import androidx.fragment.app.Fragment
+import com.lunabeestudio.stopcovid.coreui.extension.stringsFormat
 import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
-import timber.log.Timber
-import java.util.IllegalFormatException
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 import kotlin.time.days
@@ -39,14 +38,7 @@ abstract class BaseFragment : Fragment() {
     }
 
     protected fun stringsFormat(key: String, vararg args: Any?): String? {
-        return strings[key]?.let {
-            try {
-                String.format(it, *args)
-            } catch (e: IllegalFormatException) {
-                Timber.e(e)
-                it
-            }
-        }
+        return strings.stringsFormat(key, *args)
     }
 
     @OptIn(ExperimentalTime::class)

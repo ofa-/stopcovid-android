@@ -15,16 +15,18 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.lunabeestudio.domain.model.FormEntry
 import com.lunabeestudio.framework.local.datasource.SecureKeystoreDataSource
+import com.lunabeestudio.robert.datasource.LocalKeystoreDataSource
+import com.lunabeestudio.stopcovid.model.AttestationMap
 
-class AttestationsViewModel(private val secureKeystoreDataSource: SecureKeystoreDataSource) : ViewModel() {
+class AttestationsViewModel(private val keystoreDataSource: LocalKeystoreDataSource) : ViewModel() {
 
-    val attestations: LiveData<List<Map<String, FormEntry>>?>
-        get() = secureKeystoreDataSource.attestationsLiveData
+    val attestations: LiveData<List<AttestationMap>?>
+        get() = keystoreDataSource.attestationsLiveData
 
-    fun removeAttestation(attestation: Map<String, FormEntry>) {
-        val attestations = secureKeystoreDataSource.attestations?.toMutableList()
+    fun removeAttestation(attestation: AttestationMap) {
+        val attestations = keystoreDataSource.attestations?.toMutableList()
         attestations?.remove(attestation)
-        secureKeystoreDataSource.attestations = attestations
+        keystoreDataSource.attestations = attestations
     }
 }
 

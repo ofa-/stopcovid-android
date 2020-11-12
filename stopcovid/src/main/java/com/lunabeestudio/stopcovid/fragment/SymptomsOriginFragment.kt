@@ -20,7 +20,6 @@ import com.lunabeestudio.stopcovid.coreui.fastitem.dividerItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
 import com.lunabeestudio.stopcovid.extension.safeNavigate
-import com.lunabeestudio.stopcovid.fastitem.bigTitleItem
 import com.lunabeestudio.stopcovid.fastitem.doubleTextItem
 import com.mikepenz.fastadapter.GenericItem
 import java.text.DateFormat
@@ -38,11 +37,6 @@ class SymptomsOriginFragment : MainFragment() {
     override fun getItems(): List<GenericItem> {
         val items = arrayListOf<GenericItem>()
 
-        items += bigTitleItem {
-            text = strings["symptomsOriginController.title2"]
-            gravity = Gravity.CENTER
-            identifier = items.count().toLong()
-        }
         items += titleItem {
             text = strings["symptomsOriginController.explanation.title"]
             gravity = Gravity.CENTER
@@ -63,7 +57,7 @@ class SymptomsOriginFragment : MainFragment() {
                 findNavController()
                     .safeNavigate(
                         SymptomsOriginFragmentDirections
-                            .actionSymptomsOriginFragmentToSendHistoryFragment(args.code, -1)
+                            .actionSymptomsOriginFragmentToPositiveTestFragment(args.code)
                     )
             }
         }
@@ -83,7 +77,7 @@ class SymptomsOriginFragment : MainFragment() {
                     findNavController()
                         .safeNavigate(
                             SymptomsOriginFragmentDirections
-                                .actionSymptomsOriginFragmentToSendHistoryFragment(args.code, index)
+                                .actionSymptomsOriginFragmentToSendHistoryFragment(args.code, Integer(index))
                         )
                 }
             }
@@ -96,7 +90,7 @@ class SymptomsOriginFragment : MainFragment() {
                 findNavController()
                     .safeNavigate(
                         SymptomsOriginFragmentDirections
-                            .actionSymptomsOriginFragmentToSendHistoryFragment(args.code, -1)
+                            .actionSymptomsOriginFragmentToPositiveTestFragment(args.code)
                     )
             }
         }

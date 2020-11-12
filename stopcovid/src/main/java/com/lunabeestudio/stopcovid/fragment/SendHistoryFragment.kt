@@ -69,7 +69,14 @@ class SendHistoryFragment : MainFragment() {
             }
         }
         viewModel.codeSuccess.observe(viewLifecycleOwner) {
-            findNavController().safeNavigate(SendHistoryFragmentDirections.actionSendHistoryFragmentToIsSickFragment())
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle(strings["sendHistoryController.successAlert.title"])
+                .setMessage(strings["sendHistoryController.successAlert.message"])
+                .setPositiveButton(strings["sendHistoryController.successAlert.button.learnMore"]) { _, _ ->
+                    findNavController().safeNavigate(SendHistoryFragmentDirections.actionSendHistoryFragmentToIsSickFragment())
+                }
+                .setCancelable(false)
+                .show()
         }
         viewModel.covidException.observe(viewLifecycleOwner) { error ->
             if (error is UnauthorizedException) {
@@ -109,7 +116,12 @@ class SendHistoryFragment : MainFragment() {
             text = strings["common.send"]
             gravity = Gravity.CENTER
             onClickListener = View.OnClickListener {
-                viewModel.verifyCode(args.code, args.firstSymptoms, requireContext().applicationContext as RobertApplication)
+                viewModel.verifyCode(
+                    args.code,
+                    args.firstSymptoms?.toInt(),
+                    args.positiveTest?.toInt(),
+                    requireContext().applicationContext as RobertApplication
+                )
             }
             startInProgress = viewModel.loadingInProgress.value == true
             getProgressButton = { button ->

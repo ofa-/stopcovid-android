@@ -57,6 +57,8 @@ interface RobertManager {
 
     val checkStatusFrequencyHour: Float
 
+    val minStatusRetryDuration: Float
+
     val randomStatusHour: Float
 
     val apiVersion: String
@@ -72,6 +74,8 @@ interface RobertManager {
     val qrCodeFooterString: String
 
     val displayDepartmentLevel: Boolean
+
+    val proximityReactivationReminderHours: List<Int>
 
     suspend fun refreshConfig(application: RobertApplication): RobertResult
 
@@ -102,7 +106,8 @@ interface RobertManager {
 
     suspend fun report(
         token: String,
-        firstSymptoms: Int,
+        firstSymptoms: Int?,
+        positiveTest: Int?,
         application: RobertApplication
     ): RobertResult
 

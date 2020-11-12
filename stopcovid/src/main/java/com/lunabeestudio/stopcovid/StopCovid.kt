@@ -53,12 +53,14 @@ import com.lunabeestudio.stopcovid.manager.ConfigDataSource
 import com.lunabeestudio.stopcovid.manager.FormManager
 import com.lunabeestudio.stopcovid.manager.InfoCenterManager
 import com.lunabeestudio.stopcovid.manager.KeyFiguresManager
+import com.lunabeestudio.stopcovid.manager.LinksManager
 import com.lunabeestudio.stopcovid.manager.PrivacyManager
 import com.lunabeestudio.stopcovid.manager.ProximityManager
 import com.lunabeestudio.stopcovid.model.DeviceSetup
 import com.lunabeestudio.stopcovid.service.ProximityService
 import com.lunabeestudio.stopcovid.worker.AtRiskNotificationWorker
 import com.lunabeestudio.stopcovid.worker.MaintenanceWorker
+import com.lunabeestudio.stopcovid.worker.ReminderNotificationWorker
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -124,12 +126,17 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication {
         }
 
         if (sharedPrefs.lastVersionCode < BuildConfig.VERSION_CODE) {
+            LinksManager.clearLocal(this)
             PrivacyManager.clearLocal(this)
             StringsManager.clearLocal(this)
             ConfigManager.clearLocal(this)
             FormManager.clearLocal(this)
+            secureKeystoreDataSource.configVersion = null
         }
 
+        appCoroutineScope.launch {
+            LinksManager.initialize(this@StopCovid)
+        }
         appCoroutineScope.launch {
             PrivacyManager.initialize(this@StopCovid)
         }
@@ -170,13 +177,16 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication {
             AppMaintenanceManager.checkForMaintenanceUpgrade(this@StopCovid)
         }
         appCoroutineScope.launch {
+            LinksManager.onAppForeground(this@StopCovid)
+        }
+        appCoroutineScope.launch {
             PrivacyManager.onAppForeground(this@StopCovid)
         }
         appCoroutineScope.launch {
             StringsManager.onAppForeground(this@StopCovid)
         }
         appCoroutineScope.launch {
-            InfoCenterManager.onAppForeground(this@StopCovid)
+            InfoCenterManager.refreshIfNeeded(this@StopCovid)
         }
         appCoroutineScope.launch {
             KeyFiguresManager.onAppForeground(this@StopCovid)
@@ -284,13 +294,28 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication {
 
     override fun refreshInfoCenter() {
         appCoroutineScope.launch {
-            InfoCenterManager.onAppForeground(this@StopCovid)
+            InfoCenterManager.refreshIfNeeded(this@StopCovid)
         }
     }
 
     fun cancelClockNotAlignedNotification() {
         val notificationManager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.cancel(UiConstants.Notification.TIME.notificationId)
+    }
+
+    fun setReminder(inHour: Int) {
+        val reminderWorker = OneTimeWorkRequestBuilder<ReminderNotificationWorker>()
+            .setInitialDelay(inHour.toLong(), TimeUnit.HOURS)
+            .build()
+        WorkManager.getInstance(applicationContext)
+            .enqueueUniqueWork(Constants.WorkerNames.REMINDER, ExistingWorkPolicy.KEEP, reminderWorker)
+    }
+
+    fun cancelReminder() {
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.cancel(UiConstants.Notification.REMINDER.notificationId)
+        WorkManager.getInstance(applicationContext)
+            .cancelUniqueWork(Constants.WorkerNames.REMINDER)
     }
 
     suspend fun sendUpgradeNotification() {

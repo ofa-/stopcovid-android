@@ -12,8 +12,6 @@ package com.lunabeestudio.stopcovid.fragment
 
 import android.os.Bundle
 import android.view.View
-import com.lunabeestudio.stopcovid.R
-import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.extension.fillItems
 import com.lunabeestudio.stopcovid.manager.PrivacyManager
 import com.mikepenz.fastadapter.GenericItem
@@ -33,9 +31,6 @@ class PrivacyFragment : MainFragment() {
     override fun getItems(): List<GenericItem> {
         val items = arrayListOf<GenericItem>()
 
-        items += spaceItem {
-            spaceRes = R.dimen.spacing_xlarge
-        }
         PrivacyManager.privacySections.value?.fillItems(items)
 
         return items
