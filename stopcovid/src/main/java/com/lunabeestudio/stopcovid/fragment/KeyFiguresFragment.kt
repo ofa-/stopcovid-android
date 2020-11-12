@@ -46,6 +46,7 @@ import com.lunabeestudio.stopcovid.extension.showPostalCodeDialog
 import com.lunabeestudio.stopcovid.fastitem.KeyFigureCardItem
 import com.lunabeestudio.stopcovid.fastitem.bigTitleItem
 import com.lunabeestudio.stopcovid.fastitem.keyFigureCardItem
+import com.lunabeestudio.stopcovid.fastitem.linkCardItem
 import com.lunabeestudio.stopcovid.manager.KeyFiguresManager
 import com.lunabeestudio.stopcovid.manager.ShareManager
 import com.lunabeestudio.stopcovid.model.KeyFigure
@@ -139,6 +140,18 @@ class KeyFiguresFragment : MainFragment() {
                     text = strings["keyFiguresController.section.health"]
                     identifier = items.count().toLong()
                 }
+                items += linkCardItem {
+                    label = strings["keyFiguresController.explanation"]
+                    iconRes = R.drawable.ic_faq
+                    onClickListener = View.OnClickListener {
+                        MaterialAlertDialogBuilder(requireContext())
+                            .setTitle(strings["keyFiguresController.explanation.alert.title"])
+                            .setMessage(strings["keyFiguresController.explanation.alert.message"])
+                            .setPositiveButton(strings["keyFiguresController.explanation.alert.button"], null)
+                            .show()
+                    }
+                    identifier = items.count().toLong()
+                }
                 keyFigures.filter { it.category == KeyFigureCategory.HEALTH }.forEach { figure ->
                     items += itemForFigure(figure)
                 }
@@ -174,7 +187,11 @@ class KeyFiguresFragment : MainFragment() {
         return keyFigureCardItem {
             updatedAt = stringsFormat(
                 "keyFigures.update",
-                figure.lastUpdate.seconds.getRelativeDateTimeString(requireContext())
+                if (figure.category == KeyFigureCategory.HEALTH) {
+                    figure.lastUpdate.seconds.getRelativeDateString(requireContext())
+                } else {
+                    figure.lastUpdate.seconds.getRelativeDateTimeString(requireContext())
+                }
             )
 
             if (sharedPrefs.hasChosenPostalCode) {

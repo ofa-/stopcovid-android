@@ -167,6 +167,9 @@ class RobertManagerImpl(
     override val qrCodeFormattedString: String
         get() = keystoreRepository.qrCodeFormattedString ?: RobertConstant.QR_CODE_FORMATTED_STRING
 
+    override val qrCodeFormattedStringDisplayed: String
+        get() = keystoreRepository.qrCodeFormattedStringDisplayed ?: RobertConstant.QR_CODE_FORMATTED_STRING_DISPLAYED
+
     override val qrCodeFooterString: String
         get() = keystoreRepository.qrCodeFooterString ?: RobertConstant.QR_CODE_FOOTER_STRING
 
@@ -342,6 +345,11 @@ class RobertManagerImpl(
             it.name == RobertConstant.CONFIG.QR_CODE_FORMATTED_STRING
         }?.value as? String)?.let { formattedString ->
             keystoreRepository.qrCodeFormattedString = formattedString
+        }
+        (configuration?.firstOrNull {
+            it.name == RobertConstant.CONFIG.QR_CODE_FORMATTED_STRING_DISPLAYED
+        }?.value as? String)?.let { formattedStringDisplayed ->
+            keystoreRepository.qrCodeFormattedStringDisplayed = formattedStringDisplayed
         }
         (configuration?.firstOrNull {
             it.name == RobertConstant.CONFIG.QR_CODE_FOOTER_STRING

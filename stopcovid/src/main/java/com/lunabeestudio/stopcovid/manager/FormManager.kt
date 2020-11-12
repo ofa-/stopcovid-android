@@ -25,6 +25,8 @@ import timber.log.Timber
 import java.io.File
 import java.lang.reflect.Type
 
+typealias AttestationForm = List<List<FormField>>
+
 object FormManager {
 
     private var gson: Gson = Gson()
@@ -32,10 +34,10 @@ object FormManager {
     private const val cacheFileName: String = "form.json"
     private const val assetFolderName: String = "Form"
     private const val url: String = com.lunabeestudio.stopcovid.coreui.BuildConfig.SERVER_URL + BuildConfig.FORM_PATH
-    private val typeKeyFigure: Type = object : TypeToken<List<List<FormField>>>() {}.type
+    private val typeKeyFigure: Type = object : TypeToken<AttestationForm>() {}.type
 
-    private val _form: MutableLiveData<Event<List<List<FormField>>>> = MutableLiveData()
-    val form: LiveData<Event<List<List<FormField>>>>
+    private val _form: MutableLiveData<Event<AttestationForm>> = MutableLiveData()
+    val form: LiveData<Event<AttestationForm>>
         get() = _form
 
     suspend fun initialize(context: Context) {
@@ -56,13 +58,13 @@ object FormManager {
         }
     }
 
-    private suspend fun loadLocal(context: Context): List<List<FormField>>? {
+    private suspend fun loadLocal(context: Context): AttestationForm? {
         val formFile = File(context.filesDir, cacheFileName)
         return if (formFile.exists()) {
             withContext(Dispatchers.IO) {
                 try {
                     Timber.v("Loading $formFile to object")
-                    gson.fromJson<List<List<FormField>>>(formFile.readText(), typeKeyFigure)
+                    gson.fromJson<AttestationForm>(formFile.readText(), typeKeyFigure)
                 } catch (e: Exception) {
                     Timber.e(e)
                     null
@@ -73,10 +75,10 @@ object FormManager {
         }
     }
 
-    private suspend fun getDefaultAssetFile(context: Context): List<List<FormField>>? {
+    private suspend fun getDefaultAssetFile(context: Context): AttestationForm? {
         return withContext(Dispatchers.IO) {
             @Suppress("BlockingMethodInNonBlockingContext")
-            gson.fromJson<List<List<FormField>>>(context.assets.open("$assetFolderName/$cacheFileName").use {
+            gson.fromJson<AttestationForm>(context.assets.open("$assetFolderName/$cacheFileName").use {
                 it.readBytes().toString(Charsets.UTF_8)
             }, typeKeyFigure)
         }

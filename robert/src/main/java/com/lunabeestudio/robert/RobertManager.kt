@@ -67,6 +67,8 @@ interface RobertManager {
 
     val qrCodeFormattedString: String
 
+    val qrCodeFormattedStringDisplayed: String
+
     val qrCodeFooterString: String
 
     val displayDepartmentLevel: Boolean

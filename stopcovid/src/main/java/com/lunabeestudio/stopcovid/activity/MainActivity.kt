@@ -73,21 +73,36 @@ class MainActivity : BaseActivity() {
     }
 
     private fun handleIntent(intent: Intent?) {
-        intent?.getStringExtra("data")?.let { data ->
-            Uri.parse(data)?.let {
-                navController.navigate(Uri.parse(data), navOptions {
-                    anim {
-                        enter = R.anim.nav_default_enter_anim
-                        exit = R.anim.nav_default_exit_anim
-                        popEnter = R.anim.nav_default_pop_enter_anim
-                        popExit = R.anim.nav_default_pop_exit_anim
-                    }
-                })
+        intent?.let {
+            val extraData = intent.getStringExtra("data")?.let {
+                Uri.parse(it)
+            }
+
+            fixIntentData(intent)
+
+            (extraData ?: intent.data)?.let { data ->
+                if (navController.graph.hasDeepLink(data)) {
+                    navController.navigate(data, navOptions {
+                        anim {
+                            enter = R.anim.nav_default_enter_anim
+                            exit = R.anim.nav_default_exit_anim
+                            popEnter = R.anim.nav_default_pop_enter_anim
+                            popExit = R.anim.nav_default_pop_exit_anim
+                        }
+                        launchSingleTop = true
+                    })
+                }
             }
 
             intent.data = null
-            setIntent(intent)
         }
+    }
+
+    private fun fixIntentData(intent: Intent) {
+        val uriBuilder = intent.data?.buildUpon()
+            ?.path(intent.data?.path?.takeIf { it != "/" })
+
+        intent.data = uriBuilder?.build()
     }
 
     private fun initStringsObserver() {

@@ -38,17 +38,24 @@ object StringsManager : ServerManager() {
 
     suspend fun initialize(context: Context) {
         prevLanguage = Locale.getDefault().language
-        loadLocal<HashMap<String, String>>(context, false)?.let {
+        loadLocal<HashMap<String, String>>(context)?.let {
             strings = it
         }
     }
 
     suspend fun onAppForeground(context: Context) {
-        val forceRefresh = prevLanguage != Locale.getDefault().language
-        val hasFetch = fetchLast(context, forceRefresh)
-        if (hasFetch || forceRefresh) {
-            loadLocal<HashMap<String, String>>(context, forceRefresh)?.let {
-                prevLanguage = Locale.getDefault().language
+        val languageHasChanged = prevLanguage != Locale.getDefault().language
+        prevLanguage = Locale.getDefault().language
+
+        if (languageHasChanged) {
+            loadLocal<HashMap<String, String>>(context)?.let {
+                strings = it
+            }
+        }
+
+        val hasFetch = fetchLast(context, languageHasChanged)
+        if (hasFetch) {
+            loadLocal<HashMap<String, String>>(context)?.let {
                 strings = it
             }
         }

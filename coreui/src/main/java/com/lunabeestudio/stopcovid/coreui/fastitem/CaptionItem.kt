@@ -13,6 +13,7 @@ package com.lunabeestudio.stopcovid.coreui.fastitem
 import android.view.Gravity
 import android.view.View
 import android.widget.TextView
+import androidx.annotation.StyleRes
 import androidx.recyclerview.widget.RecyclerView
 import com.lunabeestudio.stopcovid.coreui.R
 import com.lunabeestudio.stopcovid.coreui.extension.safeEmojiSpanify
@@ -23,10 +24,19 @@ class CaptionItem : BaseItem<CaptionItem.ViewHolder>(
     var text: String? = null
     var gravity: Int = Gravity.NO_GRAVITY
 
+    @StyleRes
+    var textAppearance: Int = R.style.TextAppearance_StopCovid_Caption
+
     override fun bindView(holder: ViewHolder, payloads: List<Any>) {
         super.bindView(holder, payloads)
         holder.textView.text = text.safeEmojiSpanify()
         holder.textView.gravity = gravity
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            holder.textView.setTextAppearance(textAppearance)
+        } else {
+            @Suppress("DEPRECATION")
+            holder.textView.setTextAppearance(holder.textView.context, textAppearance)
+        }
     }
 
     class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {

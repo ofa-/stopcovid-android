@@ -34,6 +34,7 @@ object RobertConstant {
     const val QR_CODE_DELETION_HOURS: Float = 24F
     const val QR_CODE_EXPIRED_HOURS: Float = 1F
     const val QR_CODE_FORMATTED_STRING: String = "Cree le: <creationDate> a <creationHour>;\nNom: <lastname>;\nPrenom: <firstname>;\nNaissance: <dob> a <cityofbirth>;\nAdresse: <address> <zip> <city>;\nSortie: <datetime-day> a <datetime-hour>;\nMotif: <reason-code>"
+    const val QR_CODE_FORMATTED_STRING_DISPLAYED: String = "Créé le <creationDate> à <creationHour>\nNom : <lastname>\nPrénom : <firstname>\nNaissance : <dob> à <cityofbirth>\nAdresse : <address> <zip> <city>\nSortie : <datetime-day> à <datetime-hour>\nMotif: <reason-code>"
     const val QR_CODE_FOOTER_STRING: String = "<firstname> - <datetime-day>, <datetime-hour>\n<reason-shortlabel>"
 
     object CONFIG {
@@ -57,6 +58,7 @@ object RobertConstant {
         const val QR_CODE_DELETION_HOURS: String = "app.qrCode.deletionHours"
         const val QR_CODE_EXPIRED_HOURS: String = "app.qrCode.expiredHours"
         const val QR_CODE_FORMATTED_STRING: String = "app.qrCode.formattedString"
+        const val QR_CODE_FORMATTED_STRING_DISPLAYED: String = "app.qrCode.formattedStringDisplayed"
         const val QR_CODE_FOOTER_STRING: String = "app.qrCode.footerString"
     }
 

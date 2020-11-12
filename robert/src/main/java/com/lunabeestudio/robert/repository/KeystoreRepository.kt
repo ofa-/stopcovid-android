@@ -184,6 +184,12 @@ internal class KeystoreRepository(
             keystoreDataSource.qrCodeFormattedString = value
         }
 
+    var qrCodeFormattedStringDisplayed: String?
+        get() = keystoreDataSource.qrCodeFormattedStringDisplayed
+        set(value) {
+            keystoreDataSource.qrCodeFormattedStringDisplayed = value
+        }
+
     var qrCodeFooterString: String?
         get() = keystoreDataSource.qrCodeFooterString
         set(value) {

@@ -46,13 +46,13 @@ abstract class ServerManager {
         }
     }
 
-    protected suspend fun <T> loadLocal(context: Context, forceRefresh: Boolean): T? {
+    protected suspend fun <T> loadLocal(context: Context): T? {
         val currentLanguage = Locale.getDefault().language
-        val result: T? = loadLocal(context, currentLanguage) ?: loadAssetFile(context, currentLanguage)
-        if (result == null && (shouldRefresh(context) || forceRefresh)) {
-            fetchLast(context, UiConstants.DEFAULT_LANGUAGE)
-        }
-        return result ?: loadLocal(context, UiConstants.DEFAULT_LANGUAGE) ?: loadAssetFile(context, UiConstants.DEFAULT_LANGUAGE)
+
+        return loadFromFiles(context, currentLanguage)
+            ?: loadFromAssets(context, currentLanguage)
+            ?: loadFromFiles(context, UiConstants.DEFAULT_LANGUAGE)
+            ?: loadFromAssets(context, UiConstants.DEFAULT_LANGUAGE)
     }
 
     private suspend fun fetchLast(context: Context, languageCode: String): Boolean {
@@ -67,7 +67,7 @@ abstract class ServerManager {
         }
     }
 
-    private suspend fun <T> loadLocal(context: Context, languageCode: String): T? {
+    private suspend fun <T> loadFromFiles(context: Context, languageCode: String): T? {
         val fileName = "${prefix(context)}$languageCode${extension()}"
         val file = File(context.filesDir, fileName)
         return if (!file.exists()) {
@@ -86,7 +86,7 @@ abstract class ServerManager {
         }
     }
 
-    private suspend fun <T> loadAssetFile(context: Context, languageCode: String): T? {
+    private suspend fun <T> loadFromAssets(context: Context, languageCode: String): T? {
         val fileName = "${prefix(context)}$languageCode${extension()}"
         @Suppress("BlockingMethodInNonBlockingContext")
         return withContext(Dispatchers.IO) {

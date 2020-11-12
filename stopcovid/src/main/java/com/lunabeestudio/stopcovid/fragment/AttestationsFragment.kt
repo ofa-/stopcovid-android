@@ -176,7 +176,9 @@ class AttestationsFragment : MainFragment() {
             this.allowShare = allowShare
             onShare = {
                 val uri = ShareManager.getShareCaptureUriFromBitmap(requireContext(), bitmap, "qrCode")
-                ShareManager.shareImageAndText(requireContext(), uri, strings["attestationsController.menu.share.text"]) {
+                val text = listOf(attestationToFormattedStringDisplayed(attestation),
+                    strings["attestationsController.menu.share.text"]).joinToString("\n\n")
+                ShareManager.shareImageAndText(requireContext(), uri, text) {
                     strings["common.error.unknown"]?.let { showErrorSnackBar(it) }
                 }
             }
@@ -194,7 +196,8 @@ class AttestationsFragment : MainFragment() {
             onClick = {
                 findNavController().navigate(
                     AttestationsFragmentDirections.actionAttestationsFragmentToFullscreenAttestationFragment(
-                        attestationToFormattedString(attestation)
+                        attestationToFormattedString(attestation),
+                        attestationToFormattedStringDisplayed(attestation)
                     )
                 )
             }
@@ -205,6 +208,12 @@ class AttestationsFragment : MainFragment() {
 
     private fun attestationToFormattedString(attestation: Map<String, FormEntry>): String {
         return robertManager.qrCodeFormattedString
+            .attestationReplaceKnownValue(attestation)
+            .attestationReplaceUnknownValues()
+    }
+
+    private fun attestationToFormattedStringDisplayed(attestation: Map<String, FormEntry>): String {
+        return robertManager.qrCodeFormattedStringDisplayed
             .attestationReplaceKnownValue(attestation)
             .attestationReplaceUnknownValues()
     }

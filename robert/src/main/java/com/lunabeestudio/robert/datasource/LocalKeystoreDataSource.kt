@@ -41,6 +41,7 @@ interface LocalKeystoreDataSource {
     var qrCodeDeletionHours: Float?
     var qrCodeExpiredHours: Float?
     var qrCodeFormattedString: String?
+    var qrCodeFormattedStringDisplayed: String?
     var qrCodeFooterString: String?
     var displayDepartmentLevel: Boolean?
 }

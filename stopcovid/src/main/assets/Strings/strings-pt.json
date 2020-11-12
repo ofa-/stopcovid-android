@@ -290,7 +290,7 @@
     "myHealthController.yourDepartment.title": "Meu Departamento",
     "myHealthController.yourDepartment.subtitle": "Você poderá informar-se sobre a evolução da pandemia de COVID-19 no seu Departamento.",
     "myHealthController.yourDepartment.buttonTitle": "Obter maiores informações",
-    "myHealthController.yourDepartment.url": "https://geodes.santepubliquefrance.fr/#c=indicator&i=sp_ti_tp_7j.tx_pe_gliss&s=2020-09-07-2020-09-13&t=a01&view=map2",
+     "myHealthController.yourDepartment.url":"https://geodes.santepubliquefrance.fr/#view=map2&c=indicator",
     "myHealthController.notification.title": "Notificação em caso de risco",
     "myHealthController.notification.subtitle": "Você será alertado(a), se tiver estado próximo a um utilizador declarado como caso de COVID-19 (distância estimada a menos de um metro e durante pelo menos 15 minutos). A verificação do seu estado é efetuada a cada 24h.\n\nTousAntiCovid dar-lhe-á, então, as recomendações do Ministério das Solidariedades e da Saúde.",
     "myHealthController.alert.atitudeToAdopt": "Nossas recomendações",
@@ -457,7 +457,7 @@
     "attestationsController.attestationWebSite": "Certificate website",
     "attestationsController.termsOfUse.alert.title": "Terms",
     "attestationsController.termsOfUse.alert.message": "The manager of the \"TousAntiCovid\" app does not process any of the information entered into the certificate generator.",
-    "attestationsController.termsOfUse.url": "https://bonjour.tousanticovid.gouv.fr/privacy.html",
+    "attestationsController.termsOfUse.url": "https://bonjour.tousanticovid.gouv.fr/privacy.html#attestation",
     "newAttestationController.title": "New certificate",
     "newAttestationController.generate": "Generate",
     "newAttestationController.saveMyData": "Remember me",
@@ -473,7 +473,7 @@
     "attestationsController.menu.delete.alert.message": "Are you sure you want to delete this exemption certificate?",
     "attestationFieldItemChoiceController.title": "Choose a reason",
     "newAttestationController.generate.alert.title": "Important",
-    "newAttestationController.generate.alert.message": "I hereby certify that my reason for going out is one of the authorised reasons under the terms of the general measures required to cope with the COVID-19 pandemic as part of the health state of emergency.",
+    "newAttestationController.generate.alert.message": "Je certifie que mon déplacement est lié au motif suivant autorisé par le décret n°2020-1310 du 29 octobre 2020 prescrivant les mesures générales nécessaires pour faire face à l'épidémie de Covid19 dans le cadre de l'état d'urgence sanitaire.",
     "newAttestationController.generate.alert.validate": "I hereby certify",
     "newAttestationController.missingInfo.alert.title": "Attention",
     "newAttestationController.missingInfo.alert.message": "All fields must be completed to generate a certificate.",
@@ -484,13 +484,21 @@
     "attestationsController.expiredSection.subtitle": "These exemption certificates will be deleted from your phone automatically.",
     "attestationsController.menu.share": "Share the certificate",
     "attestationsController.menu.share.text": "Here is a #TousAntiCovid exemption certificate",
-    "newAttestationController.header": "",
-    "attestationController.footer.noAttestations": "attestationController.footer.noAttestations",
+    "newAttestationController.header": "En application du décret n°2020-1310 du 29 octobre 2020 prescrivant les mesures générales nécessaires pour faire face à l'épidémie de Covid19 dans le cadre de l'état d'urgence sanitaire",
+    
     "supportController.departmentLevel": "Display by Département",
     "supportController.departmentLevel.activate": "Activate",
     "supportController.departmentLevel.deactivate": "Deactivate",
     "newAttestationController.generate.error.alert.title": "Attention",
     "newAttestationController.generate.error.alert.message": "An error occurred when generating the certificate",
 
-    "accessibility.hint.otherActions": "Other actions"
+    "accessibility.hint.otherActions": "Other actions",
+    "attestationFieldItemChoiceController.footer": "- Les personnes souhaitant bénéficier de l'une de ces exceptions doivent se munir s'il y a lieu, lors de leurs déplacements hors de leur domicile, d'un document leur permettant de justifier que le déplacement considéré entre dans le champ de l'une de ces exceptions.\n- Déplacements professionnels ne pouvant être différés : à utiliser par les travailleurs non-salariés, lorsqu'ils ne peuvent disposer d'un justificatif de déplacement établi par leur employeur.\n- Achats de première nécessité : y compris les acquisitions à titre gratuit (distribution de denrées alimentaires...) et les déplacements liés à la perception de prestations sociales et au retrait d'espèces.",
+    "keyFiguresController.explanation": "Key figures updates",
+    "keyFiguresController.explanation.alert.title": "Key figures updates",
+    "keyFiguresController.explanation.alert.message": "Les données sur le R Effectif sont mises à jour deux fois par semaines (le mardi et vendredi), et le nombre de nouveaux cas, le taux d'incidence, le taux de positivité et le taux d’occupation sont mis à jour une fois par jour, après consolidation par Santé Publique France et le Ministère des Solidarités et de la Santé.",
+    "keyFiguresController.explanation.alert.button": "Ok, got it",
+    
+    "notification.ultimateStatus.title":"TousAntiCovid a besoin de vous",
+    "notification.ultimateStatus.message":"Relancez TousAntiCovid dès que possible pour assurer son bon fonctionnement. Merci !"
 }

@@ -2,11 +2,11 @@
   "config": [
 	{
       "name": "lastUpdate",
-      "value": "28 October 2020"
+      "value": "3 november 2020"
     },
     {
       "name": "version",
-      "value": 3
+      "value": 5
     },
     {
       "name": "app.apiVersion",
@@ -34,7 +34,7 @@
     },
     {
       "name": "app.qrCode.expiredHours",
-      "value": 12.0
+      "value": 8.0
     },
     {
       "name": "app.qrCode.formattedString",

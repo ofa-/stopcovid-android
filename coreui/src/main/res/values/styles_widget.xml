@@ -78,8 +78,8 @@
         <item name="boxCornerRadiusTopEnd">@dimen/corner_radius</item>
         <item name="boxCornerRadiusBottomStart">@dimen/corner_radius</item>
         <item name="boxCornerRadiusBottomEnd">@dimen/corner_radius</item>
-        <item name="android:layout_marginStart">@dimen/spacing_xlarge</item>
-        <item name="android:layout_marginEnd">@dimen/spacing_xlarge</item>
+        <item name="android:layout_marginStart">@dimen/spacing_large</item>
+        <item name="android:layout_marginEnd">@dimen/spacing_large</item>
         <item name="errorIconDrawable">@null</item>
         <item name="errorEnabled">true</item>
     </style>

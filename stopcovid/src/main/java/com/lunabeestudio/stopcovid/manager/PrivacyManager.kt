@@ -30,7 +30,7 @@ object PrivacyManager : ServerManager() {
 
     suspend fun initialize(context: Context) {
         prevLanguage = Locale.getDefault().language
-        loadLocal<List<PrivacySection>>(context, false)?.let {
+        loadLocal<List<PrivacySection>>(context)?.let {
             setPrivacySection(it)
         }
     }
@@ -42,11 +42,18 @@ object PrivacyManager : ServerManager() {
     }
 
     suspend fun onAppForeground(context: Context) {
-        val forceRefresh = prevLanguage != Locale.getDefault().language
-        val hasFetch = fetchLast(context, forceRefresh)
-        if (hasFetch || forceRefresh) {
-            prevLanguage = Locale.getDefault().language
-            loadLocal<List<PrivacySection>>(context, forceRefresh)?.let {
+        val languageHasChanged = prevLanguage != Locale.getDefault().language
+        prevLanguage = Locale.getDefault().language
+
+        if (languageHasChanged) {
+            loadLocal<List<PrivacySection>>(context)?.let {
+                setPrivacySection(it)
+            }
+        }
+
+        val hasFetch = fetchLast(context, languageHasChanged)
+        if (hasFetch) {
+            loadLocal<List<PrivacySection>>(context)?.let {
                 setPrivacySection(it)
             }
         }

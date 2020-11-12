@@ -91,6 +91,13 @@
         android:id="@+id/attestationsFragment"
         android:name="com.lunabeestudio.stopcovid.fragment.AttestationsFragment"
         tools:layout="@layout/fragment_recycler_view">
+        <deepLink app:uri="tousanticovid://attestations" />
+        <deepLink
+            android:autoVerify="true"
+            app:uri="https://bonjour.tousanticovid.gouv.fr/app/attestations" />
+        <deepLink
+            android:autoVerify="true"
+            app:uri="https://bonjour.stopcovid.gouv.fr/app/attestations" />
         <action
             android:id="@+id/action_attestationsFragment_to_newAttestationFragment"
             app:destination="@id/newAttestationFragment"
@@ -139,6 +146,10 @@
             android:name="qrCodeValue"
             app:argType="string"
             app:nullable="false" />
+        <argument
+            android:name="qrCodeValueDisplayed"
+            app:argType="string"
+            app:nullable="false" />
     </fragment>
     <fragment
         android:id="@+id/captchaFragment"
@@ -148,8 +159,12 @@
         android:id="@+id/reportFragment"
         android:name="com.lunabeestudio.stopcovid.fragment.ReportFragment"
         tools:layout="@layout/fragment_recycler_view">
-        <deepLink app:uri="https://bonjour.tousanticovid.gouv.fr/app/code/{code}" />
-        <deepLink app:uri="https://bonjour.stopcovid.gouv.fr/app/code/{code}" />
+        <deepLink
+            android:autoVerify="true"
+            app:uri="https://bonjour.tousanticovid.gouv.fr/app/code/{code}" />
+        <deepLink
+            android:autoVerify="true"
+            app:uri="https://bonjour.stopcovid.gouv.fr/app/code/{code}" />
         <argument
             android:name="code"
             android:defaultValue="@null"

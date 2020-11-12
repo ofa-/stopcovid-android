@@ -56,18 +56,35 @@ abstract class BaseFragment : Fragment() {
         return when {
             now - this <= 1.minutes -> strings["common.justNow"]
             now - this <= 1.days -> DateUtils.getRelativeTimeSpanString(
-                    this.coerceAtMost(now - 1.minutes).toLongMilliseconds(),
-                    now.toLongMilliseconds(),
-                    DateUtils.MINUTE_IN_MILLIS,
-                    DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_SHOW_YEAR or DateUtils.FORMAT_ABBREV_MONTH,
-            ).toString()
+                this.coerceAtMost(now - 1.minutes).toLongMilliseconds(),
+                now.toLongMilliseconds(),
+                DateUtils.MINUTE_IN_MILLIS,
+                DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_SHOW_YEAR or DateUtils.FORMAT_ABBREV_MONTH,
+            )
+                .toString()
+                .fixQuoteInString()
             else -> DateUtils.getRelativeDateTimeString(
-                    context,
-                    this.toLongMilliseconds(),
-                    DateUtils.DAY_IN_MILLIS,
-                    DateUtils.WEEK_IN_MILLIS,
-                    DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_SHOW_YEAR or DateUtils.FORMAT_ABBREV_MONTH,
-            ).toString()
+                context,
+                this.toLongMilliseconds(),
+                DateUtils.DAY_IN_MILLIS,
+                DateUtils.WEEK_IN_MILLIS,
+                DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_SHOW_YEAR or DateUtils.FORMAT_ABBREV_MONTH,
+            )
+                .toString()
+                .fixQuoteInString()
         }
     }
+
+    @OptIn(ExperimentalTime::class)
+    protected fun Duration.getRelativeDateString(context: Context): String? {
+        return DateUtils.getRelativeTimeSpanString(
+            this.toLongMilliseconds(),
+            System.currentTimeMillis(),
+            DateUtils.DAY_IN_MILLIS,
+            DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_SHOW_YEAR or DateUtils.FORMAT_ABBREV_MONTH)
+            .toString()
+    }
+
+    // Dirty hack to fix strange display of quotes on some Android devices
+    private fun String.fixQuoteInString(): String = replace("'", "")
 }

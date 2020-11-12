@@ -20,7 +20,13 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.ServiceConnection
 import android.content.SharedPreferences
+import android.content.pm.ShortcutInfo
+import android.content.pm.ShortcutManager
 import android.graphics.Color
+import android.graphics.drawable.Icon
+import android.location.LocationManager
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.os.SystemClock
@@ -29,8 +35,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
 import android.widget.FrameLayout
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ShareCompat
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.view.ViewCompat
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
@@ -135,9 +143,7 @@ class ProximityFragment : TimeMainFragment() {
     private val interpolator = DecelerateInterpolator()
     private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent) {
-            if (intent.action == BluetoothAdapter.ACTION_STATE_CHANGED) {
-                refreshItems()
-            }
+            refreshItems()
         }
     }
     private var proximityClickThreshold = 0L
@@ -175,8 +181,8 @@ class ProximityFragment : TimeMainFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = super.onCreateView(inflater, container, savedInstanceState)
-        val filter = IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED)
-        activity?.registerReceiver(receiver, filter)
+        activity?.registerReceiver(receiver, IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED))
+        activity?.registerReceiver(receiver, IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION))
 
         getActivityBinding()?.errorLayout?.let { errorLayout ->
             errorLayout.post {
@@ -186,7 +192,33 @@ class ProximityFragment : TimeMainFragment() {
 
         isProximityOn = ProximityManager.isProximityOn(requireContext(), robertManager)
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
+            setupAppShortcuts()
+        }
+
         return view
+    }
+
+    @RequiresApi(Build.VERSION_CODES.N_MR1)
+    private fun setupAppShortcuts() {
+        getSystemService(requireContext(), ShortcutManager::class.java)?.let { shortcutManager ->
+            val builder = ShortcutInfo.Builder(context, CURFEW_CERTIFICATE_SHORTCUT_ID)
+
+            strings["attestationsController.title"]?.let { builder.setShortLabel(it) }
+            strings["home.moreSection.curfewCertificate"]?.let { builder.setLongLabel(it) }
+
+            val intent = Intent(
+                Intent.ACTION_VIEW,
+                Uri.parse(CURFEW_CERTIFICATE_SHORTCUT_URI)
+            )
+            builder
+                .setIcon(Icon.createWithResource(context, R.drawable.ic_document))
+                .setIntent(intent)
+
+            val shortcut = builder.build()
+
+            shortcutManager.setDynamicShortcuts(listOf(shortcut))
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -856,5 +888,7 @@ class ProximityFragment : TimeMainFragment() {
         private const val LIGHT_STRING_KEY: String = "light"
         private const val SHORT_LABEL_STRING_KEY: String = "shortLabel"
         private const val COLOR_CODE_STRING_KEY: String = "colorCode"
+        private const val CURFEW_CERTIFICATE_SHORTCUT_ID: String = "curfewCertificateShortcut"
+        private const val CURFEW_CERTIFICATE_SHORTCUT_URI: String = "tousanticovid://attestations/"
     }
 }

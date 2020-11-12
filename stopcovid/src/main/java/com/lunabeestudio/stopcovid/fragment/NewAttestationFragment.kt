@@ -124,6 +124,7 @@ class NewAttestationFragment : MainFragment() {
         strings["newAttestationController.header"]?.takeIf { it.isNotBlank() }?.let { header ->
             items += captionItem {
                 text = header
+                textAppearance = R.style.TextAppearance_StopCovid_Caption_Small_Grey
                 identifier = text.hashCode().toLong()
             }
         }
@@ -149,6 +150,7 @@ class NewAttestationFragment : MainFragment() {
         }
         items += captionItem {
             text = strings["newAttestationController.footer"]
+            textAppearance = R.style.TextAppearance_StopCovid_Caption_Small_Grey
             identifier = text.hashCode().toLong()
         }
 
@@ -176,19 +178,24 @@ class NewAttestationFragment : MainFragment() {
                     }
                 }
             }
-            "datetime" -> pickerEditTextItem {
-                placeholder = strings[formField.key.attestationPlaceholderFromKey()]
-                hint = strings[formField.key.attestationLabelFromKey()]
-                text = viewModel.infos[formField.key]?.value?.toLongOrNull()?.let { timestamp ->
-                    dateTimeFormat.format(Date(timestamp))
+            "datetime" -> {
+                if (viewModel.infos[formField.key] == null) {
+                    viewModel.infos[formField.key] = FormEntry(System.currentTimeMillis().toString(), formField.type)
                 }
-                onClick = {
-                    val initialTimestamp = viewModel.infos[formField.key]?.value?.toLongOrNull()
-                        ?: System.currentTimeMillis()
-                    showDateTimePicker(initialTimestamp) { newDate ->
-                        text = dateTimeFormat.format(Date(newDate))
-                        viewModel.infos[formField.key] = FormEntry(newDate.toString(), formField.type)
-                        binding?.recyclerView?.adapter?.notifyDataSetChanged()
+                pickerEditTextItem {
+                    placeholder = strings[formField.key.attestationPlaceholderFromKey()]
+                    hint = strings[formField.key.attestationLabelFromKey()]
+                    text = viewModel.infos[formField.key]?.value?.toLongOrNull()?.let { timestamp ->
+                        dateTimeFormat.format(Date(timestamp))
+                    }
+                    onClick = {
+                        val initialTimestamp = viewModel.infos[formField.key]?.value?.toLongOrNull()
+                            ?: System.currentTimeMillis()
+                        showDateTimePicker(initialTimestamp) { newDate ->
+                            text = dateTimeFormat.format(Date(newDate))
+                            viewModel.infos[formField.key] = FormEntry(newDate.toString(), formField.type)
+                            binding?.recyclerView?.adapter?.notifyDataSetChanged()
+                        }
                     }
                 }
             }
