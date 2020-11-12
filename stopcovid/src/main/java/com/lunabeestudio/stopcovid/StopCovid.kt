@@ -153,9 +153,6 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication {
                 BuildConfig.APP_MAINTENANCE_URL
             )
         }
-        appCoroutineScope.launch {
-            robertManager.refreshConfig(this@StopCovid)
-        }
 
         val config = BundledEmojiCompatConfig(this)
         EmojiCompat.init(config)
@@ -186,6 +183,9 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication {
         }
         appCoroutineScope.launch {
             FormManager.onAppForeground(this@StopCovid)
+        }
+        appCoroutineScope.launch {
+            robertManager.refreshConfig(this@StopCovid)
         }
 
         refreshProximityService()
