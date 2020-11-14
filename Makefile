@@ -31,6 +31,9 @@ keystore = stopcovid/my-release-key.jks
 build: $(keystore) .
 	./gradlew assembleRelease
 
+install:
+	./gradlew installRelease
+
 $(keystore):
 	echo "password,password,,,,,,,yes" | tr , "\n" |\
 	keytool -genkey -v -keystore $(keystore) \
