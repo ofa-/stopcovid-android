@@ -50,8 +50,8 @@ abstract class ServerManager {
     protected suspend fun <T> loadLocal(context: Context): T? {
         val currentLanguage = Locale.getDefault().language
 
-        return loadFromFiles(context, currentLanguage)
-            ?: loadFromAssets(context, currentLanguage)
+        return loadFromAssets(context, currentLanguage)
+            ?: loadFromFiles(context, currentLanguage)
             ?: loadFromFiles(context, UiConstants.DEFAULT_LANGUAGE)
             ?: loadFromAssets(context, UiConstants.DEFAULT_LANGUAGE)
     }
