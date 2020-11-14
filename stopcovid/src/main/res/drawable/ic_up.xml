@@ -1,0 +1,25 @@
+<!--
+  ~ This Source Code Form is subject to the terms of the Mozilla Public
+  ~ License, v. 2.0. If a copy of the MPL was not distributed with this
+  ~ file, You can obtain one at https://mozilla.org/MPL/2.0/.
+  ~
+  ~ Authors
+  ~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ Created by Lunabee Studio / Date - 2020/10/29 - for the TOUS-ANTI-COVID project
+  -->
+
+<vector android:height="24dp" android:viewportHeight="23"
+    android:viewportWidth="19" android:width="19.826086dp"
+    xmlns:aapt="http://schemas.android.com/aapt" xmlns:android="http://schemas.android.com/apk/res/android">
+    <path android:fillType="evenOdd"
+        android:pathData="M9.2461,22.3477C10.1367,22.3477 10.7461,21.7266 10.7461,20.8008L10.7461,7.0781L10.6523,4.5352L13.3242,7.5703L15.9961,10.2188C16.2656,10.5 16.6289,10.6875 17.0742,10.6875C17.8945,10.6875 18.5039,10.0781 18.5039,9.2227C18.5039,8.8359 18.3516,8.4609 18.0352,8.1445L10.3594,0.4688C10.0781,0.1641 9.6563,0 9.2461,0C8.8359,0 8.4258,0.1641 8.1328,0.4688L0.4688,8.1445C0.1523,8.4609 0,8.8359 0,9.2227C0,10.0781 0.6094,10.6875 1.4297,10.6875C1.875,10.6875 2.2266,10.5 2.5078,10.2188L5.168,7.5703L7.8516,4.5352L7.7461,7.0781L7.7461,20.8008C7.7461,21.7266 8.3555,22.3477 9.2461,22.3477Z"
+        android:strokeColor="#00000000" android:strokeWidth="1">
+        <aapt:attr name="android:fillColor">
+            <gradient android:endX="3.023633" android:endY="0.20206209"
+                android:startX="15.594972" android:startY="22.3477" android:type="linear">
+                <item android:color="#FFE1000F" android:offset="0"/>
+                <item android:color="#FFFF6F4D" android:offset="1"/>
+            </gradient>
+        </aapt:attr>
+    </path>
+</vector>

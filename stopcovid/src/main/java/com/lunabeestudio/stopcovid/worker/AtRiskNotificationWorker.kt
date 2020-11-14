@@ -5,7 +5,7 @@
  *
  * Authors
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Created by Lunabee Studio / Date - 2020/28/05 - for the STOP-COVID project
+ * Created by Lunabee Studio / Date - 2020/28/05 - for the TOUS-ANTI-COVID project
  */
 
 package com.lunabeestudio.stopcovid.worker
@@ -16,16 +16,16 @@ import android.content.Context
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.navigation.NavDeepLinkBuilder
-import androidx.work.Worker
+import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.UiConstants
 import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
 
-class AtRiskNotificationWorker(context: Context, workerParams: WorkerParameters) : Worker(context, workerParams) {
+class AtRiskNotificationWorker(context: Context, workerParams: WorkerParameters) : CoroutineWorker(context, workerParams) {
 
-    override fun doWork(): Result {
+    override suspend fun doWork(): Result {
         val notificationManager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val strings = StringsManager.getStrings(applicationContext)
 

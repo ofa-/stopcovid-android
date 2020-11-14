@@ -5,7 +5,7 @@
   ~
   ~ Authors
   ~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  ~ Created by Lunabee Studio / Date - 2020/04/05 - for the STOP-COVID project
+  ~ Created by Lunabee Studio / Date - 2020/04/05 - for the TOUS-ANTI-COVID project
   -->
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -36,13 +36,6 @@
             app:exitAnim="@anim/nav_slide_exit_anim"
             app:popEnterAnim="@anim/nav_slide_pop_enter_anim"
             app:popExitAnim="@anim/nav_slide_pop_exit_anim" />
-        <action
-            android:id="@+id/action_onBoardingWelcomeFragment_to_mainActivity"
-            app:destination="@id/mainActivity"
-            app:enterAnim="@anim/nav_default_enter_anim"
-            app:exitAnim="@anim/nav_default_exit_anim"
-            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
-            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
     </fragment>
     <fragment
         android:id="@+id/onBoardingExplanationFragment"
@@ -97,7 +90,15 @@
     <fragment
         android:id="@+id/onBoardingNoBleFragment"
         android:name="com.lunabeestudio.stopcovid.fragment.OnBoardingNoBleFragment"
-        tools:layout="@layout/fragment_recycler_view" />
+        tools:layout="@layout/fragment_recycler_view">
+        <action
+            android:id="@+id/action_onBoardingNoBleFragment_to_onBoardingGestureFragment"
+            app:destination="@id/onBoardingGestureFragment"
+            app:enterAnim="@anim/nav_slide_enter_anim"
+            app:exitAnim="@anim/nav_slide_exit_anim"
+            app:popEnterAnim="@anim/nav_slide_pop_enter_anim"
+            app:popExitAnim="@anim/nav_slide_pop_exit_anim" />
+    </fragment>
     <fragment
         android:id="@+id/onBoardingBatteryFragment"
         android:name="com.lunabeestudio.stopcovid.fragment.OnBoardingBatteryFragment"

@@ -5,7 +5,7 @@
   ~
   ~ Authors
   ~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  ~ Created by Lunabee Studio / Date - 2020/04/05 - for the STOP-COVID project
+  ~ Created by Lunabee Studio / Date - 2020/04/05 - for the TOUS-ANTI-COVID project
   -->
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
@@ -25,7 +25,7 @@
         app:layout_constraintEnd_toStartOf="@id/textView"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:src="@drawable/hands" />
+        tools:src="@drawable/ic_gesture_hands" />
 
     <TextView
         android:id="@+id/textView"

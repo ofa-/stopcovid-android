@@ -5,7 +5,7 @@
         "links": [
 	        {
                 "label": "Más información sobre el Reglamento General de Protección de Datos (RGPD)",
-                "url": "https://bonjour.stopcovid.gouv.fr/privacy-en.html"
+                "url": "https://bonjour.tousanticovid.gouv.fr/privacy-en.html"
             }
         ]
     },
@@ -42,7 +42,7 @@
         "links": [
             {
                 "label": "Acerca de TousAntiCovid",
-                "url": "https://bonjour.stopcovid.gouv.fr/stopcovid.html"
+                "url": "https://bonjour.tousanticovid.gouv.fr/stopcovid.html"
             },
             {
                 "label": "Código fuente de la aplicación",
@@ -50,7 +50,7 @@
             },
             {
                 "label": "Política de protección de datos",
-                "url": "https://bonjour.stopcovid.gouv.fr/privacy-en.html"
+                "url": "https://bonjour.tousanticovid.gouv.fr/privacy-en.html"
             }
         ]
     }

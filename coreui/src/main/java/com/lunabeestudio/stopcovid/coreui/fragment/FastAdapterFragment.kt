@@ -5,7 +5,7 @@
  *
  * Authors
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Created by Lunabee Studio / Date - 2020/13/05 - for the STOP-COVID project
+ * Created by Lunabee Studio / Date - 2020/13/05 - for the TOUS-ANTI-COVID project
  */
 
 package com.lunabeestudio.stopcovid.coreui.fragment
@@ -42,11 +42,6 @@ abstract class FastAdapterFragment : BaseFragment() {
         binding?.recyclerView?.adapter = adapter
         onScrollListener = binding?.recyclerView?.closeKeyboardOnScroll(context)
         return binding?.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        refreshScreen()
     }
 
     override fun refreshScreen() {

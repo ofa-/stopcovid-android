@@ -5,7 +5,7 @@
  *
  * Authors
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Created by Lunabee Studio / Date - 2020/04/05 - for the STOP-COVID project
+ * Created by Lunabee Studio / Date - 2020/04/05 - for the TOUS-ANTI-COVID project
  */
 
 package com.lunabeestudio.stopcovid.fastitem
@@ -31,7 +31,6 @@ class TagItem : BaseItem<TagItem.ViewHolder>(
         holder.chip.text = text
         holder.chip.chipBackgroundColor = ColorStateList.valueOf(
             try {
-                Timber.d(color)
                 Color.parseColor(color)
             } catch (e: Exception) {
                 Timber.e(e)

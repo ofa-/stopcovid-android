@@ -5,7 +5,7 @@
  *
  * Authors
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Created by Lunabee Studio / Date - 2020/04/05 - for the STOP-COVID project
+ * Created by Lunabee Studio / Date - 2020/04/05 - for the TOUS-ANTI-COVID project
  */
 
 package com.lunabeestudio.stopcovid.viewmodel
@@ -17,6 +17,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.work.WorkManager
+import com.lunabeestudio.framework.local.datasource.SecureKeystoreDataSource
 import com.lunabeestudio.robert.RobertApplication
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.robert.model.RobertResult
@@ -29,14 +30,25 @@ import com.lunabeestudio.stopcovid.model.NeedRegisterException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class ManageDataViewModel(private val robertManager: RobertManager) : ViewModel() {
+class ManageDataViewModel(
+    private val secureKeystoreDataSource: SecureKeystoreDataSource,
+    private val robertManager: RobertManager
+) : ViewModel() {
 
+    val eraseAttestationsSuccess: SingleLiveEvent<Unit> = SingleLiveEvent()
     val eraseLocalSuccess: SingleLiveEvent<Unit> = SingleLiveEvent()
     val eraseRemoteSuccess: SingleLiveEvent<Unit> = SingleLiveEvent()
     val eraseAlertSuccess: SingleLiveEvent<Unit> = SingleLiveEvent()
     val quitStopCovidSuccess: SingleLiveEvent<Unit> = SingleLiveEvent()
     val covidException: SingleLiveEvent<CovidException> = SingleLiveEvent()
     val loadingInProgress: MutableLiveData<Boolean> = MutableLiveData(false)
+
+    fun eraseAttestations() {
+        secureKeystoreDataSource.savedAttestationData = null
+        secureKeystoreDataSource.saveAttestationData = null
+        secureKeystoreDataSource.attestations = null
+        eraseAttestationsSuccess.postValue(null)
+    }
 
     fun eraseLocalHistory() {
         if (robertManager.isRegistered) {
@@ -121,10 +133,10 @@ class ManageDataViewModel(private val robertManager: RobertManager) : ViewModel(
     }
 }
 
-class ManageDataViewModelFactory(private val robertManager: RobertManager) :
+class ManageDataViewModelFactory(private val secureKeystoreDataSource: SecureKeystoreDataSource, private val robertManager: RobertManager) :
     ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         @Suppress("UNCHECKED_CAST")
-        return ManageDataViewModel(robertManager) as T
+        return ManageDataViewModel(secureKeystoreDataSource, robertManager) as T
     }
 }

@@ -5,7 +5,7 @@
  *
  * Authors
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Created by Lunabee Studio / Date - 2020/04/05 - for the STOP-COVID project
+ * Created by Lunabee Studio / Date - 2020/04/05 - for the TOUS-ANTI-COVID project
  */
 
 package com.lunabeestudio.stopcovid.activity
@@ -17,6 +17,7 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
 import com.github.razir.progressbutton.DrawableButton
 import com.github.razir.progressbutton.bindProgressButton
 import com.github.razir.progressbutton.hideProgress
@@ -28,6 +29,7 @@ import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
 import com.lunabeestudio.stopcovid.databinding.ActivityAppMaintenanceBinding
 import com.lunabeestudio.stopcovid.manager.AppMaintenanceManager
 import com.lunabeestudio.stopcovid.model.Info
+import kotlinx.coroutines.launch
 
 /**
  * The blocking activity
@@ -88,29 +90,33 @@ class AppMaintenanceActivity : AppCompatActivity() {
                 progressColor = ContextCompat.getColor(this@AppMaintenanceActivity, R.color.color_on_primary)
                 gravity = DrawableButton.GRAVITY_CENTER
             }
-            AppMaintenanceManager.updateCheckForMaintenanceUpgrade(this,
-                appIsFreeCompletion = {
-                    startActivity(Intent(this, OnBoardingActivity::class.java))
-                    finishAndRemoveTask()
+            lifecycleScope.launch {
+                AppMaintenanceManager.updateCheckForMaintenanceUpgrade(this@AppMaintenanceActivity,
+                    appIsFreeCompletion = {
+                        startActivity(Intent(this@AppMaintenanceActivity, OnBoardingActivity::class.java))
+                        finishAndRemoveTask()
 
-                },
-                appIsBlockedCompletion = { info ->
-                    binding.refreshButton.hideProgress(strings["common.tryAgain"])
-                    binding.swipeRefreshLayout.isRefreshing = false
-                    fillScreen(info)
-                })
+                    },
+                    appIsBlockedCompletion = { info ->
+                        binding.refreshButton.hideProgress(strings["common.tryAgain"])
+                        binding.swipeRefreshLayout.isRefreshing = false
+                        fillScreen(info)
+                    })
+            }
         }
         binding.swipeRefreshLayout.setOnRefreshListener {
-            AppMaintenanceManager.updateCheckForMaintenanceUpgrade(this,
-                appIsFreeCompletion = {
-                    startActivity(Intent(this, OnBoardingActivity::class.java))
-                    finishAndRemoveTask()
+            lifecycleScope.launch {
+                AppMaintenanceManager.updateCheckForMaintenanceUpgrade(this@AppMaintenanceActivity,
+                    appIsFreeCompletion = {
+                        startActivity(Intent(this@AppMaintenanceActivity, OnBoardingActivity::class.java))
+                        finishAndRemoveTask()
 
-                },
-                appIsBlockedCompletion = { info ->
-                    binding.swipeRefreshLayout.isRefreshing = false
-                    fillScreen(info)
-                })
+                    },
+                    appIsBlockedCompletion = { info ->
+                        binding.swipeRefreshLayout.isRefreshing = false
+                        fillScreen(info)
+                    })
+            }
         }
     }
 

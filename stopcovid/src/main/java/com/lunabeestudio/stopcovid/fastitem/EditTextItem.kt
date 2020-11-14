@@ -5,7 +5,7 @@
  *
  * Authors
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Created by Lunabee Studio / Date - 2020/04/05 - for the STOP-COVID project
+ * Created by Lunabee Studio / Date - 2020/04/05 - for the TOUS-ANTI-COVID project
  */
 
 package com.lunabeestudio.stopcovid.fastitem
@@ -26,7 +26,9 @@ class EditTextItem : BaseItem<EditTextItem.ViewHolder>(
 ) {
     var text: String? = null
     var textInputType: Int = EditorInfo.TYPE_CLASS_TEXT
+    var textImeOptions: Int = EditorInfo.IME_ACTION_DONE
     var hint: String? = null
+    var placeholder: String? = null
     var requestFocus: Boolean = false
     var onTextChange: ((text: Editable?) -> Unit)? = null
     var onDone: (() -> Unit)? = null
@@ -36,6 +38,9 @@ class EditTextItem : BaseItem<EditTextItem.ViewHolder>(
 
     override fun bindView(holder: ViewHolder, payloads: List<Any>) {
         super.bindView(holder, payloads)
+        textWatcher?.let {
+            holder.editText.removeTextChangedListener(textWatcher)
+        }
         initEditText(holder)
         initLayout(holder)
         onTextChange?.let { listener ->
@@ -46,6 +51,7 @@ class EditTextItem : BaseItem<EditTextItem.ViewHolder>(
     private fun initEditText(holder: ViewHolder) {
         holder.editText.setText(text)
         holder.editText.inputType = textInputType
+        holder.editText.imeOptions = textImeOptions
         holder.editText.isEnabled = isEditTextEnabled
         if (requestFocus) {
             holder.editText.requestFocus()
@@ -62,6 +68,7 @@ class EditTextItem : BaseItem<EditTextItem.ViewHolder>(
 
     private fun initLayout(holder: ViewHolder) {
         holder.textInputLayout.hint = hint
+        holder.textInputLayout.placeholderText = placeholder
     }
 
     override fun unbindView(holder: ViewHolder) {

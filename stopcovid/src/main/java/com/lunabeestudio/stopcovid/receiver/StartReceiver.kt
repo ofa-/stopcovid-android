@@ -5,7 +5,7 @@
  *
  * Authors
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Created by Lunabee Studio / Date - 2020/03/06 - for the STOP-COVID project
+ * Created by Lunabee Studio / Date - 2020/03/06 - for the TOUS-ANTI-COVID project
  */
 
 package com.lunabeestudio.stopcovid.receiver
@@ -16,13 +16,18 @@ import android.content.Intent
 import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.service.ProximityService
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 class StartReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action == Intent.ACTION_BOOT_COMPLETED && context.robertManager().isProximityActive) {
-            StringsManager.init(context)
-            ProximityService.start(context)
+            GlobalScope.launch(Dispatchers.Main) {
+                StringsManager.initialize(context)
+                ProximityService.start(context)
+            }
         }
     }
 }

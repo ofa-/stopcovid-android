@@ -5,7 +5,7 @@
   ~
   ~ Authors
   ~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  ~ Created by Lunabee Studio / Date - 2020/04/05 - for the STOP-COVID project
+  ~ Created by Lunabee Studio / Date - 2020/04/05 - for the TOUS-ANTI-COVID project
   -->
 <androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
@@ -59,6 +59,11 @@
         android:src="@drawable/home"
         android:visibility="invisible"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+    <com.lunabeestudio.stopcovid.coreui.custom.BlockingContentLoadingProgressBar
+        android:id="@+id/blockingProgressBar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
     <include layout="@layout/layout_button_bottom_sheet" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

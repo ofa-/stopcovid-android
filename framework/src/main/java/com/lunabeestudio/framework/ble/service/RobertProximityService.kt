@@ -5,7 +5,7 @@
  *
  * Authors
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Created by Lunabee Studio / Date - 2020/04/05 - for the STOP-COVID project
+ * Created by Lunabee Studio / Date - 2020/04/05 - for the TOUS-ANTI-COVID project
  */
 
 package com.lunabeestudio.framework.ble.service
@@ -76,7 +76,7 @@ abstract class RobertProximityService : ProximityNotificationService() {
 
     override val bleSettings: BleSettings
         get() {
-            Timber.d("Fetch new BLE settings")
+            Timber.v("Fetch new BLE settings")
 
             val deviceParameterCorrection = robertManager.calibration.firstOrNull {
                 it.device_handset_model == android.os.Build.MODEL
@@ -127,7 +127,7 @@ abstract class RobertProximityService : ProximityNotificationService() {
                 .coerceAtMost(HELLO_REFRESH_MAX_DELAY_MS)
 
         payloadUpdateSchedulerScope.launch {
-            Timber.d("Next payload update in ${nextPayloadUpdateDelay}ms")
+            Timber.v("Next payload update in ${nextPayloadUpdateDelay}ms")
             delay(nextPayloadUpdateDelay)
             try {
                 if (robertManager.shouldReloadBleSettings) {
@@ -165,6 +165,9 @@ abstract class RobertProximityService : ProximityNotificationService() {
 
     override fun onEvent(event: ProximityNotificationEvent) {
         when (event) {
+            is ProximityNotificationEvent.Verbose -> {
+                Timber.v("BLE-SDK-${event.id.name}-${event.message}")
+            }
             is ProximityNotificationEvent.Debug -> {
                 Timber.d("BLE-SDK-${event.id.name}-${event.message}")
             }

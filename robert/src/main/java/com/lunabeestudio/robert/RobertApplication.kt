@@ -5,7 +5,7 @@
  *
  * Authors
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Created by Lunabee Studio / Date - 2020/04/05 - for the STOP-COVID project
+ * Created by Lunabee Studio / Date - 2020/04/05 - for the TOUS-ANTI-COVID project
  */
 
 package com.lunabeestudio.robert
@@ -17,7 +17,6 @@ interface RobertApplication {
     fun getAppContext(): Context
     fun refreshProximityService()
     fun atRiskDetected()
-    fun sendClockNotAlignedNotification()
 
     interface Listener {
         fun notify(notification: Any)
@@ -25,5 +24,6 @@ interface RobertApplication {
     fun registerListener(listener: Listener?)
     fun notifyListener(notification: Any)
 
+    suspend fun sendClockNotAlignedNotification()
     fun refreshInfoCenter()
 }

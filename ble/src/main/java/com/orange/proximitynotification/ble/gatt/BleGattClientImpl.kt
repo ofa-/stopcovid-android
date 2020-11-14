@@ -5,7 +5,7 @@
  *
  * Authors
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Created by Orange / Date - 2020/05/16 - for the STOP-COVID project
+ * Created by Orange / Date - 2020/05/16 - for the TOUS-ANTI-COVID project
  */
 
 package com.orange.proximitynotification.ble.gatt
@@ -78,7 +78,7 @@ internal class BleGattClientImpl(
 
     private inner class Callback : BluetoothGattCallback() {
         override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
-            Timber.d("onConnectionStateChange status=$status, newState=$newState")
+            Timber.i("onConnectionStateChange status=$status, newState=$newState")
             _isConnected = status == GATT_SUCCESS && newState == BluetoothProfile.STATE_CONNECTED
 
             when (status) {
@@ -88,7 +88,7 @@ internal class BleGattClientImpl(
         }
 
         override fun onReadRemoteRssi(gatt: BluetoothGatt, rssi: Int, status: Int) {
-            Timber.d("onReadRemoteRssi status=$status, rssi=$rssi")
+            Timber.i("onReadRemoteRssi status=$status, rssi=$rssi")
             remoteRssiChannel.safeOffer(ValueWithStatus(status = status, value = rssi))
         }
     }

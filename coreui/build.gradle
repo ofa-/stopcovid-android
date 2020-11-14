@@ -5,7 +5,7 @@
  *
  * Authors
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Created by Lunabee Studio / Date - 2020/13/05 - for the STOP-COVID project
+ * Created by Lunabee Studio / Date - 2020/13/05 - for the TOUS-ANTI-COVID project
  */
 
 apply plugin: 'com.android.library'
@@ -41,36 +41,36 @@ android {
 }
 
 dependencies {
-    api 'androidx.appcompat:appcompat:1.2.0'
-    api 'androidx.constraintlayout:constraintlayout:2.0.2'
-    api 'androidx.core:core-ktx:1.3.2'
-    api 'androidx.lifecycle:lifecycle-extensions:2.2.0'
-    api 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0'
-    api 'androidx.lifecycle:lifecycle-livedata-ktx:2.2.0'
-    api "androidx.lifecycle:lifecycle-viewmodel-savedstate:2.2.0"
-    api "androidx.navigation:navigation-fragment-ktx:2.3.0"
-    api "androidx.navigation:navigation-ui-ktx:2.3.0"
-    api 'androidx.preference:preference-ktx:1.1.1'
-    api 'androidx.recyclerview:recyclerview:1.1.0'
-    api 'androidx.emoji:emoji-appcompat:1.1.0'
-    api 'androidx.emoji:emoji-bundled:1.1.0'
+    api 'androidx.appcompat:appcompat:_'
+    api 'androidx.constraintlayout:constraintlayout:_'
+    api 'androidx.core:core-ktx:_'
+    api 'androidx.lifecycle:lifecycle-extensions:_'
+    api 'androidx.lifecycle:lifecycle-viewmodel-ktx:_'
+    api 'androidx.lifecycle:lifecycle-livedata-ktx:_'
+    api "androidx.lifecycle:lifecycle-viewmodel-savedstate:_"
+    api "androidx.navigation:navigation-fragment-ktx:_"
+    api "androidx.navigation:navigation-ui-ktx:_"
+    api 'androidx.preference:preference-ktx:_'
+    api 'androidx.recyclerview:recyclerview:_'
+    api 'androidx.emoji:emoji-appcompat:_'
+    api 'androidx.emoji:emoji-bundled:_'
 
-    api 'com.google.android.material:material:1.2.1'
-    api 'com.google.code.gson:gson:2.8.6'
+    api 'com.google.android.material:material:_'
+    api 'com.google.code.gson:gson:_'
 
-    api 'com.jakewharton.timber:timber:4.7.1'
+    api 'com.jakewharton.timber:timber:_'
 
-    api 'com.mikepenz:fastadapter:5.2.4'
-    api 'com.mikepenz:fastadapter-extensions-binding:5.2.4'
-    api 'com.mikepenz:fastadapter-extensions-utils:5.2.4'
+    api 'com.mikepenz:fastadapter:_'
+    api 'com.mikepenz:fastadapter-extensions-binding:_'
+    api 'com.mikepenz:fastadapter-extensions-utils:_'
 
-    implementation 'com.squareup.okhttp3:logging-interceptor:4.9.0'
-    implementation "com.squareup.okhttp3:okhttp-tls:4.9.0"
-    implementation "com.squareup.retrofit2:converter-gson:2.9.0"
-    api "com.squareup.retrofit2:retrofit:2.9.0"
+    implementation 'com.squareup.okhttp3:logging-interceptor:_'
+    implementation "com.squareup.okhttp3:okhttp-tls:_"
+    implementation "com.squareup.retrofit2:converter-gson:_"
+    api "com.squareup.retrofit2:retrofit:_"
 
-    api "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    api 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9'
+    api "org.jetbrains.kotlin:kotlin-stdlib-jdk8:_"
+    api 'org.jetbrains.kotlinx:kotlinx-coroutines-android:_'
 
     implementation project(path: ':robert')
 }

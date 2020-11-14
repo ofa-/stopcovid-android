@@ -5,7 +5,7 @@
  *
  * Authors
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Created by Lunabee Studio / Date - 2020/04/05 - for the STOP-COVID project
+ * Created by Lunabee Studio / Date - 2020/04/05 - for the TOUS-ANTI-COVID project
  */
 
 package com.lunabeestudio.stopcovid.fragment
@@ -20,7 +20,9 @@ import android.content.pm.PackageManager
 import android.os.ParcelUuid
 import android.view.Gravity
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.preference.PreferenceManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.UiConstants
@@ -30,11 +32,18 @@ import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
 import com.lunabeestudio.stopcovid.extension.safeNavigate
+import com.lunabeestudio.stopcovid.extension.setAdvertisementAvailable
 import com.lunabeestudio.stopcovid.fastitem.logoItem
 import com.lunabeestudio.stopcovid.manager.ProximityManager
 import com.mikepenz.fastadapter.GenericItem
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withTimeoutOrNull
 import timber.log.Timber
 import java.util.UUID
+import kotlin.coroutines.resume
+import kotlin.time.ExperimentalTime
+import kotlin.time.seconds
 
 class OnBoardingProximityFragment : OnBoardingFragment() {
 
@@ -116,7 +125,13 @@ class OnBoardingProximityFragment : OnBoardingFragment() {
     }
 
     private fun startNextController() {
-        testAdvertisement { success ->
+        viewLifecycleOwner.lifecycleScope.launchWhenResumed {
+            getActivityBinding().blockingProgressBar.show()
+            val success = isAdvertisementAvailable()
+            getActivityBinding().blockingProgressBar.hide()
+
+            PreferenceManager.getDefaultSharedPreferences(context).setAdvertisementAvailable(success)
+
             if (success) {
                 if (!ProximityManager.isBatteryOptimizationOff(requireContext())) {
                     findNavController()
@@ -126,31 +141,40 @@ class OnBoardingProximityFragment : OnBoardingFragment() {
                         .safeNavigate(OnBoardingProximityFragmentDirections.actionOnBoardingProximityFragmentToOnBoardingNotificationFragment())
                 }
             } else {
+
                 findNavController()
                     .safeNavigate(OnBoardingProximityFragmentDirections.actionOnBoardingProximityFragmentToOnBoardingNoBleFragment())
             }
         }
     }
 
-    private fun testAdvertisement(callback: (Boolean) -> Unit) {
-        BluetoothAdapter.getDefaultAdapter()?.bluetoothLeAdvertiser?.let { bluetoothAdvertiser ->
-            bluetoothAdvertiser.startAdvertising(
-                buildAdvertiseSettings(),
-                buildAdvertiseData(),
-                object : AdvertiseCallback() {
-                    override fun onStartSuccess(settingsInEffect: AdvertiseSettings?) {
-                        bluetoothAdvertiser.stopAdvertising(this)
-                        callback(true)
-                    }
+    @OptIn(ExperimentalTime::class)
+    private suspend fun isAdvertisementAvailable(): Boolean {
+        return withTimeoutOrNull(ADVERTISEMENT_AVAILABLE_TIMEOUT) {
+            suspendCancellableCoroutine { continuation ->
+                val bluetoothLeAdvertiser = BluetoothAdapter.getDefaultAdapter()?.bluetoothLeAdvertiser
+                if (bluetoothLeAdvertiser != null) {
+                    bluetoothLeAdvertiser.startAdvertising(
+                        buildAdvertiseSettings(),
+                        buildAdvertiseData(),
+                        object : AdvertiseCallback() {
+                            override fun onStartSuccess(settingsInEffect: AdvertiseSettings?) {
+                                bluetoothLeAdvertiser.stopAdvertising(this)
+                                continuation.resume(true)
+                            }
 
-                    override fun onStartFailure(errorCode: Int) {
-                        bluetoothAdvertiser.stopAdvertising(this)
-                        Timber.e("Advertisement not supported (Error code : $errorCode)")
-                        callback(errorCode != ADVERTISE_FAILED_FEATURE_UNSUPPORTED)
-                    }
+                            override fun onStartFailure(errorCode: Int) {
+                                bluetoothLeAdvertiser.stopAdvertising(this)
+                                Timber.e("Advertisement not supported (Error code : $errorCode)")
+                                continuation.resume(errorCode != ADVERTISE_FAILED_FEATURE_UNSUPPORTED)
+                            }
+                        }
+                    )
+                } else {
+                    continuation.resume(false)
                 }
-            )
-        } ?: callback(false)
+            }
+        } ?: false
     }
 
     private fun buildAdvertiseSettings(): AdvertiseSettings {
@@ -168,5 +192,10 @@ class OnBoardingProximityFragment : OnBoardingFragment() {
             .setIncludeDeviceName(false)
             .setIncludeTxPowerLevel(false)
             .build()
+    }
+
+    companion object {
+        @OptIn(ExperimentalTime::class)
+        private val ADVERTISEMENT_AVAILABLE_TIMEOUT = 8.seconds
     }
 }

@@ -5,7 +5,7 @@
  *
  * Authors
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Created by Lunabee Studio / Date - 2020/07/05 - for the STOP-COVID project
+ * Created by Lunabee Studio / Date - 2020/07/05 - for the TOUS-ANTI-COVID project
  */
 
 package com.lunabeestudio.stopcovid.fastitem
@@ -18,9 +18,10 @@ import com.google.android.material.button.MaterialButton
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.safeEmojiSpanify
 import com.lunabeestudio.stopcovid.coreui.fastitem.BaseItem
+import com.lunabeestudio.stopcovid.extension.setTextOrHide
 
 class ContactItem(layoutRes: Int) : BaseItem<ContactItem.ViewHolder>(
-    layoutRes, ::ViewHolder, R.id.item_contact
+    layoutRes, ::ViewHolder, R.id.item_contact + layoutRes
 ) {
     var header: String? = null
     var title: String? = null
@@ -29,15 +30,17 @@ class ContactItem(layoutRes: Int) : BaseItem<ContactItem.ViewHolder>(
     var atRisk: Boolean? = null
     var moreClickListener: View.OnClickListener? = null
     var actionClickListener: View.OnClickListener? = null
+    var actionContentDescription: String? = null
 
     override fun bindView(holder: ViewHolder, payloads: List<Any>) {
         super.bindView(holder, payloads)
-        holder.headerTextView.text = header.safeEmojiSpanify()
-        holder.titleTextView.text = title.safeEmojiSpanify()
-        holder.captionTextView.text = caption.safeEmojiSpanify()
-        holder.moreButton.text = more.safeEmojiSpanify()
+        holder.headerTextView.setTextOrHide(header.safeEmojiSpanify())
+        holder.titleTextView.setTextOrHide(title.safeEmojiSpanify())
+        holder.captionTextView.setTextOrHide(caption.safeEmojiSpanify())
+        holder.moreButton.setTextOrHide(more.safeEmojiSpanify())
         holder.moreButton.setOnClickListener(moreClickListener)
         holder.actionButton.setOnClickListener(actionClickListener)
+        holder.actionButton.contentDescription = actionContentDescription
     }
 
     class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {

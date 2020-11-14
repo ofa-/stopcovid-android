@@ -5,16 +5,16 @@
  *
  * Authors
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Created by Lunabee Studio / Date - 2020/04/05 - for the STOP-COVID project
+ * Created by Lunabee Studio / Date - 2020/04/05 - for the TOUS-ANTI-COVID project
  */
 
 package com.lunabeestudio.stopcovid.fastitem
 
 import android.view.View
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.DrawableRes
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.lunabeestudio.stopcovid.R
@@ -35,19 +35,21 @@ class LinkItem : BaseItem<LinkItem.ViewHolder>(
     override fun bindView(holder: ViewHolder, payloads: List<Any>) {
         super.bindView(holder, payloads)
         holder.textView.text = text.safeEmojiSpanify()
-        holder.constraintLayout.setOnClickListener {
+        holder.rootLayout.setOnClickListener {
             url?.openInExternalBrowser(it.context)
             onClickListener?.onClick(it)
         }
 
         iconRes?.let { holder.leftIconImageView.setImageResource(it) }
         holder.leftIconImageView.isVisible = iconRes != null
+        holder.arrowImageView.isVisible = url != null
     }
 
     class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {
-        val constraintLayout: ConstraintLayout = v.findViewById(R.id.constraintLayout)
+        val rootLayout: LinearLayout = v.findViewById(R.id.linkRootLayout)
         val textView: TextView = v.findViewById(R.id.textView)
         val leftIconImageView: ImageView = v.findViewById(R.id.leftIconImageView)
+        val arrowImageView: ImageView = v.findViewById(R.id.arrowImageView)
     }
 }
 

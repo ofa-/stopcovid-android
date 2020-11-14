@@ -5,7 +5,7 @@
   ~
   ~ Authors
   ~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  ~ Created by Lunabee Studio / Date - 2020/19/05 - for the STOP-COVID project
+  ~ Created by Lunabee Studio / Date - 2020/27/05 - for the TOUS-ANTI-COVID project
   -->
 <network-security-config xmlns:tools="http://schemas.android.com/tools">
     <domain-config cleartextTrafficPermitted="false">

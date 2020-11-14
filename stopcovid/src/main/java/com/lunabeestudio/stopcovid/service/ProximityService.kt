@@ -5,7 +5,7 @@
  *
  * Authors
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Created by Lunabee Studio / Date - 2020/13/05 - for the STOP-COVID project
+ * Created by Lunabee Studio / Date - 2020/13/05 - for the TOUS-ANTI-COVID project
  */
 
 package com.lunabeestudio.stopcovid.service
@@ -50,7 +50,8 @@ class ProximityService : RobertProximityService() {
 
     private val binder = ProximityBinder()
 
-    private val strings = StringsManager.getStrings(this)
+    private val strings: HashMap<String, String>
+        get() = StringsManager.strings
 
     override val robertManager: RobertManager by lazy {
         robertManager()
@@ -173,7 +174,7 @@ class ProximityService : RobertProximityService() {
         fun getService(): ProximityService = this@ProximityService
     }
 
-    private fun buildNotification(message: String): Notification {
+    private fun buildNotification(message: String?): Notification {
         val notificationIntent = Intent(this, MainActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(
             this, 0,

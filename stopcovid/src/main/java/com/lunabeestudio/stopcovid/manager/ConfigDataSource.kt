@@ -5,7 +5,7 @@
  *
  * Authors
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Created by Lunabee Studio / Date - 2020/28/05 - for the STOP-COVID project
+ * Created by Lunabee Studio / Date - 2020/28/05 - for the TOUS-ANTI-COVID project
  */
 
 package com.lunabeestudio.stopcovid.manager
@@ -15,7 +15,6 @@ import com.google.gson.Gson
 import com.lunabeestudio.domain.model.Configuration
 import com.lunabeestudio.robert.datasource.ConfigurationDataSource
 import com.lunabeestudio.robert.model.RobertResultData
-import com.lunabeestudio.robert.model.TimeNotAlignedException
 import com.lunabeestudio.stopcovid.coreui.manager.ConfigManager
 import com.lunabeestudio.stopcovid.extension.remoteToRobertException
 import com.lunabeestudio.stopcovid.model.ConfigurationWrapper
@@ -27,19 +26,15 @@ object ConfigDataSource : ConfigurationDataSource {
 
     private val gson = Gson()
 
-    override suspend fun fetchConfig(context: Context): RobertResultData<List<Configuration>?> {
+    override suspend fun fetchOrLoadConfig(context: Context): RobertResultData<List<Configuration>?> {
+        @Suppress("BlockingMethodInNonBlockingContext")
         return withContext(Dispatchers.IO) {
             try {
-                val response = ConfigManager.fetchLast(context)
-                if (TimeCheckManager.isTimeAlignedWithServer(response) == false) {
-                    Timber.e("Phone time not aligned with server time")
-                    RobertResultData.Failure<List<Configuration>?>(TimeNotAlignedException())
-                } else {
-                    RobertResultData.Success(gson.fromJson(response.body!!.string(), ConfigurationWrapper::class.java).config)
-                }
+                val json = ConfigManager.fetchOrLoad(context)
+                RobertResultData.Success(gson.fromJson(json, ConfigurationWrapper::class.java).config)
             } catch (e: Exception) {
                 Timber.e(e)
-                RobertResultData.Failure<List<Configuration>?>(e.remoteToRobertException())
+                RobertResultData.Failure(e.remoteToRobertException())
             }
         }
     }

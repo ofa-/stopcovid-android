@@ -1,0 +1,34 @@
+<!--
+  ~ This Source Code Form is subject to the terms of the Mozilla Public
+  ~ License, v. 2.0. If a copy of the MPL was not distributed with this
+  ~ file, You can obtain one at https://mozilla.org/MPL/2.0/.
+  ~
+  ~ Authors
+  ~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ Created by Lunabee Studio / Date - 2020/10/29 - for the TOUS-ANTI-COVID project
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="171dp"
+    android:height="171dp"
+    android:viewportWidth="171"
+    android:viewportHeight="171">
+  <path
+      android:pathData="M85.5,5.437C41.353,5.437 5.437,41.354 5.437,85.501C5.437,129.646 41.353,165.562 85.5,165.562C129.647,165.562 165.563,129.646 165.563,85.501C165.563,41.354 129.647,5.437 85.5,5.437M85.5,170.564C38.595,170.564 0.436,132.405 0.436,85.501C0.436,38.596 38.595,0.437 85.5,0.437C132.405,0.437 170.564,38.596 170.564,85.501C170.564,132.405 132.405,170.564 85.5,170.564"
+      android:strokeWidth="1"
+      android:fillColor="#85BBFF"
+      android:fillType="evenOdd"
+      android:strokeColor="#00000000"/>
+  <path
+      android:pathData="M85.039,155.4C123.786,155.4 155.31,123.877 155.31,85.129C155.31,46.38 123.786,14.857 85.039,14.857C46.292,14.857 14.768,46.38 14.768,85.129C14.768,123.877 46.292,155.4 85.039,155.4Z"
+      android:strokeWidth="1"
+      android:fillColor="#00000000"
+      android:strokeColor="#273374"
+      android:fillType="evenOdd"/>
+  <path
+      android:pathData="M86.719,121.509C101.215,121.509 109.855,111.141 109.855,98.949C109.855,87.141 101.215,77.637 88.543,77.637C81.151,77.637 74.815,80.325 70.015,85.125C70.495,68.517 76.543,58.341 88.831,58.341C94.975,58.341 99.583,61.317 103.519,67.173L110.335,61.893C105.631,55.077 99.103,50.469 88.735,50.469C69.631,50.469 61.087,65.253 61.087,87.045C61.087,110.373 70.975,121.509 86.719,121.509ZM86.527,113.637C77.983,113.637 71.839,108.261 70.399,94.053C74.431,88.293 80.479,85.413 87.199,85.413C95.071,85.413 100.831,91.461 100.831,99.237C100.831,107.301 95.551,113.637 86.527,113.637Z"
+      android:strokeWidth="1"
+      android:fillColor="#85BBFF"
+      android:fillType="evenOdd"
+      android:strokeColor="#00000000"/>
+</vector>

@@ -5,7 +5,7 @@
  *
  * Authors
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Created by Lunabee Studio / Date - 2020/13/05 - for the STOP-COVID project
+ * Created by Lunabee Studio / Date - 2020/13/05 - for the TOUS-ANTI-COVID project
  */
 
 package com.lunabeestudio.stopcovid.coreui.fastitem
@@ -24,7 +24,7 @@ import com.lunabeestudio.stopcovid.coreui.extension.safeEmojiSpanify
 
 open class ButtonItem(@LayoutRes layout: Int = R.layout.item_button,
     vh: (v: View) -> ViewHolder = ButtonItem::ViewHolder,
-    @IdRes id: Int = R.id.item_button)
+    @IdRes id: Int = R.id.item_default_button)
     : BaseItem<ButtonItem.ViewHolder>(layout, vh, id) {
     var text: String? = null
     var gravity: Int = Gravity.NO_GRAVITY

@@ -5,7 +5,7 @@
  *
  * Authors
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Created by Lunabee Studio / Date - 2020/04/05 - for the STOP-COVID project
+ * Created by Lunabee Studio / Date - 2020/04/05 - for the TOUS-ANTI-COVID project
  */
 
 package com.lunabeestudio.robert.repository
@@ -77,6 +77,6 @@ internal class RemoteServiceRepository(
     suspend fun deleteExposureHistory(apiVersion: String, serverStatusUpdate: ServerStatusUpdate): RobertResult =
         remoteServiceDataSource.deleteExposureHistory(apiVersion, serverStatusUpdate)
 
-    suspend fun fetchConfig(context: Context): RobertResultData<List<Configuration>?> =
-        configurationDataSource.fetchConfig(context)
+    suspend fun fetchOrLoadConfig(context: Context): RobertResultData<List<Configuration>?> =
+        configurationDataSource.fetchOrLoadConfig(context)
 }

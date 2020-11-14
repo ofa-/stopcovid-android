@@ -5,7 +5,7 @@
   ~
   ~ Authors
   ~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  ~ Created by Lunabee Studio / Date - 2020/13/05 - for the STOP-COVID project
+  ~ Created by Lunabee Studio / Date - 2020/13/05 - for the TOUS-ANTI-COVID project
   -->
 <resources>
 
@@ -34,6 +34,7 @@
         <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.App.SmallComponent</item>
 
         <item name="materialCardViewStyle">@style/Widget.App.CardView</item>
+        <item name="bottomSheetDialogTheme">@style/ThemeOverlay.StopCovid.BottomSheetDialog</item>
     </style>
 
     <!-- Base application theme. -->

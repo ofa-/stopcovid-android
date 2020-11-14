@@ -5,7 +5,7 @@
  *
  * Authors
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Created by Lunabee Studio / Date - 2020/04/05 - for the STOP-COVID project
+ * Created by Lunabee Studio / Date - 2020/04/05 - for the TOUS-ANTI-COVID project
  */
 
 package com.lunabeestudio.stopcovid.fragment
@@ -66,6 +66,7 @@ class IsSickFragment : AboutMainFragment() {
             showSnackBar(strings["manageDataController.quitStopCovid.success"] ?: "")
             sharedPreferences.edit {
                 remove(Constants.SharedPrefs.ON_BOARDING_DONE)
+                remove(Constants.SharedPrefs.IS_ADVERTISEMENT_AVAILABLE)
             }
             findNavController().safeNavigate(ManageDataFragmentDirections.actionGlobalOnBoardingActivity())
             activity?.finishAndRemoveTask()

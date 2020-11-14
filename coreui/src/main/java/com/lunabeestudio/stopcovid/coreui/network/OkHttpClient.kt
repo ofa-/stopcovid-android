@@ -5,7 +5,7 @@
  *
  * Authors
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Created by Lunabee Studio / Date - 2020/13/05 - for the STOP-COVID project
+ * Created by Lunabee Studio / Date - 2020/13/05 - for the TOUS-ANTI-COVID project
  */
 
 package com.lunabeestudio.stopcovid.coreui.network
@@ -18,7 +18,6 @@ import okhttp3.ConnectionSpec
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
-import okhttp3.Response
 import okhttp3.TlsVersion
 import okhttp3.logging.HttpLoggingInterceptor
 import okhttp3.tls.HandshakeCertificates
@@ -68,22 +67,16 @@ object OkHttpClient {
         ) as X509Certificate
     }
 
-    private fun getDefaultHeaderInterceptor(): Interceptor = object : Interceptor {
-        override fun intercept(chain: Interceptor.Chain): Response {
-            val request = chain.request()
-                .newBuilder().apply {
-                    addHeader("Accept", "application/json")
-                    addHeader("Content-Type", "application/json")
-                }.build()
-            return chain.proceed(request)
-        }
+    private fun getDefaultHeaderInterceptor(): Interceptor = Interceptor { chain ->
+        val request = chain.request()
+            .newBuilder().apply {
+                addHeader("Accept", "application/json")
+                addHeader("Content-Type", "application/json")
+            }.build()
+        chain.proceed(request)
     }
 
-    private fun getLogInterceptor(): HttpLoggingInterceptor = HttpLoggingInterceptor(object : HttpLoggingInterceptor.Logger {
-        override fun log(message: String) {
-            Timber.d(message)
-        }
-    }).apply {
+    private fun getLogInterceptor(): HttpLoggingInterceptor = HttpLoggingInterceptor { message -> Timber.v(message) }.apply {
         level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE
     }
 }

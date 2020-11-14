@@ -5,7 +5,7 @@
  *
  * Authors
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Created by Lunabee Studio / Date - 2020/04/05 - for the STOP-COVID project
+ * Created by Lunabee Studio / Date - 2020/04/05 - for the TOUS-ANTI-COVID project
  */
 
 package com.lunabeestudio.stopcovid.manager
@@ -16,7 +16,6 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import androidx.annotation.WorkerThread
 import androidx.core.app.NotificationCompat
 import androidx.core.content.edit
 import androidx.lifecycle.LiveData
@@ -32,6 +31,9 @@ import com.lunabeestudio.stopcovid.coreui.UiConstants
 import com.lunabeestudio.stopcovid.coreui.extension.fixFormatter
 import com.lunabeestudio.stopcovid.coreui.extension.saveTo
 import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
+import com.lunabeestudio.stopcovid.extension.areInfoNotificationsEnabled
+import com.lunabeestudio.stopcovid.extension.lastInfoCenterFetch
+import com.lunabeestudio.stopcovid.extension.lastInfoCenterRefresh
 import com.lunabeestudio.stopcovid.model.InfoCenterEntry
 import com.lunabeestudio.stopcovid.model.InfoCenterLastUpdatedAt
 import com.lunabeestudio.stopcovid.model.InfoCenterTag
@@ -42,6 +44,10 @@ import timber.log.Timber
 import java.io.File
 import java.lang.reflect.Type
 import java.util.Locale
+import kotlin.time.Duration
+import kotlin.time.ExperimentalTime
+import kotlin.time.milliseconds
+import kotlin.time.minutes
 
 object InfoCenterManager {
 
@@ -57,6 +63,9 @@ object InfoCenterManager {
     private val typeInfoCenterEntry: Type = object : TypeToken<List<InfoCenterEntry>>() {}.type
     private val typeInfoCenterTag: Type = object : TypeToken<List<InfoCenterTag>>() {}.type
     private val typeInfoCenterStrings: Type = object : TypeToken<Map<String, String>>() {}.type
+
+    @OptIn(ExperimentalTime::class)
+    private val refreshMinDelay: Duration = 5.minutes
 
     private var lastUpdatedAt: InfoCenterLastUpdatedAt? = null
 
@@ -74,25 +83,23 @@ object InfoCenterManager {
 
     private var prevLanguage: String? = null
 
-    fun init(context: Context) {
+    fun initialize(context: Context) {
         CoroutineScope(Dispatchers.IO).launch {
             prevLanguage = Locale.getDefault().language
             loadLocal(context)
         }
     }
 
-    @Suppress("RedundantSuspendModifier")
-    @WorkerThread
-    suspend fun appForeground(context: Context, forceRefresh: Boolean = false) {
-        if (fetchLastTimestamp(context) || prevLanguage != Locale.getDefault().language || forceRefresh) {
-            if (fetchLast(context, infosPrefix, null, prevLanguage != Locale.getDefault().language)
-                && fetchLast(context, tagsPrefix, null, prevLanguage != Locale.getDefault().language)
-                && fetchLast(context, stringPrefix, Locale.getDefault().language, prevLanguage != Locale.getDefault().language)) {
-                saveLastRefresh(context)
-            }
-            prevLanguage = Locale.getDefault().language
-            loadLocal(context)
+    suspend fun onAppForeground(context: Context) {
+        val forceRefresh = prevLanguage != Locale.getDefault().language
+        fetchLastTimestamp(context)
+        if (fetchLast(context, infosPrefix, null, forceRefresh)
+            && fetchLast(context, tagsPrefix, null, forceRefresh)
+            && fetchLast(context, stringPrefix, Locale.getDefault().language, forceRefresh)) {
+            saveLastRefresh(context)
         }
+        prevLanguage = Locale.getDefault().language
+        loadLocal(context)
     }
 
     private fun loadLocal(context: Context) {
@@ -143,43 +150,47 @@ object InfoCenterManager {
         }
     }
 
-    @WorkerThread
-    private fun fetchLastTimestamp(context: Context): Boolean {
+    private suspend fun fetchLastTimestamp(context: Context): Boolean {
         return try {
             val filename = "$lastUpdatePrefix.json"
-            Timber.d("Fetching remote data at $url$filename")
+            Timber.v("Fetching remote data at $url$filename")
             "$url$filename".saveTo(context, File(context.filesDir, filename))
             true
         } catch (e: Exception) {
-            Timber.d("Fetching fail for last timestamp")
+            Timber.v("Fetching fail for last timestamp")
             false
         }
     }
 
-    @WorkerThread
-    private fun fetchLast(context: Context,
+    private suspend fun fetchLast(context: Context,
         prefix: String,
         languageCode: String?,
         forceRefresh: Boolean): Boolean {
         return try {
             if (shouldRefresh(context) || forceRefresh) {
                 val filename = "$prefix${languageCode ?: ""}.json"
-                Timber.d("Fetching remote data at $url$filename")
+                Timber.v("Fetching remote data at $url$filename")
                 "$url$filename".saveTo(context, File(context.filesDir, filename))
                 true
             } else {
-                Timber.d("Use local data")
+                Timber.v("Use local data")
                 false
             }
         } catch (e: Exception) {
-            Timber.d("Fetching fail for $languageCode")
-            if (languageCode != null && languageCode != UiConstants.DEFAULT_LANGUAGE) {
-                Timber.d("Trying for ${UiConstants.DEFAULT_LANGUAGE}")
+            Timber.e("Fetching fail for $languageCode")
+            if (languageCode != null && languageCode != UiConstants.DEFAULT_LANGUAGE && !localFileExists(context, prefix)) {
+                Timber.v("Trying for ${UiConstants.DEFAULT_LANGUAGE}")
                 fetchLast(context, prefix, UiConstants.DEFAULT_LANGUAGE, forceRefresh)
             } else {
                 false
             }
         }
+    }
+
+    private fun localFileExists(context: Context, prefix: String): Boolean {
+        val fileName = "$prefix${Locale.getDefault().language}.json"
+        val file = File(context.filesDir, fileName)
+        return file.exists()
     }
 
     private fun <T> loadLocal(context: Context,
@@ -188,44 +199,48 @@ object InfoCenterManager {
         fallbackFileName: String?,
         transform: (String) -> String,
         type: Type): T? {
-        var fileName = "$prefix${if (isLocalized) Locale.getDefault().language else ""}.json"
-        if (!File(context.filesDir, fileName).exists() && fallbackFileName != null) {
-            fileName = fallbackFileName
+        val fileName = "$prefix${if (isLocalized) Locale.getDefault().language else ""}.json"
+        var file = File(context.filesDir, fileName)
+        if (!file.exists() && fallbackFileName != null) {
+            file = File(context.filesDir, fallbackFileName)
         }
-        return if (File(context.filesDir, fileName).exists()) {
+        return if (file.exists()) {
             try {
-                Timber.d("Loading file to object")
-                gson.fromJson<T>(transform(File(context.filesDir, fileName).readText()), type)
+                Timber.v("Loading $file to object")
+                gson.fromJson<T>(transform(file.readText()), type)
             } catch (e: java.lang.Exception) {
                 Timber.e(e)
                 null
             }
         } else {
-            Timber.d("Nothing to load")
+            Timber.v("Nothing to load")
             null
         }
     }
 
     private fun isLastUpdatedAtDifferent(context: Context): Boolean = (lastUpdatedAt?.lastUpdatedAt
-        ?: 0) > PreferenceManager.getDefaultSharedPreferences(context)
-        .getLong(Constants.SharedPrefs.LAST_INFO_CENTER_REFRESH, 0L)
+        ?: 0) > PreferenceManager.getDefaultSharedPreferences(context).lastInfoCenterRefresh
 
+    @OptIn(ExperimentalTime::class)
     private fun shouldRefresh(context: Context): Boolean {
-        return lastUpdatedAt == null || isLastUpdatedAtDifferent(context)
+        return lastUpdatedAt == null ||
+            isLastUpdatedAtDifferent(context) ||
+            System.currentTimeMillis().milliseconds - refreshMinDelay > PreferenceManager.getDefaultSharedPreferences(context).lastInfoCenterFetch
     }
 
-    private fun saveLastRefresh(context: Context) {
-        if (lastUpdatedAt != null && isLastUpdatedAtDifferent(context)) {
+    @OptIn(ExperimentalTime::class)
+    private suspend fun saveLastRefresh(context: Context) {
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
+        sharedPreferences.lastInfoCenterFetch = System.currentTimeMillis().milliseconds
+        if (sharedPreferences.areInfoNotificationsEnabled && lastUpdatedAt != null && isLastUpdatedAtDifferent(context)) {
             sendUpdateNotification(context)
         }
         lastUpdatedAt?.lastUpdatedAt?.let { lastUpdatedAt ->
-            PreferenceManager.getDefaultSharedPreferences(context).edit {
-                putLong(Constants.SharedPrefs.LAST_INFO_CENTER_REFRESH, lastUpdatedAt)
-            }
+            sharedPreferences.lastInfoCenterRefresh = lastUpdatedAt
         }
     }
 
-    private fun sendUpdateNotification(context: Context) {
+    private suspend fun sendUpdateNotification(context: Context) {
         PreferenceManager.getDefaultSharedPreferences(context).edit {
             putBoolean(Constants.SharedPrefs.HAS_NEWS, true)
         }
@@ -233,7 +248,7 @@ object InfoCenterManager {
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         if (StringsManager.strings.isEmpty()) {
-            StringsManager.init(context)
+            StringsManager.initialize(context)
         }
         val strings = StringsManager.strings
 

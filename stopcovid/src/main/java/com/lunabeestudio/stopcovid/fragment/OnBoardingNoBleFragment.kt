@@ -5,33 +5,38 @@
  *
  * Authors
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Created by Lunabee Studio / Date - 2020/26/05 - for the STOP-COVID project
+ * Created by Lunabee Studio / Date - 2020/26/05 - for the TOUS-ANTI-COVID project
  */
 
 package com.lunabeestudio.stopcovid.fragment
 
 import android.view.Gravity
 import android.view.View
-import androidx.core.app.ShareCompat
+import androidx.navigation.fragment.findNavController
+import androidx.preference.PreferenceManager
+import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.lightButtonItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
 import com.lunabeestudio.stopcovid.extension.openInExternalBrowser
+import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.fastitem.logoItem
 import com.mikepenz.fastadapter.GenericItem
 
 class OnBoardingNoBleFragment : OnBoardingFragment() {
 
-    override fun getTitleKey(): String = "onboarding.noBleController.title"
-    override fun getButtonTitleKey(): String? = "onboarding.noBleController.accept"
+    override fun getTitleKey(): String = "onboarding.runWithoutBleController.title"
+    override fun getButtonTitleKey(): String? = "onboarding.runWithoutBleController.accept"
 
     override fun getOnButtonClick(): () -> Unit = {
-        ShareCompat.IntentBuilder.from(requireActivity())
-            .setType("text/plain")
-            .setText(strings["sharingController.appSharingMessage"])
-            .startChooser()
+        if (PreferenceManager.getDefaultSharedPreferences(context).contains(Constants.SharedPrefs.IS_ADVERTISEMENT_AVAILABLE)) {
+            findNavController().safeNavigate(OnBoardingNoBleFragmentDirections.actionOnBoardingNoBleFragmentToOnBoardingGestureFragment())
+        } else {
+            // Should not happen but ensure we have set IS_ADVERTISEMENT_AVAILABLE pref
+            findNavController().popBackStack()
+        }
     }
 
     override fun getItems(): List<GenericItem> {
@@ -46,20 +51,20 @@ class OnBoardingNoBleFragment : OnBoardingFragment() {
             identifier = items.size.toLong()
         }
         items += titleItem {
-            text = strings["onboarding.noBleController.mainMessage.title"]
+            text = strings["onboarding.runWithoutBleController.mainMessage.title"]
             gravity = Gravity.CENTER
             identifier = items.size.toLong()
         }
         items += captionItem {
-            text = strings["onboarding.noBleController.mainMessage.subtitle"]
+            text = strings["onboarding.runWithoutBleController.mainMessage.subtitle"]
             gravity = Gravity.CENTER
             identifier = items.size.toLong()
         }
         items += lightButtonItem {
-            text = strings["onboarding.noBleController.infos"]
+            text = strings["onboarding.runWithoutBleController.infos"]
             gravity = Gravity.CENTER
             onClickListener = View.OnClickListener {
-                strings["onboarding.noBleController.infosUrl"]?.openInExternalBrowser(requireContext())
+                strings["onboarding.runWithoutBleController.infosUrl"]?.openInExternalBrowser(requireContext())
             }
             identifier = items.size.toLong()
         }

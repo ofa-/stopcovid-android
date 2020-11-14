@@ -5,7 +5,7 @@
  *
  * Authors
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Created by Lunabee Studio / Date - 2020/28/05 - for the STOP-COVID project
+ * Created by Lunabee Studio / Date - 2020/28/05 - for the TOUS-ANTI-COVID project
  */
 
 package com.lunabeestudio.robert.datasource
@@ -15,5 +15,5 @@ import com.lunabeestudio.domain.model.Configuration
 import com.lunabeestudio.robert.model.RobertResultData
 
 interface ConfigurationDataSource {
-    suspend fun fetchConfig(context: Context): RobertResultData<List<Configuration>?>
+    suspend fun fetchOrLoadConfig(context: Context): RobertResultData<List<Configuration>?>
 }

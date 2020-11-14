@@ -5,7 +5,7 @@
   ~
   ~ Authors
   ~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  ~ Created by Lunabee Studio / Date - 2020/04/05 - for the STOP-COVID project
+  ~ Created by Lunabee Studio / Date - 2020/04/05 - for the TOUS-ANTI-COVID project
   -->
 
 <com.google.android.material.card.MaterialCardView
@@ -18,42 +18,139 @@
     android:layout_marginVertical="@dimen/spacing_medium"
     app:rippleColor="@android:color/transparent">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="@dimen/spacing_large">
+        android:layout_height="wrap_content">
 
         <TextView
             android:id="@+id/updated_at_text_view"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/spacing_medium"
+            android:layout_marginTop="@dimen/spacing_large"
             android:textAppearance="@style/TextAppearance.StopCovid.Caption.Small"
+            app:layout_constraintStart_toStartOf="@id/startGuideline"
+            app:layout_constraintTop_toTopOf="parent"
             tools:text="@tools:sample/lorem[2]" />
 
+        <ImageButton
+            android:id="@+id/shareButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/ripple_rounded"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="@dimen/spacing_large"
+            android:src="@drawable/ic_baseline_share_24"
+            app:layout_constraintBottom_toBottomOf="@id/updated_at_text_view"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/updated_at_text_view" />
+
         <TextView
-            android:id="@+id/valueTextView"
+            android:id="@+id/leftLocationTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_large"
+            android:textIsSelectable="false"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="@id/startGuideline"
+            app:layout_constraintTop_toBottomOf="@id/updated_at_text_view"
+            tools:text="@tools:sample/lorem[0]"
+            tools:visibility="visible" />
+
+        <TextView
+            android:id="@+id/leftValueTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="@style/TextAppearance.StopCovid.Title.KeyFigure"
+            app:layout_constraintStart_toStartOf="@id/startGuideline"
+            app:layout_constraintTop_toBottomOf="@id/leftLocationTextView"
             tools:text="@tools:sample/lorem[0]" />
+
+        <ImageView
+            android:id="@+id/leftTrend"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/spacing_medium"
+            android:baselineAlignBottom="true"
+            app:layout_constraintBaseline_toBaselineOf="@+id/leftValueTextView"
+            app:layout_constraintBottom_toBottomOf="@id/leftValueTextView"
+            app:layout_constraintStart_toEndOf="@id/leftValueTextView"
+            tools:src="@drawable/ic_up" />
+
+        <TextView
+            android:id="@+id/rightLocationTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:layout_constraintBottom_toTopOf="@id/rightValueTextView"
+            app:layout_constraintEnd_toEndOf="@id/endGuideline"
+            app:layout_constraintStart_toStartOf="@id/rightValueTextView"
+            tools:text="@tools:sample/lorem[0]"
+            tools:visibility="visible" />
+
+        <TextView
+            android:id="@+id/rightValueTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.StopCovid.Title.KeyFigure"
+            android:textSize="@dimen/title_font_size"
+            android:visibility="gone"
+            app:layout_constraintBaseline_toBaselineOf="@id/leftValueTextView"
+            app:layout_constraintBottom_toBottomOf="@id/leftValueTextView"
+            app:layout_constraintEnd_toEndOf="@id/endGuideline"
+            app:layout_constraintHorizontal_bias="0.7"
+            app:layout_constraintStart_toStartOf="@id/startGuideline"
+            tools:text="@tools:sample/lorem[0]"
+            tools:visibility="visible" />
+
+        <ImageView
+            android:id="@+id/rightTrend"
+            android:layout_width="@dimen/icon_small_size"
+            android:layout_height="@dimen/icon_small_size"
+            android:layout_marginStart="@dimen/spacing_medium"
+            android:baselineAlignBottom="true"
+            app:layout_constraintBaseline_toBaselineOf="@+id/rightValueTextView"
+            app:layout_constraintStart_toEndOf="@id/rightValueTextView"
+            app:layout_constraintTop_toTopOf="@id/rightValueTextView"
+            tools:src="@drawable/ic_down" />
 
         <TextView
             android:id="@+id/labelTextView"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/spacing_medium"
             android:ellipsize="end"
             android:maxLines="3"
             android:textAppearance="@style/TextAppearance.StopCovid.Title"
+            app:layout_constraintStart_toStartOf="@id/startGuideline"
+            app:layout_constraintTop_toBottomOf="@id/leftValueTextView"
             tools:text="@tools:sample/lorem[1]" />
 
         <TextView
             android:id="@+id/descriptionTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_medium"
+            android:layout_marginBottom="@dimen/spacing_large"
+            android:textAppearance="@style/TextAppearance.StopCovid.Caption"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@id/endGuideline"
+            app:layout_constraintStart_toStartOf="@id/startGuideline"
+            app:layout_constraintTop_toBottomOf="@id/labelTextView"
+            tools:text="@tools:sample/lorem[43]" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/startGuideline"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.StopCovid.Caption"
-            tools:text="@tools:sample/lorem[43]" />
-    </LinearLayout>
+            android:orientation="vertical"
+            app:layout_constraintGuide_begin="@dimen/spacing_large" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/endGuideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_end="@dimen/spacing_large" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

@@ -5,7 +5,7 @@
  *
  * Authors
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Created by Lunabee Studio / Date - 2020/20/05 - for the STOP-COVID project
+ * Created by Lunabee Studio / Date - 2020/20/05 - for the TOUS-ANTI-COVID project
  */
 
 package com.lunabeestudio.framework.sharedcrypto

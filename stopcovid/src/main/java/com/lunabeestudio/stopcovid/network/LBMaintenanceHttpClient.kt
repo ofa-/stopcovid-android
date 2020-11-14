@@ -5,7 +5,7 @@
  *
  * Authors
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Created by Lunabee Studio / Date - 2020/04/05 - for the STOP-COVID project
+ * Created by Lunabee Studio / Date - 2020/04/05 - for the TOUS-ANTI-COVID project
  */
 
 package com.lunabeestudio.stopcovid.network
@@ -15,9 +15,7 @@ import com.lunabeestudio.framework.remote.RetrofitClient
 import com.lunabeestudio.stopcovid.BuildConfig
 import com.lunabeestudio.stopcovid.StopCovid
 import com.lunabeestudio.stopcovid.manager.TimeCheckManager
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.Request
 
@@ -26,24 +24,24 @@ import okhttp3.Request
  */
 object LBMaintenanceHttpClient {
 
-    @Suppress("DeferredResultUnused", "BlockingMethodInNonBlockingContext")
-        /**
-         * Do a GET http call to read a text file like json for example
-         * @param urlString : the url to use to do the call
-         * @param onSuccess : success completion, return the file as a string
-         * @param onFailure : failure completion, return the exception
-         */
-    fun get(context: Context,
+    /**
+     * Do a GET http call to read a text file like json for example
+     * @param urlString : the url to use to do the call
+     * @param onSuccess : success completion, return the file as a string
+     * @param onFailure : failure completion, return the exception
+     */
+    suspend fun get(context: Context,
         urlString: String,
-        onSuccess: (result: String) -> Unit,
-        onFailure: (e: Exception) -> Unit) {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val okHttpClient = RetrofitClient.getDefaultOKHttpClient(context, urlString, BuildConfig.APP_MAINTENANCE_CERTIFICATE_SHA256)
-                val request: Request = Request.Builder()
-                    .url(urlString)
-                    .build()
+        onSuccess: suspend (result: String) -> Unit,
+        onFailure: suspend (e: Exception) -> Unit) {
+        try {
+            val okHttpClient = RetrofitClient.getDefaultOKHttpClient(context, urlString, BuildConfig.APP_MAINTENANCE_CERTIFICATE_SHA256)
+            val request: Request = Request.Builder()
+                .url(urlString)
+                .build()
 
+            @Suppress("BlockingMethodInNonBlockingContext")
+            val string = withContext(Dispatchers.IO) {
                 val response = okHttpClient.newCall(request).execute()
                 val isClockAligned = TimeCheckManager.isTimeAlignedWithServer(response)
                 if (isClockAligned == false) {
@@ -51,21 +49,12 @@ object LBMaintenanceHttpClient {
                 } else if (isClockAligned == true) {
                     (context.applicationContext as? StopCovid)?.cancelClockNotAlignedNotification()
                 }
-                val string = response.body!!.string()
-                withContext(Dispatchers.Main) {
-                    onSuccess(string)
-                }
-            } catch (e: Exception) {
-                // FIXME workaround coroutine 1.3.7 https://github.com/Kotlin/kotlinx.coroutines/issues/2049#issuecomment-633270075
-                dispatchFailure(onFailure, e)
+                response.body!!.string()
             }
-        }
-    }
 
-    private suspend fun dispatchFailure(onFailure: (e: Exception) -> Unit, e: Exception) {
-        withContext(Dispatchers.Main) {
+            onSuccess(string)
+        } catch (e: Exception) {
             onFailure(e)
         }
     }
-
 }

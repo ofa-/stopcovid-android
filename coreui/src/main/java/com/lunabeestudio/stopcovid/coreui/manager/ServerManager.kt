@@ -5,19 +5,20 @@
  *
  * Authors
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Created by Lunabee Studio / Date - 2020/13/05 - for the STOP-COVID project
+ * Created by Lunabee Studio / Date - 2020/13/05 - for the TOUS-ANTI-COVID project
  */
 
 package com.lunabeestudio.stopcovid.coreui.manager
 
 import android.content.Context
-import androidx.annotation.WorkerThread
 import androidx.core.content.edit
 import androidx.preference.PreferenceManager
 import com.google.gson.Gson
 import com.lunabeestudio.stopcovid.coreui.BuildConfig
 import com.lunabeestudio.stopcovid.coreui.UiConstants
 import com.lunabeestudio.stopcovid.coreui.extension.saveTo
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.File
 import java.lang.reflect.Type
@@ -30,50 +31,73 @@ abstract class ServerManager {
 
     protected abstract fun folderName(): String
     protected abstract fun prefix(context: Context): String
-    protected abstract fun fallbackFileName(context: Context): String
     protected abstract fun type(): Type
     protected abstract fun lastRefreshSharedPrefsKey(): String
     protected open fun transform(input: String): String = input
     protected open fun extension(): String = ".json"
     protected open fun url(): String = BuildConfig.SERVER_URL
 
-    @WorkerThread
-    protected fun fetchLast(context: Context, languageCode: String, forceRefresh: Boolean): Boolean {
+    protected suspend fun fetchLast(context: Context, forceRefresh: Boolean): Boolean {
+        return if (shouldRefresh(context) || forceRefresh) {
+            fetchLast(context, Locale.getDefault().language)
+        } else {
+            Timber.v("Only use local data")
+            false
+        }
+    }
+
+    protected suspend fun <T> loadLocal(context: Context, forceRefresh: Boolean): T? {
+        val currentLanguage = Locale.getDefault().language
+        val result: T? = loadLocal(context, currentLanguage) ?: loadAssetFile(context, currentLanguage)
+        if (result == null && (shouldRefresh(context) || forceRefresh)) {
+            fetchLast(context, UiConstants.DEFAULT_LANGUAGE)
+        }
+        return result ?: loadLocal(context, UiConstants.DEFAULT_LANGUAGE) ?: loadAssetFile(context, UiConstants.DEFAULT_LANGUAGE)
+    }
+
+    private suspend fun fetchLast(context: Context, languageCode: String): Boolean {
         return try {
-            if (shouldRefresh(context) || forceRefresh) {
-                val filename = "${prefix(context)}${languageCode}${extension()}"
-                Timber.d("Fetching remote data at ${url()}$filename")
-                "${url()}$filename".saveTo(context, File(context.filesDir, filename))
-                saveLastRefresh(context)
-                true
-            } else {
-                Timber.d("Only use local data")
-                false
-            }
+            val filename = "${prefix(context)}${languageCode}${extension()}"
+            "${url()}$filename".saveTo(context, File(context.filesDir, filename))
+            saveLastRefresh(context)
+            true
         } catch (e: Exception) {
-            Timber.d("Fetching fail for $languageCode")
-            if (languageCode != UiConstants.DEFAULT_LANGUAGE) {
-                Timber.d("Trying for ${UiConstants.DEFAULT_LANGUAGE}")
-                fetchLast(context, UiConstants.DEFAULT_LANGUAGE, forceRefresh)
-            } else {
-                false
+            Timber.e(e, "Fetching fail for $languageCode")
+            false
+        }
+    }
+
+    private suspend fun <T> loadLocal(context: Context, languageCode: String): T? {
+        val fileName = "${prefix(context)}$languageCode${extension()}"
+        val file = File(context.filesDir, fileName)
+        return if (!file.exists()) {
+            null
+        } else {
+            withContext(Dispatchers.IO) {
+                try {
+                    Timber.v("Loading $file to object")
+                    gson.fromJson<T>(transform(file.readText()), type())
+                } catch (e: Exception) {
+                    Timber.e(e)
+                    Timber.v("Loading local $languageCode file to object")
+                    null
+                }
             }
         }
     }
 
-    protected fun <T> loadLocal(context: Context): T {
-        // removed cache (commit 9e2feeda0) compare with upstream/master
-        return getDefaultAssetFile<T>(context)
-    }
-
-    private fun <T> getDefaultAssetFile(context: Context): T {
-        var fileName = "${prefix(context)}${Locale.getDefault().language}${extension()}"
-        if (context.assets.list(folderName())?.contains(fileName) != true) {
-            fileName = fallbackFileName(context)
+    private suspend fun <T> loadAssetFile(context: Context, languageCode: String): T? {
+        val fileName = "${prefix(context)}$languageCode${extension()}"
+        @Suppress("BlockingMethodInNonBlockingContext")
+        return withContext(Dispatchers.IO) {
+            if (context.assets.list(folderName())?.contains(fileName) != true) {
+                null
+            } else {
+                gson.fromJson<T>(context.assets.open("${folderName()}/$fileName").use {
+                    transform(it.readBytes().toString(Charsets.UTF_8))
+                }, type())
+            }
         }
-        return gson.fromJson(context.assets.open("${folderName()}/$fileName").use {
-            transform(it.readBytes().toString(Charsets.UTF_8))
-        }, type())
     }
 
     private fun shouldRefresh(context: Context): Boolean {
@@ -86,5 +110,12 @@ abstract class ServerManager {
         PreferenceManager.getDefaultSharedPreferences(context).edit {
             putLong(lastRefreshSharedPrefsKey(), System.currentTimeMillis())
         }
+    }
+
+    fun clearLocal(context: Context) {
+        val filename = "${prefix(context)}${Locale.getDefault().language}${extension()}"
+        File(context.filesDir, filename).delete()
+        val defaultFilename = "${prefix(context)}${UiConstants.DEFAULT_LANGUAGE}${extension()}"
+        File(context.filesDir, defaultFilename).delete()
     }
 }

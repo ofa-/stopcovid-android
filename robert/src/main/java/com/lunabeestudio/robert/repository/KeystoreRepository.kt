@@ -5,7 +5,7 @@
  *
  * Authors
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Created by Lunabee Studio / Date - 2020/04/05 - for the STOP-COVID project
+ * Created by Lunabee Studio / Date - 2020/04/05 - for the TOUS-ANTI-COVID project
  */
 
 package com.lunabeestudio.robert.repository
@@ -164,5 +164,41 @@ internal class KeystoreRepository(
         get() = keystoreDataSource.apiVersion
         set(value) {
             keystoreDataSource.apiVersion = value
+        }
+
+    var qrCodeDeletionHours: Float?
+        get() = keystoreDataSource.qrCodeDeletionHours
+        set(value) {
+            keystoreDataSource.qrCodeDeletionHours = value
+        }
+
+    var qrCodeExpiredHours: Float?
+        get() = keystoreDataSource.qrCodeExpiredHours
+        set(value) {
+            keystoreDataSource.qrCodeExpiredHours = value
+        }
+
+    var qrCodeFormattedString: String?
+        get() = keystoreDataSource.qrCodeFormattedString
+        set(value) {
+            keystoreDataSource.qrCodeFormattedString = value
+        }
+
+    var qrCodeFooterString: String?
+        get() = keystoreDataSource.qrCodeFooterString
+        set(value) {
+            keystoreDataSource.qrCodeFooterString = value
+        }
+
+    var configVersion: Int?
+        get() = keystoreDataSource.configVersion
+        set(value) {
+            keystoreDataSource.configVersion = value
+        }
+
+    var displayDepartmentLevel: Boolean?
+        get() = keystoreDataSource.displayDepartmentLevel
+        set(value) {
+            keystoreDataSource.displayDepartmentLevel = value
         }
 }
