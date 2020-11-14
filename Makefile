@@ -14,6 +14,9 @@ cp:
 	$(ADB) cat $(FILES)/localProximity.txt		> data.txt
 	$(ADB) cat $(FILES)/disseminatedEbids.txt	> ebids.txt
 
+cat.%:
+	@$(ADB) cat $(FILES)/$*
+
 load: data.load.txt
 	$(MAKE) cp rm --ignore-errors --quiet
 	$(ADB) tee -a $(FILES)/localProximity.txt	< data.load.txt \
