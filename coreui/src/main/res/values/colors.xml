@@ -8,7 +8,6 @@
   ~ Created by Lunabee Studio / Date - 2020/04/05 - for the TOUS-ANTI-COVID project
   -->
 <resources>
-    <color name="color_primary">#5770BE</color>
     <color name="color_on_primary">#FFFFFF</color>
     <color name="color_primary_light">#1A000091</color>
     <color name="color_on_primary_light">#000091</color>
@@ -20,6 +19,7 @@
     <color name="color_icon_background">#FFFFFF</color>
     <color name="color_on_gradient">#FFFFFF</color>
 
+    <color name="color_indigo">#5770BE</color>
     <color name="color_no_risk">#449976</color>
     <color name="color_risk">#fd706a</color>
     <color name="color_on_status_notification">#FFFFFF</color>
@@ -30,4 +30,6 @@
     <color name="color_monza">#E1000F</color>
     <color name="color_east_bay">#484D7A</color>
     <color name="color_neon_carrot">#FF9940</color>
+    <color name="color_persian_blue">#0F31C8</color>
+    <color name="color_malibu">#85BBFF</color>
 </resources>

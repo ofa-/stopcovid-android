@@ -44,6 +44,7 @@ import java.util.UUID
 abstract class RobertProximityService : ProximityNotificationService() {
 
     abstract val robertManager: RobertManager
+    protected abstract fun sendErrorBluetoothNotification()
 
     private var payloadUpdateSchedulerScope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 
@@ -72,6 +73,11 @@ abstract class RobertProximityService : ProximityNotificationService() {
     override fun doStop() {
         super.doStop()
         payloadUpdateSchedulerScope.cancel("Proximity service has been stopped")
+    }
+
+    override fun onBluetoothDisabled() {
+        super.onBluetoothDisabled()
+        sendErrorBluetoothNotification()
     }
 
     override val bleSettings: BleSettings

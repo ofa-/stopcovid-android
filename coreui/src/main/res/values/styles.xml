@@ -13,7 +13,7 @@
         <item name="android:windowBackground">?colorSurface</item>
         <item name="android:windowSoftInputMode">adjustResize</item>
 
-        <item name="colorPrimary">@color/color_primary</item>
+        <item name="colorPrimary">@color/color_indigo</item>
         <item name="colorPrimaryVariant">?colorPrimary</item>
         <item name="colorPrimaryDark">?colorPrimary</item>
         <item name="colorOnPrimary">@color/color_on_primary</item>

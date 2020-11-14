@@ -15,9 +15,8 @@ import android.os.Bundle
 import android.text.format.DateUtils
 import android.view.View
 import androidx.fragment.app.Fragment
+import com.lunabeestudio.stopcovid.coreui.extension.stringsFormat
 import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
-import timber.log.Timber
-import java.util.IllegalFormatException
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 import kotlin.time.days
@@ -38,14 +37,7 @@ abstract class BaseFragment : Fragment() {
     }
 
     protected fun stringsFormat(key: String, vararg args: Any?): String? {
-        return strings[key]?.let {
-            try {
-                String.format(it, *args)
-            } catch (e: IllegalFormatException) {
-                Timber.e(e)
-                it
-            }
-        }
+        return strings.stringsFormat(key, *args)
     }
 
     @OptIn(ExperimentalTime::class)
@@ -55,18 +47,35 @@ abstract class BaseFragment : Fragment() {
         return when {
             now - this <= 1.minutes -> strings["common.justNow"]
             now - this <= 1.days -> DateUtils.getRelativeTimeSpanString(
-                    this.coerceAtMost(now - 1.minutes).toLongMilliseconds(),
-                    now.toLongMilliseconds(),
-                    DateUtils.MINUTE_IN_MILLIS,
-                    DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_SHOW_YEAR or DateUtils.FORMAT_ABBREV_MONTH,
-            ).toString()
+                this.coerceAtMost(now - 1.minutes).toLongMilliseconds(),
+                now.toLongMilliseconds(),
+                DateUtils.MINUTE_IN_MILLIS,
+                DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_SHOW_YEAR or DateUtils.FORMAT_ABBREV_MONTH,
+            )
+                .toString()
+                .fixQuoteInString()
             else -> DateUtils.getRelativeDateTimeString(
-                    context,
-                    this.toLongMilliseconds(),
-                    DateUtils.DAY_IN_MILLIS,
-                    DateUtils.WEEK_IN_MILLIS,
-                    DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_SHOW_YEAR or DateUtils.FORMAT_ABBREV_MONTH,
-            ).toString()
+                context,
+                this.toLongMilliseconds(),
+                DateUtils.DAY_IN_MILLIS,
+                DateUtils.WEEK_IN_MILLIS,
+                DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_SHOW_YEAR or DateUtils.FORMAT_ABBREV_MONTH,
+            )
+                .toString()
+                .fixQuoteInString()
         }
     }
+
+    @OptIn(ExperimentalTime::class)
+    protected fun Duration.getRelativeDateString(context: Context): String? {
+        return DateUtils.getRelativeTimeSpanString(
+            this.toLongMilliseconds(),
+            System.currentTimeMillis(),
+            DateUtils.DAY_IN_MILLIS,
+            DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_SHOW_YEAR or DateUtils.FORMAT_ABBREV_MONTH)
+            .toString()
+    }
+
+    // Dirty hack to fix strange display of quotes on some Android devices
+    private fun String.fixQuoteInString(): String = replace("'", "")
 }

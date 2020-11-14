@@ -115,6 +115,25 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
             }
         }
 
+    override var atRiskLastError: Long?
+        get() {
+            val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_AT_RISK_LAST_ERROR, null)
+            return if (encryptedText != null) {
+                cryptoManager.decryptToString(encryptedText).toLongOrNull()
+            } else {
+                null
+            }
+        }
+        set(value) {
+            if (value != null) {
+                sharedPreferences.edit()
+                    .putString(SHARED_PREF_KEY_AT_RISK_LAST_ERROR, cryptoManager.encryptToString(value.toString()))
+                    .apply()
+            } else {
+                sharedPreferences.edit().remove(SHARED_PREF_KEY_AT_RISK_LAST_ERROR).apply()
+            }
+        }
+
     override var atRiskMinHourContactNotif: Int?
         get() {
             val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_AT_RISK_MIN_HOUR_CONTACT_NOTIF, null)
@@ -401,6 +420,25 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
             }
         }
 
+    override var minStatusRetryDuraction: Float?
+        get() {
+            val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_MIN_STATUS_RETRY_DURATION, null)
+            return if (encryptedText != null) {
+                cryptoManager.decryptToString(encryptedText).toFloatOrNull()
+            } else {
+                null
+            }
+        }
+        set(value) {
+            if (value != null) {
+                sharedPreferences.edit()
+                    .putString(SHARED_PREF_KEY_MIN_STATUS_RETRY_DURATION, cryptoManager.encryptToString(value.toString()))
+                    .apply()
+            } else {
+                sharedPreferences.edit().remove(SHARED_PREF_KEY_MIN_STATUS_RETRY_DURATION).apply()
+            }
+        }
+
     override var randomStatusHour: Float?
         get() {
             val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_RANDOM_STATUS_HOUR, null)
@@ -436,6 +474,25 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
                     .apply()
             } else {
                 sharedPreferences.edit().remove(SHARED_PREF_KEY_PRE_SYMPTOMS_SPAN).apply()
+            }
+        }
+
+    override var positiveSampleSpan: Int?
+        get() {
+            val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_POSITIVE_SAMPLE_SPAN, null)
+            return if (encryptedText != null) {
+                cryptoManager.decryptToString(encryptedText).toIntOrNull()
+            } else {
+                null
+            }
+        }
+        set(value) {
+            if (value != null) {
+                sharedPreferences.edit()
+                    .putString(SHARED_PREF_KEY_POSITIVE_SAMPLE_SPAN, cryptoManager.encryptToString(value.toString()))
+                    .apply()
+            } else {
+                sharedPreferences.edit().remove(SHARED_PREF_KEY_POSITIVE_SAMPLE_SPAN).apply()
             }
         }
 
@@ -553,6 +610,25 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
             }
         }
 
+    override var qrCodeFormattedStringDisplayed: String?
+        get() {
+            val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_QR_CODE_FORMATTED_STRING_DISPLAYED, null)
+            return if (encryptedText != null) {
+                cryptoManager.decryptToString(encryptedText)
+            } else {
+                null
+            }
+        }
+        set(value) {
+            if (value != null) {
+                sharedPreferences.edit()
+                    .putString(SHARED_PREF_KEY_QR_CODE_FORMATTED_STRING_DISPLAYED, cryptoManager.encryptToString(value))
+                    .apply()
+            } else {
+                sharedPreferences.edit().remove(SHARED_PREF_KEY_QR_CODE_FORMATTED_STRING_DISPLAYED).apply()
+            }
+        }
+
     override var qrCodeFooterString: String?
         get() {
             val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_QR_CODE_FOOTER_STRING, null)
@@ -572,7 +648,26 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
             }
         }
 
-    var saveAttestationData: Boolean?
+    override var proximityReactivationReminderHours: List<Int>?
+        get() {
+            val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_PROXIMITY_REACTIVATE_REMINDER_HOURS, null)
+            return if (encryptedText != null) {
+                Gson().fromJson(cryptoManager.decryptToString(encryptedText), object : TypeToken<List<Int>>() {}.type)
+            } else {
+                null
+            }
+        }
+        set(value) {
+            if (value != null) {
+                sharedPreferences.edit()
+                    .putString(SHARED_PREF_KEY_PROXIMITY_REACTIVATE_REMINDER_HOURS, cryptoManager.encryptToString(Gson().toJson(value)))
+                    .apply()
+            } else {
+                sharedPreferences.edit().remove(SHARED_PREF_KEY_PROXIMITY_REACTIVATE_REMINDER_HOURS).apply()
+            }
+        }
+
+    override var saveAttestationData: Boolean?
         get() {
             val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_SAVE_ATTESTATION_DATA, null)
             return if (encryptedText != null) {
@@ -591,7 +686,7 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
             }
         }
 
-    var savedAttestationData: Map<String, FormEntry>?
+    override var savedAttestationData: Map<String, FormEntry>?
         get() {
             val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_SAVED_ATTESTATION_DATA, null)
             return if (encryptedText != null) {
@@ -611,8 +706,9 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
         }
 
     private var _attestationsLiveData: MutableLiveData<List<Map<String, FormEntry>>?> = MutableLiveData(attestations)
-    var attestationsLiveData: LiveData<List<Map<String, FormEntry>>?> = _attestationsLiveData
-    var attestations: List<Map<String, FormEntry>>?
+    override val attestationsLiveData: LiveData<List<Map<String, FormEntry>>?>
+        get() = _attestationsLiveData
+    override var attestations: List<Map<String, FormEntry>>?
         get() {
             val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_ATTESTATIONS, null)
             return if (encryptedText != null) {
@@ -658,6 +754,7 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
         private const val SHARED_PREF_KEY_KEA = "shared.pref.kea"
         private const val SHARED_PREF_KEY_TIME_START = "shared.pref.time_start"
         private const val SHARED_PREF_KEY_AT_RISK_LAST_REFRESH = "shared.pref.at_risk_last_refresh"
+        private const val SHARED_PREF_KEY_AT_RISK_LAST_ERROR = "shared.pref.at_risk_last_error"
         private const val SHARED_PREF_KEY_LAST_RISK_RECEIVED_DATE = "shared.pref.last_risk_received_date"
         private const val SHARED_PREF_KEY_AT_RISK_MIN_HOUR_CONTACT_NOTIF = "shared.pref.at_risk_min_hour_contact_notif"
         private const val SHARED_PREF_KEY_AT_RISK_MAX_HOUR_CONTACT_NOTIF = "shared.pref.at_risk_max_hour_contact_notif"
@@ -673,14 +770,18 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
         private const val SHARED_PREF_KEY_DATA_RETENTION_PERIOD = "shared.pref.data_retention_period"
         private const val SHARED_PREF_KEY_QUARANTINE_PERIOD = "shared.pref.quarantine_period"
         private const val SHARED_PREF_KEY_CHECK_STATUS_FREQUENCY = "shared.pref.check_status_frequency"
+        private const val SHARED_PREF_KEY_MIN_STATUS_RETRY_DURATION = "shared.pref.min_status_retry_duration"
         private const val SHARED_PREF_KEY_RANDOM_STATUS_HOUR = "shared.pref.random_status_hour"
         private const val SHARED_PREF_KEY_PRE_SYMPTOMS_SPAN = "shared.pref.pre_symptoms_span"
+        private const val SHARED_PREF_KEY_POSITIVE_SAMPLE_SPAN = "shared.pref.positive_sample_span"
         private const val SHARED_PREF_KEY_APP_AVAILABILITY = "shared.pref.app_availability"
         private const val SHARED_PREF_KEY_API_VERSION = "shared.pref.api_version"
         private const val SHARED_PREF_KEY_QR_CODE_DELETION_HOURS = "shared.pref.qr_code_deletion_hours"
         private const val SHARED_PREF_KEY_QR_CODE_EXPIRED_HOURS = "shared.pref.qr_code_expired_hours"
         private const val SHARED_PREF_KEY_QR_CODE_FORMATTED_STRING = "shared.pref.qr_code_formatted_string"
+        private const val SHARED_PREF_KEY_QR_CODE_FORMATTED_STRING_DISPLAYED = "shared.pref.qr_code_formatted_string_displayed"
         private const val SHARED_PREF_KEY_QR_CODE_FOOTER_STRING = "shared.pref.qr_code_footer_string"
+        private const val SHARED_PREF_KEY_PROXIMITY_REACTIVATE_REMINDER_HOURS = "shared.pref.proximity_reactivate_reminder_hours"
         private const val SHARED_PREF_KEY_SAVE_ATTESTATION_DATA = "shared.pref.save_attestation_data"
         private const val SHARED_PREF_KEY_SAVED_ATTESTATION_DATA = "shared.pref.saved_attestation_data"
         private const val SHARED_PREF_KEY_ATTESTATIONS = "shared.pref.attestations"

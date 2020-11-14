@@ -14,6 +14,8 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.lunabeestudio.domain.model.FormEntry
+import com.lunabeestudio.stopcovid.R
+import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.extension.attestationLongLabelFromKey
 import com.lunabeestudio.stopcovid.extension.attestationShortLabelFromKey
 import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
@@ -51,6 +53,13 @@ class NewAttestationPickerFragment : MainFragment() {
                         identifier = title.hashCode().toLong()
                     }
                 }
+            }
+        }
+        if (!strings["attestationFieldItemChoiceController.footer"].isNullOrBlank()) {
+            items += captionItem {
+                text = strings["attestationFieldItemChoiceController.footer"]
+                textAppearance = R.style.TextAppearance_StopCovid_Caption_Small_Grey
+                identifier = text.hashCode().toLong()
             }
         }
 

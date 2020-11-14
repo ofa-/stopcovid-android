@@ -77,6 +77,9 @@ class OnBoardingActivity : BaseActivity() {
             setContentView(splashScreenBinding.root)
         }
 
+        binding = ActivityOnBoardingBinding.inflate(layoutInflater)
+        mergeBinding = LayoutButtonBottomSheetBinding.bind(binding.root)
+
         // Wait 2 + 5 seconds to load strings from file or server. Show blocking error if we still don't have strings.
         splashLoadingJob = lifecycleScope.launchWhenResumed {
             delay(2.seconds)
@@ -86,53 +89,61 @@ class OnBoardingActivity : BaseActivity() {
             showNoStringsErrorDialog()
         }
 
-        val stringsObserver = object : Observer<HashMap<String, String>> {
-            override fun onChanged(strings: HashMap<String, String>?) {
-                if (!strings.isNullOrEmpty()) {
-                    StringsManager.liveStrings.removeObserver(this)
-
-                    if (onBoardingDone) {
-                        val intent = Intent(this@OnBoardingActivity, MainActivity::class.java).apply {
-                            data = intent.data
-                        }
-                        startActivity(
-                            intent,
-                            ActivityOptions
-                                .makeCustomAnimation(this@OnBoardingActivity, R.anim.nav_default_enter_anim, R.anim.nav_default_exit_anim)
-                                .toBundle()
-                        )
-                        finishAndRemoveTask()
-                    } else {
-                        splashLoadingJob?.cancel("Starting on boarding")
-                        splashScreenBinding.progressBar.hide()
-                        noStringDialog?.dismiss()
-
-                        binding = ActivityOnBoardingBinding.inflate(layoutInflater)
-                        mergeBinding = LayoutButtonBottomSheetBinding.bind(binding.root)
-                        setContentView(binding.root)
-                        setSupportActionBar(binding.toolbar)
-                        setupActionBarWithNavController(navController)
-
-                        onDestinationChangeListener = NavController.OnDestinationChangedListener { _, _, _ ->
-                            binding.toolbar.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_FOCUSED)
-                        }
-                        onDestinationChangeListener?.let { navController.addOnDestinationChangedListener(it) }
-
-                        binding.snackBarView.applyAndConsumeWindowInsetBottom()
-                        binding.toolbar.contentInsetStartWithNavigation = 0
-
-                        if (savedInstanceState == null) {
-                            replaceSplashScreenLogo()
-                        } else {
-                            viewModel.showLogo.value = true
-                            binding.animationImageView.isVisible = false
-                        }
+        if (StringsManager.strings.isEmpty()) {
+            val stringsObserver = object : Observer<HashMap<String, String>> {
+                override fun onChanged(strings: HashMap<String, String>?) {
+                    if (!strings.isNullOrEmpty()) {
+                        StringsManager.liveStrings.removeObserver(this)
+                        startOnBoardingOrMain(onBoardingDone, savedInstanceState)
                     }
                 }
             }
+            StringsManager.liveStrings.observe(this@OnBoardingActivity, stringsObserver)
+        } else {
+            startOnBoardingOrMain(onBoardingDone, savedInstanceState)
         }
+    }
 
-        StringsManager.liveStrings.observe(this@OnBoardingActivity, stringsObserver)
+    private fun startOnBoardingOrMain(onBoardingDone: Boolean, savedInstanceState: Bundle?) {
+        if (onBoardingDone) {
+            val intent = Intent(this@OnBoardingActivity, MainActivity::class.java).apply {
+                data = intent.data
+            }
+            startActivity(
+                intent,
+                ActivityOptions
+                    .makeCustomAnimation(
+                        this@OnBoardingActivity,
+                        R.anim.nav_default_enter_anim,
+                        R.anim.nav_default_exit_anim
+                    )
+                    .toBundle()
+            )
+            finishAndRemoveTask()
+        } else {
+            splashLoadingJob?.cancel("Starting on boarding")
+            splashScreenBinding.progressBar.hide()
+            noStringDialog?.dismiss()
+
+            setContentView(binding.root)
+            setSupportActionBar(binding.toolbar)
+            setupActionBarWithNavController(navController)
+
+            onDestinationChangeListener = NavController.OnDestinationChangedListener { _, _, _ ->
+                binding.toolbar.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_FOCUSED)
+            }
+            onDestinationChangeListener?.let { navController.addOnDestinationChangedListener(it) }
+
+            binding.snackBarView.applyAndConsumeWindowInsetBottom()
+            binding.toolbar.contentInsetStartWithNavigation = 0
+
+            if (savedInstanceState == null) {
+                replaceSplashScreenLogo()
+            } else {
+                viewModel.showLogo.value = true
+                binding.animationImageView.isVisible = false
+            }
+        }
     }
 
     private fun showNoStringsErrorDialog() {

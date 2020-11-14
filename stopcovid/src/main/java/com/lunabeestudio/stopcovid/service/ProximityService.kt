@@ -38,7 +38,13 @@ import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.manager.ProximityManager
 import com.orange.proximitynotification.ProximityInfo
 import com.orange.proximitynotification.ble.BleProximityMetadata
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 import kotlin.math.pow
 
@@ -119,7 +125,11 @@ class ProximityService : RobertProximityService() {
 
     override val foregroundNotificationId: Int = UiConstants.Notification.PROXIMITY.notificationId
 
-    override fun buildForegroundServiceNotification(): Notification {
+    override fun buildForegroundServiceNotification(): Notification = runBlocking {
+        if (strings.isEmpty()) {
+            StringsManager.initialize(this@ProximityService)
+        }
+
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -132,9 +142,28 @@ class ProximityService : RobertProximityService() {
             notificationManager.createNotificationChannel(channel)
         }
 
+        val notificationIntent = Intent(this@ProximityService, MainActivity::class.java)
+        val pendingIntent = PendingIntent.getActivity(
+            this@ProximityService, 0,
+            notificationIntent, 0
+        )
         notificationManager.cancel(UiConstants.Notification.BLUETOOTH.notificationId)
         notificationManager.cancel(UiConstants.Notification.ERROR.notificationId)
-        return buildNotification(strings["notification.proximityServiceRunning.title"])
+        NotificationCompat.Builder(
+            this@ProximityService,
+            UiConstants.Notification.PROXIMITY.channelId
+        )
+            .setContentTitle(strings["notification.proximityServiceRunning.title"])
+            .setOngoing(true)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setSmallIcon(R.drawable.ic_notification_bar)
+            .setNotificationSilent()
+            .setStyle(
+                NotificationCompat.BigTextStyle()
+                    .bigText(strings["notification.proximityServiceRunning.message"])
+            )
+            .setContentIntent(pendingIntent)
+            .build()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -199,71 +228,81 @@ class ProximityService : RobertProximityService() {
     }
 
     private fun sendErrorNotification() {
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        CoroutineScope(Dispatchers.Main).launch {
+            if (strings.isEmpty()) {
+                StringsManager.initialize(this@ProximityService)
+            }
+            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                UiConstants.Notification.ERROR.channelId,
-                strings["notification.channel.error.title"],
-                NotificationManager.IMPORTANCE_HIGH
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                val channel = NotificationChannel(
+                    UiConstants.Notification.ERROR.channelId,
+                    strings["notification.channel.error.title"] ?: "Erreur",
+                    NotificationManager.IMPORTANCE_HIGH
+                )
+                notificationManager.createNotificationChannel(channel)
+            }
+
+            val notificationIntent = Intent(this@ProximityService, MainActivity::class.java)
+            val pendingIntent = PendingIntent.getActivity(
+                this@ProximityService, 0,
+                notificationIntent, 0
             )
-            notificationManager.createNotificationChannel(channel)
+            val notification = NotificationCompat.Builder(
+                this@ProximityService,
+                UiConstants.Notification.ERROR.channelId
+            )
+                .setContentTitle(strings["notification.error.title"])
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setAutoCancel(true)
+                .setSmallIcon(R.drawable.ic_notification_bar)
+                .setStyle(
+                    NotificationCompat.BigTextStyle()
+                        .bigText(strings["notification.error.message"])
+                )
+                .setContentIntent(pendingIntent)
+                .build()
+            notificationManager.notify(UiConstants.Notification.ERROR.notificationId, notification)
         }
-
-        val notificationIntent = Intent(this, MainActivity::class.java)
-        val pendingIntent = PendingIntent.getActivity(
-            this, 0,
-            notificationIntent, 0
-        )
-        val notification = NotificationCompat.Builder(
-            this,
-            UiConstants.Notification.ERROR.channelId
-        )
-            .setContentTitle(strings["notification.error.title"])
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setAutoCancel(true)
-            .setSmallIcon(R.drawable.ic_notification_bar)
-            .setStyle(
-                NotificationCompat.BigTextStyle()
-                    .bigText(strings["notification.error.message"])
-            )
-            .setContentIntent(pendingIntent)
-            .build()
-        notificationManager.notify(UiConstants.Notification.ERROR.notificationId, notification)
     }
 
-    private fun sendErrorBluetoothNotification() {
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    override fun sendErrorBluetoothNotification() {
+        CoroutineScope(Dispatchers.Main).launch {
+            if (strings.isEmpty()) {
+                StringsManager.initialize(this@ProximityService)
+            }
+            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                UiConstants.Notification.BLUETOOTH.channelId,
-                strings["notification.channel.error.title"],
-                NotificationManager.IMPORTANCE_HIGH
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                val channel = NotificationChannel(
+                    UiConstants.Notification.BLUETOOTH.channelId,
+                    strings["notification.channel.error.title"] ?: "Erreur",
+                    NotificationManager.IMPORTANCE_HIGH
+                )
+                notificationManager.createNotificationChannel(channel)
+            }
+
+            val notificationIntent = Intent(this@ProximityService, MainActivity::class.java)
+            val pendingIntent = PendingIntent.getActivity(
+                this@ProximityService, 0,
+                notificationIntent, 0
             )
-            notificationManager.createNotificationChannel(channel)
+            val notification = NotificationCompat.Builder(
+                this@ProximityService,
+                UiConstants.Notification.BLUETOOTH.channelId
+            )
+                .setContentTitle(strings["notification.error.title"])
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setAutoCancel(true)
+                .setSmallIcon(R.drawable.ic_notification_bar)
+                .setStyle(
+                    NotificationCompat.BigTextStyle()
+                        .bigText(strings["notification.error.connectivity"])
+                )
+                .setContentIntent(pendingIntent)
+                .build()
+            notificationManager.notify(UiConstants.Notification.BLUETOOTH.notificationId, notification)
         }
-
-        val notificationIntent = Intent(this, MainActivity::class.java)
-        val pendingIntent = PendingIntent.getActivity(
-            this, 0,
-            notificationIntent, 0
-        )
-        val notification = NotificationCompat.Builder(
-            this,
-            UiConstants.Notification.BLUETOOTH.channelId
-        )
-            .setContentTitle(strings["notification.error.title"])
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setAutoCancel(true)
-            .setSmallIcon(R.drawable.ic_notification_bar)
-            .setStyle(
-                NotificationCompat.BigTextStyle()
-                    .bigText(strings["notification.error.connectivity"])
-            )
-            .setContentIntent(pendingIntent)
-            .build()
-        notificationManager.notify(UiConstants.Notification.BLUETOOTH.notificationId, notification)
     }
 
     companion object {

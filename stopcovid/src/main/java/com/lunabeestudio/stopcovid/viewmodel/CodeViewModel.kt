@@ -30,11 +30,11 @@ class CodeViewModel(private val robertManager: RobertManager) : ViewModel() {
     val loadingInProgress: MutableLiveData<Boolean> = MutableLiveData(false)
     val code: MutableLiveData<String> = MutableLiveData("")
 
-    fun verifyCode(code: String, firstSymptoms: Int, application: RobertApplication) {
+    fun verifyCode(code: String, firstSymptoms: Int?, positiveTest: Int?, application: RobertApplication) {
         if (loadingInProgress.value == false) {
             viewModelScope.launch(Dispatchers.IO) {
                 loadingInProgress.postValue(true)
-                val result = robertManager.report(code, firstSymptoms, application)
+                val result = robertManager.report(code, firstSymptoms, positiveTest, application)
                 loadingInProgress.postValue(false)
                 when (result) {
                     is RobertResult.Success -> codeSuccess.postValue(null)

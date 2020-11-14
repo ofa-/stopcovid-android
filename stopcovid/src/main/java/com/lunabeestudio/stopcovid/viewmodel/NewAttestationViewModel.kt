@@ -21,7 +21,7 @@ import java.util.Date
 
 class NewAttestationViewModel(private val secureKeystoreDataSource: SecureKeystoreDataSource) : ViewModel() {
 
-    var shouldSaveInfos: Boolean = secureKeystoreDataSource.saveAttestationData ?: true
+    var shouldSaveInfos: Boolean = secureKeystoreDataSource.saveAttestationData ?: false
     val infos: MutableMap<String, FormEntry> = (secureKeystoreDataSource.savedAttestationData ?: mapOf()).toMutableMap()
     private val dateFormat: DateFormat = SimpleDateFormat.getDateInstance(DateFormat.SHORT)
     private val timeFormat: DateFormat = SimpleDateFormat.getTimeInstance(DateFormat.SHORT)
@@ -40,6 +40,7 @@ class NewAttestationViewModel(private val secureKeystoreDataSource: SecureKeysto
         }
         if (shouldSaveInfos) {
             infos.remove("datetime")
+            infos.remove("reason")
             secureKeystoreDataSource.savedAttestationData = infos
         }
     }

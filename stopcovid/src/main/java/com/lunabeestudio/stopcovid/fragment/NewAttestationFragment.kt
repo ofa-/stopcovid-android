@@ -39,6 +39,7 @@ import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
 import com.lunabeestudio.stopcovid.fastitem.editTextItem
 import com.lunabeestudio.stopcovid.fastitem.pickerEditTextItem
 import com.lunabeestudio.stopcovid.manager.FormManager
+import com.lunabeestudio.stopcovid.model.AttestationMap
 import com.lunabeestudio.stopcovid.model.FormField
 import com.lunabeestudio.stopcovid.viewmodel.NewAttestationViewModel
 import com.lunabeestudio.stopcovid.viewmodel.NewAttestationViewModelFactory
@@ -63,8 +64,12 @@ class NewAttestationFragment : MainFragment() {
         setHasOptionsMenu(true)
         if (savedInstanceState != null) {
             viewModel.infos.clear()
-            viewModel.infos.putAll(gson.fromJson(savedInstanceState.getString(SAVE_INSTANCE_ATTESTATION_INFOS),
-                object : TypeToken<Map<String, FormEntry>>() {}.type))
+            viewModel.infos.putAll(
+                gson.fromJson(
+                    savedInstanceState.getString(SAVE_INSTANCE_ATTESTATION_INFOS),
+                    object : TypeToken<AttestationMap>() {}.type
+                )
+            )
         }
     }
 
@@ -124,6 +129,7 @@ class NewAttestationFragment : MainFragment() {
         strings["newAttestationController.header"]?.takeIf { it.isNotBlank() }?.let { header ->
             items += captionItem {
                 text = header
+                textAppearance = R.style.TextAppearance_StopCovid_Caption_Small_Grey
                 identifier = text.hashCode().toLong()
             }
         }
@@ -149,6 +155,7 @@ class NewAttestationFragment : MainFragment() {
         }
         items += captionItem {
             text = strings["newAttestationController.footer"]
+            textAppearance = R.style.TextAppearance_StopCovid_Caption_Small_Grey
             identifier = text.hashCode().toLong()
         }
 
@@ -176,19 +183,24 @@ class NewAttestationFragment : MainFragment() {
                     }
                 }
             }
-            "datetime" -> pickerEditTextItem {
-                placeholder = strings[formField.key.attestationPlaceholderFromKey()]
-                hint = strings[formField.key.attestationLabelFromKey()]
-                text = viewModel.infos[formField.key]?.value?.toLongOrNull()?.let { timestamp ->
-                    dateTimeFormat.format(Date(timestamp))
+            "datetime" -> {
+                if (viewModel.infos[formField.key] == null) {
+                    viewModel.infos[formField.key] = FormEntry(System.currentTimeMillis().toString(), formField.type)
                 }
-                onClick = {
-                    val initialTimestamp = viewModel.infos[formField.key]?.value?.toLongOrNull()
-                        ?: System.currentTimeMillis()
-                    showDateTimePicker(initialTimestamp) { newDate ->
-                        text = dateTimeFormat.format(Date(newDate))
-                        viewModel.infos[formField.key] = FormEntry(newDate.toString(), formField.type)
-                        binding?.recyclerView?.adapter?.notifyDataSetChanged()
+                pickerEditTextItem {
+                    placeholder = strings[formField.key.attestationPlaceholderFromKey()]
+                    hint = strings[formField.key.attestationLabelFromKey()]
+                    text = viewModel.infos[formField.key]?.value?.toLongOrNull()?.let { timestamp ->
+                        dateTimeFormat.format(Date(timestamp))
+                    }
+                    onClick = {
+                        val initialTimestamp = viewModel.infos[formField.key]?.value?.toLongOrNull()
+                            ?: System.currentTimeMillis()
+                        showDateTimePicker(initialTimestamp) { newDate ->
+                            text = dateTimeFormat.format(Date(newDate))
+                            viewModel.infos[formField.key] = FormEntry(newDate.toString(), formField.type)
+                            binding?.recyclerView?.adapter?.notifyDataSetChanged()
+                        }
                     }
                 }
             }
@@ -197,9 +209,11 @@ class NewAttestationFragment : MainFragment() {
                 hint = strings[formField.key.attestationLabelFromKey()]
                 text = strings[viewModel.infos[formField.key]?.value?.attestationShortLabelFromKey()]
                 onClick = {
-                    findNavController().navigate(NewAttestationFragmentDirections.actionNewAttestationFragmentToNewAttestationPickerFragment(
-                        formField.key,
-                        viewModel.infos[formField.key]?.value)
+                    findNavController().navigate(
+                        NewAttestationFragmentDirections.actionNewAttestationFragmentToNewAttestationPickerFragment(
+                            formField.key,
+                            viewModel.infos[formField.key]?.value
+                        )
                     )
                 }
             }
@@ -258,7 +272,8 @@ class NewAttestationFragment : MainFragment() {
             timeInMillis = initialTimestamp
         }
         val date = Calendar.getInstance()
-        val datePickerDialog = DatePickerDialog(requireContext(),
+        val datePickerDialog = DatePickerDialog(
+            requireContext(),
             { _, year, monthOfYear, dayOfMonth ->
                 date.set(year, monthOfYear, dayOfMonth)
                 TimePickerDialog(context, { _, hourOfDay, minute ->
@@ -270,7 +285,8 @@ class NewAttestationFragment : MainFragment() {
             },
             currentDate[Calendar.YEAR],
             currentDate[Calendar.MONTH],
-            currentDate[Calendar.DATE])
+            currentDate[Calendar.DATE]
+        )
         datePickerDialog.datePicker.apply {
             minDate = System.currentTimeMillis()
         }

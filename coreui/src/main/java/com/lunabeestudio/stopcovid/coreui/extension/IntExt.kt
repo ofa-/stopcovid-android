@@ -57,3 +57,15 @@ fun @receiver:AttrRes Int.fetchSystemColorStateList(context: Context): ColorStat
  */
 @Dimension
 fun @receiver:DimenRes Int.toDimensSize(context: Context): Float = context.resources.getDimension(this)
+
+/**
+ * Return the id of the resource from the receiver id.
+ *
+ * @param context context where the theme is.
+ * @return id of the resource.
+ */
+fun @receiver:AttrRes Int.resolveAttribute(context: Context): Int {
+    val outValue = TypedValue()
+    context.theme.resolveAttribute(this, outValue, true)
+    return outValue.resourceId
+}

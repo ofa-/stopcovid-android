@@ -29,16 +29,11 @@ class MoreCardItem : AbstractBindingItem<ItemMoreCardBinding>() {
     var privacyOnClickListener: View.OnClickListener? = null
     var aboutText: String? = null
     var aboutOnClickListener: View.OnClickListener? = null
-    var testText: String? = null
-    var testOnClickListener: View.OnClickListener? = null
-    var documentText: String? = null
-    var documentOnClickListener: View.OnClickListener? = null
+    var linksText: String? = null
+    var linksOnClickListener: View.OnClickListener? = null
 
     @DrawableRes
-    var testIconRes: Int? = null
-
-    @DrawableRes
-    var documentIconRes: Int? = null
+    var linksIconRes: Int? = null
 
     @DrawableRes
     var proximityIconRes: Int? = null
@@ -61,17 +56,11 @@ class MoreCardItem : AbstractBindingItem<ItemMoreCardBinding>() {
     override fun bindView(binding: ItemMoreCardBinding, payloads: List<Any>) {
         super.bindView(binding, payloads)
 
-        binding.test.textView.text = testText.safeEmojiSpanify()
-        testIconRes?.let(binding.test.leftIconImageView::setImageResource)
-        binding.test.linkRootLayout.setOnClickListener(testOnClickListener)
-        binding.test.linkRootLayout.isVisible = !testText.isNullOrEmpty()
-        binding.test.arrowImageView.isVisible = false
-
-        binding.document.textView.text = documentText.safeEmojiSpanify()
-        documentIconRes?.let(binding.document.leftIconImageView::setImageResource)
-        binding.document.linkRootLayout.setOnClickListener(documentOnClickListener)
-        binding.document.linkRootLayout.isVisible = !documentText.isNullOrEmpty()
-        binding.document.arrowImageView.isVisible = false
+        binding.links.textView.text = linksText.safeEmojiSpanify()
+        linksIconRes?.let(binding.links.leftIconImageView::setImageResource)
+        binding.links.linkRootLayout.setOnClickListener(linksOnClickListener)
+        binding.links.linkRootLayout.isVisible = !linksText.isNullOrEmpty()
+        binding.links.arrowImageView.isVisible = false
 
         binding.proximity.textView.text = proximityText.safeEmojiSpanify()
         proximityIconRes?.let(binding.proximity.leftIconImageView::setImageResource)

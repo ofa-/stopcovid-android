@@ -10,7 +10,9 @@
 
 package com.lunabeestudio.robert.datasource
 
+import androidx.lifecycle.LiveData
 import com.lunabeestudio.domain.model.DeviceParameterCorrection
+import com.lunabeestudio.domain.model.FormEntry
 
 interface LocalKeystoreDataSource {
     var shouldReloadBleSettings: Boolean?
@@ -18,6 +20,7 @@ interface LocalKeystoreDataSource {
     var kEA: ByteArray?
     var timeStart: Long?
     var atRiskLastRefresh: Long?
+    var atRiskLastError: Long?
     var atRiskMinHourContactNotif: Int?
     var atRiskMaxHourContactNotif: Int?
     var lastExposureTimeframe: Int?
@@ -32,8 +35,10 @@ interface LocalKeystoreDataSource {
     var dataRetentionPeriod: Int?
     var quarantinePeriod: Int?
     var checkStatusFrequency: Float?
+    var minStatusRetryDuraction: Float?
     var randomStatusHour: Float?
     var preSymptomsSpan: Int?
+    var positiveSampleSpan: Int?
     var appAvailability: Boolean?
     var apiVersion: String?
     var configVersion: Int?
@@ -41,6 +46,12 @@ interface LocalKeystoreDataSource {
     var qrCodeDeletionHours: Float?
     var qrCodeExpiredHours: Float?
     var qrCodeFormattedString: String?
+    var qrCodeFormattedStringDisplayed: String?
     var qrCodeFooterString: String?
     var displayDepartmentLevel: Boolean?
+    var proximityReactivationReminderHours: List<Int>?
+    val attestationsLiveData: LiveData<List<Map<String, FormEntry>>?>
+    var attestations: List<Map<String, FormEntry>>?
+    var savedAttestationData: Map<String, FormEntry>?
+    var saveAttestationData: Boolean?
 }

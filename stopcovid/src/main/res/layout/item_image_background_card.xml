@@ -27,7 +27,7 @@
         <ImageView
             android:id="@+id/imageView"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="@dimen/card_image_height"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -41,13 +41,13 @@
             android:layout_marginHorizontal="@dimen/spacing_large"
             android:layout_marginTop="@dimen/spacing_large"
             android:textAppearance="@style/TextAppearance.StopCovid.Caption"
-            android:textColor="@color/color_on_gradient"
             app:layout_constraintBottom_toTopOf="@id/titleTextView"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/imageView"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_chainStyle="packed"
-            tools:text="@tools:sample/lorem[2]" />
+            tools:text="@tools:sample/lorem[2]"
+            tools:textColor="@color/color_on_gradient" />
 
         <TextView
             android:id="@+id/titleTextView"
@@ -55,13 +55,14 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/spacing_large"
             android:textAppearance="@style/TextAppearance.StopCovid.Title"
-            android:textColor="@color/color_on_gradient"
             app:layout_constraintBottom_toTopOf="@id/subtitleTextView"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/imageView"
             app:layout_constraintTop_toBottomOf="@id/headerTextView"
+            app:layout_goneMarginBottom="@dimen/spacing_large"
             app:layout_goneMarginTop="@dimen/spacing_large"
-            tools:text="@tools:sample/lorem[3]" />
+            tools:text="@tools:sample/lorem[3]"
+            tools:textColor="@color/color_on_gradient" />
 
         <TextView
             android:id="@+id/subtitleTextView"
@@ -70,12 +71,12 @@
             android:layout_marginHorizontal="@dimen/spacing_large"
             android:layout_marginBottom="@dimen/spacing_large"
             android:textAppearance="@style/TextAppearance.StopCovid.Caption"
-            android:textColor="@color/color_on_gradient"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/imageView"
             app:layout_constraintTop_toBottomOf="@id/titleTextView"
-            tools:text="@tools:sample/lorem[2]" />
+            tools:text="@tools:sample/lorem[2]"
+            tools:textColor="@color/color_on_gradient" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

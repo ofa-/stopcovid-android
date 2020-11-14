@@ -66,6 +66,6 @@ class FullscreenAttestationFragment : BaseFragment() {
             BarcodeFormat.QR_CODE,
             qrCodeSize,
             qrCodeSize))
-        binding?.textView?.text = args.qrCodeValue
+        binding?.textView?.text = args.qrCodeValueDisplayed
     }
 }

@@ -9,13 +9,14 @@
   -->
 <com.google.android.material.textfield.TextInputLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/textInputLayout"
     style="@style/Widget.StopCovid.TextInput"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="@dimen/spacing_large"
     android:layout_marginVertical="@dimen/spacing_small"
+    app:errorEnabled="false"
     tools:hint="@tools:sample/lorem[2]">
 
     <com.google.android.material.textfield.TextInputEditText

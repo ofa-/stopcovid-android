@@ -8,7 +8,6 @@
   ~ Created by Lunabee Studio / Date - 2020/13/05 - for the TOUS-ANTI-COVID project
   -->
 <resources>
-    <color name="color_primary">#85BBFF</color>
     <color name="color_on_primary">#00285A</color>
     <color name="color_primary_light">#2685BBFF</color>
     <color name="color_on_primary_light">#FFFFFF</color>

@@ -26,6 +26,7 @@ import com.google.gson.reflect.TypeToken
 import com.lunabeestudio.robert.utils.Event
 import com.lunabeestudio.stopcovid.BuildConfig
 import com.lunabeestudio.stopcovid.Constants
+import com.lunabeestudio.stopcovid.StopCovid
 import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.UiConstants
 import com.lunabeestudio.stopcovid.coreui.extension.fixFormatter
@@ -90,7 +91,7 @@ object InfoCenterManager {
         }
     }
 
-    suspend fun onAppForeground(context: Context) {
+    suspend fun refreshIfNeeded(context: Context) {
         val forceRefresh = prevLanguage != Locale.getDefault().language
         fetchLastTimestamp(context)
         if (fetchLast(context, infosPrefix, null, forceRefresh)
@@ -223,16 +224,24 @@ object InfoCenterManager {
 
     @OptIn(ExperimentalTime::class)
     private fun shouldRefresh(context: Context): Boolean {
+        val isAppInForeground = (context.applicationContext as? StopCovid)?.isAppInForeground == true
+        val isMinDelayElapsed = System.currentTimeMillis().milliseconds - refreshMinDelay > PreferenceManager.getDefaultSharedPreferences(
+            context
+        ).lastInfoCenterFetch
         return lastUpdatedAt == null ||
             isLastUpdatedAtDifferent(context) ||
-            System.currentTimeMillis().milliseconds - refreshMinDelay > PreferenceManager.getDefaultSharedPreferences(context).lastInfoCenterFetch
+            (isAppInForeground && isMinDelayElapsed)
     }
 
     @OptIn(ExperimentalTime::class)
     private suspend fun saveLastRefresh(context: Context) {
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
         sharedPreferences.lastInfoCenterFetch = System.currentTimeMillis().milliseconds
-        if (sharedPreferences.areInfoNotificationsEnabled && lastUpdatedAt != null && isLastUpdatedAtDifferent(context)) {
+        val isAppInBackground = (context.applicationContext as? StopCovid)?.isAppInForeground != true
+        if (sharedPreferences.areInfoNotificationsEnabled
+            && lastUpdatedAt != null
+            && isLastUpdatedAtDifferent(context)
+            && isAppInBackground) {
             sendUpdateNotification(context)
         }
         lastUpdatedAt?.lastUpdatedAt?.let { lastUpdatedAt ->

@@ -12,7 +12,7 @@
     <style name="Widget.StopCovid.Button.Light">
         <item name="backgroundTint">@color/color_primary_light</item>
         <item name="android:textColor">@color/color_on_primary_light</item>
-        <item name="rippleColor">@color/color_primary</item>
+        <item name="rippleColor">?colorPrimary</item>
     </style>
 
     <style name="Widget.StopCovid.Button.Danger" parent="Widget.StopCovid.Button.Light">
