@@ -153,7 +153,7 @@ class KeyFiguresFragment : MainFragment() {
                     identifier = items.count().toLong()
                 }
                 keyFigures.filter { it.category == KeyFigureCategory.HEALTH }.forEach { figure ->
-                    items += itemForFigure(figure)
+                    items += itemForFigure(figure, false)
                 }
 
                 items += spaceItem {
@@ -166,7 +166,7 @@ class KeyFiguresFragment : MainFragment() {
                     identifier = items.count().toLong()
                 }
                 keyFigures.filter { it.category == KeyFigureCategory.APP }.forEach { figure ->
-                    items += itemForFigure(figure)
+                    items += itemForFigure(figure, true)
                 }
             }
         }
@@ -183,17 +183,9 @@ class KeyFiguresFragment : MainFragment() {
     }
 
     @OptIn(ExperimentalTime::class)
-    private fun itemForFigure(figure: KeyFigure): KeyFigureCardItem {
+    private fun itemForFigure(figure: KeyFigure, useDateTime: Boolean): KeyFigureCardItem {
         return keyFigureCardItem {
-            updatedAt = stringsFormat(
-                "keyFigures.update",
-                if (figure.category == KeyFigureCategory.HEALTH) {
-                    figure.lastUpdate.seconds.getRelativeDateString(requireContext())
-                } else {
-                    figure.lastUpdate.seconds.getRelativeDateTimeString(requireContext())
-                }
-            )
-
+            val extractDate: Long
             if (sharedPrefs.hasChosenPostalCode) {
                 val departmentKeyFigure = figure.getKeyFigureForPostalCode(sharedPrefs.chosenPostalCode)
 
@@ -204,14 +196,25 @@ class KeyFiguresFragment : MainFragment() {
                     rightValue = figure.valueGlobalToDisplay.formatNumberIfNeeded(numberFormat)
                     rightTrend = figure.trend?.getTrend()
                     leftTrend = departmentKeyFigure.trend?.getTrend()
+                    extractDate = departmentKeyFigure.extractDate
                 } else {
                     leftValue = figure.valueGlobalToDisplay.formatNumberIfNeeded(numberFormat)
                     leftTrend = figure.trend?.getTrend()
+                    extractDate = figure.extractDate
                 }
             } else {
                 leftValue = figure.valueGlobalToDisplay.formatNumberIfNeeded(numberFormat)
                 leftTrend = figure.trend?.getTrend()
+                extractDate = figure.extractDate
             }
+            updatedAt = stringsFormat(
+                "keyFigures.update",
+                if (useDateTime) {
+                    extractDate.seconds.getRelativeDateTimeString(requireContext())
+                } else {
+                    extractDate.seconds.getRelativeDateString()
+                }
+            )
 
             label = strings["${figure.labelKey}.label"]
             description = strings["${figure.labelKey}.description"]
