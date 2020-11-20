@@ -37,10 +37,12 @@ object RobertConstant {
     const val QR_CODE_FORMATTED_STRING: String = "Cree le: <creationDate> a <creationHour>;\nNom: <lastname>;\nPrenom: <firstname>;\nNaissance: <dob> a <cityofbirth>;\nAdresse: <address> <zip> <city>;\nSortie: <datetime-day> a <datetime-hour>;\nMotif: <reason-code>"
     const val QR_CODE_FORMATTED_STRING_DISPLAYED: String = "Créé le <creationDate> à <creationHour>\nNom : <lastname>\nPrénom : <firstname>\nNaissance : <dob> à <cityofbirth>\nAdresse : <address> <zip> <city>\nSortie : <datetime-day> à <datetime-hour>\nMotif: <reason-code>"
     const val QR_CODE_FOOTER_STRING: String = "<firstname> - <datetime-day>, <datetime-hour>\n<reason-shortlabel>"
+    const val REGISTER_DELAY_MONTH: Int = 2
 
     object CONFIG {
         const val CONFIG_VERSION: String = "version"
         const val API_VERSION: String = "app.apiVersion"
+        const val DISPLAY_ATTESTATION: String = "app.displayAttestation"
         const val DATA_RETENTION_PERIOD: String = "app.dataRetentionPeriod"
         const val QUARANTINE_PERIOD: String = "app.quarantinePeriod"
         const val CHECK_STATUS_FREQUENCY: String = "app.checkStatusFrequency"

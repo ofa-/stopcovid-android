@@ -34,6 +34,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.lunabeestudio.robert.utils.EventObserver
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.isNightMode
+import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.databinding.ItemKeyFigureCardBinding
 import com.lunabeestudio.stopcovid.extension.chosenPostalCode
@@ -42,11 +43,12 @@ import com.lunabeestudio.stopcovid.extension.getKeyFigureForPostalCode
 import com.lunabeestudio.stopcovid.extension.getTrend
 import com.lunabeestudio.stopcovid.extension.hasChosenPostalCode
 import com.lunabeestudio.stopcovid.extension.robertManager
+import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.extension.showPostalCodeDialog
 import com.lunabeestudio.stopcovid.fastitem.KeyFigureCardItem
 import com.lunabeestudio.stopcovid.fastitem.bigTitleItem
 import com.lunabeestudio.stopcovid.fastitem.keyFigureCardItem
-import com.lunabeestudio.stopcovid.fastitem.linkCardItem
+import com.lunabeestudio.stopcovid.fastitem.linkItem
 import com.lunabeestudio.stopcovid.manager.KeyFiguresManager
 import com.lunabeestudio.stopcovid.manager.ShareManager
 import com.lunabeestudio.stopcovid.model.KeyFigure
@@ -140,17 +142,16 @@ class KeyFiguresFragment : MainFragment() {
                     text = strings["keyFiguresController.section.health"]
                     identifier = items.count().toLong()
                 }
-                items += linkCardItem {
-                    label = strings["keyFiguresController.explanation"]
-                    iconRes = R.drawable.ic_faq
+                items += captionItem {
+                    text = strings["keyFiguresController.section.health.subtitle"]
+                    identifier = text.hashCode().toLong()
+                }
+                items += linkItem {
+                    text = strings["keyFiguresController.section.health.button"]
                     onClickListener = View.OnClickListener {
-                        MaterialAlertDialogBuilder(requireContext())
-                            .setTitle(strings["keyFiguresController.explanation.alert.title"])
-                            .setMessage(strings["keyFiguresController.explanation.alert.message"])
-                            .setPositiveButton(strings["keyFiguresController.explanation.alert.button"], null)
-                            .show()
+                        findNavController().safeNavigate(KeyFiguresFragmentDirections.actionKeyFiguresFragmentToMoreKeyFiguresFragment())
                     }
-                    identifier = items.count().toLong()
+                    identifier = text.hashCode().toLong()
                 }
                 keyFigures.filter { it.category == KeyFigureCategory.HEALTH }.forEach { figure ->
                     items += itemForFigure(figure, false)
@@ -198,6 +199,7 @@ class KeyFiguresFragment : MainFragment() {
                     leftTrend = departmentKeyFigure.trend?.getTrend()
                     extractDate = departmentKeyFigure.extractDate
                 } else {
+                    leftLocation = strings["common.country.france"]
                     leftValue = figure.valueGlobalToDisplay.formatNumberIfNeeded(numberFormat)
                     leftTrend = figure.trend?.getTrend()
                     extractDate = figure.extractDate

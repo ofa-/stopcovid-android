@@ -44,8 +44,8 @@ android {
         applicationId "fr.gouv.android.stopcovid"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 94
-        versionName "2.1.5"
+        versionCode 102
+        versionName "2.1.7"
 
         testInstrumentationRunner = 'com.lunabeestudio.stopcovid.TestRunner'
 
@@ -54,6 +54,7 @@ android {
         buildConfigField 'String', 'APP_MAINTENANCE_CERTIFICATE_SHA256', '"sha256/sXQojvwsiyblrpMQIVRXGC5u7AgknzTJm+VIK1kQmD8="'
         buildConfigField 'String', 'APP_MAINTENANCE_URL', '"https://app.stopcovid.gouv.fr/maintenance/info-maintenance-v2.json"'
         buildConfigField 'String', 'INFO_CENTER_FOLDER', '"InfoCenter/"'
+        buildConfigField 'String', 'MORE_KEY_FIGURES_FOLDER', '"MoreKeyFigures/"'
         buildConfigField 'String', 'KEY_FIGURES_PATH', '"/infos/key-figures.json"'
         buildConfigField 'String', 'FORM_PATH', '"/Attestations/form.json"'
         buildConfigField 'String', 'APP_STORE_URL', '"https://play.google.com/store/apps/details?id=fr.gouv.android.stopcovid"'

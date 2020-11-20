@@ -16,14 +16,17 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import androidx.preference.PreferenceManager
 import androidx.work.WorkManager
 import com.lunabeestudio.framework.local.datasource.SecureKeystoreDataSource
 import com.lunabeestudio.robert.RobertApplication
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.robert.model.RobertResult
 import com.lunabeestudio.stopcovid.Constants
+import com.lunabeestudio.stopcovid.StopCovid
 import com.lunabeestudio.stopcovid.coreui.UiConstants
 import com.lunabeestudio.stopcovid.coreui.utils.SingleLiveEvent
+import com.lunabeestudio.stopcovid.extension.chosenPostalCode
 import com.lunabeestudio.stopcovid.extension.toCovidException
 import com.lunabeestudio.stopcovid.model.CovidException
 import com.lunabeestudio.stopcovid.model.NeedRegisterException
@@ -32,7 +35,7 @@ import kotlinx.coroutines.launch
 
 class ManageDataViewModel(
     private val secureKeystoreDataSource: SecureKeystoreDataSource,
-    private val robertManager: RobertManager
+    private val robertManager: RobertManager,
 ) : ViewModel() {
 
     val eraseAttestationsSuccess: SingleLiveEvent<Unit> = SingleLiveEvent()
@@ -113,6 +116,9 @@ class ManageDataViewModel(
                         is RobertResult.Success -> {
                             WorkManager.getInstance(application.getAppContext()).cancelUniqueWork(Constants.WorkerNames.NOTIFICATION)
                             clearNotifications(application)
+                            eraseAttestations()
+                            (application.getAppContext() as StopCovid).cancelReminder()
+                            PreferenceManager.getDefaultSharedPreferences(application.getAppContext()).chosenPostalCode = null
                             quitStopCovidSuccess.postValue(null)
                         }
                         is RobertResult.Failure -> covidException.postValue(result.error.toCovidException())

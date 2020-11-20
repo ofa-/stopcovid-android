@@ -158,6 +158,10 @@ class NewAttestationFragment : MainFragment() {
             textAppearance = R.style.TextAppearance_StopCovid_Caption_Small_Grey
             identifier = text.hashCode().toLong()
         }
+        items += spaceItem {
+            spaceRes = R.dimen.spacing_large
+            identifier = items.count().toLong()
+        }
 
         return items
     }

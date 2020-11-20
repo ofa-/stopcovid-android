@@ -41,10 +41,7 @@ import com.mikepenz.fastadapter.GenericItem
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Date
-import kotlin.time.Duration
-import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
-import kotlin.time.hours
 
 class AttestationsFragment : MainFragment() {
 
@@ -98,18 +95,13 @@ class AttestationsFragment : MainFragment() {
             identifier = label.hashCode().toLong()
         }
         val validAttestations = viewModel.attestations.value?.filter { attestation ->
-            val expiredMilliSeconds = System.currentTimeMillis() - Duration.convert(
-                robertManager.qrCodeExpiredHours.toDouble(),
-                DurationUnit.HOURS,
-                DurationUnit.MILLISECONDS
-            )
-            (attestation["datetime"]?.value?.toLongOrNull() ?: 0L) > expiredMilliSeconds
-        }?.sortedBy { attestation ->
+            !attestation.isExpired(robertManager)
+        }?.sortedByDescending { attestation ->
             attestation["datetime"]?.value?.toLongOrNull() ?: 0L
         }
         val expiredAttestations = viewModel.attestations.value?.filter { attestation ->
-            attestation.isExpired(robertManager.qrCodeExpiredHours.toDouble().hours)
-        }?.sortedBy { attestation ->
+            attestation.isExpired(robertManager)
+        }?.sortedByDescending { attestation ->
             attestation["datetime"]?.value?.toLongOrNull() ?: 0L
         }
 
@@ -153,6 +145,10 @@ class AttestationsFragment : MainFragment() {
             text = strings["attestationsController.attestationWebSite"]
             url = strings["home.moreSection.curfewCertificate.url"]
             identifier = text.hashCode().toLong()
+        }
+        items += spaceItem {
+            spaceRes = R.dimen.spacing_large
+            identifier = items.count().toLong()
         }
 
         return items

@@ -54,6 +54,7 @@ import com.lunabeestudio.stopcovid.manager.FormManager
 import com.lunabeestudio.stopcovid.manager.InfoCenterManager
 import com.lunabeestudio.stopcovid.manager.KeyFiguresManager
 import com.lunabeestudio.stopcovid.manager.LinksManager
+import com.lunabeestudio.stopcovid.manager.MoreKeyFiguresManager
 import com.lunabeestudio.stopcovid.manager.PrivacyManager
 import com.lunabeestudio.stopcovid.manager.ProximityManager
 import com.lunabeestudio.stopcovid.model.DeviceSetup
@@ -126,6 +127,7 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication {
         }
 
         if (sharedPrefs.lastVersionCode < BuildConfig.VERSION_CODE) {
+            MoreKeyFiguresManager.clearLocal(this)
             LinksManager.clearLocal(this)
             PrivacyManager.clearLocal(this)
             StringsManager.clearLocal(this)
@@ -134,6 +136,9 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication {
             secureKeystoreDataSource.configVersion = null
         }
 
+        appCoroutineScope.launch {
+            MoreKeyFiguresManager.initialize(this@StopCovid)
+        }
         appCoroutineScope.launch {
             LinksManager.initialize(this@StopCovid)
         }
@@ -175,6 +180,9 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication {
 
         appCoroutineScope.launch {
             AppMaintenanceManager.checkForMaintenanceUpgrade(this@StopCovid)
+        }
+        appCoroutineScope.launch {
+            MoreKeyFiguresManager.onAppForeground(this@StopCovid)
         }
         appCoroutineScope.launch {
             LinksManager.onAppForeground(this@StopCovid)

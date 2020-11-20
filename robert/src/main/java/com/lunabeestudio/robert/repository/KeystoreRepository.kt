@@ -16,7 +16,8 @@ import com.lunabeestudio.robert.datasource.LocalKeystoreDataSource
 
 internal class KeystoreRepository(
     private val keystoreDataSource: LocalKeystoreDataSource,
-    private val robertManager: RobertManager) {
+    private val robertManager: RobertManager,
+) {
 
     var shouldReloadBleSettings: Boolean
         get() = keystoreDataSource.shouldReloadBleSettings ?: false
@@ -185,6 +186,12 @@ internal class KeystoreRepository(
             keystoreDataSource.apiVersion = value
         }
 
+    var displayAttestation: Boolean?
+        get() = keystoreDataSource.displayAttestation
+        set(value) {
+            keystoreDataSource.displayAttestation = value
+        }
+
     var qrCodeDeletionHours: Float?
         get() = keystoreDataSource.qrCodeDeletionHours
         set(value) {
@@ -231,5 +238,11 @@ internal class KeystoreRepository(
         get() = keystoreDataSource.proximityReactivationReminderHours
         set(value) {
             keystoreDataSource.proximityReactivationReminderHours = value
+        }
+
+    var reportDate: Long?
+        get() = keystoreDataSource.reportDate
+        set(value) {
+            keystoreDataSource.reportDate = value
         }
 }

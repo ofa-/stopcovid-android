@@ -30,7 +30,8 @@ enum class ErrorCode {
     BLE_SCANNER,
     BLE_PROXIMITY_NOTIFICATION,
     BLE_GATT,
-    TIME_NOT_ALIGNED
+    TIME_NOT_ALIGNED,
+    REPORT_DELAY
 }
 
 class UnknownException(message: String = "Unknown error occurred") :
@@ -78,3 +79,6 @@ class BLEGattException(message: String = "An error occurs in BLE gatt") :
 
 class TimeNotAlignedException(message: String = "Phone time not aligned with server time") :
     RobertException(ErrorCode.TIME_NOT_ALIGNED, message)
+
+class ReportDelayException(message: String = "You need to wait before you can use proximity again") :
+    RobertException(ErrorCode.REPORT_DELAY, message)

@@ -17,6 +17,7 @@ object Constants {
         const val ON_BOARDING_DONE: String = "On.Boarding.Done"
         const val LAST_PRIVACY_REFRESH: String = "Last.Privacy.Refresh"
         const val LAST_LINKS_REFRESH: String = "Last.Links.Refresh"
+        const val LAST_MORE_KEY_FIGURES_REFRESH: String = "Last.MoreKeyFigures.Refresh"
         const val LAST_MAINTENANCE_REFRESH: String = "Last.Maintenance.Refresh"
         const val LAST_INFO_CENTER_REFRESH: String = "Last.Info.Center.Refresh"
         const val LAST_INFO_CENTER_FETCH: String = "Last.Info.Center.Fetch"
@@ -39,5 +40,11 @@ object Constants {
 
     object ServerConstant {
         val MAX_GAP_DEVICE_SERVER: Long = TimeUnit.MINUTES.toMillis(2L)
+    }
+
+    object Attestation {
+        const val KEY_REASON: String = "reason"
+        const val KEY_DATE_TIME: String = "datetime"
+        const val VALUE_REASON_SPORT: String = "sport_animaux"
     }
 }

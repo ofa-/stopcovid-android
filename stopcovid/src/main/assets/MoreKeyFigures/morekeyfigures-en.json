@@ -1,0 +1,16 @@
+[
+	{
+        "section": "Comment interpréter",
+        "description": "Les indicateurs doivent être interprétés avec précaution et à la lumière des activités de dépistage, du contexte sanitaire et des caractéristiques de la population (âge, densité de population, facteurs de risque...) mais aussi de la qualité des données et de leur fréquence de remontée, analysés dans leur globalité.\n\nPour plus d’information sur l’analyse de la situation sanitaire, veuillez consulter le point épidémiologique hebdomadaire de Santé publique France (SpF) disponible sur santepubliquefrance.fr",
+        "links": [
+	        {
+                "label": "Santé publique France",
+                "url": "https://www.santepubliquefrance.fr/revues/beh/bulletin-epidemiologique-hebdomadaire"
+            }
+        ]
+    },
+    {
+        "section": "La mise à jour",
+        "description": "Le R Effectif est calculé sur une fenêtre de 7 jours allant de J-9 à J-3. Les données sont arrêtées le mardi et publiées une fois par semaine (le jeudi). Le R Effectif est disponible au niveau national (France métropolitaine) et au niveau régional (régions métropolitaines et ultra-marines).\n\nTous les autres indicateurs sont mis à jour quotidiennement, après consolidation par SpF et le Ministère des Solidarités et de la Santé. Au niveau national, le taux d’incidence et le taux de positivité sont arrêtés à J-3 et calculés sur la moyenne des 7 derniers jours [J-9 ; J-3] afin de mieux prendre en compte leur fluctuation.\n\nLe nombre de nouveaux cas est un indicateur arrêté à J-1, donc sans le recul et la contextualisation nécessaires pour affirmer qu’il représente complètement la situation sanitaire."
+    }
+]

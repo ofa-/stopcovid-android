@@ -30,4 +30,5 @@ fun CovidException.getString(strings: Map<String, String>): String = when (this.
     ErrorCode.BLE_PROXIMITY_NOTIFICATION -> listOfNotNull(strings["common.error.proximityNotification"], message).joinToString(" ")
     ErrorCode.BLE_GATT -> listOfNotNull(strings["common.error.bleGatt"], message).joinToString(" ")
     ErrorCode.TIME_NOT_ALIGNED -> strings["common.error.clockNotAligned.message"] ?: message
+    ErrorCode.REPORT_DELAY -> strings["home.activation.sick.alert.message"] ?: message
 }
