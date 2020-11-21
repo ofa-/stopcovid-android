@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ This Source Code Form is subject to the terms of the Mozilla Public
   ~ License, v. 2.0. If a copy of the MPL was not distributed with this
   ~ file, You can obtain one at https://mozilla.org/MPL/2.0/.
@@ -32,19 +31,25 @@
         android:id="@+id/label1TextView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/spacing_small"
         android:textAppearance="@style/TextAppearance.StopCovid.Caption.Bold"
         android:textIsSelectable="false"
+        app:layout_constraintBottom_toTopOf="@id/value1TextView"
         app:layout_constraintEnd_toStartOf="@id/label2TextView"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/locationTextView"
-        tools:text="@tools:sample/lorem[1]" />
+        app:layout_constraintVertical_bias="1"
+        app:layout_constraintVertical_chainStyle="packed"
+        tools:text="@tools:sample/lorem[4]" />
 
     <TextView
         android:id="@+id/value1TextView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/spacing_small"
         android:textAppearance="@style/TextAppearance.StopCovid.Title.Bold"
         android:textIsSelectable="false"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/value2TextView"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/label1TextView"
@@ -54,19 +59,25 @@
         android:id="@+id/label2TextView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/spacing_small"
         android:textAppearance="@style/TextAppearance.StopCovid.Caption.Bold"
         android:textIsSelectable="false"
+        app:layout_constraintBottom_toTopOf="@id/value2TextView"
         app:layout_constraintEnd_toStartOf="@id/label3TextView"
         app:layout_constraintStart_toEndOf="@id/label1TextView"
         app:layout_constraintTop_toBottomOf="@id/locationTextView"
+        app:layout_constraintVertical_bias="1"
+        app:layout_constraintVertical_chainStyle="packed"
         tools:text="@tools:sample/lorem[1]" />
 
     <TextView
         android:id="@+id/value2TextView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/spacing_small"
         android:textAppearance="@style/TextAppearance.StopCovid.Title.Bold"
         android:textIsSelectable="false"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/value3TextView"
         app:layout_constraintStart_toEndOf="@id/value1TextView"
         app:layout_constraintTop_toBottomOf="@id/label2TextView"
@@ -78,10 +89,13 @@
         android:layout_height="wrap_content"
         android:textAppearance="@style/TextAppearance.StopCovid.Caption.Bold"
         android:textIsSelectable="false"
+        app:layout_constraintBottom_toTopOf="@id/value3TextView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/label2TextView"
         app:layout_constraintTop_toBottomOf="@id/locationTextView"
-        tools:text="@tools:sample/lorem[1]" />
+        app:layout_constraintVertical_bias="1"
+        app:layout_constraintVertical_chainStyle="packed"
+        tools:text="@tools:sample/lorem[5]" />
 
     <TextView
         android:id="@+id/value3TextView"
@@ -89,6 +103,7 @@
         android:layout_height="wrap_content"
         android:textAppearance="@style/TextAppearance.StopCovid.Title.Bold"
         android:textIsSelectable="false"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/value2TextView"
         app:layout_constraintTop_toBottomOf="@id/label3TextView"

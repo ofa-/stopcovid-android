@@ -42,7 +42,7 @@ class ProximityViewModel(
     @OptIn(ExperimentalTime::class)
     val activeAttestationCount: LiveData<Int> = keystoreDataSource.attestationsLiveData.map {
         it?.filter { attestation ->
-            !attestation.isExpired(robertManager.qrCodeExpiredHours.toDouble().hours)
+            !attestation.isExpired(robertManager)
         }?.count() ?: 0
     }
 

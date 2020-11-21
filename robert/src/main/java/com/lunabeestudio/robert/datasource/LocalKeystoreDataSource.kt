@@ -41,6 +41,7 @@ interface LocalKeystoreDataSource {
     var positiveSampleSpan: Int?
     var appAvailability: Boolean?
     var apiVersion: String?
+    var displayAttestation: Boolean?
     var configVersion: Int?
     var lastRiskReceivedDate: Long?
     var qrCodeDeletionHours: Float?
@@ -54,4 +55,5 @@ interface LocalKeystoreDataSource {
     var attestations: List<Map<String, FormEntry>>?
     var savedAttestationData: Map<String, FormEntry>?
     var saveAttestationData: Boolean?
+    var reportDate: Long?
 }

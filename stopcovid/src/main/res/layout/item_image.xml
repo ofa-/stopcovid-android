@@ -17,4 +17,4 @@
     android:adjustViewBounds="true"
     android:importantForAccessibility="no"
     android:scaleType="fitCenter"
-    tools:src="@drawable/logo" />
+    tools:src="@drawable/home" />

@@ -23,6 +23,7 @@ import com.lunabeestudio.stopcovid.model.NoEphemeralBluetoothIdentifierFoundForE
 import com.lunabeestudio.stopcovid.model.NoInternetException
 import com.lunabeestudio.stopcovid.model.NoKeyException
 import com.lunabeestudio.stopcovid.model.ProximityException
+import com.lunabeestudio.stopcovid.model.ReportDelayException
 import com.lunabeestudio.stopcovid.model.RobertUnknownException
 import com.lunabeestudio.stopcovid.model.ServerDecryptException
 import com.lunabeestudio.stopcovid.model.TimeNotAlignedException
@@ -46,6 +47,7 @@ fun RobertException?.toCovidException(): CovidException = if (this != null) {
         ErrorCode.BLE_PROXIMITY_NOTIFICATION -> BLEProximityNotificationException(message)
         ErrorCode.BLE_GATT -> BLEGattException(message)
         ErrorCode.TIME_NOT_ALIGNED -> TimeNotAlignedException(message)
+        ErrorCode.REPORT_DELAY -> ReportDelayException(message)
     }
 } else {
     UnknownException()

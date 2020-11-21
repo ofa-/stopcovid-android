@@ -28,7 +28,8 @@ enum class ErrorCode {
     BLE_SCANNER,
     BLE_PROXIMITY_NOTIFICATION,
     BLE_GATT,
-    TIME_NOT_ALIGNED
+    TIME_NOT_ALIGNED,
+    REPORT_DELAY
 }
 
 class UnknownException(message: String = "Unknown error occurred") :
@@ -46,8 +47,10 @@ class NoInternetException(message: String = "No internet") :
 class NeedRegisterException(message: String = "You need to be registered to execute this action") :
     CovidException(ErrorCode.NEED_REGISTER, message)
 
-class ProximityException(val throwable: Throwable? = null,
-    message: String = throwable?.localizedMessage ?: "An error occurs in BLE proximity") :
+class ProximityException(
+    val throwable: Throwable? = null,
+    message: String = throwable?.localizedMessage ?: "An error occurs in BLE proximity",
+) :
     CovidException(ErrorCode.PROXIMITY_UNKNOWN, message)
 
 class ServerDecryptException(message: String = "Server data decrypt fail") :
@@ -79,3 +82,6 @@ class BLEGattException(message: String = "An error occurs in BLE GATT") :
 
 class TimeNotAlignedException(message: String = "Phone time not aligned with server time") :
     CovidException(ErrorCode.TIME_NOT_ALIGNED, message)
+
+class ReportDelayException(message: String = "You need to wait before you can use proximity again") :
+    CovidException(ErrorCode.REPORT_DELAY, message)

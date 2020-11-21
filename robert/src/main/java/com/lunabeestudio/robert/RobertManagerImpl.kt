@@ -43,6 +43,7 @@ import com.lunabeestudio.robert.model.AtRiskStatus
 import com.lunabeestudio.robert.model.NoEphemeralBluetoothIdentifierFound
 import com.lunabeestudio.robert.model.NoEphemeralBluetoothIdentifierFoundForEpoch
 import com.lunabeestudio.robert.model.NoKeyException
+import com.lunabeestudio.robert.model.ReportDelayException
 import com.lunabeestudio.robert.model.RobertException
 import com.lunabeestudio.robert.model.RobertResult
 import com.lunabeestudio.robert.model.RobertResultData
@@ -60,6 +61,7 @@ import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.File
+import java.util.Calendar
 import java.util.concurrent.TimeUnit
 import kotlin.math.abs
 import kotlin.math.min
@@ -106,6 +108,15 @@ class RobertManagerImpl(
         set(value) {
             keystoreRepository.shouldReloadBleSettings = value
         }
+
+    override val canActivateProximity: Boolean
+        get() = keystoreRepository.reportDate?.let { reportDate ->
+            val reportCalendar = Calendar.getInstance().apply {
+                timeInMillis = reportDate
+                add(Calendar.MONTH, RobertConstant.REGISTER_DELAY_MONTH)
+            }
+            System.currentTimeMillis() > reportCalendar.timeInMillis
+        } ?: true
 
     override val isRegistered: Boolean
         get() = keystoreRepository.kA != null && keystoreRepository.kEA != null
@@ -170,6 +181,9 @@ class RobertManagerImpl(
     override val apiVersion: String
         get() = keystoreRepository.apiVersion ?: RobertConstant.API_VERSION
 
+    override val displayAttestation: Boolean
+        get() = keystoreRepository.displayAttestation ?: false
+
     override val qrCodeDeletionHours: Float
         get() = keystoreRepository.qrCodeDeletionHours ?: RobertConstant.QR_CODE_DELETION_HOURS
 
@@ -220,11 +234,15 @@ class RobertManagerImpl(
     override suspend fun generateCaptcha(type: String, local: String): RobertResultData<String> =
         remoteServiceRepository.generateCaptcha(apiVersion, type, local)
 
-    override suspend fun getCaptchaImage(captchaId: String,
-        path: String): RobertResult = remoteServiceRepository.getCaptchaImage(apiVersion, captchaId, path)
+    override suspend fun getCaptchaImage(
+        captchaId: String,
+        path: String,
+    ): RobertResult = remoteServiceRepository.getCaptchaImage(apiVersion, captchaId, path)
 
-    override suspend fun getCaptchaAudio(captchaId: String,
-        path: String): RobertResult = remoteServiceRepository.getCaptchaAudio(apiVersion, captchaId, path)
+    override suspend fun getCaptchaAudio(
+        captchaId: String,
+        path: String,
+    ): RobertResult = remoteServiceRepository.getCaptchaAudio(apiVersion, captchaId, path)
 
     override suspend fun register(application: RobertApplication, captcha: String, captchaId: String): RobertResult {
         val registerResult = remoteServiceRepository.registerV2(apiVersion, captcha, captchaId)
@@ -352,6 +370,11 @@ class RobertManagerImpl(
             keystoreRepository.apiVersion = apiVersion
         }
         (configuration?.firstOrNull {
+            it.name == RobertConstant.CONFIG.DISPLAY_ATTESTATION
+        }?.value as? Boolean)?.let { displayAttestation ->
+            keystoreRepository.displayAttestation = displayAttestation
+        }
+        (configuration?.firstOrNull {
             it.name == RobertConstant.CONFIG.QR_CODE_DELETION_HOURS
         }?.value as? Number)?.let { deletionHours ->
             keystoreRepository.qrCodeDeletionHours = deletionHours.toFloat()
@@ -391,23 +414,27 @@ class RobertManagerImpl(
     }
 
     override suspend fun activateProximity(application: RobertApplication, statusTried: Boolean): RobertResult {
-        val isHelloAvailable = ephemeralBluetoothIdentifierRepository.getForTime() != null
-        return when {
-            isHelloAvailable -> {
-                keystoreRepository.proximityActive = true
-                application.refreshProximityService()
-                RobertResult.Success()
-            }
-            statusTried -> {
-                RobertResult.Failure(NoEphemeralBluetoothIdentifierFoundForEpoch())
-            }
-            else -> {
-                when (val status = updateStatus(application)) {
-                    is RobertResult.Success -> {
-                        activateProximity(application, true)
-                    }
-                    is RobertResult.Failure -> {
-                        RobertResult.Failure(status.error)
+        return if (!canActivateProximity) {
+            RobertResult.Failure(ReportDelayException())
+        } else {
+            val isHelloAvailable = ephemeralBluetoothIdentifierRepository.getForTime() != null
+            when {
+                isHelloAvailable -> {
+                    keystoreRepository.proximityActive = true
+                    application.refreshProximityService()
+                    RobertResult.Success()
+                }
+                statusTried -> {
+                    RobertResult.Failure(NoEphemeralBluetoothIdentifierFoundForEpoch())
+                }
+                else -> {
+                    when (val status = updateStatus(application)) {
+                        is RobertResult.Success -> {
+                            activateProximity(application, true)
+                        }
+                        is RobertResult.Failure -> {
+                            RobertResult.Failure(status.error)
+                        }
                     }
                 }
             }
@@ -538,6 +565,11 @@ class RobertManagerImpl(
         return when (result) {
             is RobertResult.Success -> {
                 keystoreRepository.isSick = true
+                val reportCalendar = Calendar.getInstance().apply {
+                    add(Calendar.DAY_OF_YEAR, -(firstSymptoms ?: positiveTest ?: 0))
+                }
+                keystoreRepository.reportDate = reportCalendar.timeInMillis
+                deactivateProximity(application)
                 result
             }
             else -> result
@@ -637,6 +669,7 @@ class RobertManagerImpl(
         keystoreRepository.lastExposureTimeframe = null
         keystoreRepository.proximityActive = null
         keystoreRepository.isSick = null
+        keystoreRepository.reportDate = null
     }
 
     /*suspend*/ fun getLocalProximityItems(timeMs : Long = 0): List<LocalProximity> {

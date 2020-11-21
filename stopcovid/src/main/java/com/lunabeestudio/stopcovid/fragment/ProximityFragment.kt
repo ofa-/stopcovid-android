@@ -283,7 +283,6 @@ class ProximityFragment : TimeMainFragment() {
         }
         viewModel.activateProximitySuccess.observe(viewLifecycleOwner) {
             refreshItems()
-
             (requireContext().applicationContext as StopCovid).cancelReminder()
         }
         robertManager.atRiskStatus.observe(viewLifecycleOwner, EventObserver(this.javaClass.name.hashCode()) { isAtRisk ->
@@ -339,7 +338,9 @@ class ProximityFragment : TimeMainFragment() {
         addActivateButtonItems(items)
         addHealthItems(items, isSick)
         addNewsItems(items)
-        addAttestationItems(items)
+        if (robertManager.displayAttestation) {
+            addAttestationItems(items)
+        }
         addDeclareItems(items, isSick)
         addSharingItems(items)
         addMoreItems(items)
@@ -728,11 +729,21 @@ class ProximityFragment : TimeMainFragment() {
     }
 
     private fun activateProximity() {
-        if (!robertManager.isRegistered) {
-            viewModel.refreshConfig(requireContext().applicationContext as RobertApplication)
-        } else {
-            bindToProximityService()
-            viewModel.activateProximity(requireContext().applicationContext as RobertApplication)
+        when {
+            !robertManager.canActivateProximity -> {
+                MaterialAlertDialogBuilder(requireContext())
+                    .setTitle(strings["home.activation.sick.alert.title"])
+                    .setMessage(strings["home.activation.sick.alert.message"])
+                    .setPositiveButton(strings["common.ok"], null)
+                    .show()
+            }
+            !robertManager.isRegistered -> {
+                viewModel.refreshConfig(requireContext().applicationContext as RobertApplication)
+            }
+            else -> {
+                bindToProximityService()
+                viewModel.activateProximity(requireContext().applicationContext as RobertApplication)
+            }
         }
     }
 

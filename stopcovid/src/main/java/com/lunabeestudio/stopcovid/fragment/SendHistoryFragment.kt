@@ -24,6 +24,7 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.lunabeestudio.robert.RobertApplication
 import com.lunabeestudio.stopcovid.R
+import com.lunabeestudio.stopcovid.StopCovid
 import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
@@ -69,6 +70,7 @@ class SendHistoryFragment : MainFragment() {
             }
         }
         viewModel.codeSuccess.observe(viewLifecycleOwner) {
+            (requireContext().applicationContext as StopCovid).cancelReminder()
             MaterialAlertDialogBuilder(requireContext())
                 .setTitle(strings["sendHistoryController.successAlert.title"])
                 .setMessage(strings["sendHistoryController.successAlert.message"])

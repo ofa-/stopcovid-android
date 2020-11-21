@@ -67,7 +67,7 @@ abstract class BaseFragment : Fragment() {
     }
 
     @OptIn(ExperimentalTime::class)
-    protected fun Duration.getRelativeDateString(context: Context): String? {
+    protected fun Duration.getRelativeDateString(): String? {
         return DateUtils.getRelativeTimeSpanString(
             this.toLongMilliseconds(),
             System.currentTimeMillis(),

@@ -553,6 +553,25 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
             }
         }
 
+    override var displayAttestation: Boolean?
+        get() {
+            val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_DISPLAY_ATTESTATION, null)
+            return if (encryptedText != null) {
+                cryptoManager.decryptToString(encryptedText).toBoolean()
+            } else {
+                null
+            }
+        }
+        set(value) {
+            if (value != null) {
+                sharedPreferences.edit()
+                    .putString(SHARED_PREF_KEY_DISPLAY_ATTESTATION, cryptoManager.encryptToString(value.toString()))
+                    .apply()
+            } else {
+                sharedPreferences.edit().remove(SHARED_PREF_KEY_DISPLAY_ATTESTATION).apply()
+            }
+        }
+
     override var qrCodeDeletionHours: Float?
         get() {
             val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_QR_CODE_DELETION_HOURS, null)
@@ -747,6 +766,18 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
             }
         }
 
+    override var reportDate: Long?
+        get() = sharedPreferences.getLong(SHARED_PREF_KEY_REPORT_DATE, Long.MIN_VALUE).takeIf { it != Long.MIN_VALUE }
+        set(value) {
+            if (value != null) {
+                sharedPreferences.edit()
+                    .putLong(SHARED_PREF_KEY_REPORT_DATE, value)
+                    .apply()
+            } else {
+                sharedPreferences.edit().remove(SHARED_PREF_KEY_REPORT_DATE).apply()
+            }
+        }
+
     companion object {
         private const val SHARED_PREF_NAME = "robert_prefs"
         private const val SHARED_PREF_KEY_SHOULD_RELOAD_BLE_SETTINGS = "shared.pref.should_reload_ble_settings"
@@ -776,6 +807,7 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
         private const val SHARED_PREF_KEY_POSITIVE_SAMPLE_SPAN = "shared.pref.positive_sample_span"
         private const val SHARED_PREF_KEY_APP_AVAILABILITY = "shared.pref.app_availability"
         private const val SHARED_PREF_KEY_API_VERSION = "shared.pref.api_version"
+        private const val SHARED_PREF_KEY_DISPLAY_ATTESTATION = "shared.pref.display_attestation"
         private const val SHARED_PREF_KEY_QR_CODE_DELETION_HOURS = "shared.pref.qr_code_deletion_hours"
         private const val SHARED_PREF_KEY_QR_CODE_EXPIRED_HOURS = "shared.pref.qr_code_expired_hours"
         private const val SHARED_PREF_KEY_QR_CODE_FORMATTED_STRING = "shared.pref.qr_code_formatted_string"
@@ -787,5 +819,6 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
         private const val SHARED_PREF_KEY_ATTESTATIONS = "shared.pref.attestations"
         private const val SHARED_PREF_KEY_CONFIG_VERSION = "shared.pref.config_version"
         private const val SHARED_PREF_KEY_DISPLAY_DEPARTMENT_LEVEL = "shared.pref.display_department_level"
+        private const val SHARED_PREF_KEY_REPORT_DATE = "shared.pref.report_date"
     }
 }

@@ -51,8 +51,10 @@ android {
 
     defaultConfig {
         applicationId "fr.gouv.android.stopcovid"
-        versionCode 94
-        versionName "2.1.5"
+        versionCode 102
+        versionName "2.1.7"
+        minSdkVersion 21
+        targetSdkVersion 30
 
         testInstrumentationRunner = 'com.lunabeestudio.stopcovid.TestRunner'
 
@@ -64,6 +66,7 @@ android {
         buildConfigField 'String', 'BUILD_ID', /"${gitRev}"/
 
         buildConfigField 'String', 'INFO_CENTER_FOLDER', '"InfoCenter/"'
+        buildConfigField 'String', 'MORE_KEY_FIGURES_FOLDER', '"MoreKeyFigures/"'
         buildConfigField 'String', 'KEY_FIGURES_PATH', '"/infos/key-figures.json"'
         buildConfigField 'String', 'FORM_PATH', '"/Attestations/form.json"'
         buildConfigField 'String', 'APP_STORE_URL', '"https://play.google.com/store/apps/details?id=fr.gouv.android.stopcovid"'

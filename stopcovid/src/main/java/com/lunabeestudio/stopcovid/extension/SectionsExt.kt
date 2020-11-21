@@ -11,11 +11,8 @@
 package com.lunabeestudio.stopcovid.extension
 
 import com.lunabeestudio.stopcovid.R
-import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
-import com.lunabeestudio.stopcovid.coreui.fastitem.dividerItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
-import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
-import com.lunabeestudio.stopcovid.fastitem.linkItem
+import com.lunabeestudio.stopcovid.fastitem.dynamicCardItem
 import com.lunabeestudio.stopcovid.model.Section
 import com.mikepenz.fastadapter.GenericItem
 
@@ -26,26 +23,15 @@ fun List<Section>.fillItems(items: MutableList<GenericItem>) {
                 spaceRes = R.dimen.spacing_medium
             }
         }
-        items += titleItem {
-            text = section
+        items += dynamicCardItem {
+            title = section
+            caption = description
+            this.links = links
             identifier = section.hashCode().toLong()
         }
-        description?.let { description ->
-            items += captionItem {
-                text = description
-                identifier = description.hashCode().toLong()
-            }
-            items += spaceItem {
-                spaceRes = R.dimen.spacing_large
-            }
-        }
-        links?.forEach { link ->
-            items += linkItem {
-                text = link.label
-                url = link.url
-                identifier = text.hashCode().toLong()
-            }
-        }
-        items += dividerItem {}
+    }
+    items += spaceItem {
+        spaceRes = R.dimen.spacing_large
+        identifier = items.count().toLong()
     }
 }

@@ -23,6 +23,8 @@ import com.lunabeestudio.robert.utils.Event
 interface RobertManager {
     var shouldReloadBleSettings: Boolean
 
+    val canActivateProximity: Boolean
+
     val isRegistered: Boolean
 
     val isProximityActive: Boolean
@@ -62,6 +64,8 @@ interface RobertManager {
     val randomStatusHour: Float
 
     val apiVersion: String
+
+    val displayAttestation: Boolean
 
     val qrCodeDeletionHours: Float
 

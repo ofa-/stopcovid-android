@@ -17,6 +17,7 @@
     <item name="item_date" type="id" />
     <item name="item_double_logo" type="id" />
     <item name="item_double_text" type="id" />
+    <item name="item_dynamic_card" type="id" />
     <item name="item_edit_text" type="id" />
     <item name="item_icon_title" type="id" />
     <item name="item_image" type="id" />
