@@ -49,12 +49,15 @@ android {
     kotlinOptions.jvmTarget = JavaVersion.VERSION_1_8.toString()
     kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
 
+    // minSdkVersion & targetSdkVersion
+    // duped below from ../build.gradle
+    // to avoid conflict on upstream merges
     defaultConfig {
         applicationId "fr.gouv.android.stopcovid"
-        versionCode 102
-        versionName "2.1.7"
         minSdkVersion 21
         targetSdkVersion 30
+        versionCode 104
+        versionName "2.1.8"
 
         testInstrumentationRunner = 'com.lunabeestudio.stopcovid.TestRunner'
 
