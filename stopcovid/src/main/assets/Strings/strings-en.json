@@ -142,9 +142,9 @@
     "common.send": "Send",
     "common.dontSend": "Don’t send",
     "common.warning": "Attention",
-    "common.error": "There are a lot of you!",
+    "common.error": "Too many people right now!",
     "common.error.internet": "Check your internet connection and try again",
-    "common.error.server": "A lot of people have joined TousAntiCovid. Thank you! We're doing our utmost to be back online very soon.",
+    "common.error.server": "A lot of people have joined TousAntiCovid. Thank you! We're doing our best to be back online very soon.",
     "common.error.needRegister": "You need to register to do this",
     "accessibility.back.label": "Return",
     "accessibility.onboarding.explanations.step1": "First",
@@ -333,6 +333,7 @@
     "home.moreSection.manageData": "Settings",
     "home.moreSection.privacy": "Privacy",
     "home.moreSection.aboutStopCovid": "About TousAntiCovid",
+    "home.moreSection.support": "Support",
     "home.healthSection.title": "My health",
     "home.healthSection.noContact.cellTitle": "No high-risk exposure detected",
     "home.healthSection.noContact.cellSubtitle": "Learn more",
@@ -515,7 +516,6 @@
     "newAttestationController.generate.error.alert.message": "An error occurred when generating the certificate",
 
     "accessibility.hint.otherActions": "Other actions",
-    "attestationFieldItemChoiceController.footer": "- Les personnes souhaitant bénéficier de l'une de ces exceptions doivent se munir s'il y a lieu, lors de leurs déplacements hors de leur domicile, d'un document leur permettant de justifier que le déplacement considéré entre dans le champ de l'une de ces exceptions.\n- Déplacements professionnels ne pouvant être différés : à utiliser par les travailleurs non-salariés, lorsqu'ils ne peuvent disposer d'un justificatif de déplacement établi par leur employeur.\n- Achats de première nécessité : y compris les acquisitions à titre gratuit (distribution de denrées alimentaires...) et les déplacements liés à la perception de prestations sociales et au retrait d'espèces.",
     "keyFiguresController.explanation": "Key figures updates",
     "keyFiguresController.explanation.alert.title": "Key figures updates",
     "keyFiguresController.explanation.alert.message": "Les données sur le R Effectif sont mises à jour deux fois par semaines (le mardi et vendredi), et le nombre de nouveaux cas, le taux d'incidence, le taux de positivité et le taux d’occupation sont mis à jour une fois par jour, après consolidation par Santé Publique France et le Ministère des Solidarités et de la Santé.",
@@ -563,5 +563,6 @@
     "keyFiguresController.section.health.button": "Lire maintenant",
 
     "home.activation.sick.alert.title": "Informations",
-    "home.activation.sick.alert.message": "Vous ne pouvez pas activer le “contact tracing” pendant 2 mois après votre déclaration de positivité au COVID-19.\n\nEn effet, pendant les 2 mois suivant un test positif pour la COVID-19, vous ne serez pas considéré comme \"à risque de contamination\"."
+    "home.activation.sick.alert.message": "Vous ne pouvez pas activer le “contact tracing” pendant 2 mois après votre déclaration de positivité au COVID-19.\n\nEn effet, pendant les 2 mois suivant un test positif pour la COVID-19, vous ne serez pas considéré comme \"à risque de contamination\".",
+    "common.error.secretKey": "Échec de décryption de la base. Essayez à nouveau ou redémarrez votre téléphone."
 }
