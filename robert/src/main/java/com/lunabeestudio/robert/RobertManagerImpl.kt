@@ -110,6 +110,8 @@ class RobertManagerImpl(
         }
 
     override val canActivateProximity: Boolean
+        get() = true
+    /*
         get() = keystoreRepository.reportDate?.let { reportDate ->
             val reportCalendar = Calendar.getInstance().apply {
                 timeInMillis = reportDate
@@ -117,6 +119,7 @@ class RobertManagerImpl(
             }
             System.currentTimeMillis() > reportCalendar.timeInMillis
         } ?: true
+    */
 
     override val isRegistered: Boolean
         get() = keystoreRepository.kA != null && keystoreRepository.kEA != null
