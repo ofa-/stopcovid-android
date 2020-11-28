@@ -26,6 +26,14 @@ tar:
 	$(ADB) tar c $(FILES)/local_proximity		> data.tar
 
 
+strings: strings-fr
+strings-%: src.dir = stopcovid/src/main/assets/Strings
+strings-%:
+	curl -s https://app.stopcovid.gouv.fr/json/version-25/$@.json \
+		> $(src.dir)/$@.json
+	git diff $(src.dir)
+
+
 keystore = stopcovid/my-release-key.jks
 
 build: $(keystore) .
