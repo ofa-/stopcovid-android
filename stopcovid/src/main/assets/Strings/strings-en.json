@@ -453,6 +453,8 @@
     "attestation.form.travail.longLabel": "Commuting to work or business travel that cannot be deferred",
     "attestation.form.achats.shortLabel": "Shopping",
     "attestation.form.achats.longLabel": "Going out to buy work supplies, basic necessities from authorised outlets (see list at gouvernement.fr) and home deliveries",
+    "attestation.form.achats_culturel_cultuel.shortLabel": "Shopping, culture and religion",
+    "attestation.form.achats_culturel_cultuel.longLabel": "Going out to buy supplies from authorised outlets (see list at gouvernement.fr) and home deliveries, going to an authorized cultural place, going to religious service",
     "attestation.form.sante.shortLabel": "Doctor visits and healthcare",
     "attestation.form.sante.longLabel": "Doctor visits and healthcare that cannot be done remotely or deferred, and medication purchases",
     "attestation.form.famille.shortLabel": "Family obligations, vulnerable persons and childcare",
