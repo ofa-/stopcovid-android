@@ -27,7 +27,8 @@ abstract class BaseFragment : Fragment() {
 
     abstract fun refreshScreen()
 
-    protected var strings = StringsManager.strings
+    protected val strings: HashMap<String, String>
+        get() = StringsManager.strings
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
