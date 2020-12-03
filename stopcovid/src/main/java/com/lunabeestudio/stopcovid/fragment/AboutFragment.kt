@@ -46,16 +46,16 @@ class AboutFragment : MainFragment() {
     companion object {
         const val releasesUri = "https://github.com/ofa-/stopcovid-android/releases"
         const val downloadUri = "$releasesUri/latest/download/stopcovid-release.apk"
-    }
 
-    private fun isLatest() : Boolean {
-        "$releasesUri/latest".run {
-            return (OkHttpClient.Builder().build()
-                .newCall(Request.Builder().url(this).build())
-                .execute()
-                .body?.string() ?: "")
-                .contains("commit/" + BuildConfig.BUILD_ID)
-        }
+	fun isLatest() : Boolean {
+		"$releasesUri/latest".run {
+		    return (OkHttpClient.Builder().build()
+			.newCall(Request.Builder().url(this).build())
+			.execute()
+			.body?.string() ?: "")
+			.contains("commit/" + BuildConfig.BUILD_ID)
+		}
+	    }
     }
 
     private fun toast(text: String?) {

@@ -111,6 +111,7 @@ import com.lunabeestudio.stopcovid.viewmodel.ProximityViewModel
 import com.lunabeestudio.stopcovid.viewmodel.ProximityViewModelFactory
 import com.mikepenz.fastadapter.GenericItem
 import kotlinx.android.synthetic.main.activity_main.view.*
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -844,6 +845,7 @@ class ProximityFragment : TimeMainFragment() {
             val freshProximityOn = ProximityManager.isProximityOn(context, robertManager)
             (activity as AppCompatActivity).supportActionBar?.title = strings[getTitleKey()]
             updateErrorLayout(getActivityBinding()?.errorLayout, freshProximityOn)
+            asyncUpdateNewVersionAvailableTitle()
         }
     }
 
@@ -1018,6 +1020,32 @@ class ProximityFragment : TimeMainFragment() {
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data)
+        }
+    }
+
+    private fun asyncUpdateNewVersionAvailableTitle() {
+        CoroutineScope(Dispatchers.Default).launch {
+            val indicatorText = newVersionAvailableIndicator()
+            CoroutineScope(Dispatchers.Main).launch {
+                val titleText = strings[getTitleKey()] + "  " + indicatorText
+                (activity as AppCompatActivity).supportActionBar?.title = titleText
+            }
+        }
+    }
+
+    private fun newVersionAvailableIndicator(): String {
+        return when {
+            updateAvailable() -> ":: 🎁 ::"
+            else -> ""
+        }
+    }
+
+    private fun updateAvailable(): Boolean {
+        try {
+            return ! AboutFragment.isLatest()
+        }
+        catch(e: Exception) {
+            return false
         }
     }
 
