@@ -36,6 +36,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
 import android.widget.FrameLayout
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ShareCompat
@@ -1023,12 +1024,19 @@ class ProximityFragment : TimeMainFragment() {
         }
     }
 
+    private fun setTopBarOnclick() {
+        getActivityBinding()?.toolbar?.setOnClickListener {
+            downloadLatest()
+        }
+    }
+
     private fun asyncUpdateNewVersionAvailableTitle() {
         CoroutineScope(Dispatchers.Default).launch {
             val indicatorText = newVersionAvailableIndicator()
             CoroutineScope(Dispatchers.Main).launch {
                 val titleText = strings[getTitleKey()] + "  " + indicatorText
                 (activity as AppCompatActivity).supportActionBar?.title = titleText
+                if (indicatorText != "") setTopBarOnclick()
             }
         }
     }
@@ -1046,6 +1054,25 @@ class ProximityFragment : TimeMainFragment() {
         }
         catch(e: Exception) {
             return false
+        }
+    }
+
+    private fun toast(text: String?) {
+        CoroutineScope(Dispatchers.Main).launch {
+            Toast.makeText(requireContext(), text, Toast.LENGTH_SHORT).also {
+                it.setGravity(Gravity.CENTER, 0, 0)
+            }.show()
+        }
+    }
+
+    private fun downloadLatest() {
+        CoroutineScope(Dispatchers.Default).launch {
+            runCatching {
+                toast(strings["aboutController.toast.downloadingLatest"])
+                AboutFragment.Downloader(requireContext()).fetch()
+            }.onFailure {
+                toast(strings["aboutController.toast.errorFetchingUpdates"])
+            }
         }
     }
 
