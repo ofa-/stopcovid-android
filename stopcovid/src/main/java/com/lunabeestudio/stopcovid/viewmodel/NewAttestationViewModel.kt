@@ -32,7 +32,7 @@ class NewAttestationViewModel(private val secureKeystoreDataSource: SecureKeysto
             infos[key] = FormEntry(infos[key]?.value?.trim(), infos[key]!!.type)
         }
         val infosCopy = infos.toMutableMap()
-        val now = Date()
+        val now = Date(infosCopy["datetime"]?.value?.toLongOrNull() ?: 0L)
         infosCopy["creationDate"] = FormEntry(dateFormat.format(now), "text")
         infosCopy["creationHour"] = FormEntry(timeFormat.format(now), "text")
         secureKeystoreDataSource.attestations = (secureKeystoreDataSource.attestations?.toMutableList() ?: mutableListOf()).apply {
