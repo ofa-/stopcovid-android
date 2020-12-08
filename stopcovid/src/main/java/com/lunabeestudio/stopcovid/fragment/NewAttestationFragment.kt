@@ -96,15 +96,8 @@ class NewAttestationFragment : MainFragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return if (item.itemId == R.id.item_text) {
             if (viewModel.areInfosValid()) {
-                MaterialAlertDialogBuilder(requireContext())
-                    .setTitle(strings["newAttestationController.generate.alert.title"])
-                    .setMessage(strings["newAttestationController.generate.alert.message"])
-                    .setPositiveButton(strings["newAttestationController.generate.alert.validate"]) { _, _ ->
                         viewModel.generateQrCode()
                         findNavController().navigateUp()
-                    }
-                    .setNegativeButton(strings["common.cancel"], null)
-                    .show()
             } else {
                 MaterialAlertDialogBuilder(requireContext())
                     .setTitle(strings["newAttestationController.missingInfo.alert.title"])
