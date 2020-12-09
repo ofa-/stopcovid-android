@@ -43,6 +43,12 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import kotlin.time.ExperimentalTime
 
+import com.lunabeestudio.stopcovid.viewmodel.NewAttestationViewModel
+import com.lunabeestudio.stopcovid.viewmodel.NewAttestationViewModelFactory
+import com.lunabeestudio.domain.model.FormEntry
+import androidx.fragment.app.activityViewModels
+
+
 class AttestationsFragment : MainFragment() {
 
     private val robertManager: RobertManager by lazy {
@@ -67,6 +73,29 @@ class AttestationsFragment : MainFragment() {
         }
     }
 
+    val reasonMap = mapOf(
+        1 to "travail",
+        2 to "achats_culturel_cultuel",
+        6 to "sport_animaux",
+        9 to "enfants",
+    )
+    val labelMap = mapOf(
+        1 to "Travail",
+        2 to "Achats",
+        6 to "Plein air",
+        9 to "Enfants",
+    )
+
+    private fun generateNewAttestation(typ: Int) {
+        val navm: NewAttestationViewModel by activityViewModels {
+            NewAttestationViewModelFactory(requireContext().secureKeystoreDataSource())
+        }
+        navm.infos.put("datetime", FormEntry(System.currentTimeMillis().toString(), "datetime"))
+        navm.infos.put("reason", FormEntry(reasonMap[typ], "list"))
+        navm.generateQrCode()
+        refreshScreen()
+    }
+
     @OptIn(ExperimentalTime::class)
     override fun getItems(): List<GenericItem> {
         val items = ArrayList<GenericItem>()
@@ -78,6 +107,16 @@ class AttestationsFragment : MainFragment() {
                 findNavController().navigate(AttestationsFragmentDirections.actionAttestationsFragmentToNewAttestationFragment())
             }
             identifier = label.hashCode().toLong()
+        }
+        labelMap.forEach { key, labelText ->
+        items += linkCardItem {
+            label = "$key. $labelText"
+            iconRes = R.drawable.ic_add
+            onClickListener = View.OnClickListener {
+                generateNewAttestation(key)
+            }
+            identifier = label.hashCode().toLong()
+        }
         }
         items += linkCardItem {
             label = strings["attestationsController.termsOfUse"]
