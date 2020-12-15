@@ -30,6 +30,7 @@ import com.lunabeestudio.stopcovid.StopCovid
 import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.UiConstants
 import com.lunabeestudio.stopcovid.coreui.extension.fixFormatter
+import com.lunabeestudio.stopcovid.coreui.extension.getFirstSupportedLanguage
 import com.lunabeestudio.stopcovid.coreui.extension.saveTo
 import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
 import com.lunabeestudio.stopcovid.extension.areInfoNotificationsEnabled
@@ -44,7 +45,6 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.io.File
 import java.lang.reflect.Type
-import java.util.Locale
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 import kotlin.time.milliseconds
@@ -86,20 +86,21 @@ object InfoCenterManager {
 
     fun initialize(context: Context) {
         CoroutineScope(Dispatchers.IO).launch {
-            prevLanguage = Locale.getDefault().language
+            prevLanguage = context.getFirstSupportedLanguage()
             loadLocal(context)
         }
     }
 
     suspend fun refreshIfNeeded(context: Context) {
-        val forceRefresh = prevLanguage != Locale.getDefault().language
+        val newLanguage = context.getFirstSupportedLanguage()
+        val forceRefresh = prevLanguage != newLanguage
         fetchLastTimestamp(context)
         if (fetchLast(context, infosPrefix, null, forceRefresh)
             && fetchLast(context, tagsPrefix, null, forceRefresh)
-            && fetchLast(context, stringPrefix, Locale.getDefault().language, forceRefresh)) {
+            && fetchLast(context, stringPrefix, newLanguage, forceRefresh)) {
+            prevLanguage = newLanguage
             saveLastRefresh(context)
         }
-        prevLanguage = Locale.getDefault().language
         loadLocal(context)
     }
 
@@ -163,10 +164,12 @@ object InfoCenterManager {
         }
     }
 
-    private suspend fun fetchLast(context: Context,
+    private suspend fun fetchLast(
+        context: Context,
         prefix: String,
         languageCode: String?,
-        forceRefresh: Boolean): Boolean {
+        forceRefresh: Boolean,
+    ): Boolean {
         return try {
             if (shouldRefresh(context) || forceRefresh) {
                 val filename = "$prefix${languageCode ?: ""}.json"
@@ -189,18 +192,20 @@ object InfoCenterManager {
     }
 
     private fun localFileExists(context: Context, prefix: String): Boolean {
-        val fileName = "$prefix${Locale.getDefault().language}.json"
+        val fileName = "$prefix${context.getFirstSupportedLanguage()}.json"
         val file = File(context.filesDir, fileName)
         return file.exists()
     }
 
-    private fun <T> loadLocal(context: Context,
+    private fun <T> loadLocal(
+        context: Context,
         prefix: String,
         isLocalized: Boolean,
         fallbackFileName: String?,
         transform: (String) -> String,
-        type: Type): T? {
-        val fileName = "$prefix${if (isLocalized) Locale.getDefault().language else ""}.json"
+        type: Type,
+    ): T? {
+        val fileName = "$prefix${if (isLocalized) context.getFirstSupportedLanguage() else ""}.json"
         var file = File(context.filesDir, fileName)
         if (!file.exists() && fallbackFileName != null) {
             file = File(context.filesDir, fallbackFileName)

@@ -98,6 +98,13 @@
             app:exitAnim="@anim/nav_slide_exit_anim"
             app:popEnterAnim="@anim/nav_slide_pop_enter_anim"
             app:popExitAnim="@anim/nav_slide_pop_exit_anim" />
+        <action
+            android:id="@+id/action_onBoardingNoBleFragment_to_onBoardingNotificationFragment"
+            app:destination="@id/onBoardingNotificationFragment"
+            app:enterAnim="@anim/nav_slide_enter_anim"
+            app:exitAnim="@anim/nav_slide_exit_anim"
+            app:popEnterAnim="@anim/nav_slide_pop_enter_anim"
+            app:popExitAnim="@anim/nav_slide_pop_exit_anim" />
     </fragment>
     <fragment
         android:id="@+id/onBoardingBatteryFragment"
@@ -122,6 +129,25 @@
             app:exitAnim="@anim/nav_slide_exit_anim"
             app:popEnterAnim="@anim/nav_slide_pop_enter_anim"
             app:popExitAnim="@anim/nav_slide_pop_exit_anim" />
+        <action
+            android:id="@+id/action_onBoardingNotificationFragment_to_onBoardingVenuesFragment"
+            app:destination="@id/onBoardingVenuesFragment"
+            app:enterAnim="@anim/nav_slide_enter_anim"
+            app:exitAnim="@anim/nav_slide_exit_anim"
+            app:popEnterAnim="@anim/nav_slide_pop_enter_anim"
+            app:popExitAnim="@anim/nav_slide_pop_exit_anim" />
+    </fragment>
+    <fragment
+        android:id="@+id/onBoardingVenuesFragment"
+        android:name="com.lunabeestudio.stopcovid.fragment.OnBoardingVenuesFragment"
+        tools:layout="@layout/fragment_recycler_view">
+        <action
+            android:id="@+id/action_onBoardingVenuesFragment_to_onBoardingGestureFragment"
+            app:destination="@id/onBoardingGestureFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
     </fragment>
     <fragment
         android:id="@+id/onBoardingGestureFragment"

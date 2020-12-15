@@ -20,44 +20,48 @@ import com.lunabeestudio.robert.RobertApplication
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.robert.datasource.LocalKeystoreDataSource
 import com.lunabeestudio.robert.model.RobertResult
+import com.lunabeestudio.robert.utils.Event
 import com.lunabeestudio.stopcovid.coreui.utils.SingleLiveEvent
 import com.lunabeestudio.stopcovid.extension.isExpired
 import com.lunabeestudio.stopcovid.extension.toCovidException
+import com.lunabeestudio.stopcovid.manager.IsolationFormStateEnum
+import com.lunabeestudio.stopcovid.manager.IsolationManager
 import com.lunabeestudio.stopcovid.model.CovidException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlin.time.ExperimentalTime
-import kotlin.time.hours
 
 class ProximityViewModel(
     private val robertManager: RobertManager,
+    isolationManager: IsolationManager,
     keystoreDataSource: LocalKeystoreDataSource,
 ) : ViewModel() {
 
-    val refreshConfigSuccess: SingleLiveEvent<Unit> = SingleLiveEvent()
     val activateProximitySuccess: SingleLiveEvent<Unit> = SingleLiveEvent()
     val covidException: SingleLiveEvent<CovidException?> = SingleLiveEvent()
     val loadingInProgress: MutableLiveData<Boolean> = MutableLiveData(false)
+    val isolationFormState: LiveData<Event<IsolationFormStateEnum?>> = isolationManager.currentFormState
+    val isolationDataChanged: SingleLiveEvent<Unit> = isolationManager.changedEvent
 
     @OptIn(ExperimentalTime::class)
-    val activeAttestationCount: LiveData<Int> = keystoreDataSource.attestationsLiveData.map {
-        it?.filter { attestation ->
+    val activeAttestationCount: LiveData<Event<Int>> = keystoreDataSource.attestationsLiveData.map {
+        Event(it?.filter { attestation ->
             !attestation.isExpired(robertManager)
-        }?.count() ?: 0
+        }?.count() ?: 0)
     }
 
-    fun refreshConfig(application: RobertApplication) {
+    suspend fun refreshConfig(application: RobertApplication): Boolean {
         loadingInProgress.postValue(true)
-        viewModelScope.launch(Dispatchers.IO) {
-            when (val result = robertManager.refreshConfig(application)) {
-                is RobertResult.Success -> {
-                    refreshConfigSuccess.postValue(null)
-                }
-                is RobertResult.Failure -> {
-                    covidException.postValue(result.error.toCovidException())
-                }
+        val result = robertManager.refreshConfig(application)
+        loadingInProgress.postValue(false)
+        return when (result) {
+            is RobertResult.Success -> {
+                true
             }
-            loadingInProgress.postValue(false)
+            is RobertResult.Failure -> {
+                covidException.postValue(result.error.toCovidException())
+                false
+            }
         }
     }
 
@@ -79,11 +83,12 @@ class ProximityViewModel(
 
 class ProximityViewModelFactory(
     private val robertManager: RobertManager,
+    private val isolationManager: IsolationManager,
     private val keystoreDataSource: LocalKeystoreDataSource,
 ) :
     ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         @Suppress("UNCHECKED_CAST")
-        return ProximityViewModel(robertManager, keystoreDataSource) as T
+        return ProximityViewModel(robertManager, isolationManager, keystoreDataSource) as T
     }
 }

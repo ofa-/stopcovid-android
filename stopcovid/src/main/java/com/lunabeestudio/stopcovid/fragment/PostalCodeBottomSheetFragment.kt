@@ -19,6 +19,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
 import com.lunabeestudio.stopcovid.databinding.FragmentPostalCodeBottomSheetBinding
 import com.lunabeestudio.stopcovid.extension.chosenPostalCode
@@ -74,7 +75,7 @@ class PostalCodeBottomSheetFragment : BottomSheetDialogFragment() {
     }
 
     private fun dismissDialog(shouldRefresh: Boolean) {
-        findNavController().previousBackStackEntry?.savedStateHandle?.set(SHOULD_BE_REFRESHED_KEY, shouldRefresh)
+        findNavControllerOrNull()?.previousBackStackEntry?.savedStateHandle?.set(SHOULD_BE_REFRESHED_KEY, shouldRefresh)
         this@PostalCodeBottomSheetFragment.dismiss()
     }
 

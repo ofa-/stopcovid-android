@@ -13,10 +13,9 @@ package com.lunabeestudio.stopcovid.fragment
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
-import androidx.navigation.fragment.findNavController
-import com.lunabeestudio.robert.utils.EventObserver
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.callPhone
+import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.fastitem.buttonItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
@@ -34,9 +33,9 @@ class InformationFragment : MainFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        robertManager.atRiskStatus.observe(viewLifecycleOwner, EventObserver(this.javaClass.name.hashCode()) {
+        robertManager.atRiskStatus.observe(viewLifecycleOwner) {
             refreshScreen()
-        })
+        }
     }
 
     override fun getTitleKey(): String = "informationController.title"
@@ -48,86 +47,149 @@ class InformationFragment : MainFragment() {
             spaceRes = R.dimen.spacing_xlarge
             identifier = items.count().toLong()
         }
-        if (robertManager.isAtRisk == true) {
-            items += titleItem {
-                text = strings["informationController.mainMessage.atRisk.title"]
-                gravity = Gravity.CENTER
-                identifier = items.count().toLong()
+
+        val isAtRisk = robertManager.isAtRisk
+        val isWarningAtRisk = robertManager.isWarningAtRisk
+
+        addMainMessage(items, isAtRisk, isWarningAtRisk)
+        addStep1(items, isAtRisk, isWarningAtRisk)
+        addStep2(items, isAtRisk, isWarningAtRisk)
+        addStep3(items, isAtRisk, isWarningAtRisk)
+
+        return items
+    }
+
+    private fun addMainMessage(items: ArrayList<GenericItem>, isAtRisk: Boolean?, isWarningAtRisk: Boolean?) {
+        when {
+            isAtRisk == true -> {
+                items += titleItem {
+                    text = strings["informationController.mainMessage.atRisk.title"]
+                    gravity = Gravity.CENTER
+                    identifier = items.count().toLong()
+                }
+                items += captionItem {
+                    text = strings["informationController.mainMessage.atRisk.subtitle"]
+                    gravity = Gravity.CENTER
+                    identifier = items.count().toLong()
+                }
             }
-            items += captionItem {
-                text = strings["informationController.mainMessage.atRisk.subtitle"]
-                gravity = Gravity.CENTER
-                identifier = items.count().toLong()
+            isWarningAtRisk == true -> {
+                items += titleItem {
+                    text = strings["informationController.mainMessage.warning.title"]
+                    gravity = Gravity.CENTER
+                    identifier = items.count().toLong()
+                }
+                items += captionItem {
+                    text = strings["informationController.mainMessage.warning.subtitle"]
+                    gravity = Gravity.CENTER
+                    identifier = items.count().toLong()
+                }
             }
-        } else {
-            items += titleItem {
-                text = strings["informationController.mainMessage.nothing.title"]
-                gravity = Gravity.CENTER
-                identifier = items.count().toLong()
-            }
-            items += captionItem {
-                text = strings["informationController.mainMessage.nothing.subtitle"]
-                gravity = Gravity.CENTER
-                identifier = items.count().toLong()
+            else -> {
+                items += titleItem {
+                    text = strings["informationController.mainMessage.nothing.title"]
+                    gravity = Gravity.CENTER
+                    identifier = items.count().toLong()
+                }
+                items += captionItem {
+                    text = strings["informationController.mainMessage.nothing.subtitle"]
+                    gravity = Gravity.CENTER
+                    identifier = items.count().toLong()
+                }
             }
         }
         items += spaceItem {
             spaceRes = R.dimen.spacing_xlarge
             identifier = items.count().toLong()
         }
-        var titleCount = 1
-        if (robertManager.isAtRisk == true) {
-            items += titleItem {
-                text = stringsFormat("informationController.step.isolate.atRisk.title", titleCount++)
-                gravity = Gravity.CENTER
-                identifier = items.count().toLong()
+    }
+
+    private fun addStep1(items: ArrayList<GenericItem>, isAtRisk: Boolean?, isWarningAtRisk: Boolean?) {
+        when {
+            isAtRisk == true -> {
+                items += titleItem {
+                    text = stringsFormat("informationController.step.isolate.atRisk.title", 1)
+                    gravity = Gravity.CENTER
+                    identifier = items.count().toLong()
+                }
+                items += captionItem {
+                    text = strings["informationController.step.isolate.atRisk.subtitle"]
+                    gravity = Gravity.CENTER
+                    identifier = items.count().toLong()
+                }
             }
-            items += captionItem {
-                text = strings["informationController.step.isolate.atRisk.subtitle"]
-                gravity = Gravity.CENTER
-                identifier = items.count().toLong()
+            isWarningAtRisk == true -> {
+                items += titleItem {
+                    text = stringsFormat("informationController.step.isolate.warning.title", 1)
+                    gravity = Gravity.CENTER
+                    identifier = items.count().toLong()
+                }
+                items += captionItem {
+                    text = strings["informationController.step.isolate.warning.subtitle"]
+                    gravity = Gravity.CENTER
+                    identifier = items.count().toLong()
+                }
             }
-        } else {
-            items += titleItem {
-                text = stringsFormat("informationController.step.isolate.nothing.title", titleCount++)
-                gravity = Gravity.CENTER
-                identifier = items.count().toLong()
-            }
-            items += captionItem {
-                text = strings["informationController.step.isolate.nothing.subtitle"]
-                gravity = Gravity.CENTER
-                identifier = items.count().toLong()
+            else -> {
+                items += titleItem {
+                    text = stringsFormat("informationController.step.isolate.nothing.title", 1)
+                    gravity = Gravity.CENTER
+                    identifier = items.count().toLong()
+                }
+                items += captionItem {
+                    text = strings["informationController.step.isolate.nothing.subtitle"]
+                    gravity = Gravity.CENTER
+                    identifier = items.count().toLong()
+                }
             }
         }
         items += buttonItem {
             text = strings["informationController.step.isolate.buttonTitle"]
             gravity = Gravity.CENTER
             onClickListener = View.OnClickListener {
-                findNavController().safeNavigate(InformationFragmentDirections.actionInformationFragmentToGestureFragment())
+                findNavControllerOrNull()?.safeNavigate(InformationFragmentDirections.actionInformationFragmentToGestureFragment())
             }
             identifier = items.count().toLong()
         }
-        if (robertManager.isAtRisk == true) {
-            items += titleItem {
-                text = stringsFormat("informationController.step.beCareful.atRisk.title", titleCount++)
-                gravity = Gravity.CENTER
-                identifier = items.count().toLong()
+    }
+
+    private fun addStep2(items: ArrayList<GenericItem>, isAtRisk: Boolean?, isWarningAtRisk: Boolean?) {
+        when {
+            isAtRisk == true -> {
+                items += titleItem {
+                    text = stringsFormat("informationController.step.beCareful.atRisk.title", 2)
+                    gravity = Gravity.CENTER
+                    identifier = items.count().toLong()
+                }
+                items += captionItem {
+                    text = strings["informationController.step.beCareful.atRisk.subtitle"]
+                    gravity = Gravity.CENTER
+                    identifier = items.count().toLong()
+                }
             }
-            items += captionItem {
-                text = strings["informationController.step.beCareful.atRisk.subtitle"]
-                gravity = Gravity.CENTER
-                identifier = items.count().toLong()
+            isWarningAtRisk == true -> {
+                items += titleItem {
+                    text = stringsFormat("informationController.step.beCareful.warning.title", 2)
+                    gravity = Gravity.CENTER
+                    identifier = items.count().toLong()
+                }
+                items += captionItem {
+                    text = strings["informationController.step.beCareful.warning.subtitle"]
+                    gravity = Gravity.CENTER
+                    identifier = items.count().toLong()
+                }
             }
-        } else {
-            items += titleItem {
-                text = stringsFormat("informationController.step.beCareful.nothing.title", titleCount++)
-                gravity = Gravity.CENTER
-                identifier = items.count().toLong()
-            }
-            items += captionItem {
-                text = strings["informationController.step.beCareful.nothing.subtitle"]
-                gravity = Gravity.CENTER
-                identifier = items.count().toLong()
+            else -> {
+                items += titleItem {
+                    text = stringsFormat("informationController.step.beCareful.nothing.title", 2)
+                    gravity = Gravity.CENTER
+                    identifier = items.count().toLong()
+                }
+                items += captionItem {
+                    text = strings["informationController.step.beCareful.nothing.subtitle"]
+                    gravity = Gravity.CENTER
+                    identifier = items.count().toLong()
+                }
             }
         }
         items += buttonItem {
@@ -138,9 +200,12 @@ class InformationFragment : MainFragment() {
             }
             identifier = items.count().toLong()
         }
-        if (robertManager.isAtRisk == true) {
+    }
+
+    private fun addStep3(items: ArrayList<GenericItem>, isAtRisk: Boolean?, isWarningAtRisk: Boolean?) {
+        if (isAtRisk == true || isWarningAtRisk == true) {
             items += titleItem {
-                text = stringsFormat("informationController.step.appointment.title", titleCount++)
+                text = stringsFormat("informationController.step.appointment.title", 3)
                 gravity = Gravity.CENTER
                 identifier = items.count().toLong()
             }
@@ -158,25 +223,5 @@ class InformationFragment : MainFragment() {
                 identifier = items.count().toLong()
             }
         }
-        items += titleItem {
-            text = stringsFormat("informationController.step.moreInfo.title", titleCount++)
-            gravity = Gravity.CENTER
-            identifier = items.count().toLong()
-        }
-        items += captionItem {
-            text = strings["informationController.step.moreInfo.subtitle"]
-            gravity = Gravity.CENTER
-            identifier = items.count().toLong()
-        }
-        items += buttonItem {
-            text = strings["informationController.step.moreInfo.buttonTitle"]
-            gravity = Gravity.CENTER
-            onClickListener = View.OnClickListener {
-                strings["informationController.step.moreInfo.url"]?.openInExternalBrowser(requireContext())
-            }
-            identifier = items.count().toLong()
-        }
-
-        return items
     }
 }

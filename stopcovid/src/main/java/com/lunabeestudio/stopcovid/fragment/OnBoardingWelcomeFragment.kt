@@ -16,6 +16,7 @@ import android.view.View
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.lunabeestudio.stopcovid.R
+import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
@@ -33,8 +34,8 @@ class OnBoardingWelcomeFragment : OnBoardingFragment() {
     override fun getTitleKey(): String = "onboarding.welcomeController.title"
     override fun getButtonTitleKey(): String? = "onboarding.welcomeController.howDoesItWork"
     override fun getOnButtonClick(): () -> Unit = {
-        findNavController()
-            .safeNavigate(OnBoardingWelcomeFragmentDirections.actionOnBoardingWelcomeFragmentToOnBoardingExplanationFragment())
+        findNavControllerOrNull()
+            ?.safeNavigate(OnBoardingWelcomeFragmentDirections.actionOnBoardingWelcomeFragmentToOnBoardingExplanationFragment())
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

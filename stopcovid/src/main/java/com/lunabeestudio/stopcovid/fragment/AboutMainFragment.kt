@@ -18,6 +18,7 @@ import android.view.View
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
 import com.lunabeestudio.stopcovid.R
+import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.extension.safeNavigate
 
 abstract class AboutMainFragment : MainFragment() {
@@ -35,7 +36,7 @@ abstract class AboutMainFragment : MainFragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return if (item.itemId == R.id.item_text) {
-            findNavController().safeNavigate(R.id.nav_about, null, navOptions {
+            findNavControllerOrNull()?.safeNavigate(R.id.nav_about, null, navOptions {
                 anim {
                     enter = R.anim.nav_default_enter_anim
                     popEnter = R.anim.nav_default_pop_enter_anim

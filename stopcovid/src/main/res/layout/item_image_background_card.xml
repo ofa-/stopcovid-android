@@ -18,65 +18,58 @@
     android:layout_marginVertical="@dimen/spacing_small"
     android:foreground="?selectableItemBackground">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/constraintLayout"
+    <LinearLayout
+        android:id="@+id/mainLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:background="@drawable/bg_no_risk">
+        android:orientation="horizontal"
+        tools:background="@drawable/bg_no_risk"
+        android:layoutDirection="inherit"
+        android:gravity="end">
 
         <ImageView
             android:id="@+id/imageView"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/card_image_height"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="1"
+            android:layout_gravity="bottom"
             tools:src="@tools:sample/avatars" />
 
-        <TextView
-            android:id="@+id/headerTextView"
+        <LinearLayout
             android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/spacing_large"
-            android:layout_marginTop="@dimen/spacing_large"
-            android:textAppearance="@style/TextAppearance.StopCovid.Caption"
-            app:layout_constraintBottom_toTopOf="@id/titleTextView"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/imageView"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_chainStyle="packed"
-            tools:text="@tools:sample/lorem[2]"
-            tools:textColor="@color/color_on_gradient" />
+            android:layout_gravity="center"
+            android:padding="@dimen/spacing_large"
+            android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/titleTextView"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/spacing_large"
-            android:textAppearance="@style/TextAppearance.StopCovid.Title"
-            app:layout_constraintBottom_toTopOf="@id/subtitleTextView"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/imageView"
-            app:layout_constraintTop_toBottomOf="@id/headerTextView"
-            app:layout_goneMarginBottom="@dimen/spacing_large"
-            app:layout_goneMarginTop="@dimen/spacing_large"
-            tools:text="@tools:sample/lorem[3]"
-            tools:textColor="@color/color_on_gradient" />
+            <TextView
+                android:id="@+id/headerTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.StopCovid.Caption"
+                tools:text="@tools:sample/lorem[2]"
+                tools:textColor="@color/color_on_gradient" />
 
-        <TextView
-            android:id="@+id/subtitleTextView"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/spacing_large"
-            android:layout_marginBottom="@dimen/spacing_large"
-            android:textAppearance="@style/TextAppearance.StopCovid.Caption"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/imageView"
-            app:layout_constraintTop_toBottomOf="@id/titleTextView"
-            tools:text="@tools:sample/lorem[2]"
-            tools:textColor="@color/color_on_gradient" />
+            <TextView
+                android:id="@+id/titleTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.StopCovid.Title"
+                app:layout_goneMarginBottom="@dimen/spacing_large"
+                app:layout_goneMarginTop="@dimen/spacing_large"
+                tools:text="@tools:sample/lorem[3]"
+                tools:textColor="@color/color_on_gradient" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <TextView
+                android:id="@+id/subtitleTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.StopCovid.Caption"
+                tools:text="@tools:sample/lorem[2]"
+                tools:textColor="@color/color_on_gradient" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
 </com.google.android.material.card.MaterialCardView>

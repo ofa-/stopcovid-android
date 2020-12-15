@@ -15,6 +15,8 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.net.Uri
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.lunabeestudio.stopcovid.coreui.UiConstants
+import java.util.Locale
 
 fun Context.isNightMode(): Boolean {
     return when (resources?.configuration?.uiMode?.and(Configuration.UI_MODE_NIGHT_MASK)) {
@@ -32,9 +34,11 @@ fun Context.isNightMode(): Boolean {
  * @param subject The subject to use in the email
  * @param body The body to use in the email
  */
-fun Context.startEmailIntent(emailAddress: String,
+fun Context.startEmailIntent(
+    emailAddress: String,
     subject: String? = null,
-    body: String? = null) {
+    body: String? = null,
+) {
     val intent = Intent(Intent.ACTION_SENDTO)
     intent.data = Uri.parse("mailto:")
     intent.putExtra(Intent.EXTRA_EMAIL, arrayOf(emailAddress))
@@ -47,16 +51,31 @@ fun Context.startEmailIntent(emailAddress: String,
     startActivity(Intent.createChooser(intent, null))
 }
 
-fun Context.showPermissionRationale(strings: Map<String, String>,
+fun Context.showPermissionRationale(
+    strings: Map<String, String>,
     messageKey: String,
     positiveKey: String,
-    positiveAction: () -> Unit) {
+    cancelable: Boolean,
+    positiveAction: () -> Unit,
+    negativeAction: (() -> Unit)?,
+) {
     MaterialAlertDialogBuilder(this)
         .setTitle(strings["common.permissionsNeeded"])
         .setMessage(strings[messageKey])
+        .setCancelable(cancelable)
         .setPositiveButton(strings[positiveKey]) { _, _ ->
             positiveAction()
         }
-        .setNegativeButton(strings["common.cancel"], null)
+        .setNegativeButton(strings["common.cancel"]) { _, _ ->
+            negativeAction?.invoke()
+        }
         .show()
+}
+
+fun Context.getFirstSupportedLanguage(): String {
+    return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+        resources.configuration.locales.getFirstMatch(UiConstants.SUPPORTED_LANGUAGE)?.language ?: UiConstants.DEFAULT_LANGUAGE
+    } else {
+        Locale.getDefault().language.takeIf { UiConstants.SUPPORTED_LANGUAGE.contains(it) } ?: UiConstants.DEFAULT_LANGUAGE
+    }
 }

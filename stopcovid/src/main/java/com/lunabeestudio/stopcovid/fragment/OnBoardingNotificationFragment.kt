@@ -11,11 +11,12 @@
 package com.lunabeestudio.stopcovid.fragment
 
 import android.view.Gravity
-import androidx.navigation.fragment.findNavController
 import com.lunabeestudio.stopcovid.R
+import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
+import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.fastitem.logoItem
 import com.mikepenz.fastadapter.GenericItem
@@ -25,8 +26,13 @@ class OnBoardingNotificationFragment : OnBoardingFragment() {
     override fun getTitleKey(): String = "onboarding.beAwareController.title"
     override fun getButtonTitleKey(): String? = "onboarding.beAwareController.allowNotifications"
     override fun getOnButtonClick(): () -> Unit = {
-        findNavController()
-            .safeNavigate(OnBoardingNotificationFragmentDirections.actionOnBoardingNotificationFragmentToOnBoardingGestureFragment())
+        if (requireContext().robertManager().displayRecordVenues) {
+            findNavControllerOrNull()
+                ?.safeNavigate(OnBoardingNotificationFragmentDirections.actionOnBoardingNotificationFragmentToOnBoardingVenuesFragment())
+        } else {
+            findNavControllerOrNull()
+                ?.safeNavigate(OnBoardingNotificationFragmentDirections.actionOnBoardingNotificationFragmentToOnBoardingGestureFragment())
+        }
     }
 
     override fun getItems(): List<GenericItem> {

@@ -19,7 +19,7 @@ import com.lunabeestudio.stopcovid.activity.OnBoardingActivity
 import com.lunabeestudio.stopcovid.coreui.extension.registerToAppBarLayoutForLiftOnScroll
 import com.lunabeestudio.stopcovid.coreui.extension.safeEmojiSpanify
 import com.lunabeestudio.stopcovid.coreui.fragment.FastAdapterFragment
-import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
+import com.lunabeestudio.stopcovid.databinding.ActivityOnBoardingBinding
 
 abstract class OnBoardingFragment : FastAdapterFragment() {
 
@@ -27,7 +27,7 @@ abstract class OnBoardingFragment : FastAdapterFragment() {
     abstract fun getButtonTitleKey(): String?
     abstract fun getOnButtonClick(): () -> Unit
 
-    protected fun getActivityBinding() = (activity as OnBoardingActivity).binding
+    protected fun getActivityBinding(): ActivityOnBoardingBinding = (activity as OnBoardingActivity).binding
     private fun getActivityMergeBinding() = (activity as OnBoardingActivity).mergeBinding
 
     override fun getAppBarLayout(): AppBarLayout? = getActivityBinding().appBarLayout
@@ -35,12 +35,8 @@ abstract class OnBoardingFragment : FastAdapterFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        StringsManager.liveStrings.observe(viewLifecycleOwner) {
-            if (it.isNotEmpty()) {
-                binding?.recyclerView?.registerToAppBarLayoutForLiftOnScroll(getActivityBinding().appBarLayout)
-                initBottomButton()
-            }
-        }
+        binding?.recyclerView?.registerToAppBarLayoutForLiftOnScroll(getActivityBinding().appBarLayout)
+        initBottomButton()
     }
 
     override fun refreshScreen() {

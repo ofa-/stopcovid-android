@@ -31,8 +31,11 @@ object UiConstants {
         TIME("error", 5),
         BLUETOOTH("error", 6),
         NEWS("news", 7),
-        REMINDER("reminder", 8)
+        ACTIVATE_REMINDER("reminder", 8),
+        ISOLATION_REMINDER("reminder", 9)
     }
+
+    val SUPPORTED_LANGUAGE: Array<String> = arrayOf("ar", "de", "en", "es", "fr", "it", "pt")
 
     const val DEFAULT_LANGUAGE: String = "en"
 }

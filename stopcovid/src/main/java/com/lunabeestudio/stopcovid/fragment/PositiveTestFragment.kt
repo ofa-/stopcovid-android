@@ -15,6 +15,7 @@ import android.view.View
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.lunabeestudio.stopcovid.R
+import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.dividerItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
@@ -54,8 +55,8 @@ class PositiveTestFragment : MainFragment() {
         items += doubleTextItem {
             title = strings["positiveTestController.noDate"]
             onClickListener = View.OnClickListener {
-                findNavController()
-                    .safeNavigate(
+                findNavControllerOrNull()
+                    ?.safeNavigate(
                         PositiveTestFragmentDirections
                             .actionPositiveTestFragmentToSendHistoryFragment(args.code, args.firstSymptoms)
                     )
@@ -74,8 +75,8 @@ class PositiveTestFragment : MainFragment() {
                 this.title = title
                 caption = dateFormat.format(currentDate)
                 onClickListener = View.OnClickListener {
-                    findNavController()
-                        .safeNavigate(
+                    findNavControllerOrNull()
+                        ?.safeNavigate(
                             PositiveTestFragmentDirections
                                 .actionPositiveTestFragmentToSendHistoryFragment(args.code, args.firstSymptoms, Integer(index))
                         )

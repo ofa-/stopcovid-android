@@ -29,6 +29,8 @@ android {
 
             packagingOptions {
                 exclude 'DebugProbesKt.bin'
+                exclude 'META-INF/AL2.0'
+                exclude 'META-INF/LGPL2.1'
             }
         }
     }
@@ -44,8 +46,8 @@ android {
         applicationId "fr.gouv.android.stopcovid"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 104
-        versionName "2.1.8"
+        versionCode 126
+        versionName "2.2.0"
 
         testInstrumentationRunner = 'com.lunabeestudio.stopcovid.TestRunner'
 
@@ -91,9 +93,4 @@ dependencies {
     implementation project(path: ':framework')
     implementation project(path: ':robert')
     implementation project(path: ':domain')
-
-    androidTestImplementation "androidx.test.espresso:espresso-core:_"
-    androidTestImplementation "androidx.test.espresso:espresso-contrib:_"
-    androidTestImplementation "androidx.test.espresso:espresso-intents:_"
-    androidTestImplementation "androidx.test:rules:_"
 }

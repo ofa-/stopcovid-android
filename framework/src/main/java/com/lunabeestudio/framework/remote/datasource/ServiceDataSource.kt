@@ -13,8 +13,11 @@ package com.lunabeestudio.framework.remote.datasource
 import android.content.Context
 import com.lunabeestudio.domain.model.LocalProximity
 import com.lunabeestudio.domain.model.RegisterReport
+import com.lunabeestudio.domain.model.ReportResponse
 import com.lunabeestudio.domain.model.ServerStatusUpdate
 import com.lunabeestudio.domain.model.StatusReport
+import com.lunabeestudio.domain.model.VenueQrCode
+import com.lunabeestudio.domain.model.WStatusReport
 import com.lunabeestudio.framework.BuildConfig
 import com.lunabeestudio.framework.remote.RetrofitClient
 import com.lunabeestudio.framework.remote.extension.remoteToRobertException
@@ -24,9 +27,12 @@ import com.lunabeestudio.framework.remote.model.ApiRegisterV2RQ
 import com.lunabeestudio.framework.remote.model.ApiReportRQ
 import com.lunabeestudio.framework.remote.model.ApiStatusRQ
 import com.lunabeestudio.framework.remote.model.ApiUnregisterRQ
+import com.lunabeestudio.framework.remote.model.ApiWReportRQ
+import com.lunabeestudio.framework.remote.model.ApiWStatusRQ
 import com.lunabeestudio.framework.remote.model.CaptchaRQ
 import com.lunabeestudio.framework.remote.model.toDomain
 import com.lunabeestudio.framework.remote.server.StopCovidApi
+import com.lunabeestudio.framework.remote.server.StopCovidWarningApi
 import com.lunabeestudio.robert.datasource.RemoteServiceDataSource
 import com.lunabeestudio.robert.model.BackendException
 import com.lunabeestudio.robert.model.RobertResult
@@ -36,9 +42,14 @@ import retrofit2.Response
 import timber.log.Timber
 import java.io.File
 
-class ServiceDataSource(context: Context, baseUrl: String = BuildConfig.BASE_URL) : RemoteServiceDataSource {
+class ServiceDataSource(
+    context: Context,
+    baseUrl: String = BuildConfig.BASE_URL,
+    warningBaseUrl: String = BuildConfig.WARNING_BASE_URL,
+) : RemoteServiceDataSource {
 
     private var api: StopCovidApi = RetrofitClient.getService(context, baseUrl, StopCovidApi::class.java)
+    private var warningApi: StopCovidWarningApi = RetrofitClient.getWarningService(context, warningBaseUrl, StopCovidWarningApi::class.java)
     private var fileApi: StopCovidApi = RetrofitClient.getFileService(context, baseUrl, StopCovidApi::class.java)
 
     override suspend fun generateCaptcha(apiVersion: String, type: String, language: String): RobertResultData<String> {
@@ -72,10 +83,12 @@ class ServiceDataSource(context: Context, baseUrl: String = BuildConfig.BASE_URL
         }
     }
 
-    override suspend fun registerV2(apiVersion: String,
+    override suspend fun registerV2(
+        apiVersion: String,
         captcha: String,
         captchaId: String,
-        clientPublicECDHKey: String): RobertResultData<RegisterReport> {
+        clientPublicECDHKey: String,
+    ): RobertResultData<RegisterReport> {
         val result = tryCatchRequestData {
             api.registerV2(apiVersion, ApiRegisterV2RQ(captcha = captcha, captchaId = captchaId, clientPublicECDHKey = clientPublicECDHKey))
         }
@@ -108,9 +121,43 @@ class ServiceDataSource(context: Context, baseUrl: String = BuildConfig.BASE_URL
         }
     }
 
-    override suspend fun report(apiVersion: String, token: String, localProximityList: List<LocalProximity>): RobertResult {
-        return tryCatchRequest {
+    override suspend fun wstatus(
+        warningApiVersion: String,
+        venueQrCodeList: List<VenueQrCode>,
+    ): RobertResultData<WStatusReport> {
+        val result = tryCatchRequestData {
+            warningApi.wstatus(
+                warningApiVersion,
+                ApiWStatusRQ.fromVenueQrCodeList(venueQrCodeList)
+            )
+        }
+        return when (result) {
+            is RobertResultData.Success -> RobertResultData.Success(result.data.toDomain())
+            is RobertResultData.Failure -> RobertResultData.Failure(result.error)
+        }
+    }
+
+    override suspend fun report(
+        apiVersion: String,
+        token: String,
+        localProximityList: List<LocalProximity>,
+    ): RobertResultData<ReportResponse> {
+        val result = tryCatchRequestData {
             api.report(apiVersion, ApiReportRQ.fromLocalProximityList(token, localProximityList))
+        }
+        return when (result) {
+            is RobertResultData.Success -> RobertResultData.Success(result.data.toDomain())
+            is RobertResultData.Failure -> RobertResultData.Failure(result.error)
+        }
+    }
+
+    override suspend fun wreport(
+        warningApiVersion: String,
+        token: String,
+        venueQrCodeList: List<VenueQrCode>,
+    ): RobertResult {
+        return tryCatchRequest {
+            warningApi.wreport(warningApiVersion, "Bearer $token", ApiWReportRQ.fromVenueQrCodeList(venueQrCodeList))
         }
     }
 

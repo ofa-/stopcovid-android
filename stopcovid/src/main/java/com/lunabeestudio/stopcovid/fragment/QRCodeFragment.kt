@@ -10,26 +10,36 @@
 
 package com.lunabeestudio.stopcovid.fragment
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.navigation.fragment.findNavController
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import com.journeyapps.barcodescanner.BarcodeResult
+import com.lunabeestudio.stopcovid.coreui.UiConstants
+import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
+import com.lunabeestudio.stopcovid.coreui.extension.openAppSettings
+import com.lunabeestudio.stopcovid.coreui.extension.showPermissionRationale
 import com.lunabeestudio.stopcovid.coreui.fragment.BaseFragment
 import com.lunabeestudio.stopcovid.databinding.FragmentQrCodeBinding
-import com.lunabeestudio.stopcovid.extension.isCodeValid
-import com.lunabeestudio.stopcovid.extension.safeNavigate
-import com.lunabeestudio.stopcovid.extension.showInvalidCodeAlert
 
-class QRCodeFragment : BaseFragment() {
+abstract class QRCodeFragment : BaseFragment() {
 
-    private var binding: FragmentQrCodeBinding? = null
+    abstract fun getTitleKey(): String
+    abstract fun getExplanationKey(): String
+    abstract fun onCodeScanned(code: String)
+    protected var isReadyToStartScanFlow: Boolean = true
+
+    protected var binding: FragmentQrCodeBinding? = null
+    private var showingRationale: Boolean = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View? {
         binding = FragmentQrCodeBinding.inflate(inflater, container, false)
         return binding?.root
@@ -37,16 +47,42 @@ class QRCodeFragment : BaseFragment() {
 
     override fun onResume() {
         super.onResume()
+        if (isReadyToStartScanFlow) {
+            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
+                if (!showingRationale) {
+                    if (shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)) {
+                        showingRationale = true
+                        context?.showPermissionRationale(strings, "common.needCameraAccessToScan", "common.ok", false, {
+                            requestPermissions(
+                                arrayOf(Manifest.permission.CAMERA),
+                                UiConstants.Permissions.CAMERA.ordinal
+                            )
+                            showingRationale = false
+                        }) {
+                            findNavControllerOrNull()?.navigateUp()
+                            showingRationale = false
+                        }
+                        showingRationale = false
+                    } else {
+                        requestPermissions(
+                            arrayOf(Manifest.permission.CAMERA),
+                            UiConstants.Permissions.CAMERA.ordinal
+                        )
+                    }
+                }
+            } else {
+                resumeQrCodeReader()
+            }
+        }
+    }
+
+    private fun resumeQrCodeReader() {
         binding?.qrCodeReaderView?.resume()
         binding?.qrCodeReaderView?.decodeContinuous { result: BarcodeResult? ->
             binding?.qrCodeReaderView?.stopDecoding()
             result?.text?.let { code ->
-                if (!code.isCodeValid()) {
-                    context?.showInvalidCodeAlert(strings)
-                    findNavController().navigateUp()
-                } else {
-                    findNavController().safeNavigate(QRCodeFragmentDirections.actionQrCodeFragmentToSymptomsOriginFragment(code))
-                }
+                onCodeScanned(code)
             }
         }
     }
@@ -58,6 +94,26 @@ class QRCodeFragment : BaseFragment() {
     }
 
     override fun refreshScreen() {
-        binding?.title?.text = strings["scanCodeController.explanation"]
+        (activity as AppCompatActivity).supportActionBar?.title = strings[getTitleKey()]
+        binding?.title?.text = strings[getExplanationKey()]
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        if (requestCode == UiConstants.Permissions.CAMERA.ordinal) {
+            if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                resumeQrCodeReader()
+            } else if (!shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)) {
+                showingRationale = true
+                context?.showPermissionRationale(strings, "common.needCameraAccessToScan", "common.settings", false, {
+                    openAppSettings()
+                    showingRationale = false
+                }) {
+                    findNavControllerOrNull()?.navigateUp()
+                    showingRationale = false
+                }
+            }
+        } else {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        }
     }
 }

@@ -15,14 +15,13 @@ import android.os.Bundle
 import android.view.View
 import androidx.core.content.edit
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.observe
-import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.lunabeestudio.robert.RobertApplication
 import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.activity.MainActivity
+import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.dividerItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.lightButtonItem
@@ -31,9 +30,11 @@ import com.lunabeestudio.stopcovid.coreui.fastitem.switchItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
 import com.lunabeestudio.stopcovid.extension.areInfoNotificationsEnabled
 import com.lunabeestudio.stopcovid.extension.getString
+import com.lunabeestudio.stopcovid.extension.isolationManager
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
+import com.lunabeestudio.stopcovid.extension.venuesFeaturedWasActivatedAtLeastOneTime
 import com.lunabeestudio.stopcovid.fastitem.dangerButtonItem
 import com.lunabeestudio.stopcovid.manager.ProximityManager
 import com.lunabeestudio.stopcovid.model.DeviceSetup
@@ -51,9 +52,20 @@ class ManageDataFragment : MainFragment() {
         ProximityManager.getDeviceSetup(requireContext())
     }
 
+    private val isolationManager by lazy {
+        requireContext().isolationManager()
+    }
+
+    private val robertManager by lazy {
+        requireContext().robertManager()
+    }
+
     private val viewModel: ManageDataViewModel by viewModels {
-        ManageDataViewModelFactory(requireContext().secureKeystoreDataSource(),
-            requireContext().robertManager())
+        ManageDataViewModelFactory(
+            requireContext().secureKeystoreDataSource(),
+            robertManager,
+            isolationManager
+        )
     }
 
     override fun getTitleKey(): String = "manageDataController.title"
@@ -73,6 +85,12 @@ class ManageDataFragment : MainFragment() {
         viewModel.eraseAttestationsSuccess.observe(viewLifecycleOwner) {
             showSnackBar(strings["manageDataController.eraseLocalHistory.success"] ?: "")
         }
+        viewModel.eraseIsolationSuccess.observe(viewLifecycleOwner) {
+            showSnackBar(strings["manageDataController.eraseLocalHistory.success"] ?: "")
+        }
+        viewModel.eraseVenuesSuccess.observe(viewLifecycleOwner) {
+            showSnackBar(strings["manageDataController.eraseLocalHistory.success"] ?: "")
+        }
         viewModel.eraseLocalSuccess.observe(viewLifecycleOwner) {
             showSnackBar(strings["manageDataController.eraseLocalHistory.success"] ?: "")
         }
@@ -87,8 +105,10 @@ class ManageDataFragment : MainFragment() {
             sharedPreferences.edit {
                 remove(Constants.SharedPrefs.ON_BOARDING_DONE)
                 remove(Constants.SharedPrefs.IS_ADVERTISEMENT_AVAILABLE)
+                remove(Constants.SharedPrefs.PRIVATE_EVENT_QR_CODE_GENERATION_DATE)
+                remove(Constants.SharedPrefs.PRIVATE_EVENT_QR_CODE)
             }
-            findNavController().safeNavigate(ManageDataFragmentDirections.actionGlobalOnBoardingActivity())
+            findNavControllerOrNull()?.safeNavigate(ManageDataFragmentDirections.actionGlobalOnBoardingActivity())
             activity?.finishAndRemoveTask()
         }
     }
@@ -100,6 +120,14 @@ class ManageDataFragment : MainFragment() {
         spaceDividerItems(items)
         eraseAttestationItems(items)
         spaceDividerItems(items)
+        if (robertManager.displayIsolation) {
+            eraseIsolationItems(items)
+            spaceDividerItems(items)
+        }
+        if (sharedPreferences.venuesFeaturedWasActivatedAtLeastOneTime || robertManager.displayRecordVenues) {
+            eraseVenuesItems(items)
+            spaceDividerItems(items)
+        }
 
         if (deviceSetup != DeviceSetup.NO_BLE) {
             eraseLocalHistoryItems(items)
@@ -108,6 +136,9 @@ class ManageDataFragment : MainFragment() {
             spaceDividerItems(items)
             eraseRemoteAlertItems(items)
             spaceDividerItems(items)
+        }
+
+        if (deviceSetup != DeviceSetup.NO_BLE || robertManager.isRegistered) {
             quitStopCovidItems(items)
         }
 
@@ -143,6 +174,34 @@ class ManageDataFragment : MainFragment() {
         }
     }
 
+    private fun eraseVenuesItems(items: MutableList<GenericItem>) {
+        items += titleItem {
+            text = strings["manageDataController.venuesData.title"]
+            identifier = items.count().toLong()
+        }
+        items += spaceItem {
+            spaceRes = R.dimen.spacing_medium
+        }
+        items += captionItem {
+            text = strings["manageDataController.venuesData.subtitle"]
+            identifier = items.count().toLong()
+        }
+        items += lightButtonItem {
+            text = strings["manageDataController.venuesData.button"]
+            onClickListener = View.OnClickListener {
+                MaterialAlertDialogBuilder(requireContext())
+                    .setTitle(strings["manageDataController.venuesData.confirmationDialog.title"])
+                    .setMessage(strings["manageDataController.venuesData.confirmationDialog.message"])
+                    .setNegativeButton(strings["common.cancel"], null)
+                    .setPositiveButton(strings["common.confirm"]) { _, _ ->
+                        viewModel.eraseVenues(requireContext().applicationContext as RobertApplication)
+                    }
+                    .show()
+            }
+            identifier = items.count().toLong()
+        }
+    }
+
     private fun eraseAttestationItems(items: MutableList<GenericItem>) {
         items += titleItem {
             text = strings["manageDataController.attestationsData.title"]
@@ -164,6 +223,34 @@ class ManageDataFragment : MainFragment() {
                     .setNegativeButton(strings["common.cancel"], null)
                     .setPositiveButton(strings["common.confirm"]) { _, _ ->
                         viewModel.eraseAttestations()
+                    }
+                    .show()
+            }
+            identifier = items.count().toLong()
+        }
+    }
+
+    private fun eraseIsolationItems(items: MutableList<GenericItem>) {
+        items += titleItem {
+            text = strings["manageDataController.isolationData.title"]
+            identifier = items.count().toLong()
+        }
+        items += spaceItem {
+            spaceRes = R.dimen.spacing_medium
+        }
+        items += captionItem {
+            text = strings["manageDataController.isolationData.subtitle"]
+            identifier = items.count().toLong()
+        }
+        items += lightButtonItem {
+            text = strings["manageDataController.isolationData.button"]
+            onClickListener = View.OnClickListener {
+                MaterialAlertDialogBuilder(requireContext())
+                    .setTitle(strings["manageDataController.isolationData.confirmationDialog.title"])
+                    .setMessage(strings["manageDataController.isolationData.confirmationDialog.message"])
+                    .setNegativeButton(strings["common.cancel"], null)
+                    .setPositiveButton(strings["common.confirm"]) { _, _ ->
+                        viewModel.eraseIsolation()
                     }
                     .show()
             }

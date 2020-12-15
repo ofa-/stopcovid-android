@@ -15,6 +15,7 @@ import android.view.View
 import androidx.navigation.fragment.findNavController
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.callPhone
+import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.fastitem.buttonItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
@@ -73,7 +74,7 @@ class IsSickFragment : AboutMainFragment() {
             text = strings["sickController.button.cautionMeasures"]
             gravity = Gravity.CENTER
             onClickListener = View.OnClickListener {
-                findNavController().safeNavigate(IsSickFragmentDirections.actionIsSickFragmentToGestureFragment())
+                findNavControllerOrNull()?.safeNavigate(IsSickFragmentDirections.actionIsSickFragmentToGestureFragment())
             }
             identifier = items.count().toLong()
         }

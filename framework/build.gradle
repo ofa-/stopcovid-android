@@ -26,9 +26,12 @@ android {
             sourceCompatibility JavaVersion.VERSION_1_8
             targetCompatibility JavaVersion.VERSION_1_8
         }
+        kotlinOptions.jvmTarget = JavaVersion.VERSION_1_8.toString()
 
         buildConfigField 'String', 'BASE_URL', '"https://api.stopcovid.gouv.fr"'
+        buildConfigField 'String', 'WARNING_BASE_URL', '"https://tacw.tousanticovid.gouv.fr"'
         buildConfigField 'String', 'CERTIFICATE_SHA256', '"sha256/Up+TDyVDu8vKvd22TeAnXYxQqfPd2oNOU9Y04JahHpQ="'
+        buildConfigField 'String', 'WARNING_CERTIFICATE_SHA256', '"sha256/b7w+uqyD+XILNIlRc3XVmEROwFCVTv5yOchb2i5FJbo="'
         buildConfigField 'String', 'URL_PATH', '"api/v1"'
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"

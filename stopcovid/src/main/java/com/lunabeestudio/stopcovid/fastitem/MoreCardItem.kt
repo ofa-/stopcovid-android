@@ -23,15 +23,22 @@ import com.mikepenz.fastadapter.binding.AbstractBindingItem
 class MoreCardItem : AbstractBindingItem<ItemMoreCardBinding>() {
     var manageDataText: String? = null
     var manageDataOnClickListener: View.OnClickListener? = null
+    var shareText: String? = null
+    var shareOnClickListener: View.OnClickListener? = null
     var privacyText: String? = null
     var privacyOnClickListener: View.OnClickListener? = null
     var aboutText: String? = null
     var aboutOnClickListener: View.OnClickListener? = null
     var linksText: String? = null
     var linksOnClickListener: View.OnClickListener? = null
+    var venuesHistoryText: String? = null
+    var venuesHistoryOnClickListener: View.OnClickListener? = null
 
     @DrawableRes
     var linksIconRes: Int? = null
+
+    @DrawableRes
+    var venuesHistoryIconRes: Int? = null
 
     @DrawableRes
     var manageDataIconRes: Int? = null
@@ -41,6 +48,9 @@ class MoreCardItem : AbstractBindingItem<ItemMoreCardBinding>() {
 
     @DrawableRes
     var aboutIconRes: Int? = null
+
+    @DrawableRes
+    var shareIconRes: Int? = null
 
     override val type: Int = R.id.item_more_card
 
@@ -56,6 +66,12 @@ class MoreCardItem : AbstractBindingItem<ItemMoreCardBinding>() {
         binding.links.linkRootLayout.setOnClickListener(linksOnClickListener)
         binding.links.linkRootLayout.isVisible = !linksText.isNullOrEmpty()
         binding.links.arrowImageView.isVisible = false
+
+        binding.venuesHistory.textView.text = venuesHistoryText.safeEmojiSpanify()
+        venuesHistoryIconRes?.let(binding.venuesHistory.leftIconImageView::setImageResource)
+        binding.venuesHistory.linkRootLayout.setOnClickListener(venuesHistoryOnClickListener)
+        binding.venuesHistory.linkRootLayout.isVisible = !venuesHistoryText.isNullOrEmpty()
+        binding.venuesHistory.arrowImageView.isVisible = false
 
         binding.managerData.textView.text = manageDataText.safeEmojiSpanify()
         manageDataIconRes?.let(binding.managerData.leftIconImageView::setImageResource)
@@ -74,6 +90,12 @@ class MoreCardItem : AbstractBindingItem<ItemMoreCardBinding>() {
         binding.about.linkRootLayout.setOnClickListener(aboutOnClickListener)
         binding.about.linkRootLayout.isVisible = !aboutText.isNullOrEmpty()
         binding.about.arrowImageView.isVisible = false
+
+        binding.share.textView.text = shareText.safeEmojiSpanify()
+        shareIconRes?.let(binding.share.leftIconImageView::setImageResource)
+        binding.share.linkRootLayout.setOnClickListener(shareOnClickListener)
+        binding.share.linkRootLayout.isVisible = !shareText.isNullOrEmpty()
+        binding.share.arrowImageView.isVisible = false
     }
 }
 

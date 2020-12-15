@@ -17,11 +17,12 @@ import com.google.gson.reflect.TypeToken
 import com.lunabeestudio.domain.model.EphemeralBluetoothIdentifier
 import com.lunabeestudio.framework.local.LocalCryptoManager
 import com.lunabeestudio.robert.datasource.LocalEphemeralBluetoothIdentifierDataSource
+import timber.log.Timber
 import java.io.File
 
 class SecureFileEphemeralBluetoothIdentifierDataSource(
     context: Context,
-    private val cryptoManager: LocalCryptoManager
+    private val cryptoManager: LocalCryptoManager,
 ) : LocalEphemeralBluetoothIdentifierDataSource {
 
     private val epochFile = File(context.filesDir, "epochs")
@@ -40,10 +41,15 @@ class SecureFileEphemeralBluetoothIdentifierDataSource(
 
     @WorkerThread
     override fun getAll(): List<EphemeralBluetoothIdentifier> {
-        return if (epochFile.exists()) {
-            val json = cryptoManager.decryptToString(epochFile)
-            gson.fromJson(json, gsonEphemeralBluetoothIdentifierListType)
-        } else {
+        return try {
+            if (epochFile.exists()) {
+                val json = cryptoManager.decryptToString(epochFile)
+                gson.fromJson(json, gsonEphemeralBluetoothIdentifierListType)
+            } else {
+                emptyList()
+            }
+        } catch (e: Exception) {
+            Timber.e(e)
             emptyList()
         }
     }

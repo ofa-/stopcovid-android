@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ This Source Code Form is subject to the terms of the Mozilla Public
+  ~ License, v. 2.0. If a copy of the MPL was not distributed with this
+  ~ file, You can obtain one at https://mozilla.org/MPL/2.0/.
+  ~
+  ~ Authors
+  ~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ Created by Lunabee Studio / Date - 2020/12/12 - for the TOUS-ANTI-COVID project
+  -->
+
+<RadioGroup
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/stateRadioGroup"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingHorizontal="@dimen/spacing_large"
+    android:paddingTop="@dimen/spacing_large">
+
+    <TextView
+        android:id="@+id/groupTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:text="Lorem[1]"
+        android:textAppearance="@style/TextAppearance.StopCovid.Title" />
+
+    <RadioButton
+        android:id="@+id/stateAllGoodRadioButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="@dimen/spacing_large"
+        android:paddingVertical="@dimen/spacing_medium"
+        tools:text="lorem[1]" />
+
+    <RadioButton
+        android:id="@+id/stateSymptomsRadioButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="@dimen/spacing_large"
+        android:paddingVertical="@dimen/spacing_medium"
+        tools:text="lorem[1]" />
+
+    <RadioButton
+        android:id="@+id/stateContactRadioButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="@dimen/spacing_large"
+        android:paddingVertical="@dimen/spacing_medium"
+        tools:text="lorem[1]" />
+
+    <RadioButton
+        android:id="@+id/statePositiveRadioButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="@dimen/spacing_large"
+        android:paddingVertical="@dimen/spacing_medium"
+        tools:text="lorem[1]" />
+
+</RadioGroup>

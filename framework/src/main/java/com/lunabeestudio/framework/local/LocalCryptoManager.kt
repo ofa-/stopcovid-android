@@ -18,9 +18,12 @@ import android.security.KeyPairGeneratorSpec
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.util.Base64
+import androidx.core.content.edit
 import com.lunabeestudio.framework.utils.SelfDestroyCipherInputStream
 import com.lunabeestudio.framework.utils.SelfDestroyCipherOutputStream
 import com.lunabeestudio.robert.extension.randomize
+import com.lunabeestudio.robert.model.SecretKeyAlreadyGeneratedException
+import timber.log.Timber
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.IOException
@@ -62,6 +65,7 @@ class LocalCryptoManager(private val appContext: Context) {
 
     private val sharedPreferences: SharedPreferences = appContext.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE)
     private val localProtectionKey: SecretKey
+        @Synchronized
         get() = getAesGcmLocalProtectionKey(appContext)
 
     fun encryptToString(clearText: String): String {
@@ -91,13 +95,13 @@ class LocalCryptoManager(private val appContext: Context) {
             }
         }
 
-        val ciphertext = bos.toByteArray()
+        val cipherText = bos.toByteArray()
 
         if (clearPassphrase) {
             passphrase.randomize()
         }
 
-        return ciphertext
+        return cipherText
     }
 
     fun decrypt(encryptedText: String): ByteArray {
@@ -157,7 +161,7 @@ class LocalCryptoManager(private val appContext: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             secretKey = if (keyStore.containsAlias(AES_LOCAL_PROTECTION_KEY_ALIAS)) {
                 keyStore.getKey(AES_LOCAL_PROTECTION_KEY_ALIAS, null) as SecretKey
-            } else {
+            } else if (!sharedPreferences.getBoolean(SECRET_KEY_GENERATED_SHARED_PREFERENCE, false)) {
                 val generator: KeyGenerator = KeyGenerator.getInstance(
                     KeyProperties.KEY_ALGORITHM_AES,
                     ANDROID_KEY_STORE_PROVIDER
@@ -172,7 +176,15 @@ class LocalCryptoManager(private val appContext: Context) {
                         .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
                         .build()
                 )
+                sharedPreferences.edit {
+                    putBoolean(SECRET_KEY_GENERATED_SHARED_PREFERENCE, true)
+                }
                 generator.generateKey()
+            } else {
+                Timber.e("Secret key couldn't be found in the KeyStore but data are already encrypted with it\nkeystore aliases = ${
+                    keyStore.aliases().toList()
+                }")
+                throw SecretKeyAlreadyGeneratedException()
             }
         } else {
             val wrappedAesKeyString = sharedPreferences.getString(AES_WRAPPED_PROTECTION_KEY_SHARED_PREFERENCE, null)
@@ -305,6 +317,7 @@ class LocalCryptoManager(private val appContext: Context) {
         private const val RSA_WRAP_LOCAL_PROTECTION_KEY_ALIAS = "rsa_wrap_local_protection"
         private const val RSA_WRAP_CIPHER_TYPE = "RSA/NONE/PKCS1Padding"
         private const val AES_WRAPPED_PROTECTION_KEY_SHARED_PREFERENCE = "aes_wrapped_local_protection"
+        private const val SECRET_KEY_GENERATED_SHARED_PREFERENCE = "secret_key_generated"
 
         private const val BUFFER_SIZE = 4 * 256
 

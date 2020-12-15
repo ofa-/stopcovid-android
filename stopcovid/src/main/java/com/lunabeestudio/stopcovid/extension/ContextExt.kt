@@ -17,8 +17,12 @@ import com.lunabeestudio.framework.local.datasource.SecureKeystoreDataSource
 import com.lunabeestudio.robert.RobertApplication
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.stopcovid.StopCovid
+import com.lunabeestudio.stopcovid.`interface`.IsolationApplication
+import com.lunabeestudio.stopcovid.manager.IsolationManager
 
 fun Context.robertManager(): RobertManager = (applicationContext as RobertApplication).robertManager
+
+fun Context.isolationManager(): IsolationManager = (applicationContext as IsolationApplication).isolationManager
 
 fun Context.secureKeystoreDataSource(): SecureKeystoreDataSource = (applicationContext as StopCovid).secureKeystoreDataSource
 

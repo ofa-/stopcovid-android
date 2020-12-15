@@ -35,6 +35,8 @@
 
         <item name="materialCardViewStyle">@style/Widget.App.CardView</item>
         <item name="bottomSheetDialogTheme">@style/ThemeOverlay.StopCovid.BottomSheetDialog</item>
+
+        <item name="dividerColor">@color/color_mercury</item>
     </style>
 
     <!-- Base application theme. -->

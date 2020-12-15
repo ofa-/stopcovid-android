@@ -31,6 +31,10 @@ interface RobertManager {
 
     val isAtRisk: Boolean?
 
+    val isWarningAtRisk: Boolean?
+
+    val lastWarningReceivedDate: Long?
+
     val atRiskStatus: LiveData<Event<AtRiskStatus>>
 
     val atRiskLastRefresh: Long?
@@ -40,6 +44,8 @@ interface RobertManager {
     val atRiskMaxHourContactNotif: Int
 
     val lastExposureTimeframe: Int
+
+    val lastRiskReceivedDate: Long?
 
     val quarantinePeriod: Int
 
@@ -65,6 +71,8 @@ interface RobertManager {
 
     val apiVersion: String
 
+    val warningApiVersion: String
+
     val displayAttestation: Boolean
 
     val qrCodeDeletionHours: Float
@@ -79,7 +87,27 @@ interface RobertManager {
 
     val displayDepartmentLevel: Boolean
 
+    val displayRecordVenues: Boolean
+
+    val displayPrivateEvent: Boolean
+
+    val displayIsolation: Boolean
+
+    val privateEventVenueType: String
+
     val proximityReactivationReminderHours: List<Int>
+
+    val venuesTimestampRoundingInterval: Int
+
+    val venuesRetentionPeriod: Int
+
+    val reportSymptomsStartDate: Long?
+
+    val reportPositiveTestDate: Long?
+
+    val isolationDuration: Long
+
+    val postIsolationDuration: Long
 
     suspend fun refreshConfig(application: RobertApplication): RobertResult
 
@@ -92,12 +120,13 @@ interface RobertManager {
     suspend fun registerV2(
         application: RobertApplication,
         captcha: String,
-        captchaId: String
+        captchaId: String,
+        activateProximity: Boolean,
     ): RobertResult
 
     suspend fun activateProximity(
         application: RobertApplication,
-        statusTried: Boolean = false
+        statusTried: Boolean = false,
     ): RobertResult
 
     fun deactivateProximity(application: RobertApplication)
@@ -112,8 +141,10 @@ interface RobertManager {
         token: String,
         firstSymptoms: Int?,
         positiveTest: Int?,
-        application: RobertApplication
+        application: RobertApplication,
     ): RobertResult
+
+    suspend fun wreportIfNeeded(application: RobertApplication, shouldRetry: Boolean)
 
     suspend fun storeLocalProximity(vararg localProximity: LocalProximity)
 

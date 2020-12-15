@@ -12,6 +12,7 @@ package com.lunabeestudio.stopcovid.fastitem
 
 import android.view.Gravity
 import android.view.View
+import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.RecyclerView
@@ -25,6 +26,7 @@ class DangerButtonItem : BaseItem<DangerButtonItem.ViewHolder>(
 ) {
     var text: String? = null
     var gravity: Int = Gravity.NO_GRAVITY
+    var width: Int = ViewGroup.LayoutParams.WRAP_CONTENT
     var onClickListener: View.OnClickListener? = null
 
     override fun bindView(holder: ViewHolder, payloads: List<Any>) {
@@ -33,6 +35,7 @@ class DangerButtonItem : BaseItem<DangerButtonItem.ViewHolder>(
         holder.button.setOnClickListener(onClickListener)
         holder.button.updateLayoutParams<FrameLayout.LayoutParams> {
             this.gravity = this@DangerButtonItem.gravity
+            this.width = this@DangerButtonItem.width
         }
     }
 

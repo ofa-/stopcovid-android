@@ -12,6 +12,7 @@ package com.lunabeestudio.stopcovid.extension
 
 import android.util.MalformedJsonException
 import com.lunabeestudio.robert.model.BackendException
+import com.lunabeestudio.robert.model.ForbiddenException
 import com.lunabeestudio.robert.model.NoInternetException
 import com.lunabeestudio.robert.model.RobertException
 import com.lunabeestudio.robert.model.UnauthorizedException
@@ -25,10 +26,12 @@ internal fun Exception.remoteToRobertException(): RobertException = when (this) 
     is MalformedJsonException -> BackendException()
     is SSLException -> BackendException()
     is SocketTimeoutException,
-    is IOException -> NoInternetException()
+    is IOException,
+    -> NoInternetException()
     is HttpException -> {
         when (code()) {
             401 -> UnauthorizedException()
+            403 -> ForbiddenException()
             else -> BackendException()
         }
     }

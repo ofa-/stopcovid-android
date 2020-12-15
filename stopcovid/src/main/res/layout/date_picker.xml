@@ -5,11 +5,12 @@
   ~
   ~ Authors
   ~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  ~ Created by Lunabee Studio / Date - 2020/30/10 - for the STOP-COVID project
+  ~ Created by Lunabee Studio / Date - 2020/30/10 - for the TOUS-ANTI-COVID project
   -->
 <DatePicker
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:calendarViewShown="false"
-    android:datePickerMode="spinner" />
+    android:datePickerMode="spinner"
+    android:descendantFocusability="blocksDescendants" />

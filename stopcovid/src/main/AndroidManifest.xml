@@ -25,6 +25,9 @@
             <category android:name="android.intent.category.BROWSABLE" />
             <data android:scheme="https" />
         </intent>
+        <intent>
+            <action android:name="android.media.browse.MediaBrowserService" />
+        </intent>
     </queries>
 
     <application
@@ -42,6 +45,7 @@
         android:usesCleartextTraffic="false"
         tools:ignore="AllowBackup,HardcodedDebugMode,LockedOrientationActivity"
         tools:targetApi="m">
+
         <activity
             android:name=".activity.OnBoardingActivity"
             android:exported="true"

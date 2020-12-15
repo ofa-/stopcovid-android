@@ -30,6 +30,7 @@ class LinkItem : BaseItem<LinkItem.ViewHolder>(
     var gravity: Int = Gravity.CENTER_VERTICAL
     var url: String? = null
     var onClickListener: View.OnClickListener? = null
+    var forceShowArrow: Boolean = false
 
     @DrawableRes
     var iconRes: Int? = null
@@ -45,7 +46,7 @@ class LinkItem : BaseItem<LinkItem.ViewHolder>(
 
         iconRes?.let { holder.leftIconImageView.setImageResource(it) }
         holder.leftIconImageView.isVisible = iconRes != null
-        holder.arrowImageView.isVisible = url != null
+        holder.arrowImageView.isVisible = forceShowArrow || url != null
     }
 
     class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {

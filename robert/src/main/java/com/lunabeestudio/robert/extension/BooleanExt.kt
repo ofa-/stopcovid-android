@@ -12,8 +12,14 @@ package com.lunabeestudio.robert.extension
 
 import com.lunabeestudio.robert.model.AtRiskStatus
 
-fun Boolean?.toAtRiskStatus(): AtRiskStatus = when (this) {
+fun Boolean?.toAtRiskStatus(isWarningAtRisk: Boolean?): AtRiskStatus = when (this) {
     true -> AtRiskStatus.AT_RISK
-    false -> AtRiskStatus.NOT_AT_RISK
+    false -> {
+        if (isWarningAtRisk == true) {
+            AtRiskStatus.WARNING_AT_RISK
+        } else {
+            AtRiskStatus.NOT_AT_RISK
+        }
+    }
     null -> AtRiskStatus.UNKNOWN
 }

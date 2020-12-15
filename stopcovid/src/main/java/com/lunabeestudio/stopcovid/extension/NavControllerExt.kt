@@ -16,8 +16,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavDirections
 import androidx.navigation.NavOptions
 
-fun NavController.safeNavigate(@IdRes resId: Int, args: Bundle?,
-    navOptions: NavOptions?) {
+fun NavController.safeNavigate(@IdRes resId: Int, args: Bundle?, navOptions: NavOptions?) {
     try {
         navigate(resId, args, navOptions, null)
     } catch (e: IllegalArgumentException) {
@@ -27,7 +26,7 @@ fun NavController.safeNavigate(@IdRes resId: Int, args: Bundle?,
 
 fun NavController.safeNavigate(directions: NavDirections) {
     try {
-        navigate(directions.actionId, directions.arguments)
+        navigate(directions)
     } catch (e: IllegalArgumentException) {
         // back and button pressed quickly can trigger this exception.
     }

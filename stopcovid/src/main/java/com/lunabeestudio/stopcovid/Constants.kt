@@ -26,15 +26,23 @@ object Constants {
         const val IS_ADVERTISEMENT_AVAILABLE: String = "Is.Advertisement.Available"
         const val ARE_INFO_NOTIFICATIONS_ENABLED: String = "Are.Info.Notifications.Enabled"
         const val LAST_VERSION_CODE: String = "Last.Version.Code"
+        const val PRIVATE_EVENT_QR_CODE: String = "Private.Event.QR.Code"
+        const val PRIVATE_EVENT_QR_CODE_GENERATION_DATE: String = "Private.Event.QR.Code.Generation.Data"
+        const val VENUES_ON_BOARDING_DONE: String = "isVenueOnBoardingDone"
+        const val VENUES_FEATURED_ACTIVATED: String = "venuesFeaturedWasActivatedAtLeastOneTime"
     }
 
     object Notification {
         const val APP_IN_MAINTENANCE: String = "App.In.Maintenance"
+        const val SERVICE_ERROR: String = "Service.Error"
+        const val SERVICE_ERROR_EXTRA: String = "Service.Error.Extra"
     }
 
     object WorkerNames {
-        const val NOTIFICATION: String = "StopCovid.Notification.Worker"
-        const val REMINDER: String = "StopCovid.Reminder.Worker"
+        const val AT_RISK_NOTIFICATION: String = "StopCovid.AtRisk.Notification.Worker"
+        const val WARNING_NOTIFICATION: String = "StopCovid.Warning.Notification.Worker"
+        const val ACTIVATE_REMINDER: String = "StopCovid.Activate.Reminder.Worker"
+        const val ISOLATION_REMINDER: String = "StopCovid.Isolation.Reminder.Worker"
         const val TIME_CHANGED: String = "StopCovid.TimeChanged.Worker"
     }
 
@@ -46,5 +54,13 @@ object Constants {
         const val KEY_REASON: String = "reason"
         const val KEY_DATE_TIME: String = "datetime"
         const val VALUE_REASON_SPORT: String = "sport_animaux"
+    }
+
+    object Url {
+        const val VENUE_ROOT_URL: String = "https://tac.gouv.fr/"
+    }
+
+    object Android {
+        const val ANIMATION_DELAY: Long = 500L
     }
 }

@@ -11,12 +11,16 @@
 package com.lunabeestudio.robert
 
 import android.content.Context
+import com.lunabeestudio.domain.model.VenueQrCode
 
 interface RobertApplication {
     val robertManager: RobertManager
     fun getAppContext(): Context
     fun refreshProximityService()
     fun atRiskDetected()
+    fun warningAtRiskDetected()
     suspend fun sendClockNotAlignedNotification()
     fun refreshInfoCenter()
+    fun getVenueQrCodeList(startTime: Long?): List<VenueQrCode>?
+    fun clearVenueQrCodeList()
 }

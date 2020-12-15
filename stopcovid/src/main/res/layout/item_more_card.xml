@@ -25,6 +25,14 @@
             layout="@layout/item_link" />
 
         <include
+            android:id="@+id/share"
+            layout="@layout/item_link" />
+
+        <include
+            android:id="@+id/venuesHistory"
+            layout="@layout/item_link" />
+
+        <include
             android:id="@+id/managerData"
             layout="@layout/item_link" />
 

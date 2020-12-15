@@ -1,31 +1,61 @@
 [
-   {
-      "section": "Info Coronavirus",
-      "description": "Site web du gouvernement \"Informations Coronavirus\".",
-      "links": [
-         {
-            "label": "En savoir plus",
-            "url": "https://www.gouvernement.fr/info-coronavirus"
-         }
-      ]
-   },
-   {
-      "section": "Ameli.fr",
-      "description": "Voici plusieurs informations utiles fournies par Ameli.fr.",
-      "links": [
-         {
-            "label": "Contact tracing",
-            "url": "https://www.ameli.fr/assure/covid-19/tester-alerter-proteger-comprendre-la-strategie-pour-stopper-lepidemie/contact-tracing-arreter-les-chaines-de-transmission"
-         },
-         {
-            "label": "Arrêt de travail",
-            "url": "https://www.ameli.fr/assure/covid-19/arret-de-travail/covid-19-dispositif-dindemnisation-des-interruptions-de-travail"
-         },
-         {
-            "label": "Vous êtes cas contact ?",
-            "url": "https://www.ameli.fr/assure/covid-19/en-cas-de-contact-avec-une-personne-malade-du-covid-19/en-cas-de-contact-avec-une-personne-malade-de-la-covid-19"
-         }
+	{
+        "section": "Info Coronavirus",
+        "links": [
+	        {
+                "label": "Aller sur le site du gouvernement",
+                "url": "https://www.gouvernement.fr/info-coronavirus"
+            }
+        ]
+    },
+    {
+        "section": "Où se faire dépister",
+        "description" : "Pour trouver où se faire dépister, rendez vous sur Santé.fr.",
+        "links": [
+	        {
+                "label": "Trouver où se faire dépister",
+                "url": "https://sante.fr/recherche/trouver/DepistageCovid"
+            }
+        ]
+    },
+    {
+        "section": "Mes Conseils Covid",
+        "description" : "Retrouvez des conseils personnalisés de prévention et de prise en charge sur le site Mes Conseils Covid. Mes Conseils Covid est un service du ministère des Solidarités et de la Santé.",
+        "links": [
+	        {
+                "label": "Mes Conseils Covid",
+                "url": "https://mesconseilscovid.sante.gouv.fr/?source=TousAntiCovid#introduction"
+            }
+        ]
+    },
+    {
+        "section": "l'Assurance Maladie",
+        "description": "Voici plusieurs informations utiles fournies par Ameli.fr.",
+        "links": [
+	        {
+                "label": "Contact tracing",
+                "url": "https://www.ameli.fr/assure/covid-19/tester-alerter-proteger-comprendre-la-strategie-pour-stopper-lepidemie/contact-tracing-arreter-les-chaines-de-transmission"
+            },
+            {
+				"label": "Vous êtes une personne contact ?",
+                "url": "https://www.ameli.fr/assure/covid-19/en-cas-de-contact-avec-une-personne-malade-du-covid-19/en-cas-de-contact-avec-une-personne-malade-de-la-covid-19"
 
-      ]
-   }
+            },
+            {
+               	"label": "Arrêt de travail",
+                "url": "https://www.ameli.fr/assure/covid-19/arret-de-travail/covid-19-dispositif-dindemnisation-des-interruptions-de-travail"
+            }
+            
+        ]
+    },
+    {
+        "section": "Cnam.BriserLaChaine.org",
+        "description" : "En collaboration avec l'Assurance Maladie, le site internet Cnam.BriserLaChaine.org peut vous aider à vous souvenir de toutes les personnes que vous avez croisées",
+        "links": [
+	        {
+                "label": "Aller sur Cnam.BriserLaChaine.org",
+                "url": "https://cnam.briserlachaine.org/accueil"
+            }
+        ]
+    }
 ]

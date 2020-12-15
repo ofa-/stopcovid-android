@@ -14,38 +14,39 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.reflect.TypeToken
+import com.lunabeestudio.robert.utils.Event
 import com.lunabeestudio.stopcovid.coreui.R
 import com.lunabeestudio.stopcovid.coreui.UiConstants
 import com.lunabeestudio.stopcovid.coreui.extension.fixFormatter
+import com.lunabeestudio.stopcovid.coreui.extension.getFirstSupportedLanguage
 import java.lang.reflect.Type
-import java.util.Locale
 
 object StringsManager : ServerManager() {
 
     var strings: HashMap<String, String> = hashMapOf()
         private set(value) {
             if (field != value) {
-                _liveStrings.postValue(value)
+                _liveStrings.postValue(Event(value))
             }
             field = value
         }
 
-    private val _liveStrings: MutableLiveData<HashMap<String, String>> = MutableLiveData()
-    val liveStrings: LiveData<HashMap<String, String>>
+    private val _liveStrings: MutableLiveData<Event<HashMap<String, String>>> = MutableLiveData()
+    val liveStrings: LiveData<Event<HashMap<String, String>>>
         get() = _liveStrings
 
     private var prevLanguage: String? = null
 
     suspend fun initialize(context: Context) {
-        prevLanguage = Locale.getDefault().language
+        prevLanguage = context.getFirstSupportedLanguage()
         loadLocal<HashMap<String, String>>(context)?.let {
             strings = it
         }
     }
 
     suspend fun onAppForeground(context: Context) {
-        val languageHasChanged = prevLanguage != Locale.getDefault().language
-        prevLanguage = Locale.getDefault().language
+        val newLanguage = context.getFirstSupportedLanguage()
+        val languageHasChanged = prevLanguage != newLanguage
 
         if (languageHasChanged) {
             loadLocal<HashMap<String, String>>(context)?.let {
@@ -56,6 +57,7 @@ object StringsManager : ServerManager() {
         val hasFetch = fetchLast(context, languageHasChanged)
         if (hasFetch) {
             loadLocal<HashMap<String, String>>(context)?.let {
+                prevLanguage = newLanguage
                 strings = it
             }
         }

@@ -15,6 +15,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.AppBarLayout
@@ -23,6 +24,10 @@ import com.lunabeestudio.stopcovid.coreui.extension.closeKeyboardOnScroll
 import com.mikepenz.fastadapter.GenericItem
 import com.mikepenz.fastadapter.adapters.FastItemAdapter
 import com.mikepenz.fastadapter.adapters.GenericFastItemAdapter
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 abstract class FastAdapterFragment : BaseFragment() {
     protected var binding: FragmentRecyclerViewBinding? = null
@@ -30,11 +35,12 @@ abstract class FastAdapterFragment : BaseFragment() {
     protected abstract fun getItems(): List<GenericItem>
     protected abstract fun getAppBarLayout(): AppBarLayout?
     private var onScrollListener: RecyclerView.OnScrollListener? = null
+    private var refreshScreenJob: Job? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View? {
         adapter.attachDefaultListeners = false
         binding = FragmentRecyclerViewBinding.inflate(inflater, container, false)
@@ -45,12 +51,16 @@ abstract class FastAdapterFragment : BaseFragment() {
     }
 
     override fun refreshScreen() {
-        val items = getItems()
-        if (items.isEmpty()) {
-            showEmpty()
-        } else {
-            adapter.setNewList(items)
-            showData()
+        refreshScreenJob?.cancel()
+        refreshScreenJob = viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
+            delay(10)
+            val items = getItems()
+            if (items.isEmpty()) {
+                showEmpty()
+            } else {
+                adapter.setNewList(items)
+                showData()
+            }
         }
     }
 

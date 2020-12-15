@@ -61,10 +61,10 @@
 	            "code":"handicap"
             },
             {
-               "code":"convocation"
+	            "code":"sport_animaux"
             },
             {
-	            "code":"sport_animaux"
+               "code":"convocation"
             },
             {
                "code":"missions"

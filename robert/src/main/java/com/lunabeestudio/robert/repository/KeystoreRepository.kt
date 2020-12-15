@@ -19,6 +19,18 @@ internal class KeystoreRepository(
     private val robertManager: RobertManager,
 ) {
 
+    var reportPositiveTestDate: Long?
+        get() = keystoreDataSource.reportPositiveTestDate
+        set(value) {
+            keystoreDataSource.reportPositiveTestDate = value
+        }
+
+    var reportSymptomsStartDate: Long?
+        get() = keystoreDataSource.reportSymptomsStartDate
+        set(value) {
+            keystoreDataSource.reportSymptomsStartDate = value
+        }
+
     var shouldReloadBleSettings: Boolean
         get() = keystoreDataSource.shouldReloadBleSettings ?: false
         set(value) {
@@ -47,6 +59,20 @@ internal class KeystoreRepository(
         get() = keystoreDataSource.lastRiskReceivedDate
         set(value) {
             keystoreDataSource.lastRiskReceivedDate = value
+            robertManager.refreshAtRisk()
+        }
+
+    var isWarningAtRisk: Boolean?
+        get() = keystoreDataSource.isWarningAtRisk
+        set(value) {
+            keystoreDataSource.isWarningAtRisk = value
+            robertManager.refreshAtRisk()
+        }
+
+    var lastWarningReceivedDate: Long?
+        get() = keystoreDataSource.lastWarningReceivedDate
+        set(value) {
+            keystoreDataSource.lastWarningReceivedDate = value
             robertManager.refreshAtRisk()
         }
 
@@ -137,6 +163,12 @@ internal class KeystoreRepository(
             keystoreDataSource.dataRetentionPeriod = value
         }
 
+    var venuesRetentionPeriod: Int?
+        get() = keystoreDataSource.venuesRetentionPeriod
+        set(value) {
+            keystoreDataSource.venuesRetentionPeriod = value
+        }
+
     var quarantinePeriod: Int?
         get() = keystoreDataSource.quarantinePeriod
         set(value) {
@@ -174,6 +206,18 @@ internal class KeystoreRepository(
             keystoreDataSource.positiveSampleSpan = value
         }
 
+    var isolationDuration: Long?
+        get() = keystoreDataSource.isolationDuration
+        set(value) {
+            keystoreDataSource.isolationDuration = value
+        }
+
+    var postIsolationDuration: Long?
+        get() = keystoreDataSource.postIsolationDuration
+        set(value) {
+            keystoreDataSource.postIsolationDuration = value
+        }
+
     var appAvailability: Boolean?
         get() = keystoreDataSource.appAvailability
         set(value) {
@@ -186,10 +230,34 @@ internal class KeystoreRepository(
             keystoreDataSource.apiVersion = value
         }
 
+    var warningApiVersion: String?
+        get() = keystoreDataSource.warningApiVersion
+        set(value) {
+            keystoreDataSource.warningApiVersion = value
+        }
+
     var displayAttestation: Boolean?
         get() = keystoreDataSource.displayAttestation
         set(value) {
             keystoreDataSource.displayAttestation = value
+        }
+
+    var displayRecordVenues: Boolean?
+        get() = keystoreDataSource.displayRecordVenues
+        set(value) {
+            keystoreDataSource.displayRecordVenues = value
+        }
+
+    var displayPrivateEvent: Boolean?
+        get() = keystoreDataSource.displayPrivateEvent
+        set(value) {
+            keystoreDataSource.displayPrivateEvent = value
+        }
+
+    var displayIsolation: Boolean?
+        get() = keystoreDataSource.displayIsolation
+        set(value) {
+            keystoreDataSource.displayIsolation = value
         }
 
     var qrCodeDeletionHours: Float?
@@ -244,5 +312,29 @@ internal class KeystoreRepository(
         get() = keystoreDataSource.reportDate
         set(value) {
             keystoreDataSource.reportDate = value
+        }
+
+    var venuesTimestampRoundingInterval: Int?
+        get() = keystoreDataSource.venuesTimestampRoundingInterval
+        set(value) {
+            keystoreDataSource.venuesTimestampRoundingInterval = value
+        }
+
+    var privateEventVenueType: String?
+        get() = keystoreDataSource.privateEventVenueType
+        set(value) {
+            keystoreDataSource.privateEventVenueType = value
+        }
+
+    var reportValidationToken: String?
+        get() = keystoreDataSource.reportValidationToken
+        set(value) {
+            keystoreDataSource.reportValidationToken = value
+        }
+
+    var reportToSendTime: Long?
+        get() = keystoreDataSource.reportToSendTime
+        set(value) {
+            keystoreDataSource.reportToSendTime = value
         }
 }

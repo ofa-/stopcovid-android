@@ -11,12 +11,14 @@
 package com.lunabeestudio.stopcovid.fragment
 
 import android.view.Gravity
+import android.view.View
 import com.lunabeestudio.stopcovid.BuildConfig
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.dividerItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
+import com.lunabeestudio.stopcovid.extension.startEmailIntent
 import com.lunabeestudio.stopcovid.fastitem.linkItem
 import com.lunabeestudio.stopcovid.fastitem.logoItem
 import com.mikepenz.fastadapter.GenericItem
@@ -62,9 +64,12 @@ class AboutFragment : MainFragment() {
             identifier = items.count().toLong()
         }
         items += linkItem {
-            iconRes = R.drawable.ic_web
-            text = strings["aboutController.webpage"]
-            url = strings["aboutController.webpageUrl"]
+            iconRes = R.drawable.ic_email
+            text = strings["aboutController.contactUsByEmail"]
+            onClickListener = View.OnClickListener {
+                strings["aboutController.contactEmail"]?.startEmailIntent(requireContext())
+            }
+            forceShowArrow = true
             identifier = items.size.toLong()
         }
         items += dividerItem {
@@ -83,6 +88,15 @@ class AboutFragment : MainFragment() {
             iconRes = R.drawable.ic_feedback
             text = strings["aboutController.opinion"]
             url = strings["aboutController.opinionUrl"]
+            identifier = items.size.toLong()
+        }
+        items += dividerItem {
+            identifier = items.count().toLong()
+        }
+        items += linkItem {
+            iconRes = R.drawable.ic_web
+            text = strings["aboutController.webpage"]
+            url = strings["aboutController.webpageUrl"]
             identifier = items.size.toLong()
         }
 

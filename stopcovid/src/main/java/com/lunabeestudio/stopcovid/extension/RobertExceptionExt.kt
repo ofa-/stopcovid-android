@@ -18,6 +18,7 @@ import com.lunabeestudio.stopcovid.model.BLEProximityNotificationException
 import com.lunabeestudio.stopcovid.model.BLEScannerException
 import com.lunabeestudio.stopcovid.model.BackendException
 import com.lunabeestudio.stopcovid.model.CovidException
+import com.lunabeestudio.stopcovid.model.ForbiddenException
 import com.lunabeestudio.stopcovid.model.NoEphemeralBluetoothIdentifierFound
 import com.lunabeestudio.stopcovid.model.NoEphemeralBluetoothIdentifierFoundForEpoch
 import com.lunabeestudio.stopcovid.model.NoInternetException
@@ -25,6 +26,7 @@ import com.lunabeestudio.stopcovid.model.NoKeyException
 import com.lunabeestudio.stopcovid.model.ProximityException
 import com.lunabeestudio.stopcovid.model.ReportDelayException
 import com.lunabeestudio.stopcovid.model.RobertUnknownException
+import com.lunabeestudio.stopcovid.model.SecretKeyAlreadyGeneratedException
 import com.lunabeestudio.stopcovid.model.ServerDecryptException
 import com.lunabeestudio.stopcovid.model.TimeNotAlignedException
 import com.lunabeestudio.stopcovid.model.UnauthorizedException
@@ -34,6 +36,7 @@ fun RobertException?.toCovidException(): CovidException = if (this != null) {
     when (this.errorCode) {
         ErrorCode.UNKNOWN -> UnknownException(message)
         ErrorCode.UNAUTHORIZED -> UnauthorizedException(message)
+        ErrorCode.FORBIDDEN -> ForbiddenException(message)
         ErrorCode.BACKEND -> BackendException(message)
         ErrorCode.NO_INTERNET -> NoInternetException(message)
         ErrorCode.PROXIMITY_UNKNOWN -> ProximityException((this as? com.lunabeestudio.robert.model.ProximityException)?.throwable, message)
@@ -48,6 +51,7 @@ fun RobertException?.toCovidException(): CovidException = if (this != null) {
         ErrorCode.BLE_GATT -> BLEGattException(message)
         ErrorCode.TIME_NOT_ALIGNED -> TimeNotAlignedException(message)
         ErrorCode.REPORT_DELAY -> ReportDelayException(message)
+        ErrorCode.SECRET_KEY_ALREADY_GENERATED -> SecretKeyAlreadyGeneratedException(message)
     }
 } else {
     UnknownException()

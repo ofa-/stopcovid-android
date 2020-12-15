@@ -15,7 +15,9 @@ import com.lunabeestudio.stopcovid.model.ErrorCode
 
 fun CovidException.getString(strings: Map<String, String>): String = when (this.errorCode) {
     ErrorCode.NO_INTERNET -> strings["common.error.internet"] ?: message
-    ErrorCode.UNAUTHORIZED -> listOfNotNull(strings["common.error.unauthorized"], message).joinToString("\n")
+    ErrorCode.UNAUTHORIZED,
+    ErrorCode.FORBIDDEN,
+    -> listOfNotNull(strings["common.error.unauthorized"], message).joinToString("\n")
     ErrorCode.UNKNOWN -> listOfNotNull(strings["common.error.unknown"], message).joinToString("\n")
     ErrorCode.BACKEND -> strings["common.error.server"] ?: message
     ErrorCode.NEED_REGISTER -> strings["common.error.needRegister"] ?: message
@@ -31,4 +33,5 @@ fun CovidException.getString(strings: Map<String, String>): String = when (this.
     ErrorCode.BLE_GATT -> listOfNotNull(strings["common.error.bleGatt"], message).joinToString(" ")
     ErrorCode.TIME_NOT_ALIGNED -> strings["common.error.clockNotAligned.message"] ?: message
     ErrorCode.REPORT_DELAY -> strings["home.activation.sick.alert.message"] ?: message
+    ErrorCode.SECRET_KEY_ALREADY_GENERATED -> strings["common.error.secretKey"] ?: message
 }

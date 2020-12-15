@@ -13,17 +13,17 @@ package com.lunabeestudio.stopcovid.fragment
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.button.MaterialButton
 import com.lunabeestudio.stopcovid.R
+import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.extension.hideSoftKeyBoard
 import com.lunabeestudio.stopcovid.coreui.extension.showSoftKeyBoard
 import com.lunabeestudio.stopcovid.coreui.fastitem.buttonItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
-import com.lunabeestudio.stopcovid.extension.isCodeValid
+import com.lunabeestudio.stopcovid.extension.isReportCodeValid
 import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.extension.showInvalidCodeAlert
 import com.lunabeestudio.stopcovid.fastitem.editTextItem
@@ -107,10 +107,10 @@ class CodeFragment : MainFragment() {
 
     private fun verifyCode() {
         val trimmedCode = code.trim()
-        if (!trimmedCode.isCodeValid()) {
+        if (!trimmedCode.isReportCodeValid()) {
             context?.showInvalidCodeAlert(strings)
         } else {
-            findNavController().safeNavigate(CodeFragmentDirections.actionCodeFragmentToSymptomsOriginFragment(trimmedCode))
+            findNavControllerOrNull()?.safeNavigate(CodeFragmentDirections.actionCodeFragmentToSymptomsOriginFragment(trimmedCode))
         }
     }
 

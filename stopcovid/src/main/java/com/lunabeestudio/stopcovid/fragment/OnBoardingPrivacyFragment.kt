@@ -14,6 +14,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.navigation.fragment.findNavController
 import com.lunabeestudio.stopcovid.R
+import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.extension.fillItems
 import com.lunabeestudio.stopcovid.extension.safeNavigate
@@ -25,8 +26,8 @@ class OnBoardingPrivacyFragment : OnBoardingFragment() {
     override fun getTitleKey(): String = "onboarding.privacyController.title"
     override fun getButtonTitleKey(): String = "onboarding.privacyController.accept"
     override fun getOnButtonClick(): () -> Unit = {
-        findNavController()
-            .safeNavigate(OnBoardingPrivacyFragmentDirections.actionOnBoardingPrivacyFragmentToOnBoardingProximityFragment())
+        findNavControllerOrNull()
+            ?.safeNavigate(OnBoardingPrivacyFragmentDirections.actionOnBoardingPrivacyFragmentToOnBoardingProximityFragment())
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

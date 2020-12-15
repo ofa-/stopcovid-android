@@ -27,9 +27,13 @@
     <color name="color_persian_green">#00AC8C</color>
     <color name="color_mountain_meadow">#169B62</color>
     <color name="color_persimmon">#FF6F4D</color>
+    <color name="color_orange">#FD704E</color>
+    <color name="color_trinidad">#E14800</color>
     <color name="color_monza">#E1000F</color>
     <color name="color_east_bay">#484D7A</color>
     <color name="color_neon_carrot">#FF9940</color>
     <color name="color_persian_blue">#0F31C8</color>
     <color name="color_malibu">#85BBFF</color>
+    <color name="color_mercury">#E6E6E6</color>
+    <color name="color_mine_shaft">#313131</color>
 </resources>

@@ -15,7 +15,6 @@ import android.view.Gravity
 import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.github.razir.progressbutton.DrawableButton
 import com.github.razir.progressbutton.hideProgress
@@ -26,6 +25,7 @@ import com.lunabeestudio.robert.RobertApplication
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.StopCovid
 import com.lunabeestudio.stopcovid.activity.MainActivity
+import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
@@ -70,12 +70,12 @@ class SendHistoryFragment : MainFragment() {
             }
         }
         viewModel.codeSuccess.observe(viewLifecycleOwner) {
-            (requireContext().applicationContext as StopCovid).cancelReminder()
+            (requireContext().applicationContext as StopCovid).cancelActivateReminder()
             MaterialAlertDialogBuilder(requireContext())
                 .setTitle(strings["sendHistoryController.successAlert.title"])
                 .setMessage(strings["sendHistoryController.successAlert.message"])
                 .setPositiveButton(strings["sendHistoryController.successAlert.button.learnMore"]) { _, _ ->
-                    findNavController().safeNavigate(SendHistoryFragmentDirections.actionSendHistoryFragmentToIsSickFragment())
+                    findNavControllerOrNull()?.safeNavigate(SendHistoryFragmentDirections.actionSendHistoryFragmentToIsSickFragment())
                 }
                 .setCancelable(false)
                 .show()

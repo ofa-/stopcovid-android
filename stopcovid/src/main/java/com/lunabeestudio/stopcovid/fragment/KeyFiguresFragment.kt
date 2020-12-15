@@ -28,20 +28,24 @@ import android.view.Window
 import androidx.core.view.MenuItemCompat
 import androidx.core.view.isInvisible
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.lunabeestudio.robert.utils.EventObserver
+import com.lunabeestudio.robert.extension.observeEventAndConsume
 import com.lunabeestudio.stopcovid.R
+import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.extension.isNightMode
+import com.lunabeestudio.stopcovid.coreui.extension.viewLifecycleOwnerOrNull
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.databinding.ItemKeyFigureCardBinding
 import com.lunabeestudio.stopcovid.extension.chosenPostalCode
+import com.lunabeestudio.stopcovid.extension.colorStringKey
+import com.lunabeestudio.stopcovid.extension.descriptionStringKey
 import com.lunabeestudio.stopcovid.extension.formatNumberIfNeeded
 import com.lunabeestudio.stopcovid.extension.getKeyFigureForPostalCode
 import com.lunabeestudio.stopcovid.extension.getTrend
 import com.lunabeestudio.stopcovid.extension.hasChosenPostalCode
+import com.lunabeestudio.stopcovid.extension.labelStringKey
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.extension.showPostalCodeDialog
@@ -93,13 +97,13 @@ class KeyFiguresFragment : MainFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        KeyFiguresManager.figures.observe(viewLifecycleOwner, EventObserver(this.javaClass.name.hashCode()) {
+        KeyFiguresManager.figures.observeEventAndConsume(viewLifecycleOwner) {
             refreshScreen()
-        })
+        }
 
         binding?.emptyButton?.setOnClickListener {
             showLoading()
-            viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+            viewLifecycleOwnerOrNull()?.lifecycleScope?.launch(Dispatchers.IO) {
                 KeyFiguresManager.onAppForeground(requireContext())
                 withContext(Dispatchers.Main) {
                     refreshScreen()
@@ -107,7 +111,7 @@ class KeyFiguresFragment : MainFragment() {
             }
         }
 
-        findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<Boolean>(
+        findNavControllerOrNull()?.currentBackStackEntry?.savedStateHandle?.getLiveData<Boolean>(
             PostalCodeBottomSheetFragment.SHOULD_BE_REFRESHED_KEY
         )?.observe(viewLifecycleOwner) { shouldBeRefreshed ->
             if (shouldBeRefreshed) {
@@ -121,7 +125,7 @@ class KeyFiguresFragment : MainFragment() {
             if (sharedPrefs.chosenPostalCode == null) {
                 showPostalCodeDialog()
             } else {
-                findNavController().navigate(KeyFiguresFragmentDirections.actionKeyFiguresFragmentToPostalCodeBottomSheetFragment())
+                findNavControllerOrNull()?.safeNavigate(KeyFiguresFragmentDirections.actionKeyFiguresFragmentToPostalCodeBottomSheetFragment())
             }
             true
         } else {
@@ -149,7 +153,7 @@ class KeyFiguresFragment : MainFragment() {
                 items += linkItem {
                     text = strings["keyFiguresController.section.health.button"]
                     onClickListener = View.OnClickListener {
-                        findNavController().safeNavigate(KeyFiguresFragmentDirections.actionKeyFiguresFragmentToMoreKeyFiguresFragment())
+                        findNavControllerOrNull()?.safeNavigate(KeyFiguresFragmentDirections.actionKeyFiguresFragmentToMoreKeyFiguresFragment())
                     }
                     identifier = text.hashCode().toLong()
                 }
@@ -218,21 +222,17 @@ class KeyFiguresFragment : MainFragment() {
                 }
             )
 
-            label = strings["${figure.labelKey}.label"]
-            description = strings["${figure.labelKey}.description"]
+            label = strings[figure.labelStringKey]
+            description = strings[figure.descriptionStringKey]
             identifier = figure.labelKey.hashCode().toLong()
 
-            if (requireContext().isNightMode()) {
-                strings["${figure.labelKey}.colorCode.dark"]
-            } else {
-                strings["${figure.labelKey}.colorCode.light"]
-            }?.let {
+            strings[figure.colorStringKey(requireContext().isNightMode())]?.let {
                 color = parseColor(it)
             }
 
             shareContentDescription = strings["accessibility.hint.keyFigure.share"]
             onShareCard = { binding ->
-                viewLifecycleOwner.lifecycleScope.launch {
+                viewLifecycleOwnerOrNull()?.lifecycleScope?.launch {
                     val uri = getShareCaptureUri(binding, "$label")
                     withContext(Dispatchers.Main) {
                         yield()

@@ -80,3 +80,13 @@ fun String.fixFormatter() = this
     .replace(Regex("%\\d\\$@")) { matchResult ->
         matchResult.value.replace('@', 's')
     }
+
+fun String?.formatWithSameValue(value: Any?): String? {
+    return this?.let {
+        val placeholder = "%s"
+        val cleanedString = it.replace(placeholder, "")
+        val count = (this.count() - cleanedString.count()) / placeholder.count()
+        val values = Array(count) { value }
+        return String.format(it, *values)
+    }
+}

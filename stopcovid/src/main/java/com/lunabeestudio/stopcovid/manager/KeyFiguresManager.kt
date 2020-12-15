@@ -37,6 +37,12 @@ object KeyFiguresManager {
     val figures: LiveData<Event<List<KeyFigure>>>
         get() = _figures
 
+    val highlightedFigures: KeyFigure?
+        get() = _figures.value?.peekContent()?.firstOrNull { it.isFeatured && (it.isHighlighted == true) }
+
+    val featuredFigures: List<KeyFigure>?
+        get() = _figures.value?.peekContent()?.filter { it.isFeatured && (it.isHighlighted != true) }?.take(3)
+
     suspend fun initialize(context: Context) {
         loadLocal(context)?.let { figures ->
             if (_figures.value?.peekContent() != figures) {

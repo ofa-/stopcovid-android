@@ -2,19 +2,47 @@
   "config": [
 	{
       "name": "lastUpdate",
-      "value": "13 november 2020"
+      "value": "12 december 2020"
     },
     {
       "name": "version",
-      "value": 6
+      "value": 13
     },
     {
       "name": "app.apiVersion",
-      "value": "v3"
+      "value": "v4"
+    },
+    {
+      "name": "app.warningApiVersion",
+      "value": "v1"
     },
     {
       "name": "app.keyfigures.displayDepartmentLevel",
+      "value": true
+    },
+    {
+      "name": "app.displayIsolation",
+      "value": true
+    },
+    {
+      "name": "app.isolation.duration",
+      "value": 691200
+    },
+    {
+      "name": "app.postIsolation.duration",
+      "value": 691200
+    },
+    {
+      "name": "app.displayRecordVenues",
       "value": false
+    },
+    {
+      "name": "app.displayPrivateEvent",
+      "value": false
+    },
+    {
+      "name": "app.privateEventVenueType",
+      "value": "PEV"
     },
     {
       "name": "app.displayAttestation",
@@ -54,11 +82,15 @@
     },
     {
       "name": "app.qrCode.footerString",
-      "value": "<firstname> - <datetime-day>, <datetime-hour>\n<reason-shortlabel>"
+      "value": "<firstname> <lastname>\n<datetime-day>, <datetime-hour> <reason-shortlabel>"
     },
     {
-      "name": "app.randomStatusHour",
-      "value": 1
+      "name": "app.venuesTimestampRoundingInterval",
+      "value": 900
+    },
+    {
+      "name": "app.venuesRetentionPeriod",
+      "value": 14
     },
     {
       "name": "app.dataRetentionPeriod",
@@ -75,6 +107,10 @@
     {
       "name": "app.quarantinePeriod",
       "value": 14
+    },
+    {
+      "name": "app.randomStatusHour",
+      "value": 0.1
     },
     {
       "name": "app.checkStatusFrequency",
@@ -110,7 +146,7 @@
     },
     {
       "name": "ble.filterConfig",
-      "value": "{\"a\":4.3429448190325175,\"b\":0.1,\"deltas\":[39.0,27.0,23.0,21.0,20.0,19.0,18.0,17.0,16.0,15.0],\"durationThreshold\":120,\"p0\":-66.0,\"rssiThreshold\":-25,\"timeOverlap\":60,\"timeWindow\":120,\"riskThreshold\":0.1}"
+      "value": "{\"a\":4.3429448190325175,\"b\":0.1,\"deltas\":[29.6,20.9,18.5,17.6,16.9,15.5,15.0,15.0,15.0,15.0],\"durationThreshold\":90,\"p0\":-66.0,\"rssiThreshold\":-25,\"timeOverlap\":60,\"timeWindow\":120,\"riskThreshold\":0.1}"
     },
     {
       "name": "ble.filterMode",

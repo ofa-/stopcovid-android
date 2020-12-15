@@ -20,6 +20,18 @@ private const val HAUTE_CORSE_KEY: String = "2B"
 private val CORSE_DU_SUD: Array<String> = arrayOf("200", "201")
 private val OVERSEAS_FRANCE: Array<String> = arrayOf("97", "98")
 
+val KeyFigure.labelStringKey: String
+    get() = "$labelKey.label"
+
+val KeyFigure.descriptionStringKey: String
+    get() = "$labelKey.description"
+
+fun KeyFigure.colorStringKey(dark: Boolean?): String = if (dark == true) {
+    "$labelKey.colorCode.dark"
+} else {
+    "$labelKey.colorCode.light"
+}
+
 fun KeyFigure.getKeyFigureForPostalCode(postalCode: String?): DepartmentKeyFigure? {
     var key = postalCode?.take(2)
 
