@@ -77,15 +77,15 @@ class AttestationsFragment : MainFragment() {
 
     val reasonMap = mapOf(
         1 to "travail",
-        2 to "achats_culturel_cultuel",
-        6 to "sport_animaux",
-        9 to "enfants",
+        2 to "sante",
+        3 to "famille",
+        8 to "animaux",
     )
     val labelMap = mapOf(
         1 to "Travail",
-        2 to "Achats",
-        6 to "Plein air",
-        9 to "Enfants",
+        2 to "Santé",
+        3 to "Famille",
+        8 to "Animaux",
     )
 
     private fun generateNewAttestation(typ: Int) {
