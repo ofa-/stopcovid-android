@@ -121,6 +121,57 @@
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_proximityFragment_to_venueQrCodeFragment"
+            app:destination="@id/venueQrCodeFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_proximityFragment_to_venuesHistoryFragment"
+            app:destination="@id/venuesHistoryFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_proximityFragment_to_venuesPrivateEventFragment"
+            app:destination="@id/venuesPrivateEventFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_proximityFragment_to_isolationFormFragment"
+            app:destination="@id/isolationFormFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+    </fragment>
+    <fragment
+        android:id="@+id/isolationFormFragment"
+        android:name="com.lunabeestudio.stopcovid.fragment.IsolationFormFragment"
+        tools:layout="@layout/fragment_recycler_view" />
+    <fragment
+        android:id="@+id/venueOnBoardingFragment"
+        android:name="com.lunabeestudio.stopcovid.fragment.VenueOnBoardingFragment"
+        tools:layout="@layout/fragment_recycler_view">
+        <argument
+            android:name="venueFullPath"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
+        <action
+            android:id="@+id/action_venueOnBoardingFragment_to_venueQrCodeFragment"
+            app:destination="@id/venueQrCodeFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim"
+            app:popUpTo="@id/venueOnBoardingFragment"
+            app:popUpToInclusive="true" />
     </fragment>
     <dialog
         android:id="@+id/reminderBottomSheetDialogFragment"
@@ -193,7 +244,42 @@
     <fragment
         android:id="@+id/captchaFragment"
         android:name="com.lunabeestudio.stopcovid.fragment.CaptchaFragment"
-        tools:layout="@layout/fragment_recycler_view" />
+        tools:layout="@layout/fragment_recycler_view">
+        <argument
+            android:name="nextFragment"
+            app:argType="com.lunabeestudio.stopcovid.model.CaptchaNextFragment" />
+        <argument
+            android:name="venueFullPath"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
+        <action
+            android:id="@+id/action_captchaFragment_to_venueOnBoardingFragment"
+            app:destination="@id/venueOnBoardingFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim"
+            app:popUpTo="@id/captchaFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_captchaFragment_to_venueQrCodeFragment"
+            app:destination="@id/venueQrCodeFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim"
+            app:popUpTo="@id/captchaFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_captchaFragment_to_venuesPrivateEventFragment"
+            app:destination="@id/venuesPrivateEventFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim"
+            app:popUpTo="@id/proximityFragment" />
+    </fragment>
     <fragment
         android:id="@+id/reportFragment"
         android:name="com.lunabeestudio.stopcovid.fragment.ReportFragment"
@@ -217,8 +303,8 @@
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
         <action
-            android:id="@+id/action_reportFragment_to_qrCodeFragment"
-            app:destination="@id/qrCodeFragment"
+            android:id="@+id/action_reportFragment_to_reportQrCodeFragment"
+            app:destination="@id/reportQrCodeFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
@@ -281,11 +367,98 @@
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
     </fragment>
     <fragment
-        android:id="@+id/qrCodeFragment"
-        android:name="com.lunabeestudio.stopcovid.fragment.QRCodeFragment"
+        android:id="@+id/venueQrCodeFragment"
+        android:name="com.lunabeestudio.stopcovid.fragment.VenueQRCodeFragment"
+        tools:layout="@layout/fragment_qr_code">
+        <deepLink app:uri="tousanticovid://venueQRCode" />
+        <deepLink
+            android:autoVerify="true"
+            app:uri="https://tac.gouv.fr/0/{venueStaticPath}" />
+        <deepLink
+            android:autoVerify="true"
+            app:uri="https://tac.gouv.fr/1/{venueDynamicPath}" />
+        <argument
+            android:name="venueFullPath"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="venueStaticPath"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="venueDynamicPath"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
+        <action
+            android:id="@+id/action_venueQrCodeFragment_to_venueConfirmationFragment"
+            app:destination="@id/venueConfirmationFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim"
+            app:popUpTo="@id/proximityFragment" />
+        <action
+            android:id="@+id/action_venueQrCodeFragment_to_venueOnBoardingFragment"
+            app:destination="@id/venueOnBoardingFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim"
+            app:popUpTo="@id/proximityFragment" />
+        <action
+            android:id="@+id/action_venueQrCodeFragment_to_captchaFragment"
+            app:destination="@id/captchaFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim"
+            app:popUpTo="@id/proximityFragment" />
+        <action
+            android:id="@+id/action_venueQrCodeFragment_to_confirmVenueQrCodeFragment"
+            app:destination="@id/confirmVenueQrCodeFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim"
+            app:popUpTo="@id/proximityFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/confirmVenueQrCodeFragment"
+        android:name="com.lunabeestudio.stopcovid.fragment.ConfirmVenueQrCodeFragment"
+        tools:layout="@layout/fragment_qr_code">
+        <argument
+            android:name="venueFullPath"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_confirmVenueQrCodeFragment_to_venueConfirmationFragment"
+            app:destination="@id/venueConfirmationFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim"
+            app:popUpTo="@id/proximityFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/venueConfirmationFragment"
+        android:name="com.lunabeestudio.stopcovid.fragment.VenueConfirmationFragment"
+        tools:layout="@layout/fragment_qr_code">
+        <argument
+            android:name="venueType"
+            app:argType="string" />
+    </fragment>
+    <fragment
+        android:id="@+id/venuesPrivateEventFragment"
+        android:name="com.lunabeestudio.stopcovid.fragment.VenuesPrivateEventFragment"
+        tools:layout="@layout/fragment_qr_code" />
+    <fragment
+        android:id="@+id/reportQrCodeFragment"
+        android:name="com.lunabeestudio.stopcovid.fragment.ReportQRCodeFragment"
         tools:layout="@layout/fragment_qr_code">
         <action
-            android:id="@+id/action_qrCodeFragment_to_symptomsOriginFragment"
+            android:id="@+id/action_reportQrCodeFragment_to_symptomsOriginFragment"
             app:destination="@id/symptomsOriginFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
@@ -425,4 +598,8 @@
         android:id="@+id/postalCodeBottomSheetFragment"
         android:name="com.lunabeestudio.stopcovid.fragment.PostalCodeBottomSheetFragment"
         tools:layout="@layout/fragment_postal_code_bottom_sheet" />
+    <fragment
+        android:id="@+id/venuesHistoryFragment"
+        android:name="com.lunabeestudio.stopcovid.fragment.VenuesHistoryFragment"
+        tools:layout="@layout/fragment_recycler_view" />
 </navigation>

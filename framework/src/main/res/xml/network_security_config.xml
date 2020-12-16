@@ -18,6 +18,15 @@
         </trust-anchors>
     </domain-config>
     <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="true">tacw.tousanticovid.gouv.fr</domain>
+        <pin-set tools:ignore="MissingBackupPin">
+            <pin digest="SHA-256">b7w+uqyD+XILNIlRc3XVmEROwFCVTv5yOchb2i5FJbo=</pin>
+        </pin-set>
+        <trust-anchors>
+            <certificates src="@raw/tacw_tousanticovid_gouv_fr" />
+        </trust-anchors>
+    </domain-config>
+    <domain-config cleartextTrafficPermitted="false">
         <domain includeSubdomains="true">app.stopcovid.gouv.fr</domain>
         <pin-set tools:ignore="MissingBackupPin">
             <pin digest="SHA-256">sXQojvwsiyblrpMQIVRXGC5u7AgknzTJm+VIK1kQmD8=</pin>

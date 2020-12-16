@@ -35,6 +35,7 @@ class KeystoreDataSourceTest {
         context.getSharedPreferences("robert_prefs", Context.MODE_PRIVATE).edit().remove("shared.pref.time_start").commit()
         context.getSharedPreferences("robert_prefs", Context.MODE_PRIVATE).edit().remove("shared.pref.db_key").commit()
         context.getSharedPreferences("crypto_prefs", Context.MODE_PRIVATE).edit().remove("aes_wrapped_local_protection").commit()
+        context.getSharedPreferences("crypto_prefs", Context.MODE_PRIVATE).edit().remove("secret_key_generated").commit()
 
         keystoreDataSource = SecureKeystoreDataSource(context, LocalCryptoManager(context))
     }
@@ -50,12 +51,13 @@ class KeystoreDataSourceTest {
         context.getSharedPreferences("robert_prefs", Context.MODE_PRIVATE).edit().remove("shared.pref.time_start").commit()
         context.getSharedPreferences("robert_prefs", Context.MODE_PRIVATE).edit().remove("shared.pref.db_key").commit()
         context.getSharedPreferences("crypto_prefs", Context.MODE_PRIVATE).edit().remove("aes_wrapped_local_protection").commit()
+        context.getSharedPreferences("crypto_prefs", Context.MODE_PRIVATE).edit().remove("secret_key_generated").commit()
     }
 
     @Test
     fun saveKA_and_getKA() {
         val key = Random.nextBytes(16)
-        keystoreDataSource.kA = key
+        keystoreDataSource.kA = key.copyOf()
 
         val storedString = ApplicationProvider.getApplicationContext<Context>()
             .getSharedPreferences("robert_prefs", Context.MODE_PRIVATE)
@@ -73,7 +75,7 @@ class KeystoreDataSourceTest {
     @Test
     fun saveLongString_and_getLongString() {
         val key = Random.nextBytes(8732)
-        keystoreDataSource.kA = key
+        keystoreDataSource.kA = key.copyOf()
 
         val storedString = ApplicationProvider.getApplicationContext<Context>()
             .getSharedPreferences("robert_prefs", Context.MODE_PRIVATE)

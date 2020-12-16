@@ -18,9 +18,11 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.lunabeestudio.robert.extension.observeEventAndConsume
 import com.lunabeestudio.robert.utils.EventObserver
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.activity.MainActivity
+import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.dividerItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
@@ -74,16 +76,16 @@ class HealthFragment : TimeMainFragment() {
         viewModel.covidException.observe(viewLifecycleOwner) { covidException ->
             showErrorSnackBar(covidException.getString(strings))
         }
-        robertManager.atRiskStatus.observe(viewLifecycleOwner, EventObserver(this.javaClass.name.hashCode()) {
+        robertManager.atRiskStatus.observeEventAndConsume(viewLifecycleOwner) {
             refreshScreen()
-        })
+        }
     }
 
     override fun getItems(): List<GenericItem> {
         return when {
+            robertManager.isRegistered -> registeredItems()
             deviceSetup == DeviceSetup.NO_BLE -> noBleItems()
-            !robertManager.isRegistered -> notRegisteredItems()
-            else -> registeredItems()
+            else -> notRegisteredItems()
         }
     }
 
@@ -114,7 +116,7 @@ class HealthFragment : TimeMainFragment() {
                 true
             }
             R.id.notification_menu_learnmore -> {
-                findNavController().safeNavigate(HealthFragmentDirections.actionHealthFragmentToInformationFragment())
+                findNavControllerOrNull()?.safeNavigate(HealthFragmentDirections.actionHealthFragmentToInformationFragment())
                 true
             }
             else -> false
@@ -143,7 +145,7 @@ class HealthFragment : TimeMainFragment() {
         items += linkItem {
             text = strings["myHealthController.alert.atitudeToAdopt"]
             onClickListener = View.OnClickListener {
-                findNavController().safeNavigate(HealthFragmentDirections.actionHealthFragmentToInformationFragment())
+                findNavControllerOrNull()?.safeNavigate(HealthFragmentDirections.actionHealthFragmentToInformationFragment())
             }
             identifier = items.size.toLong()
         }
@@ -231,8 +233,8 @@ class HealthFragment : TimeMainFragment() {
             identifier = items.count().toLong()
         }
 
-        when (robertManager.isAtRisk) {
-            true -> {
+        when {
+            robertManager.isAtRisk == true -> {
                 val endExposureCalendar = Calendar.getInstance()
                 endExposureCalendar.add(Calendar.DAY_OF_YEAR, robertManager.quarantinePeriod - robertManager.lastExposureTimeframe)
                 val endExposureDate = endExposureCalendar.time
@@ -246,7 +248,7 @@ class HealthFragment : TimeMainFragment() {
                     caption = stringsFormat("sickController.state.contact.subtitle", dateFormat.format(endExposureDate))
                     more = strings["myHealthController.alert.atitudeToAdopt"]
                     moreClickListener = View.OnClickListener {
-                        findNavController().safeNavigate(HealthFragmentDirections.actionHealthFragmentToInformationFragment())
+                        findNavControllerOrNull()?.safeNavigate(HealthFragmentDirections.actionHealthFragmentToInformationFragment())
                     }
                     actionClickListener = View.OnClickListener {
                         showMenu(it)
@@ -255,7 +257,26 @@ class HealthFragment : TimeMainFragment() {
                     identifier = items.count().toLong()
                 }
             }
-            false -> {
+            robertManager.isWarningAtRisk == true -> {
+                items += contactItem(R.layout.item_warning_contact) {
+                    header = stringsFormat(
+                        "myHealthController.notification.update",
+                        robertManager.atRiskLastRefresh?.milliseconds?.getRelativeDateTimeString(requireContext())
+                    )
+                    title = strings["sickController.state.warning.title"]
+                    caption = strings["sickController.state.warning.subtitle"]
+                    more = strings["myHealthController.alert.atitudeToAdopt"]
+                    moreClickListener = View.OnClickListener {
+                        findNavControllerOrNull()?.safeNavigate(HealthFragmentDirections.actionHealthFragmentToInformationFragment())
+                    }
+                    actionClickListener = View.OnClickListener {
+                        showMenu(it)
+                    }
+                    actionContentDescription = strings["accessibility.hint.otherActions"]
+                    identifier = items.count().toLong()
+                }
+            }
+            robertManager.isAtRisk == false -> {
                 items += contactItem(R.layout.item_no_contact) {
                     header = stringsFormat(
                         "myHealthController.notification.update",
@@ -265,7 +286,7 @@ class HealthFragment : TimeMainFragment() {
                     caption = strings["sickController.state.nothing.subtitle"]
                     more = strings["myHealthController.alert.atitudeToAdopt"]
                     moreClickListener = View.OnClickListener {
-                        findNavController().safeNavigate(HealthFragmentDirections.actionHealthFragmentToInformationFragment())
+                        findNavControllerOrNull()?.safeNavigate(HealthFragmentDirections.actionHealthFragmentToInformationFragment())
                     }
                     actionClickListener = View.OnClickListener {
                         showMenu(it)

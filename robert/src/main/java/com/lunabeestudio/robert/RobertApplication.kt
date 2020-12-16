@@ -11,6 +11,7 @@
 package com.lunabeestudio.robert
 
 import android.content.Context
+import com.lunabeestudio.domain.model.VenueQrCode
 
 interface RobertApplication {
     val robertManager: RobertManager
@@ -24,6 +25,9 @@ interface RobertApplication {
     fun registerListener(listener: Listener?)
     fun notifyListener(notification: Any)
 
+    fun warningAtRiskDetected()
     suspend fun sendClockNotAlignedNotification()
     fun refreshInfoCenter()
+    fun getVenueQrCodeList(startTime: Long?): List<VenueQrCode>?
+    fun clearVenueQrCodeList()
 }

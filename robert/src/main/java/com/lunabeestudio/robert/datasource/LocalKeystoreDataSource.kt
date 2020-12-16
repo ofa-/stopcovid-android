@@ -13,12 +13,15 @@ package com.lunabeestudio.robert.datasource
 import androidx.lifecycle.LiveData
 import com.lunabeestudio.domain.model.DeviceParameterCorrection
 import com.lunabeestudio.domain.model.FormEntry
+import com.lunabeestudio.domain.model.VenueQrCode
 
 interface LocalKeystoreDataSource {
+
     var shouldReloadBleSettings: Boolean?
     var kA: ByteArray?
     var kEA: ByteArray?
     var timeStart: Long?
+    var isWarningAtRisk: Boolean?
     var atRiskLastRefresh: Long?
     var atRiskLastError: Long?
     var atRiskMinHourContactNotif: Int?
@@ -33,15 +36,22 @@ interface LocalKeystoreDataSource {
     var characteristicUUID: String?
     var backgroundServiceManufacturerData: String?
     var dataRetentionPeriod: Int?
+    var venuesRetentionPeriod: Int?
     var quarantinePeriod: Int?
     var checkStatusFrequency: Float?
     var minStatusRetryDuraction: Float?
     var randomStatusHour: Float?
     var preSymptomsSpan: Int?
     var positiveSampleSpan: Int?
+    var isolationDuration: Long?
+    var postIsolationDuration: Long?
     var appAvailability: Boolean?
     var apiVersion: String?
+    var warningApiVersion: String?
     var displayAttestation: Boolean?
+    var displayRecordVenues: Boolean?
+    var displayPrivateEvent: Boolean?
+    var displayIsolation: Boolean?
     var configVersion: Int?
     var lastRiskReceivedDate: Long?
     var qrCodeDeletionHours: Float?
@@ -56,4 +66,27 @@ interface LocalKeystoreDataSource {
     var savedAttestationData: Map<String, FormEntry>?
     var saveAttestationData: Boolean?
     var reportDate: Long?
+    var venuesTimestampRoundingInterval: Int?
+    var privateEventVenueType: String?
+    var reportValidationToken: String?
+    var reportToSendTime: Long?
+    var venuesQrCode: List<VenueQrCode>?
+
+    var reportPositiveTestDate: Long?
+    var reportSymptomsStartDate: Long?
+    var lastWarningReceivedDate: Long?
+
+    // Isolation vars
+    var isolationLastContactDate: Long?
+    var isolationIsKnownIndexAtHome: Boolean?
+    var isolationKnowsIndexSymptomsEndDate: Boolean?
+    var isolationIndexSymptomsEndDate: Long?
+    var isolationLastFormValidationDate: Long?
+    var isolationIsTestNegative: Boolean?
+    var isolationPositiveTestingDate: Long?
+    var isolationIsHavingSymptoms: Boolean?
+    var isolationSymptomsStartDate: Long?
+    var isolationIsStillHavingFever: Boolean?
+    var isolationIsFeverReminderScheduled: Boolean?
+    var isolationFormState: Int?
 }

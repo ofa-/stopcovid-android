@@ -185,6 +185,14 @@ class ProximityService : RobertProximityService() {
             robertManager.deactivateProximity(applicationContext as RobertApplication)
             lastError = error
             onError?.invoke(error)
+            // Send error in case service binding didn't have time to happen
+            if (onError == null) {
+                sendBroadcast(
+                    Intent()
+                        .setAction(com.lunabeestudio.stopcovid.Constants.Notification.SERVICE_ERROR)
+                        .putExtra(com.lunabeestudio.stopcovid.Constants.Notification.SERVICE_ERROR_EXTRA, error)
+                )
+            }
         }
     }
 

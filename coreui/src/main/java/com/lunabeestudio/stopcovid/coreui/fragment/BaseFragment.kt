@@ -15,6 +15,7 @@ import android.os.Bundle
 import android.text.format.DateUtils
 import android.view.View
 import androidx.fragment.app.Fragment
+import com.lunabeestudio.robert.extension.observeEventAndConsume
 import com.lunabeestudio.stopcovid.coreui.extension.stringsFormat
 import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
 import kotlin.time.Duration
@@ -27,14 +28,15 @@ abstract class BaseFragment : Fragment() {
 
     abstract fun refreshScreen()
 
-    protected val strings: HashMap<String, String>
+    val strings: HashMap<String, String>
         get() = StringsManager.strings
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        StringsManager.liveStrings.observe(viewLifecycleOwner) {
+        StringsManager.liveStrings.observeEventAndConsume(viewLifecycleOwner) {
             refreshScreen()
         }
+        refreshScreen()
     }
 
     protected fun stringsFormat(key: String, vararg args: Any?): String? {

@@ -14,6 +14,7 @@ import com.lunabeestudio.robert.manager.LocalProximityFilter
 
 object RobertConstant {
     const val API_VERSION: String = "v1"
+    const val WARNING_API_VERSION: String = "v1"
     const val STATUS_WORKER_NAME: String = "RobertManager.Status.Worker"
     const val EPOCH_DURATION_S: Int = 15 * 60
     const val KA_STRING_INPUT: String = "mac"
@@ -38,10 +39,16 @@ object RobertConstant {
     const val QR_CODE_FORMATTED_STRING_DISPLAYED: String = "Créé le <creationDate> à <creationHour>\nNom : <lastname>\nPrénom : <firstname>\nNaissance : <dob> à <cityofbirth>\nAdresse : <address> <zip> <city>\nSortie : <datetime-day> à <datetime-hour>\nMotif: <reason-code>"
     const val QR_CODE_FOOTER_STRING: String = "<firstname> - <datetime-day>, <datetime-hour>\n<reason-shortlabel>"
     const val REGISTER_DELAY_MONTH: Int = 2
+    const val VENUES_TIMESTAMP_ROUNDING_INTERVAL: Int = 900
+    const val VENUES_RETENTION_PERIOD: Int = 14
+    const val PRIVATE_EVENT_VENUE_TYPE: String = "PEV"
+    const val ISOLATION_DURATION: Long = 691200L
+    const val POST_ISOLATION_DURATION: Long = 691200L
 
     object CONFIG {
         const val CONFIG_VERSION: String = "version"
         const val API_VERSION: String = "app.apiVersion"
+        const val WARNING_API_VERSION: String = "app.warningApiVersion"
         const val DISPLAY_ATTESTATION: String = "app.displayAttestation"
         const val DATA_RETENTION_PERIOD: String = "app.dataRetentionPeriod"
         const val QUARANTINE_PERIOD: String = "app.quarantinePeriod"
@@ -64,7 +71,16 @@ object RobertConstant {
         const val QR_CODE_FORMATTED_STRING: String = "app.qrCode.formattedString"
         const val QR_CODE_FORMATTED_STRING_DISPLAYED: String = "app.qrCode.formattedStringDisplayed"
         const val QR_CODE_FOOTER_STRING: String = "app.qrCode.footerString"
+        const val VENUES_TIMESTAMP_ROUNDING_INTERVAL: String = "app.venuesTimestampRoundingInterval"
         const val PROXIMITY_REACTICATION_REMINDER_HOURS: String = "app.proximityReactivation.reminderHours"
+        const val VENUES_RETENTION_PERIOD: String = "app.venuesRetentionPeriod"
+        const val PRIVATE_EVENT_VENUE_TYPE: String = "app.privateEventVenueType"
+        const val DISPLAY_RECORD_VEMUES: String = "app.displayRecordVenues"
+        const val DISPLAY_PRIVATE_EVENT: String = "app.displayPrivateEvent"
+        const val DISPLAY_ISOLATION: String = "app.displayIsolation"
+        const val POSITIVE_SAMPLE_SPAN: String = "app.positiveSampleSpan"
+        const val ISOLATION_DURATION: String = "app.isolation.duration"
+        const val POST_ISOLATION_DURATION: String = "app.postIsolation.duration"
     }
 
     object PREFIX {

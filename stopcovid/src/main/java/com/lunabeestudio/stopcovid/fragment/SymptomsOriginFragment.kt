@@ -15,6 +15,7 @@ import android.view.View
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.lunabeestudio.stopcovid.R
+import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.dividerItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
@@ -54,8 +55,8 @@ class SymptomsOriginFragment : MainFragment() {
         items += doubleTextItem {
             title = strings["symptomsOriginController.noSymptoms"]
             onClickListener = View.OnClickListener {
-                findNavController()
-                    .safeNavigate(
+                findNavControllerOrNull()
+                    ?.safeNavigate(
                         SymptomsOriginFragmentDirections
                             .actionSymptomsOriginFragmentToPositiveTestFragment(args.code)
                     )
@@ -74,8 +75,8 @@ class SymptomsOriginFragment : MainFragment() {
                 this.title = title
                 caption = dateFormat.format(currentDate)
                 onClickListener = View.OnClickListener {
-                    findNavController()
-                        .safeNavigate(
+                    findNavControllerOrNull()
+                        ?.safeNavigate(
                             SymptomsOriginFragmentDirections
                                 .actionSymptomsOriginFragmentToSendHistoryFragment(args.code, Integer(index))
                         )
@@ -87,8 +88,8 @@ class SymptomsOriginFragment : MainFragment() {
         items += doubleTextItem {
             title = strings["common.iDontKnow"]
             onClickListener = View.OnClickListener {
-                findNavController()
-                    .safeNavigate(
+                findNavControllerOrNull()
+                    ?.safeNavigate(
                         SymptomsOriginFragmentDirections
                             .actionSymptomsOriginFragmentToPositiveTestFragment(args.code)
                     )

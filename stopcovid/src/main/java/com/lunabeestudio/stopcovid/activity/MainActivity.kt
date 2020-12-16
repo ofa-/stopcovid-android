@@ -20,10 +20,9 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
 import androidx.navigation.ui.NavigationUI.setupActionBarWithNavController
 import com.google.android.material.snackbar.Snackbar
+import com.lunabeestudio.robert.extension.observeEventAndConsume
 import com.lunabeestudio.stopcovid.R
-import com.lunabeestudio.stopcovid.coreui.databinding.LayoutButtonBottomSheetBinding
 import com.lunabeestudio.stopcovid.coreui.extension.applyAndConsumeWindowInsetBottom
-import com.lunabeestudio.stopcovid.coreui.extension.hideBottomSheet
 import com.lunabeestudio.stopcovid.coreui.extension.showSnackBar
 import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
 import com.lunabeestudio.stopcovid.databinding.ActivityMainBinding
@@ -31,7 +30,6 @@ import com.lunabeestudio.stopcovid.databinding.ActivityMainBinding
 class MainActivity : BaseActivity() {
 
     lateinit var binding: ActivityMainBinding
-    private lateinit var mergeBinding: LayoutButtonBottomSheetBinding
 
     private val navController: NavController by lazy {
         supportFragmentManager.findFragmentById(R.id.navHostFragment)!!.findNavController()
@@ -47,13 +45,11 @@ class MainActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
-        mergeBinding = LayoutButtonBottomSheetBinding.bind(binding.rootView)
 
         setSupportActionBar(binding.toolbar)
         setupNavigation()
 
-        binding.rootView.applyAndConsumeWindowInsetBottom()
-        mergeBinding.bottomSheetFrameLayout.hideBottomSheet()
+        binding.snackBarView.applyAndConsumeWindowInsetBottom()
         binding.toolbar.contentInsetStartWithNavigation = 0
 
         setContentView(binding.root)
@@ -98,7 +94,7 @@ class MainActivity : BaseActivity() {
     }
 
     private fun initStringsObserver() {
-        StringsManager.liveStrings.observe(this) { strings ->
+        StringsManager.liveStrings.observeEventAndConsume(this) { strings ->
             this.strings = strings
             invalidateOptionsMenu()
         }

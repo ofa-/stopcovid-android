@@ -13,6 +13,7 @@ package com.lunabeestudio.stopcovid.fragment
 import android.view.Gravity
 import androidx.navigation.fragment.findNavController
 import com.lunabeestudio.stopcovid.R
+import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
@@ -25,8 +26,8 @@ class OnBoardingExplanationFragment : OnBoardingFragment() {
     override fun getTitleKey(): String = "onboarding.explanationsController.title"
     override fun getButtonTitleKey(): String? = "onboarding.explanationsController.dataPrivacy"
     override fun getOnButtonClick(): () -> Unit = {
-        findNavController()
-            .safeNavigate(OnBoardingExplanationFragmentDirections.actionOnBoardingExplanationFragmentToOnBoardingPrivacyFragment())
+        findNavControllerOrNull()
+            ?.safeNavigate(OnBoardingExplanationFragmentDirections.actionOnBoardingExplanationFragmentToOnBoardingPrivacyFragment())
     }
 
     override fun getItems(): List<GenericItem> {

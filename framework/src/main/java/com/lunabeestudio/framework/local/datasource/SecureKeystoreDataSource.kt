@@ -12,771 +12,361 @@ package com.lunabeestudio.framework.local.datasource
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.core.content.edit
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.lunabeestudio.domain.model.DeviceParameterCorrection
 import com.lunabeestudio.domain.model.FormEntry
+import com.lunabeestudio.domain.model.VenueQrCode
 import com.lunabeestudio.framework.local.LocalCryptoManager
 import com.lunabeestudio.robert.datasource.LocalKeystoreDataSource
+import java.lang.reflect.Type
 
 class SecureKeystoreDataSource(context: Context, private val cryptoManager: LocalCryptoManager) : LocalKeystoreDataSource {
 
+    private var cache: HashMap<String, Any?> = hashMapOf()
     private val gson: Gson = Gson()
-
     private val sharedPreferences: SharedPreferences = context.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE)
 
     override var shouldReloadBleSettings: Boolean?
-        get() {
-            val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_SHOULD_RELOAD_BLE_SETTINGS, null)
-            return if (encryptedText != null) {
-                cryptoManager.decryptToString(encryptedText).toBoolean()
-            } else {
-                null
-            }
-        }
-        set(value) {
-            if (value != null) {
-                sharedPreferences.edit()
-                    .putString(SHARED_PREF_KEY_SHOULD_RELOAD_BLE_SETTINGS, cryptoManager.encryptToString(value.toString()))
-                    .apply()
-            } else {
-                sharedPreferences.edit().remove(SHARED_PREF_KEY_SHOULD_RELOAD_BLE_SETTINGS).apply()
-            }
-        }
+        get() = getEncryptedValue(SHARED_PREF_KEY_SHOULD_RELOAD_BLE_SETTINGS, Boolean::class.java)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_SHOULD_RELOAD_BLE_SETTINGS, value)
 
     override var kA: ByteArray?
-        get() {
-            val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_KA, null)
-            return if (encryptedText != null) {
-                cryptoManager.decrypt(encryptedText)
-            } else {
-                null
-            }
-        }
-        set(value) {
-            if (value != null) {
-                sharedPreferences.edit()
-                    .putString(SHARED_PREF_KEY_KA, cryptoManager.encryptToString(value))
-                    .apply()
-            } else {
-                sharedPreferences.edit().remove(SHARED_PREF_KEY_KA).apply()
-            }
-        }
+        get() = getEncryptedValue(SHARED_PREF_KEY_KA, ByteArray::class.java, useCache = false)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_KA, value, useCache = false)
 
     override var kEA: ByteArray?
-        get() {
-            val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_KEA, null)
-            return if (encryptedText != null) {
-                cryptoManager.decrypt(encryptedText)
-            } else {
-                null
-            }
-        }
-        set(value) {
-            if (value != null) {
-                sharedPreferences.edit()
-                    .putString(SHARED_PREF_KEY_KEA, cryptoManager.encryptToString(value))
-                    .apply()
-            } else {
-                sharedPreferences.edit().remove(SHARED_PREF_KEY_KEA).apply()
-            }
-        }
+        get() = getEncryptedValue(SHARED_PREF_KEY_KEA, ByteArray::class.java, useCache = false)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_KEA, value, useCache = false)
 
     override var timeStart: Long?
-        get() = sharedPreferences.getLong(SHARED_PREF_KEY_TIME_START, Long.MIN_VALUE).takeIf { it != Long.MIN_VALUE }
-        set(value) {
-            if (value != null) {
-                sharedPreferences.edit()
-                    .putLong(SHARED_PREF_KEY_TIME_START, value)
-                    .apply()
-            } else {
-                sharedPreferences.edit().remove(SHARED_PREF_KEY_TIME_START).apply()
-            }
-        }
+        get() = getAndMigrateOldUnencryptedLong(SHARED_PREF_KEY_TIME_START, SHARED_PREF_KEY_TIME_START_ENCRYPTED)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_TIME_START_ENCRYPTED, value)
+
+    override var isWarningAtRisk: Boolean?
+        get() = getEncryptedValue(SHARED_PREF_KEY_IS_WARNING_AT_RISK, Boolean::class.java, useCache = false)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_IS_WARNING_AT_RISK, value, useCache = false)
 
     override var atRiskLastRefresh: Long?
-        get() {
-            val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_AT_RISK_LAST_REFRESH, null)
-            return if (encryptedText != null) {
-                cryptoManager.decryptToString(encryptedText).toLongOrNull()
-            } else {
-                null
-            }
-        }
-        set(value) {
-            if (value != null) {
-                sharedPreferences.edit()
-                    .putString(SHARED_PREF_KEY_AT_RISK_LAST_REFRESH, cryptoManager.encryptToString(value.toString()))
-                    .apply()
-            } else {
-                sharedPreferences.edit().remove(SHARED_PREF_KEY_AT_RISK_LAST_REFRESH).apply()
-            }
-        }
+        get() = getEncryptedValue(SHARED_PREF_KEY_AT_RISK_LAST_REFRESH, Long::class.java)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_AT_RISK_LAST_REFRESH, value)
 
     override var atRiskLastError: Long?
-        get() {
-            val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_AT_RISK_LAST_ERROR, null)
-            return if (encryptedText != null) {
-                cryptoManager.decryptToString(encryptedText).toLongOrNull()
-            } else {
-                null
-            }
-        }
-        set(value) {
-            if (value != null) {
-                sharedPreferences.edit()
-                    .putString(SHARED_PREF_KEY_AT_RISK_LAST_ERROR, cryptoManager.encryptToString(value.toString()))
-                    .apply()
-            } else {
-                sharedPreferences.edit().remove(SHARED_PREF_KEY_AT_RISK_LAST_ERROR).apply()
-            }
-        }
+        get() = getEncryptedValue(SHARED_PREF_KEY_AT_RISK_LAST_ERROR, Long::class.java)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_AT_RISK_LAST_ERROR, value)
 
     override var atRiskMinHourContactNotif: Int?
-        get() {
-            val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_AT_RISK_MIN_HOUR_CONTACT_NOTIF, null)
-            return if (encryptedText != null) {
-                cryptoManager.decryptToString(encryptedText).toIntOrNull()
-            } else {
-                null
-            }
-        }
-        set(value) {
-            if (value != null) {
-                sharedPreferences.edit()
-                    .putString(SHARED_PREF_KEY_AT_RISK_MIN_HOUR_CONTACT_NOTIF, cryptoManager.encryptToString(value.toString()))
-                    .apply()
-            } else {
-                sharedPreferences.edit().remove(SHARED_PREF_KEY_AT_RISK_MIN_HOUR_CONTACT_NOTIF).apply()
-            }
-        }
+        get() = getEncryptedValue(SHARED_PREF_KEY_AT_RISK_MIN_HOUR_CONTACT_NOTIF, Int::class.java)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_AT_RISK_MIN_HOUR_CONTACT_NOTIF, value)
 
     override var atRiskMaxHourContactNotif: Int?
-        get() {
-            val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_AT_RISK_MAX_HOUR_CONTACT_NOTIF, null)
-            return if (encryptedText != null) {
-                cryptoManager.decryptToString(encryptedText).toIntOrNull()
-            } else {
-                null
-            }
-        }
-        set(value) {
-            if (value != null) {
-                sharedPreferences.edit()
-                    .putString(SHARED_PREF_KEY_AT_RISK_MAX_HOUR_CONTACT_NOTIF, cryptoManager.encryptToString(value.toString()))
-                    .apply()
-            } else {
-                sharedPreferences.edit().remove(SHARED_PREF_KEY_AT_RISK_MAX_HOUR_CONTACT_NOTIF).apply()
-            }
-        }
+        get() = getEncryptedValue(SHARED_PREF_KEY_AT_RISK_MAX_HOUR_CONTACT_NOTIF, Int::class.java)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_AT_RISK_MAX_HOUR_CONTACT_NOTIF, value)
 
     override var lastRiskReceivedDate: Long?
-        get() {
-            val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_LAST_RISK_RECEIVED_DATE, null)
-            return if (encryptedText != null) {
-                cryptoManager.decryptToString(encryptedText).toLongOrNull()
-            } else {
-                null
-            }
-        }
-        set(value) {
-            if (value != null) {
-                sharedPreferences.edit()
-                    .putString(SHARED_PREF_KEY_LAST_RISK_RECEIVED_DATE, cryptoManager.encryptToString(value.toString()))
-                    .apply()
-            } else {
-                sharedPreferences.edit().remove(SHARED_PREF_KEY_LAST_RISK_RECEIVED_DATE).apply()
-            }
-        }
+        get() = getEncryptedValue(SHARED_PREF_KEY_LAST_RISK_RECEIVED_DATE, Long::class.java)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_LAST_RISK_RECEIVED_DATE, value)
 
     override var lastExposureTimeframe: Int?
-        get() {
-            val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_LAST_EXPOSURE_TIMEFRAME, null)
-            return if (encryptedText != null) {
-                cryptoManager.decryptToString(encryptedText).toIntOrNull()
-            } else {
-                null
-            }
-        }
-        set(value) {
-            if (value != null) {
-                sharedPreferences.edit()
-                    .putString(SHARED_PREF_KEY_LAST_EXPOSURE_TIMEFRAME, cryptoManager.encryptToString(value.toString()))
-                    .apply()
-            } else {
-                sharedPreferences.edit().remove(SHARED_PREF_KEY_LAST_EXPOSURE_TIMEFRAME).apply()
-            }
-        }
+        get() = getEncryptedValue(SHARED_PREF_KEY_LAST_EXPOSURE_TIMEFRAME, Int::class.java, useCache = false)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_LAST_EXPOSURE_TIMEFRAME, value, useCache = false)
 
     override var proximityActive: Boolean?
-        get() {
-            val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_PROXIMITY_ACTIVE, null)
-            return if (encryptedText != null) {
-                cryptoManager.decryptToString(encryptedText).toBoolean()
-            } else {
-                null
-            }
-        }
-        set(value) {
-            if (value != null) {
-                sharedPreferences.edit()
-                    .putString(SHARED_PREF_KEY_PROXIMITY_ACTIVE, cryptoManager.encryptToString(value.toString()))
-                    .apply()
-            } else {
-                sharedPreferences.edit().remove(SHARED_PREF_KEY_PROXIMITY_ACTIVE).apply()
-            }
-        }
+        get() = getEncryptedValue(SHARED_PREF_KEY_PROXIMITY_ACTIVE, Boolean::class.java)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_PROXIMITY_ACTIVE, value)
 
     override var isSick: Boolean?
-        get() {
-            val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_IS_SICK, null)
-            return if (encryptedText != null) {
-                cryptoManager.decryptToString(encryptedText).toBoolean()
-            } else {
-                null
-            }
-        }
-        set(value) {
-            if (value != null) {
-                sharedPreferences.edit()
-                    .putString(SHARED_PREF_KEY_IS_SICK, cryptoManager.encryptToString(value.toString()))
-                    .apply()
-            } else {
-                sharedPreferences.edit().remove(SHARED_PREF_KEY_IS_SICK).apply()
-            }
-        }
+        get() = getEncryptedValue(SHARED_PREF_KEY_IS_SICK, Boolean::class.java, useCache = false)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_IS_SICK, value, useCache = false)
 
     override var calibration: List<DeviceParameterCorrection>?
-        get() {
-            val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_CALIBRATION, null)
-            return if (encryptedText != null) {
-                val typeToken = object : TypeToken<List<DeviceParameterCorrection>>() {}.type
-                Gson().fromJson(cryptoManager.decryptToString(encryptedText), typeToken)
-            } else {
-                null
-            }
-        }
-        set(value) {
-            if (value != null) {
-                sharedPreferences.edit()
-                    .putString(SHARED_PREF_KEY_CALIBRATION, cryptoManager.encryptToString(Gson().toJson(value)))
-                    .apply()
-            } else {
-                sharedPreferences.edit().remove(SHARED_PREF_KEY_CALIBRATION).apply()
-            }
-        }
+        get() = getEncryptedValue(SHARED_PREF_KEY_CALIBRATION, object : TypeToken<List<DeviceParameterCorrection>>() {}.type)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_CALIBRATION, value)
 
     override var filteringConfig: String?
-        get() {
-            val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_FILTERING_CONFIG, null)
-            return if (encryptedText != null) {
-                cryptoManager.decryptToString(encryptedText)
-            } else {
-                null
-            }
-        }
-        set(value) {
-            if (value != null) {
-                sharedPreferences.edit()
-                    .putString(SHARED_PREF_KEY_FILTERING_CONFIG, cryptoManager.encryptToString(value))
-                    .apply()
-            } else {
-                sharedPreferences.edit().remove(SHARED_PREF_KEY_FILTERING_CONFIG).apply()
-            }
-        }
+        get() = getEncryptedValue(SHARED_PREF_KEY_FILTERING_CONFIG, String::class.java)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_FILTERING_CONFIG, value)
 
     override var filteringMode: String?
-        get() {
-            val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_FILTERING_MODE, null)
-            return if (encryptedText != null) {
-                cryptoManager.decryptToString(encryptedText)
-            } else {
-                null
-            }
-        }
-        set(value) {
-            if (value != null) {
-                sharedPreferences.edit()
-                    .putString(SHARED_PREF_KEY_FILTERING_MODE, cryptoManager.encryptToString(value))
-                    .apply()
-            } else {
-                sharedPreferences.edit().remove(SHARED_PREF_KEY_FILTERING_MODE).apply()
-            }
-        }
+        get() = getEncryptedValue(SHARED_PREF_KEY_FILTERING_MODE, String::class.java)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_FILTERING_MODE, value)
 
     override var serviceUUID: String?
-        get() {
-            val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_SERVICE_UUID, null)
-            return if (encryptedText != null) {
-                cryptoManager.decryptToString(encryptedText)
-            } else {
-                null
-            }
-        }
-        set(value) {
-            if (value != null) {
-                sharedPreferences.edit()
-                    .putString(SHARED_PREF_KEY_SERVICE_UUID, cryptoManager.encryptToString(value))
-                    .apply()
-            } else {
-                sharedPreferences.edit().remove(SHARED_PREF_KEY_SERVICE_UUID).apply()
-            }
-        }
+        get() = getEncryptedValue(SHARED_PREF_KEY_SERVICE_UUID, String::class.java)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_SERVICE_UUID, value)
 
     override var characteristicUUID: String?
-        get() {
-            val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_CHARACTERISTIC_UUID, null)
-            return if (encryptedText != null) {
-                cryptoManager.decryptToString(encryptedText)
-            } else {
-                null
-            }
-        }
-        set(value) {
-            if (value != null) {
-                sharedPreferences.edit()
-                    .putString(SHARED_PREF_KEY_CHARACTERISTIC_UUID, cryptoManager.encryptToString(value))
-                    .apply()
-            } else {
-                sharedPreferences.edit().remove(SHARED_PREF_KEY_CHARACTERISTIC_UUID).apply()
-            }
-        }
+        get() = getEncryptedValue(SHARED_PREF_KEY_CHARACTERISTIC_UUID, String::class.java)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_CHARACTERISTIC_UUID, value)
 
     override var backgroundServiceManufacturerData: String?
-        get() {
-            val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_BACKGROUND_SERVICE_MANUFACTURER_DATA, null)
-            return if (encryptedText != null) {
-                cryptoManager.decryptToString(encryptedText)
-            } else {
-                null
-            }
-        }
-        set(value) {
-            if (value != null) {
-                sharedPreferences.edit()
-                    .putString(SHARED_PREF_KEY_BACKGROUND_SERVICE_MANUFACTURER_DATA, cryptoManager.encryptToString(value))
-                    .apply()
-            } else {
-                sharedPreferences.edit().remove(SHARED_PREF_KEY_BACKGROUND_SERVICE_MANUFACTURER_DATA).apply()
-            }
-        }
+        get() = getEncryptedValue(SHARED_PREF_KEY_BACKGROUND_SERVICE_MANUFACTURER_DATA, String::class.java)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_BACKGROUND_SERVICE_MANUFACTURER_DATA, value)
 
     override var dataRetentionPeriod: Int?
-        get() {
-            val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_DATA_RETENTION_PERIOD, null)
-            return if (encryptedText != null) {
-                cryptoManager.decryptToString(encryptedText).toIntOrNull()
-            } else {
-                null
-            }
-        }
-        set(value) {
-            if (value != null) {
-                sharedPreferences.edit()
-                    .putString(SHARED_PREF_KEY_DATA_RETENTION_PERIOD, cryptoManager.encryptToString(value.toString()))
-                    .apply()
-            } else {
-                sharedPreferences.edit().remove(SHARED_PREF_KEY_DATA_RETENTION_PERIOD).apply()
-            }
-        }
+        get() = getEncryptedValue(SHARED_PREF_KEY_DATA_RETENTION_PERIOD, Int::class.java)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_DATA_RETENTION_PERIOD, value)
+
+    override var venuesRetentionPeriod: Int?
+        get() = getEncryptedValue(SHARED_PREF_KEY_VENUES_RETENTION_PERIOD, Int::class.java)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_VENUES_RETENTION_PERIOD, value)
 
     override var quarantinePeriod: Int?
-        get() {
-            val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_QUARANTINE_PERIOD, null)
-            return if (encryptedText != null) {
-                cryptoManager.decryptToString(encryptedText).toIntOrNull()
-            } else {
-                null
-            }
-        }
-        set(value) {
-            if (value != null) {
-                sharedPreferences.edit()
-                    .putString(SHARED_PREF_KEY_QUARANTINE_PERIOD, cryptoManager.encryptToString(value.toString()))
-                    .apply()
-            } else {
-                sharedPreferences.edit().remove(SHARED_PREF_KEY_QUARANTINE_PERIOD).apply()
-            }
-        }
+        get() = getEncryptedValue(SHARED_PREF_KEY_QUARANTINE_PERIOD, Int::class.java)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_QUARANTINE_PERIOD, value)
 
     override var checkStatusFrequency: Float?
-        get() {
-            val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_CHECK_STATUS_FREQUENCY, null)
-            return if (encryptedText != null) {
-                cryptoManager.decryptToString(encryptedText).toFloatOrNull()
-            } else {
-                null
-            }
-        }
-        set(value) {
-            if (value != null) {
-                sharedPreferences.edit()
-                    .putString(SHARED_PREF_KEY_CHECK_STATUS_FREQUENCY, cryptoManager.encryptToString(value.toString()))
-                    .apply()
-            } else {
-                sharedPreferences.edit().remove(SHARED_PREF_KEY_CHECK_STATUS_FREQUENCY).apply()
-            }
-        }
+        get() = getEncryptedValue(SHARED_PREF_KEY_CHECK_STATUS_FREQUENCY, Float::class.java)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_CHECK_STATUS_FREQUENCY, value)
 
     override var minStatusRetryDuraction: Float?
-        get() {
-            val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_MIN_STATUS_RETRY_DURATION, null)
-            return if (encryptedText != null) {
-                cryptoManager.decryptToString(encryptedText).toFloatOrNull()
-            } else {
-                null
-            }
-        }
-        set(value) {
-            if (value != null) {
-                sharedPreferences.edit()
-                    .putString(SHARED_PREF_KEY_MIN_STATUS_RETRY_DURATION, cryptoManager.encryptToString(value.toString()))
-                    .apply()
-            } else {
-                sharedPreferences.edit().remove(SHARED_PREF_KEY_MIN_STATUS_RETRY_DURATION).apply()
-            }
-        }
+        get() = getEncryptedValue(SHARED_PREF_KEY_MIN_STATUS_RETRY_DURATION, Float::class.java)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_MIN_STATUS_RETRY_DURATION, value)
 
     override var randomStatusHour: Float?
-        get() {
-            val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_RANDOM_STATUS_HOUR, null)
-            return if (encryptedText != null) {
-                cryptoManager.decryptToString(encryptedText).toFloatOrNull()
-            } else {
-                null
-            }
-        }
-        set(value) {
-            if (value != null) {
-                sharedPreferences.edit()
-                    .putString(SHARED_PREF_KEY_RANDOM_STATUS_HOUR, cryptoManager.encryptToString(value.toString()))
-                    .apply()
-            } else {
-                sharedPreferences.edit().remove(SHARED_PREF_KEY_RANDOM_STATUS_HOUR).apply()
-            }
-        }
+        get() = getEncryptedValue(SHARED_PREF_KEY_RANDOM_STATUS_HOUR, Float::class.java)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_RANDOM_STATUS_HOUR, value)
 
     override var preSymptomsSpan: Int?
-        get() {
-            val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_PRE_SYMPTOMS_SPAN, null)
-            return if (encryptedText != null) {
-                cryptoManager.decryptToString(encryptedText).toIntOrNull()
-            } else {
-                null
-            }
-        }
-        set(value) {
-            if (value != null) {
-                sharedPreferences.edit()
-                    .putString(SHARED_PREF_KEY_PRE_SYMPTOMS_SPAN, cryptoManager.encryptToString(value.toString()))
-                    .apply()
-            } else {
-                sharedPreferences.edit().remove(SHARED_PREF_KEY_PRE_SYMPTOMS_SPAN).apply()
-            }
-        }
+        get() = getEncryptedValue(SHARED_PREF_KEY_PRE_SYMPTOMS_SPAN, Int::class.java)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_PRE_SYMPTOMS_SPAN, value)
 
     override var positiveSampleSpan: Int?
-        get() {
-            val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_POSITIVE_SAMPLE_SPAN, null)
-            return if (encryptedText != null) {
-                cryptoManager.decryptToString(encryptedText).toIntOrNull()
-            } else {
-                null
-            }
-        }
-        set(value) {
-            if (value != null) {
-                sharedPreferences.edit()
-                    .putString(SHARED_PREF_KEY_POSITIVE_SAMPLE_SPAN, cryptoManager.encryptToString(value.toString()))
-                    .apply()
-            } else {
-                sharedPreferences.edit().remove(SHARED_PREF_KEY_POSITIVE_SAMPLE_SPAN).apply()
-            }
-        }
+        get() = getEncryptedValue(SHARED_PREF_KEY_POSITIVE_SAMPLE_SPAN, Int::class.java)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_POSITIVE_SAMPLE_SPAN, value)
 
     override var appAvailability: Boolean?
-        get() {
-            val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_APP_AVAILABILITY, null)
-            return if (encryptedText != null) {
-                cryptoManager.decryptToString(encryptedText).toBoolean()
-            } else {
-                null
-            }
-        }
-        set(value) {
-            if (value != null) {
-                sharedPreferences.edit()
-                    .putString(SHARED_PREF_KEY_APP_AVAILABILITY, cryptoManager.encryptToString(value.toString()))
-                    .apply()
-            } else {
-                sharedPreferences.edit().remove(SHARED_PREF_KEY_APP_AVAILABILITY).apply()
-            }
-        }
+        get() = getEncryptedValue(SHARED_PREF_KEY_APP_AVAILABILITY, Boolean::class.java)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_APP_AVAILABILITY, value)
 
     override var displayDepartmentLevel: Boolean?
-        get() {
-            val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_DISPLAY_DEPARTMENT_LEVEL, null)
-            return if (encryptedText != null) {
-                cryptoManager.decryptToString(encryptedText).toBoolean()
-            } else {
-                null
-            }
-        }
-        set(value) {
-            if (value != null) {
-                sharedPreferences.edit()
-                    .putString(SHARED_PREF_KEY_DISPLAY_DEPARTMENT_LEVEL, cryptoManager.encryptToString(value.toString()))
-                    .apply()
-            } else {
-                sharedPreferences.edit().remove(SHARED_PREF_KEY_DISPLAY_DEPARTMENT_LEVEL).apply()
-            }
-        }
+        get() = getEncryptedValue(SHARED_PREF_KEY_DISPLAY_DEPARTMENT_LEVEL, Boolean::class.java)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_DISPLAY_DEPARTMENT_LEVEL, value)
 
     override var apiVersion: String?
-        get() {
-            val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_API_VERSION, null)
-            return if (encryptedText != null) {
-                cryptoManager.decryptToString(encryptedText)
-            } else {
-                null
-            }
-        }
-        set(value) {
-            if (value != null) {
-                sharedPreferences.edit()
-                    .putString(SHARED_PREF_KEY_API_VERSION, cryptoManager.encryptToString(value))
-                    .apply()
-            } else {
-                sharedPreferences.edit().remove(SHARED_PREF_KEY_API_VERSION).apply()
-            }
-        }
+        get() = getEncryptedValue(SHARED_PREF_KEY_API_VERSION, String::class.java)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_API_VERSION, value)
+
+    override var warningApiVersion: String?
+        get() = getEncryptedValue(SHARED_PREF_KEY_WARNING_API_VERSION, String::class.java)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_WARNING_API_VERSION, value)
 
     override var displayAttestation: Boolean?
-        get() {
-            val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_DISPLAY_ATTESTATION, null)
-            return if (encryptedText != null) {
-                cryptoManager.decryptToString(encryptedText).toBoolean()
-            } else {
-                null
-            }
-        }
-        set(value) {
-            if (value != null) {
-                sharedPreferences.edit()
-                    .putString(SHARED_PREF_KEY_DISPLAY_ATTESTATION, cryptoManager.encryptToString(value.toString()))
-                    .apply()
-            } else {
-                sharedPreferences.edit().remove(SHARED_PREF_KEY_DISPLAY_ATTESTATION).apply()
-            }
-        }
+        get() = getEncryptedValue(SHARED_PREF_KEY_DISPLAY_ATTESTATION, Boolean::class.java)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_DISPLAY_ATTESTATION, value)
+
+    override var displayRecordVenues: Boolean?
+        get() = getEncryptedValue(SHARED_PREF_KEY_DISPLAY_RECORD_VENUES, Boolean::class.java)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_DISPLAY_RECORD_VENUES, value)
+
+    override var displayPrivateEvent: Boolean?
+        get() = getEncryptedValue(SHARED_PREF_KEY_DISPLAY_PRIVATE_EVENT, Boolean::class.java)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_DISPLAY_PRIVATE_EVENT, value)
 
     override var qrCodeDeletionHours: Float?
-        get() {
-            val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_QR_CODE_DELETION_HOURS, null)
-            return if (encryptedText != null) {
-                cryptoManager.decryptToString(encryptedText).toFloatOrNull()
-            } else {
-                null
-            }
-        }
-        set(value) {
-            if (value != null) {
-                sharedPreferences.edit()
-                    .putString(SHARED_PREF_KEY_QR_CODE_DELETION_HOURS, cryptoManager.encryptToString(value.toString()))
-                    .apply()
-            } else {
-                sharedPreferences.edit().remove(SHARED_PREF_KEY_QR_CODE_DELETION_HOURS).apply()
-            }
-        }
+        get() = getEncryptedValue(SHARED_PREF_KEY_QR_CODE_DELETION_HOURS, Float::class.java)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_QR_CODE_DELETION_HOURS, value)
 
     override var qrCodeExpiredHours: Float?
-        get() {
-            val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_QR_CODE_EXPIRED_HOURS, null)
-            return if (encryptedText != null) {
-                cryptoManager.decryptToString(encryptedText).toFloatOrNull()
-            } else {
-                null
-            }
-        }
-        set(value) {
-            if (value != null) {
-                sharedPreferences.edit()
-                    .putString(SHARED_PREF_KEY_QR_CODE_EXPIRED_HOURS, cryptoManager.encryptToString(value.toString()))
-                    .apply()
-            } else {
-                sharedPreferences.edit().remove(SHARED_PREF_KEY_QR_CODE_EXPIRED_HOURS).apply()
-            }
-        }
+        get() = getEncryptedValue(SHARED_PREF_KEY_QR_CODE_EXPIRED_HOURS, Float::class.java)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_QR_CODE_EXPIRED_HOURS, value)
 
     override var qrCodeFormattedString: String?
-        get() {
-            val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_QR_CODE_FORMATTED_STRING, null)
-            return if (encryptedText != null) {
-                cryptoManager.decryptToString(encryptedText)
-            } else {
-                null
-            }
-        }
-        set(value) {
-            if (value != null) {
-                sharedPreferences.edit()
-                    .putString(SHARED_PREF_KEY_QR_CODE_FORMATTED_STRING, cryptoManager.encryptToString(value))
-                    .apply()
-            } else {
-                sharedPreferences.edit().remove(SHARED_PREF_KEY_QR_CODE_FORMATTED_STRING).apply()
-            }
-        }
+        get() = getEncryptedValue(SHARED_PREF_KEY_QR_CODE_FORMATTED_STRING, String::class.java)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_QR_CODE_FORMATTED_STRING, value)
 
     override var qrCodeFormattedStringDisplayed: String?
-        get() {
-            val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_QR_CODE_FORMATTED_STRING_DISPLAYED, null)
-            return if (encryptedText != null) {
-                cryptoManager.decryptToString(encryptedText)
-            } else {
-                null
-            }
-        }
-        set(value) {
-            if (value != null) {
-                sharedPreferences.edit()
-                    .putString(SHARED_PREF_KEY_QR_CODE_FORMATTED_STRING_DISPLAYED, cryptoManager.encryptToString(value))
-                    .apply()
-            } else {
-                sharedPreferences.edit().remove(SHARED_PREF_KEY_QR_CODE_FORMATTED_STRING_DISPLAYED).apply()
-            }
-        }
+        get() = getEncryptedValue(SHARED_PREF_KEY_QR_CODE_FORMATTED_STRING_DISPLAYED, String::class.java)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_QR_CODE_FORMATTED_STRING_DISPLAYED, value)
 
     override var qrCodeFooterString: String?
-        get() {
-            val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_QR_CODE_FOOTER_STRING, null)
-            return if (encryptedText != null) {
-                cryptoManager.decryptToString(encryptedText)
-            } else {
-                null
-            }
-        }
-        set(value) {
-            if (value != null) {
-                sharedPreferences.edit()
-                    .putString(SHARED_PREF_KEY_QR_CODE_FOOTER_STRING, cryptoManager.encryptToString(value))
-                    .apply()
-            } else {
-                sharedPreferences.edit().remove(SHARED_PREF_KEY_QR_CODE_FOOTER_STRING).apply()
-            }
-        }
+        get() = getEncryptedValue(SHARED_PREF_KEY_QR_CODE_FOOTER_STRING, String::class.java)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_QR_CODE_FOOTER_STRING, value)
 
     override var proximityReactivationReminderHours: List<Int>?
-        get() {
-            val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_PROXIMITY_REACTIVATE_REMINDER_HOURS, null)
-            return if (encryptedText != null) {
-                Gson().fromJson(cryptoManager.decryptToString(encryptedText), object : TypeToken<List<Int>>() {}.type)
-            } else {
-                null
-            }
-        }
-        set(value) {
-            if (value != null) {
-                sharedPreferences.edit()
-                    .putString(SHARED_PREF_KEY_PROXIMITY_REACTIVATE_REMINDER_HOURS, cryptoManager.encryptToString(Gson().toJson(value)))
-                    .apply()
-            } else {
-                sharedPreferences.edit().remove(SHARED_PREF_KEY_PROXIMITY_REACTIVATE_REMINDER_HOURS).apply()
-            }
-        }
+        get() = getEncryptedValue(SHARED_PREF_KEY_PROXIMITY_REACTIVATE_REMINDER_HOURS, object : TypeToken<List<Int>>() {}.type)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_PROXIMITY_REACTIVATE_REMINDER_HOURS, value)
 
     override var saveAttestationData: Boolean?
-        get() {
-            val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_SAVE_ATTESTATION_DATA, null)
-            return if (encryptedText != null) {
-                cryptoManager.decryptToString(encryptedText).toBoolean()
-            } else {
-                null
-            }
-        }
-        set(value) {
-            if (value != null) {
-                sharedPreferences.edit()
-                    .putString(SHARED_PREF_KEY_SAVE_ATTESTATION_DATA, cryptoManager.encryptToString(value.toString()))
-                    .apply()
-            } else {
-                sharedPreferences.edit().remove(SHARED_PREF_KEY_SAVE_ATTESTATION_DATA).apply()
-            }
-        }
+        get() = getEncryptedValue(SHARED_PREF_KEY_SAVE_ATTESTATION_DATA, Boolean::class.java)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_SAVE_ATTESTATION_DATA, value)
 
     override var savedAttestationData: Map<String, FormEntry>?
-        get() {
-            val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_SAVED_ATTESTATION_DATA, null)
-            return if (encryptedText != null) {
-                gson.fromJson(cryptoManager.decryptToString(encryptedText), object : TypeToken<Map<String, FormEntry>>() {}.type)
-            } else {
-                null
-            }
-        }
-        set(value) {
-            if (value != null) {
-                sharedPreferences.edit()
-                    .putString(SHARED_PREF_KEY_SAVED_ATTESTATION_DATA, cryptoManager.encryptToString(gson.toJson(value)))
-                    .apply()
-            } else {
-                sharedPreferences.edit().remove(SHARED_PREF_KEY_SAVED_ATTESTATION_DATA).apply()
-            }
-        }
+        get() = getEncryptedValue(SHARED_PREF_KEY_SAVED_ATTESTATION_DATA, object : TypeToken<Map<String, FormEntry>>() {}.type)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_SAVED_ATTESTATION_DATA, value)
 
     private var _attestationsLiveData: MutableLiveData<List<Map<String, FormEntry>>?> = MutableLiveData(attestations)
     override val attestationsLiveData: LiveData<List<Map<String, FormEntry>>?>
         get() = _attestationsLiveData
     override var attestations: List<Map<String, FormEntry>>?
-        get() {
-            val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_ATTESTATIONS, null)
-            return if (encryptedText != null) {
-                gson.fromJson(cryptoManager.decryptToString(encryptedText), object : TypeToken<List<Map<String, FormEntry>>>() {}.type)
-            } else {
-                null
-            }
-        }
+        get() = getEncryptedValue(SHARED_PREF_KEY_ATTESTATIONS, object : TypeToken<List<Map<String, FormEntry>>>() {}.type)
         set(value) {
-            if (value != null) {
-                sharedPreferences.edit()
-                    .putString(SHARED_PREF_KEY_ATTESTATIONS, cryptoManager.encryptToString(gson.toJson(value)))
-                    .apply()
-            } else {
-                sharedPreferences.edit().remove(SHARED_PREF_KEY_ATTESTATIONS).apply()
-            }
+            setEncryptedValue(SHARED_PREF_KEY_ATTESTATIONS, value)
             _attestationsLiveData.postValue(value)
         }
 
     override var configVersion: Int?
-        get() {
-            val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_CONFIG_VERSION, null)
+        get() = getEncryptedValue(SHARED_PREF_KEY_CONFIG_VERSION, Int::class.java)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_CONFIG_VERSION, value)
+
+    override var venuesTimestampRoundingInterval: Int?
+        get() = getEncryptedValue(SHARED_PREF_KEY_VENUES_TIMESTAMP_ROUNDING_INTERVAL, Int::class.java)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_VENUES_TIMESTAMP_ROUNDING_INTERVAL, value)
+
+    override var reportDate: Long?
+        get() = getAndMigrateOldUnencryptedLong(SHARED_PREF_KEY_REPORT_DATE, SHARED_PREF_KEY_REPORT_DATE_ENCRYPTED)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_REPORT_DATE_ENCRYPTED, value)
+
+    override var reportValidationToken: String?
+        get() = getEncryptedValue(SHARED_PREF_KEY_REPORT_VALIDATION_TOKEN, String::class.java)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_REPORT_VALIDATION_TOKEN, value)
+
+    override var venuesQrCode: List<VenueQrCode>?
+        get() = getEncryptedValue(SHARED_PREF_KEY_SAVE_DATA_VENUES_QR_CODE, object : TypeToken<List<VenueQrCode>>() {}.type)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_SAVE_DATA_VENUES_QR_CODE, value)
+
+    override var privateEventVenueType: String?
+        get() = getEncryptedValue(SHARED_PREF_KEY_PRIVATE_EVENT_VENUE_TYPE, String::class.java)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_PRIVATE_EVENT_VENUE_TYPE, value)
+
+    override var reportToSendTime: Long?
+        get() = getEncryptedValue(SHARED_PREF_KEY_REPORT_TO_SEND_TIME, Long::class.java)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_REPORT_TO_SEND_TIME, value)
+
+    override var displayIsolation: Boolean?
+        get() = getEncryptedValue(SHARED_PREF_KEY_DISPLAY_ISOLATION, Boolean::class.java)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_DISPLAY_ISOLATION, value)
+
+    override var reportPositiveTestDate: Long?
+        get() = getEncryptedValue(SHARED_PREF_KEY_REPORT_POSITIVE_TEST_DATE, Long::class.java)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_REPORT_POSITIVE_TEST_DATE, value)
+
+    override var reportSymptomsStartDate: Long?
+        get() = getEncryptedValue(SHARED_PREF_KEY_REPORT_SYMPTOMS_DATE, Long::class.java)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_REPORT_SYMPTOMS_DATE, value)
+
+    override var lastWarningReceivedDate: Long?
+        get() = getEncryptedValue(SHARED_PREF_KEY_WARNING_RECEIVED_DATE, Long::class.java)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_WARNING_RECEIVED_DATE, value)
+
+    // Isolation vars
+    override var isolationFormState: Int?
+        get() = getEncryptedValue(SHARED_PREF_KEY_ISOLATION_FORM_STATE, Int::class.java)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_ISOLATION_FORM_STATE, value)
+
+    override var isolationLastContactDate: Long?
+        get() = getEncryptedValue(SHARED_PREF_KEY_ISOLATION_LAST_CONTACT_DATE, Long::class.java)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_ISOLATION_LAST_CONTACT_DATE, value)
+
+    override var isolationIsKnownIndexAtHome: Boolean?
+        get() = getEncryptedValue(SHARED_PREF_KEY_ISOLATION_IS_KNOWN_INDEX_AT_HOME, Boolean::class.java)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_ISOLATION_IS_KNOWN_INDEX_AT_HOME, value)
+
+    override var isolationKnowsIndexSymptomsEndDate: Boolean?
+        get() = getEncryptedValue(SHARED_PREF_KEY_ISOLATION_KNOWS_SYMPTOMS_END_DATE, Boolean::class.java)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_ISOLATION_KNOWS_SYMPTOMS_END_DATE, value)
+
+    override var isolationIndexSymptomsEndDate: Long?
+        get() = getEncryptedValue(SHARED_PREF_KEY_ISOLATION_INDEX_SYMPTOMS_END_DATE, Long::class.java)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_ISOLATION_INDEX_SYMPTOMS_END_DATE, value)
+
+    override var isolationLastFormValidationDate: Long?
+        get() = getEncryptedValue(SHARED_PREF_KEY_ISOLATION_LAST_FORM_VALIDATION_DATE, Long::class.java)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_ISOLATION_LAST_FORM_VALIDATION_DATE, value)
+
+    override var isolationIsTestNegative: Boolean?
+        get() = getEncryptedValue(SHARED_PREF_KEY_ISOLATION_IS_TEST_NEGATIVE, Boolean::class.java)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_ISOLATION_IS_TEST_NEGATIVE, value)
+
+    override var isolationPositiveTestingDate: Long?
+        get() = getEncryptedValue(SHARED_PREF_KEY_ISOLATION_POSITIVE_TESTING_DATE, Long::class.java)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_ISOLATION_POSITIVE_TESTING_DATE, value)
+
+    override var isolationIsHavingSymptoms: Boolean?
+        get() = getEncryptedValue(SHARED_PREF_KEY_ISOLATION_IS_HAVING_SYMPTOMS, Boolean::class.java)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_ISOLATION_IS_HAVING_SYMPTOMS, value)
+
+    override var isolationSymptomsStartDate: Long?
+        get() = getEncryptedValue(SHARED_PREF_KEY_ISOLATION_SYMPTOMS_START_DATE, Long::class.java)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_ISOLATION_SYMPTOMS_START_DATE, value)
+
+    override var isolationIsStillHavingFever: Boolean?
+        get() = getEncryptedValue(SHARED_PREF_KEY_ISOLATION_IS_STILL_HAVING_FEVER, Boolean::class.java)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_ISOLATION_IS_STILL_HAVING_FEVER, value)
+
+    override var isolationIsFeverReminderScheduled: Boolean?
+        get() = getEncryptedValue(SHARED_PREF_KEY_ISOLATION_IS_FEVER_REMINDER_SCHEDULES, Boolean::class.java)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_ISOLATION_IS_FEVER_REMINDER_SCHEDULES, value)
+
+    override var isolationDuration: Long?
+        get() = getEncryptedValue(SHARED_PREF_KEY_ISOLATION_DURATION, Long::class.java)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_ISOLATION_DURATION, value)
+
+    override var postIsolationDuration: Long?
+        get() = getEncryptedValue(SHARED_PREF_KEY_POST_ISOLATION_DURATION, Long::class.java)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_POST_ISOLATION_DURATION, value)
+
+    // GENERIC METHODS
+    private fun <T> getEncryptedValue(key: String, type: Type, useCache: Boolean = true): T? {
+        @Suppress("UNCHECKED_CAST")
+        return (cache[key] as? T?).takeIf { useCache } ?: run {
+            val encryptedText = sharedPreferences.getString(key, null)
             return if (encryptedText != null) {
-                cryptoManager.decryptToString(encryptedText).toIntOrNull()
+                val result = kotlin.runCatching {
+                    if (type == ByteArray::class.java) {
+                        cryptoManager.decrypt(encryptedText) as? T
+                    } else {
+                        val decryptedString = cryptoManager.decryptToString(encryptedText)
+                        gson.fromJson<T>(decryptedString, type)
+                    }
+                }.getOrNull()
+                if (useCache) {
+                    cache[key] = result
+                }
+                result
             } else {
                 null
             }
         }
-        set(value) {
-            if (value != null) {
-                sharedPreferences.edit()
-                    .putString(SHARED_PREF_KEY_CONFIG_VERSION, cryptoManager.encryptToString(value.toString()))
-                    .apply()
-            } else {
-                sharedPreferences.edit().remove(SHARED_PREF_KEY_CONFIG_VERSION).apply()
-            }
-        }
+    }
 
-    override var reportDate: Long?
-        get() = sharedPreferences.getLong(SHARED_PREF_KEY_REPORT_DATE, Long.MIN_VALUE).takeIf { it != Long.MIN_VALUE }
-        set(value) {
-            if (value != null) {
-                sharedPreferences.edit()
-                    .putLong(SHARED_PREF_KEY_REPORT_DATE, value)
-                    .apply()
-            } else {
-                sharedPreferences.edit().remove(SHARED_PREF_KEY_REPORT_DATE).apply()
+    private fun setEncryptedValue(key: String, value: Any?, useCache: Boolean = true) {
+        if (useCache) {
+            cache[key] = when (value) {
+                is List<*> -> value.toList()
+                is Map<*, *> -> value.toMap()
+                else -> value
             }
         }
+        if (value != null) {
+            sharedPreferences.edit()
+                .putString(
+                    key,
+                    if (value is ByteArray) {
+                        cryptoManager.encryptToString(value)
+                    } else {
+                        cryptoManager.encryptToString(gson.toJson(value))
+                    }
+                )
+                .apply()
+        } else {
+            sharedPreferences.edit().remove(key).apply()
+        }
+    }
+
+    private fun getAndMigrateOldUnencryptedLong(oldKey: String, newKey: String): Long? {
+        return if (sharedPreferences.contains(oldKey)) {
+            val prevLong = sharedPreferences.getLong(oldKey, Long.MIN_VALUE).takeIf { it != Long.MIN_VALUE }
+            setEncryptedValue(newKey, prevLong)
+            sharedPreferences.edit { remove(oldKey) }
+            prevLong
+        } else {
+            getEncryptedValue(newKey, Long::class.java)
+        }
+    }
 
     companion object {
         private const val SHARED_PREF_NAME = "robert_prefs"
@@ -784,6 +374,8 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
         private const val SHARED_PREF_KEY_KA = "shared.pref.ka"
         private const val SHARED_PREF_KEY_KEA = "shared.pref.kea"
         private const val SHARED_PREF_KEY_TIME_START = "shared.pref.time_start"
+        private const val SHARED_PREF_KEY_TIME_START_ENCRYPTED = "shared.pref.time_start_encrypted"
+        private const val SHARED_PREF_KEY_IS_WARNING_AT_RISK = "shared.pref.is_warning_at_risk"
         private const val SHARED_PREF_KEY_AT_RISK_LAST_REFRESH = "shared.pref.at_risk_last_refresh"
         private const val SHARED_PREF_KEY_AT_RISK_LAST_ERROR = "shared.pref.at_risk_last_error"
         private const val SHARED_PREF_KEY_LAST_RISK_RECEIVED_DATE = "shared.pref.last_risk_received_date"
@@ -799,6 +391,7 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
         private const val SHARED_PREF_KEY_CHARACTERISTIC_UUID = "shared.pref.characteristic_uuid"
         private const val SHARED_PREF_KEY_BACKGROUND_SERVICE_MANUFACTURER_DATA = "shared.pref.background_service_manufacturer_data"
         private const val SHARED_PREF_KEY_DATA_RETENTION_PERIOD = "shared.pref.data_retention_period"
+        private const val SHARED_PREF_KEY_VENUES_RETENTION_PERIOD = "shared.pref.venues_retention_period"
         private const val SHARED_PREF_KEY_QUARANTINE_PERIOD = "shared.pref.quarantine_period"
         private const val SHARED_PREF_KEY_CHECK_STATUS_FREQUENCY = "shared.pref.check_status_frequency"
         private const val SHARED_PREF_KEY_MIN_STATUS_RETRY_DURATION = "shared.pref.min_status_retry_duration"
@@ -807,12 +400,16 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
         private const val SHARED_PREF_KEY_POSITIVE_SAMPLE_SPAN = "shared.pref.positive_sample_span"
         private const val SHARED_PREF_KEY_APP_AVAILABILITY = "shared.pref.app_availability"
         private const val SHARED_PREF_KEY_API_VERSION = "shared.pref.api_version"
+        private const val SHARED_PREF_KEY_WARNING_API_VERSION = "shared.pref.warning_api_version"
         private const val SHARED_PREF_KEY_DISPLAY_ATTESTATION = "shared.pref.display_attestation"
+        private const val SHARED_PREF_KEY_DISPLAY_RECORD_VENUES = "shared.pref.display_record_venues"
+        private const val SHARED_PREF_KEY_DISPLAY_PRIVATE_EVENT = "shared.pref.display_private_event"
         private const val SHARED_PREF_KEY_QR_CODE_DELETION_HOURS = "shared.pref.qr_code_deletion_hours"
         private const val SHARED_PREF_KEY_QR_CODE_EXPIRED_HOURS = "shared.pref.qr_code_expired_hours"
         private const val SHARED_PREF_KEY_QR_CODE_FORMATTED_STRING = "shared.pref.qr_code_formatted_string"
         private const val SHARED_PREF_KEY_QR_CODE_FORMATTED_STRING_DISPLAYED = "shared.pref.qr_code_formatted_string_displayed"
         private const val SHARED_PREF_KEY_QR_CODE_FOOTER_STRING = "shared.pref.qr_code_footer_string"
+        private const val SHARED_PREF_KEY_VENUES_TIMESTAMP_ROUNDING_INTERVAL = "shared.pref.venuesTimestampRoundingInterval"
         private const val SHARED_PREF_KEY_PROXIMITY_REACTIVATE_REMINDER_HOURS = "shared.pref.proximity_reactivate_reminder_hours"
         private const val SHARED_PREF_KEY_SAVE_ATTESTATION_DATA = "shared.pref.save_attestation_data"
         private const val SHARED_PREF_KEY_SAVED_ATTESTATION_DATA = "shared.pref.saved_attestation_data"
@@ -820,5 +417,32 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
         private const val SHARED_PREF_KEY_CONFIG_VERSION = "shared.pref.config_version"
         private const val SHARED_PREF_KEY_DISPLAY_DEPARTMENT_LEVEL = "shared.pref.display_department_level"
         private const val SHARED_PREF_KEY_REPORT_DATE = "shared.pref.report_date"
+        private const val SHARED_PREF_KEY_REPORT_DATE_ENCRYPTED = "shared.pref.report_date_encrypted"
+        private const val SHARED_PREF_KEY_SAVE_DATA_VENUES_QR_CODE = "shared.pref.venues_qr_code"
+        private const val SHARED_PREF_KEY_REPORT_VALIDATION_TOKEN = "shared.pref.report_validation_token"
+        private const val SHARED_PREF_KEY_PRIVATE_EVENT_VENUE_TYPE = "shared.pref.private_event_venue_type"
+        private const val SHARED_PREF_KEY_REPORT_TO_SEND_TIME = "shared.pref.report_to_send_time"
+
+        // Add on to ROBERT for isolation
+        private const val SHARED_PREF_KEY_REPORT_SYMPTOMS_DATE = "shared.pref.reportSymptomsDate"
+        private const val SHARED_PREF_KEY_REPORT_POSITIVE_TEST_DATE = "shared.pref.reportPositiveTestDate"
+        private const val SHARED_PREF_KEY_WARNING_RECEIVED_DATE = "shared.pref.warningReceivedDate"
+
+        // Isolation keys
+        private const val SHARED_PREF_KEY_DISPLAY_ISOLATION = "shared.pref.displayIsolation"
+        private const val SHARED_PREF_KEY_ISOLATION_FORM_STATE = "shared.pref.isolationFormState"
+        private const val SHARED_PREF_KEY_ISOLATION_LAST_CONTACT_DATE = "shared.pref.isolationLastContactDate"
+        private const val SHARED_PREF_KEY_ISOLATION_IS_KNOWN_INDEX_AT_HOME = "shared.pref.isolationIsKnownIndexAtHome"
+        private const val SHARED_PREF_KEY_ISOLATION_KNOWS_SYMPTOMS_END_DATE = "shared.pref.isolationKnowsIndexSymptomsEndDate"
+        private const val SHARED_PREF_KEY_ISOLATION_INDEX_SYMPTOMS_END_DATE = "shared.pref.isolationIndexSymptomsEndDate"
+        private const val SHARED_PREF_KEY_ISOLATION_LAST_FORM_VALIDATION_DATE = "shared.pref.isolationLastFormValidationDate"
+        private const val SHARED_PREF_KEY_ISOLATION_IS_TEST_NEGATIVE = "shared.pref.isolationIsTestNegative"
+        private const val SHARED_PREF_KEY_ISOLATION_POSITIVE_TESTING_DATE = "shared.pref.isolationPositiveTestingDate"
+        private const val SHARED_PREF_KEY_ISOLATION_IS_HAVING_SYMPTOMS = "shared.pref.isolationIsHavingSymptoms"
+        private const val SHARED_PREF_KEY_ISOLATION_SYMPTOMS_START_DATE = "shared.pref.isolationSymptomsStartDate"
+        private const val SHARED_PREF_KEY_ISOLATION_IS_STILL_HAVING_FEVER = "shared.pref.isolationIsStillHavingFever"
+        private const val SHARED_PREF_KEY_ISOLATION_IS_FEVER_REMINDER_SCHEDULES = "shared.pref.isolationIsFeverReminderScheduled"
+        private const val SHARED_PREF_KEY_ISOLATION_DURATION = "shared.pref.isolation_duration"
+        private const val SHARED_PREF_KEY_POST_ISOLATION_DURATION = "shared.pref.post_isolation_duration"
     }
 }

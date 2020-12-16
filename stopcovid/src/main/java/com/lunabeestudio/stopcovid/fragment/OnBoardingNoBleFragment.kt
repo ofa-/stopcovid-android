@@ -16,11 +16,13 @@ import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
 import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.R
+import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.lightButtonItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
 import com.lunabeestudio.stopcovid.extension.openInExternalBrowser
+import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.fastitem.logoItem
 import com.mikepenz.fastadapter.GenericItem
@@ -32,10 +34,20 @@ class OnBoardingNoBleFragment : OnBoardingFragment() {
 
     override fun getOnButtonClick(): () -> Unit = {
         if (PreferenceManager.getDefaultSharedPreferences(context).contains(Constants.SharedPrefs.IS_ADVERTISEMENT_AVAILABLE)) {
-            findNavController().safeNavigate(OnBoardingNoBleFragmentDirections.actionOnBoardingNoBleFragmentToOnBoardingGestureFragment())
+            if (requireContext().robertManager().displayRecordVenues) {
+                findNavControllerOrNull()
+                    ?.safeNavigate(
+                        OnBoardingNoBleFragmentDirections.actionOnBoardingNoBleFragmentToOnBoardingNotificationFragment()
+                    )
+            } else {
+                findNavControllerOrNull()
+                    ?.safeNavigate(
+                        OnBoardingNoBleFragmentDirections.actionOnBoardingNoBleFragmentToOnBoardingGestureFragment()
+                    )
+            }
         } else {
             // Should not happen but ensure we have set IS_ADVERTISEMENT_AVAILABLE pref
-            findNavController().popBackStack()
+            findNavControllerOrNull()?.popBackStack()
         }
     }
 

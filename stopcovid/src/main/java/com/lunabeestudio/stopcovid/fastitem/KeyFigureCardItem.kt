@@ -13,7 +13,8 @@ package com.lunabeestudio.stopcovid.fastitem
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.viewbinding.ViewBinding
+import androidx.core.view.isGone
+import androidx.core.view.isInvisible
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.databinding.ItemKeyFigureCardBinding
 import com.lunabeestudio.stopcovid.extension.setTextOrHide
@@ -59,6 +60,11 @@ class KeyFigureCardItem : AbstractBindingItem<ItemKeyFigureCardBinding>() {
 
         binding.leftValueTextView.setTextOrHide(leftValue)
         binding.rightValueTextView.setTextOrHide(rightValue)
+        if (rightValue != null) {
+            binding.fakeLeftValueTextView.isInvisible = true
+        } else {
+            binding.fakeLeftValueTextView.isGone = true
+        }
         binding.labelTextView.setTextOrHide(label)
 
         binding.descriptionTextView.setTextOrHide(description)

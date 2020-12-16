@@ -14,6 +14,7 @@ import android.util.MalformedJsonException
 import com.google.gson.Gson
 import com.lunabeestudio.framework.remote.model.ServerException
 import com.lunabeestudio.robert.model.BackendException
+import com.lunabeestudio.robert.model.ForbiddenException
 import com.lunabeestudio.robert.model.NoInternetException
 import com.lunabeestudio.robert.model.RobertException
 import com.lunabeestudio.robert.model.UnauthorizedException
@@ -27,11 +28,13 @@ internal fun Exception.remoteToRobertException(): RobertException = when (this) 
     is MalformedJsonException -> BackendException()
     is SSLException -> BackendException()
     is SocketTimeoutException,
-    is IOException -> NoInternetException()
+    is IOException,
+    -> NoInternetException()
     is HttpException -> {
         try {
             when (code()) {
                 401 -> UnauthorizedException()
+                403 -> ForbiddenException()
                 else -> {
                     val robertServerError =
                         Gson().fromJson(this.response()?.errorBody()?.string() ?: "", ServerException::class.java)

@@ -16,6 +16,7 @@ import com.lunabeestudio.framework.remote.model.ApiDeleteExposureHistoryRQ
 import com.lunabeestudio.framework.remote.model.ApiRegisterRS
 import com.lunabeestudio.framework.remote.model.ApiRegisterV2RQ
 import com.lunabeestudio.framework.remote.model.ApiReportRQ
+import com.lunabeestudio.framework.remote.model.ApiReportRS
 import com.lunabeestudio.framework.remote.model.ApiStatusRQ
 import com.lunabeestudio.framework.remote.model.ApiStatusRS
 import com.lunabeestudio.framework.remote.model.ApiUnregisterRQ
@@ -33,9 +34,11 @@ internal interface StopCovidApi {
     suspend fun captcha(@Path("apiVersion") apiVersion: String, @Body captchaRQ: CaptchaRQ): Response<ApiCaptchaRS>
 
     @GET("/api/{apiVersion}/captcha/{captchaId}/{type}")
-    suspend fun getCaptcha(@Path("apiVersion") apiVersion: String,
+    suspend fun getCaptcha(
+        @Path("apiVersion") apiVersion: String,
         @Path("captchaId") captchaId: String,
-        @Path("type") type: String): Response<ResponseBody>
+        @Path("type") type: String,
+    ): Response<ResponseBody>
 
     @POST("/api/{apiVersion}/register")
     suspend fun registerV2(@Path("apiVersion") apiVersion: String, @Body registerRQ: ApiRegisterV2RQ): Response<ApiRegisterRS>
@@ -47,9 +50,11 @@ internal interface StopCovidApi {
     suspend fun status(@Path("apiVersion") apiVersion: String, @Body statusRQ: ApiStatusRQ): Response<ApiStatusRS>
 
     @POST("/api/{apiVersion}/report")
-    suspend fun report(@Path("apiVersion") apiVersion: String, @Body reportRQ: ApiReportRQ): Response<ApiCommonRS>
+    suspend fun report(@Path("apiVersion") apiVersion: String, @Body reportRQ: ApiReportRQ): Response<ApiReportRS>
 
     @POST("/api/{apiVersion}/deleteExposureHistory")
-    suspend fun deleteExposureHistory(@Path("apiVersion") apiVersion: String,
-        @Body deleteExposureHistoryRQ: ApiDeleteExposureHistoryRQ): Response<ApiCommonRS>
+    suspend fun deleteExposureHistory(
+        @Path("apiVersion") apiVersion: String,
+        @Body deleteExposureHistoryRQ: ApiDeleteExposureHistoryRQ,
+    ): Response<ApiCommonRS>
 }

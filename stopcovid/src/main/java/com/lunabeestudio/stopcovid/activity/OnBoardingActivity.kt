@@ -27,6 +27,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.preference.PreferenceManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.lunabeestudio.robert.utils.Event
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.databinding.LayoutButtonBottomSheetBinding
 import com.lunabeestudio.stopcovid.coreui.extension.applyAndConsumeWindowInsetBottom
@@ -90,9 +91,9 @@ class OnBoardingActivity : BaseActivity() {
         }
 
         if (StringsManager.strings.isEmpty()) {
-            val stringsObserver = object : Observer<HashMap<String, String>> {
-                override fun onChanged(strings: HashMap<String, String>?) {
-                    if (!strings.isNullOrEmpty()) {
+            val stringsObserver = object : Observer<Event<HashMap<String, String>>> {
+                override fun onChanged(strings: Event<HashMap<String, String>>?) {
+                    if (!strings?.peekContent().isNullOrEmpty()) {
                         StringsManager.liveStrings.removeObserver(this)
                         startOnBoardingOrMain(onBoardingDone, savedInstanceState)
                     }
@@ -147,27 +148,29 @@ class OnBoardingActivity : BaseActivity() {
     }
 
     private fun showNoStringsErrorDialog() {
-        noStringDialog = MaterialAlertDialogBuilder(this@OnBoardingActivity)
-            .setTitle(getString(R.string.splashScreenErrorDialog_title, getString(R.string.app_name)))
-            .setMessage(R.string.splashScreenErrorDialog_message)
-            .setPositiveButton(R.string.splashScreenErrorDialog_positiveButton) { _, _ ->
-                splashLoadingJob = lifecycleScope.launch {
-                    splashScreenBinding.progressBar.show()
-                    StringsManager.initialize(this@OnBoardingActivity)
-                    StringsManager.onAppForeground(this@OnBoardingActivity)
-                    splashScreenBinding.progressBar.hide()
-                    if (StringsManager.strings.isEmpty()) {
-                        showNoStringsErrorDialog()
+        if (!isFinishing) {
+            noStringDialog = MaterialAlertDialogBuilder(this@OnBoardingActivity)
+                .setTitle(getString(R.string.splashScreenErrorDialog_title, getString(R.string.app_name)))
+                .setMessage(R.string.splashScreenErrorDialog_message)
+                .setPositiveButton(R.string.splashScreenErrorDialog_positiveButton) { _, _ ->
+                    splashLoadingJob = lifecycleScope.launch {
+                        splashScreenBinding.progressBar.show()
+                        StringsManager.initialize(this@OnBoardingActivity)
+                        StringsManager.onAppForeground(this@OnBoardingActivity)
+                        splashScreenBinding.progressBar.hide()
+                        if (StringsManager.strings.isEmpty()) {
+                            showNoStringsErrorDialog()
+                        }
                     }
                 }
-            }
-            .setNegativeButton(R.string.splashScreenErrorDialog_negativeButton) { _, _ ->
-                exitProcess(0)
-            }
-            .setOnDismissListener {
-                noStringDialog = null
-            }
-            .show()
+                .setNegativeButton(R.string.splashScreenErrorDialog_negativeButton) { _, _ ->
+                    exitProcess(0)
+                }
+                .setOnDismissListener {
+                    noStringDialog = null
+                }
+                .show()
+        }
     }
 
     private fun replaceSplashScreenLogo() {

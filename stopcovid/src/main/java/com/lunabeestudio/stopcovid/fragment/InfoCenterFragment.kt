@@ -16,10 +16,11 @@ import androidx.core.content.edit
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
-import com.lunabeestudio.robert.utils.EventObserver
 import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.R
+import com.lunabeestudio.stopcovid.coreui.extension.viewLifecycleOwnerOrNull
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
+import com.lunabeestudio.robert.extension.observeEventAndConsume
 import com.lunabeestudio.stopcovid.extension.startTextIntent
 import com.lunabeestudio.stopcovid.fastitem.infoCenterDetailCardItem
 import com.lunabeestudio.stopcovid.manager.InfoCenterManager
@@ -37,19 +38,19 @@ class InfoCenterFragment : TimeMainFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        InfoCenterManager.infos.observe(viewLifecycleOwner, EventObserver(this.javaClass.name.hashCode()) {
+        InfoCenterManager.infos.observeEventAndConsume(viewLifecycleOwner) {
             refreshScreen()
-        })
-        InfoCenterManager.tags.observe(viewLifecycleOwner, EventObserver(this.javaClass.name.hashCode()) {
+        }
+        InfoCenterManager.tags.observeEventAndConsume(viewLifecycleOwner) {
             refreshScreen()
-        })
-        InfoCenterManager.strings.observe(viewLifecycleOwner, EventObserver(this.javaClass.name.hashCode()) {
+        }
+        InfoCenterManager.strings.observeEventAndConsume(viewLifecycleOwner) {
             refreshScreen()
-        })
+        }
 
         binding?.emptyButton?.setOnClickListener {
             showLoading()
-            viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+            viewLifecycleOwnerOrNull()?.lifecycleScope?.launch(Dispatchers.IO) {
                 InfoCenterManager.refreshIfNeeded(requireContext())
                 withContext(Dispatchers.Main) {
                     refreshScreen()
@@ -63,7 +64,7 @@ class InfoCenterFragment : TimeMainFragment() {
         PreferenceManager.getDefaultSharedPreferences(requireContext()).edit {
             putBoolean(Constants.SharedPrefs.HAS_NEWS, false)
         }
-        viewLifecycleOwner.lifecycleScope.launch {
+        viewLifecycleOwnerOrNull()?.lifecycleScope?.launch {
             InfoCenterManager.refreshIfNeeded(requireContext())
         }
     }

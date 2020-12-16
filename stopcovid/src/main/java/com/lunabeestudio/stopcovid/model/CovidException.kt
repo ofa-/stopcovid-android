@@ -15,6 +15,7 @@ abstract class CovidException(val errorCode: ErrorCode, override val message: St
 enum class ErrorCode {
     UNKNOWN,
     UNAUTHORIZED,
+    FORBIDDEN,
     NO_INTERNET,
     BACKEND,
     NEED_REGISTER,
@@ -29,7 +30,8 @@ enum class ErrorCode {
     BLE_PROXIMITY_NOTIFICATION,
     BLE_GATT,
     TIME_NOT_ALIGNED,
-    REPORT_DELAY
+    REPORT_DELAY,
+    SECRET_KEY_ALREADY_GENERATED
 }
 
 class UnknownException(message: String = "Unknown error occurred") :
@@ -37,6 +39,9 @@ class UnknownException(message: String = "Unknown error occurred") :
 
 class UnauthorizedException(message: String = "Not authorized to call this endpoint") :
     CovidException(ErrorCode.UNAUTHORIZED, message)
+
+class ForbiddenException(message: String = "Forbidden to call this endpoint") :
+    CovidException(ErrorCode.FORBIDDEN, message)
 
 class BackendException(message: String = "An error occurs. Our team is working to fix it!") :
     CovidException(ErrorCode.BACKEND, message)
@@ -85,3 +90,6 @@ class TimeNotAlignedException(message: String = "Phone time not aligned with ser
 
 class ReportDelayException(message: String = "You need to wait before you can use proximity again") :
     CovidException(ErrorCode.REPORT_DELAY, message)
+
+class SecretKeyAlreadyGeneratedException(message: String = "Secret key was already generated but can't be found in the KeyStore") :
+    CovidException(ErrorCode.SECRET_KEY_ALREADY_GENERATED, message)

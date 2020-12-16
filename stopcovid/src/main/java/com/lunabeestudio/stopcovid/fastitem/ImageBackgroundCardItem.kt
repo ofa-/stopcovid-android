@@ -10,9 +10,11 @@
 
 package com.lunabeestudio.stopcovid.fastitem
 
+import android.util.LayoutDirection
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
 import com.lunabeestudio.stopcovid.R
@@ -26,7 +28,11 @@ class ImageBackgroundCardItem : AbstractBindingItem<ItemImageBackgroundCardBindi
     var header: String? = null
     var title: String? = null
     var subtitle: String? = null
+    var layoutDirection: Int = LayoutDirection.INHERIT
     var onClickListener: View.OnClickListener? = null
+
+    @ColorInt
+    var textColor: Int? = null
 
     @DrawableRes
     var backgroundDrawable: Int? = null
@@ -45,7 +51,7 @@ class ImageBackgroundCardItem : AbstractBindingItem<ItemImageBackgroundCardBindi
     override fun bindView(binding: ItemImageBackgroundCardBinding, payloads: List<Any>) {
         super.bindView(binding, payloads)
 
-        val textColor = if (backgroundDrawable == null) {
+        val textColor = textColor ?: if (backgroundDrawable == null) {
             R.attr.colorOnSurface.fetchSystemColor(binding.root.context)
         } else {
             ContextCompat.getColor(binding.root.context, R.color.color_on_gradient)
@@ -58,14 +64,16 @@ class ImageBackgroundCardItem : AbstractBindingItem<ItemImageBackgroundCardBindi
         binding.subtitleTextView.setTextOrHide(subtitle)
         binding.subtitleTextView.setTextColor(textColor)
         binding.imageView.setImageResourceOrHide(iconRes)
-        backgroundDrawable?.let { binding.constraintLayout.setBackgroundResource(it) }
+        backgroundDrawable?.let { binding.mainLayout.setBackgroundResource(it) }
+        binding.mainLayout.layoutDirection = layoutDirection
         binding.root.setOnClickListener(onClickListener)
         binding.root.contentDescription = contentDescription
     }
 
     override fun unbindView(binding: ItemImageBackgroundCardBinding) {
         super.unbindView(binding)
-        binding.constraintLayout.background = null
+        binding.mainLayout.background = null
+        binding.mainLayout.layoutDirection = LayoutDirection.INHERIT
     }
 }
 

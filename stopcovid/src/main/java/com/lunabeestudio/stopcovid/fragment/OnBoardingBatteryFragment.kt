@@ -19,6 +19,7 @@ import androidx.annotation.RequiresApi
 import androidx.navigation.fragment.findNavController
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.UiConstants
+import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
@@ -38,8 +39,8 @@ class OnBoardingBatteryFragment : OnBoardingFragment() {
         if (!ProximityManager.isBatteryOptimizationOff(requireContext())) {
             ProximityManager.requestIgnoreBatteryOptimization(this)
         } else {
-            findNavController()
-                .safeNavigate(OnBoardingBatteryFragmentDirections.actionOnBoardingBatteryFragmentToOnBoardingNotificationFragment())
+            findNavControllerOrNull()
+                ?.safeNavigate(OnBoardingBatteryFragmentDirections.actionOnBoardingBatteryFragmentToOnBoardingNotificationFragment())
         }
     }
 
@@ -71,8 +72,8 @@ class OnBoardingBatteryFragment : OnBoardingFragment() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == UiConstants.Activity.BATTERY.ordinal) {
             if (resultCode == Activity.RESULT_OK) {
-                findNavController()
-                    .safeNavigate(OnBoardingBatteryFragmentDirections.actionOnBoardingBatteryFragmentToOnBoardingNotificationFragment())
+                findNavControllerOrNull()
+                    ?.safeNavigate(OnBoardingBatteryFragmentDirections.actionOnBoardingBatteryFragmentToOnBoardingNotificationFragment())
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data)

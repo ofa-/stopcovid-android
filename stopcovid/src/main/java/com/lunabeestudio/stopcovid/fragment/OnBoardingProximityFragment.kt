@@ -21,13 +21,14 @@ import android.os.ParcelUuid
 import android.view.Gravity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.UiConstants
+import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.extension.openAppSettings
 import com.lunabeestudio.stopcovid.coreui.extension.showPermissionRationale
+import com.lunabeestudio.stopcovid.coreui.extension.viewLifecycleOwnerOrNull
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
@@ -36,7 +37,6 @@ import com.lunabeestudio.stopcovid.extension.setAdvertisementAvailable
 import com.lunabeestudio.stopcovid.fastitem.logoItem
 import com.lunabeestudio.stopcovid.manager.ProximityManager
 import com.mikepenz.fastadapter.GenericItem
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withTimeoutOrNull
 import timber.log.Timber
@@ -105,9 +105,9 @@ class OnBoardingProximityFragment : OnBoardingFragment() {
                     startNextController()
                 }
             } else if (!shouldShowRequestPermissionRationale(ProximityManager.getManifestLocationPermission())) {
-                context?.showPermissionRationale(strings, "common.needLocalisationAccessToScan", "common.settings") {
+                context?.showPermissionRationale(strings, "common.needLocalisationAccessToScan", "common.settings", true, {
                     openAppSettings()
-                }
+                }, null)
             }
         } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults)
@@ -125,7 +125,7 @@ class OnBoardingProximityFragment : OnBoardingFragment() {
     }
 
     private fun startNextController() {
-        viewLifecycleOwner.lifecycleScope.launchWhenResumed {
+        viewLifecycleOwnerOrNull()?.lifecycleScope?.launchWhenResumed {
             getActivityBinding().blockingProgressBar.show()
             val success = isAdvertisementAvailable()
             getActivityBinding().blockingProgressBar.hide()
@@ -134,16 +134,15 @@ class OnBoardingProximityFragment : OnBoardingFragment() {
 
             if (success) {
                 if (!ProximityManager.isBatteryOptimizationOff(requireContext())) {
-                    findNavController()
-                        .safeNavigate(OnBoardingProximityFragmentDirections.actionOnBoardingProximityFragmentToOnBoardingBatteryFragment())
+                    findNavControllerOrNull()
+                        ?.safeNavigate(OnBoardingProximityFragmentDirections.actionOnBoardingProximityFragmentToOnBoardingBatteryFragment())
                 } else {
-                    findNavController()
-                        .safeNavigate(OnBoardingProximityFragmentDirections.actionOnBoardingProximityFragmentToOnBoardingNotificationFragment())
+                    findNavControllerOrNull()
+                        ?.safeNavigate(OnBoardingProximityFragmentDirections.actionOnBoardingProximityFragmentToOnBoardingNotificationFragment())
                 }
             } else {
-
-                findNavController()
-                    .safeNavigate(OnBoardingProximityFragmentDirections.actionOnBoardingProximityFragmentToOnBoardingNoBleFragment())
+                findNavControllerOrNull()
+                    ?.safeNavigate(OnBoardingProximityFragmentDirections.actionOnBoardingProximityFragmentToOnBoardingNoBleFragment())
             }
         }
     }

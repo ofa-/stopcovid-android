@@ -11,16 +11,19 @@
 package com.lunabeestudio.stopcovid.fragment
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
 import android.view.accessibility.AccessibilityManager
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
+import androidx.preference.PreferenceManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.lunabeestudio.robert.RobertApplication
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.activity.MainActivity
+import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.extension.hideSoftKeyBoard
 import com.lunabeestudio.stopcovid.coreui.fastitem.ButtonItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.buttonItem
@@ -33,6 +36,7 @@ import com.lunabeestudio.stopcovid.fastitem.audioItem
 import com.lunabeestudio.stopcovid.fastitem.editTextItem
 import com.lunabeestudio.stopcovid.fastitem.imageItem
 import com.lunabeestudio.stopcovid.fastitem.linkItem
+import com.lunabeestudio.stopcovid.model.CaptchaNextFragment
 import com.lunabeestudio.stopcovid.model.UnauthorizedException
 import com.lunabeestudio.stopcovid.viewmodel.CaptchaViewModel
 import com.lunabeestudio.stopcovid.viewmodel.CaptchaViewModelFactory
@@ -43,8 +47,14 @@ class CaptchaFragment : MainFragment() {
 
     override fun getTitleKey(): String = "captchaController.title"
 
+    private val args: CaptchaFragmentArgs by navArgs()
+
     private val robertManager by lazy {
         requireContext().robertManager()
+    }
+
+    private val sharedPreferences: SharedPreferences by lazy {
+        PreferenceManager.getDefaultSharedPreferences(requireContext())
     }
 
     private val viewModel: CaptchaViewModel by viewModels { CaptchaViewModelFactory(robertManager) }
@@ -74,8 +84,13 @@ class CaptchaFragment : MainFragment() {
         viewModel.audioSuccess.observe(viewLifecycleOwner) {
             refreshScreen()
         }
-        viewModel.codeSuccess.observe(viewLifecycleOwner) {
-            findNavController().navigateUp()
+        viewModel.codeSuccess.observe(viewLifecycleOwner) { captchaNextFragment ->
+            val nextFragmentArgs = if (captchaNextFragment == CaptchaNextFragment.Venue) {
+                args.venueFullPath
+            } else {
+                null
+            }
+            captchaNextFragment.registerPostAction(findNavControllerOrNull(), sharedPreferences, nextFragmentArgs)
         }
         viewModel.covidException.observe(viewLifecycleOwner) { error ->
             if (error is UnauthorizedException && viewModel.code.isNotBlank()) {
@@ -88,7 +103,7 @@ class CaptchaFragment : MainFragment() {
                 resetFiles()
                 viewModel.generateCaptcha()
             } else {
-                findNavController().navigateUp()
+                findNavControllerOrNull()?.navigateUp()
                 (activity as? MainActivity)?.showErrorSnackBar(error.getString(strings))
             }
         }
@@ -177,7 +192,7 @@ class CaptchaFragment : MainFragment() {
             onDone = {
                 if (viewModel.code.isNotBlank()) {
                     activity?.hideSoftKeyBoard()
-                    viewModel.register(requireContext().applicationContext as RobertApplication)
+                    viewModel.register(requireContext().applicationContext as RobertApplication, args.nextFragment)
                 }
             }
             identifier = 53L
@@ -194,7 +209,7 @@ class CaptchaFragment : MainFragment() {
                     viewModel.generateCaptcha()
                 } else {
                     activity?.hideSoftKeyBoard()
-                    viewModel.register(requireContext().applicationContext as RobertApplication)
+                    viewModel.register(requireContext().applicationContext as RobertApplication, args.nextFragment)
                 }
             }
             gravity = Gravity.CENTER

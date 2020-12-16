@@ -25,7 +25,7 @@ android {
     }
     defaultConfig {
         buildConfigField 'String', 'BASE_URL', '"https://app.stopcovid.gouv.fr"'
-        buildConfigField 'String', 'SERVER_URL', 'BASE_URL+"/json/version-25/"'
+        buildConfigField 'String', 'SERVER_URL', 'BASE_URL+"/json/version-26/"'
         buildConfigField 'String', 'SERVER_CERTIFICATE_SHA256', '"sha256/sXQojvwsiyblrpMQIVRXGC5u7AgknzTJm+VIK1kQmD8="'
         buildConfigField 'String', 'CONFIG_JSON', '"config.json"'
     }

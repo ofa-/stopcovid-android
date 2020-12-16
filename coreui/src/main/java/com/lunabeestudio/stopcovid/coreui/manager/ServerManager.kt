@@ -16,6 +16,7 @@ import androidx.preference.PreferenceManager
 import com.google.gson.Gson
 import com.lunabeestudio.stopcovid.coreui.BuildConfig
 import com.lunabeestudio.stopcovid.coreui.UiConstants
+import com.lunabeestudio.stopcovid.coreui.extension.getFirstSupportedLanguage
 import com.lunabeestudio.stopcovid.coreui.extension.saveTo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -40,7 +41,7 @@ abstract class ServerManager {
 
     protected suspend fun fetchLast(context: Context, forceRefresh: Boolean): Boolean {
         return if (shouldRefresh(context) || forceRefresh) {
-            fetchLast(context, Locale.getDefault().language)
+            fetchLast(context, context.getFirstSupportedLanguage())
         } else {
             Timber.v("Only use local data")
             false
@@ -48,12 +49,10 @@ abstract class ServerManager {
     }
 
     protected suspend fun <T> loadLocal(context: Context): T? {
-        val currentLanguage = Locale.getDefault().language
+        val currentLanguage = context.getFirstSupportedLanguage()
 
         return loadFromAssets(context, currentLanguage)
             ?: loadFromFiles(context, currentLanguage)
-            ?: loadFromFiles(context, UiConstants.DEFAULT_LANGUAGE)
-            ?: loadFromAssets(context, UiConstants.DEFAULT_LANGUAGE)
     }
 
     private suspend fun fetchLast(context: Context, languageCode: String): Boolean {
@@ -114,7 +113,7 @@ abstract class ServerManager {
     }
 
     fun clearLocal(context: Context) {
-        val filename = "${prefix(context)}${Locale.getDefault().language}${extension()}"
+        val filename = "${prefix(context)}${context.getFirstSupportedLanguage()}${extension()}"
         File(context.filesDir, filename).delete()
         val defaultFilename = "${prefix(context)}${UiConstants.DEFAULT_LANGUAGE}${extension()}"
         File(context.filesDir, defaultFilename).delete()

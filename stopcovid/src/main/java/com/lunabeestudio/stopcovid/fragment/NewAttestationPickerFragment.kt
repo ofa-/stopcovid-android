@@ -15,6 +15,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.lunabeestudio.domain.model.FormEntry
 import com.lunabeestudio.stopcovid.R
+import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.extension.attestationLongLabelFromKey
 import com.lunabeestudio.stopcovid.extension.attestationShortLabelFromKey
@@ -48,7 +49,7 @@ class NewAttestationPickerFragment : MainFragment() {
                         showSelection = formEntryItem.code == args.selectedCode
                         onClick = {
                             viewModel.infos[args.key] = FormEntry(formEntryItem.code, formEntry.type)
-                            findNavController().popBackStack()
+                            findNavControllerOrNull()?.popBackStack()
                         }
                         identifier = title.hashCode().toLong()
                     }

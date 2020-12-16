@@ -36,7 +36,11 @@ class ServiceTest {
     fun setUp() {
         server = MockWebServer()
         server.start()
-        dataSource = ServiceDataSource(ApplicationProvider.getApplicationContext(), server.url("/api/v1.0/").toString())
+        dataSource = ServiceDataSource(
+            ApplicationProvider.getApplicationContext(),
+            server.url("/api/v1.0/").toString(),
+            server.url("/api/v1.0/").toString(),
+        )
     }
 
     @Test
@@ -105,18 +109,61 @@ class ServiceTest {
     }
 
     @Test
+    fun wstatusTest() {
+        server.enqueue(
+            MockResponse().setResponseCode(200)
+                .setBody(ResourcesHelper.readTestFileAsString("wstatusSuccess"))
+        )
+        val result = runBlocking {
+            dataSource.wstatus("", emptyList())
+        }
+        assertThat(result).isInstanceOf(RobertResultData.Success::class.java)
+        assertThat((result as RobertResultData.Success).data.atRisk)
+
+        testDataErrors {
+            dataSource.wstatus("", emptyList())
+        }
+    }
+
+    @Test
     fun reportTest() {
         server.enqueue(
             MockResponse().setResponseCode(200)
                 .setBody(ResourcesHelper.readTestFileAsString("reportSuccess"))
         )
-        val result = runBlocking {
+        var result = runBlocking {
             dataSource.report("", "", emptyList())
+        }
+        assertThat(result).isInstanceOf(RobertResultData.Success::class.java)
+        server.enqueue(
+            MockResponse().setResponseCode(200)
+                .setBody(ResourcesHelper.readTestFileAsString("reportWithTokenSuccess"))
+        )
+        result = runBlocking {
+            dataSource.report("", "", emptyList())
+        }
+        assertThat(result).isInstanceOf(RobertResultData.Success::class.java)
+        assertThat((result as RobertResultData.Success).data.reportValidationToken).isEqualTo("token")
+
+
+        testDataErrors {
+            dataSource.report("", "", emptyList())
+        }
+    }
+
+    @Test
+    fun wreportTest() {
+        server.enqueue(
+            MockResponse().setResponseCode(200)
+                .setBody(ResourcesHelper.readTestFileAsString("wreportSuccess"))
+        )
+        val result = runBlocking {
+            dataSource.wreport("", "", emptyList())
         }
         assertThat(result).isInstanceOf(RobertResult.Success::class.java)
 
         testErrors {
-            dataSource.report("", "", emptyList())
+            dataSource.wreport("", "", emptyList())
         }
     }
 

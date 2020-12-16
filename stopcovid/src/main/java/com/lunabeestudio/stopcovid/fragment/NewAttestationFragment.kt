@@ -13,21 +13,19 @@ package com.lunabeestudio.stopcovid.fragment
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.EditorInfo
-import android.widget.DatePicker
 import androidx.fragment.app.activityViewModels
-import androidx.navigation.fragment.findNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.lunabeestudio.domain.model.FormEntry
-import com.lunabeestudio.robert.utils.EventObserver
+import com.lunabeestudio.robert.extension.observeEventAndConsume
 import com.lunabeestudio.stopcovid.R
+import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.extension.hideSoftKeyBoard
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
@@ -35,7 +33,9 @@ import com.lunabeestudio.stopcovid.coreui.fastitem.switchItem
 import com.lunabeestudio.stopcovid.extension.attestationLabelFromKey
 import com.lunabeestudio.stopcovid.extension.attestationPlaceholderFromKey
 import com.lunabeestudio.stopcovid.extension.attestationShortLabelFromKey
+import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
+import com.lunabeestudio.stopcovid.extension.showSpinnerDatePicker
 import com.lunabeestudio.stopcovid.fastitem.editTextItem
 import com.lunabeestudio.stopcovid.fastitem.pickerEditTextItem
 import com.lunabeestudio.stopcovid.manager.FormManager
@@ -76,11 +76,11 @@ class NewAttestationFragment : MainFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        FormManager.form.observe(viewLifecycleOwner, EventObserver(this.javaClass.name.hashCode()) {
+        FormManager.form.observeEventAndConsume(viewLifecycleOwner) {
             refreshScreen()
-        })
+        }
 
-        findNavController().addOnDestinationChangedListener { _, destination, _ ->
+        findNavControllerOrNull()?.addOnDestinationChangedListener { _, destination, _ ->
             if (destination.id == R.id.attestationsFragment) {
                 viewModel.resetInfos()
                 activity?.hideSoftKeyBoard()
@@ -97,7 +97,7 @@ class NewAttestationFragment : MainFragment() {
         return if (item.itemId == R.id.item_text) {
             if (viewModel.areInfosValid()) {
                         viewModel.generateQrCode()
-                        findNavController().navigateUp()
+                        findNavControllerOrNull()?.navigateUp()
             } else {
                 MaterialAlertDialogBuilder(requireContext())
                     .setTitle(strings["newAttestationController.missingInfo.alert.title"])
@@ -123,13 +123,15 @@ class NewAttestationFragment : MainFragment() {
             items += captionItem {
                 text = header
                 textAppearance = R.style.TextAppearance_StopCovid_Caption_Small_Grey
-                identifier = text.hashCode().toLong()
+                identifier = "newAttestationController.header".hashCode().toLong()
             }
         }
         FormManager.form.value?.peekContent()?.let { form ->
             form.forEach { section ->
-                section.forEach { formEntry ->
-                    items += itemForFormEntry(formEntry)
+                section.forEach { formField ->
+                    items += itemForFormField(formField).apply {
+                        identifier = formField.key.hashCode().toLong()
+                    }
                 }
                 items += spaceItem {
                     spaceRes = R.dimen.spacing_large
@@ -145,11 +147,12 @@ class NewAttestationFragment : MainFragment() {
                 isChecked = checked
                 viewModel.shouldSaveInfos = checked
             }
+            identifier = "newAttestationController.saveMyData".hashCode().toLong()
         }
         items += captionItem {
             text = strings["newAttestationController.footer"]
             textAppearance = R.style.TextAppearance_StopCovid_Caption_Small_Grey
-            identifier = text.hashCode().toLong()
+            identifier = "newAttestationController.footer".hashCode().toLong()
         }
         items += spaceItem {
             spaceRes = R.dimen.spacing_large
@@ -159,7 +162,7 @@ class NewAttestationFragment : MainFragment() {
         return items
     }
 
-    private fun itemForFormEntry(formField: FormField): GenericItem {
+    private fun itemForFormField(formField: FormField): GenericItem {
         return when (formField.type) {
             "date" -> pickerEditTextItem {
                 placeholder = strings[formField.key.attestationPlaceholderFromKey()]
@@ -173,7 +176,7 @@ class NewAttestationFragment : MainFragment() {
                             timeInMillis = System.currentTimeMillis()
                             set(Calendar.YEAR, get(Calendar.YEAR) - 18)
                         }.timeInMillis
-                    showSpinnerDatePicker(initialTimestamp) { newDate ->
+                    MaterialAlertDialogBuilder(requireContext()).showSpinnerDatePicker(strings, initialTimestamp) { newDate ->
                         text = dateFormat.format(Date(newDate))
                         viewModel.infos[formField.key] = FormEntry(newDate.toString(), formField.type)
                         binding?.recyclerView?.adapter?.notifyDataSetChanged()
@@ -206,7 +209,7 @@ class NewAttestationFragment : MainFragment() {
                 hint = strings[formField.key.attestationLabelFromKey()]
                 text = strings[viewModel.infos[formField.key]?.value?.attestationShortLabelFromKey()]
                 onClick = {
-                    findNavController().navigate(
+                    findNavControllerOrNull()?.safeNavigate(
                         NewAttestationFragmentDirections.actionNewAttestationFragmentToNewAttestationPickerFragment(
                             formField.key,
                             viewModel.infos[formField.key]?.value
@@ -236,33 +239,6 @@ class NewAttestationFragment : MainFragment() {
         }
     }
 
-    private fun showSpinnerDatePicker(initialTimestamp: Long, onDatePicked: (Long) -> Unit) {
-        val initialCalendar: Calendar = Calendar.getInstance().apply {
-            timeInMillis = initialTimestamp
-        }
-        var newDate: Date = initialCalendar.time
-        val datePicker = LayoutInflater.from(context).inflate(
-            R.layout.date_picker,
-            null,
-            false
-        ) as DatePicker
-        datePicker.init(
-            initialCalendar.get(Calendar.YEAR),
-            initialCalendar.get(Calendar.MONTH),
-            initialCalendar.get(Calendar.DAY_OF_MONTH)
-        ) { _, year, month, dayOfMonth ->
-            val newCalendar = calendarInstance(year, month, dayOfMonth)
-            newDate = newCalendar.time
-        }
-        datePicker.maxDate = System.currentTimeMillis()
-        MaterialAlertDialogBuilder(requireContext()).setView(datePicker)
-            .setPositiveButton(strings["common.ok"]) { _, _ ->
-                onDatePicked.invoke(newDate.time)
-            }
-            .setNegativeButton(strings["common.cancel"], null)
-            .show()
-    }
-
     // Adapted from here https://stackoverflow.com/a/35745881/2794437
     private fun showDateTimePicker(initialTimestamp: Long, onDatePicked: (Long) -> Unit) {
         val currentDate = Calendar.getInstance().apply {
@@ -271,9 +247,15 @@ class NewAttestationFragment : MainFragment() {
         val date = Calendar.getInstance()
         val datePickerDialog = DatePickerDialog(
             requireContext(),
-            { _, year, monthOfYear, dayOfMonth ->
+            { datePicker, year, monthOfYear, dayOfMonth ->
+                // Fix crash https://issuetracker.google.com/issues/37055335
+                datePicker.isSaveFromParentEnabled = false
+                datePicker.isSaveEnabled = false
                 date.set(year, monthOfYear, dayOfMonth)
-                TimePickerDialog(context, { _, hourOfDay, minute ->
+                TimePickerDialog(context, { timePicker, hourOfDay, minute ->
+                    // Fix crash https://issuetracker.google.com/issues/37055335
+                    timePicker.isSaveFromParentEnabled = false
+                    timePicker.isSaveEnabled = false
                     date.set(Calendar.HOUR_OF_DAY, hourOfDay)
                     date.set(Calendar.MINUTE, minute)
                     onDatePicked.invoke(date.timeInMillis)
@@ -289,14 +271,6 @@ class NewAttestationFragment : MainFragment() {
         }
         datePickerDialog.setTitle("")
         datePickerDialog.show()
-    }
-
-    private fun calendarInstance(year: Int, month: Int, dayOfMonth: Int): Calendar {
-        val newCalendar = Calendar.getInstance()
-        newCalendar.set(Calendar.YEAR, year)
-        newCalendar.set(Calendar.MONTH, month)
-        newCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-        return newCalendar
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

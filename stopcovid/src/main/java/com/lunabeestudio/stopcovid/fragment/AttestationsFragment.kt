@@ -19,6 +19,7 @@ import com.google.zxing.BarcodeFormat
 import com.journeyapps.barcodescanner.BarcodeEncoder
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.stopcovid.R
+import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.extension.toDimensSize
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
@@ -27,6 +28,7 @@ import com.lunabeestudio.stopcovid.extension.attestationShortLabelFromKey
 import com.lunabeestudio.stopcovid.extension.isExpired
 import com.lunabeestudio.stopcovid.extension.openInExternalBrowser
 import com.lunabeestudio.stopcovid.extension.robertManager
+import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
 import com.lunabeestudio.stopcovid.fastitem.AttestationQrCodeItem
 import com.lunabeestudio.stopcovid.fastitem.attestationQrCodeItem
@@ -104,7 +106,7 @@ class AttestationsFragment : MainFragment() {
             label = strings["attestationsController.newAttestation"]
             iconRes = R.drawable.ic_add
             onClickListener = View.OnClickListener {
-                findNavController().navigate(AttestationsFragmentDirections.actionAttestationsFragmentToNewAttestationFragment())
+                findNavControllerOrNull()?.safeNavigate(AttestationsFragmentDirections.actionAttestationsFragmentToNewAttestationFragment())
             }
             identifier = label.hashCode().toLong()
         }
@@ -228,7 +230,7 @@ class AttestationsFragment : MainFragment() {
                     .show()
             }
             onClick = {
-                findNavController().navigate(
+                findNavControllerOrNull()?.safeNavigate(
                     AttestationsFragmentDirections.actionAttestationsFragmentToFullscreenAttestationFragment(
                         attestationToFormattedString(attestation),
                         attestationToFormattedStringDisplayed(attestation)

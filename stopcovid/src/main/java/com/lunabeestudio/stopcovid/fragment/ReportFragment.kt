@@ -10,28 +10,24 @@
 
 package com.lunabeestudio.stopcovid.fragment
 
-import android.Manifest
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.lunabeestudio.stopcovid.R
-import com.lunabeestudio.stopcovid.coreui.UiConstants
-import com.lunabeestudio.stopcovid.coreui.extension.openAppSettings
-import com.lunabeestudio.stopcovid.coreui.extension.showPermissionRationale
+import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.fastitem.buttonItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.lightButtonItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.textButtonItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
+import com.lunabeestudio.stopcovid.extension.openInExternalBrowser
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
+import com.lunabeestudio.stopcovid.extension.startEmailIntent
 import com.lunabeestudio.stopcovid.fastitem.logoItem
 import com.mikepenz.fastadapter.GenericItem
 
@@ -48,7 +44,7 @@ class ReportFragment : MainFragment() {
 
         if (robertManager.isRegistered) {
             if (args.code != null && !codeUsed) {
-                findNavController().safeNavigate(ReportFragmentDirections.actionReportFragmentToCodeFragment(args.code))
+                findNavControllerOrNull()?.safeNavigate(ReportFragmentDirections.actionReportFragmentToCodeFragment(args.code))
                 codeUsed = true
             }
         }
@@ -82,39 +78,6 @@ class ReportFragment : MainFragment() {
                 spaceRes = R.dimen.spacing_large
                 identifier = items.size.toLong()
             }
-            items += buttonItem {
-                width = ViewGroup.LayoutParams.MATCH_PARENT
-                text = strings["sickController.button.flash"]
-                onClickListener = View.OnClickListener {
-                    if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA)
-                        != PackageManager.PERMISSION_GRANTED) {
-                        if (shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)) {
-                            context?.showPermissionRationale(strings, "common.needCameraAccessToScan", "common.ok") {
-                                requestPermissions(
-                                    arrayOf(Manifest.permission.CAMERA),
-                                    UiConstants.Permissions.CAMERA.ordinal
-                                )
-                            }
-                        } else {
-                            requestPermissions(
-                                arrayOf(Manifest.permission.CAMERA),
-                                UiConstants.Permissions.CAMERA.ordinal
-                            )
-                        }
-                    } else {
-                        findNavController().safeNavigate(ReportFragmentDirections.actionReportFragmentToQrCodeFragment())
-                    }
-                }
-                identifier = items.count().toLong()
-            }
-            items += lightButtonItem {
-                width = ViewGroup.LayoutParams.MATCH_PARENT
-                text = strings["sickController.button.tap"]
-                onClickListener = View.OnClickListener {
-                    findNavController().safeNavigate(ReportFragmentDirections.actionReportFragmentToCodeFragment())
-                }
-                identifier = items.count().toLong()
-            }
             items += textButtonItem {
                 width = ViewGroup.LayoutParams.MATCH_PARENT
                 text = strings["declareController.codeNotReceived.buttonTitle"]
@@ -123,7 +86,29 @@ class ReportFragment : MainFragment() {
                         .setTitle(strings["declareController.codeNotReceived.alert.title"])
                         .setMessage(strings["declareController.codeNotReceived.alert.message"])
                         .setPositiveButton(strings["common.ok"], null)
+                        .setNegativeButton(strings["declareController.codeNotReceived.alert.showVideo"]) { _, _ ->
+                            strings["declareController.codeNotReceived.alert.video.url"]?.openInExternalBrowser(requireContext())
+                        }
+                        .setNeutralButton(strings["declareController.codeNotReceived.alert.contactUs"]) { _, _ ->
+                            strings["aboutController.contactEmail"]?.startEmailIntent(requireContext())
+                        }
                         .show()
+                }
+                identifier = items.count().toLong()
+            }
+            items += buttonItem {
+                width = ViewGroup.LayoutParams.MATCH_PARENT
+                text = strings["sickController.button.flash"]
+                onClickListener = View.OnClickListener {
+                    findNavControllerOrNull()?.safeNavigate(ReportFragmentDirections.actionReportFragmentToReportQrCodeFragment())
+                }
+                identifier = items.count().toLong()
+            }
+            items += lightButtonItem {
+                width = ViewGroup.LayoutParams.MATCH_PARENT
+                text = strings["sickController.button.tap"]
+                onClickListener = View.OnClickListener {
+                    findNavControllerOrNull()?.safeNavigate(ReportFragmentDirections.actionReportFragmentToCodeFragment())
                 }
                 identifier = items.count().toLong()
             }
@@ -141,19 +126,5 @@ class ReportFragment : MainFragment() {
         }
 
         return items
-    }
-
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        if (requestCode == UiConstants.Permissions.CAMERA.ordinal) {
-            if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                findNavController().safeNavigate(ReportFragmentDirections.actionReportFragmentToQrCodeFragment())
-            } else if (!shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)) {
-                context?.showPermissionRationale(strings, "common.needCameraAccessToScan", "common.settings") {
-                    openAppSettings()
-                }
-            } else {
-                super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-            }
-        }
     }
 }

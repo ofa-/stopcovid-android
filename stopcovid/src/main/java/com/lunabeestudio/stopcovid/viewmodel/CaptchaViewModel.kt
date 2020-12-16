@@ -20,6 +20,7 @@ import com.lunabeestudio.robert.model.RobertResult
 import com.lunabeestudio.robert.model.RobertResultData
 import com.lunabeestudio.stopcovid.coreui.utils.SingleLiveEvent
 import com.lunabeestudio.stopcovid.extension.toCovidException
+import com.lunabeestudio.stopcovid.model.CaptchaNextFragment
 import com.lunabeestudio.stopcovid.model.CovidException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -29,7 +30,7 @@ class CaptchaViewModel(private val robertManager: RobertManager) : ViewModel() {
 
     val imageSuccess: SingleLiveEvent<Unit> = SingleLiveEvent()
     val audioSuccess: SingleLiveEvent<Unit> = SingleLiveEvent()
-    val codeSuccess: SingleLiveEvent<Unit> = SingleLiveEvent()
+    val codeSuccess: SingleLiveEvent<CaptchaNextFragment> = SingleLiveEvent()
     val covidException: SingleLiveEvent<CovidException> = SingleLiveEvent()
     val loadingInProgress: MutableLiveData<Boolean> = MutableLiveData(false)
     lateinit var audioPath: String
@@ -79,14 +80,14 @@ class CaptchaViewModel(private val robertManager: RobertManager) : ViewModel() {
         }
     }
 
-    fun register(application: RobertApplication) {
+    fun register(application: RobertApplication, captchaNextFragment: CaptchaNextFragment) {
         if (loadingInProgress.value == false) {
             viewModelScope.launch(Dispatchers.IO) {
                 loadingInProgress.postValue(true)
-                val result = robertManager.register(application, code, captchaId)
+                val result = robertManager.register(application, code, captchaId, captchaNextFragment.activateProximity)
                 loadingInProgress.postValue(false)
                 when (result) {
-                    is RobertResult.Success -> codeSuccess.postValue(null)
+                    is RobertResult.Success -> codeSuccess.postValue(captchaNextFragment)
                     is RobertResult.Failure -> covidException.postValue(result.error.toCovidException())
                 }
             }

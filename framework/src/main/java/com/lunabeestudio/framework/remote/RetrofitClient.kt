@@ -39,6 +39,14 @@ object RetrofitClient {
             .build().create(clazz)
     }
 
+    internal fun <T> getWarningService(context: Context, warningBaseUrl: String, clazz: Class<T>): T {
+        return Retrofit.Builder()
+            .baseUrl(warningBaseUrl.toHttpUrl())
+            .addConverterFactory(GsonConverterFactory.create(GsonBuilder().create()))
+            .client(getDefaultOKHttpClient(context, warningBaseUrl, BuildConfig.WARNING_CERTIFICATE_SHA256))
+            .build().create(clazz)
+    }
+
     internal fun <T> getFileService(context: Context, baseUrl: String, clazz: Class<T>): T {
         return Retrofit.Builder()
             .baseUrl(baseUrl.toHttpUrl())
@@ -62,6 +70,7 @@ object RetrofitClient {
                 )
                 val certificates: HandshakeCertificates = HandshakeCertificates.Builder()
                     .addTrustedCertificate(certificateFromString(context, "api_stopcovid_gouv_fr"))
+                    .addTrustedCertificate(certificateFromString(context, "tacw_tousanticovid_gouv_fr"))
                     .addTrustedCertificate(certificateFromString(context, "app_stopcovid_gouv_fr"))
                     .build()
                 sslSocketFactory(certificates.sslSocketFactory(), certificates.trustManager)

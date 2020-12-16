@@ -16,20 +16,12 @@
     android:minHeight="@dimen/min_logo_height">
 
     <com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/offLottieAnimationView"
+        android:id="@+id/lottieAnimationView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:adjustViewBounds="true"
         android:importantForAccessibility="no"
-        android:visibility="gone"
-        app:lottie_renderMode="hardware" />
-
-    <com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/onLottieAnimationView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:adjustViewBounds="true"
-        android:importantForAccessibility="no"
-        android:visibility="gone"
+        app:lottie_autoPlay="true"
+        app:lottie_loop="true"
         app:lottie_renderMode="hardware" />
 </FrameLayout>

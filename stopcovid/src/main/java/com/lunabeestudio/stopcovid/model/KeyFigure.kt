@@ -21,6 +21,7 @@ data class KeyFigure(
     val valueGlobalToDisplay: String,
     val valueGlobal: Double?,
     val isFeatured: Boolean,
+    val isHighlighted: Boolean?,
     val extractDate: Long,
     val valuesDepartments: List<DepartmentKeyFigure>?,
     val trend: Int?

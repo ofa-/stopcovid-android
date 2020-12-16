@@ -93,7 +93,7 @@ class ReminderBottomSheetDialogFragment : BottomSheetDialogFragment() {
                 }
                 gravity = Gravity.CENTER
                 onClickListener = View.OnClickListener {
-                    (requireContext().applicationContext as StopCovid).setReminder(inHour)
+                    (requireContext().applicationContext as StopCovid).setActivateReminder(inHour)
                     dismiss()
                 }
                 identifier = text.hashCode().toLong()

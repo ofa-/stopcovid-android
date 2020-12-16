@@ -52,3 +52,19 @@ val SharedPreferences.hasChosenPostalCode: Boolean
 var SharedPreferences.lastVersionCode: Int
     get() = getInt(Constants.SharedPrefs.LAST_VERSION_CODE, 0)
     set(value) = edit { putInt(Constants.SharedPrefs.LAST_VERSION_CODE, value) }
+
+var SharedPreferences.venuesFeaturedWasActivatedAtLeastOneTime: Boolean
+    get() = getBoolean(Constants.SharedPrefs.VENUES_FEATURED_ACTIVATED, false)
+    set(value) = edit { putBoolean(Constants.SharedPrefs.VENUES_FEATURED_ACTIVATED, value) }
+
+var SharedPreferences.isVenueOnBoardingDone: Boolean
+    get() = getBoolean(Constants.SharedPrefs.VENUES_ON_BOARDING_DONE, false)
+    set(value) = edit { putBoolean(Constants.SharedPrefs.VENUES_ON_BOARDING_DONE, value) }
+
+var SharedPreferences.privateEventQrCode: String?
+    get() = getString(Constants.SharedPrefs.PRIVATE_EVENT_QR_CODE, null)
+    set(value) = edit { putString(Constants.SharedPrefs.PRIVATE_EVENT_QR_CODE, value) }
+
+var SharedPreferences.privateEventQrCodeGenerationDate: Long
+    get() = getLong(Constants.SharedPrefs.PRIVATE_EVENT_QR_CODE_GENERATION_DATE, 0L)
+    set(value) = edit { putLong(Constants.SharedPrefs.PRIVATE_EVENT_QR_CODE_GENERATION_DATE, value) }

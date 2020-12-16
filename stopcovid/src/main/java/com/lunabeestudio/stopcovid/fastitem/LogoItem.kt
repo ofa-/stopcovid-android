@@ -22,12 +22,12 @@ class LogoItem : BaseItem<LogoItem.ViewHolder>(
     R.layout.item_logo, ::ViewHolder, R.id.item_logo
 ) {
     @DrawableRes
-    var imageRes: Int = -1
+    var imageRes: Int? = null
     var isInvisible: Boolean = false
 
     override fun bindView(holder: ViewHolder, payloads: List<Any>) {
         super.bindView(holder, payloads)
-        holder.imageSwitcher.setImageResource(imageRes)
+        imageRes?.let(holder.imageSwitcher::setImageResource)
         holder.imageSwitcher.isInvisible = isInvisible
     }
 

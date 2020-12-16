@@ -27,12 +27,15 @@ import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.preference.PreferenceManager
 import androidx.work.Constraints
+import androidx.work.Data
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequest
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
+import com.lunabeestudio.domain.model.VenueQrCode
 import com.lunabeestudio.framework.local.LocalCryptoManager
 import com.lunabeestudio.framework.local.datasource.SecureFileEphemeralBluetoothIdentifierDataSource
 import com.lunabeestudio.framework.local.datasource.SecureFileLocalProximityDataSource
@@ -43,6 +46,7 @@ import com.lunabeestudio.framework.sharedcrypto.BouncyCastleCryptoDataSource
 import com.lunabeestudio.robert.RobertApplication
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.robert.RobertManagerImpl
+import com.lunabeestudio.stopcovid.`interface`.IsolationApplication
 import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.UiConstants
 import com.lunabeestudio.stopcovid.coreui.manager.ConfigManager
@@ -54,16 +58,19 @@ import com.lunabeestudio.stopcovid.manager.AppMaintenanceManager
 import com.lunabeestudio.stopcovid.manager.ConfigDataSource
 import com.lunabeestudio.stopcovid.manager.FormManager
 import com.lunabeestudio.stopcovid.manager.InfoCenterManager
+import com.lunabeestudio.stopcovid.manager.IsolationManager
 import com.lunabeestudio.stopcovid.manager.KeyFiguresManager
 import com.lunabeestudio.stopcovid.manager.LinksManager
 import com.lunabeestudio.stopcovid.manager.MoreKeyFiguresManager
 import com.lunabeestudio.stopcovid.manager.PrivacyManager
 import com.lunabeestudio.stopcovid.manager.ProximityManager
+import com.lunabeestudio.stopcovid.manager.VenuesManager
 import com.lunabeestudio.stopcovid.model.DeviceSetup
 import com.lunabeestudio.stopcovid.service.ProximityService
+import com.lunabeestudio.stopcovid.worker.ActivateReminderNotificationWorker
 import com.lunabeestudio.stopcovid.worker.AtRiskNotificationWorker
+import com.lunabeestudio.stopcovid.worker.IsolationReminderNotificationWorker
 import com.lunabeestudio.stopcovid.worker.MaintenanceWorker
-import com.lunabeestudio.stopcovid.worker.ReminderNotificationWorker
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -81,7 +88,9 @@ import kotlin.time.ExperimentalTime
 import kotlin.time.hours
 import kotlin.time.milliseconds
 
-class StopCovid : Application(), LifecycleObserver, RobertApplication {
+class StopCovid : Application(), LifecycleObserver, RobertApplication, IsolationApplication {
+
+    override val isolationManager: IsolationManager by lazy { IsolationManager(this, robertManager, secureKeystoreDataSource) }
 
     private val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
         Timber.e(throwable)
@@ -212,6 +221,10 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication {
         refreshProximityService()
         refreshStatusIfNeeded()
         deleteOldAttestations()
+        VenuesManager.clearExpired(robertManager, secureKeystoreDataSource)
+        appCoroutineScope.launch {
+            robertManager.wreportIfNeeded(this@StopCovid, false)
+        }
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
@@ -238,6 +251,24 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication {
     }
 
     override fun atRiskDetected() {
+        val inputData = Data.Builder()
+            .putString(AtRiskNotificationWorker.INPUT_DATA_TITLE_KEY, "notification.atRisk.title")
+            .putString(AtRiskNotificationWorker.INPUT_DATA_MESSAGE_KEY, "notification.atRisk.message")
+            .build()
+        sendAtRiskNotification(OneTimeWorkRequestBuilder<AtRiskNotificationWorker>().setInputData(inputData),
+            Constants.WorkerNames.AT_RISK_NOTIFICATION)
+    }
+
+    override fun warningAtRiskDetected() {
+        val inputData = Data.Builder()
+            .putString(AtRiskNotificationWorker.INPUT_DATA_TITLE_KEY, "notification.atWarning.title")
+            .putString(AtRiskNotificationWorker.INPUT_DATA_MESSAGE_KEY, "notification.atWarning.message")
+            .build()
+        sendAtRiskNotification(OneTimeWorkRequestBuilder<AtRiskNotificationWorker>().setInputData(inputData),
+            Constants.WorkerNames.WARNING_NOTIFICATION)
+    }
+
+    private fun sendAtRiskNotification(oneTimeWorkRequestBuilder: OneTimeWorkRequest.Builder, workerId: String) {
         val minHour = robertManager.atRiskMinHourContactNotif
         val maxHour = robertManager.atRiskMaxHourContactNotif
 
@@ -248,7 +279,7 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication {
         targetCalendar.set(Calendar.MINUTE, 0)
 
         val statusWorkRequest = if (hours in minHour..maxHour) {
-            OneTimeWorkRequestBuilder<AtRiskNotificationWorker>().build()
+            oneTimeWorkRequestBuilder.build()
         } else {
             if (hours > maxHour) {
                 targetCalendar.add(Calendar.DAY_OF_YEAR, 1)
@@ -265,13 +296,13 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication {
 
             Timber.v("Delay notification of ${delay / 1000}sec (trigger at ${Date(randomTime)})")
 
-            OneTimeWorkRequestBuilder<AtRiskNotificationWorker>()
+            oneTimeWorkRequestBuilder
                 .setInitialDelay(delay, TimeUnit.MILLISECONDS)
                 .build()
         }
 
         WorkManager.getInstance(applicationContext)
-            .enqueueUniqueWork(Constants.WorkerNames.NOTIFICATION, ExistingWorkPolicy.KEEP, statusWorkRequest)
+            .enqueueUniqueWork(workerId, ExistingWorkPolicy.KEEP, statusWorkRequest)
     }
 
     override suspend fun sendClockNotAlignedNotification() {
@@ -315,24 +346,63 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication {
         }
     }
 
+    override fun getVenueQrCodeList(startTime: Long?): List<VenueQrCode>? = VenuesManager.getVenuesQrCode(secureKeystoreDataSource,
+        startTime)
+
+    override fun clearVenueQrCodeList() {
+        VenuesManager.clearAllData(sharedPrefs, secureKeystoreDataSource)
+    }
+
     fun cancelClockNotAlignedNotification() {
         val notificationManager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.cancel(UiConstants.Notification.TIME.notificationId)
     }
 
-    fun setReminder(inHour: Int) {
-        val reminderWorker = OneTimeWorkRequestBuilder<ReminderNotificationWorker>()
+    fun setActivateReminder(inHour: Int) {
+        val reminderWorker = OneTimeWorkRequestBuilder<ActivateReminderNotificationWorker>()
             .setInitialDelay(inHour.toLong(), TimeUnit.HOURS)
             .build()
         WorkManager.getInstance(applicationContext)
-            .enqueueUniqueWork(Constants.WorkerNames.REMINDER, ExistingWorkPolicy.KEEP, reminderWorker)
+            .enqueueUniqueWork(Constants.WorkerNames.ACTIVATE_REMINDER, ExistingWorkPolicy.KEEP, reminderWorker)
     }
 
-    fun cancelReminder() {
+    fun cancelActivateReminder() {
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.cancel(UiConstants.Notification.REMINDER.notificationId)
+        notificationManager.cancel(UiConstants.Notification.ACTIVATE_REMINDER.notificationId)
         WorkManager.getInstance(applicationContext)
-            .cancelUniqueWork(Constants.WorkerNames.REMINDER)
+            .cancelUniqueWork(Constants.WorkerNames.ACTIVATE_REMINDER)
+    }
+
+    fun setIsolationReminder(date: Date) {
+        val minHour = robertManager.atRiskMinHourContactNotif
+        val maxHour = robertManager.atRiskMaxHourContactNotif
+
+        val targetCalendar = Calendar.getInstance()
+        targetCalendar.time = date
+        targetCalendar.set(Calendar.MINUTE, 0)
+        targetCalendar.set(Calendar.HOUR_OF_DAY, minHour)
+        val minTime = targetCalendar.time.time
+        targetCalendar.set(Calendar.HOUR_OF_DAY, maxHour)
+        val maxTime = targetCalendar.time.time
+
+        val currentTime = System.currentTimeMillis()
+        val randomTime = Random.nextLong(minTime, maxTime)
+        val delay = (randomTime - currentTime).coerceAtLeast(0)
+
+        Timber.v("Delay notification of ${delay / 1000}sec (trigger at ${Date(randomTime)})")
+
+        val reminderWorker = OneTimeWorkRequestBuilder<IsolationReminderNotificationWorker>()
+            .setInitialDelay(delay, TimeUnit.MILLISECONDS)
+            .build()
+        WorkManager.getInstance(applicationContext)
+            .enqueueUniqueWork(Constants.WorkerNames.ISOLATION_REMINDER, ExistingWorkPolicy.KEEP, reminderWorker)
+    }
+
+    fun cancelIsolationReminder() {
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.cancel(UiConstants.Notification.ISOLATION_REMINDER.notificationId)
+        WorkManager.getInstance(applicationContext)
+            .cancelUniqueWork(Constants.WorkerNames.ISOLATION_REMINDER)
     }
 
     suspend fun sendUpgradeNotification() {

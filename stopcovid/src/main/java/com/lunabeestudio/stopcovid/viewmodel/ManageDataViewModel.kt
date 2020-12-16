@@ -28,6 +28,8 @@ import com.lunabeestudio.stopcovid.coreui.UiConstants
 import com.lunabeestudio.stopcovid.coreui.utils.SingleLiveEvent
 import com.lunabeestudio.stopcovid.extension.chosenPostalCode
 import com.lunabeestudio.stopcovid.extension.toCovidException
+import com.lunabeestudio.stopcovid.manager.IsolationManager
+import com.lunabeestudio.stopcovid.manager.VenuesManager
 import com.lunabeestudio.stopcovid.model.CovidException
 import com.lunabeestudio.stopcovid.model.NeedRegisterException
 import kotlinx.coroutines.Dispatchers
@@ -36,9 +38,12 @@ import kotlinx.coroutines.launch
 class ManageDataViewModel(
     private val secureKeystoreDataSource: SecureKeystoreDataSource,
     private val robertManager: RobertManager,
+    private val isolationManager: IsolationManager,
 ) : ViewModel() {
 
     val eraseAttestationsSuccess: SingleLiveEvent<Unit> = SingleLiveEvent()
+    val eraseIsolationSuccess: SingleLiveEvent<Unit> = SingleLiveEvent()
+    val eraseVenuesSuccess: SingleLiveEvent<Unit> = SingleLiveEvent()
     val eraseLocalSuccess: SingleLiveEvent<Unit> = SingleLiveEvent()
     val eraseRemoteSuccess: SingleLiveEvent<Unit> = SingleLiveEvent()
     val eraseAlertSuccess: SingleLiveEvent<Unit> = SingleLiveEvent()
@@ -46,11 +51,27 @@ class ManageDataViewModel(
     val covidException: SingleLiveEvent<CovidException> = SingleLiveEvent()
     val loadingInProgress: MutableLiveData<Boolean> = MutableLiveData(false)
 
-    fun eraseAttestations() {
+    fun eraseVenues(application: RobertApplication, postValue: Boolean = true) {
+        VenuesManager.clearAllData(PreferenceManager.getDefaultSharedPreferences(application.getAppContext()), secureKeystoreDataSource)
+        if (postValue) {
+            eraseVenuesSuccess.postValue(null)
+        }
+    }
+
+    fun eraseAttestations(postValue: Boolean = true) {
         secureKeystoreDataSource.savedAttestationData = null
         secureKeystoreDataSource.saveAttestationData = null
         secureKeystoreDataSource.attestations = null
-        eraseAttestationsSuccess.postValue(null)
+        if (postValue) {
+            eraseAttestationsSuccess.postValue(null)
+        }
+    }
+
+    fun eraseIsolation(postValue: Boolean = true) {
+        isolationManager.resetData()
+        if (postValue) {
+            eraseIsolationSuccess.postValue(null)
+        }
     }
 
     fun eraseLocalHistory() {
@@ -114,10 +135,15 @@ class ManageDataViewModel(
                     loadingInProgress.postValue(true)
                     when (val result = robertManager.quitStopCovid(application)) {
                         is RobertResult.Success -> {
-                            WorkManager.getInstance(application.getAppContext()).cancelUniqueWork(Constants.WorkerNames.NOTIFICATION)
+                            WorkManager.getInstance(application.getAppContext())
+                                .cancelUniqueWork(Constants.WorkerNames.AT_RISK_NOTIFICATION)
+                            WorkManager.getInstance(application.getAppContext())
+                                .cancelUniqueWork(Constants.WorkerNames.WARNING_NOTIFICATION)
                             clearNotifications(application)
-                            eraseAttestations()
-                            (application.getAppContext() as StopCovid).cancelReminder()
+                            eraseAttestations(false)
+                            eraseVenues(application, false)
+                            (application.getAppContext() as StopCovid).cancelActivateReminder()
+                            eraseIsolation(false)
                             PreferenceManager.getDefaultSharedPreferences(application.getAppContext()).chosenPostalCode = null
                             quitStopCovidSuccess.postValue(null)
                         }
@@ -139,10 +165,14 @@ class ManageDataViewModel(
     }
 }
 
-class ManageDataViewModelFactory(private val secureKeystoreDataSource: SecureKeystoreDataSource, private val robertManager: RobertManager) :
+class ManageDataViewModelFactory(
+    private val secureKeystoreDataSource: SecureKeystoreDataSource,
+    private val robertManager: RobertManager,
+    private val isolationManager: IsolationManager,
+) :
     ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         @Suppress("UNCHECKED_CAST")
-        return ManageDataViewModel(secureKeystoreDataSource, robertManager) as T
+        return ManageDataViewModel(secureKeystoreDataSource, robertManager, isolationManager) as T
     }
 }
