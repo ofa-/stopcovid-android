@@ -569,10 +569,10 @@ class ProximityFragment : TimeMainFragment() {
     }
 
     private fun addVenueItems(items: ArrayList<GenericItem>, isSick: Boolean) {
-        val displayRecordVenues = robertManager.displayRecordVenues
-        val displayPrivateEvent = robertManager.displayPrivateEvent
+        val displayRecordVenues = true
+        val displayPrivateEvent = true
 
-        if (!isSick && (displayRecordVenues || displayPrivateEvent)) {
+        if (true) {
             items += bigTitleItem {
                 text = strings["home.venuesSection.title"]
                 identifier = "home.venuesSection.title".hashCode().toLong()
