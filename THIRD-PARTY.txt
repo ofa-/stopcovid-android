@@ -28,6 +28,17 @@ Component: Timber
 License Text URL: https://github.com/JakeWharton/timber/blob/master/LICENSE.txt
 Source Code: https://github.com/JakeWharton/timber
 
+Component: Progress button
+Source Code: https://github.com/razir/ProgressButton
+
+Component: QRCode image processing library
+License Text URL: https://github.com/zxing/zxing/blob/master/LICENSE
+Source Code: https://github.com/zxing/zxing
+
+Component: Barcode scanning library for Android, using ZXing for decoding
+License Text URL: http://www.apache.org/licenses/LICENSE-2.0
+Source Code: https://github.com/journeyapps/zxing-android-embedded
+
 ================================================================================
 BSD 3-Clause
 ================================================================================
