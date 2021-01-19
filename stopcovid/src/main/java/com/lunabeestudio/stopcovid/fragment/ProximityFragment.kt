@@ -30,6 +30,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.os.SystemClock
+import android.util.LayoutDirection
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -51,7 +52,6 @@ import com.airbnb.lottie.utils.Utils
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.lunabeestudio.robert.RobertApplication
 import com.lunabeestudio.robert.extension.observeEventAndConsume
-import com.lunabeestudio.robert.model.AtRiskStatus
 import com.lunabeestudio.robert.model.ProximityException
 import com.lunabeestudio.robert.model.RobertException
 import com.lunabeestudio.stopcovid.Constants
@@ -60,13 +60,15 @@ import com.lunabeestudio.stopcovid.StopCovid
 import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.UiConstants
 import com.lunabeestudio.stopcovid.coreui.extension.addRipple
-import com.lunabeestudio.stopcovid.coreui.extension.fetchSystemColor
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.extension.isNightMode
 import com.lunabeestudio.stopcovid.coreui.extension.refreshLift
-import com.lunabeestudio.stopcovid.coreui.extension.resolveAttribute
 import com.lunabeestudio.stopcovid.coreui.extension.viewLifecycleOwnerOrNull
+import com.lunabeestudio.stopcovid.coreui.fastitem.CardWithActionsItem
+import com.lunabeestudio.stopcovid.coreui.fastitem.cardWithActionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
+import com.lunabeestudio.stopcovid.coreui.model.Action
+import com.lunabeestudio.stopcovid.coreui.model.CardTheme
 import com.lunabeestudio.stopcovid.extension.addIsolationItems
 import com.lunabeestudio.stopcovid.extension.chosenPostalCode
 import com.lunabeestudio.stopcovid.extension.colorStringKey
@@ -83,22 +85,14 @@ import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
 import com.lunabeestudio.stopcovid.extension.showPostalCodeDialog
 import com.lunabeestudio.stopcovid.extension.toCovidException
 import com.lunabeestudio.stopcovid.extension.venuesFeaturedWasActivatedAtLeastOneTime
-import com.lunabeestudio.stopcovid.fastitem.ImageBackgroundCardItem
-import com.lunabeestudio.stopcovid.fastitem.InfoCenterCardItem
 import com.lunabeestudio.stopcovid.fastitem.LogoItem
 import com.lunabeestudio.stopcovid.fastitem.NumbersCardItem
 import com.lunabeestudio.stopcovid.fastitem.OnOffLottieItem
 import com.lunabeestudio.stopcovid.fastitem.ProximityButtonItem
 import com.lunabeestudio.stopcovid.fastitem.State
-import com.lunabeestudio.stopcovid.fastitem.addPostalCodeCardItem
 import com.lunabeestudio.stopcovid.fastitem.bigTitleItem
-import com.lunabeestudio.stopcovid.fastitem.buttonCardItem
 import com.lunabeestudio.stopcovid.fastitem.highlightedNumberCardItem
-import com.lunabeestudio.stopcovid.fastitem.imageBackgroundCardItem
-import com.lunabeestudio.stopcovid.fastitem.infoCenterCardItem
-import com.lunabeestudio.stopcovid.fastitem.linkCardItem
 import com.lunabeestudio.stopcovid.fastitem.logoItem
-import com.lunabeestudio.stopcovid.fastitem.moreCardItem
 import com.lunabeestudio.stopcovid.fastitem.numbersCardItem
 import com.lunabeestudio.stopcovid.fastitem.onOffLottieItem
 import com.lunabeestudio.stopcovid.fastitem.proximityButtonItem
@@ -150,8 +144,8 @@ class ProximityFragment : TimeMainFragment() {
     private var onOffLottieItem: OnOffLottieItem? = null
     private var logoItem: LogoItem? = null
     private var proximityButtonItem: ProximityButtonItem? = null
-    private lateinit var infoCenterCardItem: InfoCenterCardItem
-    private var healthItem: ImageBackgroundCardItem? = null
+    private lateinit var infoCenterCardItem: CardWithActionsItem
+    private var healthItem: CardWithActionsItem? = null
     private var shouldRefresh: Boolean = false
     private var isProximityOn: Boolean = false
     private val interpolator = DecelerateInterpolator()
@@ -169,10 +163,11 @@ class ProximityFragment : TimeMainFragment() {
     }
     private var proximityClickThreshold = 0L
     private var lastAdapterRefresh: Long = 0L
+    private var boundedService: ProximityService? = null
 
     private val proximityServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-            val boundedService = (service as ProximityService.ProximityBinder).getService()
+            boundedService = (service as ProximityService.ProximityBinder).getService()
 
             val handleError = { error: RobertException ->
                 context?.let {
@@ -180,8 +175,8 @@ class ProximityFragment : TimeMainFragment() {
                 } ?: Unit
             }
 
-            boundedService.consumeLastError()?.let(handleError)
-            boundedService.onError = handleError
+            boundedService?.consumeLastError()?.let(handleError)
+            boundedService?.onError = handleError
         }
 
         override fun onServiceDisconnected(name: ComponentName?) {}
@@ -238,7 +233,7 @@ class ProximityFragment : TimeMainFragment() {
 
     @RequiresApi(Build.VERSION_CODES.N_MR1)
     private fun createCertificateShortcut(): ShortcutInfo? {
-        return if (robertManager.displayAttestation) {
+        return if (robertManager.configuration.displayAttestation) {
             val builder = ShortcutInfo.Builder(context, CURFEW_CERTIFICATE_SHORTCUT_ID)
 
             builder.setShortLabel(strings["attestationsController.title"] ?: "Attestations")
@@ -259,7 +254,7 @@ class ProximityFragment : TimeMainFragment() {
 
     @RequiresApi(Build.VERSION_CODES.N_MR1)
     private fun createVenueQrCodeShortcut(): ShortcutInfo? {
-        return if (robertManager.displayRecordVenues) {
+        return if (robertManager.configuration.displayRecordVenues) {
             val builder = ShortcutInfo.Builder(context, VENUE_QRCODE_SHORTCUT_ID)
 
             builder.setShortLabel(strings["appShortcut.venues"] ?: "Scanner un lieu")
@@ -328,32 +323,8 @@ class ProximityFragment : TimeMainFragment() {
         viewModel.isolationDataChanged.observe(viewLifecycleOwner) {
             refreshScreen()
         }
-        robertManager.atRiskStatus.observeEventAndConsume(viewLifecycleOwner) { isAtRisk ->
-            when {
-                isAtRisk == AtRiskStatus.UNKNOWN -> {
-                    healthItem = null
-                    refreshScreen()
-                }
-                healthItem == null -> refreshScreen()
-                isAtRisk == AtRiskStatus.AT_RISK -> refreshHealthItem(
-                    requireContext(),
-                    pIsAtRisk = true,
-                    pIsWarningAtRisk = false,
-                    notifyAdapter = true
-                )
-                isAtRisk == AtRiskStatus.WARNING_AT_RISK -> refreshHealthItem(
-                    requireContext(),
-                    pIsAtRisk = false,
-                    pIsWarningAtRisk = true,
-                    notifyAdapter = true
-                )
-                isAtRisk == AtRiskStatus.NOT_AT_RISK -> refreshHealthItem(
-                    requireContext(),
-                    pIsAtRisk = false,
-                    pIsWarningAtRisk = false,
-                    notifyAdapter = true
-                )
-            }
+        robertManager.atRiskStatus.observeEventAndConsume(viewLifecycleOwner) {
+            refreshScreen()
         }
         InfoCenterManager.infos.observeEventAndConsume(viewLifecycleOwner) {
             refreshScreen()
@@ -385,6 +356,8 @@ class ProximityFragment : TimeMainFragment() {
     override fun onStop() {
         super.onStop()
         requireActivity().unbindService(proximityServiceConnection)
+        boundedService?.onError = null
+        boundedService = null
     }
 
     override fun getItems(): List<GenericItem> {
@@ -394,16 +367,28 @@ class ProximityFragment : TimeMainFragment() {
 
         addTopImageItems(items)
         addActivateButtonItems(items)
+
+        // Health items
         addHealthItems(items, isSick)
-        if (robertManager.displayIsolation) {
+        if (robertManager.configuration.displayIsolation) {
             addIsolationItems(items)
         }
         addDeclareItems(items, isSick)
-        addVenueItems(items, isSick)
+        if (robertManager.configuration.displayVaccination) {
+            addVaccinationItems(items)
+        }
+        // News items
         addNewsItems(items)
-        if (robertManager.displayAttestation) {
+
+        // Attestation
+        if (robertManager.configuration.displayAttestation) {
             addAttestationItems(items)
         }
+
+        // Venue items
+        addVenueItems(items, isSick)
+
+        // More items
         addMoreItems(items)
 
         refreshItems()
@@ -445,13 +430,13 @@ class ProximityFragment : TimeMainFragment() {
                 }
                 identifier = items.count().toLong()
             }
+
             if (robertManager.isRegistered) {
                 proximityButtonItem?.let { items += it }
             } else {
-                items += buttonCardItem {
-                    text = strings["home.activationExplanation"]
-                    buttonText = strings["home.mainButton.activate"]
-                    onClickListener = View.OnClickListener {
+                items += cardWithActionItem(CardTheme.Primary) {
+                    mainBody = strings["home.activationExplanation"]
+                    onCardClick = {
                         if (SystemClock.elapsedRealtime() > proximityClickThreshold) {
                             proximityClickThreshold = SystemClock.elapsedRealtime() + PROXIMITY_BUTTON_DELAY
                             if (robertManager.isProximityActive) {
@@ -463,6 +448,19 @@ class ProximityFragment : TimeMainFragment() {
                         }
                     }
                     identifier = items.count().toLong()
+                    actions = listOf(
+                        Action(label = strings["home.mainButton.activate"]) {
+                            if (SystemClock.elapsedRealtime() > proximityClickThreshold) {
+                                proximityClickThreshold = SystemClock.elapsedRealtime() + PROXIMITY_BUTTON_DELAY
+                                if (robertManager.isProximityActive) {
+                                    deactivateProximity()
+                                    refreshItems()
+                                } else {
+                                    activateProximity()
+                                }
+                            }
+                        }
+                    )
                 }
             }
 
@@ -481,53 +479,43 @@ class ProximityFragment : TimeMainFragment() {
         }
 
         when {
-            deviceSetup == DeviceSetup.NO_BLE && !robertManager.displayRecordVenues -> {
+            deviceSetup == DeviceSetup.NO_BLE && !robertManager.configuration.displayRecordVenues -> {
                 healthItem = null
-                items += imageBackgroundCardItem {
-                    iconRes = R.drawable.health_card
-                    backgroundDrawable = R.drawable.bg_no_risk
-                    onClickListener = View.OnClickListener {
+                items += cardWithActionItem(CardTheme.Healthy) {
+                    mainImage = R.drawable.health_card
+                    mainTitle = strings["myHealthController.alert.atitudeToAdopt"]
+                    mainBody = strings["home.healthSection.noContact.cellSubtitle"]
+                    onCardClick = {
                         findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToHealthFragment())
                     }
-                    title = strings["myHealthController.alert.atitudeToAdopt"]
-                    subtitle = strings["home.healthSection.noContact.cellSubtitle"]
                     identifier = R.drawable.health_card.toLong()
                 }
             }
             isSick -> {
                 healthItem = null
-                items += imageBackgroundCardItem {
-                    iconRes = R.drawable.health_card
-                    backgroundDrawable = R.drawable.bg_sick
-                    title = strings["home.healthSection.isSick.standaloneTitle"]
-                    subtitle = null
-                    identifier = R.drawable.health_card.toLong()
-                    onClickListener = View.OnClickListener {
+                items += cardWithActionItem(CardTheme.Sick) {
+                    mainImage = R.drawable.health_card
+                    mainTitle = strings["home.healthSection.isSick.standaloneTitle"]
+                    onCardClick = {
                         findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToIsSickFragment())
                     }
+                    identifier = R.drawable.health_card.toLong()
                 }
             }
             else -> {
                 if (robertManager.isAtRisk != null || robertManager.isWarningAtRisk != null) {
-                    healthItem = imageBackgroundCardItem {
-                        iconRes = R.drawable.health_card
-                        backgroundDrawable = when {
-                            robertManager.isAtRisk == true -> {
-                                R.drawable.bg_risk
-                            }
-                            robertManager.isWarningAtRisk == true -> {
-                                R.drawable.bg_warning_risk
-                            }
-                            else -> {
-                                R.drawable.bg_no_risk
-                            }
-                        }
-                        onClickListener = View.OnClickListener {
+                    val cardTheme = when {
+                        robertManager.isAtRisk == true -> CardTheme.Danger
+                        robertManager.isWarningAtRisk == true -> CardTheme.Warning
+                        else -> CardTheme.Healthy
+                    }
+                    healthItem = cardWithActionItem(cardTheme) {
+                        mainImage = R.drawable.health_card
+                        onCardClick = {
                             findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToHealthFragment())
                         }
                         identifier = R.drawable.health_card.toLong()
                     }
-                    healthItem
                 } else {
                     healthItem = null
                 }
@@ -545,8 +533,8 @@ class ProximityFragment : TimeMainFragment() {
     }
 
     private fun addVenueItems(items: ArrayList<GenericItem>, isSick: Boolean) {
-        val displayRecordVenues = robertManager.displayRecordVenues
-        val displayPrivateEvent = robertManager.displayPrivateEvent
+        val displayRecordVenues = robertManager.configuration.displayRecordVenues
+        val displayPrivateEvent = robertManager.configuration.displayPrivateEvent
 
         if (!isSick && (displayRecordVenues || displayPrivateEvent)) {
             items += bigTitleItem {
@@ -556,27 +544,31 @@ class ProximityFragment : TimeMainFragment() {
             }
 
             if (displayRecordVenues) {
-                items += imageBackgroundCardItem {
-                    iconRes = R.drawable.shops_card
-                    backgroundDrawable = android.R.attr.colorPrimary.resolveAttribute(requireContext())
-                    onClickListener = View.OnClickListener {
+                items += cardWithActionItem(CardTheme.Primary) {
+                    mainImage = R.drawable.shops_card
+                    onCardClick = {
                         startRecordVenue()
                     }
-                    textColor = R.attr.colorOnPrimary.fetchSystemColor(requireContext())
-                    title = strings["home.venuesSection.recordCell.title"]
-                    subtitle = strings["home.venuesSection.recordCell.subtitle"]
+                    mainTitle = strings["home.venuesSection.recordCell.title"]
+                    mainBody = strings["home.venuesSection.recordCell.subtitle"]
                     identifier = R.drawable.shops_card.toLong()
+                }
+
+                items += spaceItem {
+                    spaceRes = R.dimen.spacing_medium
+                    identifier = items.count().toLong()
                 }
             }
 
             if (displayPrivateEvent) {
-                items += imageBackgroundCardItem {
-                    iconRes = R.drawable.parties_card
-                    onClickListener = View.OnClickListener {
+                items += cardWithActionItem {
+                    mainImage = R.drawable.parties_card
+                    onCardClick = {
                         startPrivateEvent()
                     }
-                    title = strings["home.venuesSection.privateCell.title"]
-                    subtitle = strings["home.venuesSection.privateCell.subtitle"]
+                    mainTitle = strings["home.venuesSection.privateCell.title"]
+                    mainBody = strings["home.venuesSection.privateCell.subtitle"]
+                    mainLayoutDirection = LayoutDirection.RTL
                     identifier = R.drawable.parties_card.toLong()
                 }
             }
@@ -617,15 +609,26 @@ class ProximityFragment : TimeMainFragment() {
 
         items += getKeyFiguresItems()
 
-        infoCenterCardItem = infoCenterCardItem {
-            header = strings["home.infoSection.lastInfo"]
-            link = strings["home.infoSection.readAll"]
+        infoCenterCardItem = cardWithActionItem {
+            cardTitle = strings["home.infoSection.lastInfo"]
+            cardTitleIcon = R.drawable.ic_bell
+
             contentDescription = strings["home.infoSection.readAll"]
-            showBadge = sharedPrefs.getBoolean(Constants.SharedPrefs.HAS_NEWS, false)
-            onClickListener = View.OnClickListener {
+
+            identifier = cardTitle.hashCode().toLong()
+            mainMaxLines = 3
+            onCardClick = {
                 findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToInfoCenterFragment())
             }
-            identifier = header.hashCode().toLong()
+
+            actions = listOf(
+                Action(
+                    label = strings["home.infoSection.readAll"],
+                    showBadge = sharedPrefs.getBoolean(Constants.SharedPrefs.HAS_NEWS, false)
+                ) {
+                    findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToInfoCenterFragment())
+                }
+            )
         }
         items += infoCenterCardItem
 
@@ -655,11 +658,14 @@ class ProximityFragment : TimeMainFragment() {
                 }
                 identifier = "highlightedNumberCard".hashCode().toLong()
             }
+            items += spaceItem {
+                spaceRes = R.dimen.spacing_medium
+                identifier = items.count().toLong()
+            }
             isHighlighted = true
         }
 
         items += numbersCardItem {
-
             if (isHighlighted) {
                 subheader = null
                 header = strings["home.infoSection.otherKeyFigures"]
@@ -692,34 +698,39 @@ class ProximityFragment : TimeMainFragment() {
                 }
             }
         }
-
-        if (robertManager.displayDepartmentLevel) {
-            if (sharedPrefs.chosenPostalCode == null) {
-                items += addPostalCodeCardItem {
-                    header = strings["home.infoSection.newPostalCode"]
-                    content = strings["home.infoSection.newPostalCode.subtitle"]
-                    link = strings["home.infoSection.newPostalCode.button"]
-                    contentDescription = strings["home.infoSection.newPostalCode.subtitle"]
-                    onClickListener = View.OnClickListener {
-                        showPostalCodeDialog()
-                    }
-                    identifier = header.hashCode().toLong()
-                }
-            } else {
-                items += linkCardItem {
-                    label = strings["home.infoSection.updatePostalCode"]
-                    iconRes = R.drawable.ic_map
-                    onClickListener = View.OnClickListener {
-                        findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToPostalCodeBottomSheetFragment())
-                    }
-                    identifier = label.hashCode().toLong()
-                }
-            }
+        items += spaceItem {
+            spaceRes = R.dimen.spacing_medium
+            identifier = items.count().toLong()
         }
 
-        items += spaceItem {
-            spaceRes = R.dimen.spacing_large
-            identifier = items.count().toLong()
+        if (robertManager.configuration.displayDepartmentLevel) {
+            if (sharedPrefs.chosenPostalCode == null) {
+                items += cardWithActionItem(CardTheme.Primary) {
+                    cardTitle = strings["home.infoSection.newPostalCode"]
+                    cardTitleIcon = R.drawable.ic_map
+                    mainBody = strings["home.infoSection.newPostalCode.subtitle"]
+                    onCardClick = {
+                        showPostalCodeDialog()
+                    }
+                    actions = listOf(
+                        Action(label = strings["home.infoSection.newPostalCode.button"]) {
+                            showPostalCodeDialog()
+                        }
+                    )
+                    contentDescription = strings["home.infoSection.newPostalCode.subtitle"]
+                    identifier = cardTitle.hashCode().toLong()
+                }
+            } else {
+                items += cardWithActionItem {
+                    actions = listOf(Action(R.drawable.ic_map, strings["home.infoSection.updatePostalCode"]) {
+                        findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToPostalCodeBottomSheetFragment())
+                    })
+                }
+            }
+            items += spaceItem {
+                spaceRes = R.dimen.spacing_medium
+                identifier = items.count().toLong()
+            }
         }
 
         return items
@@ -746,16 +757,14 @@ class ProximityFragment : TimeMainFragment() {
             importantForAccessibility = ViewCompat.IMPORTANT_FOR_ACCESSIBILITY_NO
         }
 
-        items += imageBackgroundCardItem {
-            iconRes = R.drawable.attestation_card
-            textColor = R.attr.colorOnPrimary.fetchSystemColor(requireContext())
-            backgroundDrawable = android.R.attr.colorPrimary.resolveAttribute(requireContext())
-            onClickListener = View.OnClickListener {
+        items += cardWithActionItem(CardTheme.Primary) {
+            mainImage = R.drawable.attestation_card
+            onCardClick = {
                 findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToAttestationsFragment())
             }
-            title = strings["home.attestationSection.cell.title"]
+            mainTitle = strings["home.attestationSection.cell.title"]
             val attestationCount = viewModel.activeAttestationCount.value
-            subtitle = when (val count = attestationCount?.peekContent()) {
+            mainBody = when (val count = attestationCount?.peekContent()) {
                 0, null -> strings["home.attestationSection.cell.subtitle.noAttestations"]
                 1 -> strings["home.attestationSection.cell.subtitle.oneAttestation"]
                 else -> stringsFormat("home.attestationSection.cell.subtitle.multipleAttestations", count)
@@ -764,7 +773,7 @@ class ProximityFragment : TimeMainFragment() {
         }
 
         items += spaceItem {
-            spaceRes = R.dimen.spacing_large
+            spaceRes = R.dimen.spacing_medium
             identifier = items.count().toLong()
         }
     }
@@ -780,77 +789,85 @@ class ProximityFragment : TimeMainFragment() {
     }
 
     private fun addDeclareItems(items: ArrayList<GenericItem>, isSick: Boolean) {
-        if ((deviceSetup != DeviceSetup.NO_BLE || robertManager.displayRecordVenues) && !isSick) {
-            items += imageBackgroundCardItem {
-                title = strings["home.declareSection.cellTitle"]
-                subtitle = strings["home.declareSection.cellSubtitle"]
-                iconRes = R.drawable.declare_card
+        if ((deviceSetup != DeviceSetup.NO_BLE || robertManager.configuration.displayRecordVenues) && !isSick) {
+            items += cardWithActionItem {
+                mainTitle = strings["home.declareSection.cellTitle"]
+                mainBody = strings["home.declareSection.cellSubtitle"]
+                mainImage = R.drawable.declare_card
                 contentDescription = strings["home.declareSection.title"]
-                onClickListener = View.OnClickListener {
+                onCardClick = {
                     findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToReportFragment())
                 }
-                identifier = title.hashCode().toLong()
+                identifier = mainTitle.hashCode().toLong()
             }
 
             items += spaceItem {
-                spaceRes = R.dimen.spacing_large
+                spaceRes = R.dimen.spacing_medium
                 identifier = items.count().toLong()
             }
+        }
+    }
+
+    private fun addVaccinationItems(items: ArrayList<GenericItem>) {
+        items += cardWithActionItem {
+            cardTitle = strings["home.vaccinationSection.cellTitle"]
+            cardTitleColorInt = R.color.color_no_risk
+            cardTitleIcon = R.drawable.ic_vaccin
+            mainHeader = strings["home.vaccinationSection.cellSubtitle"]
+            contentDescription = strings["home.vaccinationSection.cellTitle"]
+            onCardClick = {
+                findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToVaccinationFragment())
+            }
+            identifier = "home.vaccinationSection.cellTitle".hashCode().toLong()
+        }
+
+        items += spaceItem {
+            spaceRes = R.dimen.spacing_medium
+            identifier = items.count().toLong()
         }
     }
 
     private fun addMoreItems(items: ArrayList<GenericItem>) {
         items += bigTitleItem {
             text = strings["home.moreSection.title"]
-            identifier = items.count().toLong()
+            identifier = "home.moreSection.title".hashCode().toLong()
             importantForAccessibility = ViewCompat.IMPORTANT_FOR_ACCESSIBILITY_NO
         }
 
-        items += moreCardItem {
-            linksText = strings["home.moreSection.usefulLinks"]
-            linksOnClickListener = View.OnClickListener {
-                findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToLinksFragment())
-            }
-            linksIconRes = R.drawable.ic_link
-            venuesHistoryText = strings["home.moreSection.venuesHistory"]?.takeIf {
-                !robertManager.isSick && robertManager.displayRecordVenues
-            }
-            venuesHistoryOnClickListener = View.OnClickListener {
-                findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToVenuesHistoryFragment())
-            }
-            venuesHistoryIconRes = R.drawable.ic_clock
-            privacyText = strings["home.moreSection.privacy"]
-            privacyOnClickListener = View.OnClickListener {
-                findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToPrivacyFragment())
-            }
-            privacyIconRes = R.drawable.ic_privacy
-            manageDataText = strings["common.settings"]
-            manageDataOnClickListener = View.OnClickListener {
-                findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToManageDataFragment())
-            }
-            manageDataIconRes = R.drawable.ic_manage_data
-            aboutText = strings["home.moreSection.aboutStopCovid"]
-            aboutOnClickListener = View.OnClickListener {
-                findNavControllerOrNull()?.safeNavigate(R.id.nav_about, null, navOptions {
-                    anim {
-                        enter = R.anim.nav_default_enter_anim
-                        popEnter = R.anim.nav_default_pop_enter_anim
-                        popExit = R.anim.nav_default_pop_exit_anim
-                        exit = R.anim.nav_default_exit_anim
-                    }
-                })
-            }
-            aboutIconRes = R.drawable.ic_about
-            identifier = items.count().toLong()
-
-            shareText = strings["home.moreSection.appSharing"]
-            shareIconRes = R.drawable.ic_chat_bubble
-            shareOnClickListener = View.OnClickListener {
-                ShareCompat.IntentBuilder.from(requireActivity())
-                    .setType("text/plain")
-                    .setText(strings["sharingController.appSharingMessage"])
-                    .startChooser()
-            }
+        items += cardWithActionItem {
+            actions = listOf(
+                Action(R.drawable.ic_link, strings["home.moreSection.usefulLinks"]) {
+                    findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToLinksFragment())
+                },
+                Action(R.drawable.ic_share, strings["home.moreSection.appSharing"]) {
+                    ShareCompat.IntentBuilder.from(requireActivity())
+                        .setType("text/plain")
+                        .setText(strings["sharingController.appSharingMessage"])
+                        .startChooser()
+                },
+                Action(R.drawable.ic_history, strings["home.moreSection.venuesHistory"]) {
+                    findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToVenuesHistoryFragment())
+                }.takeIf {
+                    !robertManager.isSick && robertManager.configuration.displayRecordVenues
+                },
+                Action(R.drawable.ic_settings, strings["common.settings"]) {
+                    findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToManageDataFragment())
+                },
+                Action(R.drawable.ic_privacy, strings["home.moreSection.privacy"]) {
+                    findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToPrivacyFragment())
+                },
+                Action(R.drawable.ic_about, strings["home.moreSection.aboutStopCovid"]) {
+                    findNavControllerOrNull()?.safeNavigate(R.id.nav_about, null, navOptions {
+                        anim {
+                            enter = R.anim.nav_default_enter_anim
+                            popEnter = R.anim.nav_default_pop_enter_anim
+                            popExit = R.anim.nav_default_pop_exit_anim
+                            exit = R.anim.nav_default_exit_anim
+                        }
+                    })
+                }
+            ).filterNotNull()
+            identifier = "home.moreSection.title.content".hashCode().toLong()
         }
 
         items += spaceItem {
@@ -911,9 +928,9 @@ class ProximityFragment : TimeMainFragment() {
             InfoCenterManager.infos.value?.peekContent()?.firstOrNull()?.let { info ->
                 if (::infoCenterCardItem.isInitialized) {
                     infoCenterCardItem.apply {
-                        subheader = info.timestamp.seconds.getRelativeDateTimeString(requireContext())
-                        title = infoCenterStrings[info.titleKey]
-                        subtitle = infoCenterStrings[info.descriptionKey]
+                        mainHeader = info.timestamp.seconds.getRelativeDateTimeString(requireContext())
+                        mainTitle = infoCenterStrings[info.titleKey]
+                        mainBody = infoCenterStrings[info.descriptionKey]
                     }
                 }
             }
@@ -978,35 +995,23 @@ class ProximityFragment : TimeMainFragment() {
             val isAtRisk = pIsAtRisk ?: robertManager.isAtRisk
             val isWarningAtRisk = pIsWarningAtRisk ?: robertManager.isWarningAtRisk ?: false
 
-            header = stringsFormat(
+            mainHeader = stringsFormat(
                 "myHealthController.notification.update",
-                robertManager.atRiskLastRefresh?.milliseconds?.getRelativeDateTimeString(context)
+                robertManager.atRiskLastRefresh?.milliseconds?.getRelativeDateTimeString(context) ?: ""
             )
 
             when {
                 isAtRisk == true -> {
-                    title = strings["home.healthSection.contact.cellTitle"]
-                    subtitle = strings["home.healthSection.contact.cellSubtitle"]
+                    mainTitle = strings["home.healthSection.contact.cellTitle"]
+                    mainBody = strings["home.healthSection.contact.cellSubtitle"]
                 }
                 isWarningAtRisk -> {
-                    title = strings["home.healthSection.warningContact.cellTitle"]
-                    subtitle = strings["home.healthSection.warningContact.cellSubtitle"]
+                    mainTitle = strings["home.healthSection.warningContact.cellTitle"]
+                    mainBody = strings["home.healthSection.warningContact.cellSubtitle"]
                 }
                 else -> {
-                    title = strings["home.healthSection.noContact.cellTitle"]
-                    subtitle = strings["home.healthSection.noContact.cellSubtitle"]
-                }
-            }
-
-            backgroundDrawable = when {
-                isAtRisk == true -> {
-                    R.drawable.bg_risk
-                }
-                isWarningAtRisk -> {
-                    R.drawable.bg_warning_risk
-                }
-                else -> {
-                    R.drawable.bg_no_risk
+                    mainTitle = strings["home.healthSection.noContact.cellTitle"]
+                    mainBody = strings["home.healthSection.noContact.cellSubtitle"]
                 }
             }
         }
@@ -1023,7 +1028,7 @@ class ProximityFragment : TimeMainFragment() {
         if (notifyCalledMoreThanHalfAMinuteAgo) {
             viewLifecycleOwnerOrNull()?.lifecycleScope?.launch(Dispatchers.Default) {
                 healthItem?.apply {
-                    header = stringsFormat(
+                    mainHeader = stringsFormat(
                         "myHealthController.notification.update",
                         robertManager.atRiskLastRefresh?.milliseconds?.getRelativeDateTimeString(requireContext())
                     )
@@ -1031,7 +1036,7 @@ class ProximityFragment : TimeMainFragment() {
                 InfoCenterManager.infos.value?.peekContent()?.firstOrNull()?.let { info ->
                     if (::infoCenterCardItem.isInitialized) {
                         infoCenterCardItem.apply {
-                            subheader = info.timestamp.seconds.getRelativeDateTimeString(requireContext())
+                            mainHeader = info.timestamp.seconds.getRelativeDateTimeString(requireContext())
                         }
                     }
                 }

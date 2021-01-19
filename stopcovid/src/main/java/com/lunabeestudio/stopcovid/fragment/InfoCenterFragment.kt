@@ -80,6 +80,11 @@ class InfoCenterFragment : TimeMainFragment() {
         val tags = InfoCenterManager.tags.value?.peekContent() ?: emptyList()
 
         if (infoCenterStrings != null) {
+            items += spaceItem {
+                spaceRes = R.dimen.spacing_large
+                identifier = items.size.toLong()
+            }
+
             infos.forEach { info ->
                 val infoTitle = infoCenterStrings[info.titleKey]
                 val infoDescription = infoCenterStrings[info.descriptionKey]

@@ -10,7 +10,7 @@
 
 package com.lunabeestudio.robert.repository
 
-import com.lunabeestudio.domain.model.DeviceParameterCorrection
+import com.lunabeestudio.domain.model.Configuration
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.robert.datasource.LocalKeystoreDataSource
 
@@ -18,6 +18,11 @@ internal class KeystoreRepository(
     private val keystoreDataSource: LocalKeystoreDataSource,
     private val robertManager: RobertManager,
 ) {
+    var configuration: Configuration?
+        get() = keystoreDataSource.configuration
+        set(value) {
+            keystoreDataSource.configuration = value
+        }
 
     var reportPositiveTestDate: Long?
         get() = keystoreDataSource.reportPositiveTestDate
@@ -90,18 +95,6 @@ internal class KeystoreRepository(
             robertManager.refreshAtRisk()
         }
 
-    var atRiskMinHourContactNotif: Int?
-        get() = keystoreDataSource.atRiskMinHourContactNotif
-        set(value) {
-            keystoreDataSource.atRiskMinHourContactNotif = value
-        }
-
-    var atRiskMaxHourContactNotif: Int?
-        get() = keystoreDataSource.atRiskMaxHourContactNotif
-        set(value) {
-            keystoreDataSource.atRiskMaxHourContactNotif = value
-        }
-
     var lastExposureTimeframe: Int?
         get() = keystoreDataSource.lastExposureTimeframe
         set(value) {
@@ -121,209 +114,10 @@ internal class KeystoreRepository(
             keystoreDataSource.isSick = value
         }
 
-    var calibration: List<DeviceParameterCorrection>?
-        get() = keystoreDataSource.calibration
-        set(value) {
-            keystoreDataSource.calibration = value
-        }
-
-    var filteringConfig: String?
-        get() = keystoreDataSource.filteringConfig
-        set(value) {
-            keystoreDataSource.filteringConfig = value
-        }
-
-    var filteringMode: String?
-        get() = keystoreDataSource.filteringMode
-        set(value) {
-            keystoreDataSource.filteringMode = value
-        }
-
-    var serviceUUID: String?
-        get() = keystoreDataSource.serviceUUID
-        set(value) {
-            keystoreDataSource.serviceUUID = value
-        }
-
-    var characteristicUUID: String?
-        get() = keystoreDataSource.characteristicUUID
-        set(value) {
-            keystoreDataSource.characteristicUUID = value
-        }
-
-    var backgroundServiceManufacturerData: String?
-        get() = keystoreDataSource.backgroundServiceManufacturerData
-        set(value) {
-            keystoreDataSource.backgroundServiceManufacturerData = value
-        }
-
-    var dataRetentionPeriod: Int?
-        get() = keystoreDataSource.dataRetentionPeriod
-        set(value) {
-            keystoreDataSource.dataRetentionPeriod = value
-        }
-
-    var venuesRetentionPeriod: Int?
-        get() = keystoreDataSource.venuesRetentionPeriod
-        set(value) {
-            keystoreDataSource.venuesRetentionPeriod = value
-        }
-
-    var quarantinePeriod: Int?
-        get() = keystoreDataSource.quarantinePeriod
-        set(value) {
-            keystoreDataSource.quarantinePeriod = value
-            robertManager.refreshAtRisk()
-        }
-
-    var checkStatusFrequencyHour: Float?
-        get() = keystoreDataSource.checkStatusFrequency
-        set(value) {
-            keystoreDataSource.checkStatusFrequency = value
-        }
-
-    var minStatusRetryDuration: Float?
-        get() = keystoreDataSource.minStatusRetryDuraction
-        set(value) {
-            keystoreDataSource.minStatusRetryDuraction = value
-        }
-
-    var randomStatusHour: Float?
-        get() = keystoreDataSource.randomStatusHour
-        set(value) {
-            keystoreDataSource.randomStatusHour = value
-        }
-
-    var preSymptomsSpan: Int?
-        get() = keystoreDataSource.preSymptomsSpan
-        set(value) {
-            keystoreDataSource.preSymptomsSpan = value
-        }
-
-    var positiveSampleSpan: Int?
-        get() = keystoreDataSource.positiveSampleSpan
-        set(value) {
-            keystoreDataSource.positiveSampleSpan = value
-        }
-
-    var isolationDuration: Long?
-        get() = keystoreDataSource.isolationDuration
-        set(value) {
-            keystoreDataSource.isolationDuration = value
-        }
-
-    var postIsolationDuration: Long?
-        get() = keystoreDataSource.postIsolationDuration
-        set(value) {
-            keystoreDataSource.postIsolationDuration = value
-        }
-
-    var appAvailability: Boolean?
-        get() = keystoreDataSource.appAvailability
-        set(value) {
-            keystoreDataSource.appAvailability = value
-        }
-
-    var apiVersion: String?
-        get() = keystoreDataSource.apiVersion
-        set(value) {
-            keystoreDataSource.apiVersion = value
-        }
-
-    var warningApiVersion: String?
-        get() = keystoreDataSource.warningApiVersion
-        set(value) {
-            keystoreDataSource.warningApiVersion = value
-        }
-
-    var displayAttestation: Boolean?
-        get() = keystoreDataSource.displayAttestation
-        set(value) {
-            keystoreDataSource.displayAttestation = value
-        }
-
-    var displayRecordVenues: Boolean?
-        get() = keystoreDataSource.displayRecordVenues
-        set(value) {
-            keystoreDataSource.displayRecordVenues = value
-        }
-
-    var displayPrivateEvent: Boolean?
-        get() = keystoreDataSource.displayPrivateEvent
-        set(value) {
-            keystoreDataSource.displayPrivateEvent = value
-        }
-
-    var displayIsolation: Boolean?
-        get() = keystoreDataSource.displayIsolation
-        set(value) {
-            keystoreDataSource.displayIsolation = value
-        }
-
-    var qrCodeDeletionHours: Float?
-        get() = keystoreDataSource.qrCodeDeletionHours
-        set(value) {
-            keystoreDataSource.qrCodeDeletionHours = value
-        }
-
-    var qrCodeExpiredHours: Float?
-        get() = keystoreDataSource.qrCodeExpiredHours
-        set(value) {
-            keystoreDataSource.qrCodeExpiredHours = value
-        }
-
-    var qrCodeFormattedString: String?
-        get() = keystoreDataSource.qrCodeFormattedString
-        set(value) {
-            keystoreDataSource.qrCodeFormattedString = value
-        }
-
-    var qrCodeFormattedStringDisplayed: String?
-        get() = keystoreDataSource.qrCodeFormattedStringDisplayed
-        set(value) {
-            keystoreDataSource.qrCodeFormattedStringDisplayed = value
-        }
-
-    var qrCodeFooterString: String?
-        get() = keystoreDataSource.qrCodeFooterString
-        set(value) {
-            keystoreDataSource.qrCodeFooterString = value
-        }
-
-    var configVersion: Int?
-        get() = keystoreDataSource.configVersion
-        set(value) {
-            keystoreDataSource.configVersion = value
-        }
-
-    var displayDepartmentLevel: Boolean?
-        get() = keystoreDataSource.displayDepartmentLevel
-        set(value) {
-            keystoreDataSource.displayDepartmentLevel = value
-        }
-
-    var proximityReactivationReminderHours: List<Int>?
-        get() = keystoreDataSource.proximityReactivationReminderHours
-        set(value) {
-            keystoreDataSource.proximityReactivationReminderHours = value
-        }
-
     var reportDate: Long?
         get() = keystoreDataSource.reportDate
         set(value) {
             keystoreDataSource.reportDate = value
-        }
-
-    var venuesTimestampRoundingInterval: Int?
-        get() = keystoreDataSource.venuesTimestampRoundingInterval
-        set(value) {
-            keystoreDataSource.venuesTimestampRoundingInterval = value
-        }
-
-    var privateEventVenueType: String?
-        get() = keystoreDataSource.privateEventVenueType
-        set(value) {
-            keystoreDataSource.privateEventVenueType = value
         }
 
     var reportValidationToken: String?

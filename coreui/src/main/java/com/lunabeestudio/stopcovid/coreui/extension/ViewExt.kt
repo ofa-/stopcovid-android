@@ -61,7 +61,7 @@ fun View.showBottomSheet() {
 fun View.showSnackBar(
     message: String,
     duration: Int = Snackbar.LENGTH_LONG,
-    errorSnackBar: Boolean = false
+    errorSnackBar: Boolean = false,
 ) {
     this.showSnackBar(message, duration) {
         if (errorSnackBar) {
@@ -76,7 +76,7 @@ fun View.showSnackBar(
 inline fun View.showSnackBar(
     message: String,
     length: Int = Snackbar.LENGTH_LONG,
-    f: Snackbar.() -> Unit
+    f: Snackbar.() -> Unit,
 ) {
     val snack = Snackbar.make(this, message, length)
     snack.f()
@@ -86,4 +86,13 @@ inline fun View.showSnackBar(
 fun View.addRipple(): Unit = with(TypedValue()) {
     context.theme.resolveAttribute(R.attr.selectableItemBackground, this, true)
     setBackgroundResource(resourceId)
+}
+
+fun View.setOnClickListenerOrHideRipple(onClickListener: View.OnClickListener?) {
+    if (onClickListener != null) {
+        addRipple()
+    } else {
+        background = null
+    }
+    setOnClickListener(onClickListener)
 }

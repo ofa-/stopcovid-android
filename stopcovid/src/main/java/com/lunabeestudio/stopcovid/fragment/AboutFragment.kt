@@ -18,6 +18,7 @@ import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.dividerItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
+import com.lunabeestudio.stopcovid.extension.openInExternalBrowser
 import com.lunabeestudio.stopcovid.extension.startEmailIntent
 import com.lunabeestudio.stopcovid.fastitem.linkItem
 import com.lunabeestudio.stopcovid.fastitem.logoItem
@@ -66,10 +67,7 @@ class AboutFragment : MainFragment() {
         items += linkItem {
             iconRes = R.drawable.ic_email
             text = strings["aboutController.contactUsByEmail"]
-            onClickListener = View.OnClickListener {
-                strings["aboutController.contactEmail"]?.startEmailIntent(requireContext())
-            }
-            forceShowArrow = true
+            url = strings["contactUs.url"]
             identifier = items.size.toLong()
         }
         items += dividerItem {

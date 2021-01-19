@@ -10,11 +10,7 @@
 
 package com.lunabeestudio.stopcovid.fragment
 
-import android.os.Bundle
 import android.view.Gravity
-import android.view.View
-import androidx.fragment.app.activityViewModels
-import androidx.navigation.fragment.findNavController
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
@@ -22,14 +18,9 @@ import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
 import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.fastitem.logoItem
-import com.lunabeestudio.stopcovid.viewmodel.OnBoardingViewModel
-import com.lunabeestudio.stopcovid.viewmodel.OnBoardingViewModelFactory
 import com.mikepenz.fastadapter.GenericItem
-import timber.log.Timber
 
 class OnBoardingWelcomeFragment : OnBoardingFragment() {
-
-    private val viewModel: OnBoardingViewModel by activityViewModels { OnBoardingViewModelFactory() }
 
     override fun getTitleKey(): String = "onboarding.welcomeController.title"
     override fun getButtonTitleKey(): String? = "onboarding.welcomeController.howDoesItWork"
@@ -38,21 +29,15 @@ class OnBoardingWelcomeFragment : OnBoardingFragment() {
             ?.safeNavigate(OnBoardingWelcomeFragmentDirections.actionOnBoardingWelcomeFragmentToOnBoardingExplanationFragment())
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        viewModel.showLogo.observe(viewLifecycleOwner) {
-            if (binding?.recyclerView?.isComputingLayout == false && it) {
-                refreshScreen()
-            }
-        }
-    }
-
     override fun getItems(): List<GenericItem> {
         val items = arrayListOf<GenericItem>()
 
+        items += spaceItem {
+            spaceRes = R.dimen.spacing_large
+            identifier = items.size.toLong()
+        }
         items += logoItem {
             imageRes = R.drawable.home
-            isInvisible = viewModel.showLogo.value != true
             identifier = items.size.toLong()
         }
         items += spaceItem {

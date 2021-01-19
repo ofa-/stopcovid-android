@@ -17,7 +17,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.lunabeestudio.domain.model.DeviceParameterCorrection
+import com.lunabeestudio.domain.model.Configuration
 import com.lunabeestudio.domain.model.FormEntry
 import com.lunabeestudio.domain.model.VenueQrCode
 import com.lunabeestudio.framework.local.LocalCryptoManager
@@ -29,6 +29,10 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
     private var cache: HashMap<String, Any?> = hashMapOf()
     private val gson: Gson = Gson()
     private val sharedPreferences: SharedPreferences = context.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE)
+
+    override var configuration: Configuration?
+        get() = getValue(SHARED_PREF_KEY_CONFIGURATION, Configuration::class.java)
+        set(value) = setValue(SHARED_PREF_KEY_CONFIGURATION, value)
 
     override var shouldReloadBleSettings: Boolean?
         get() = getEncryptedValue(SHARED_PREF_KEY_SHOULD_RELOAD_BLE_SETTINGS, Boolean::class.java)
@@ -58,14 +62,6 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
         get() = getEncryptedValue(SHARED_PREF_KEY_AT_RISK_LAST_ERROR, Long::class.java)
         set(value) = setEncryptedValue(SHARED_PREF_KEY_AT_RISK_LAST_ERROR, value)
 
-    override var atRiskMinHourContactNotif: Int?
-        get() = getEncryptedValue(SHARED_PREF_KEY_AT_RISK_MIN_HOUR_CONTACT_NOTIF, Int::class.java)
-        set(value) = setEncryptedValue(SHARED_PREF_KEY_AT_RISK_MIN_HOUR_CONTACT_NOTIF, value)
-
-    override var atRiskMaxHourContactNotif: Int?
-        get() = getEncryptedValue(SHARED_PREF_KEY_AT_RISK_MAX_HOUR_CONTACT_NOTIF, Int::class.java)
-        set(value) = setEncryptedValue(SHARED_PREF_KEY_AT_RISK_MAX_HOUR_CONTACT_NOTIF, value)
-
     override var lastRiskReceivedDate: Long?
         get() = getEncryptedValue(SHARED_PREF_KEY_LAST_RISK_RECEIVED_DATE, Long::class.java)
         set(value) = setEncryptedValue(SHARED_PREF_KEY_LAST_RISK_RECEIVED_DATE, value)
@@ -81,114 +77,6 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
     override var isSick: Boolean?
         get() = getEncryptedValue(SHARED_PREF_KEY_IS_SICK, Boolean::class.java, useCache = false)
         set(value) = setEncryptedValue(SHARED_PREF_KEY_IS_SICK, value, useCache = false)
-
-    override var calibration: List<DeviceParameterCorrection>?
-        get() = getEncryptedValue(SHARED_PREF_KEY_CALIBRATION, object : TypeToken<List<DeviceParameterCorrection>>() {}.type)
-        set(value) = setEncryptedValue(SHARED_PREF_KEY_CALIBRATION, value)
-
-    override var filteringConfig: String?
-        get() = getEncryptedValue(SHARED_PREF_KEY_FILTERING_CONFIG, String::class.java)
-        set(value) = setEncryptedValue(SHARED_PREF_KEY_FILTERING_CONFIG, value)
-
-    override var filteringMode: String?
-        get() = getEncryptedValue(SHARED_PREF_KEY_FILTERING_MODE, String::class.java)
-        set(value) = setEncryptedValue(SHARED_PREF_KEY_FILTERING_MODE, value)
-
-    override var serviceUUID: String?
-        get() = getEncryptedValue(SHARED_PREF_KEY_SERVICE_UUID, String::class.java)
-        set(value) = setEncryptedValue(SHARED_PREF_KEY_SERVICE_UUID, value)
-
-    override var characteristicUUID: String?
-        get() = getEncryptedValue(SHARED_PREF_KEY_CHARACTERISTIC_UUID, String::class.java)
-        set(value) = setEncryptedValue(SHARED_PREF_KEY_CHARACTERISTIC_UUID, value)
-
-    override var backgroundServiceManufacturerData: String?
-        get() = getEncryptedValue(SHARED_PREF_KEY_BACKGROUND_SERVICE_MANUFACTURER_DATA, String::class.java)
-        set(value) = setEncryptedValue(SHARED_PREF_KEY_BACKGROUND_SERVICE_MANUFACTURER_DATA, value)
-
-    override var dataRetentionPeriod: Int?
-        get() = getEncryptedValue(SHARED_PREF_KEY_DATA_RETENTION_PERIOD, Int::class.java)
-        set(value) = setEncryptedValue(SHARED_PREF_KEY_DATA_RETENTION_PERIOD, value)
-
-    override var venuesRetentionPeriod: Int?
-        get() = getEncryptedValue(SHARED_PREF_KEY_VENUES_RETENTION_PERIOD, Int::class.java)
-        set(value) = setEncryptedValue(SHARED_PREF_KEY_VENUES_RETENTION_PERIOD, value)
-
-    override var quarantinePeriod: Int?
-        get() = getEncryptedValue(SHARED_PREF_KEY_QUARANTINE_PERIOD, Int::class.java)
-        set(value) = setEncryptedValue(SHARED_PREF_KEY_QUARANTINE_PERIOD, value)
-
-    override var checkStatusFrequency: Float?
-        get() = getEncryptedValue(SHARED_PREF_KEY_CHECK_STATUS_FREQUENCY, Float::class.java)
-        set(value) = setEncryptedValue(SHARED_PREF_KEY_CHECK_STATUS_FREQUENCY, value)
-
-    override var minStatusRetryDuraction: Float?
-        get() = getEncryptedValue(SHARED_PREF_KEY_MIN_STATUS_RETRY_DURATION, Float::class.java)
-        set(value) = setEncryptedValue(SHARED_PREF_KEY_MIN_STATUS_RETRY_DURATION, value)
-
-    override var randomStatusHour: Float?
-        get() = getEncryptedValue(SHARED_PREF_KEY_RANDOM_STATUS_HOUR, Float::class.java)
-        set(value) = setEncryptedValue(SHARED_PREF_KEY_RANDOM_STATUS_HOUR, value)
-
-    override var preSymptomsSpan: Int?
-        get() = getEncryptedValue(SHARED_PREF_KEY_PRE_SYMPTOMS_SPAN, Int::class.java)
-        set(value) = setEncryptedValue(SHARED_PREF_KEY_PRE_SYMPTOMS_SPAN, value)
-
-    override var positiveSampleSpan: Int?
-        get() = getEncryptedValue(SHARED_PREF_KEY_POSITIVE_SAMPLE_SPAN, Int::class.java)
-        set(value) = setEncryptedValue(SHARED_PREF_KEY_POSITIVE_SAMPLE_SPAN, value)
-
-    override var appAvailability: Boolean?
-        get() = getEncryptedValue(SHARED_PREF_KEY_APP_AVAILABILITY, Boolean::class.java)
-        set(value) = setEncryptedValue(SHARED_PREF_KEY_APP_AVAILABILITY, value)
-
-    override var displayDepartmentLevel: Boolean?
-        get() = getEncryptedValue(SHARED_PREF_KEY_DISPLAY_DEPARTMENT_LEVEL, Boolean::class.java)
-        set(value) = setEncryptedValue(SHARED_PREF_KEY_DISPLAY_DEPARTMENT_LEVEL, value)
-
-    override var apiVersion: String?
-        get() = getEncryptedValue(SHARED_PREF_KEY_API_VERSION, String::class.java)
-        set(value) = setEncryptedValue(SHARED_PREF_KEY_API_VERSION, value)
-
-    override var warningApiVersion: String?
-        get() = getEncryptedValue(SHARED_PREF_KEY_WARNING_API_VERSION, String::class.java)
-        set(value) = setEncryptedValue(SHARED_PREF_KEY_WARNING_API_VERSION, value)
-
-    override var displayAttestation: Boolean?
-        get() = getEncryptedValue(SHARED_PREF_KEY_DISPLAY_ATTESTATION, Boolean::class.java)
-        set(value) = setEncryptedValue(SHARED_PREF_KEY_DISPLAY_ATTESTATION, value)
-
-    override var displayRecordVenues: Boolean?
-        get() = getEncryptedValue(SHARED_PREF_KEY_DISPLAY_RECORD_VENUES, Boolean::class.java)
-        set(value) = setEncryptedValue(SHARED_PREF_KEY_DISPLAY_RECORD_VENUES, value)
-
-    override var displayPrivateEvent: Boolean?
-        get() = getEncryptedValue(SHARED_PREF_KEY_DISPLAY_PRIVATE_EVENT, Boolean::class.java)
-        set(value) = setEncryptedValue(SHARED_PREF_KEY_DISPLAY_PRIVATE_EVENT, value)
-
-    override var qrCodeDeletionHours: Float?
-        get() = getEncryptedValue(SHARED_PREF_KEY_QR_CODE_DELETION_HOURS, Float::class.java)
-        set(value) = setEncryptedValue(SHARED_PREF_KEY_QR_CODE_DELETION_HOURS, value)
-
-    override var qrCodeExpiredHours: Float?
-        get() = getEncryptedValue(SHARED_PREF_KEY_QR_CODE_EXPIRED_HOURS, Float::class.java)
-        set(value) = setEncryptedValue(SHARED_PREF_KEY_QR_CODE_EXPIRED_HOURS, value)
-
-    override var qrCodeFormattedString: String?
-        get() = getEncryptedValue(SHARED_PREF_KEY_QR_CODE_FORMATTED_STRING, String::class.java)
-        set(value) = setEncryptedValue(SHARED_PREF_KEY_QR_CODE_FORMATTED_STRING, value)
-
-    override var qrCodeFormattedStringDisplayed: String?
-        get() = getEncryptedValue(SHARED_PREF_KEY_QR_CODE_FORMATTED_STRING_DISPLAYED, String::class.java)
-        set(value) = setEncryptedValue(SHARED_PREF_KEY_QR_CODE_FORMATTED_STRING_DISPLAYED, value)
-
-    override var qrCodeFooterString: String?
-        get() = getEncryptedValue(SHARED_PREF_KEY_QR_CODE_FOOTER_STRING, String::class.java)
-        set(value) = setEncryptedValue(SHARED_PREF_KEY_QR_CODE_FOOTER_STRING, value)
-
-    override var proximityReactivationReminderHours: List<Int>?
-        get() = getEncryptedValue(SHARED_PREF_KEY_PROXIMITY_REACTIVATE_REMINDER_HOURS, object : TypeToken<List<Int>>() {}.type)
-        set(value) = setEncryptedValue(SHARED_PREF_KEY_PROXIMITY_REACTIVATE_REMINDER_HOURS, value)
 
     override var saveAttestationData: Boolean?
         get() = getEncryptedValue(SHARED_PREF_KEY_SAVE_ATTESTATION_DATA, Boolean::class.java)
@@ -208,14 +96,6 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
             _attestationsLiveData.postValue(value)
         }
 
-    override var configVersion: Int?
-        get() = getEncryptedValue(SHARED_PREF_KEY_CONFIG_VERSION, Int::class.java)
-        set(value) = setEncryptedValue(SHARED_PREF_KEY_CONFIG_VERSION, value)
-
-    override var venuesTimestampRoundingInterval: Int?
-        get() = getEncryptedValue(SHARED_PREF_KEY_VENUES_TIMESTAMP_ROUNDING_INTERVAL, Int::class.java)
-        set(value) = setEncryptedValue(SHARED_PREF_KEY_VENUES_TIMESTAMP_ROUNDING_INTERVAL, value)
-
     override var reportDate: Long?
         get() = getAndMigrateOldUnencryptedLong(SHARED_PREF_KEY_REPORT_DATE, SHARED_PREF_KEY_REPORT_DATE_ENCRYPTED)
         set(value) = setEncryptedValue(SHARED_PREF_KEY_REPORT_DATE_ENCRYPTED, value)
@@ -228,17 +108,9 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
         get() = getEncryptedValue(SHARED_PREF_KEY_SAVE_DATA_VENUES_QR_CODE, object : TypeToken<List<VenueQrCode>>() {}.type)
         set(value) = setEncryptedValue(SHARED_PREF_KEY_SAVE_DATA_VENUES_QR_CODE, value)
 
-    override var privateEventVenueType: String?
-        get() = getEncryptedValue(SHARED_PREF_KEY_PRIVATE_EVENT_VENUE_TYPE, String::class.java)
-        set(value) = setEncryptedValue(SHARED_PREF_KEY_PRIVATE_EVENT_VENUE_TYPE, value)
-
     override var reportToSendTime: Long?
         get() = getEncryptedValue(SHARED_PREF_KEY_REPORT_TO_SEND_TIME, Long::class.java)
         set(value) = setEncryptedValue(SHARED_PREF_KEY_REPORT_TO_SEND_TIME, value)
-
-    override var displayIsolation: Boolean?
-        get() = getEncryptedValue(SHARED_PREF_KEY_DISPLAY_ISOLATION, Boolean::class.java)
-        set(value) = setEncryptedValue(SHARED_PREF_KEY_DISPLAY_ISOLATION, value)
 
     override var reportPositiveTestDate: Long?
         get() = getEncryptedValue(SHARED_PREF_KEY_REPORT_POSITIVE_TEST_DATE, Long::class.java)
@@ -301,14 +173,6 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
         get() = getEncryptedValue(SHARED_PREF_KEY_ISOLATION_IS_FEVER_REMINDER_SCHEDULES, Boolean::class.java)
         set(value) = setEncryptedValue(SHARED_PREF_KEY_ISOLATION_IS_FEVER_REMINDER_SCHEDULES, value)
 
-    override var isolationDuration: Long?
-        get() = getEncryptedValue(SHARED_PREF_KEY_ISOLATION_DURATION, Long::class.java)
-        set(value) = setEncryptedValue(SHARED_PREF_KEY_ISOLATION_DURATION, value)
-
-    override var postIsolationDuration: Long?
-        get() = getEncryptedValue(SHARED_PREF_KEY_POST_ISOLATION_DURATION, Long::class.java)
-        set(value) = setEncryptedValue(SHARED_PREF_KEY_POST_ISOLATION_DURATION, value)
-
     // GENERIC METHODS
     private fun <T> getEncryptedValue(key: String, type: Type, useCache: Boolean = true): T? {
         @Suppress("UNCHECKED_CAST")
@@ -357,6 +221,40 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
         }
     }
 
+    private fun <T> getValue(@Suppress("SameParameterValue") key: String, type: Type): T? {
+        @Suppress("UNCHECKED_CAST")
+        return (cache[key] as? T?) ?: run {
+            val text = sharedPreferences.getString(key, null)
+            return if (text != null) {
+                val result = kotlin.runCatching {
+                    gson.fromJson<T>(text, type)
+                }.getOrNull()
+                cache[key] = result
+                result
+            } else {
+                null
+            }
+        }
+    }
+
+    private fun setValue(@Suppress("SameParameterValue") key: String, value: Any?) {
+        cache[key] = when (value) {
+            is List<*> -> value.toList()
+            is Map<*, *> -> value.toMap()
+            else -> value
+        }
+        if (value != null) {
+            sharedPreferences.edit()
+                .putString(
+                    key,
+                    cryptoManager.encryptToString(gson.toJson(value))
+                )
+                .apply()
+        } else {
+            sharedPreferences.edit().remove(key).apply()
+        }
+    }
+
     private fun getAndMigrateOldUnencryptedLong(oldKey: String, newKey: String): Long? {
         return if (sharedPreferences.contains(oldKey)) {
             val prevLong = sharedPreferences.getLong(oldKey, Long.MIN_VALUE).takeIf { it != Long.MIN_VALUE }
@@ -370,6 +268,7 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
 
     companion object {
         private const val SHARED_PREF_NAME = "robert_prefs"
+        private const val SHARED_PREF_KEY_CONFIGURATION = "shared.pref.configuration"
         private const val SHARED_PREF_KEY_SHOULD_RELOAD_BLE_SETTINGS = "shared.pref.should_reload_ble_settings"
         private const val SHARED_PREF_KEY_KA = "shared.pref.ka"
         private const val SHARED_PREF_KEY_KEA = "shared.pref.kea"
@@ -379,48 +278,16 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
         private const val SHARED_PREF_KEY_AT_RISK_LAST_REFRESH = "shared.pref.at_risk_last_refresh"
         private const val SHARED_PREF_KEY_AT_RISK_LAST_ERROR = "shared.pref.at_risk_last_error"
         private const val SHARED_PREF_KEY_LAST_RISK_RECEIVED_DATE = "shared.pref.last_risk_received_date"
-        private const val SHARED_PREF_KEY_AT_RISK_MIN_HOUR_CONTACT_NOTIF = "shared.pref.at_risk_min_hour_contact_notif"
-        private const val SHARED_PREF_KEY_AT_RISK_MAX_HOUR_CONTACT_NOTIF = "shared.pref.at_risk_max_hour_contact_notif"
         private const val SHARED_PREF_KEY_LAST_EXPOSURE_TIMEFRAME = "shared.pref.last_exposure_timeframe"
         private const val SHARED_PREF_KEY_PROXIMITY_ACTIVE = "shared.pref.proximity_active"
         private const val SHARED_PREF_KEY_IS_SICK = "shared.pref.is_sick"
-        private const val SHARED_PREF_KEY_CALIBRATION = "shared.pref.calibration"
-        private const val SHARED_PREF_KEY_FILTERING_CONFIG = "shared.pref.filtering_config"
-        private const val SHARED_PREF_KEY_FILTERING_MODE = "shared.pref.filtering_mode"
-        private const val SHARED_PREF_KEY_SERVICE_UUID = "shared.pref.service_uuid"
-        private const val SHARED_PREF_KEY_CHARACTERISTIC_UUID = "shared.pref.characteristic_uuid"
-        private const val SHARED_PREF_KEY_BACKGROUND_SERVICE_MANUFACTURER_DATA = "shared.pref.background_service_manufacturer_data"
-        private const val SHARED_PREF_KEY_DATA_RETENTION_PERIOD = "shared.pref.data_retention_period"
-        private const val SHARED_PREF_KEY_VENUES_RETENTION_PERIOD = "shared.pref.venues_retention_period"
-        private const val SHARED_PREF_KEY_QUARANTINE_PERIOD = "shared.pref.quarantine_period"
-        private const val SHARED_PREF_KEY_CHECK_STATUS_FREQUENCY = "shared.pref.check_status_frequency"
-        private const val SHARED_PREF_KEY_MIN_STATUS_RETRY_DURATION = "shared.pref.min_status_retry_duration"
-        private const val SHARED_PREF_KEY_RANDOM_STATUS_HOUR = "shared.pref.random_status_hour"
-        private const val SHARED_PREF_KEY_PRE_SYMPTOMS_SPAN = "shared.pref.pre_symptoms_span"
-        private const val SHARED_PREF_KEY_POSITIVE_SAMPLE_SPAN = "shared.pref.positive_sample_span"
-        private const val SHARED_PREF_KEY_APP_AVAILABILITY = "shared.pref.app_availability"
-        private const val SHARED_PREF_KEY_API_VERSION = "shared.pref.api_version"
-        private const val SHARED_PREF_KEY_WARNING_API_VERSION = "shared.pref.warning_api_version"
-        private const val SHARED_PREF_KEY_DISPLAY_ATTESTATION = "shared.pref.display_attestation"
-        private const val SHARED_PREF_KEY_DISPLAY_RECORD_VENUES = "shared.pref.display_record_venues"
-        private const val SHARED_PREF_KEY_DISPLAY_PRIVATE_EVENT = "shared.pref.display_private_event"
-        private const val SHARED_PREF_KEY_QR_CODE_DELETION_HOURS = "shared.pref.qr_code_deletion_hours"
-        private const val SHARED_PREF_KEY_QR_CODE_EXPIRED_HOURS = "shared.pref.qr_code_expired_hours"
-        private const val SHARED_PREF_KEY_QR_CODE_FORMATTED_STRING = "shared.pref.qr_code_formatted_string"
-        private const val SHARED_PREF_KEY_QR_CODE_FORMATTED_STRING_DISPLAYED = "shared.pref.qr_code_formatted_string_displayed"
-        private const val SHARED_PREF_KEY_QR_CODE_FOOTER_STRING = "shared.pref.qr_code_footer_string"
-        private const val SHARED_PREF_KEY_VENUES_TIMESTAMP_ROUNDING_INTERVAL = "shared.pref.venuesTimestampRoundingInterval"
-        private const val SHARED_PREF_KEY_PROXIMITY_REACTIVATE_REMINDER_HOURS = "shared.pref.proximity_reactivate_reminder_hours"
         private const val SHARED_PREF_KEY_SAVE_ATTESTATION_DATA = "shared.pref.save_attestation_data"
         private const val SHARED_PREF_KEY_SAVED_ATTESTATION_DATA = "shared.pref.saved_attestation_data"
         private const val SHARED_PREF_KEY_ATTESTATIONS = "shared.pref.attestations"
-        private const val SHARED_PREF_KEY_CONFIG_VERSION = "shared.pref.config_version"
-        private const val SHARED_PREF_KEY_DISPLAY_DEPARTMENT_LEVEL = "shared.pref.display_department_level"
         private const val SHARED_PREF_KEY_REPORT_DATE = "shared.pref.report_date"
         private const val SHARED_PREF_KEY_REPORT_DATE_ENCRYPTED = "shared.pref.report_date_encrypted"
         private const val SHARED_PREF_KEY_SAVE_DATA_VENUES_QR_CODE = "shared.pref.venues_qr_code"
         private const val SHARED_PREF_KEY_REPORT_VALIDATION_TOKEN = "shared.pref.report_validation_token"
-        private const val SHARED_PREF_KEY_PRIVATE_EVENT_VENUE_TYPE = "shared.pref.private_event_venue_type"
         private const val SHARED_PREF_KEY_REPORT_TO_SEND_TIME = "shared.pref.report_to_send_time"
 
         // Add on to ROBERT for isolation
@@ -429,7 +296,6 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
         private const val SHARED_PREF_KEY_WARNING_RECEIVED_DATE = "shared.pref.warningReceivedDate"
 
         // Isolation keys
-        private const val SHARED_PREF_KEY_DISPLAY_ISOLATION = "shared.pref.displayIsolation"
         private const val SHARED_PREF_KEY_ISOLATION_FORM_STATE = "shared.pref.isolationFormState"
         private const val SHARED_PREF_KEY_ISOLATION_LAST_CONTACT_DATE = "shared.pref.isolationLastContactDate"
         private const val SHARED_PREF_KEY_ISOLATION_IS_KNOWN_INDEX_AT_HOME = "shared.pref.isolationIsKnownIndexAtHome"
@@ -442,7 +308,5 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
         private const val SHARED_PREF_KEY_ISOLATION_SYMPTOMS_START_DATE = "shared.pref.isolationSymptomsStartDate"
         private const val SHARED_PREF_KEY_ISOLATION_IS_STILL_HAVING_FEVER = "shared.pref.isolationIsStillHavingFever"
         private const val SHARED_PREF_KEY_ISOLATION_IS_FEVER_REMINDER_SCHEDULES = "shared.pref.isolationIsFeverReminderScheduled"
-        private const val SHARED_PREF_KEY_ISOLATION_DURATION = "shared.pref.isolation_duration"
-        private const val SHARED_PREF_KEY_POST_ISOLATION_DURATION = "shared.pref.post_isolation_duration"
     }
 }

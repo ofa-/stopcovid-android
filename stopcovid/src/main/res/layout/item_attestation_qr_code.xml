@@ -29,6 +29,7 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/spacing_large"
             android:layout_marginTop="@dimen/spacing_large"
+            android:importantForAccessibility="no"
             app:layout_constraintBottom_toTopOf="@id/textView"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -43,6 +44,7 @@
             android:layout_marginBottom="@dimen/spacing_large"
             android:gravity="center"
             android:textAppearance="@style/TextAppearance.StopCovid.Title"
+            android:textIsSelectable="true"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -58,7 +60,8 @@
             android:src="@drawable/ic_more"
             android:tint="?colorControlNormal"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="ContentDescription" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </com.google.android.material.card.MaterialCardView>

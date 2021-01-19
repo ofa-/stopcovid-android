@@ -60,8 +60,8 @@ internal class StatusWorker(context: Context, workerParams: WorkerParameters) : 
 
     companion object {
         fun scheduleStatusWorker(context: Context, robertManager: RobertManager, policy: ExistingPeriodicWorkPolicy) {
-            val minDelaySec: Long = (robertManager.checkStatusFrequencyHour * 3600).roundToLong()
-            val maxDelaySec: Long = minDelaySec + (robertManager.randomStatusHour * 3600).roundToLong()
+            val minDelaySec: Long = (robertManager.configuration.checkStatusFrequencyHour * 3600).roundToLong()
+            val maxDelaySec: Long = minDelaySec + (robertManager.configuration.randomStatusHour * 3600).roundToLong()
             val randomDelaySec: Long = if (minDelaySec != maxDelaySec) {
                 Random.nextLong(minDelaySec, maxDelaySec)
             } else {
@@ -77,7 +77,9 @@ internal class StatusWorker(context: Context, workerParams: WorkerParameters) : 
             val statusWorkRequest = PeriodicWorkRequestBuilder<StatusWorker>(minDelaySec, TimeUnit.SECONDS)
                 .setConstraints(constraints)
                 .setInitialDelay(randomDelaySec, TimeUnit.SECONDS)
-                .setBackoffCriteria(BackoffPolicy.LINEAR, (robertManager.minStatusRetryDuration * 3600).roundToLong(), TimeUnit.SECONDS)
+                .setBackoffCriteria(BackoffPolicy.LINEAR,
+                    (robertManager.configuration.minStatusRetryDuration * 3600).roundToLong(),
+                    TimeUnit.SECONDS)
                 .build()
 
             WorkManager.getInstance(context)

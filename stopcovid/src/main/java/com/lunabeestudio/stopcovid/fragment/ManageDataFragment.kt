@@ -120,11 +120,11 @@ class ManageDataFragment : MainFragment() {
         spaceDividerItems(items)
         eraseAttestationItems(items)
         spaceDividerItems(items)
-        if (robertManager.displayIsolation) {
+        if (robertManager.configuration.displayIsolation) {
             eraseIsolationItems(items)
             spaceDividerItems(items)
         }
-        if (sharedPreferences.venuesFeaturedWasActivatedAtLeastOneTime || robertManager.displayRecordVenues) {
+        if (sharedPreferences.venuesFeaturedWasActivatedAtLeastOneTime || robertManager.configuration.displayRecordVenues) {
             eraseVenuesItems(items)
             spaceDividerItems(items)
         }

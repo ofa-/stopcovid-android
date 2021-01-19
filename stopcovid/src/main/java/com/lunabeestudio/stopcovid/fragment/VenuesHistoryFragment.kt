@@ -18,6 +18,7 @@ import com.lunabeestudio.domain.extension.ntpTimeSToUnixTimeMs
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
+import com.lunabeestudio.stopcovid.extension.setImageResourceOrHide
 import com.lunabeestudio.stopcovid.fastitem.deleteCardItem
 import com.lunabeestudio.stopcovid.manager.VenuesManager
 import com.mikepenz.fastadapter.GenericItem
@@ -38,8 +39,11 @@ class VenuesHistoryFragment : MainFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding?.emptyDescriptionTextView?.isVisible = false
+
+        binding?.emptyImageView?.setImageResourceOrHide(R.drawable.shops)
+        binding?.emptyTitleTextView?.isVisible = false
         binding?.emptyButton?.isVisible = false
+
     }
 
     override fun getItems(): List<GenericItem> {
@@ -51,6 +55,7 @@ class VenuesHistoryFragment : MainFragment() {
             deleteCardItem {
                 title = stringsFormat("venuesHistoryController.entry", venueType, venueDate)
                 caption = venueQrCode.uuid
+                deleteContentDescription = strings["common.delete"]
                 onDelete = {
                     MaterialAlertDialogBuilder(requireContext())
                         .setTitle(strings["venuesHistoryController.delete.alert.title"])
@@ -80,6 +85,6 @@ class VenuesHistoryFragment : MainFragment() {
 
     override fun refreshScreen() {
         super.refreshScreen()
-        binding?.emptyTitleTextView?.text = strings["venuesHistoryController.noVenuesEmptyView.title"]
+        binding?.emptyDescriptionTextView?.text = strings["venuesHistoryController.noVenuesEmptyView.title"]
     }
 }

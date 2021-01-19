@@ -38,28 +38,6 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         app:navGraph="@navigation/nav_on_boarding" />
 
-    <ImageView
-        android:id="@+id/animationImageView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:adjustViewBounds="true"
-        android:importantForAccessibility="no"
-        android:scaleType="fitCenter"
-        android:src="@drawable/home" />
-
-    <ImageView
-        android:id="@+id/animationEndImageView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal|top"
-        android:adjustViewBounds="true"
-        android:importantForAccessibility="no"
-        android:scaleType="fitCenter"
-        android:src="@drawable/home"
-        android:visibility="invisible"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
-
     <include layout="@layout/layout_button_bottom_sheet" />
 
     <com.lunabeestudio.stopcovid.coreui.custom.BlockingContentLoadingProgressBar

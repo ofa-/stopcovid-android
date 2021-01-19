@@ -11,7 +11,7 @@
 package com.lunabeestudio.domain.model
 
 class DeviceParameterCorrection(
-    val device_handset_model: String,
-    val tx_RSS_correction_factor: Double,
-    val rx_RSS_correction_factor: Double
+    val deviceHandsetModel: String,
+    val txRssCorrectionFactor: Double,
+    val rxRssCorrectionFactor: Double
 )

@@ -142,6 +142,13 @@
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_proximityFragment_to_vaccinationFragment"
+            app:destination="@id/vaccinationFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
     </fragment>
     <fragment
         android:id="@+id/isolationFormFragment"
@@ -177,10 +184,14 @@
         <deepLink app:uri="tousanticovid://attestations" />
         <deepLink
             android:autoVerify="true"
-            app:uri="https://bonjour.tousanticovid.gouv.fr/app/attestations" />
+            app:uri="https://bonjour.tousanticovid.gouv.fr/app/attestations"
+            tools:ignore="UnusedAttribute"
+            tools:targetApi="m" />
         <deepLink
             android:autoVerify="true"
-            app:uri="https://bonjour.stopcovid.gouv.fr/app/attestations" />
+            app:uri="https://bonjour.stopcovid.gouv.fr/app/attestations"
+            tools:ignore="UnusedAttribute"
+            tools:targetApi="m" />
         <action
             android:id="@+id/action_attestationsFragment_to_newAttestationFragment"
             app:destination="@id/newAttestationFragment"
@@ -279,10 +290,14 @@
         tools:layout="@layout/fragment_recycler_view">
         <deepLink
             android:autoVerify="true"
-            app:uri="https://bonjour.tousanticovid.gouv.fr/app/code/{code}" />
+            app:uri="https://bonjour.tousanticovid.gouv.fr/app/code/{code}"
+            tools:ignore="UnusedAttribute"
+            tools:targetApi="m" />
         <deepLink
             android:autoVerify="true"
-            app:uri="https://bonjour.stopcovid.gouv.fr/app/code/{code}" />
+            app:uri="https://bonjour.stopcovid.gouv.fr/app/code/{code}"
+            tools:ignore="UnusedAttribute"
+            tools:targetApi="m" />
         <argument
             android:name="code"
             android:defaultValue="@null"
@@ -366,10 +381,14 @@
         <deepLink app:uri="tousanticovid://venueQRCode" />
         <deepLink
             android:autoVerify="true"
-            app:uri="https://tac.gouv.fr/0/{venueStaticPath}" />
+            app:uri="https://tac.gouv.fr/0/{venueStaticPath}"
+            tools:ignore="UnusedAttribute"
+            tools:targetApi="m" />
         <deepLink
             android:autoVerify="true"
-            app:uri="https://tac.gouv.fr/1/{venueDynamicPath}" />
+            app:uri="https://tac.gouv.fr/1/{venueDynamicPath}"
+            tools:ignore="UnusedAttribute"
+            tools:targetApi="m" />
         <argument
             android:name="venueFullPath"
             android:defaultValue="@null"
@@ -573,7 +592,6 @@
     <fragment
         android:id="@+id/isSickFragment"
         android:name="com.lunabeestudio.stopcovid.fragment.IsSickFragment"
-        android:label="IsSickFragment"
         tools:layout="@layout/fragment_recycler_view">
         <action
             android:id="@+id/action_isSickFragment_to_gestureFragment"
@@ -591,4 +609,9 @@
         android:id="@+id/venuesHistoryFragment"
         android:name="com.lunabeestudio.stopcovid.fragment.VenuesHistoryFragment"
         tools:layout="@layout/fragment_recycler_view" />
+    <fragment
+        android:id="@+id/vaccinationFragment"
+        android:name="com.lunabeestudio.stopcovid.fragment.VaccinationFragment"
+        tools:layout="@layout/fragment_recycler_view" />
+
 </navigation>

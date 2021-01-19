@@ -47,7 +47,7 @@ class VenueQRCodeFragment : QRCodeFragment() {
             ?: args.venueDynamicPath?.let { "${VenueQrType.DYNAMIC.value}/$it" }
 
         when {
-            !robertManager.displayRecordVenues || robertManager.isSick -> findNavControllerOrNull()?.navigateUp()
+            !robertManager.configuration.displayRecordVenues || robertManager.isSick -> findNavControllerOrNull()?.navigateUp()
             !robertManager.isRegistered -> findNavControllerOrNull()?.safeNavigate(
                 VenueQRCodeFragmentDirections.actionVenueQrCodeFragmentToCaptchaFragment(
                     CaptchaNextFragment.Venue,

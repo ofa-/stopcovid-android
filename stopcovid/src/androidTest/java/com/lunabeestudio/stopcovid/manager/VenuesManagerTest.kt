@@ -12,8 +12,8 @@ import com.lunabeestudio.stopcovid.extension.privateEventQrCode
 import com.lunabeestudio.stopcovid.extension.privateEventQrCodeGenerationDate
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
-import junit.framework.Assert.assertNotNull
 import org.junit.After
+import org.junit.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Test
 import java.security.KeyStore
@@ -121,7 +121,7 @@ class VenuesManagerTest {
     @OptIn(ExperimentalTime::class)
     @Test
     fun clear_expired() {
-        val gracePeriod = context.robertManager().venuesRetentionPeriod.days.toLongMilliseconds()
+        val gracePeriod = context.robertManager().configuration.venuesRetentionPeriod.days.toLongMilliseconds()
         val venue1 = VenueQrCode(
             "idtest1",
             "uuid",
@@ -264,13 +264,15 @@ class VenuesManagerTest {
         assert(venueQrCode.qrType == VenueQrType.STATIC) { "Qr type is wrong" }
         assert(venueQrCode.uuid == "491ab3ae-ad35-4301-8dd9-414ecf210712") { "UUID is wrong" }
         assert(venueQrCode.venueType == "L") { "Venue type is wrong" }
+        assert(venueQrCode.venueCategory == 0) { "Venue category should be 0" }
+        assert(venueQrCode.venueCapacity == 0) { "Venue capacity should be 0" }
         assertNotNull("Venue category should be null", venueQrCode.venueCategory)
         assertNotNull("Venue capacity should be null", venueQrCode.venueCapacity)
 
         assert(VenuesManager.processVenueUrl(
             robertManager = context.robertManager(),
             secureKeystoreDataSource = keystoreDataSource,
-            "https://tac.gouv.fr/1/491ab3ae-ad35-4301-8dd9-414ecf210713/GA/4/400/"
+            "https://tac.gouv.fr/1/491ab3ae-ad35-4301-8dd9-414ecf210713/GA/-/400/"
         ) == "GA")
         val venue2QrCode = VenuesManager.getVenuesQrCode(keystoreDataSource)?.get(1)
         assertNotNull("venue QR code should exist", venueQrCode)
@@ -278,14 +280,50 @@ class VenuesManagerTest {
         assert(venue2QrCode.qrType == VenueQrType.DYNAMIC) { "Qr type is wrong" }
         assert(venue2QrCode.uuid == "491ab3ae-ad35-4301-8dd9-414ecf210713") { "UUID is wrong" }
         assert(venue2QrCode.venueType == "GA") { "Venue type is wrong" }
-        assert(venue2QrCode.venueCategory == 4) { "Venue category is wrong" }
+        assert(venue2QrCode.venueCategory == 0) { "Venue category is wrong" }
         assert(venue2QrCode.venueCapacity == 400) { "Venue capacity is wrong" }
 
         assert(VenuesManager.processVenueUrl(
             robertManager = context.robertManager(),
             secureKeystoreDataSource = keystoreDataSource,
-            "https://tac.gouv.fr/0/491ab3ae-ad35-4301-8dd9-414ecf210712/l/"
-        ) == "L")
+            "https://tac.gouv.fr/1/491ab3ae-ad35-4301-8dd9-414ecf210714/GA/4/400/"
+        ) == "GA")
+        val venue3QrCode = VenuesManager.getVenuesQrCode(keystoreDataSource)?.get(2)
+        assertNotNull("venue QR code should exist", venueQrCode)
+        assert(venue3QrCode!!.id == "491ab3ae-ad35-4301-8dd9-414ecf210714${venueQrCode.ntpTimestamp}") { "id is wrong" }
+        assert(venue3QrCode.qrType == VenueQrType.DYNAMIC) { "Qr type is wrong" }
+        assert(venue3QrCode.uuid == "491ab3ae-ad35-4301-8dd9-414ecf210714") { "UUID is wrong" }
+        assert(venue3QrCode.venueType == "GA") { "Venue type is wrong" }
+        assert(venue3QrCode.venueCategory == 4) { "Venue category is wrong" }
+        assert(venue3QrCode.venueCapacity == 400) { "Venue capacity is wrong" }
+
+        assert(VenuesManager.processVenueUrl(
+            robertManager = context.robertManager(),
+            secureKeystoreDataSource = keystoreDataSource,
+            "https://tac.gouv.fr/1/491ab3ae-ad35-4301-8dd9-414ecf210715/GA/4/-/"
+        ) == "GA")
+        val venue4QrCode = VenuesManager.getVenuesQrCode(keystoreDataSource)?.get(3)
+        assertNotNull("venue QR code should exist", venueQrCode)
+        assert(venue4QrCode!!.id == "491ab3ae-ad35-4301-8dd9-414ecf210715${venueQrCode.ntpTimestamp}") { "id is wrong" }
+        assert(venue4QrCode.qrType == VenueQrType.DYNAMIC) { "Qr type is wrong" }
+        assert(venue4QrCode.uuid == "491ab3ae-ad35-4301-8dd9-414ecf210715") { "UUID is wrong" }
+        assert(venue4QrCode.venueType == "GA") { "Venue type is wrong" }
+        assert(venue4QrCode.venueCategory == 4) { "Venue category is wrong" }
+        assert(venue4QrCode.venueCapacity == 0) { "Venue capacity is wrong" }
+
+        assert(VenuesManager.processVenueUrl(
+            robertManager = context.robertManager(),
+            secureKeystoreDataSource = keystoreDataSource,
+            "https://tac.gouv.fr/1/491ab3ae-ad35-4301-8dd9-414ecf210716/GA/-/-/"
+        ) == "GA")
+        val venue5QrCode = VenuesManager.getVenuesQrCode(keystoreDataSource)?.get(4)
+        assertNotNull("venue QR code should exist", venueQrCode)
+        assert(venue5QrCode!!.id == "491ab3ae-ad35-4301-8dd9-414ecf210716${venueQrCode.ntpTimestamp}") { "id is wrong" }
+        assert(venue5QrCode.qrType == VenueQrType.DYNAMIC) { "Qr type is wrong" }
+        assert(venue5QrCode.uuid == "491ab3ae-ad35-4301-8dd9-414ecf210716") { "UUID is wrong" }
+        assert(venue5QrCode.venueType == "GA") { "Venue type is wrong" }
+        assert(venue5QrCode.venueCategory == 0) { "Venue category is wrong" }
+        assert(venue5QrCode.venueCapacity == 0) { "Venue capacity is wrong" }
     }
 
     @OptIn(ExperimentalTime::class)
@@ -301,7 +339,7 @@ class VenuesManagerTest {
         assertNotNull("venue QR code should exist", venueQrCode)
         assert(venueQrCode?.qrType == VenueQrType.STATIC) { "Qr type is wrong" }
         assert(eventCode?.contains(venueQrCode?.uuid!!) == true) { "UUID is wrong" }
-        assert(venueQrCode?.venueType == context.robertManager().privateEventVenueType) { "Venue type is wrong" }
+        assert(venueQrCode?.venueType == context.robertManager().configuration.privateEventVenueType) { "Venue type is wrong" }
         assertNotNull("Venue category should be null", venueQrCode?.venueCategory)
         assertNotNull("Venue capacity should be null", venueQrCode?.venueCapacity)
 

@@ -85,7 +85,7 @@ class KeyFiguresFragment : MainFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setHasOptionsMenu(robertManager.displayDepartmentLevel)
+        setHasOptionsMenu(robertManager.configuration.displayDepartmentLevel)
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

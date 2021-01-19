@@ -35,8 +35,8 @@ abstract class MainFragment : FastAdapterFragment() {
     }
 
     override fun refreshScreen() {
-        super.refreshScreen()
         setTitle()
+        super.refreshScreen()
     }
 
     protected open fun setTitle() {

@@ -33,10 +33,9 @@ abstract class BaseFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        StringsManager.liveStrings.observeEventAndConsume(viewLifecycleOwner) {
+        StringsManager.liveStrings.observe(viewLifecycleOwner) {
             refreshScreen()
         }
-        refreshScreen()
     }
 
     protected fun stringsFormat(key: String, vararg args: Any?): String? {

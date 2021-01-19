@@ -21,25 +21,7 @@ import kotlinx.coroutines.withContext
 import okhttp3.Request
 import retrofit2.HttpException
 import retrofit2.Response
-import timber.log.Timber
 import java.io.File
-
-@Suppress("BlockingMethodInNonBlockingContext")
-suspend fun String.download(context: Context): okhttp3.Response {
-    return withContext(Dispatchers.IO) {
-        val okHttpClient = OkHttpClient.getDefaultOKHttpClient(context, this@download, BuildConfig.SERVER_CERTIFICATE_SHA256)
-        val request: Request = Request.Builder()
-            .url(this@download)
-            .build()
-        val response = okHttpClient.newCall(request).execute()
-        if (response.isSuccessful && response.body != null) {
-            response
-        } else {
-            Timber.e(response.body?.string())
-            throw HttpException(Response.error<Any>(response.body!!, response))
-        }
-    }
-}
 
 @Suppress("BlockingMethodInNonBlockingContext")
 suspend fun String.saveTo(context: Context, file: File) {
@@ -75,7 +57,7 @@ fun String?.safeEmojiSpanify(): CharSequence? {
     }
 }
 
-fun String.fixFormatter() = this
+fun String.fixFormatter(): String = this
     .replace("%@", "%s")
     .replace(Regex("%\\d\\$@")) { matchResult ->
         matchResult.value.replace('@', 's')

@@ -59,8 +59,8 @@ object VenuesManager {
             val qrType = VenueQrType.fromValue(info[0].toInt())
             val uuid = info[1]
             val venueType = info[2].toUpperCase(Locale.getDefault())
-            val venueCategory = if (info.count() >= 4) info[3].toInt() else 0
-            val venueCapacity = if (info.count() >= 5) info[4].toInt() else 0
+            val venueCategory = info.getOrNull(3)?.toIntOrNull() ?: 0
+            val venueCapacity = info.getOrNull(4)?.toIntOrNull() ?: 0
 
             // Conditions
             if (!(uuid.isValidUUID()
@@ -70,10 +70,10 @@ object VenuesManager {
                     && venueCapacity >= 0)
             ) throw Exception("invalid UUID, qrType, venueType, venueCategory or venueCapacity")
 
-            val nowRoundedNtpTimestamp: Long = Date().roundedTimeIntervalSince1900(robertManager.venuesTimestampRoundingInterval.toLong())
+            val nowRoundedNtpTimestamp: Long = Date().roundedTimeIntervalSince1900(robertManager.configuration.venuesTimestampRoundingInterval.toLong())
             val id = "$uuid$nowRoundedNtpTimestamp"
 
-            val salt: Int = Random.nextInt(1, 1000)
+            val salt: Int = Random.nextInt(1, robertManager.configuration.venuesSalt)
             val payload: String = "$salt$uuid".sha256()
 
             val venueQrCode = VenueQrCode(
@@ -118,7 +118,7 @@ object VenuesManager {
         robertManager: RobertManager,
         keystoreDataSource: SecureKeystoreDataSource,
     ) {
-        val gracePeriod = robertManager.venuesRetentionPeriod.days.toLongMilliseconds()
+        val gracePeriod = robertManager.configuration.venuesRetentionPeriod.days.toLongMilliseconds()
         keystoreDataSource.venuesQrCode = keystoreDataSource.venuesQrCode?.filter { venueQrCode ->
             val recordTimestamp = venueQrCode.ntpTimestamp.ntpTimeSToUnixTimeMs()
             recordTimestamp + gracePeriod >= System.currentTimeMillis()
@@ -148,7 +148,7 @@ object VenuesManager {
         }
         if (nowCalendar.get(Calendar.DAY_OF_YEAR) != lastGenerationCalendar.get(Calendar.DAY_OF_YEAR)
             || nowCalendar.get(Calendar.YEAR) != lastGenerationCalendar.get(Calendar.YEAR)) {
-            val venueUrl = "${Constants.Url.VENUE_ROOT_URL}0/${UUID.randomUUID()}/${robertManager.privateEventVenueType}"
+            val venueUrl = "${Constants.Url.VENUE_ROOT_URL}0/${UUID.randomUUID()}/${robertManager.configuration.privateEventVenueType}"
             sharedPreferences.privateEventQrCode = venueUrl
             processVenueUrl(robertManager, keystoreDataSource, venueUrl)
             sharedPreferences.privateEventQrCodeGenerationDate = System.currentTimeMillis()

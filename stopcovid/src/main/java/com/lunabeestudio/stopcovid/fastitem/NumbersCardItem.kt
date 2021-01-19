@@ -77,7 +77,10 @@ class NumbersCardItem : AbstractBindingItem<ItemNumbersCardBinding>() {
             dataFigure3?.color?.let { binding.franceInclude.label3TextView.setTextColor(it) }
         }
 
-        binding.linkTextView.setTextOrHide(link)
+        binding.action.textView.setTextOrHide(link)
+        binding.action.leftIconImageView.visibility = View.GONE
+        binding.action.actionRootLayout.setOnClickListener(onClickListener)
+
         binding.root.setOnClickListener(onClickListener)
 
         binding.root.contentDescription = contentDescription

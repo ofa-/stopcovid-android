@@ -21,6 +21,7 @@ import com.mikepenz.fastadapter.binding.AbstractBindingItem
 class DeleteCardItem : AbstractBindingItem<ItemDeleteCardBinding>() {
     var title: String? = null
     var caption: String? = null
+    var deleteContentDescription: String? = null
     var onDelete: (() -> Unit)? = null
 
     override val type: Int = R.id.item_delete_card
@@ -37,6 +38,7 @@ class DeleteCardItem : AbstractBindingItem<ItemDeleteCardBinding>() {
         binding.captionTextView.isVisible = caption != null
         binding.captionTextView.text = caption.safeEmojiSpanify()
         binding.deleteImageView.isVisible = onDelete != null
+        binding.deleteImageView.contentDescription = deleteContentDescription
         binding.deleteImageView.setOnClickListener {
             onDelete?.invoke()
         }

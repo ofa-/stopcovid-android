@@ -28,6 +28,10 @@ android {
     }
 
     kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
+
+    lintOptions {
+        disable "GradleDependency"
+    }
 }
 
 dependencies {

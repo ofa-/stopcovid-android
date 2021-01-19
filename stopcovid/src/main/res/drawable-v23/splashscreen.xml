@@ -12,6 +12,6 @@
     <!-- The android:opacity=”opaque” line — this is critical in preventing a flash of black as your theme transitions. -->
     <item android:drawable="?colorSurface" />
     <item
-        android:drawable="@drawable/home"
+        android:drawable="@drawable/splash"
         android:gravity="center" />
 </layer-list>

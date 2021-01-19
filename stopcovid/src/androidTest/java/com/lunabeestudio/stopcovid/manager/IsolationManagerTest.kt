@@ -15,7 +15,7 @@ class IsolationManagerTest {
 
     private val context: StopCovid = ApplicationProvider.getApplicationContext() as StopCovid
     private val isolationManager: IsolationManager = context.isolationManager
-    val secureKeystoreDataSource: SecureKeystoreDataSource by lazy {
+    private val secureKeystoreDataSource: SecureKeystoreDataSource by lazy {
         context.secureKeystoreDataSource
     }
 

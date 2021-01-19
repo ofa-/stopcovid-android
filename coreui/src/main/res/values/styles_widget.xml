@@ -14,32 +14,19 @@
         <item name="popupTheme">@style/ThemeOverlay.StopCovid.PopUp</item>
     </style>
 
-    <style name="ThemeOverlay.StopCovid.Toolbar.Surface" parent="ThemeOverlay.MaterialComponents.ActionBar">
-        <item name="android:background">?colorSurface</item>
-    </style>
-
-    <style name="ThemeOverlay.StopCovid.PopUp" parent="ThemeOverlay.MaterialComponents">
-        <item name="android:colorBackground">?colorSurface</item>
-        <item name="android:textColor">?colorOnSurface</item>
-    </style>
-
-    <style name="ThemeOverlay.StopCovid.BottomSheetDialog" parent="@style/ThemeOverlay.MaterialComponents.BottomSheetDialog">
-        <item name="bottomSheetStyle">@style/Widget.StopCovid.BottomSheetDialog</item>
-    </style>
-
     <style name="Widget.StopCovid.Button" parent="Widget.MaterialComponents.Button.UnelevatedButton">
         <item name="android:padding">@dimen/spacing_large</item>
         <item name="android:textSize">@dimen/button_font_size</item>
         <item name="android:textAllCaps">false</item>
         <item name="cornerRadius">@dimen/corner_radius</item>
         <item name="android:letterSpacing">@dimen/button_letter_spacing</item>
+        <item name="rippleColor">@color/color_primary_light</item>
     </style>
 
     <style name="Widget.StopCovid.Button.Light" parent="Widget.MaterialComponents.Button.OutlinedButton">
         <item name="cornerRadius">@dimen/corner_radius</item>
         <item name="android:padding">@dimen/spacing_large</item>
         <item name="strokeColor">@color/color_primary_light</item>
-        <item name="elevation">0dp</item>
         <item name="rippleColor">@color/color_primary_light</item>
         <item name="android:textAllCaps">false</item>
         <item name="android:textColor">?colorPrimary</item>
@@ -51,9 +38,13 @@
         <item name="android:padding">@dimen/spacing_large</item>
         <item name="rippleColor">@color/color_primary_light</item>
         <item name="android:textAllCaps">false</item>
-        <item name="android:textColor">?colorPrimary</item>
         <item name="android:textSize">@dimen/button_font_size</item>
         <item name="android:letterSpacing">@dimen/button_letter_spacing</item>
+        <item name="colorOnSurface">?colorAccent</item>
+    </style>
+
+    <style name="Widget.StopCovid.Button.Text.Action">
+        <item name="android:textSize">@dimen/caption_font_size</item>
     </style>
 
     <style name="Widget.StopCovid.Button.Danger" parent="Widget.StopCovid.Button.Light">
@@ -89,28 +80,11 @@
     </style>
 
     <style name="Widget.StopCovid.BottomSheetDialog" parent="Widget.MaterialComponents.BottomSheet">
-        <item name="shapeAppearanceOverlay">@style/ShapeAppearance.App.BottomSheetDialog</item>
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearance.StopCovid.BottomSheetDialog</item>
     </style>
 
     <style name="Widget.App.CardView" parent="Widget.MaterialComponents.CardView">
         <item name="cardElevation">@dimen/cardElevation</item>
     </style>
 
-    <style name="ShapeAppearance.App.MediumComponent" parent="ShapeAppearance.MaterialComponents.MediumComponent">
-        <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">@dimen/corner_radius</item>
-    </style>
-
-    <style name="ShapeAppearance.App.SmallComponent" parent="ShapeAppearance.MaterialComponents.SmallComponent">
-        <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">@dimen/corner_radius</item>
-    </style>
-
-    <style name="ShapeAppearance.App.BottomSheetDialog" parent="">
-        <item name="cornerSize">0dp</item>
-        <item name="cornerFamilyTopLeft">rounded</item>
-        <item name="cornerFamilyTopRight">rounded</item>
-        <item name="cornerSizeTopLeft">@dimen/corner_radius</item>
-        <item name="cornerSizeTopRight">@dimen/corner_radius</item>
-    </style>
 </resources>

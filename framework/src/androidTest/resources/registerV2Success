@@ -1,11 +1,5 @@
 {
   "tuples": "test",
-  "config": [
-    {
-      "name": "distance",
-      "value": 12
-    }
-  ],
   "timeStart": 3799958400,
   "message": "The application did register successfully"
 }

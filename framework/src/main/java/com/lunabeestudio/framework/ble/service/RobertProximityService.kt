@@ -45,6 +45,7 @@ abstract class RobertProximityService : ProximityNotificationService() {
 
     abstract val robertManager: RobertManager
     protected abstract fun sendErrorBluetoothNotification()
+    protected open fun useProximityBleIds(): Boolean = false
 
     private var payloadUpdateSchedulerScope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 
@@ -84,18 +85,29 @@ abstract class RobertProximityService : ProximityNotificationService() {
         get() {
             Timber.v("Fetch new BLE settings")
 
-            val deviceParameterCorrection = robertManager.calibration.firstOrNull {
-                it.device_handset_model == android.os.Build.MODEL
-            } ?: robertManager.calibration.firstOrNull {
-                it.device_handset_model == "DEFAULT"
+            val deviceParameterCorrection = robertManager.configuration.calibration.firstOrNull {
+                it.deviceHandsetModel == android.os.Build.MODEL
+            } ?: robertManager.configuration.calibration.firstOrNull {
+                it.deviceHandsetModel == "DEFAULT"
             } ?: DeviceParameterCorrection("", FALLBACK_TX, FALLBACK_RX)
 
+            val serviceUUID: String = if (useProximityBleIds()) {
+                "0000f061-0000-1000-8000-00805f9b34fb"
+            } else {
+                robertManager.configuration.serviceUUID
+            }
+            val backgroundServiceManufacturerData: String = if (useProximityBleIds()) {
+                "1.0.0.0.0.0.0.0.0.0.64.0.0.0.0.0.0"
+            } else {
+                robertManager.configuration.backgroundServiceManufacturerData
+            }
+
             val settings = BleSettings(
-                serviceUuid = UUID.fromString(robertManager.serviceUUID),
-                servicePayloadCharacteristicUuid = UUID.fromString(robertManager.characteristicUUID),
-                backgroundServiceManufacturerDataIOS = robertManager.backgroundServiceManufacturerData.splitToByteArray(),
-                txCompensationGain = deviceParameterCorrection.tx_RSS_correction_factor.toInt(),
-                rxCompensationGain = deviceParameterCorrection.rx_RSS_correction_factor.toInt()
+                serviceUuid = UUID.fromString(serviceUUID),
+                servicePayloadCharacteristicUuid = UUID.fromString(robertManager.configuration.characteristicUUID),
+                backgroundServiceManufacturerDataIOS = backgroundServiceManufacturerData.splitToByteArray(),
+                txCompensationGain = deviceParameterCorrection.txRssCorrectionFactor.toInt(),
+                rxCompensationGain = deviceParameterCorrection.rxRssCorrectionFactor.toInt()
             )
 
             robertManager.shouldReloadBleSettings = false

@@ -11,7 +11,6 @@
 package com.lunabeestudio.stopcovid.extension
 
 import android.util.LayoutDirection
-import android.view.View
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.R
@@ -19,10 +18,10 @@ import com.lunabeestudio.stopcovid.StopCovid
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.extension.fixFormatter
 import com.lunabeestudio.stopcovid.coreui.extension.formatWithSameValue
+import com.lunabeestudio.stopcovid.coreui.fastitem.cardWithActionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
-import com.lunabeestudio.stopcovid.fastitem.IsolationCardActions
-import com.lunabeestudio.stopcovid.fastitem.imageBackgroundCardItem
-import com.lunabeestudio.stopcovid.fastitem.isolationCardItem
+import com.lunabeestudio.stopcovid.coreui.model.Action
+import com.lunabeestudio.stopcovid.coreui.model.CardTheme
 import com.lunabeestudio.stopcovid.fragment.ProximityFragment
 import com.lunabeestudio.stopcovid.fragment.ProximityFragmentDirections
 import com.lunabeestudio.stopcovid.manager.IsolationFormStateEnum
@@ -39,26 +38,28 @@ import java.util.Date
 internal fun ProximityFragment.addIsolationItems(items: ArrayList<GenericItem>) {
     val dateFormat: DateFormat = SimpleDateFormat.getDateInstance(DateFormat.LONG)
     val state = isolationManager.currentRecommendationState
-    val formListener = View.OnClickListener {
-        findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToIsolationFormFragment())
-    }
 
     if (state == IsolationRecommendationStateEnum.INITIAL_CASE_SAFE) {
-        items += imageBackgroundCardItem {
-            title = strings[state.getTitleStringKey()]
-            subtitle = strings[state.getBodyStringKey()]
-            iconRes = R.drawable.doctor
-            layoutDirection = LayoutDirection.RTL
+        items += cardWithActionItem {
+            mainTitle = strings[state.getTitleStringKey()]
+            mainBody = strings[state.getBodyStringKey()]
+            mainImage = R.drawable.doctor
+            mainLayoutDirection = LayoutDirection.RTL
             contentDescription = strings[state.getTitleStringKey()]
-            onClickListener = formListener
+            onCardClick = {
+                findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToIsolationFormFragment())
+            }
             identifier = "isolationSafe".hashCode().toLong()
         }
     } else {
-        items += isolationCardItem {
-            title = strings[state.getTitleStringKey()]
+        items += cardWithActionItem(CardTheme.Primary) {
+            cardTitle = strings[state.getTitleStringKey()]
+            cardTitleIcon = R.drawable.ic_recommendation
             val isolationEndDateString = isolationManager.currentIsolationEndDate?.let { dateFormat.format(Date(it)) }
-            content = strings[state.getBodyStringKey()]?.fixFormatter()?.formatWithSameValue(isolationEndDateString)
-            onClickListener = formListener
+            mainBody = strings[state.getBodyStringKey()]?.fixFormatter()?.formatWithSameValue(isolationEndDateString)
+            onCardClick = {
+                findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToIsolationFormFragment())
+            }
             actions = actionsForIsolationState(state)
             identifier = "isolationNotSafe".hashCode().toLong()
         }
@@ -70,7 +71,7 @@ internal fun ProximityFragment.addIsolationItems(items: ArrayList<GenericItem>) 
     }
 }
 
-private fun ProximityFragment.actionsForIsolationState(recommendationState: IsolationRecommendationStateEnum): List<IsolationCardActions> {
+private fun ProximityFragment.actionsForIsolationState(recommendationState: IsolationRecommendationStateEnum): List<Action> {
 
     return when (recommendationState) {
         IsolationRecommendationStateEnum.INDETERMINATE,
@@ -128,15 +129,15 @@ private fun ProximityFragment.openIsolationForm() {
     findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToIsolationFormFragment())
 }
 
-private fun ProximityFragment.changeStateAction(isolationRecommendationState: IsolationRecommendationStateEnum): IsolationCardActions =
-    IsolationCardActions(strings["isolation.recommendation.${isolationRecommendationState.key}.changeMyState"])
+private fun ProximityFragment.changeStateAction(isolationRecommendationState: IsolationRecommendationStateEnum): Action =
+    Action(label = strings["isolation.recommendation.${isolationRecommendationState.key}.changeMyState"])
     {
         isolationManager.resetData()
         openIsolationForm()
     }
 
 private fun ProximityFragment.defineIsolationAction(isolationRecommendationState: IsolationRecommendationStateEnum) =
-    IsolationCardActions(strings["isolation.recommendation.${isolationRecommendationState.key}.defineIsolationPeriod"])
+    Action(label = strings["isolation.recommendation.${isolationRecommendationState.key}.defineIsolationPeriod"])
     {
         isolationManager.resetData()
         openIsolationForm()
@@ -145,14 +146,14 @@ private fun ProximityFragment.defineIsolationAction(isolationRecommendationState
         }
     }
 
-private fun ProximityFragment.testingSitesAction(isolationRecommendationState: IsolationRecommendationStateEnum): IsolationCardActions =
-    IsolationCardActions(strings["isolation.recommendation.${isolationRecommendationState.key}.testingSites"])
+private fun ProximityFragment.testingSitesAction(isolationRecommendationState: IsolationRecommendationStateEnum) =
+    Action(label = strings["isolation.recommendation.${isolationRecommendationState.key}.testingSites"])
     {
         strings["myHealthController.testingSites.url"]?.openInExternalBrowser(requireContext())
     }
 
-private fun ProximityFragment.positiveTestAction(isolationRecommendationState: IsolationRecommendationStateEnum): IsolationCardActions =
-    IsolationCardActions(strings["isolation.recommendation.${isolationRecommendationState.key}.positiveTest"])
+private fun ProximityFragment.positiveTestAction(isolationRecommendationState: IsolationRecommendationStateEnum) =
+    Action(label = strings["isolation.recommendation.${isolationRecommendationState.key}.positiveTest"])
     {
         openIsolationForm()
         executeActionAfterAnimation {
@@ -163,8 +164,8 @@ private fun ProximityFragment.positiveTestAction(isolationRecommendationState: I
 private fun ProximityFragment.negativeTestAction(
     isolationRecommendationState: IsolationRecommendationStateEnum,
     openForm: Boolean = true, resetState: Boolean = false,
-): IsolationCardActions =
-    IsolationCardActions(strings["isolation.recommendation.${isolationRecommendationState.key}.negativeTest"])
+) =
+    Action(label = strings["isolation.recommendation.${isolationRecommendationState.key}.negativeTest"])
     {
         if (resetState) {
             isolationManager.resetData()
@@ -179,39 +180,39 @@ private fun ProximityFragment.negativeTestAction(
         }
     }
 
-private fun ProximityFragment.symptomsAction(isolationRecommendationState: IsolationRecommendationStateEnum): IsolationCardActions =
-    IsolationCardActions(strings["isolation.recommendation.${isolationRecommendationState.key}.symptoms"]) {
+private fun ProximityFragment.symptomsAction(isolationRecommendationState: IsolationRecommendationStateEnum) =
+    Action(label = strings["isolation.recommendation.${isolationRecommendationState.key}.symptoms"]) {
         MaterialAlertDialogBuilder(requireContext()).showSymptomConfirmationDialog(strings) {
-            if (it){
+            if (it) {
                 isolationManager.updateState(IsolationFormStateEnum.SYMPTOMS)
                 openIsolationForm()
             }
         }
     }
 
-private fun ProximityFragment.havingDateAction(isolationRecommendationState: IsolationRecommendationStateEnum): IsolationCardActions =
-    IsolationCardActions(strings["isolation.recommendation.${isolationRecommendationState.key}.havingTheDate"])
+private fun ProximityFragment.havingDateAction(isolationRecommendationState: IsolationRecommendationStateEnum) =
+    Action(label = strings["isolation.recommendation.${isolationRecommendationState.key}.havingTheDate"])
     {
         openIsolationForm()
         isolationManager.setKnowsIndexSymptomsEndDate(true)
     }
 
-private fun ProximityFragment.scheduleReminderAction(isolationRecommendationState: IsolationRecommendationStateEnum): IsolationCardActions =
-    IsolationCardActions(strings["isolation.recommendation.${isolationRecommendationState.key}.scheduleReminder"])
+private fun ProximityFragment.scheduleReminderAction(isolationRecommendationState: IsolationRecommendationStateEnum) =
+    Action(label = strings["isolation.recommendation.${isolationRecommendationState.key}.scheduleReminder"])
     {
         val triggerDate = Date(isolationManager.positiveCaseIsolationEndDate ?: System.currentTimeMillis())
         (context?.applicationContext as? StopCovid)?.setIsolationReminder(triggerDate)
         isolationManager.setFeverReminderScheduled()
     }
 
-private fun ProximityFragment.answerStillHavingFeverAction(isolationRecommendationState: IsolationRecommendationStateEnum): IsolationCardActions =
-    IsolationCardActions(strings["isolation.recommendation.${isolationRecommendationState.key}.stillHavingFever"])
+private fun ProximityFragment.answerStillHavingFeverAction(isolationRecommendationState: IsolationRecommendationStateEnum) =
+    Action(label = strings["isolation.recommendation.${isolationRecommendationState.key}.stillHavingFever"])
     {
         openIsolationForm()
     }
 
-private fun ProximityFragment.noMoreFeverAction(isolationRecommendationState: IsolationRecommendationStateEnum): IsolationCardActions =
-    IsolationCardActions(strings["isolation.recommendation.${isolationRecommendationState.key}.noMoreFever"])
+private fun ProximityFragment.noMoreFeverAction(isolationRecommendationState: IsolationRecommendationStateEnum) =
+    Action(label = strings["isolation.recommendation.${isolationRecommendationState.key}.noMoreFever"])
     {
         isolationManager.setStillHavingFever(false)
     }

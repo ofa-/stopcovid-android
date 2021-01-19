@@ -8,13 +8,16 @@
   ~ Created by Lunabee Studio / Date - 2020/10/29 - for the TOUS-ANTI-COVID project
   -->
 
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/qr_code_menu_share"
         android:orderInCategory="1"
-        android:title="Share" />
+        android:title="Share"
+        tools:ignore="HardcodedText" />
     <item
         android:id="@+id/qr_code_menu_delete"
         android:orderInCategory="2"
-        android:title="Delete" />
+        android:title="Delete"
+        tools:ignore="HardcodedText" />
 </menu>

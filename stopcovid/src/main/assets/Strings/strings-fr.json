@@ -38,7 +38,7 @@
    "sickController.message.youHaveSymptoms.subtitle":"Vous souhaitez savoir quel comportement adopter ?\nCe questionnaire est là pour vous orienter.",
    "sickController.button.flash":"Scanner le QR code",
    "sickController.button.tap":"Saisir le code",
-   "sickController.button.myConditionInformation":"M’informer sur mon état",
+   "sickController.button.myConditionInformation":"M’informer sur mon état de santé",
    "sickController.button.myConditionInformation.url":"https://orientation.covid19.etalab.gouv.fr/",
    "sickController.button.callCenter":"Trouver mon centre d'appel",
    "sickController.button.recommendations":"Mes conseils personnalisés",
@@ -49,7 +49,7 @@
    "sickController.state.nothing.title":"Vous n'avez pas été à proximité d’un utilisateur diagnostiqué comme un cas de COVID-19",
    "sickController.state.nothing.subtitle":"N'oubliez pas pour autant les mesures barrières et les recommandations sanitaires",
    "sickController.state.contact.title":"Vous avez été exposé à au moins un utilisateur diagnostiqué comme un cas de COVID-19 ces derniers jours, vous êtes un contact à risque",
-   "sickController.state.contact.subtitle":"Isolez-vous, contactez votre médecin en l’informant que vous avez été notifié comme contact à risque et faites-vous tester.",
+   "sickController.state.contact.subtitle":"Isolez-vous, contactez votre médecin en l’informant que vous avez été notifié comme contact à risque et faites-vous tester dès aujourd’hui grâce à un accès prioritaire. Ne contactez pas les plateformes de l’Assurance Maladie, elles vous contacteront si la personne diagnostiquée positive vous connait. Pour savoir combien de temps vous isoler, allez sur la page d'accueil de l'appli.",
    "sickController.state.deleteNotification":"Supprimer la notification",
    "sickController.state.deleteNotification.alert.title":"Voulez-vous vraiment supprimer la notification ?",
    "sharingController.title":"Partager",
@@ -226,7 +226,7 @@
    "common.error.proximityUnknown":"Une erreur Bluetooth est survenue.",
    "common.error.robertUnknown":"Une erreur du protocole Robert est survenue.",
    "common.error.robertNoEbidForEpoch":"Impossible de trouver un identifiant pour l'heure de votre téléphone.",
-   "common.error.robertNoEbid":"Impossible de fournir de crypto-identifiant.",
+   "common.error.robertNoEbid":"Impossible de fournir de crypto-identifiant. Essayez à nouveau ou redémarrez votre téléphone.",
    "common.error.keystoreNoKey":"Aucune clé retrouvée dans votre téléphone.",
    "common.error.decryptFail":"Impossible de décrypter la clé enregistrée.",
    "common.error.bleAdvertiser":"Échec de l'activation Bluetooth. Essayez à nouveau ou redémarrez votre téléphone.",
@@ -315,7 +315,7 @@
    "home.infoSection.figures.notified":"Notifiés",
    "home.infoSection.seeAll":"Voir tous les chiffres",
    "home.declareSection.title":"Me déclarer",
-   "home.declareSection.cellTitle":"Se déclarer cas COVID avec un code",
+   "home.declareSection.cellTitle":"Se déclarer cas COVID-19 avec un code",
    "home.declareSection.cellSubtitle":"Appuyez ici pour vous déclarer",
    "home.sharingSection.title":"Je partage",
    "home.sharingSection.cellTitle":"Plus nous sommes nombreux et mieux nous sommes protégés",
@@ -390,7 +390,7 @@
    "common.justNow":"À l'instant",
    "keyfigure.dailyUpdates":"Mis à jour quotidiennement",
    "home.moreSection.curfewCertificate":"Attestation de déplacement",
-   "home.moreSection.curfewCertificate.url":"https://media.interieur.gouv.fr/deplacement-covid-19/",
+   "home.moreSection.curfewCertificate.url":"https://media.interieur.gouv.fr/attestation-couvre-feu-covid-19/",
    "home.infoSection.newPostalCode":"Situation sanitaire locale",
    "home.infoSection.newPostalCode.subtitle":"Vous pouvez accéder aux chiffres clés au niveau local, en indiquant un code postal.",
    "home.infoSection.newPostalCode.button":"Entrer un code postal",
@@ -418,7 +418,7 @@
    "keyFigures.update":"Donnée du : %@",
    "declareController.codeNotReceived.buttonTitle":"J'ai besoin d'aide",
    "declareController.codeNotReceived.alert.title":"J'ai besoin d'aide",
-   "declareController.codeNotReceived.alert.message":"Si vous n'avez pas reçu le QR Code, vous pouvez vous rapprocher d’un professionnel de santé (médecin, infirmier, pharmacien, chirurgien-dentiste, masseur-kinésithérapeute ou sage-femme) qui pourra vous procurer un code valable 1h avec 6 caractères à saisir, grâce à l’interface Pro TousAntiCovid.",
+   "declareController.codeNotReceived.alert.message":"Si vous n'avez pas reçu le QR Code, vous pouvez vous rapprocher d’un professionnel de santé (médecin, infirmier, pharmacien, chirurgien-dentiste, masseur-kinésithérapeute ou sage-femme) qui pourra vous procurer un code valable 1h avec 6 caractères à saisir, grâce à l’interface Pro TousAntiCovid.\n\nSi vous avez toujours besoin d'aide, vous pouvez nous contacter par email.",
    "keyFigure.sharing.national":"%1$@ (France): %2$@. Retrouve tous les chiffres clés dans l'appli TousAntiCovid https://bonjour.tousanticovid.gouv.fr",
    "keyFigure.sharing.department":"%1$@ (%2$@): %3$@. %4$@ (France): %5$@. Retrouve tous les chiffres clés dans l'appli TousAntiCovid https://bonjour.tousanticovid.gouv.fr",
    "info.sharing.title":"À lire dans l'app TousAntiCovid : \"%@\". Retrouve toutes les actualités dans TousAntiCovid https://bonjour.tousanticovid.gouv.fr",
@@ -442,7 +442,7 @@
    "attestation.form.reason.placeholder":"-",
    
    "attestation.form.travail.shortLabel":"1. Activité professionnelle, enseignement et formation",
-   "attestation.form.travail.longLabel":"Déplacements entre le domicile et le lieu d'exercice de l'activité professionnelle ou le lieu d'enseignement et de formation",
+   "attestation.form.travail.longLabel":"Déplacements entre le domicile et le lieu d'exercice de l'activité professionnelle ou le lieu d'enseignement et de formation, déplacements professionnels ne pouvant être différés",
    
    "attestation.form.achats_culturel_cultuel.shortLabel":"2. Etablissement culturel, lieu de culte, achats",
    "attestation.form.achats_culturel_cultuel.longLabel":"Déplacements pour se rendre dans un établissement culturel autorisé ou un lieu de culte ; déplacements pour effectuer des achats de biens, pour des services dont la fourniture est autorisée, pour les retraits de commandes et les livraisons à domicile",
@@ -465,16 +465,16 @@
    "attestation.form.missions.shortLabel":"6. Missions d'intérêt général",
    "attestation.form.missions.longLabel":"Déplacements pour participer à des missions d'intérêt général sur demande de l'autorité administrative",
    
-   "attestation.form.transits.shortLabel":"7. Transits ferroviaires ou aériens",
-   "attestation.form.transits.longLabel":"Déplacements liés à des transits ferroviaires ou aériens pour des déplacements de longues distances",
+   "attestation.form.transits.shortLabel":"7. Transits ferroviaires ou aériens ou en bus",
+   "attestation.form.transits.longLabel":"Déplacements liés à des transits ferroviaires ou aériens ou en bus pour des déplacements de longues distances",
    
    "attestation.form.animaux.shortLabel":"8. Animaux de compagnie",
    "attestation.form.animaux.longLabel":"Déplacements brefs, dans un rayon maximal d'un kilomètre autour du domicile pour les besoins des animaux de compagnie",
    
    "attestation.form.enfants.shortLabel":"Enfants à l’école",
    "attestation.form.enfants.longLabel":"Déplacements pour chercher les enfants à l’école et à l’occasion de leurs activités périscolaires",
-   
-   
+  
+     
    "accessibility.keyFigures.noValueAvailable":"Information non disponible",
    "accessibility.hint.keyFigure.share":"Partager le chiffre clé",
    "accessibility.hint.keyFigure.valueUp":"Cette valeur a augmenté",
@@ -532,7 +532,7 @@
    "home.healthSection.isSick.subtitle":"En savoir plus",
    "myHealthController.sick.title":"Recommandations sanitaires",
    "home.attestationSection.title":"Attestation",
-   "home.attestationSection.cell.title":"Créez rapidement vos attestations de déplacement",
+   "home.attestationSection.cell.title":"Vos attestations de déplacement (couvre-feu)",
    "home.attestationSection.cell.subtitle.noAttestations":"Appuyez ici",
    "home.attestationSection.cell.subtitle.oneAttestation":"1 attestation",
    "home.attestationSection.cell.subtitle.multipleAttestations":"%d attestations",
@@ -556,22 +556,21 @@
    "home.moreSection.usefulLinks": "Liens utiles",
    "linksController.title": "Liens utiles",
    
-   
    "sendHistoryController.successAlert.title": "Merci !",
    "sendHistoryController.successAlert.message": "Merci de vous être déclaré via TousAntiCovid et d'avoir informé les utilisateurs qui ont été à proximité lorsque vous étiez contagieux.\n\nGrâce à vous ces utilisateurs vont pouvoir prendre les mesures nécessaires pour se protéger et protéger les autres. Merci de contribuer à la lutte contre la Covid.",
    "sendHistoryController.successAlert.button.learnMore": "En savoir plus",
    
    "keyFiguresExplanationsController.title": "Explication des chiffres",
-   "keyFiguresController.section.health.subtitle": "Appuyez sur \"lire maintenant\" pour en savoir plus sur la source des chiffres sanitaires, leur interprétation, ainsi que leur mise à jour.",
-   "keyFiguresController.section.health.button": "Lire maintenant",
+   "keyFiguresController.section.health.subtitle": "Appuyez sur \"en savoir plus\" pour découvrir la source des chiffres sanitaires, leur interprétation, ainsi que leur mise à jour.",
+   "keyFiguresController.section.health.button": "En savoir plus",
 
    "home.activation.sick.alert.title": "Informations",
    "home.activation.sick.alert.message": "Vous ne pouvez pas activer l’alerte en cas d’exposition à la COVID-19 pendant 2 mois après votre déclaration de positivité au COVID-19.\n\nEn effet, pendant les 2 mois suivant un test positif pour la COVID-19, vous ne serez pas considéré comme \"à risque de contamination\".",
    "common.error.secretKey": "Échec de décryption de la base. Essayez à nouveau ou redémarrez votre téléphone.",
    
    "home.venuesSection.title": "Lieux",
-   "home.venuesSection.recordCell.title": "Enregistrez l’historique des lieux que vous fréquentez",
-   "home.venuesSection.recordCell.subtitle": "Appuyez pour scanner le QR code",
+   "home.venuesSection.recordCell.title": "Scanner un QR code lieu",
+   "home.venuesSection.recordCell.subtitle": "Enregistrez l’historique des lieux que vous fréquentez",
    "home.venuesSection.privateCell.title": "Vous organisez un événement privé ?",
    "home.venuesSection.privateCell.subtitle": "Créez votre propre code, permettant de protéger vos invités",
    "home.moreSection.venuesHistory": "Historique des lieux",
@@ -637,7 +636,7 @@
    "declareController.codeNotReceived.alert.showVideo": "Voir la vidéo",
    "declareController.codeNotReceived.alert.video.url": "https://youtu.be/uCEMHFr50a0",
    
-   "aboutController.contactUsByEmail": "Nous contacter par email",
+   "aboutController.contactUsByEmail": "Support : contact@tousanticovid.gouv.fr",
    "aboutController.contactEmail": "contact@tousanticovid.gouv.fr",
 
 
@@ -648,28 +647,28 @@
    "isolation.recommendation.initialCaseAtRiskOrSick.body": "Votre isolement est très important pour rompre les chaînes de transmission. Il vous est recommandé de respecter l’isolement.",
 
    "isolation.recommendation.allGood.title": "Recommandation isolement",
-   "isolation.recommendation.allGood.body": "Pas besoin de s'isoler ! Et je continue de respecter les mesures barrières.",
+   "isolation.recommendation.allGood.body": "Si tout va bien, pas besoin de m'isoler !\n\nEt je continue de respecter les mesures barrières.",
 
    "isolation.recommendation.symptoms.title": "Recommandation isolement",
    "isolation.recommendation.symptoms.body": "Je m'isole immédiatement et je cherche l'endroit le plus proche où me faire dépister.\n\nEt je m'isole également en attendant les résultats de mon test.",
    
    "isolation.recommendation.symptomsTested.title": "Recommandation isolement",
-   "isolation.recommendation.symptomsTested.body": "Je peux arrêter mon isolement ! Et je continue de respecter les mesures barrières.",
+   "isolation.recommendation.symptomsTested.body": "Je peux arrêter mon isolement !\n\nEt je continue de respecter les mesures barrières.",
 
    "isolation.recommendation.contactCaseUnknownIndex.title": "Recommandation isolement",
-   "isolation.recommendation.contactCaseUnknownIndex.body": "Je m'isole pendant 7 jours.\n\nFin prévue d’isolement : %@\n\nJe prends un rendez-vous le %@ pour me faire tester.",
+   "isolation.recommendation.contactCaseUnknownIndex.body": "Je m'isole pendant 7 jours.\n\nFin prévue d’isolement : %@\n\nSi je ne sais pas quand j'ai été en contact avec un cas, je me fais tester dès aujourd'hui, sinon je prends rendez-vous pour me faire tester le %@.",
 
    "isolation.recommendation.contactCaseKnownIndexNotTested.title": "Recommandation isolement",
    "isolation.recommendation.contactCaseKnownIndexNotTested.body": "Je m'isole immédiatement et je cherche l'endroit le plus proche où me faire dépister.\n\nEt je m'isole également en attendant les résultats de mon test.",
 
    "isolation.recommendation.contactCaseKnownIndexTestedKnownDate.title": "Recommandation isolement",
-   "isolation.recommendation.contactCaseKnownIndexTestedKnownDate.body": "Je reste isolé jusqu'à 7 jours après la date de de guérison du cas (absence de fièvre depuis 48h) avec qui je partage mon foyer.\n\nFin prévue d’isolement : %@",
+   "isolation.recommendation.contactCaseKnownIndexTestedKnownDate.body": "Je reste isolé jusqu'à 7 jours après la date de guérison du cas (absence de fièvre depuis 48h) avec qui je partage mon foyer.\n\nFin prévue d’isolement : %@",
 
    "isolation.recommendation.contactCaseKnownIndexTestedUnknownDate.title": "Recommandation isolement",
    "isolation.recommendation.contactCaseKnownIndexTestedUnknownDate.body": "Je reste isolé jusqu'à 7 jours après la date de guérison du cas (absence de fièvre depuis 48h)  avec qui je partage mon foyer.\n\nRevenez sur ce formulaire quand vous avez la date de guérison du cas avec qui vous partagez votre foyer.",
    
    "isolation.recommendation.contactCasePostIsolationPeriod.title": "Recommandation isolement",
-   "isolation.recommendation.contactCasePostIsolationPeriod.body": "Pendant 7 jours après la date de fin d'isolement, veuillez respecter strictement les mesures barrières, notamment le port rigoureux du masque, le lavage régulier des mains et la distanciation physique. Il faut aussi éviter tout contact avec des personnes vulnérables.",
+   "isolation.recommendation.contactCasePostIsolationPeriod.body": "Pendant 7 jours après la date de fin d'isolement, veuillez respecter strictement les mesures barrières, notamment le port rigoureux du masque, le lavage régulier des mains et la distanciation physique.\n\nIl faut aussi éviter tout contact avec des personnes vulnérables.",
 
    "isolation.recommendation.positiveCaseNoSymptoms.title": "Recommandation isolement",
    "isolation.recommendation.positiveCaseNoSymptoms.body": "Je m'isole immédiatement après avoir reçu mon résultat et pour 7 jours à partir de la date de prélèvement de mon test positif.\n\nFin prévue d’isolement : %@",
@@ -681,7 +680,7 @@
    "isolation.recommendation.positiveCaseSymptomsAfterIsolation.body": "Je m'isole immédiatement après avoir reçu mon résultat et pour 7 jours.\n\nFin prévue d’isolement : %@",
 
    "isolation.recommendation.positiveCasePostIsolationPeriod.title": "Recommandation isolement",
-   "isolation.recommendation.positiveCasePostIsolationPeriod.body": "Pendant 7 jours après la date de fin d'isolement, veuillez respecter strictement les mesures barrières, notamment le port rigoureux du masque, le lavage régulier des mains et la distanciation physique. Il faut aussi éviter tout contact avec des personnes vulnérables.",
+   "isolation.recommendation.positiveCasePostIsolationPeriod.body": "Pendant 7 jours après la date de fin d'isolement, veuillez respecter strictement les mesures barrières, notamment le port rigoureux du masque, le lavage régulier des mains et la distanciation physique.\n\nIl faut aussi éviter tout contact avec des personnes vulnérables.",
 
    "isolation.recommendation.positiveCaseSymptomsAfterIsolationStillHavingFever.title": "Recommandation isolement",
    "isolation.recommendation.positiveCaseSymptomsAfterIsolationStillHavingFever.body": "Attendez 48h à partir du moment où vous n'avez plus de fièvre pour lever votre isolement.",
@@ -727,7 +726,7 @@
    "isolationFormController.state.contactCase": "😷 Je suis personne contact",
    "isolationFormController.state.positiveCase": "🤒 Je suis testé positif",
    "isolationFormController.contactCase.lastContactDate": "Date de dernier contact (optionnelle)",
-   "isolationFormController.contactCase.index.sectionTitle": "Je partage mon foyer avec une personne diagnostiquée comme un cas de COVID-19 ?",
+   "isolationFormController.contactCase.index.sectionTitle": "Je suis contact à risque d’une personne contaminée au sein de mon foyer ?",
    "isolationFormController.contactCase.haveIndexSymptomsEndDate.sectionTitle": "Avez-vous la date de guérison du cas (absence de fièvre depuis 48h)  avec qui vous partagez votre foyer ?",
    "isolationFormController.contactCase.symptomsEndDate.sectionTitle": "La date de guérison du cas avec qui vous partagez votre foyer :",
    "isolationFormController.contactCase.symptomsEndDate": "Date de guérison",
@@ -740,7 +739,7 @@
    "isolationFormController.header.title": "",
    "isolationFormController.footer.title": "Veuillez bien répondre aux questions du formulaire pour qu'on puisse vous faire des recommandations sur votre durée d’isolement.",
    
-   "declareController.codeNotReceived.alert.contactUs": "Nous contacter",
+   "declareController.codeNotReceived.alert.contactUs": "contact@tousanticovid.gouv.fr",
    "venuesHistoryController.footer": "Cet historique des lieux vous permettra d'être averti si quelqu'un se déclare positif dans ce lieu.\nTous les lieux de plus de 14 jours sont effacés automatiquement à chaque ouverture de l'application.",
    "venuesHistoryController.delete.alert.title": "Souhaitez-vous supprimer ce lieu ?",
    "venuesHistoryController.delete.alert.message": "Une fois supprimé, si une personne qui a fréquenté ce lieu en même temps que vous se déclare malade, alors vous ne serez pas notifié.",
@@ -751,6 +750,19 @@
    "manageDataController.isolationData.confirmationDialog.message":"Confirmez-vous vouloir supprimer toutes les données liées à l'isolement ?",
    "confirmVenueQrCodeController.title":"Confirmation",
    "confirmVenueQrCodeController.explanation.title":"Vous venez d'appuyer sur un lien TousAntiCovid pour un lieu.",
-   "confirmVenueQrCodeController.explanation.subtitle":"Voulez vous ajouter ce lieu à votre historique de lieux ?",
-   "confirmVenueQrCodeController.confirm":"Ajouter ce lieu"
+   "confirmVenueQrCodeController.explanation.subtitle":"Voulez-vous ajouter ce lieu à votre historique de lieux ?",
+   "confirmVenueQrCodeController.confirm":"Ajouter ce lieu",
+   
+   "home.vaccinationSection.cellTitle": "La vaccination, c'est maintenant !",
+   "home.vaccinationSection.cellSubtitle": "Vérifiez votre éligibilité et trouvez où vous faire vacciner.",
+   "vaccinationController.title": "Vaccination",
+   "vaccinationController.eligibility.title": "Suis-je éligible ?",
+   "vaccinationController.eligibility.subtitle": "Tu as plus de 65 ans et cice et cela et encore cela .... ? C'est le moment.",
+   "vaccinationController.eligibility.buttonTitle": "En savoir plus",
+   "vaccinationController.eligibility.url": "https://solidarites-sante.gouv.fr/grands-dossiers/la-vaccination-contre-la-covid-19/article/la-strategie-vaccinale",
+   "vaccinationController.vaccinationLocation.title": "Où me faire vacciner ?",
+   "vaccinationController.vaccinationLocation.subtitle": "Rendez-vous sur sante.fr pour trouver les lieux de vaccination.",
+   "vaccinationController.vaccinationLocation.buttonTitle": "Trouver un lieu",
+   "vaccinationController.vaccinationLocation.url": "https://www.data.gouv.fr/fr/datasets/vaccinations-covid19-en-france-par-region-donnees-ministere-de-la-sante/",
+   "contactUs.url": "https://bonjour.tousanticovid.gouv.fr/contact.html"
 }

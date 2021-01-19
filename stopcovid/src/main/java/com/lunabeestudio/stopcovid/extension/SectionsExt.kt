@@ -11,22 +11,29 @@
 package com.lunabeestudio.stopcovid.extension
 
 import com.lunabeestudio.stopcovid.R
+import com.lunabeestudio.stopcovid.coreui.fastitem.cardWithActionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
-import com.lunabeestudio.stopcovid.fastitem.dynamicCardItem
+import com.lunabeestudio.stopcovid.coreui.model.Action
 import com.lunabeestudio.stopcovid.model.Section
 import com.mikepenz.fastadapter.GenericItem
 
 fun List<Section>.fillItems(items: MutableList<GenericItem>) {
+    items += spaceItem {
+        spaceRes = R.dimen.spacing_large
+        identifier = items.count().toLong()
+    }
     forEach { (section, description, links) ->
-        if (items.size > 0) {
-            items += spaceItem {
-                spaceRes = R.dimen.spacing_medium
-            }
+        items += spaceItem {
+            spaceRes = R.dimen.spacing_medium
         }
-        items += dynamicCardItem {
-            title = section
-            caption = description
-            this.links = links
+        items += cardWithActionItem {
+            mainTitle = section
+            mainBody = description
+            actions = links?.map { link ->
+                Action(label = link.label) {
+                    link.url.openInExternalBrowser(it.context)
+                }
+            }
             identifier = section.hashCode().toLong()
         }
     }

@@ -13,6 +13,5 @@ package com.lunabeestudio.domain.model
 class RegisterReport(
     val tuples: String,
     val message: String?,
-    val timeStart: Long,
-    val configuration: List<Configuration>?
+    val timeStart: Long
 )

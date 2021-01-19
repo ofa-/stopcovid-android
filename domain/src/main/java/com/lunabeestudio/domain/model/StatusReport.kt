@@ -14,6 +14,5 @@ class StatusReport(
     val atRisk: Boolean,
     val lastExposureTimeframe: Int?,
     val message: String?,
-    val tuples: String?,
-    val config: List<Configuration>
+    val tuples: String?
 )

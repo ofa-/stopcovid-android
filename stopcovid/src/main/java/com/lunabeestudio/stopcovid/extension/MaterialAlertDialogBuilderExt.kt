@@ -10,6 +10,7 @@
 
 package com.lunabeestudio.stopcovid.extension
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.inputmethod.EditorInfo
 import android.widget.DatePicker
@@ -70,6 +71,7 @@ fun MaterialAlertDialogBuilder.showPostalCodeDialog(
     }
 }
 
+@SuppressLint("InflateParams")
 fun MaterialAlertDialogBuilder.showSpinnerDayPicker(
     strings: Map<String, String>,
     initialTimestamp: Long,
@@ -123,6 +125,7 @@ fun MaterialAlertDialogBuilder.showSpinnerDayPicker(
     show()
 }
 
+@SuppressLint("InflateParams")
 fun MaterialAlertDialogBuilder.showSpinnerDatePicker(
     strings: Map<String, String>,
     initialTimestamp: Long,
