@@ -2,6 +2,7 @@ package com.lunabeestudio.stopcovid.manager
 
 import android.content.SharedPreferences
 import com.lunabeestudio.domain.extension.ntpTimeSToUnixTimeMs
+import com.lunabeestudio.domain.extension.unixTimeMsToNtpTimeS
 import com.lunabeestudio.domain.model.VenueQrCode
 import com.lunabeestudio.domain.model.VenueQrType
 import com.lunabeestudio.framework.local.datasource.SecureKeystoreDataSource
@@ -23,6 +24,8 @@ import java.util.UUID
 import kotlin.random.Random
 import kotlin.time.ExperimentalTime
 import kotlin.time.days
+import kotlin.time.milliseconds
+import kotlin.time.seconds
 
 object VenuesManager {
 
@@ -45,12 +48,13 @@ object VenuesManager {
         }
     }
 
+    @OptIn(ExperimentalTime::class)
     fun processVenuePath(
         robertManager: RobertManager,
         secureKeystoreDataSource: SecureKeystoreDataSource,
         path: String,
     ): String? {
-        try {
+        return try {
             val info: List<String> = path.trimEnd('/').split("/")
 
             if (info.count() < 3) throw Exception("not enough parameter")
@@ -61,16 +65,20 @@ object VenuesManager {
             val venueType = info[2].toUpperCase(Locale.getDefault())
             val venueCategory = info.getOrNull(3)?.toIntOrNull() ?: 0
             val venueCapacity = info.getOrNull(4)?.toIntOrNull() ?: 0
+            val timestamp = info.getOrNull(5)?.toLongOrNull()?.seconds ?: System.currentTimeMillis().milliseconds
 
             // Conditions
             if (!(uuid.isValidUUID()
                     && qrType != null
                     && (1..3).contains(venueType.count())
                     && (0..5).contains(venueCategory)
-                    && venueCapacity >= 0)
+                    && venueCapacity >= 0
+                    && !isVenuePathExpired(robertManager, path))
             ) throw Exception("invalid UUID, qrType, venueType, venueCategory or venueCapacity")
 
-            val nowRoundedNtpTimestamp: Long = Date().roundedTimeIntervalSince1900(robertManager.configuration.venuesTimestampRoundingInterval.toLong())
+            val nowRoundedNtpTimestamp: Long =
+                Date(timestamp.toLongMilliseconds())
+                    .roundedTimeIntervalSince1900(robertManager.configuration.venuesTimestampRoundingInterval.toLong())
             val id = "$uuid$nowRoundedNtpTimestamp"
 
             val salt: Int = Random.nextInt(1, robertManager.configuration.venuesSalt)
@@ -87,10 +95,39 @@ object VenuesManager {
                 payload
             )
             saveVenue(secureKeystoreDataSource, venueQrCode)
-            return venueType
+            venueType
         } catch (e: Exception) {
             Timber.e(e, "Fail to proces path $path")
-            return null
+            null
+        }
+    }
+
+    fun isVenueUrlExpired(
+        robertManager: RobertManager,
+        stringUrl: String,
+    ): Boolean {
+        return try {
+            val url = URL(stringUrl)
+            val path: String = url.path.drop(1)
+            isVenuePathExpired(robertManager, path)
+        } catch (e: Exception) {
+            Timber.e(e)
+            false
+        }
+    }
+
+    @OptIn(ExperimentalTime::class)
+    fun isVenuePathExpired(robertManager: RobertManager, path: String): Boolean {
+        return try {
+            val info: List<String> = path.trimEnd('/').split("/")
+
+            if (info.count() < 3) throw Exception("not enough parameter")
+
+            val timestamp = info.getOrNull(5)?.toLongOrNull()?.seconds ?: System.currentTimeMillis().milliseconds
+
+            return timestamp.toLongMilliseconds() + gracePeriod(robertManager) < System.currentTimeMillis()
+        } catch (e: Exception) {
+            false
         }
     }
 
@@ -107,23 +144,28 @@ object VenuesManager {
     fun getVenuesQrCode(
         keystoreDataSource: SecureKeystoreDataSource,
         startNtpTimestamp: Long? = null,
-    ): List<VenueQrCode>? = startNtpTimestamp?.let {
+        includingFuture: Boolean = false,
+    ): List<VenueQrCode>? = (startNtpTimestamp ?: Long.MIN_VALUE).let { forcedStartNtpTimestamp ->
+        val currentNtpTimestamp = System.currentTimeMillis().unixTimeMsToNtpTimeS()
         keystoreDataSource.venuesQrCode?.filter {
-            it.ntpTimestamp >= startNtpTimestamp
+            it.ntpTimestamp >= forcedStartNtpTimestamp && (includingFuture || it.ntpTimestamp <= currentNtpTimestamp)
         }
-    } ?: keystoreDataSource.venuesQrCode
+    }
 
     @OptIn(ExperimentalTime::class)
     fun clearExpired(
         robertManager: RobertManager,
         keystoreDataSource: SecureKeystoreDataSource,
     ) {
-        val gracePeriod = robertManager.configuration.venuesRetentionPeriod.days.toLongMilliseconds()
+        val gracePeriod = gracePeriod(robertManager)
         keystoreDataSource.venuesQrCode = keystoreDataSource.venuesQrCode?.filter { venueQrCode ->
             val recordTimestamp = venueQrCode.ntpTimestamp.ntpTimeSToUnixTimeMs()
             recordTimestamp + gracePeriod >= System.currentTimeMillis()
         }
     }
+
+    @OptIn(ExperimentalTime::class)
+    private fun gracePeriod(robertManager: RobertManager) = robertManager.configuration.venuesRetentionPeriod.days.toLongMilliseconds()
 
     fun removeVenue(keystoreDataSource: SecureKeystoreDataSource, venueId: String) {
         val venuesQrCode = keystoreDataSource.venuesQrCode?.toMutableList() ?: mutableListOf()

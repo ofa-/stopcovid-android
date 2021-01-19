@@ -26,6 +26,14 @@ fun Context.isolationManager(): IsolationManager = (applicationContext as Isolat
 
 fun Context.secureKeystoreDataSource(): SecureKeystoreDataSource = (applicationContext as StopCovid).secureKeystoreDataSource
 
+fun Context.showExpiredCodeAlert(strings: Map<String, String>) {
+    MaterialAlertDialogBuilder(this)
+        .setTitle(strings["enterCodeController.alert.expiredCode.title"])
+        .setMessage(strings["enterCodeController.alert.expiredCode.message"])
+        .setPositiveButton(strings["common.ok"], null)
+        .show()
+}
+
 fun Context.showInvalidCodeAlert(strings: Map<String, String>) {
     MaterialAlertDialogBuilder(this)
         .setTitle(strings["enterCodeController.alert.invalidCode.title"])

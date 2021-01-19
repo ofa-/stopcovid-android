@@ -84,7 +84,6 @@ import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
 import com.lunabeestudio.stopcovid.extension.showPostalCodeDialog
 import com.lunabeestudio.stopcovid.extension.toCovidException
-import com.lunabeestudio.stopcovid.extension.venuesFeaturedWasActivatedAtLeastOneTime
 import com.lunabeestudio.stopcovid.fastitem.LogoItem
 import com.lunabeestudio.stopcovid.fastitem.NumbersCardItem
 import com.lunabeestudio.stopcovid.fastitem.OnOffLottieItem
@@ -99,6 +98,7 @@ import com.lunabeestudio.stopcovid.fastitem.proximityButtonItem
 import com.lunabeestudio.stopcovid.manager.InfoCenterManager
 import com.lunabeestudio.stopcovid.manager.KeyFiguresManager
 import com.lunabeestudio.stopcovid.manager.ProximityManager
+import com.lunabeestudio.stopcovid.manager.VenuesManager
 import com.lunabeestudio.stopcovid.model.CaptchaNextFragment
 import com.lunabeestudio.stopcovid.model.DeviceSetup
 import com.lunabeestudio.stopcovid.model.KeyFigure
@@ -527,7 +527,7 @@ class ProximityFragment : TimeMainFragment() {
         }
 
         items += spaceItem {
-            spaceRes = R.dimen.spacing_medium
+            spaceRes = R.dimen.spacing_large
             identifier = items.count().toLong()
         }
     }
@@ -581,12 +581,10 @@ class ProximityFragment : TimeMainFragment() {
     }
 
     private fun startRecordVenue() {
-        sharedPrefs.venuesFeaturedWasActivatedAtLeastOneTime = true
         findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToVenueQrCodeFragment())
     }
 
     private fun startPrivateEvent() {
-        sharedPrefs.venuesFeaturedWasActivatedAtLeastOneTime = true
         when {
             !robertManager.isRegistered -> {
                 findNavControllerOrNull()
@@ -773,7 +771,7 @@ class ProximityFragment : TimeMainFragment() {
         }
 
         items += spaceItem {
-            spaceRes = R.dimen.spacing_medium
+            spaceRes = R.dimen.spacing_large
             identifier = items.count().toLong()
         }
     }
@@ -848,7 +846,9 @@ class ProximityFragment : TimeMainFragment() {
                 Action(R.drawable.ic_history, strings["home.moreSection.venuesHistory"]) {
                     findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToVenuesHistoryFragment())
                 }.takeIf {
-                    !robertManager.isSick && robertManager.configuration.displayRecordVenues
+                    !robertManager.isSick && (robertManager.configuration.displayRecordVenues || !VenuesManager.getVenuesQrCode(
+                        requireContext().secureKeystoreDataSource(),
+                        includingFuture = true).isNullOrEmpty())
                 },
                 Action(R.drawable.ic_settings, strings["common.settings"]) {
                     findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToManageDataFragment())

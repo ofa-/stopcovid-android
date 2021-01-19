@@ -304,7 +304,7 @@ class RobertManagerImpl(
                 if (shouldRefreshStatus) {
                     if (ssu is RobertResultData.Success) {
                         val venueQrCodeList: List<VenueQrCode>? = robertApplication.getVenueQrCodeList(null)
-                        if (configuration.displayRecordVenues && !venueQrCodeList.isNullOrEmpty()) {
+                        if (!venueQrCodeList.isNullOrEmpty()) {
                             val wResult = remoteServiceRepository.wstatus(configuration.warningApiVersion, venueQrCodeList)
                             when (wResult) {
                                 is RobertResultData.Success -> {
@@ -438,7 +438,7 @@ class RobertManagerImpl(
     override suspend fun wreportIfNeeded(application: RobertApplication, shouldRetry: Boolean) {
         val wToken = keystoreRepository.reportValidationToken
         val reportToSendTime = keystoreRepository.reportToSendTime
-        if (wToken != null && reportToSendTime != null && configuration.displayRecordVenues) {
+        if (wToken != null && reportToSendTime != null) {
             val venueQrCodeList = application.getVenueQrCodeList(reportToSendTime)
             if (!venueQrCodeList.isNullOrEmpty()) {
                 val result = remoteServiceRepository.wreport(configuration.warningApiVersion, wToken, venueQrCodeList)

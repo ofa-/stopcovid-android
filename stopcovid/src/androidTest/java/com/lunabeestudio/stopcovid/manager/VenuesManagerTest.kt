@@ -11,6 +11,7 @@ import com.lunabeestudio.framework.local.datasource.SecureKeystoreDataSource
 import com.lunabeestudio.stopcovid.extension.privateEventQrCode
 import com.lunabeestudio.stopcovid.extension.privateEventQrCodeGenerationDate
 import com.lunabeestudio.stopcovid.extension.robertManager
+import com.lunabeestudio.stopcovid.extension.roundedTimeIntervalSince1900
 import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
 import org.junit.After
 import org.junit.Assert.assertNotNull
@@ -18,6 +19,7 @@ import org.junit.Before
 import org.junit.Test
 import java.security.KeyStore
 import java.util.Calendar
+import java.util.Date
 import kotlin.time.ExperimentalTime
 import kotlin.time.days
 import kotlin.time.seconds
@@ -76,7 +78,7 @@ class VenuesManagerTest {
             "uuid",
             VenueQrType.STATIC,
             "GA",
-            System.currentTimeMillis(),
+            System.currentTimeMillis().unixTimeMsToNtpTimeS(),
             null,
             null,
             "playload"
@@ -87,6 +89,16 @@ class VenuesManagerTest {
             VenueQrType.STATIC,
             "GA",
             1L,
+            null,
+            null,
+            "playload"
+        )
+        val venue4 = VenueQrCode(
+            "idtest3",
+            "uuid",
+            VenueQrType.STATIC,
+            "GA",
+            Long.MAX_VALUE,
             null,
             null,
             "playload"
@@ -108,14 +120,19 @@ class VenuesManagerTest {
         saveVenueMethod.invoke(VenuesManager, *parameters)
         parameters[1] = venue3
         saveVenueMethod.invoke(VenuesManager, *parameters)
+        parameters[1] = venue4
+        saveVenueMethod.invoke(VenuesManager, *parameters)
         assert(VenuesManager.getVenuesQrCode(keystoreDataSource)?.count() == 2)
         assert(VenuesManager.getVenuesQrCode(keystoreDataSource)?.get(0) == venue1)
         assert(VenuesManager.getVenuesQrCode(keystoreDataSource)?.get(1) == venue2)
         assert(VenuesManager.getVenuesQrCode(keystoreDataSource, 0L)?.count() == 2)
         assert(VenuesManager.getVenuesQrCode(keystoreDataSource, 2L)?.count() == 1)
+        assert(VenuesManager.getVenuesQrCode(keystoreDataSource, includingFuture = true)?.count() == 3)
+        assert(VenuesManager.getVenuesQrCode(keystoreDataSource, 2L, true)?.count() == 2)
 
         VenuesManager.clearAllData(sharedPrefs, keystoreDataSource)
         assert(VenuesManager.getVenuesQrCode(keystoreDataSource)?.count() ?: 0 == 0)
+        assert(VenuesManager.getVenuesQrCode(keystoreDataSource, includingFuture = true)?.count() ?: 0 == 0)
     }
 
     @OptIn(ExperimentalTime::class)
@@ -275,8 +292,8 @@ class VenuesManagerTest {
             "https://tac.gouv.fr/1/491ab3ae-ad35-4301-8dd9-414ecf210713/GA/-/400/"
         ) == "GA")
         val venue2QrCode = VenuesManager.getVenuesQrCode(keystoreDataSource)?.get(1)
-        assertNotNull("venue QR code should exist", venueQrCode)
-        assert(venue2QrCode!!.id == "491ab3ae-ad35-4301-8dd9-414ecf210713${venueQrCode.ntpTimestamp}") { "id is wrong" }
+        assertNotNull("venue QR code should exist", venue2QrCode)
+        assert(venue2QrCode!!.id == "491ab3ae-ad35-4301-8dd9-414ecf210713${venue2QrCode.ntpTimestamp}") { "id is wrong" }
         assert(venue2QrCode.qrType == VenueQrType.DYNAMIC) { "Qr type is wrong" }
         assert(venue2QrCode.uuid == "491ab3ae-ad35-4301-8dd9-414ecf210713") { "UUID is wrong" }
         assert(venue2QrCode.venueType == "GA") { "Venue type is wrong" }
@@ -289,8 +306,8 @@ class VenuesManagerTest {
             "https://tac.gouv.fr/1/491ab3ae-ad35-4301-8dd9-414ecf210714/GA/4/400/"
         ) == "GA")
         val venue3QrCode = VenuesManager.getVenuesQrCode(keystoreDataSource)?.get(2)
-        assertNotNull("venue QR code should exist", venueQrCode)
-        assert(venue3QrCode!!.id == "491ab3ae-ad35-4301-8dd9-414ecf210714${venueQrCode.ntpTimestamp}") { "id is wrong" }
+        assertNotNull("venue QR code should exist", venue3QrCode)
+        assert(venue3QrCode!!.id == "491ab3ae-ad35-4301-8dd9-414ecf210714${venue3QrCode.ntpTimestamp}") { "id is wrong" }
         assert(venue3QrCode.qrType == VenueQrType.DYNAMIC) { "Qr type is wrong" }
         assert(venue3QrCode.uuid == "491ab3ae-ad35-4301-8dd9-414ecf210714") { "UUID is wrong" }
         assert(venue3QrCode.venueType == "GA") { "Venue type is wrong" }
@@ -303,8 +320,8 @@ class VenuesManagerTest {
             "https://tac.gouv.fr/1/491ab3ae-ad35-4301-8dd9-414ecf210715/GA/4/-/"
         ) == "GA")
         val venue4QrCode = VenuesManager.getVenuesQrCode(keystoreDataSource)?.get(3)
-        assertNotNull("venue QR code should exist", venueQrCode)
-        assert(venue4QrCode!!.id == "491ab3ae-ad35-4301-8dd9-414ecf210715${venueQrCode.ntpTimestamp}") { "id is wrong" }
+        assertNotNull("venue QR code should exist", venue4QrCode)
+        assert(venue4QrCode!!.id == "491ab3ae-ad35-4301-8dd9-414ecf210715${venue4QrCode.ntpTimestamp}") { "id is wrong" }
         assert(venue4QrCode.qrType == VenueQrType.DYNAMIC) { "Qr type is wrong" }
         assert(venue4QrCode.uuid == "491ab3ae-ad35-4301-8dd9-414ecf210715") { "UUID is wrong" }
         assert(venue4QrCode.venueType == "GA") { "Venue type is wrong" }
@@ -317,13 +334,57 @@ class VenuesManagerTest {
             "https://tac.gouv.fr/1/491ab3ae-ad35-4301-8dd9-414ecf210716/GA/-/-/"
         ) == "GA")
         val venue5QrCode = VenuesManager.getVenuesQrCode(keystoreDataSource)?.get(4)
-        assertNotNull("venue QR code should exist", venueQrCode)
-        assert(venue5QrCode!!.id == "491ab3ae-ad35-4301-8dd9-414ecf210716${venueQrCode.ntpTimestamp}") { "id is wrong" }
+        assertNotNull("venue QR code should exist", venue5QrCode)
+        assert(venue5QrCode!!.id == "491ab3ae-ad35-4301-8dd9-414ecf210716${venue5QrCode.ntpTimestamp}") { "id is wrong" }
         assert(venue5QrCode.qrType == VenueQrType.DYNAMIC) { "Qr type is wrong" }
         assert(venue5QrCode.uuid == "491ab3ae-ad35-4301-8dd9-414ecf210716") { "UUID is wrong" }
         assert(venue5QrCode.venueType == "GA") { "Venue type is wrong" }
         assert(venue5QrCode.venueCategory == 0) { "Venue category is wrong" }
         assert(venue5QrCode.venueCapacity == 0) { "Venue capacity is wrong" }
+
+        assert(VenuesManager.processVenueUrl(
+            robertManager = context.robertManager(),
+            secureKeystoreDataSource = keystoreDataSource,
+            "https://tac.gouv.fr/1/491ab3ae-ad35-4301-8dd9-414ecf210717/GA/-/-/1610621656"
+        ) == "GA")
+        val venue6QrCode = VenuesManager.getVenuesQrCode(keystoreDataSource)?.get(5)
+        assertNotNull("venue QR code should exist", venue6QrCode)
+        assert(venue6QrCode!!.id == "491ab3ae-ad35-4301-8dd9-414ecf210717${venue6QrCode.ntpTimestamp}") { "id is wrong" }
+        assert(venue6QrCode.qrType == VenueQrType.DYNAMIC) { "Qr type is wrong" }
+        assert(venue6QrCode.uuid == "491ab3ae-ad35-4301-8dd9-414ecf210717") { "UUID is wrong" }
+        assert(venue6QrCode.venueType == "GA") { "Venue type is wrong" }
+        assert(venue6QrCode.venueCategory == 0) { "Venue category is wrong" }
+        assert(venue6QrCode.venueCapacity == 0) { "Venue capacity is wrong" }
+        assert(venue6QrCode.ntpTimestamp == Date(1610621656000)
+            .roundedTimeIntervalSince1900(context.robertManager().configuration.venuesTimestampRoundingInterval.toLong())) {
+            "Venue capacity is wrong"
+        }
+    }
+
+    @OptIn(ExperimentalTime::class)
+    @Test
+    fun is_venue_expired() {
+        assert(!VenuesManager.isVenueUrlExpired(
+            robertManager = context.robertManager(),
+            "https://tac.gouv.fr/0/491ab3/GA/4/400/"
+        )) { "Invalid format" }
+
+        assert(!VenuesManager.isVenueUrlExpired(
+            robertManager = context.robertManager(),
+            "https://tac.gouv.fr/1/491ab3ae-ad35-4301-8dd9-414ecf210717/GA/-/-"
+        )) { "Not date shouldn't be expired" }
+
+        val expiredTimestamp = (System.currentTimeMillis() - context.robertManager().configuration.venuesRetentionPeriod.days.toLongMilliseconds()) / 1000
+        assert(VenuesManager.isVenueUrlExpired(
+            robertManager = context.robertManager(),
+            "https://tac.gouv.fr/1/491ab3ae-ad35-4301-8dd9-414ecf210717/GA/-/-/$expiredTimestamp"
+        )) { "Timestamp before retention date should be expired" }
+
+        val notExpiredTimestamp = expiredTimestamp + 1
+        assert(!VenuesManager.isVenueUrlExpired(
+            robertManager = context.robertManager(),
+            "https://tac.gouv.fr/1/491ab3ae-ad35-4301-8dd9-414ecf210717/GA/-/-/$notExpiredTimestamp"
+        )) { "Expired +1s shouldn't be expired" }
     }
 
     @OptIn(ExperimentalTime::class)

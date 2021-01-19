@@ -74,7 +74,8 @@ fun Context.showPermissionRationale(
 
 fun Context.getFirstSupportedLanguage(): String {
     return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-        resources.configuration.locales.getFirstMatch(UiConstants.SUPPORTED_LANGUAGE)?.language ?: UiConstants.DEFAULT_LANGUAGE
+        val locales = resources.configuration.locales.toList()
+        locales.firstOrNull { UiConstants.SUPPORTED_LANGUAGE.contains(it.language) }?.language ?: UiConstants.DEFAULT_LANGUAGE
     } else {
         Locale.getDefault().language.takeIf { UiConstants.SUPPORTED_LANGUAGE.contains(it) } ?: UiConstants.DEFAULT_LANGUAGE
     }
