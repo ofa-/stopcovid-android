@@ -24,7 +24,9 @@ data class KeyFigure(
     val isHighlighted: Boolean?,
     val extractDate: Long,
     val valuesDepartments: List<DepartmentKeyFigure>?,
-    val trend: Int?
+    val trend: Int?,
+    val displayOnSameChart: Boolean,
+    val series: List<KeyFigureSeriesItem>
 )
 
 data class DepartmentKeyFigure(
@@ -34,7 +36,13 @@ data class DepartmentKeyFigure(
     val value: Double,
     val valueToDisplay: String?,
     val color: String,
-    val trend: Int?
+    val trend: Int?,
+    val series: List<KeyFigureSeriesItem>
+)
+
+data class KeyFigureSeriesItem(
+    val date: Long,
+    val value: Double
 )
 
 enum class Trend(@DrawableRes val imageRes: Int, val hint: String?) {

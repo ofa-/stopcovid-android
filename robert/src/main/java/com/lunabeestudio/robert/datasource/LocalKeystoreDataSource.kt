@@ -18,6 +18,7 @@ import com.lunabeestudio.domain.model.VenueQrCode
 interface LocalKeystoreDataSource {
     var configuration: Configuration?
     var shouldReloadBleSettings: Boolean?
+    var isRegistered: Boolean
     var kA: ByteArray?
     var kEA: ByteArray?
     var timeStart: Long?

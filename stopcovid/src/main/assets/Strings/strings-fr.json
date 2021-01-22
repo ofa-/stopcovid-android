@@ -285,7 +285,7 @@
    "myHealthController.testingSites.title":"Où me faire dépister",
    "myHealthController.testingSites.subtitle":"Rendez vous sur Santé.fr pour trouver les lieux de dépistage.",
    "myHealthController.testingSites.buttonTitle":"Trouver un lieu",
-   "myHealthController.testingSites.url":"https://sante.fr/recherche/trouver/DepistageCovid",
+   "myHealthController.testingSites.url":"https://sante.fr/recherche/trouver/DepistageCovid?source=TousAntiCovid",
    "myHealthController.yourDepartment.title":"Mon département",
    "myHealthController.yourDepartment.subtitle":"Vous pouvez connaître l'état de la pandémie de COVID-19 dans votre département.",
    "myHealthController.yourDepartment.buttonTitle":"En savoir plus",
@@ -352,7 +352,7 @@
    "keyfigure.nombrecas.shortLabel":"Nouveaux cas",
    "keyfigure.nombrecas.description":"Cet indicateur, disponible seulement au niveau national, correspond au nombre de nouveaux cas confirmés par un test positif (RT-PCR et test antigénique), sur les dernières 24 heures. Les données rapportées en début de semaine sont souvent moins élevées en raison d’une diminution des activités liées au dépistage le week-end.",
    "keyfigure.nombrecasj3.label":"Cas positifs prélevés J-3",
-   "keyfigure.nombrecasj3.shortLabel":"Cas positifs prélevés J-3",
+   "keyfigure.nombrecasj3.shortLabel":"Cas positifs J-3",
    "keyfigure.nombrecasj3.description":"Cet indicateur correspond au nombre de nouveaux cas testés positif (RT-PCR et test antigénique) à la COVID-19, enregistrés par date de prélèvement. L’indicateur informe sur la situation d’il y a trois jours. Cela permet d’avoir suffisamment de temps pour que les données sur les tests remontent et qu’elles reflètent correctement la situation épidémiologique d’il y a trois jours.",
    "keyfigure.nouveauxpatientsrea.label":"Nouveaux patients en réanimation",
    "keyfigure.nouveauxpatientsrea.shortLabel":"Nouveaux réa",
@@ -448,7 +448,7 @@
    "attestation.form.achats_culturel_cultuel.longLabel":"Déplacements pour se rendre dans un établissement culturel autorisé ou un lieu de culte ; déplacements pour effectuer des achats de biens, pour des services dont la fourniture est autorisée, pour les retraits de commandes et les livraisons à domicile",
    
    "attestation.form.sante.shortLabel":"2. Consultations et soins",
-   "attestation.form.sante.longLabel":"Déplacements pour des consultations et soins ne pouvant être assurés à distance et ne pouvant être différés ou pour l'achat de produits de santé",
+   "attestation.form.sante.longLabel":"Déplacements pour des consultations, examens, actes de prévention (dont vaccination) et soins ne pouvant être assurés à distance et ne pouvant être différés ou pour l’achat de produits de santé",
    
    "attestation.form.famille.shortLabel":"3. Motif familial impérieux, personnes vulnérables ou précaires ou garde d'enfant",
    "attestation.form.famille.longLabel":"Déplacements pour motif familial impérieux, pour l'assistance aux personnes vulnérables ou précaires ou pour la garde d'enfants",
@@ -636,7 +636,7 @@
    "declareController.codeNotReceived.alert.showVideo": "Voir la vidéo",
    "declareController.codeNotReceived.alert.video.url": "https://youtu.be/uCEMHFr50a0",
    
-   "aboutController.contactUsByEmail": "Support : contact@tousanticovid.gouv.fr",
+   "aboutController.contactUsByEmail": "Nous contacter",
    "aboutController.contactEmail": "contact@tousanticovid.gouv.fr",
 
 
@@ -739,7 +739,7 @@
    "isolationFormController.header.title": "",
    "isolationFormController.footer.title": "Veuillez bien répondre aux questions du formulaire pour qu'on puisse vous faire des recommandations sur votre durée d’isolement.",
    
-   "declareController.codeNotReceived.alert.contactUs": "contact@tousanticovid.gouv.fr",
+   "declareController.codeNotReceived.alert.contactUs": "Nous contacter",
    "venuesHistoryController.footer": "Cet historique des lieux vous permettra d'être averti si quelqu'un se déclare positif dans ce lieu.\nTous les lieux de plus de 14 jours sont effacés automatiquement à chaque ouverture de l'application.",
    "venuesHistoryController.delete.alert.title": "Souhaitez-vous supprimer ce lieu ?",
    "venuesHistoryController.delete.alert.message": "Une fois supprimé, si une personne qui a fréquenté ce lieu en même temps que vous se déclare malade, alors vous ne serez pas notifié.",
@@ -757,9 +757,9 @@
    "home.vaccinationSection.cellSubtitle": "Vérifiez votre éligibilité et trouvez un centre près de chez vous pour vous faire vacciner.",
    "vaccinationController.title": "Vaccination",
    "vaccinationController.eligibility.title": "Suis-je prioritaire pour me faire vacciner ?",
-   "vaccinationController.eligibility.subtitle": "Aujourd’hui, les publics prioritaires définis par les autorités sanitaires sont :\n- Les personnes âgées en EHPAD ou en unité de soin de longue durée.\n- L’ensemble des soignants de plus de 50 ans ou présentant des comorbidités.\n- Les pompiers de plus de 50 ans ou présentant des comorbidités.\n- Les aides à domicile de plus de 50 ans ou présentant des comorbidités.\n- Personnes handicapées vulnérables prises en charge dans les foyers d’accueil médicalisés et les maisons d’accueil spécialisées\n\nDès le 18 janvier la campagne de vaccination s’ouvrira à l’ensemble des personnes de plus de 75 ans.",
+   "vaccinationController.eligibility.subtitle": "Aujourd’hui, les publics prioritaires définis par les autorités sanitaires sont :\n- Les personnes âgées de plus de 75 ans,\n- Les personnes ayant une pathologie qui les expose à un très haut risque face à la Covid-19 disposant d’une ordonnance médicale pour se faire vacciner prioritairement,\n- Les personnes âgées résidant en établissements (par exemple EHPAD, USLD),\n- Les professionnels y exerçant et présentant un risque élevé (âge supérieur à 50 ans, pathologies),\n- Tous les professionnels de santé, y compris libéraux, les pompiers et les aides-à-domicile de plus de 50 ans et/ou atteints de comorbidités,\n- Les personnes en situation de handicap hébergées en établissement et les personnels y exerçant âgés de 50 ans et plus et/ou atteints de comorbidités",
    "vaccinationController.eligibility.buttonTitle": "En savoir plus",
-   "vaccinationController.eligibility.url": "https://solidarites-sante.gouv.fr/grands-dossiers/la-vaccination-contre-la-covid-19/article/la-strategie-vaccinale",
+   "vaccinationController.eligibility.url": "https://solidarites-sante.gouv.fr/actualites/presse/communiques-de-presse/article/le-gouvernement-ouvre-la-vaccination-aux-patients-vulnerables",
    "vaccinationController.vaccinationLocation.title": "Trouver un centre pour me faire vacciner",
    "vaccinationController.vaccinationLocation.subtitle": "Rendez vous sur www.Santé.fr pour trouver les centres de vaccination.",
    "vaccinationController.vaccinationLocation.buttonTitle": "Trouver un centre",
@@ -772,5 +772,21 @@
    "keyfigure.nombrevaccinations.shortLabel":"Total vaccinés",
    "keyfigure.nombrevaccinations.description":"Le nombre cumulé de personnes vaccinées en France est obtenu quotidiennement auprès des Agences Régionales de Santé, qui recensent les données auprès des établissements pour personnes âgées (vaccination des résidents et des professionnels des établissements) et des centres de vaccination (vaccination des professionnels de santé). Les données sont disponibles au niveau régional et national de manière quotidienne.",
    "enterCodeController.alert.expiredCode.title":"Expiré",
-   "enterCodeController.alert.expiredCode.message":"Votre présence dans ce lieu date de plus de 14 jours. Il n'est donc plus utile d'un point de vue sanitaire de l'ajouter à votre historique."
+   "enterCodeController.alert.expiredCode.message":"Votre présence dans ce lieu date de plus de 14 jours. Il n'est donc plus utile d'un point de vue sanitaire de l'ajouter à votre historique.",
+   
+   "keyFigureDetailController.section.evolution.title": "Evolution",
+   "keyFigureDetailController.section.evolution.chartInfos": "%@ : %d dernières valeurs depuis le %@",
+      
+   "keyfigure.nombrecas.learnMore":"Les données rapportées en début de semaine sont souvent moins élevées en raison d’une diminution des activités liées au dépistage le week-end.\n\nCet indicateur est seulement disponible au niveau national ; il est très sensible aux variations quotidiennes des activités de dépistage qui sont remontées à Santé publique France et ne constitue pas un bon reflet de la situation sanitaire.",
+   "keyFigureDetailController.section.learnmore.title": "En savoir plus",
+   
+   "keyfigure.registered.shortLabel":"Enregistrements",
+   "keyfigure.notification.shortLabel":"Notifiés par l’app",
+   "keyfigure.qrcodes.shortLabel":"Cas déclarés",
+   
+      
+   "keyFigureDetailController.section.evolution.subtitle": "%@.\nDernière valeur du %@ : %@",
+   "keyFigureDetailController.section.evolution.subtitle2Charts": "%@.\nDernière valeur du %@ : %@ (France : %@)"
+
+   
 }

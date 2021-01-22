@@ -60,6 +60,7 @@ internal class RemoteServiceRepository(
                 kADerivation = RobertConstant.KA_STRING_INPUT.toByteArray(),
                 kEADerivation = RobertConstant.KEA_STRING_INPUT.toByteArray()
             ).let {
+                keystoreDataSource.isRegistered = true
                 keystoreDataSource.kA = it.first
                 keystoreDataSource.kEA = it.second
             }

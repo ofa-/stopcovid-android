@@ -49,10 +49,6 @@ class ManageDataFragment : MainFragment() {
         PreferenceManager.getDefaultSharedPreferences(requireContext())
     }
 
-    private val deviceSetup by lazy {
-        ProximityManager.getDeviceSetup(requireContext())
-    }
-
     private val isolationManager by lazy {
         requireContext().isolationManager()
     }
@@ -127,11 +123,15 @@ class ManageDataFragment : MainFragment() {
         }
         if (sharedPreferences.venuesFeaturedWasActivatedAtLeastOneTime
             || robertManager.configuration.displayRecordVenues
-            || !VenuesManager.getVenuesQrCode(requireContext().secureKeystoreDataSource(),
-                includingFuture = false).isNullOrEmpty()) {
+            || !VenuesManager.getVenuesQrCode(
+                requireContext().secureKeystoreDataSource(),
+                includingFuture = false
+            ).isNullOrEmpty()) {
             eraseVenuesItems(items)
             spaceDividerItems(items)
         }
+
+        val deviceSetup = ProximityManager.getDeviceSetup(requireContext())
 
         if (deviceSetup != DeviceSetup.NO_BLE) {
             eraseLocalHistoryItems(items)

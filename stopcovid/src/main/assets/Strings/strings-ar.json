@@ -705,11 +705,11 @@
    "home.vaccinationSection.cellSubtitle": "Vérifiez votre éligibilité et trouvez un centre près de chez vous pour vous faire vacciner.",
    "vaccinationController.title": "Vaccination",
    "vaccinationController.eligibility.title": "Suis-je prioritaire pour me faire vacciner ?",
-   "vaccinationController.eligibility.subtitle": "Aujourd’hui, les publics prioritaires définis par les autorités sanitaires sont :\n- Les personnes âgées en EHPAD ou en unité de soin de longue durée.\n- L’ensemble des soignants de plus de 50 ans ou présentant des comorbidités.\n- Les pompiers de plus de 50 ans ou présentant des comorbidités.\n- Les aides à domicile de plus de 50 ans ou présentant des comorbidités.\n- Personnes handicapées vulnérables prises en charge dans les foyers d’accueil médicalisés et les maisons d’accueil spécialisées\n\nDès le 18 janvier la campagne de vaccination s’ouvrira à l’ensemble des personnes de plus de 75 ans.",
+   "vaccinationController.eligibility.subtitle": "Aujourd’hui, les publics prioritaires définis par les autorités sanitaires sont :\n- Les personnes âgées de plus de 75 ans,\n- Les personnes ayant une pathologie qui les expose à un très haut risque face à la Covid-19 disposant d’une ordonnance médicale pour se faire vacciner prioritairement,\n- Les personnes âgées résidant en établissements (par exemple EHPAD, USLD),\n- Les professionnels y exerçant et présentant un risque élevé (âge supérieur à 50 ans, pathologies),\n- Tous les professionnels de santé, y compris libéraux, les pompiers et les aides-à-domicile de plus de 50 ans et/ou atteints de comorbidités,\n- Les personnes en situation de handicap hébergées en établissement et les personnels y exerçant âgés de 50 ans et plus et/ou atteints de comorbidités",
    "vaccinationController.eligibility.buttonTitle": "En savoir plus",
-   "vaccinationController.eligibility.url": "https://solidarites-sante.gouv.fr/grands-dossiers/la-vaccination-contre-la-covid-19/article/la-strategie-vaccinale",
+   "vaccinationController.eligibility.url": "https://solidarites-sante.gouv.fr/actualites/presse/communiques-de-presse/article/le-gouvernement-ouvre-la-vaccination-aux-patients-vulnerables",
    "vaccinationController.vaccinationLocation.title": "Trouver un centre pour me faire vacciner",
-   "vaccinationController.vaccinationLocation.subtitle": "Rendez vous sur www.Santé.fr pour trouver les centres de vaccination dès le vendredi 15 janvier à 8h.",
+   "vaccinationController.vaccinationLocation.subtitle": "Rendez vous sur www.Santé.fr pour trouver les centres de vaccination.",
    "vaccinationController.vaccinationLocation.buttonTitle": "Trouver un centre",
    "vaccinationController.vaccinationLocation.url": "https://www.sante.fr/carte-vaccination-covid?source=TousAntiCovid",
    "contactUs.url": "https://bonjour.tousanticovid.gouv.fr/contact.html",
@@ -720,5 +720,19 @@
    "keyfigure.nombrevaccinations.shortLabel":"Total vaccinés",
    "keyfigure.nombrevaccinations.description":"Le nombre cumulé de personnes vaccinées en France est obtenu quotidiennement auprès des Agences Régionales de Santé, qui recensent les données auprès des établissements pour personnes âgées (vaccination des résidents et des professionnels des établissements) et des centres de vaccination (vaccination des professionnels de santé). Les données sont disponibles au niveau régional et national de manière quotidienne.",
    "enterCodeController.alert.expiredCode.title":"Expiré",
-   "enterCodeController.alert.expiredCode.message":"Votre présence dans ce lieu date de plus de 14 jours. Il n'est donc plus utile d'un point de vue sanitaire de l'ajouter à votre historique."
+   "enterCodeController.alert.expiredCode.message":"Votre présence dans ce lieu date de plus de 14 jours. Il n'est donc plus utile d'un point de vue sanitaire de l'ajouter à votre historique.",
+   
+    "keyFigureDetailController.section.evolution.title": "Evolution",
+   "keyFigureDetailController.section.evolution.chartInfos": "%@ : %d dernières valeurs depuis le %@",
+   "keyfigure.nombrecas.learnMore":"Les données rapportées en début de semaine sont souvent moins élevées en raison d’une diminution des activités liées au dépistage le week-end.\n\nCet indicateur est seulement disponible au niveau national ; il est très sensible aux variations quotidiennes des activités de dépistage qui sont remontées à Santé publique France et ne constitue pas un bon reflet de la situation sanitaire.",
+   "keyFigureDetailController.section.learnmore.title": "En savoir plus",
+   
+   "keyfigure.registered.shortLabel":"Enregistrements",
+   "keyfigure.notification.shortLabel":"Notifiés par l’app",
+   "keyfigure.qrcodes.shortLabel":"Cas déclarés",
+   
+      
+   "keyFigureDetailController.section.evolution.subtitle": "%@.\nDernière valeur du %@ : %@",
+   "keyFigureDetailController.section.evolution.subtitle2Charts": "%@.\nDernière valeur du %@ : %@ (France : %@)"
+
 }

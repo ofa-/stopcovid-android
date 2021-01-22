@@ -42,6 +42,12 @@ internal class KeystoreRepository(
             keystoreDataSource.shouldReloadBleSettings = value
         }
 
+    var isRegistered: Boolean
+        get() = keystoreDataSource.isRegistered
+        set(value) {
+            keystoreDataSource.isRegistered = value
+        }
+
     var kA: ByteArray?
         get() = keystoreDataSource.kA
         set(value) {

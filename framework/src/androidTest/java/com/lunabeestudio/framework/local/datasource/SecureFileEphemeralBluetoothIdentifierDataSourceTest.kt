@@ -50,6 +50,8 @@ class SecureFileEphemeralBluetoothIdentifierDataSourceTest {
         val get250 = secureFileEphemeralBluetoothIdentifierDataSource.getForTime(250L)
         val get1000 = secureFileEphemeralBluetoothIdentifierDataSource.getForTime(1000L)
 
+        secureFileEphemeralBluetoothIdentifierDataSource.saveAll()
+
         assertThat(getAll).hasSize(2)
         assertThat(get250).isNotNull()
         assertThat(get1000).isNull()

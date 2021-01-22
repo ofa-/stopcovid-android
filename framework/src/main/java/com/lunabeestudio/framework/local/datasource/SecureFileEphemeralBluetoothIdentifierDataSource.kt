@@ -30,7 +30,7 @@ class SecureFileEphemeralBluetoothIdentifierDataSource(
     private var cache: List<EphemeralBluetoothIdentifier>? = null
         @Synchronized
         get() {
-            if (field == null) {
+            if (field.isNullOrEmpty()) {
                 field = getAll()
             }
             return field
@@ -60,9 +60,14 @@ class SecureFileEphemeralBluetoothIdentifierDataSource(
 
     @WorkerThread
     override fun saveAll(vararg ephemeralBluetoothIdentifier: EphemeralBluetoothIdentifier) {
-        val json = gson.toJson(ephemeralBluetoothIdentifier)
-        cryptoManager.encryptToFile(json, epochFile)
-        cache = null
+        if (ephemeralBluetoothIdentifier.isNotEmpty()) {
+            val json = gson.toJson(ephemeralBluetoothIdentifier)
+            cryptoManager.encryptToFile(json, epochFile)
+            cache = null
+        } else {
+            val message = "Trying to save empty ebid array is forbidden"
+            Timber.e(message)
+        }
     }
 
     override fun removeUntilTimeKeepLast(ntpTimeS: Long) {

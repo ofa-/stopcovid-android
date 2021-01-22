@@ -10,8 +10,22 @@
 
 package com.lunabeestudio.stopcovid.extension
 
+import android.content.Context
+import android.content.SharedPreferences
+import android.graphics.Color
+import com.lunabeestudio.stopcovid.coreui.extension.isNightMode
+import com.lunabeestudio.stopcovid.coreui.extension.stringsFormat
+import com.lunabeestudio.stopcovid.fastitem.KeyFigureCardItem
+import com.lunabeestudio.stopcovid.fastitem.keyFigureCardItem
+import com.lunabeestudio.stopcovid.manager.ShareManager
 import com.lunabeestudio.stopcovid.model.DepartmentKeyFigure
 import com.lunabeestudio.stopcovid.model.KeyFigure
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.yield
+import java.text.NumberFormat
+import kotlin.time.ExperimentalTime
+import kotlin.time.seconds
 
 private const val CORSICA_KEY: String = "20"
 private const val CORSE_DU_SUD_KEY: String = "2A"
@@ -23,8 +37,14 @@ private val OVERSEAS_FRANCE: Array<String> = arrayOf("97", "98")
 val KeyFigure.labelStringKey: String
     get() = "$labelKey.label"
 
+val KeyFigure.labelShortStringKey: String
+    get() = "$labelKey.shortLabel"
+
 val KeyFigure.descriptionStringKey: String
     get() = "$labelKey.description"
+
+val KeyFigure.learnMoreStringKey: String
+    get() = "$labelKey.learnMore"
 
 fun KeyFigure.colorStringKey(dark: Boolean?): String = if (dark == true) {
     "$labelKey.colorCode.dark"
@@ -58,4 +78,54 @@ fun List<KeyFigure>?.getDepartmentLabel(postalCode: String?): String? {
     )
 
     return localization?.dptLabel
+}
+
+@OptIn(ExperimentalTime::class)
+fun KeyFigure.itemForFigure(context: Context,
+    sharedPrefs: SharedPreferences,
+    numberFormat: NumberFormat,
+    strings: HashMap<String, String>,
+    useDateTime: Boolean,
+    block: (KeyFigureCardItem.() -> Unit)): KeyFigureCardItem {
+    return keyFigureCardItem {
+        val extractDate: Long
+        if (sharedPrefs.hasChosenPostalCode) {
+            val departmentKeyFigure = getKeyFigureForPostalCode(sharedPrefs.chosenPostalCode)
+
+            if (departmentKeyFigure != null) {
+                rightLocation = strings["common.country.france"]
+                leftLocation = departmentKeyFigure.dptLabel
+                leftValue = departmentKeyFigure.valueToDisplay?.formatNumberIfNeeded(numberFormat)
+                rightValue = valueGlobalToDisplay.formatNumberIfNeeded(numberFormat)
+                rightTrend = trend?.getTrend()
+                leftTrend = departmentKeyFigure.trend?.getTrend()
+                extractDate = departmentKeyFigure.extractDate
+            } else {
+                leftLocation = strings["common.country.france"]
+                leftValue = valueGlobalToDisplay.formatNumberIfNeeded(numberFormat)
+                leftTrend = trend?.getTrend()
+                extractDate = this@itemForFigure.extractDate
+            }
+        } else {
+            leftValue = valueGlobalToDisplay.formatNumberIfNeeded(numberFormat)
+            leftTrend = trend?.getTrend()
+            extractDate = this@itemForFigure.extractDate
+        }
+        updatedAt = strings.stringsFormat(
+            "keyFigures.update",
+            if (useDateTime) {
+                extractDate.seconds.getRelativeDateTimeString(context, strings["common.justNow"])
+            } else {
+                extractDate.seconds.getRelativeDateString()
+            }
+        )
+
+        label = strings[labelStringKey]
+        description = strings[descriptionStringKey]
+        identifier = labelKey.hashCode().toLong()
+
+        strings[colorStringKey(context.isNightMode())]?.let {
+            color = Color.parseColor(it)
+        }
+    }.apply(block)
 }
