@@ -8,8 +8,9 @@
  * Created by Lunabee Studio / Date - 2020/28/05 - for the TOUS-ANTI-COVID project
  */
 
-package com.lunabeestudio.stopcovid.model
+package com.lunabeestudio.stopcovid.coreui.model
 
-import com.lunabeestudio.domain.model.Configuration
-
-class ConfigurationWrapper(val config: List<Configuration>?)
+class ConfigurationEntry(
+    val name: String,
+    val value: Any,
+)

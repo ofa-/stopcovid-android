@@ -131,10 +131,7 @@ class AboutFragment : MainFragment() {
         items += linkItem {
             iconRes = R.drawable.ic_email
             text = strings["aboutController.contactUsByEmail"]
-            onClickListener = View.OnClickListener {
-                strings["aboutController.contactEmail"]?.startEmailIntent(requireContext())
-            }
-            forceShowArrow = true
+            url = strings["contactUs.url"]
             identifier = items.size.toLong()
         }
         items += dividerItem {

@@ -81,7 +81,7 @@ class ReminderBottomSheetDialogFragment : BottomSheetDialogFragment() {
         items += spaceItem {
             spaceRes = R.dimen.spacing_medium
         }
-        robertManager.proximityReactivationReminderHours.forEach { inHour ->
+        robertManager.configuration.proximityReactivationReminderHours.forEach { inHour ->
             items += dividerItem {
                 marginStartRes = null
             }

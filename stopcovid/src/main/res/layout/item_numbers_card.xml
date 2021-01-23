@@ -15,14 +15,12 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="@dimen/spacing_large"
-    android:layout_marginVertical="@dimen/spacing_small"
     android:foreground="?selectableItemBackground">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="@dimen/spacing_large">
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/headerTextView"
@@ -31,6 +29,8 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/spacing_medium"
             android:drawablePadding="@dimen/spacing_medium"
+            android:paddingHorizontal="@dimen/spacing_large"
+            android:paddingTop="@dimen/spacing_large"
             android:textColor="@color/color_persimmon"
             android:textIsSelectable="false"
             app:drawableStartCompat="@drawable/ic_compass"
@@ -41,6 +41,7 @@
             android:id="@+id/subheader_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:paddingHorizontal="@dimen/spacing_large"
             android:layout_marginBottom="@dimen/spacing_large"
             android:textAppearance="@style/TextAppearance.StopCovid.Caption.Small"
             android:textIsSelectable="false"
@@ -55,13 +56,7 @@
             android:id="@+id/franceInclude"
             layout="@layout/include_numbers" />
 
-        <TextView
-            android:id="@+id/linkTextView"
-            style="@style/Theme.StopCovid.Link"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textIsSelectable="false"
-            tools:text="@tools:sample/lorem[2]" />
+        <include layout="@layout/item_action" android:id="@+id/action" />
 
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

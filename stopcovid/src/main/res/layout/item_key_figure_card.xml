@@ -15,7 +15,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="@dimen/spacing_large"
-    android:layout_marginVertical="@dimen/spacing_medium"
+    android:layout_marginBottom="@dimen/spacing_medium"
+    android:theme="@style/ShapeAppearance.StopCovid.MediumComponent"
     app:rippleColor="@android:color/transparent">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -43,7 +44,8 @@
             android:src="@drawable/ic_baseline_share_24"
             app:layout_constraintBottom_toBottomOf="@id/updated_at_text_view"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/updated_at_text_view" />
+            app:layout_constraintTop_toTopOf="@id/updated_at_text_view"
+            tools:ignore="ContentDescription" />
 
         <androidx.constraintlayout.helper.widget.Flow
             android:id="@+id/flow"
@@ -64,7 +66,8 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/leftConstraintLayout"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            tools:ignore="MissingConstraints">
 
             <TextView
                 android:id="@+id/leftLocationTextView"
@@ -102,6 +105,7 @@
                 android:layout_marginStart="@dimen/spacing_medium"
                 android:layout_marginEnd="@dimen/spacing_large"
                 android:baselineAlignBottom="true"
+                android:importantForAccessibility="no"
                 app:layout_constraintBaseline_toBaselineOf="@+id/leftValueTextView"
                 app:layout_constraintBottom_toBottomOf="@id/leftValueTextView"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -112,7 +116,8 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/rightConstraintLayout"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            tools:ignore="MissingConstraints">
 
             <TextView
                 android:id="@+id/rightLocationTextView"
@@ -163,6 +168,7 @@
                 android:layout_height="@dimen/icon_small_size"
                 android:layout_marginStart="@dimen/spacing_medium"
                 android:baselineAlignBottom="true"
+                android:importantForAccessibility="no"
                 app:layout_constraintBaseline_toBaselineOf="@+id/rightValueTextView"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/rightValueTextView"

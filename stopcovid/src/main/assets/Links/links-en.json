@@ -30,8 +30,12 @@
     },
     {
         "section": "l'Assurance Maladie",
-        "description": "Voici plusieurs informations utiles fournies par Ameli.fr.",
+        "description": "Voici plusieurs informations utiles fournies par Ameli.fr, dont l’arrêt de travail dérogatoire si vous êtes personne contact ou si vous présentez des symptômes de la Covid-19.",
         "links": [
+	        {
+                "label": "Arrêt de travail dérogatoire",
+                "url": "https://declare.ameli.fr/"
+            },
 	        {
                 "label": "Contact tracing",
                 "url": "https://www.ameli.fr/assure/covid-19/tester-alerter-proteger-comprendre-la-strategie-pour-stopper-lepidemie/contact-tracing-arreter-les-chaines-de-transmission"
@@ -40,10 +44,6 @@
 				"label": "Vous êtes une personne contact ?",
                 "url": "https://www.ameli.fr/assure/covid-19/en-cas-de-contact-avec-une-personne-malade-du-covid-19/en-cas-de-contact-avec-une-personne-malade-de-la-covid-19"
 
-            },
-            {
-               	"label": "Arrêt de travail",
-                "url": "https://www.ameli.fr/assure/covid-19/arret-de-travail/covid-19-dispositif-dindemnisation-des-interruptions-de-travail"
             }
             
         ]

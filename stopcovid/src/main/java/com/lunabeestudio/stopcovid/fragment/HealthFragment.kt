@@ -16,10 +16,8 @@ import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.widget.PopupMenu
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.lunabeestudio.robert.extension.observeEventAndConsume
-import com.lunabeestudio.robert.utils.EventObserver
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
@@ -236,7 +234,8 @@ class HealthFragment : TimeMainFragment() {
         when {
             robertManager.isAtRisk == true -> {
                 val endExposureCalendar = Calendar.getInstance()
-                endExposureCalendar.add(Calendar.DAY_OF_YEAR, robertManager.quarantinePeriod - robertManager.lastExposureTimeframe)
+                endExposureCalendar.add(Calendar.DAY_OF_YEAR,
+                    robertManager.configuration.quarantinePeriod - robertManager.lastExposureTimeframe)
                 val endExposureDate = endExposureCalendar.time
 
                 items += contactItem(R.layout.item_contact) {

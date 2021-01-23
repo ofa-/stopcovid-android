@@ -22,6 +22,7 @@ import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
+import com.lunabeestudio.stopcovid.extension.showExpiredCodeAlert
 import com.lunabeestudio.stopcovid.extension.showInvalidCodeAlert
 import com.lunabeestudio.stopcovid.fastitem.dangerButtonItem
 import com.lunabeestudio.stopcovid.fastitem.logoItem
@@ -73,7 +74,7 @@ class ConfirmVenueQrCodeFragment : MainFragment() {
                     secureKeystoreDataSource = requireContext().secureKeystoreDataSource(),
                     args.venueFullPath,
                 )
-                handleVenueType(venueType)
+                handleVenueType(args.venueFullPath, venueType)
             }
             identifier = "confirmVenueQrCodeController.confirm".hashCode().toLong()
         }
@@ -94,9 +95,13 @@ class ConfirmVenueQrCodeFragment : MainFragment() {
         return items
     }
 
-    private fun handleVenueType(venueType: String?) {
+    private fun handleVenueType(code: String, venueType: String?) {
         if (venueType == null) {
-            context?.showInvalidCodeAlert(strings)
+            if (VenuesManager.isVenuePathExpired(robertManager, code)) {
+                context?.showExpiredCodeAlert(strings)
+            } else {
+                context?.showInvalidCodeAlert(strings)
+            }
             findNavControllerOrNull()?.navigateUp()
         } else {
             findNavControllerOrNull()

@@ -20,7 +20,7 @@
         <item name="colorSecondary">?colorPrimary</item>
         <item name="colorSecondaryVariant">?colorSecondary</item>
         <item name="colorOnSecondary">?colorOnPrimary</item>
-        <item name="colorAccent">?colorSecondary</item>
+        <item name="colorAccent">?colorPrimary</item>
         <item name="colorControlNormal">?colorPrimary</item>
 
         <item name="appBarLayoutStyle">@style/Widget.MaterialComponents.AppBarLayout.Surface</item>
@@ -30,8 +30,8 @@
 
         <item name="android:windowTranslucentNavigation">true</item>
 
-        <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.App.MediumComponent</item>
-        <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.App.SmallComponent</item>
+        <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.StopCovid.MediumComponent</item>
+        <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.StopCovid.SmallComponent</item>
 
         <item name="materialCardViewStyle">@style/Widget.App.CardView</item>
         <item name="bottomSheetDialogTheme">@style/ThemeOverlay.StopCovid.BottomSheetDialog</item>

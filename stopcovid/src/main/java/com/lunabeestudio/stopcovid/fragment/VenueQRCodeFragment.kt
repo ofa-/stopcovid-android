@@ -21,6 +21,7 @@ import com.lunabeestudio.stopcovid.extension.isVenueOnBoardingDone
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
+import com.lunabeestudio.stopcovid.extension.showExpiredCodeAlert
 import com.lunabeestudio.stopcovid.extension.showInvalidCodeAlert
 import com.lunabeestudio.stopcovid.manager.VenuesManager
 import com.lunabeestudio.stopcovid.model.CaptchaNextFragment
@@ -72,12 +73,16 @@ class VenueQRCodeFragment : QRCodeFragment() {
             secureKeystoreDataSource = requireContext().secureKeystoreDataSource(),
             code
         )
-        handleVenueType(venueType)
+        handleVenueType(code, venueType)
     }
 
-    private fun handleVenueType(venueType: String?) {
+    private fun handleVenueType(code: String, venueType: String?) {
         if (venueType == null) {
-            context?.showInvalidCodeAlert(strings)
+            if (VenuesManager.isVenueUrlExpired(robertManager, code)) {
+                context?.showExpiredCodeAlert(strings)
+            } else {
+                context?.showInvalidCodeAlert(strings)
+            }
             findNavControllerOrNull()?.navigateUp()
         } else {
             findNavControllerOrNull()

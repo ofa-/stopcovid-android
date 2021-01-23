@@ -11,7 +11,7 @@
 package com.lunabeestudio.robert
 
 import androidx.lifecycle.LiveData
-import com.lunabeestudio.domain.model.DeviceParameterCorrection
+import com.lunabeestudio.domain.model.Configuration
 import com.lunabeestudio.domain.model.HelloBuilder
 import com.lunabeestudio.domain.model.LocalProximity
 import com.lunabeestudio.robert.manager.LocalProximityFilter
@@ -21,6 +21,8 @@ import com.lunabeestudio.robert.model.RobertResultData
 import com.lunabeestudio.robert.utils.Event
 
 interface RobertManager {
+    val configuration: Configuration
+
     var shouldReloadBleSettings: Boolean
 
     val canActivateProximity: Boolean
@@ -39,75 +41,17 @@ interface RobertManager {
 
     val atRiskLastRefresh: Long?
 
-    val atRiskMinHourContactNotif: Int
-
-    val atRiskMaxHourContactNotif: Int
-
     val lastExposureTimeframe: Int
 
     val lastRiskReceivedDate: Long?
 
-    val quarantinePeriod: Int
-
     val isSick: Boolean
-
-    val calibration: List<DeviceParameterCorrection>
-
-    val filteringConfig: String
-
-    val filteringMode: LocalProximityFilter.Mode
-
-    val serviceUUID: String
-
-    val characteristicUUID: String
-
-    val backgroundServiceManufacturerData: String
-
-    val checkStatusFrequencyHour: Float
-
-    val minStatusRetryDuration: Float
-
-    val randomStatusHour: Float
-
-    val apiVersion: String
-
-    val warningApiVersion: String
-
-    val displayAttestation: Boolean
-
-    val qrCodeDeletionHours: Float
-
-    val qrCodeExpiredHours: Float
-
-    val qrCodeFormattedString: String
-
-    val qrCodeFormattedStringDisplayed: String
-
-    val qrCodeFooterString: String
-
-    val displayDepartmentLevel: Boolean
-
-    val displayRecordVenues: Boolean
-
-    val displayPrivateEvent: Boolean
-
-    val displayIsolation: Boolean
-
-    val privateEventVenueType: String
-
-    val proximityReactivationReminderHours: List<Int>
-
-    val venuesTimestampRoundingInterval: Int
-
-    val venuesRetentionPeriod: Int
 
     val reportSymptomsStartDate: Long?
 
     val reportPositiveTestDate: Long?
 
-    val isolationDuration: Long
-
-    val postIsolationDuration: Long
+    val filteringMode: LocalProximityFilter.Mode
 
     suspend fun refreshConfig(application: RobertApplication): RobertResult
 

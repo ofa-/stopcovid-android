@@ -44,9 +44,10 @@
             android:focusable="true"
             android:padding="@dimen/spacing_large"
             android:src="@drawable/ic_baseline_share_24"
-            app:layout_constraintBottom_toBottomOf="@id/updated_at_text_view"
+            app:layout_constraintBottom_toBottomOf="@id/header_text_view"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/updated_at_text_view" />
+            app:layout_constraintTop_toTopOf="@id/header_text_view"
+            tools:ignore="ContentDescription" />
 
         <TextView
             android:id="@+id/titleTextView"

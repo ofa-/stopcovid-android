@@ -144,7 +144,9 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
             StringsManager.clearLocal(this)
             ConfigManager.clearLocal(this)
             FormManager.clearLocal(this)
-            secureKeystoreDataSource.configVersion = null
+            secureKeystoreDataSource.configuration = secureKeystoreDataSource.configuration?.apply {
+                version = 0
+            }
         }
 
         appCoroutineScope.launch {
@@ -269,8 +271,8 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
     }
 
     private fun sendAtRiskNotification(oneTimeWorkRequestBuilder: OneTimeWorkRequest.Builder, workerId: String) {
-        val minHour = robertManager.atRiskMinHourContactNotif
-        val maxHour = robertManager.atRiskMaxHourContactNotif
+        val minHour = robertManager.configuration.minHourContactNotif
+        val maxHour = robertManager.configuration.maxHourContactNotif
 
         val currentCal = Calendar.getInstance()
         val hours = currentCal.get(Calendar.HOUR_OF_DAY)
@@ -374,8 +376,8 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
     }
 
     fun setIsolationReminder(date: Date) {
-        val minHour = robertManager.atRiskMinHourContactNotif
-        val maxHour = robertManager.atRiskMaxHourContactNotif
+        val minHour = robertManager.configuration.minHourContactNotif
+        val maxHour = robertManager.configuration.maxHourContactNotif
 
         val targetCalendar = Calendar.getInstance()
         targetCalendar.time = date
@@ -464,7 +466,7 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
 
     @OptIn(ExperimentalTime::class)
     private fun deleteOldAttestations() {
-        val expiredMilliSeconds = System.currentTimeMillis() - Duration.convert(robertManager.qrCodeDeletionHours.toDouble(),
+        val expiredMilliSeconds = System.currentTimeMillis() - Duration.convert(robertManager.configuration.qrCodeDeletionHours.toDouble(),
             DurationUnit.HOURS,
             DurationUnit.MILLISECONDS)
         secureKeystoreDataSource.attestations = secureKeystoreDataSource.attestations?.filter { attestation ->
@@ -475,7 +477,7 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
     @OptIn(ExperimentalTime::class)
     private fun refreshStatusIfNeeded() {
         val elapsedTimeSinceRefresh = (System.currentTimeMillis() - (robertManager.atRiskLastRefresh ?: 0L)).milliseconds
-        val checkStatusFrequency = robertManager.checkStatusFrequencyHour.toDouble().hours
+        val checkStatusFrequency = robertManager.configuration.checkStatusFrequencyHour.toDouble().hours
         if (robertManager.isRegistered && elapsedTimeSinceRefresh > checkStatusFrequency) {
             appCoroutineScope.launch {
                 robertManager.updateStatus(this@StopCovid)

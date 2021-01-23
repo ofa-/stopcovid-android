@@ -90,7 +90,7 @@ class ReportFragment : MainFragment() {
                             strings["declareController.codeNotReceived.alert.video.url"]?.openInExternalBrowser(requireContext())
                         }
                         .setNeutralButton(strings["declareController.codeNotReceived.alert.contactUs"]) { _, _ ->
-                            strings["aboutController.contactEmail"]?.startEmailIntent(requireContext())
+                            strings["contactUs.url"]?.openInExternalBrowser(requireContext())
                         }
                         .show()
                 }

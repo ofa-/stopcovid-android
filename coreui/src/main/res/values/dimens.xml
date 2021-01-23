@@ -17,8 +17,8 @@
 
     <dimen name="bottom_sheet_card_elevation">16dp</dimen>
     <dimen name="corner_radius">8dp</dimen>
-    <dimen name="cardElevation">4dp</dimen>
-    <dimen name="divider_height">1dp</dimen>
+    <dimen name="cardElevation">10dp</dimen>
+    <dimen name="divider_height">0.5dp</dimen>
     <dimen name="double_item_image_width">70dp</dimen>
     <dimen name="icon_size">24dp</dimen>
     <dimen name="icon_small_size">12dp</dimen>
@@ -46,4 +46,6 @@
 
     <dimen name="loading_elevation">40dp</dimen>
     <dimen name="recycler_tag_padding_start">12dp</dimen>
+
+    <dimen name="card_image_height">110dp</dimen>
 </resources>

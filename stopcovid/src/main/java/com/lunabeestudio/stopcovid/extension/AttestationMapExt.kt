@@ -12,7 +12,7 @@ import kotlin.time.milliseconds
 fun AttestationMap.isExpired(robertManager: RobertManager): Boolean {
     val qrCodeExpired: Duration = when (this[Constants.Attestation.KEY_REASON]?.value) {
         Constants.Attestation.VALUE_REASON_SPORT -> 3.hours
-        else -> robertManager.qrCodeExpiredHours.toDouble().hours
+        else -> robertManager.configuration.qrCodeExpiredHours.toDouble().hours
     }
     val attestationDuration = System.currentTimeMillis().milliseconds - (this[Constants.Attestation.KEY_DATE_TIME]?.value?.toLongOrNull()?.milliseconds
         ?: Duration.ZERO)

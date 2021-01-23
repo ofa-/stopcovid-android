@@ -13,9 +13,6 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'androidx.navigation.safeargs.kotlin'
-apply plugin: 'shot'
-
-apply from: 'test.gradle'
 
 android {
     signingConfigs {
@@ -58,10 +55,10 @@ android {
         applicationId "fr.gouv.android.stopcovid"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 126
-        versionName "2.2.0"
+        versionCode 136
+        versionName "2.2.2"
 
-        testInstrumentationRunner = 'com.lunabeestudio.stopcovid.TestRunner'
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         buildConfigField 'String', 'APP_MAINTENANCE_CERTIFICATE_SHA256', '"sha256/sXQojvwsiyblrpMQIVRXGC5u7AgknzTJm+VIK1kQmD8="'
         buildConfigField 'String', 'APP_MAINTENANCE_URL', '"https://app.stopcovid.gouv.fr/maintenance/info-maintenance-v2.json"'
@@ -78,9 +75,14 @@ android {
     }
 
     lintOptions {
-        disable "InvalidPackage",
+        disable "GradleDependency",
+                "IidCompatibilityCheckFailure",
+                "InvalidPackage",
                 "ObsoleteLintCustomCheck",
-                "ExpiredTargetSdkVersion"
+                "UnsafeExperimentalUsageError",
+                "UnsafeExperimentalUsageWarning",
+                "VectorPath",
+                "VectorRaster"
     }
 
     testOptions {
@@ -107,4 +109,7 @@ dependencies {
     implementation project(path: ':framework')
     implementation project(path: ':robert')
     implementation project(path: ':domain')
+
+    androidTestImplementation "androidx.test.ext:junit:_"
+    androidTestImplementation "androidx.test:runner:_"
 }

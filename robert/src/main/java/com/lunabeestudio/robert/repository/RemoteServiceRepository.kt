@@ -86,6 +86,9 @@ internal class RemoteServiceRepository(
     suspend fun deleteExposureHistory(apiVersion: String, serverStatusUpdate: ServerStatusUpdate): RobertResult =
         remoteServiceDataSource.deleteExposureHistory(apiVersion, serverStatusUpdate)
 
-    suspend fun fetchOrLoadConfig(context: Context): RobertResultData<List<Configuration>?> =
+    suspend fun fetchOrLoadConfig(context: Context): RobertResultData<Configuration> =
         configurationDataSource.fetchOrLoadConfig(context)
+
+    fun loadConfig(context: Context): Configuration =
+        configurationDataSource.loadConfig(context)
 }

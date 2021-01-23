@@ -151,7 +151,7 @@ class IsolationManager(
     private val contactCaseIsolationEndDate: Long?
         get() {
             return contactCaseIsolationStartDate?.let {
-                it + SECONDS.toMillis(robertManager.isolationDuration)
+                it + SECONDS.toMillis(robertManager.configuration.isolationDuration)
             }.roundTimestampToStartOfDay()
         }
 
@@ -163,7 +163,7 @@ class IsolationManager(
     private val contactCasePostIsolationEndDate: Long?
         get() {
             return contactCaseIsolationStartDate?.let {
-                it + SECONDS.toMillis(robertManager.isolationDuration + robertManager.postIsolationDuration)
+                it + SECONDS.toMillis(robertManager.configuration.isolationDuration + robertManager.configuration.postIsolationDuration)
             }.roundTimestampToStartOfDay()
         }
 
@@ -180,7 +180,7 @@ class IsolationManager(
     val positiveCaseIsolationEndDate: Long?
         get() {
             return positiveCaseIsolationStartDate?.let {
-                it + (robertManager.isolationDuration) * 1000
+                it + (robertManager.configuration.isolationDuration) * 1000
             }.roundTimestampToStartOfDay()
         }
 
@@ -192,7 +192,7 @@ class IsolationManager(
     private val positiveCasePostIsolationEndDate: Long?
         get() {
             return positiveCaseIsolationStartDate?.let {
-                it + (robertManager.isolationDuration + robertManager.postIsolationDuration) * 1000
+                it + (robertManager.configuration.isolationDuration + robertManager.configuration.postIsolationDuration) * 1000
             }.roundTimestampToStartOfDay()
         }
 

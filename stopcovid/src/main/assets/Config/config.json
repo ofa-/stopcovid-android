@@ -2,11 +2,11 @@
   "config": [
 	{
       "name": "lastUpdate",
-      "value": "12 december 2020"
+      "value": "17 december 2020"
     },
     {
       "name": "version",
-      "value": 13
+      "value": 22
     },
     {
       "name": "app.apiVersion",
@@ -22,6 +22,10 @@
     },
     {
       "name": "app.displayIsolation",
+      "value": true
+    },
+    {
+      "name": "app.displayVaccination",
       "value": true
     },
     {
@@ -83,6 +87,10 @@
     {
       "name": "app.qrCode.footerString",
       "value": "<firstname> <lastname>\n<datetime-day>, <datetime-hour> <reason-shortlabel>"
+    },
+    {
+      "name": "app.venuesSalt",
+      "value": 2
     },
     {
       "name": "app.venuesTimestampRoundingInterval",

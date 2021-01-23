@@ -15,5 +15,7 @@ import com.lunabeestudio.domain.model.Configuration
 import com.lunabeestudio.robert.model.RobertResultData
 
 interface ConfigurationDataSource {
-    suspend fun fetchOrLoadConfig(context: Context): RobertResultData<List<Configuration>?>
+    suspend fun fetchOrLoadConfig(context: Context): RobertResultData<Configuration>
+
+    fun loadConfig(context: Context): Configuration
 }

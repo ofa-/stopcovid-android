@@ -17,15 +17,11 @@ internal class ApiStatusRS(
     val lastExposureTimeframe: Int?,
     val message: String?,
     val tuples: String,
-    val config: List<ApiConfigurationRS>
 )
 
 internal fun ApiStatusRS.toDomain() = StatusReport(
     atRisk = atRisk,
     lastExposureTimeframe = lastExposureTimeframe,
     message = message,
-    tuples = tuples,
-    config = config.map {
-        it.toDomain()
-    }
+    tuples = tuples
 )

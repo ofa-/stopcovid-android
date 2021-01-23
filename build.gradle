@@ -17,7 +17,6 @@ buildscript {
         classpath "com.android.tools.build:gradle:_"
         classpath "androidx.navigation:navigation-safe-args-gradle-plugin:_"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:_"
-        classpath "com.karumi:shot:_"
         classpath "com.google.protobuf:protobuf-gradle-plugin:_"
         classpath "io.realm:realm-gradle-plugin:_"
 

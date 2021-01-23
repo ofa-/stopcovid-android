@@ -11,6 +11,7 @@
     <color name="color_on_primary">#FFFFFF</color>
     <color name="color_primary_light">#1A000091</color>
     <color name="color_on_primary_light">#000091</color>
+    <color name="color_blue_france">#0B0091</color>
     <color name="color_error">#FF5C5C</color>
     <color name="color_error_light">#FACDD2</color>
     <color name="color_on_error">#FFF</color>

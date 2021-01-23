@@ -37,6 +37,7 @@ import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
 import com.lunabeestudio.stopcovid.extension.venuesFeaturedWasActivatedAtLeastOneTime
 import com.lunabeestudio.stopcovid.fastitem.dangerButtonItem
 import com.lunabeestudio.stopcovid.manager.ProximityManager
+import com.lunabeestudio.stopcovid.manager.VenuesManager
 import com.lunabeestudio.stopcovid.model.DeviceSetup
 import com.lunabeestudio.stopcovid.viewmodel.ManageDataViewModel
 import com.lunabeestudio.stopcovid.viewmodel.ManageDataViewModelFactory
@@ -120,11 +121,14 @@ class ManageDataFragment : MainFragment() {
         spaceDividerItems(items)
         eraseAttestationItems(items)
         spaceDividerItems(items)
-        if (robertManager.displayIsolation) {
+        if (robertManager.configuration.displayIsolation) {
             eraseIsolationItems(items)
             spaceDividerItems(items)
         }
-        if (sharedPreferences.venuesFeaturedWasActivatedAtLeastOneTime || robertManager.displayRecordVenues) {
+        if (sharedPreferences.venuesFeaturedWasActivatedAtLeastOneTime
+            || robertManager.configuration.displayRecordVenues
+            || !VenuesManager.getVenuesQrCode(requireContext().secureKeystoreDataSource(),
+                includingFuture = false).isNullOrEmpty()) {
             eraseVenuesItems(items)
             spaceDividerItems(items)
         }

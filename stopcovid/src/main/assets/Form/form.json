@@ -49,9 +49,6 @@
                "code":"travail"
             },
             {
-               "code":"achats"
-            },
-            {
                "code":"sante"
             },
             {
@@ -61,16 +58,16 @@
 	            "code":"handicap"
             },
             {
-	            "code":"sport_animaux"
-            },
-            {
                "code":"convocation"
             },
             {
                "code":"missions"
             },
             {
-	            "code":"enfants"
+               "code":"transits"
+            },
+            {
+	            "code":"animaux"
             }
          ]
       }

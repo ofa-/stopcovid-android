@@ -26,7 +26,7 @@ class OnBoardingNotificationFragment : OnBoardingFragment() {
     override fun getTitleKey(): String = "onboarding.beAwareController.title"
     override fun getButtonTitleKey(): String? = "onboarding.beAwareController.allowNotifications"
     override fun getOnButtonClick(): () -> Unit = {
-        if (requireContext().robertManager().displayRecordVenues) {
+        if (requireContext().robertManager().configuration.displayRecordVenues) {
             findNavControllerOrNull()
                 ?.safeNavigate(OnBoardingNotificationFragmentDirections.actionOnBoardingNotificationFragmentToOnBoardingVenuesFragment())
         } else {

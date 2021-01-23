@@ -16,11 +16,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.WorkManager
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import com.lunabeestudio.domain.extension.unixTimeMsToNtpTimeS
 import com.lunabeestudio.domain.model.Configuration
-import com.lunabeestudio.domain.model.DeviceParameterCorrection
 import com.lunabeestudio.domain.model.EphemeralBluetoothIdentifier
 import com.lunabeestudio.domain.model.HelloBuilder
 import com.lunabeestudio.domain.model.HelloSettings
@@ -99,11 +96,9 @@ class RobertManagerImpl(
             configurationDataSource
         )
 
-    init {
-        if (isRegistered) {
-            startStatusWorker(application.getAppContext())
-        }
-    }
+    private var _configuration: Configuration
+    override val configuration: Configuration
+        get() = keystoreRepository.configuration ?: _configuration
 
     override var shouldReloadBleSettings: Boolean
         get() = keystoreRepository.shouldReloadBleSettings
@@ -135,7 +130,7 @@ class RobertManagerImpl(
     override val isAtRisk: Boolean?
         get() = keystoreRepository.lastRiskReceivedDate?.let {
             // if last time we've been notified is older than quarantine period minus the last exposure time frame :
-            System.currentTimeMillis() - it < TimeUnit.DAYS.toMillis((quarantinePeriod - lastExposureTimeframe).toLong())
+            System.currentTimeMillis() - it < TimeUnit.DAYS.toMillis((configuration.quarantinePeriod - lastExposureTimeframe).toLong())
         } ?: atRiskLastRefresh?.let { false }
 
     override val lastRiskReceivedDate: Long?
@@ -150,95 +145,17 @@ class RobertManagerImpl(
     override val atRiskLastRefresh: Long?
         get() = keystoreRepository.atRiskLastRefresh
 
-    override val atRiskMinHourContactNotif: Int
-        get() = keystoreRepository.atRiskMinHourContactNotif ?: RobertConstant.MIN_HOUR_CONTACT_NOTIF
-
-    override val atRiskMaxHourContactNotif: Int
-        get() = keystoreRepository.atRiskMaxHourContactNotif ?: RobertConstant.MAX_HOUR_CONTACT_NOTIF
-
     override val lastExposureTimeframe: Int
         get() = keystoreRepository.lastExposureTimeframe ?: 0
-
-    override val quarantinePeriod: Int
-        get() = keystoreRepository.quarantinePeriod ?: RobertConstant.QUARANTINE_PERIOD
 
     override val isSick: Boolean
         get() = keystoreRepository.isSick ?: false
 
-    override val calibration: List<DeviceParameterCorrection>
-        get() = keystoreRepository.calibration ?: emptyList()
-
-    override val filteringConfig: String
-        get() = keystoreRepository.filteringConfig ?: RobertConstant.BLE_FILTER_CONFIG
-
     override val filteringMode: LocalProximityFilter.Mode
-        get() = keystoreRepository.filteringMode?.let { safeEnumValueOf<LocalProximityFilter.Mode>(it) } ?: RobertConstant.BLE_FILTER_MODE
+        get() = safeEnumValueOf<LocalProximityFilter.Mode>(configuration.filterMode) ?: RobertConstant.BLE_FILTER_MODE
 
-    override val serviceUUID: String
-        get() = keystoreRepository.serviceUUID ?: RobertConstant.BLE_SERVICE_UUID
-
-    override val characteristicUUID: String
-        get() = keystoreRepository.characteristicUUID ?: RobertConstant.BLE_CHARACTERISTIC_UUID
-
-    override val backgroundServiceManufacturerData: String
-        get() = keystoreRepository.backgroundServiceManufacturerData ?: RobertConstant.BLE_BACKGROUND_SERVICE_MANUFACTURER_DATA_IOS
-
-    override val checkStatusFrequencyHour: Float
-        get() = keystoreRepository.checkStatusFrequencyHour ?: RobertConstant.CHECK_STATUS_FREQUENCY_HOURS
-
-    override val minStatusRetryDuration: Float
-        get() = keystoreRepository.minStatusRetryDuration ?: RobertConstant.MIN_STATUS_RETRY_DURATION
-
-    override val randomStatusHour: Float
-        get() = keystoreRepository.randomStatusHour ?: RobertConstant.RANDOM_STATUS_HOUR
-
-    override val apiVersion: String
-        get() = keystoreRepository.apiVersion ?: RobertConstant.API_VERSION
-
-    override val warningApiVersion: String
-        get() = keystoreRepository.warningApiVersion ?: RobertConstant.WARNING_API_VERSION
-
-    override val displayAttestation: Boolean
-        get() = keystoreRepository.displayAttestation ?: false
-
-    override val displayRecordVenues: Boolean
-        get() = keystoreRepository.displayRecordVenues ?: false
-
-    override val displayPrivateEvent: Boolean
-        get() = keystoreRepository.displayPrivateEvent ?: false
-
-    override val displayIsolation: Boolean
-        get() = keystoreRepository.displayIsolation ?: false
-
-    override val privateEventVenueType: String
-        get() = keystoreRepository.privateEventVenueType ?: RobertConstant.PRIVATE_EVENT_VENUE_TYPE
-
-    override val qrCodeDeletionHours: Float
-        get() = keystoreRepository.qrCodeDeletionHours ?: RobertConstant.QR_CODE_DELETION_HOURS
-
-    override val qrCodeExpiredHours: Float
-        get() = keystoreRepository.qrCodeExpiredHours ?: RobertConstant.QR_CODE_EXPIRED_HOURS
-
-    override val qrCodeFormattedString: String
-        get() = keystoreRepository.qrCodeFormattedString ?: RobertConstant.QR_CODE_FORMATTED_STRING
-
-    override val qrCodeFormattedStringDisplayed: String
-        get() = keystoreRepository.qrCodeFormattedStringDisplayed ?: RobertConstant.QR_CODE_FORMATTED_STRING_DISPLAYED
-
-    override val qrCodeFooterString: String
-        get() = keystoreRepository.qrCodeFooterString ?: RobertConstant.QR_CODE_FOOTER_STRING
-
-    override val displayDepartmentLevel: Boolean
-        get() = keystoreRepository.displayDepartmentLevel ?: false
-
-    override val proximityReactivationReminderHours: List<Int>
-        get() = keystoreRepository.proximityReactivationReminderHours ?: emptyList()
-
-    override val venuesTimestampRoundingInterval: Int
-        get() = keystoreRepository.venuesTimestampRoundingInterval ?: RobertConstant.VENUES_TIMESTAMP_ROUNDING_INTERVAL
-
-    override val venuesRetentionPeriod: Int
-        get() = keystoreRepository.venuesRetentionPeriod ?: RobertConstant.VENUES_RETENTION_PERIOD
+    private val apiVersion: String
+        get() = configuration.apiVersion
 
     override val reportSymptomsStartDate: Long?
         get() = keystoreRepository.reportSymptomsStartDate
@@ -246,29 +163,26 @@ class RobertManagerImpl(
     override val reportPositiveTestDate: Long?
         get() = keystoreRepository.reportPositiveTestDate
 
-    override val isolationDuration: Long
-        get() = keystoreRepository.isolationDuration ?: RobertConstant.ISOLATION_DURATION
-
-    override val postIsolationDuration: Long
-        get() = keystoreRepository.postIsolationDuration ?: RobertConstant.POST_ISOLATION_DURATION
+    init {
+        _configuration = remoteServiceRepository.loadConfig(application.getAppContext())
+        if (isRegistered) {
+            startStatusWorker(application.getAppContext())
+        }
+    }
 
     override suspend fun refreshConfig(application: RobertApplication): RobertResult {
         val configResult = remoteServiceRepository.fetchOrLoadConfig(application.getAppContext())
         return when (configResult) {
             is RobertResultData.Success -> {
-                if (configResult.data.isNullOrEmpty()) {
-                    RobertResult.Failure(RobertUnknownException())
-                } else {
-                    try {
-                        handleConfigChange(configResult.data)
-                        RobertResult.Success()
-                    } catch (e: Exception) {
-                        Timber.e(e)
-                        if (e is RobertException) {
-                            RobertResult.Failure(e)
-                        } else {
-                            RobertResult.Failure(RobertUnknownException())
-                        }
+                try {
+                    handleConfigChange(configResult.data)
+                    RobertResult.Success()
+                } catch (e: Exception) {
+                    Timber.e(e)
+                    if (e is RobertException) {
+                        RobertResult.Failure(e)
+                    } else {
+                        RobertResult.Failure(RobertUnknownException())
                     }
                 }
             }
@@ -334,191 +248,11 @@ class RobertManagerImpl(
         }
     }
 
-    private fun handleConfigChange(configuration: List<Configuration>?) {
-        val newConfigVersion = (configuration?.firstOrNull {
-            it.name == RobertConstant.CONFIG.CONFIG_VERSION
-        }?.value as? Number ?: 0).toInt()
-
-        if (newConfigVersion <= keystoreRepository.configVersion ?: -1) {
+    private fun handleConfigChange(configuration: Configuration) {
+        if (configuration.version <= keystoreRepository.configuration?.version ?: -1) {
             return
         }
-
-        keystoreRepository.configVersion = newConfigVersion
-
-        (configuration?.firstOrNull {
-            it.name == RobertConstant.CONFIG.CALIBRATION
-        }?.value as? List<*>)?.let { calibrations ->
-            val gson = Gson()
-            val typeToken = object : TypeToken<List<DeviceParameterCorrection>>() {}.type
-            keystoreRepository.calibration = gson.fromJson(gson.toJson(calibrations), typeToken)
-        }
-        (configuration?.firstOrNull {
-            it.name == RobertConstant.CONFIG.FILTER_CONFIG
-        }?.value as? String)?.let { filterConfig ->
-            keystoreRepository.filteringConfig = filterConfig
-        }
-        (configuration?.firstOrNull {
-            it.name == RobertConstant.CONFIG.FILTER_MODE
-        }?.value as? String)?.let { filterMode ->
-            keystoreRepository.filteringMode = filterMode
-        }
-        (configuration?.firstOrNull {
-            it.name == RobertConstant.CONFIG.SERVICE_UUID
-        }?.value as? String)?.let { serviceUUID ->
-            keystoreRepository.serviceUUID = serviceUUID
-        }
-        (configuration?.firstOrNull {
-            it.name == RobertConstant.CONFIG.CHARACTERISTIC_UUID
-        }?.value as? String)?.let { characteristicUUID ->
-            keystoreRepository.characteristicUUID = characteristicUUID
-        }
-        (configuration?.firstOrNull {
-            it.name == RobertConstant.CONFIG.BACKGROUND_SERVICE_MANUFACTURER_DATA
-        }?.value as? String)?.let { backgroundServiceManufacturerData ->
-            keystoreRepository.backgroundServiceManufacturerData = backgroundServiceManufacturerData
-        }
-        (configuration?.firstOrNull {
-            it.name == RobertConstant.CONFIG.DATA_RETENTION_PERIOD
-        }?.value as? Number)?.let { dataRetentionPeriod ->
-            keystoreRepository.dataRetentionPeriod = dataRetentionPeriod.toInt()
-        }
-        (configuration?.firstOrNull {
-            it.name == RobertConstant.CONFIG.VENUES_RETENTION_PERIOD
-        }?.value as? Number)?.let { venuesRetentionPeriod ->
-            keystoreRepository.venuesRetentionPeriod = venuesRetentionPeriod.toInt()
-        }
-        (configuration?.firstOrNull {
-            it.name == RobertConstant.CONFIG.QUARANTINE_PERIOD
-        }?.value as? Number)?.let { quarantinePeriod ->
-            keystoreRepository.quarantinePeriod = quarantinePeriod.toInt()
-        }
-        (configuration?.firstOrNull {
-            it.name == RobertConstant.CONFIG.MIN_STATUS_RETRY_DURATION
-        }?.value as? Number)?.let { minStatusRetryDuration ->
-            keystoreRepository.minStatusRetryDuration = minStatusRetryDuration.toFloat()
-        }
-        (configuration?.firstOrNull {
-            it.name == RobertConstant.CONFIG.CHECK_STATUS_FREQUENCY
-        }?.value as? Number)?.let { checkStatusFrequency ->
-            keystoreRepository.checkStatusFrequencyHour = checkStatusFrequency.toFloat()
-        }
-        (configuration?.firstOrNull {
-            it.name == RobertConstant.CONFIG.RANDOM_STATUS_HOUR
-        }?.value as? Number)?.let { randomStatusHour ->
-            keystoreRepository.randomStatusHour = randomStatusHour.toFloat()
-        }
-        (configuration?.firstOrNull {
-            it.name == RobertConstant.CONFIG.PRE_SYMPTOMS_SPAN
-        }?.value as? Number)?.let { preSymptomsSpan ->
-            keystoreRepository.preSymptomsSpan = preSymptomsSpan.toInt()
-        }
-        (configuration?.firstOrNull {
-            it.name == RobertConstant.CONFIG.APP_AVAILABILITY
-        }?.value as? Boolean)?.let { appAvailability ->
-            keystoreRepository.appAvailability = appAvailability
-        }
-        (configuration?.firstOrNull {
-            it.name == RobertConstant.CONFIG.MIN_HOUR_CONTACT_NOTIF
-        }?.value as? Number)?.let { minHourContactNotif ->
-            keystoreRepository.atRiskMinHourContactNotif = minHourContactNotif.toInt()
-        }
-        (configuration?.firstOrNull {
-            it.name == RobertConstant.CONFIG.MAX_HOUR_CONTACT_NOTIF
-        }?.value as? Number)?.let { maxHourContactNotif ->
-            keystoreRepository.atRiskMaxHourContactNotif = maxHourContactNotif.toInt()
-        }
-        (configuration?.firstOrNull {
-            it.name == RobertConstant.CONFIG.API_VERSION
-        }?.value as? String)?.let { apiVersion ->
-            keystoreRepository.apiVersion = apiVersion
-        }
-        (configuration?.firstOrNull {
-            it.name == RobertConstant.CONFIG.WARNING_API_VERSION
-        }?.value as? String)?.let { warningApiVersion ->
-            keystoreRepository.warningApiVersion = warningApiVersion
-        }
-        (configuration?.firstOrNull {
-            it.name == RobertConstant.CONFIG.DISPLAY_ATTESTATION
-        }?.value as? Boolean)?.let { displayAttestation ->
-            keystoreRepository.displayAttestation = displayAttestation
-        }
-        (configuration?.firstOrNull {
-            it.name == RobertConstant.CONFIG.QR_CODE_DELETION_HOURS
-        }?.value as? Number)?.let { deletionHours ->
-            keystoreRepository.qrCodeDeletionHours = deletionHours.toFloat()
-        }
-        (configuration?.firstOrNull {
-            it.name == RobertConstant.CONFIG.QR_CODE_EXPIRED_HOURS
-        }?.value as? Number)?.let { expiredHours ->
-            keystoreRepository.qrCodeExpiredHours = expiredHours.toFloat()
-        }
-        (configuration?.firstOrNull {
-            it.name == RobertConstant.CONFIG.QR_CODE_FORMATTED_STRING
-        }?.value as? String)?.let { formattedString ->
-            keystoreRepository.qrCodeFormattedString = formattedString
-        }
-        (configuration?.firstOrNull {
-            it.name == RobertConstant.CONFIG.QR_CODE_FORMATTED_STRING_DISPLAYED
-        }?.value as? String)?.let { formattedStringDisplayed ->
-            keystoreRepository.qrCodeFormattedStringDisplayed = formattedStringDisplayed
-        }
-        (configuration?.firstOrNull {
-            it.name == RobertConstant.CONFIG.QR_CODE_FOOTER_STRING
-        }?.value as? String)?.let { footerString ->
-            keystoreRepository.qrCodeFooterString = footerString
-        }
-        (configuration?.firstOrNull {
-            it.name == RobertConstant.CONFIG.DISPLAY_DEPARTMENT_LEVEL
-        }?.value as? Boolean)?.let { displayDepartmentLevel ->
-            keystoreRepository.displayDepartmentLevel = displayDepartmentLevel
-        }
-        (configuration?.firstOrNull {
-            it.name == RobertConstant.CONFIG.PROXIMITY_REACTICATION_REMINDER_HOURS
-        }?.value as? List<*>)?.let { proximityReactivateReminderHours ->
-            val gson = Gson()
-            val typeToken = object : TypeToken<List<Int>>() {}.type
-            keystoreRepository.proximityReactivationReminderHours = gson.fromJson(gson.toJson(proximityReactivateReminderHours), typeToken)
-        }
-        (configuration?.firstOrNull {
-            it.name == RobertConstant.CONFIG.VENUES_TIMESTAMP_ROUNDING_INTERVAL
-        }?.value as? Number)?.let { timeStampInterval ->
-            keystoreRepository.venuesTimestampRoundingInterval = timeStampInterval.toInt()
-        }
-        (configuration?.firstOrNull {
-            it.name == RobertConstant.CONFIG.PRIVATE_EVENT_VENUE_TYPE
-        }?.value as? String)?.let { privateEventVenueType ->
-            keystoreRepository.privateEventVenueType = privateEventVenueType
-        }
-        (configuration?.firstOrNull {
-            it.name == RobertConstant.CONFIG.DISPLAY_RECORD_VEMUES
-        }?.value as? Boolean)?.let { displayRecordVenues ->
-            keystoreRepository.displayRecordVenues = displayRecordVenues
-        }
-        (configuration?.firstOrNull {
-            it.name == RobertConstant.CONFIG.DISPLAY_PRIVATE_EVENT
-        }?.value as? Boolean)?.let { displayPrivateEvent ->
-            keystoreRepository.displayPrivateEvent = displayPrivateEvent
-        }
-        (configuration?.firstOrNull {
-            it.name == RobertConstant.CONFIG.DISPLAY_ISOLATION
-        }?.value as? Boolean)?.let { displayIsolation ->
-            keystoreRepository.displayIsolation = displayIsolation
-        }
-        (configuration?.firstOrNull {
-            it.name == RobertConstant.CONFIG.POSITIVE_SAMPLE_SPAN
-        }?.value as? Number)?.let { positiveSampleSpan ->
-            keystoreRepository.positiveSampleSpan = positiveSampleSpan.toInt()
-        }
-        (configuration?.firstOrNull {
-            it.name == RobertConstant.CONFIG.ISOLATION_DURATION
-        }?.value as? Number)?.let { isolationDuration ->
-            keystoreRepository.isolationDuration = isolationDuration.toLong()
-        }
-        (configuration?.firstOrNull {
-            it.name == RobertConstant.CONFIG.POST_ISOLATION_DURATION
-        }?.value as? Number)?.let { postIsolationDuration ->
-            keystoreRepository.postIsolationDuration = postIsolationDuration.toLong()
-        }
+        keystoreRepository.configuration = configuration
     }
 
     override suspend fun activateProximity(application: RobertApplication, statusTried: Boolean): RobertResult {
@@ -561,14 +295,14 @@ class RobertManagerImpl(
             statusSemaphore.withPermit {
                 val ssu = getSSU(RobertConstant.PREFIX.C2)
                 val checkStatusFrequencyHourMs = Duration.convert(
-                    checkStatusFrequencyHour.toDouble(),
+                    configuration.checkStatusFrequencyHour.toDouble(),
                     DurationUnit.HOURS,
                     DurationUnit.MILLISECONDS
                 )
                 val lastSuccessLongEnough =
                     abs((atRiskLastRefresh ?: 0L) - System.currentTimeMillis()) > checkStatusFrequencyHourMs
                 val minStatusRetryDurationMs = Duration.convert(
-                    minStatusRetryDuration.toDouble(),
+                    configuration.minStatusRetryDuration.toDouble(),
                     DurationUnit.HOURS,
                     DurationUnit.MILLISECONDS
                 )
@@ -578,8 +312,8 @@ class RobertManagerImpl(
                 if (shouldRefreshStatus) {
                     if (ssu is RobertResultData.Success) {
                         val venueQrCodeList: List<VenueQrCode>? = robertApplication.getVenueQrCodeList(null)
-                        if (displayRecordVenues && !venueQrCodeList.isNullOrEmpty()) {
-                            val wResult = remoteServiceRepository.wstatus(warningApiVersion, venueQrCodeList)
+                        if (!venueQrCodeList.isNullOrEmpty()) {
+                            val wResult = remoteServiceRepository.wstatus(configuration.warningApiVersion, venueQrCodeList)
                             when (wResult) {
                                 is RobertResultData.Success -> {
                                     keystoreRepository.atRiskLastRefresh = System.currentTimeMillis()
@@ -598,6 +332,7 @@ class RobertManagerImpl(
                         when (result) {
                             is RobertResultData.Success -> {
                                 try {
+                                    keystoreRepository.atRiskLastRefresh = System.currentTimeMillis()
                                     ephemeralBluetoothIdentifierRepository.save(Base64.decode(result.data.tuples, Base64.NO_WRAP))
                                     // Only notify at risk became true every 24h
                                     val atRiskDelayOK = keystoreRepository.lastRiskReceivedDate?.let {
@@ -608,7 +343,6 @@ class RobertManagerImpl(
                                         keystoreRepository.lastExposureTimeframe = result.data.lastExposureTimeframe
                                         robertApplication.atRiskDetected()
                                     }
-                                    keystoreRepository.atRiskLastRefresh = System.currentTimeMillis()
                                     keystoreRepository.shouldReloadBleSettings = true
 
                                     Timber.v("Updating worker status to new random date")
@@ -655,8 +389,7 @@ class RobertManagerImpl(
         ephemeralBluetoothIdentifierRepository.removeUntilTimeKeepLast(ephemeralBluetoothIdentifierExpiredTime)
         val localProximityExpiredTime: Long =
             (System.currentTimeMillis() - TimeUnit.DAYS.toMillis(
-                (keystoreRepository.dataRetentionPeriod
-                    ?: RobertConstant.DATA_RETENTION_PERIOD).toLong()
+                configuration.dataRetentionPeriod.toLong()
             )).unixTimeMsToNtpTimeS()
         localProximityRepository.removeUntilTime(localProximityExpiredTime)
     }
@@ -668,16 +401,16 @@ class RobertManagerImpl(
         application: RobertApplication,
     ): RobertResult {
         // Max take hello 14 days from now
-        var originDayInPast = (keystoreRepository.dataRetentionPeriod ?: RobertConstant.DATA_RETENTION_PERIOD).toLong()
+        var originDayInPast = configuration.dataRetentionPeriod.toLong()
         when {
             firstSymptoms != null -> {
                 // if symptoms take `preSymptomsSpan` days before first symptoms
-                val preSymptomsSpan = (keystoreRepository.preSymptomsSpan ?: RobertConstant.PRE_SYMPTOMS_SPAN).toLong()
+                val preSymptomsSpan = configuration.preSymptomsSpan.toLong()
                 originDayInPast = min(originDayInPast, firstSymptoms.toLong() + preSymptomsSpan)
             }
             positiveTest != null -> {
                 // if positive test take `positiveSampleSpan` days before positive test
-                val positiveSampleSpan = (keystoreRepository.positiveSampleSpan ?: RobertConstant.POSITIVE_SAMPLE_SPAN).toLong()
+                val positiveSampleSpan = configuration.positiveSampleSpan.toLong()
                 originDayInPast = min(originDayInPast, positiveTest.toLong() + positiveSampleSpan)
             }
         }
@@ -688,7 +421,7 @@ class RobertManagerImpl(
         val filteredLocalProximityList = localProximityFilter.filter(
             localProximityList,
             filteringMode,
-            filteringConfig
+            configuration.filterConfig
         )
 
         val result = remoteServiceRepository.report(apiVersion, token, filteredLocalProximityList)
@@ -713,10 +446,10 @@ class RobertManagerImpl(
     override suspend fun wreportIfNeeded(application: RobertApplication, shouldRetry: Boolean) {
         val wToken = keystoreRepository.reportValidationToken
         val reportToSendTime = keystoreRepository.reportToSendTime
-        if (wToken != null && reportToSendTime != null && displayRecordVenues) {
+        if (wToken != null && reportToSendTime != null) {
             val venueQrCodeList = application.getVenueQrCodeList(reportToSendTime)
             if (!venueQrCodeList.isNullOrEmpty()) {
-                val result = remoteServiceRepository.wreport(warningApiVersion, wToken, venueQrCodeList)
+                val result = remoteServiceRepository.wreport(configuration.warningApiVersion, wToken, venueQrCodeList)
                 when (result) {
                     is RobertResult.Success -> {
                         keystoreRepository.reportValidationToken = null
@@ -800,7 +533,7 @@ class RobertManagerImpl(
         keystoreRepository.lastRiskReceivedDate = null
         keystoreRepository.atRiskLastRefresh = null
         keystoreRepository.lastExposureTimeframe = null
-        keystoreRepository.isWarningAtRisk = false
+        keystoreRepository.isWarningAtRisk = null
         return RobertResult.Success()
     }
 
@@ -837,7 +570,7 @@ class RobertManagerImpl(
         keystoreRepository.proximityActive = null
         keystoreRepository.isSick = null
         keystoreRepository.reportDate = null
-        keystoreRepository.configVersion = null
+        keystoreRepository.configuration = configuration.apply { version = 0 }
         keystoreRepository.reportPositiveTestDate = null
         keystoreRepository.reportSymptomsStartDate = null
         keystoreRepository.isWarningAtRisk = null

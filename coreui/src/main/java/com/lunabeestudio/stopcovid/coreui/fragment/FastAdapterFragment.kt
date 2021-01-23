@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.AppBarLayout
 import com.lunabeestudio.stopcovid.coreui.databinding.FragmentRecyclerViewBinding
 import com.lunabeestudio.stopcovid.coreui.extension.closeKeyboardOnScroll
+import com.lunabeestudio.stopcovid.coreui.extension.viewLifecycleOwnerOrNull
 import com.mikepenz.fastadapter.GenericItem
 import com.mikepenz.fastadapter.adapters.FastItemAdapter
 import com.mikepenz.fastadapter.adapters.GenericFastItemAdapter
@@ -52,7 +53,7 @@ abstract class FastAdapterFragment : BaseFragment() {
 
     override fun refreshScreen() {
         refreshScreenJob?.cancel()
-        refreshScreenJob = viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
+        refreshScreenJob = viewLifecycleOwnerOrNull()?.lifecycleScope?.launch(Dispatchers.Main) {
             delay(10)
             val items = getItems()
             if (items.isEmpty()) {

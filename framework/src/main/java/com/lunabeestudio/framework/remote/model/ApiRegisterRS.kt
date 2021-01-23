@@ -15,15 +15,11 @@ import com.lunabeestudio.domain.model.RegisterReport
 internal class ApiRegisterRS(
     val tuples: String,
     val message: String?,
-    val timeStart: Long,
-    val config: List<ApiConfigurationRS>?
+    val timeStart: Long
 )
 
 internal fun ApiRegisterRS.toDomain() = RegisterReport(
     tuples = tuples,
     message = message,
-    timeStart = timeStart,
-    configuration = config?.map {
-        it.toDomain()
-    }
+    timeStart = timeStart
 )

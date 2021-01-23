@@ -13,7 +13,6 @@ package com.lunabeestudio.stopcovid.fragment
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.zxing.BarcodeFormat
 import com.journeyapps.barcodescanner.BarcodeEncoder
@@ -101,6 +100,11 @@ class AttestationsFragment : MainFragment() {
     @OptIn(ExperimentalTime::class)
     override fun getItems(): List<GenericItem> {
         val items = ArrayList<GenericItem>()
+
+        items += spaceItem {
+            spaceRes = R.dimen.spacing_large
+            identifier = items.size.toLong()
+        }
 
         items += linkCardItem {
             label = strings["attestationsController.newAttestation"]
@@ -243,19 +247,19 @@ class AttestationsFragment : MainFragment() {
     }
 
     private fun attestationToFormattedString(attestation: AttestationMap): String {
-        return robertManager.qrCodeFormattedString
+        return robertManager.configuration.qrCodeFormattedString
             .attestationReplaceKnownValue(attestation)
             .attestationReplaceUnknownValues()
     }
 
     private fun attestationToFormattedStringDisplayed(attestation: AttestationMap): String {
-        return robertManager.qrCodeFormattedStringDisplayed
+        return robertManager.configuration.qrCodeFormattedStringDisplayed
             .attestationReplaceKnownValue(attestation)
             .attestationReplaceUnknownValues()
     }
 
     private fun attestationToFooterString(attestation: AttestationMap): String {
-        return robertManager.qrCodeFooterString
+        return robertManager.configuration.qrCodeFooterString
             .attestationReplaceKnownValue(attestation)
             .attestationReplaceUnknownValues()
     }

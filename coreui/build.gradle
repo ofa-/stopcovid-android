@@ -38,6 +38,11 @@ android {
     kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
 
     buildFeatures.viewBinding = true
+
+    lintOptions {
+        disable "GradleDependency",
+                "VectorPath"
+    }
 }
 
 dependencies {
@@ -72,5 +77,6 @@ dependencies {
     api "org.jetbrains.kotlin:kotlin-stdlib-jdk8:_"
     api 'org.jetbrains.kotlinx:kotlinx-coroutines-android:_'
 
+    implementation project(path: ':domain')
     implementation project(path: ':robert')
 }

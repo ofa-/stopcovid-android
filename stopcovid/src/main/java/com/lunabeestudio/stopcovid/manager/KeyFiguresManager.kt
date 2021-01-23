@@ -11,6 +11,7 @@
 package com.lunabeestudio.stopcovid.manager
 
 import android.content.Context
+import android.util.MalformedJsonException
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
@@ -67,7 +68,7 @@ object KeyFiguresManager {
             withContext(Dispatchers.IO) {
                 try {
                     Timber.v("Loading $keyFiguresFile to object")
-                    gson.fromJson<List<KeyFigure>>(keyFiguresFile.readText(), typeKeyFigure)
+                    gson.fromJson<List<KeyFigure>>(File(context.filesDir, cacheFileName).readText(), typeKeyFigure)
                 } catch (e: Exception) {
                     Timber.e(e)
                     null
@@ -80,15 +81,31 @@ object KeyFiguresManager {
     }
 
     private suspend fun fetchLast(context: Context): Boolean {
+        val filename = "$cacheFileName.bck"
+        val tmpFile = File(context.filesDir, filename)
         return try {
-            val filename: String = cacheFileName
             Timber.v("Fetching remote data at $url")
-            url.saveTo(context, File(context.filesDir, filename))
+            url.saveTo(context, tmpFile)
+            if (fileNotCorrupted(context, filename)) {
+                tmpFile.copyTo(File(context.filesDir, cacheFileName), overwrite = true, bufferSize = 4 * 1024)
+            } else {
+                throw MalformedJsonException("Failed to parse key figure JSON")
+            }
             true
         } catch (e: Exception) {
             Timber.e(e, "Fetching failed")
             false
+        } finally {
+            tmpFile.delete()
         }
     }
 
+    private suspend fun fileNotCorrupted(context: Context, filename: String): Boolean {
+        return withContext(Dispatchers.IO) {
+            val content = gson.fromJson<List<KeyFigure?>>(File(context.filesDir, filename).readText(), typeKeyFigure)
+            content.none {
+                it == null
+            }
+        }
+    }
 }

@@ -74,9 +74,6 @@ class ServiceTest {
         result as RobertResultData.Success
         assertThat(result.data.message).isEqualTo("The application did register successfully")
         assertThat(result.data.timeStart).isEqualTo(3799958400L)
-        assertThat(result.data.configuration?.size).isEqualTo(1)
-        assertThat(result.data.configuration?.get(0)?.name).isEqualTo("distance")
-        assertThat(result.data.configuration?.get(0)?.value).isEqualTo(12.0)
         assertThat(result.data.tuples).isEqualTo("test")
 
         testDataErrors {
@@ -99,9 +96,6 @@ class ServiceTest {
         assertThat(result.data.message)
             .isEqualTo("Votre test COVID-19 est positif. Merci de respecter la période de quatorzaine. Prenez soin de vous et de vos proches.")
         assertThat(result.data.tuples).isNotNull()
-        assertThat(result.data.config.size).isEqualTo(1)
-        assertThat(result.data.config[0].name).isEqualTo("distance")
-        assertThat(result.data.config[0].value).isEqualTo(12.0)
 
         testDataErrors {
             dataSource.status("", ServerStatusUpdate("", 0L, "", ""))

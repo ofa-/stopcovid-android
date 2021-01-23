@@ -27,12 +27,6 @@ fun <T> SecretKey.safeUse(block: (SecretKey) -> T): T {
     try {
         return block(this)
     } finally {
-        try {
-            destroy()
-        } catch (e: DestroyFailedException) {
-            // Destroy not implemented
-        } catch (e: NoSuchMethodError) {
-            // Destroy not implemented
-        }
+        safeDestroy()
     }
 }

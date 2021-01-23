@@ -34,7 +34,7 @@ class OnBoardingNoBleFragment : OnBoardingFragment() {
 
     override fun getOnButtonClick(): () -> Unit = {
         if (PreferenceManager.getDefaultSharedPreferences(context).contains(Constants.SharedPrefs.IS_ADVERTISEMENT_AVAILABLE)) {
-            if (requireContext().robertManager().displayRecordVenues) {
+            if (requireContext().robertManager().configuration.displayRecordVenues) {
                 findNavControllerOrNull()
                     ?.safeNavigate(
                         OnBoardingNoBleFragmentDirections.actionOnBoardingNoBleFragmentToOnBoardingNotificationFragment()

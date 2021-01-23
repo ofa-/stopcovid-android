@@ -30,7 +30,7 @@
         android:scaleType="center"
         app:tint="?colorPrimary"
         tools:ignore="ContentDescription"
-        tools:src="@drawable/ic_manage_data" />
+        tools:src="@drawable/ic_about" />
 
     <TextView
         android:id="@+id/textView"

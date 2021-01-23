@@ -10,9 +10,9 @@
 
 package com.lunabeestudio.stopcovid.fragment
 
+import android.annotation.SuppressLint
 import android.view.Gravity
 import android.view.View
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
@@ -35,6 +35,7 @@ class PositiveTestFragment : MainFragment() {
 
     private val dateFormat: DateFormat = SimpleDateFormat.getDateInstance(DateFormat.FULL)
 
+    @SuppressLint("UseValueOf")
     override fun getItems(): List<GenericItem> {
         val items = arrayListOf<GenericItem>()
 
