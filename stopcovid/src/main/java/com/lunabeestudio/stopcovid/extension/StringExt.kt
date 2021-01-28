@@ -89,3 +89,6 @@ fun String.sha256() = MessageDigest
     .getInstance("SHA-256")
     .digest(this.toByteArray())
     .fold("", { str, it -> str + "%02x".format(it) })
+
+// Dirty hack to fix strange display of quotes on some Android devices
+fun String.fixQuoteInString(): String = replace("'", "")

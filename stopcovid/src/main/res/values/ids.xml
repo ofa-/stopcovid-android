@@ -45,4 +45,5 @@
     <item name="item_tag" type="id" />
     <item name="item_add_postal_code_card" type="id" />
     <item name="item_isolation_boolean_radio_group" type="id" />
+    <item name="item_key_figure_chart_card" type="id" />
 </resources>

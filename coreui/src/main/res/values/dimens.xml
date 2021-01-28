@@ -48,4 +48,6 @@
     <dimen name="recycler_tag_padding_start">12dp</dimen>
 
     <dimen name="card_image_height">110dp</dimen>
+
+    <dimen name="key_figure_chart_height">220dp</dimen>
 </resources>

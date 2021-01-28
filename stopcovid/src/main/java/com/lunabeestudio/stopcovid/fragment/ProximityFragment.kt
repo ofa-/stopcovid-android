@@ -77,9 +77,11 @@ import com.lunabeestudio.stopcovid.extension.colorStringKey
 import com.lunabeestudio.stopcovid.extension.formatNumberIfNeeded
 import com.lunabeestudio.stopcovid.extension.getDepartmentLabel
 import com.lunabeestudio.stopcovid.extension.getKeyFigureForPostalCode
+import com.lunabeestudio.stopcovid.extension.getRelativeDateTimeString
 import com.lunabeestudio.stopcovid.extension.getString
 import com.lunabeestudio.stopcovid.extension.hasChosenPostalCode
 import com.lunabeestudio.stopcovid.extension.isolationManager
+import com.lunabeestudio.stopcovid.extension.labelShortStringKey
 import com.lunabeestudio.stopcovid.extension.labelStringKey
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
@@ -145,10 +147,6 @@ class ProximityFragment : TimeMainFragment() {
         PreferenceManager.getDefaultSharedPreferences(requireContext())
     }
 
-    private val deviceSetup by lazy {
-        ProximityManager.getDeviceSetup(requireContext())
-    }
-
     private lateinit var subTitleItem: TitleItem
 
     private var onOffLottieItem: OnOffLottieItem? = null
@@ -161,14 +159,14 @@ class ProximityFragment : TimeMainFragment() {
     private val interpolator = DecelerateInterpolator()
     private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent) {
-            refreshItems()
+            refreshItems(context?.let(ProximityManager::getDeviceSetup))
         }
     }
     private val errorReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent) {
             val exception = intent.getSerializableExtra(Constants.Notification.SERVICE_ERROR_EXTRA) as? ProximityException
             showErrorSnackBar(exception.toCovidException().getString(strings))
-            refreshItems()
+            refreshItems(context?.let(ProximityManager::getDeviceSetup))
         }
     }
     private var proximityClickThreshold = 0L
@@ -194,6 +192,7 @@ class ProximityFragment : TimeMainFragment() {
 
     override fun getTitleKey(): String {
         //return "proximityController.tabBar.title"
+        val deviceSetup = context?.let(ProximityManager::getDeviceSetup)
         return when {
             deviceSetup == DeviceSetup.NO_BLE -> "app.name"
             ProximityManager.isProximityOn(requireContext(), robertManager) && deviceSetup == DeviceSetup.BLE -> "home.title.activated"
@@ -203,7 +202,7 @@ class ProximityFragment : TimeMainFragment() {
 
     private val sharedPreferenceChangeListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
         if (key == Constants.SharedPrefs.HAS_NEWS) {
-            refreshItems()
+            refreshItems(context?.let(ProximityManager::getDeviceSetup))
         }
     }
 
@@ -322,10 +321,10 @@ class ProximityFragment : TimeMainFragment() {
             covidException?.let {
                 showErrorSnackBar(it.getString(strings))
             }
-            refreshItems()
+            refreshItems(context?.let(ProximityManager::getDeviceSetup))
         }
         viewModel.activateProximitySuccess.observe(viewLifecycleOwner) {
-            refreshItems()
+            refreshItems(context?.let(ProximityManager::getDeviceSetup))
             (requireContext().applicationContext as StopCovid).cancelActivateReminder()
         }
         viewModel.isolationFormState.observeEventAndConsume(viewLifecycleOwner) {
@@ -375,17 +374,18 @@ class ProximityFragment : TimeMainFragment() {
         val items = ArrayList<GenericItem>()
 
         val isSick = robertManager.isSick
+        val deviceSetup = context?.let(ProximityManager::getDeviceSetup)
 
-        addTopImageItems(items)
+        addTopImageItems(items, deviceSetup)
         addSubTitleItem(items)
-        addActivateButtonItems(items)
+        addActivateButtonItems(items, deviceSetup)
 
         // Health items
-        addHealthItems(items, isSick)
+        addHealthItems(items, isSick, deviceSetup)
         if (robertManager.configuration.displayIsolation) {
             addIsolationItems(items)
         }
-        addDeclareItems(items, isSick)
+        addDeclareItems(items, isSick, deviceSetup)
         if (robertManager.configuration.displayVaccination) {
             addVaccinationItems(items)
         }
@@ -403,7 +403,7 @@ class ProximityFragment : TimeMainFragment() {
         // More items
         addMoreItems(items)
 
-        refreshItems()
+        refreshItems(deviceSetup)
 
         return items
     }
@@ -419,7 +419,7 @@ class ProximityFragment : TimeMainFragment() {
         items += subTitleItem
     }
 
-    private fun addTopImageItems(items: ArrayList<GenericItem>) {
+    private fun addTopImageItems(items: ArrayList<GenericItem>, deviceSetup: DeviceSetup?) {
         if (deviceSetup != DeviceSetup.NO_BLE) {
             onOffLottieItem = onOffLottieItem {
                 identifier = items.count().toLong()
@@ -435,7 +435,7 @@ class ProximityFragment : TimeMainFragment() {
         }
     }
 
-    private fun addActivateButtonItems(items: ArrayList<GenericItem>) {
+    private fun addActivateButtonItems(items: ArrayList<GenericItem>, deviceSetup: DeviceSetup?) {
         if (deviceSetup != DeviceSetup.NO_BLE) {
             proximityButtonItem = proximityButtonItem {
                 mainText = strings["home.mainButton.activate"]
@@ -445,7 +445,7 @@ class ProximityFragment : TimeMainFragment() {
                         proximityClickThreshold = SystemClock.elapsedRealtime() + PROXIMITY_BUTTON_DELAY
                         if (robertManager.isProximityActive) {
                             deactivateProximity()
-                            refreshItems()
+                            refreshItems(deviceSetup)
                         } else {
                             activateProximity()
                         }
@@ -464,7 +464,7 @@ class ProximityFragment : TimeMainFragment() {
                             proximityClickThreshold = SystemClock.elapsedRealtime() + PROXIMITY_BUTTON_DELAY
                             if (robertManager.isProximityActive) {
                                 deactivateProximity()
-                                refreshItems()
+                                refreshItems(deviceSetup)
                             } else {
                                 activateProximity()
                             }
@@ -477,7 +477,7 @@ class ProximityFragment : TimeMainFragment() {
                                 proximityClickThreshold = SystemClock.elapsedRealtime() + PROXIMITY_BUTTON_DELAY
                                 if (robertManager.isProximityActive) {
                                     deactivateProximity()
-                                    refreshItems()
+                                    refreshItems(deviceSetup)
                                 } else {
                                     activateProximity()
                                 }
@@ -494,7 +494,7 @@ class ProximityFragment : TimeMainFragment() {
         }
     }
 
-    private fun addHealthItems(items: ArrayList<GenericItem>, isSick: Boolean) {
+    private fun addHealthItems(items: ArrayList<GenericItem>, isSick: Boolean, deviceSetup: DeviceSetup?) {
         items += bigTitleItem {
             text = strings["home.healthSection.title"]
             identifier = "home.healthSection.title".hashCode().toLong()
@@ -668,13 +668,19 @@ class ProximityFragment : TimeMainFragment() {
             findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToKeyFiguresFragment())
         }
 
-        KeyFiguresManager.highlightedFigures?.let {
+        KeyFiguresManager.highlightedFigures?.let { figure ->
             items += highlightedNumberCardItem {
-                label = strings[it.labelStringKey]
+                label = strings[figure.labelStringKey]
                 updatedAt = strings["keyfigure.dailyUpdates"]
-                value = it.valueGlobalToDisplay.formatNumberIfNeeded(numberFormat)
-                onClickListener = keyFiguresClickListener
-                strings[it.colorStringKey(darkMode)]?.let {
+                value = figure.valueGlobalToDisplay.formatNumberIfNeeded(numberFormat)
+                onClickListener = View.OnClickListener {
+                    findNavControllerOrNull()?.safeNavigate(
+                        ProximityFragmentDirections.actionProximityFragmentToKeyFigureDetailsFragment(
+                            figure.labelKey
+                        )
+                    )
+                }
+                strings[figure.colorStringKey(darkMode)]?.let {
                     color = Color.parseColor(it)
                 }
                 identifier = "highlightedNumberCard".hashCode().toLong()
@@ -739,13 +745,14 @@ class ProximityFragment : TimeMainFragment() {
                         }
                     )
                     contentDescription = strings["home.infoSection.newPostalCode.subtitle"]
-                    identifier = cardTitle.hashCode().toLong()
+                    identifier = "home.infoSection.newPostalCode".hashCode().toLong()
                 }
             } else {
                 items += cardWithActionItem {
                     actions = listOf(Action(R.drawable.ic_map, strings["home.infoSection.updatePostalCode"]) {
                         findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToPostalCodeBottomSheetFragment())
                     })
+                    identifier = "home.infoSection.updatePostalCode".hashCode().toLong()
                 }
             }
             items += spaceItem {
@@ -759,7 +766,7 @@ class ProximityFragment : TimeMainFragment() {
 
     private fun generateFromKeyFigure(keyFigure: KeyFigure, fromDepartment: Boolean = false): NumbersCardItem.DataFigure {
         return NumbersCardItem.DataFigure(
-            strings["${keyFigure.labelKey}.$SHORT_LABEL_STRING_KEY"],
+            strings[keyFigure.labelShortStringKey],
             if (fromDepartment) {
                 keyFigure.getKeyFigureForPostalCode(sharedPrefs.chosenPostalCode)?.valueToDisplay?.formatNumberIfNeeded(numberFormat)
             } else {
@@ -809,7 +816,7 @@ class ProximityFragment : TimeMainFragment() {
         }
     }
 
-    private fun addDeclareItems(items: ArrayList<GenericItem>, isSick: Boolean) {
+    private fun addDeclareItems(items: ArrayList<GenericItem>, isSick: Boolean, deviceSetup: DeviceSetup?) {
         if ((deviceSetup != DeviceSetup.NO_BLE || robertManager.configuration.displayRecordVenues) && !isSick) {
             items += cardWithActionItem {
                 mainTitle = strings["home.declareSection.cellTitle"]
@@ -856,7 +863,7 @@ class ProximityFragment : TimeMainFragment() {
         }
 
         items += cardWithActionItem {
-            actions = listOf(
+            actions = listOfNotNull(
                 Action(R.drawable.ic_settings, strings["proximityController.tuneProximity"]) {
                     findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToTuneProximityFragment())
                 },
@@ -874,7 +881,8 @@ class ProximityFragment : TimeMainFragment() {
                 }.takeIf {
                     !robertManager.isSick && (robertManager.configuration.displayRecordVenues || !VenuesManager.getVenuesQrCode(
                         requireContext().secureKeystoreDataSource(),
-                        includingFuture = true).isNullOrEmpty())
+                        includingFuture = true
+                    ).isNullOrEmpty())
                 },
                 Action(R.drawable.ic_settings, strings["common.settings"]) {
                     findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToManageDataFragment())
@@ -892,7 +900,7 @@ class ProximityFragment : TimeMainFragment() {
                         }
                     })
                 }
-            ).filterNotNull()
+            )
             identifier = "home.moreSection.title.content".hashCode().toLong()
         }
 
@@ -936,12 +944,12 @@ class ProximityFragment : TimeMainFragment() {
 
     @OptIn(ExperimentalTime::class)
     @SuppressLint("RestrictedApi")
-    private fun refreshItems() {
+    private fun refreshItems(deviceSetup: DeviceSetup?) {
         if (strings.isEmpty()) {
             return // Do nothing until strings are loaded
         }
 
-        refreshHealthItem(requireContext(), pIsAtRisk = null, pIsWarningAtRisk = null, notifyAdapter = false)
+        refreshHealthItem(requireContext())
 
         context?.let { context ->
             val freshProximityOn = ProximityManager.isProximityOn(context, robertManager)
@@ -954,7 +962,7 @@ class ProximityFragment : TimeMainFragment() {
             InfoCenterManager.infos.value?.peekContent()?.firstOrNull()?.let { info ->
                 if (::infoCenterCardItem.isInitialized) {
                     infoCenterCardItem.apply {
-                        mainHeader = info.timestamp.seconds.getRelativeDateTimeString(requireContext())
+                        mainHeader = info.timestamp.seconds.getRelativeDateTimeString(requireContext(), strings["common.justNow"])
                         mainTitle = infoCenterStrings[info.titleKey]
                         mainBody = infoCenterStrings[info.descriptionKey]
                     }
@@ -962,7 +970,7 @@ class ProximityFragment : TimeMainFragment() {
             }
 
             proximityButtonItem?.showMainButton = !isProximityOn
-            proximityButtonItem?.isButtonEnabled = ProximityManager.getDeviceSetup(context) == DeviceSetup.BLE
+            proximityButtonItem?.isButtonEnabled = deviceSetup == DeviceSetup.BLE
 
             if (isAdded && !isHidden) {
                 refreshTitleAndErrorLayout()
@@ -994,7 +1002,7 @@ class ProximityFragment : TimeMainFragment() {
         context?.let { context ->
             val freshProximityOn = ProximityManager.isProximityOn(context, robertManager)
             (activity as AppCompatActivity).supportActionBar?.title = strings[getTitleKey()]
-            updateErrorLayout(getActivityBinding()?.errorLayout, freshProximityOn)
+            updateErrorLayout(getActivityBinding()?.errorLayout, freshProximityOn, ProximityManager.getDeviceSetup(context))
             asyncUpdateNewVersionAvailableTitle()
         }
     }
@@ -1025,14 +1033,14 @@ class ProximityFragment : TimeMainFragment() {
     }
 
     @OptIn(ExperimentalTime::class)
-    private fun refreshHealthItem(context: Context, pIsAtRisk: Boolean?, pIsWarningAtRisk: Boolean?, notifyAdapter: Boolean) {
+    private fun refreshHealthItem(context: Context) {
         healthItem?.apply {
-            val isAtRisk = pIsAtRisk ?: robertManager.isAtRisk
-            val isWarningAtRisk = pIsWarningAtRisk ?: robertManager.isWarningAtRisk ?: false
+            val isAtRisk = robertManager.isAtRisk
+            val isWarningAtRisk = robertManager.isWarningAtRisk ?: false
 
             mainHeader = stringsFormat(
                 "myHealthController.notification.update",
-                robertManager.atRiskLastRefresh?.milliseconds?.getRelativeDateTimeString(context) ?: ""
+                robertManager.atRiskLastRefresh?.milliseconds?.getRelativeDateTimeString(context, strings["common.justNow"]) ?: ""
             )
 
             when {
@@ -1050,11 +1058,6 @@ class ProximityFragment : TimeMainFragment() {
                 }
             }
         }
-
-        if (notifyAdapter && binding?.recyclerView?.isComputingLayout == false) {
-            lastAdapterRefresh = System.currentTimeMillis()
-            binding?.recyclerView?.adapter?.notifyDataSetChanged()
-        }
     }
 
     @OptIn(ExperimentalTime::class)
@@ -1065,13 +1068,16 @@ class ProximityFragment : TimeMainFragment() {
                 healthItem?.apply {
                     mainHeader = stringsFormat(
                         "myHealthController.notification.update",
-                        robertManager.atRiskLastRefresh?.milliseconds?.getRelativeDateTimeString(requireContext())
+                        robertManager.atRiskLastRefresh?.milliseconds?.getRelativeDateTimeString(
+                            requireContext(),
+                            strings["common.justNow"]
+                        )
                     )
                 }
                 InfoCenterManager.infos.value?.peekContent()?.firstOrNull()?.let { info ->
                     if (::infoCenterCardItem.isInitialized) {
                         infoCenterCardItem.apply {
-                            mainHeader = info.timestamp.seconds.getRelativeDateTimeString(requireContext())
+                            mainHeader = info.timestamp.seconds.getRelativeDateTimeString(requireContext(), strings["common.justNow"])
                         }
                     }
                 }
@@ -1089,7 +1095,7 @@ class ProximityFragment : TimeMainFragment() {
     @SuppressLint("RestrictedApi")
     private fun isAnimationEnabled(): Boolean = Utils.getAnimationScale(context) != 0f
 
-    private fun updateErrorLayout(errorLayout: FrameLayout?, freshProximityOn: Boolean) {
+    private fun updateErrorLayout(errorLayout: FrameLayout?, freshProximityOn: Boolean, deviceSetup: DeviceSetup?) {
         getActivityBinding()?.errorTextView?.text = ProximityManager.getErrorText(this, robertManager, strings)
         val clickListener = ProximityManager.getErrorClickListener(this) {
             if (SystemClock.elapsedRealtime() > proximityClickThreshold) {
@@ -1222,7 +1228,6 @@ class ProximityFragment : TimeMainFragment() {
 
     companion object {
         private const val PROXIMITY_BUTTON_DELAY: Long = 2000L
-        private const val SHORT_LABEL_STRING_KEY: String = "shortLabel"
         private const val CURFEW_CERTIFICATE_SHORTCUT_ID: String = "curfewCertificateShortcut"
         private const val CURFEW_CERTIFICATE_SHORTCUT_URI: String = "tousanticovid://attestations/"
         private const val VENUE_QRCODE_SHORTCUT_ID: String = "venueQRCodeShortcut"

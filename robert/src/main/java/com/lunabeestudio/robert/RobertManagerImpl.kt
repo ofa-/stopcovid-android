@@ -119,7 +119,7 @@ class RobertManagerImpl(
     */
 
     override val isRegistered: Boolean
-        get() = keystoreRepository.kA != null && keystoreRepository.kEA != null
+        get() = keystoreRepository.isRegistered
 
     override val isProximityActive: Boolean
         get() = keystoreRepository.proximityActive ?: false
@@ -561,6 +561,7 @@ class RobertManagerImpl(
         deactivateProximity(application)
         ephemeralBluetoothIdentifierRepository.removeAll()
         localProximityRepository.removeAll()
+        keystoreRepository.isRegistered = false
         keystoreRepository.kA = null
         keystoreRepository.kEA = null
         keystoreRepository.timeStart = null

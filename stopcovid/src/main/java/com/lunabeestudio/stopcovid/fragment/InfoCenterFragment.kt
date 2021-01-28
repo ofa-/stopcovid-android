@@ -16,11 +16,12 @@ import androidx.core.content.edit
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
+import com.lunabeestudio.robert.extension.observeEventAndConsume
 import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.viewLifecycleOwnerOrNull
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
-import com.lunabeestudio.robert.extension.observeEventAndConsume
+import com.lunabeestudio.stopcovid.extension.getRelativeDateTimeString
 import com.lunabeestudio.stopcovid.extension.startTextIntent
 import com.lunabeestudio.stopcovid.fastitem.infoCenterDetailCardItem
 import com.lunabeestudio.stopcovid.manager.InfoCenterManager
@@ -96,7 +97,7 @@ class InfoCenterFragment : TimeMainFragment() {
                     }
 
                     items += infoCenterDetailCardItem {
-                        header = info.timestamp.seconds.getRelativeDateTimeString(requireContext())
+                        header = info.timestamp.seconds.getRelativeDateTimeString(requireContext(), strings["common.justNow"])
                         title = infoTitle
                         body = infoDescription
                         link = infoCenterStrings[info.buttonLabelKey]

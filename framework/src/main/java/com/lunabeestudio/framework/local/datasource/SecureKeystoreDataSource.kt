@@ -38,6 +38,18 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
         get() = getEncryptedValue(SHARED_PREF_KEY_SHOULD_RELOAD_BLE_SETTINGS, Boolean::class.java)
         set(value) = setEncryptedValue(SHARED_PREF_KEY_SHOULD_RELOAD_BLE_SETTINGS, value)
 
+    override var isRegistered: Boolean
+        get() {
+            val value: Boolean? = getEncryptedValue(SHARED_PREF_KEY_IS_REGISTERED, Boolean::class.java)
+            return if (value == null) {
+                isRegistered = kA != null && kEA != null
+                false
+            } else {
+                value
+            }
+        }
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_IS_REGISTERED, value)
+
     override var kA: ByteArray?
         get() = getEncryptedValue(SHARED_PREF_KEY_KA, ByteArray::class.java, useCache = false)
         set(value) = setEncryptedValue(SHARED_PREF_KEY_KA, value, useCache = false)
@@ -270,6 +282,7 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
         private const val SHARED_PREF_NAME = "robert_prefs"
         private const val SHARED_PREF_KEY_CONFIGURATION = "shared.pref.configuration"
         private const val SHARED_PREF_KEY_SHOULD_RELOAD_BLE_SETTINGS = "shared.pref.should_reload_ble_settings"
+        private const val SHARED_PREF_KEY_IS_REGISTERED = "shared.pref.is_registered"
         private const val SHARED_PREF_KEY_KA = "shared.pref.ka"
         private const val SHARED_PREF_KEY_KEA = "shared.pref.kea"
         private const val SHARED_PREF_KEY_TIME_START = "shared.pref.time_start"

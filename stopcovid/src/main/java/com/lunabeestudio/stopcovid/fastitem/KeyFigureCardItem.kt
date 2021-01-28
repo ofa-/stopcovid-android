@@ -12,6 +12,7 @@ package com.lunabeestudio.stopcovid.fastitem
 
 import android.graphics.Color
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isGone
 import androidx.core.view.isInvisible
@@ -31,9 +32,12 @@ class KeyFigureCardItem : AbstractBindingItem<ItemKeyFigureCardBinding>() {
     var rightTrend: Trend? = null
     var label: String? = null
     var description: String? = null
+    var descriptionMaxLines: Int = Int.MAX_VALUE
     var color: Int? = null
     var shareContentDescription: String? = null
     var onShareCard: ((binding: ItemKeyFigureCardBinding) -> Unit)? = null
+    var onClickListener: View.OnClickListener? = null
+    var actionText: String? = null
 
     override val type: Int = R.id.item_key_figure_card
 
@@ -68,6 +72,7 @@ class KeyFigureCardItem : AbstractBindingItem<ItemKeyFigureCardBinding>() {
         binding.labelTextView.setTextOrHide(label)
 
         binding.descriptionTextView.setTextOrHide(description)
+        binding.descriptionTextView.maxLines = descriptionMaxLines
         color?.let {
             binding.labelTextView.setTextColor(it)
             binding.leftValueTextView.setTextColor(it)
@@ -77,6 +82,19 @@ class KeyFigureCardItem : AbstractBindingItem<ItemKeyFigureCardBinding>() {
         binding.shareButton.contentDescription = shareContentDescription
         binding.shareButton.setOnClickListener {
             onShareCard?.invoke(binding)
+        }
+
+        actionText?.let {
+            binding.action.textView.text = it
+            binding.action.leftIconImageView.visibility = View.GONE
+            binding.action.badgeView.visibility = View.GONE
+            binding.action.actionRootLayout.visibility = View.VISIBLE
+        } ?: run {
+            binding.action.actionRootLayout.visibility = View.GONE
+        }
+
+        onClickListener?.let {
+            binding.cardView.setOnClickListener(it)
         }
     }
 

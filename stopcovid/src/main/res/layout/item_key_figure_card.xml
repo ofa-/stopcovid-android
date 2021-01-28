@@ -12,12 +12,12 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cardView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="@dimen/spacing_large"
     android:layout_marginBottom="@dimen/spacing_medium"
-    android:theme="@style/ShapeAppearance.StopCovid.MediumComponent"
-    app:rippleColor="@android:color/transparent">
+    android:theme="@style/ShapeAppearance.StopCovid.MediumComponent">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -193,13 +193,27 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/spacing_medium"
-            android:layout_marginBottom="@dimen/spacing_large"
+            android:ellipsize="end"
+            android:paddingBottom="@dimen/spacing_medium"
             android:textAppearance="@style/TextAppearance.StopCovid.Caption"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@id/endGuideline"
             app:layout_constraintStart_toStartOf="@id/startGuideline"
             app:layout_constraintTop_toBottomOf="@id/labelTextView"
             tools:text="@tools:sample/lorem[43]" />
+
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_medium"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/descriptionTextView">
+
+            <include
+                android:id="@+id/action"
+                layout="@layout/item_action" />
+        </FrameLayout>
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/startGuideline"

@@ -25,6 +25,7 @@ import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.dividerItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
+import com.lunabeestudio.stopcovid.extension.getRelativeDateTimeString
 import com.lunabeestudio.stopcovid.extension.getString
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
@@ -47,10 +48,6 @@ class HealthFragment : TimeMainFragment() {
 
     private val robertManager by lazy {
         requireContext().robertManager()
-    }
-
-    private val deviceSetup by lazy {
-        ProximityManager.getDeviceSetup(requireContext())
     }
 
     private val viewModel: HealthViewModel by viewModels { HealthViewModelFactory(robertManager) }
@@ -82,7 +79,7 @@ class HealthFragment : TimeMainFragment() {
     override fun getItems(): List<GenericItem> {
         return when {
             robertManager.isRegistered -> registeredItems()
-            deviceSetup == DeviceSetup.NO_BLE -> noBleItems()
+            ProximityManager.getDeviceSetup(requireContext()) == DeviceSetup.NO_BLE -> noBleItems()
             else -> notRegisteredItems()
         }
     }
@@ -234,14 +231,19 @@ class HealthFragment : TimeMainFragment() {
         when {
             robertManager.isAtRisk == true -> {
                 val endExposureCalendar = Calendar.getInstance()
-                endExposureCalendar.add(Calendar.DAY_OF_YEAR,
-                    robertManager.configuration.quarantinePeriod - robertManager.lastExposureTimeframe)
+                endExposureCalendar.add(
+                    Calendar.DAY_OF_YEAR,
+                    robertManager.configuration.quarantinePeriod - robertManager.lastExposureTimeframe
+                )
                 val endExposureDate = endExposureCalendar.time
 
                 items += contactItem(R.layout.item_contact) {
                     header = stringsFormat(
                         "myHealthController.notification.update",
-                        robertManager.atRiskLastRefresh?.milliseconds?.getRelativeDateTimeString(requireContext())
+                        robertManager.atRiskLastRefresh?.milliseconds?.getRelativeDateTimeString(
+                            requireContext(),
+                            strings["common.justNow"]
+                        )
                     )
                     title = strings["sickController.state.contact.title"]
                     caption = stringsFormat("sickController.state.contact.subtitle", dateFormat.format(endExposureDate))
@@ -260,7 +262,10 @@ class HealthFragment : TimeMainFragment() {
                 items += contactItem(R.layout.item_warning_contact) {
                     header = stringsFormat(
                         "myHealthController.notification.update",
-                        robertManager.atRiskLastRefresh?.milliseconds?.getRelativeDateTimeString(requireContext())
+                        robertManager.atRiskLastRefresh?.milliseconds?.getRelativeDateTimeString(
+                            requireContext(),
+                            strings["common.justNow"]
+                        )
                     )
                     title = strings["sickController.state.warning.title"]
                     caption = strings["sickController.state.warning.subtitle"]
@@ -279,7 +284,10 @@ class HealthFragment : TimeMainFragment() {
                 items += contactItem(R.layout.item_no_contact) {
                     header = stringsFormat(
                         "myHealthController.notification.update",
-                        robertManager.atRiskLastRefresh?.milliseconds?.getRelativeDateTimeString(requireContext())
+                        robertManager.atRiskLastRefresh?.milliseconds?.getRelativeDateTimeString(
+                            requireContext(),
+                            strings["common.justNow"]
+                        )
                     )
                     title = strings["sickController.state.nothing.title"]
                     caption = strings["sickController.state.nothing.subtitle"]

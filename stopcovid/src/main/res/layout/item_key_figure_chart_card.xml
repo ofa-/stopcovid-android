@@ -1,0 +1,60 @@
+<!--
+  ~ This Source Code Form is subject to the terms of the Mozilla Public
+  ~ License, v. 2.0. If a copy of the MPL was not distributed with this
+  ~ file, You can obtain one at https://mozilla.org/MPL/2.0/.
+  ~
+  ~ Authors
+  ~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ Created by Lunabee Studio / Date - 2021/01/15 - for the TOUS-ANTI-COVID project
+  -->
+
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cardView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="@dimen/spacing_large"
+    android:layout_marginBottom="@dimen/spacing_medium"
+    android:theme="@style/ShapeAppearance.StopCovid.MediumComponent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/spacing_large">
+
+        <TextView
+            android:id="@+id/chartSerie1LegendTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/spacing_medium"
+            android:textAppearance="@style/TextAppearance.StopCovid.Caption.Bold"
+            app:drawableStartCompat="@drawable/ic_chart_marker"
+            tools:text="Bourgogne Franche-Comté" />
+
+        <TextView
+            android:id="@+id/chartSerie2LegendTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/spacing_medium"
+            android:textAppearance="@style/TextAppearance.StopCovid.Caption.Bold"
+            app:drawableStartCompat="@drawable/ic_chart_marker"
+            tools:text="Bourgogne Franche-Comté" />
+
+        <com.github.mikephil.charting.charts.LineChart
+            android:id="@+id/keyFigureChart"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/key_figure_chart_height" />
+
+        <TextView
+            android:id="@+id/chartDescriptionTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_large"
+            android:textAppearance="@style/TextAppearance.StopCovid.Caption.Small.Grey"
+            tools:text="@tools:sample/lorem[2]" />
+
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>
