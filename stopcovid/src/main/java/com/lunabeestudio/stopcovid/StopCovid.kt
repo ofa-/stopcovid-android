@@ -62,6 +62,7 @@ import com.lunabeestudio.stopcovid.manager.LinksManager
 import com.lunabeestudio.stopcovid.manager.MoreKeyFiguresManager
 import com.lunabeestudio.stopcovid.manager.PrivacyManager
 import com.lunabeestudio.stopcovid.manager.ProximityManager
+import com.lunabeestudio.stopcovid.manager.VaccinationCenterManager
 import com.lunabeestudio.stopcovid.manager.VenuesManager
 import com.lunabeestudio.stopcovid.model.DeviceSetup
 import com.lunabeestudio.stopcovid.service.ProximityService
@@ -169,6 +170,9 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
             FormManager.initialize(this@StopCovid)
         }
         appCoroutineScope.launch {
+            VaccinationCenterManager.initialize(this@StopCovid, sharedPrefs)
+        }
+        appCoroutineScope.launch {
             AppMaintenanceManager.initialize(
                 this@StopCovid,
                 R.drawable.maintenance,
@@ -212,6 +216,9 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
         }
         appCoroutineScope.launch {
             FormManager.onAppForeground(this@StopCovid)
+        }
+        appCoroutineScope.launch {
+            VaccinationCenterManager.onAppForeground(this@StopCovid, sharedPrefs)
         }
         appCoroutineScope.launch {
             robertManager.refreshConfig(this@StopCovid)

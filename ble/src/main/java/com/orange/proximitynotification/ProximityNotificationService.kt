@@ -20,6 +20,7 @@ import com.orange.proximitynotification.ble.BleProximityNotification
 import com.orange.proximitynotification.ble.BleProximityNotificationFactory
 import com.orange.proximitynotification.ble.BleSettings
 import com.orange.proximitynotification.tools.BluetoothStateBroadcastReceiver
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
@@ -51,6 +52,7 @@ abstract class ProximityNotificationService : Service(),
 
     abstract val foregroundNotificationId: Int
     abstract val bleSettings: BleSettings
+    abstract val exceptionHandler: CoroutineExceptionHandler
 
     private val bluetoothAdapter: BluetoothAdapter
         get() = BluetoothAdapter.getDefaultAdapter()
@@ -160,7 +162,7 @@ abstract class ProximityNotificationService : Service(),
     fun isRunning() = bleProximityNotification?.isRunning == true
 
     protected open fun doStart() {
-        launch(Dispatchers.Main.immediate + NonCancellable) {
+        launch(Dispatchers.Main.immediate + NonCancellable + exceptionHandler) {
 
             if (!isBluetoothRestartInProgress) {
                 startForeground(foregroundNotificationId, buildForegroundServiceNotification())
@@ -171,8 +173,7 @@ abstract class ProximityNotificationService : Service(),
     }
 
     protected open fun doStop() {
-        launch(Dispatchers.Main.immediate + NonCancellable) {
-
+        launch(Dispatchers.Main.immediate + NonCancellable + exceptionHandler) {
             stopBleProximityNotification()
 
             if (!isBluetoothRestartInProgress) {

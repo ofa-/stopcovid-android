@@ -94,6 +94,8 @@ internal class ApiConfiguration(
     val allowNoAdvertisingDevice: Boolean,
     @SerializedName("app.unsupportedDevices")
     val unsupportedDevices: String?,
+    @SerializedName("app.vaccinationCentersCount")
+    val vaccinationCentersCount: Int,
 )
 
 internal fun ApiConfiguration.toDomain(gson: Gson) = Configuration(
@@ -144,5 +146,6 @@ internal fun ApiConfiguration.toDomain(gson: Gson) = Configuration(
     unsupportedDevices = gson.fromJson(
         unsupportedDevices,
         object : TypeToken<List<String>?>() {}.type
-    )
+    ),
+    vaccinationCentersCount = vaccinationCentersCount,
 )

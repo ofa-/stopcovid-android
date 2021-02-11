@@ -99,6 +99,7 @@ import com.lunabeestudio.stopcovid.fastitem.proximityButtonItem
 import com.lunabeestudio.stopcovid.manager.InfoCenterManager
 import com.lunabeestudio.stopcovid.manager.KeyFiguresManager
 import com.lunabeestudio.stopcovid.manager.ProximityManager
+import com.lunabeestudio.stopcovid.manager.VaccinationCenterManager
 import com.lunabeestudio.stopcovid.manager.VenuesManager
 import com.lunabeestudio.stopcovid.model.CaptchaNextFragment
 import com.lunabeestudio.stopcovid.model.CovidException
@@ -549,7 +550,7 @@ class ProximityFragment : TimeMainFragment() {
         }
 
         items += spaceItem {
-            spaceRes = R.dimen.spacing_large
+            spaceRes = R.dimen.spacing_medium
             identifier = items.count().toLong()
         }
     }
@@ -811,7 +812,12 @@ class ProximityFragment : TimeMainFragment() {
             strings
         ) { postalCode ->
             sharedPrefs.chosenPostalCode = postalCode
-            refreshScreen()
+            viewLifecycleOwner.lifecycleScope.launch {
+                (activity as? MainActivity)?.showProgress(true)
+                VaccinationCenterManager.postalCodeDidUpdate(requireContext(), sharedPrefs, postalCode)
+                (activity as? MainActivity)?.showProgress(false)
+                refreshScreen()
+            }
         }
     }
 

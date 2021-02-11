@@ -29,6 +29,9 @@ object Constants {
         const val PRIVATE_EVENT_QR_CODE_GENERATION_DATE: String = "Private.Event.QR.Code.Generation.Data"
         const val VENUES_ON_BOARDING_DONE: String = "isVenueOnBoardingDone"
         const val VENUES_FEATURED_ACTIVATED: String = "venuesFeaturedWasActivatedAtLeastOneTime"
+        const val CURRENT_VACCINATION_REFERENCE_DEPARTMENT_CODE: String = "currentVaccinationReferenceDepartmentCode"
+        const val CURRENT_VACCINATION_REFERENCE_LATITUDE: String = "currentVaccinationReferenceLatitude"
+        const val CURRENT_VACCINATION_REFERENCE_LONGITUDE: String = "currentVaccinationReferenceLongitude"
     }
 
     object Notification {
@@ -61,6 +64,7 @@ object Constants {
 
     object Android {
         const val ANIMATION_DELAY: Long = 500L
+        const val FORCE_LOADING_DELAY: Long = 2000L
     }
 
     object Chart {

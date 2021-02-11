@@ -198,7 +198,7 @@
     "onboarding.proximityController.allowProximity.warning": "انتبه: سيطلب نظام Android منك الوصول إلى مكان تواجد هذا الجهاز. لن يستعمل TousAntiCovid غير كشف الهواتف الموجودة في محيطه بواسطة Bluetooth، دون تحديد الموقع الجغرافي بتاتًا",
     "common.understand": "موافق",
     "onboarding.gesturesController.gesture5": "تجنب لمس وجهك",
-    "onboarding.gesturesController.gesture6": "احتفظ بمسافة لا تقل عن متر 1 بينك وبين الآخرين",
+    "onboarding.gesturesController.gesture6": "احتفظ بمسافة لا تقل عن متر 2 بينك وبين الآخرين",
     "common.bravo": "مُفعَّل",
     "proximityController.button.activateProximity": "أقوم بتفعيل TousAntiCovid",
     "proximityController.button.deactivateProximity": "أوقف تفعيل TousAntiCovid",
@@ -710,7 +710,7 @@
    "vaccinationController.eligibility.url": "https://solidarites-sante.gouv.fr/actualites/presse/communiques-de-presse/article/le-gouvernement-ouvre-la-vaccination-aux-patients-vulnerables",
    "vaccinationController.vaccinationLocation.title": "Trouver un centre pour me faire vacciner",
    "vaccinationController.vaccinationLocation.subtitle": "Rendez vous sur www.Santé.fr pour trouver les centres de vaccination.",
-   "vaccinationController.vaccinationLocation.buttonTitle": "Trouver un centre",
+   "vaccinationController.vaccinationLocation.buttonTitle": "Aller sur Santé.fr",
    "vaccinationController.vaccinationLocation.url": "https://www.sante.fr/carte-vaccination-covid?source=TousAntiCovid",
    "contactUs.url": "https://bonjour.tousanticovid.gouv.fr/contact.html",
    
@@ -736,6 +736,24 @@
    "keyFigureDetailController.section.evolution.subtitle2Charts": "%@.\nDernière valeur du %@ : %@ (France : %@)",
    "home.activationExplanation.title": "Attention",
    "home.activationExplanation.message": "Votre téléphone ne supportant pas l'advertising, TousAntiCovid va redémarrer le Bluetooth de votre téléphone régulièrement pour fonctionner",
-   "accessibility.hint.keyFigure.chart.share": "Partager le graphique du chiffre clé"
+   "accessibility.hint.keyFigure.chart.share": "Partager le graphique du chiffre clé",
+   
+   "keyfigure.nombrevaccinations.learnMore":"Le nombre d’injections réalisées depuis le début de la campagne de vaccination est dorénavant dénombré par Vaccin Covid (au 26 janvier, 1 136 906 injections réalisées, dont 6 153 deuxièmes injections).\n\nAu 26 janvier, les données issues des Agences Régionales de Santé (ARS) faisaient état de 1 184 510 injections réalisées depuis le début de la campagne de vaccination. Cet écart constaté de 53 757 injections correspond aux injections effectuées mais non encore enregistrées dans Vaccin Covid, et qui seront progressivement rattrapées.",
+
+   "vaccinationController.vaccinationLocation.newPostalCode": "Renseigner un code postal",
+   "vaccinationController.vaccinationLocation.updatePostalCode": "Changer de code postal",
+   "vaccinationController.vaccinationLocation.footer": "Si vous ne trouvez pas un centre de vaccination qui vous convient, retrouvez tous les centres sur Santé.fr",
+   "vaccinationCenterCell.openingDate.title": "Horaires",
+   "vaccinationCenterCell.openingDate.from": "À partir du",
+   "vaccinationController.vaccinationLocation.section.title": "Où me faire vacciner ?",
+
+   "vaccinationController.vaccinationCenter.actionSheet.alert.sharing": "Partager les infos",
+   "vaccinationController.vaccinationCenter.actionSheet.alert.website": "Prendre rdv sur internet",
+   "vaccinationController.vaccinationCenter.actionSheet.alert.mapLocation": "Localiser sur une carte",
+   "vaccinationController.vaccinationCenter.actionSheet.alert.call": "Appeler (%@)",
+   "vaccinationController.vaccinationCenter.actionSheet.alert.sharing.text.tel": "Tél : %@",
+   "vaccinationController.vaccinationCenter.actionSheet.alert.sharing.text.url": "Prise de rendez-vous sur le web : %@",
+   "vaccinationController.vaccinationLocation.vaccinationCenterNotFound": "Aucun centre de vaccination n'a été trouvé",
+   "vaccinationController.vaccinationLocation.explanation": "Avec un code postal, l'application vous donnera une liste des %d centres de vaccination les plus proches de ce code postal."
 
 }

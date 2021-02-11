@@ -49,5 +49,6 @@ class Configuration(
     val postIsolationDuration: Long,
     val venuesSalt: Int,
     val allowNoAdvertisingDevice: Boolean,
-    val unsupportedDevices: List<String>?
+    val unsupportedDevices: List<String>?,
+    val vaccinationCentersCount: Int,
 )

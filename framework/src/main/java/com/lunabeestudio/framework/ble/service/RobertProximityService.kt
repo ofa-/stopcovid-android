@@ -34,6 +34,7 @@ import com.orange.proximitynotification.ProximityPayload
 import com.orange.proximitynotification.ProximityPayloadId
 import com.orange.proximitynotification.ble.BleSettings
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -57,6 +58,10 @@ abstract class RobertProximityService : ProximityNotificationService() {
     // Help to distinguish between between error at the beginning of the service and after some time
     protected var creationDate: Long = System.currentTimeMillis()
 
+    override val exceptionHandler: CoroutineExceptionHandler = CoroutineExceptionHandler { _, t ->
+        handleBleException(t)
+    }
+
     final override suspend fun current(): ProximityPayload {
         return withContext(Dispatchers.IO) {
             getProximityPayload(true)
@@ -75,14 +80,18 @@ abstract class RobertProximityService : ProximityNotificationService() {
             creationDate = System.currentTimeMillis()
             start()
         } catch (e: Exception) {
-            Timber.e(e)
-            val robertException = e as? RobertException ?: ProximityException(
-                e.cause,
-                e.localizedMessage ?: "An error occurred in BLE proximity"
-            )
-            onError(robertException)
-            stop()
+            handleBleException(e)
         }
+    }
+
+    private fun handleBleException(t: Throwable) {
+        Timber.e(t)
+        val robertException = t as? RobertException ?: ProximityException(
+            t.cause,
+            t.localizedMessage ?: "An error occurred in BLE proximity"
+        )
+        onError(robertException)
+        stop()
     }
 
     override suspend fun onProximity(proximityInfo: ProximityInfo) {

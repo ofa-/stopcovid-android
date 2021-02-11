@@ -14,6 +14,7 @@ import androidx.viewbinding.ViewBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.lunabeestudio.robert.extension.observeEventAndConsume
 import com.lunabeestudio.stopcovid.R
+import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.extension.viewLifecycleOwnerOrNull
 import com.lunabeestudio.stopcovid.databinding.ItemKeyFigureCardBinding
@@ -26,6 +27,7 @@ import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.showPostalCodeDialog
 import com.lunabeestudio.stopcovid.manager.KeyFiguresManager
 import com.lunabeestudio.stopcovid.manager.ShareManager
+import com.lunabeestudio.stopcovid.manager.VaccinationCenterManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -95,7 +97,12 @@ abstract class KeyFigureGenericFragment : MainFragment() {
             strings
         ) { postalCode ->
             sharedPrefs.chosenPostalCode = postalCode
-            refreshScreen()
+            viewLifecycleOwner.lifecycleScope.launch {
+                (activity as? MainActivity)?.showProgress(true)
+                VaccinationCenterManager.postalCodeDidUpdate(requireContext(), sharedPrefs, postalCode)
+                (activity as? MainActivity)?.showProgress(false)
+                refreshScreen()
+            }
         }
     }
 

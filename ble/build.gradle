@@ -19,7 +19,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 30
 
-        buildConfigField 'String', 'BLE_VERSION', '"2.1.0"'
+        buildConfigField 'String', 'BLE_VERSION', '"2.1.1"'
     }
 
     compileOptions {

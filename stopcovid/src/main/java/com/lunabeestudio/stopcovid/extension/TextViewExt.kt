@@ -15,5 +15,5 @@ import androidx.core.view.isVisible
 
 fun TextView.setTextOrHide(text: CharSequence?) {
     setText(text)
-    isVisible = text != null
+    isVisible = !text.isNullOrBlank()
 }

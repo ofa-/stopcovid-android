@@ -59,3 +59,41 @@ var SharedPreferences.privateEventQrCode: String?
 var SharedPreferences.privateEventQrCodeGenerationDate: Long
     get() = getLong(Constants.SharedPrefs.PRIVATE_EVENT_QR_CODE_GENERATION_DATE, 0L)
     set(value) = edit { putLong(Constants.SharedPrefs.PRIVATE_EVENT_QR_CODE_GENERATION_DATE, value) }
+
+var SharedPreferences.currentVaccinationReferenceDepartmentCode: String?
+    get() = getString(Constants.SharedPrefs.CURRENT_VACCINATION_REFERENCE_DEPARTMENT_CODE, null)
+    set(value) = edit { putString(Constants.SharedPrefs.CURRENT_VACCINATION_REFERENCE_DEPARTMENT_CODE, value) }
+
+var SharedPreferences.currentVaccinationReferenceLatitude: Double?
+    get() = if (contains(Constants.SharedPrefs.CURRENT_VACCINATION_REFERENCE_LATITUDE)) {
+        getFloat(
+            Constants.SharedPrefs.CURRENT_VACCINATION_REFERENCE_LATITUDE,
+            0f
+        ).toDouble()
+    } else {
+        null
+    }
+    set(value) = edit {
+        if (value != null) {
+            putFloat(Constants.SharedPrefs.CURRENT_VACCINATION_REFERENCE_LATITUDE, value.toFloat())
+        } else {
+            remove(Constants.SharedPrefs.CURRENT_VACCINATION_REFERENCE_LATITUDE)
+        }
+    }
+
+var SharedPreferences.currentVaccinationReferenceLongitude: Double?
+    get() = if (contains(Constants.SharedPrefs.CURRENT_VACCINATION_REFERENCE_LONGITUDE)) {
+        getFloat(
+            Constants.SharedPrefs.CURRENT_VACCINATION_REFERENCE_LONGITUDE,
+            0f
+        ).toDouble()
+    } else {
+        null
+    }
+    set(value) = edit {
+        if (value != null) {
+            putFloat(Constants.SharedPrefs.CURRENT_VACCINATION_REFERENCE_LONGITUDE, value.toFloat())
+        } else {
+            remove(Constants.SharedPrefs.CURRENT_VACCINATION_REFERENCE_LONGITUDE)
+        }
+    }

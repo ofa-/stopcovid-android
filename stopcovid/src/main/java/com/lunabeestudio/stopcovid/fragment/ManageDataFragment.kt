@@ -37,6 +37,7 @@ import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
 import com.lunabeestudio.stopcovid.extension.venuesFeaturedWasActivatedAtLeastOneTime
 import com.lunabeestudio.stopcovid.fastitem.dangerButtonItem
 import com.lunabeestudio.stopcovid.manager.ProximityManager
+import com.lunabeestudio.stopcovid.manager.VaccinationCenterManager
 import com.lunabeestudio.stopcovid.manager.VenuesManager
 import com.lunabeestudio.stopcovid.model.DeviceSetup
 import com.lunabeestudio.stopcovid.viewmodel.ManageDataViewModel
@@ -104,6 +105,7 @@ class ManageDataFragment : MainFragment() {
                 remove(Constants.SharedPrefs.PRIVATE_EVENT_QR_CODE_GENERATION_DATE)
                 remove(Constants.SharedPrefs.PRIVATE_EVENT_QR_CODE)
             }
+            VaccinationCenterManager.clearAllData(sharedPreferences)
             findNavControllerOrNull()?.safeNavigate(ManageDataFragmentDirections.actionGlobalOnBoardingActivity())
             activity?.finishAndRemoveTask()
         }
