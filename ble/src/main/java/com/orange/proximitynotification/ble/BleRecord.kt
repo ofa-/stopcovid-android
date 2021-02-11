@@ -15,7 +15,8 @@ import java.util.Date
 internal data class BleRecord(
     val payload: BlePayload,
     val rssi: Int,
-    val timestamp: Date
+    val timestamp: Date,
+    val isRssiCalibrated: Boolean = false
 ) {
     val txPowerLevel: Int
         get() = payload.txPowerLevel

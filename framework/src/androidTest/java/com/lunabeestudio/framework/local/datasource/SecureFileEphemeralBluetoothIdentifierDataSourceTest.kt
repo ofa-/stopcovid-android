@@ -15,6 +15,7 @@ import androidx.test.core.app.ApplicationProvider
 import com.google.common.truth.Truth.assertThat
 import com.lunabeestudio.domain.model.EphemeralBluetoothIdentifier
 import com.lunabeestudio.framework.local.LocalCryptoManager
+import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -40,7 +41,7 @@ class SecureFileEphemeralBluetoothIdentifierDataSourceTest {
     }
 
     @Test
-    fun write_and_read() {
+    fun write_and_read() = runBlocking {
         secureFileEphemeralBluetoothIdentifierDataSource.saveAll(
             getEphemeralBluetoothIdentifier(0L, 500L),
             getEphemeralBluetoothIdentifier(500L, 1000L)
@@ -58,7 +59,7 @@ class SecureFileEphemeralBluetoothIdentifierDataSourceTest {
     }
 
     @Test
-    fun remove_until_time() {
+    fun remove_until_time() = runBlocking {
         secureFileEphemeralBluetoothIdentifierDataSource.saveAll(
             getEphemeralBluetoothIdentifier(0L, 500L),
             getEphemeralBluetoothIdentifier(1000L, 1500L),
@@ -78,7 +79,7 @@ class SecureFileEphemeralBluetoothIdentifierDataSourceTest {
     }
 
     @Test
-    fun remove_all() {
+    fun remove_all() = runBlocking {
         secureFileEphemeralBluetoothIdentifierDataSource.saveAll(
             getEphemeralBluetoothIdentifier(0L, 500L),
             getEphemeralBluetoothIdentifier(500L, 1000L)

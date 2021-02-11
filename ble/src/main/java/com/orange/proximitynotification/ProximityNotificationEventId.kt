@@ -10,7 +10,10 @@
 
 package com.orange.proximitynotification
 
-import com.orange.proximitynotification.ProximityNotificationEventId.Category.*
+import com.orange.proximitynotification.ProximityNotificationEventId.Category.BLE_ADVERTISER
+import com.orange.proximitynotification.ProximityNotificationEventId.Category.BLE_GATT
+import com.orange.proximitynotification.ProximityNotificationEventId.Category.BLE_SCANNER
+import com.orange.proximitynotification.ProximityNotificationEventId.Category.PROXIMITY_NOTIFICATION
 
 enum class ProximityNotificationEventId(val category: Category) {
 
@@ -27,10 +30,16 @@ enum class ProximityNotificationEventId(val category: Category) {
     BLE_GATT_STOP(BLE_GATT),
     BLE_GATT_STOP_ERROR(BLE_GATT),
     BLE_GATT_STOP_SUCCESS(BLE_GATT),
+    BLE_GATT_CONNECT_ERROR(BLE_GATT),
+    BLE_GATT_CONNECT_SUCCESS(BLE_GATT),
     BLE_GATT_REQUEST_REMOTE_RSSI(BLE_GATT),
     BLE_GATT_REQUEST_REMOTE_RSSI_TIMEOUT(BLE_GATT),
     BLE_GATT_REQUEST_REMOTE_RSSI_ERROR(BLE_GATT),
     BLE_GATT_REQUEST_REMOTE_RSSI_SUCCESS(BLE_GATT),
+    BLE_GATT_EXCHANGE_PAYLOAD(BLE_GATT),
+    BLE_GATT_EXCHANGE_PAYLOAD_TIMEOUT(BLE_GATT),
+    BLE_GATT_EXCHANGE_PAYLOAD_ERROR(BLE_GATT),
+    BLE_GATT_EXCHANGE_PAYLOAD_SUCCESS(BLE_GATT),
     BLE_GATT_ON_CHARACTERISTIC_WRITE_REQUEST(BLE_GATT),
     BLE_GATT_ON_CHARACTERISTIC_WRITE_REQUEST_ERROR(BLE_GATT),
     BLE_GATT_ON_CHARACTERISTIC_WRITE_REQUEST_SUCCESS(BLE_GATT),
@@ -52,8 +61,12 @@ enum class ProximityNotificationEventId(val category: Category) {
     PROXIMITY_NOTIFICATION_BLE_SETTINGS_UPDATED(PROXIMITY_NOTIFICATION),
     PROXIMITY_NOTIFICATION_BLUETOOTH_DISABLED(PROXIMITY_NOTIFICATION),
     PROXIMITY_NOTIFICATION_BLUETOOTH_ENABLED(PROXIMITY_NOTIFICATION),
+    PROXIMITY_NOTIFICATION_RESTART_BLUETOOTH(PROXIMITY_NOTIFICATION),
+
+    BLE_PROXIMITY_NOTIFICATION_WITHOUT_ADVERTISER(PROXIMITY_NOTIFICATION),
 
     BLE_PROXIMITY_NOTIFICATION_FACTORY(PROXIMITY_NOTIFICATION);
+
 
     enum class Category {
         /**
@@ -76,5 +89,6 @@ enum class ProximityNotificationEventId(val category: Category) {
          */
         PROXIMITY_NOTIFICATION
     }
+
 
 }

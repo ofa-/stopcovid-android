@@ -10,19 +10,14 @@
 
 package com.orange.proximitynotification.ble
 
-import android.bluetooth.BluetoothDevice
 import com.orange.proximitynotification.ble.scanner.BleScannedDevice
-
-internal typealias DeviceId = String
 
 internal abstract class BleRecordProvider {
 
     protected fun buildRecord(payload: BlePayload, scannedDevice: BleScannedDevice) = BleRecord(
         payload = payload,
         rssi = scannedDevice.rssi,
-        timestamp = scannedDevice.timestamp
+        timestamp = scannedDevice.timestamp,
+        isRssiCalibrated = false
     )
-
-    protected fun BleScannedDevice.deviceId(): DeviceId = device.deviceId()
-    protected fun BluetoothDevice.deviceId(): DeviceId = address
 }

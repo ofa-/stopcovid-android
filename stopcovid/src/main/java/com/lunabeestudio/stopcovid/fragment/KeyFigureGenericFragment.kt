@@ -1,8 +1,6 @@
 package com.lunabeestudio.stopcovid.fragment
 
 import android.content.SharedPreferences
-import android.graphics.Bitmap
-import android.graphics.Canvas
 import android.net.Uri
 import android.os.Bundle
 import android.view.Menu
@@ -10,16 +8,20 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import androidx.core.view.MenuItemCompat
-import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
+import androidx.viewbinding.ViewBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.lunabeestudio.robert.extension.observeEventAndConsume
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.extension.viewLifecycleOwnerOrNull
 import com.lunabeestudio.stopcovid.databinding.ItemKeyFigureCardBinding
+import com.lunabeestudio.stopcovid.databinding.ItemKeyFigureChartCardBinding
 import com.lunabeestudio.stopcovid.extension.chosenPostalCode
+import com.lunabeestudio.stopcovid.extension.getBitmapForItem
+import com.lunabeestudio.stopcovid.extension.getBitmapForItemKeyFigureCardBinding
+import com.lunabeestudio.stopcovid.extension.getBitmapForItemKeyFigureChartCardBinding
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.showPostalCodeDialog
 import com.lunabeestudio.stopcovid.manager.KeyFiguresManager
@@ -29,8 +31,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.NumberFormat
 import java.util.Locale
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 abstract class KeyFigureGenericFragment : MainFragment() {
 
@@ -114,39 +114,13 @@ abstract class KeyFigureGenericFragment : MainFragment() {
         }
     }
 
-    protected suspend fun getShareCaptureUri(binding: ItemKeyFigureCardBinding, filenameWithoutExt: String): Uri {
-        val bitmap = getBitmapForItem(binding)
-        return ShareManager.getShareCaptureUriFromBitmap(binding.root.context, bitmap, filenameWithoutExt)
-    }
-
-    private suspend fun getBitmapForItem(binding: ItemKeyFigureCardBinding): Bitmap {
-        val savedShareVisibility = binding.shareButton.isVisible
-        binding.shareButton.isVisible = false
-        val savedDescriptionVisibility = binding.descriptionTextView.isVisible
-        binding.descriptionTextView.isVisible = false
-        binding.root.measure(
-            View.MeasureSpec.makeMeasureSpec(binding.root.width, View.MeasureSpec.EXACTLY),
-            View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
-        )
-
-        val bitmap = Bitmap.createBitmap(binding.root.measuredWidth, binding.root.measuredHeight, Bitmap.Config.ARGB_8888)
-        val canvas = Canvas(bitmap)
-
-        suspendCoroutine<Unit> { continuation ->
-            binding.root.post {
-                binding.root.draw(canvas)
-                continuation.resume(Unit)
-            }
+    protected suspend fun getShareCaptureUri(binding: ViewBinding, filenameWithoutExt: String): Uri {
+        val bitmap = when (binding) {
+            is ItemKeyFigureCardBinding -> binding.getBitmapForItemKeyFigureCardBinding()
+            is ItemKeyFigureChartCardBinding -> binding.getBitmapForItemKeyFigureChartCardBinding()
+            else -> binding.getBitmapForItem()
         }
-
-        binding.shareButton.isVisible = savedShareVisibility
-        binding.descriptionTextView.isVisible = savedDescriptionVisibility
-        binding.root.measure(
-            View.MeasureSpec.makeMeasureSpec(binding.root.width, View.MeasureSpec.EXACTLY),
-            View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
-        )
-
-        return bitmap
+        return ShareManager.getShareCaptureUriFromBitmap(binding.root.context, bitmap, filenameWithoutExt)
     }
 
 }

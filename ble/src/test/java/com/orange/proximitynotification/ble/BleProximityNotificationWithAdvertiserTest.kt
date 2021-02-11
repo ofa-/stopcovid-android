@@ -26,12 +26,16 @@ import com.orange.proximitynotification.CoroutineTestRule
 import com.orange.proximitynotification.ProximityInfo
 import com.orange.proximitynotification.ProximityNotificationCallback
 import com.orange.proximitynotification.ProximityNotificationError
+import com.orange.proximitynotification.ProximityPayload
+import com.orange.proximitynotification.ProximityPayloadId
+import com.orange.proximitynotification.ProximityPayloadIdProvider
 import com.orange.proximitynotification.ProximityPayloadProvider
 import com.orange.proximitynotification.ble.advertiser.BleAdvertiser
 import com.orange.proximitynotification.ble.calibration.BleRssiCalibration
 import com.orange.proximitynotification.ble.gatt.BleGattManager
 import com.orange.proximitynotification.ble.scanner.BleScannedDevice
 import com.orange.proximitynotification.ble.scanner.BleScanner
+import com.orange.proximitynotification.tools.Result
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Assert
@@ -41,7 +45,7 @@ import org.junit.runner.RunWith
 import java.util.Date
 
 @RunWith(AndroidJUnit4::class)
-class BleProximityNotificationTest {
+class BleProximityNotificationWithAdvertiserTest {
 
     @get:Rule
     val testCoroutineRule = CoroutineTestRule()
@@ -58,7 +62,7 @@ class BleProximityNotificationTest {
     private val bleGattManager: BleGattManager = mock()
     private val bleAdvertiser: BleAdvertiser = mock()
 
-    private val bleProximityNotification = BleProximityNotification(
+    private val bleProximityNotification = BleProximityNotificationWithAdvertiser(
         bleAdvertiser = bleAdvertiser,
         bleGattManager = bleGattManager,
         bleScanner = bleScanner,
@@ -82,7 +86,7 @@ class BleProximityNotificationTest {
             // When
             var callbackSucceed = false
             val callback = object : ProximityNotificationCallback {
-                override fun onProximity(proximityInfo: ProximityInfo) {
+                override suspend fun onProximity(proximityInfo: ProximityInfo) {
                     assertThat(proximityInfo.payload).isEqualTo(payload.proximityPayload)
                     assertThat(proximityInfo.timestamp).isEqualTo(scannedDevice.timestamp)
                     with(proximityInfo.metadata as BleProximityMetadata) {
@@ -100,7 +104,7 @@ class BleProximityNotificationTest {
                     callbackSucceed = true
                 }
 
-                override fun onError(error: ProximityNotificationError) {
+                override suspend fun onError(error: ProximityNotificationError) {
                     Assert.fail()
                 }
             }
@@ -109,6 +113,7 @@ class BleProximityNotificationTest {
             // Then
             assertThat(callbackSucceed).isTrue()
         }
+
 
     @Test
     fun scanner_with_bad_result_should_never_call_onProximity() =
@@ -124,11 +129,11 @@ class BleProximityNotificationTest {
 
             // When
             val callback = object : ProximityNotificationCallback {
-                override fun onProximity(proximityInfo: ProximityInfo) {
+                override suspend fun onProximity(proximityInfo: ProximityInfo) {
                     Assert.fail()
                 }
 
-                override fun onError(error: ProximityNotificationError) {
+                override suspend fun onError(error: ProximityNotificationError) {
                     Assert.fail()
                 }
             }
@@ -148,11 +153,11 @@ class BleProximityNotificationTest {
         // When
         var callbackSucceed = false
         val callback = object : ProximityNotificationCallback {
-            override fun onProximity(proximityInfo: ProximityInfo) {
+            override suspend fun onProximity(proximityInfo: ProximityInfo) {
                 Assert.fail()
             }
 
-            override fun onError(error: ProximityNotificationError) {
+            override suspend fun onError(error: ProximityNotificationError) {
                 assertThat(error.type).isEqualTo(ProximityNotificationError.Type.BLE_SCANNER)
                 assertThat(error.rootErrorCode).isNull()
                 callbackSucceed = true
@@ -183,11 +188,11 @@ class BleProximityNotificationTest {
         // When
         var callbackSucceed = false
         val callback = object : ProximityNotificationCallback {
-            override fun onProximity(proximityInfo: ProximityInfo) {
+            override suspend fun onProximity(proximityInfo: ProximityInfo) {
                 Assert.fail()
             }
 
-            override fun onError(error: ProximityNotificationError) {
+            override suspend fun onError(error: ProximityNotificationError) {
                 assertThat(error.type).isEqualTo(ProximityNotificationError.Type.BLE_SCANNER)
                 assertThat(error.rootErrorCode).isEqualTo(erroCode)
                 callbackSucceed = true
@@ -211,11 +216,11 @@ class BleProximityNotificationTest {
 
             // When
             val callback = object : ProximityNotificationCallback {
-                override fun onProximity(proximityInfo: ProximityInfo) {
+                override suspend fun onProximity(proximityInfo: ProximityInfo) {
                     Assert.fail()
                 }
 
-                override fun onError(error: ProximityNotificationError) {
+                override suspend fun onError(error: ProximityNotificationError) {
                     Assert.fail()
                 }
             }
@@ -226,7 +231,7 @@ class BleProximityNotificationTest {
         }
 
     @Test
-    fun advertiser_start__error_should_call_onError() =
+    fun advertiser_start_error_should_call_onError() =
         testCoroutineRule.runBlockingTest {
 
             // Given
@@ -237,11 +242,11 @@ class BleProximityNotificationTest {
             // When
             var callbackSucceed = false
             val callback = object : ProximityNotificationCallback {
-                override fun onProximity(proximityInfo: ProximityInfo) {
+                override suspend fun onProximity(proximityInfo: ProximityInfo) {
                     Assert.fail()
                 }
 
-                override fun onError(error: ProximityNotificationError) {
+                override suspend fun onError(error: ProximityNotificationError) {
                     assertThat(error.type).isEqualTo(ProximityNotificationError.Type.BLE_ADVERTISER)
                     assertThat(error.rootErrorCode).isNull()
                     callbackSucceed = true
@@ -272,11 +277,11 @@ class BleProximityNotificationTest {
             // When
             var callbackSucceed = false
             val callback = object : ProximityNotificationCallback {
-                override fun onProximity(proximityInfo: ProximityInfo) {
+                override suspend fun onProximity(proximityInfo: ProximityInfo) {
                     Assert.fail()
                 }
 
-                override fun onError(error: ProximityNotificationError) {
+                override suspend fun onError(error: ProximityNotificationError) {
                     assertThat(error.type).isEqualTo(ProximityNotificationError.Type.BLE_ADVERTISER)
                     assertThat(error.rootErrorCode).isEqualTo(erroCode)
                     callbackSucceed = true
@@ -301,11 +306,11 @@ class BleProximityNotificationTest {
             // When
             var callbackSucceed = false
             val callback = object : ProximityNotificationCallback {
-                override fun onProximity(proximityInfo: ProximityInfo) {
+                override suspend fun onProximity(proximityInfo: ProximityInfo) {
                     Assert.fail()
                 }
 
-                override fun onError(error: ProximityNotificationError) {
+                override suspend fun onError(error: ProximityNotificationError) {
                     assertThat(error.type).isEqualTo(ProximityNotificationError.Type.BLE_GATT)
                     assertThat(error.rootErrorCode).isNull()
                     callbackSucceed = true
@@ -317,6 +322,7 @@ class BleProximityNotificationTest {
             // Then
             assertThat(callbackSucceed).isTrue()
         }
+
 
     @Test
     fun scanner_and_gatt_with_good_result_should_call_onProximity_like_ios() =
@@ -340,14 +346,19 @@ class BleProximityNotificationTest {
             whenever(bleScanner.start(any())).thenAnswer {
                 val callback = it.arguments[0] as BleScanner.Callback
                 callback.onResult(listOf(scannedDevice))
-                runBlocking { gattCallback.onWritePayloadRequest(bluetoothDevice, payload.toByteArray()) }
+                runBlocking {
+                    gattCallback.onPayloadReceived(
+                        bluetoothDevice,
+                        payload.toByteArray()
+                    )
+                }
                 true
             }
 
             // When
             var callbackSucceed = false
             val callback = object : ProximityNotificationCallback {
-                override fun onProximity(proximityInfo: ProximityInfo) {
+                override suspend fun onProximity(proximityInfo: ProximityInfo) {
                     assertThat(proximityInfo.payload).isEqualTo(payload.proximityPayload)
                     assertThat(proximityInfo.timestamp).isEqualTo(scannedDevice.timestamp)
                     with(proximityInfo.metadata as BleProximityMetadata) {
@@ -365,14 +376,14 @@ class BleProximityNotificationTest {
                     callbackSucceed = true
                 }
 
-                override fun onError(error: ProximityNotificationError) {
+                override suspend fun onError(error: ProximityNotificationError) {
                     Assert.fail()
                 }
             }
             onStart(callback)
 
             // Then
-            verify(bleGattManager, never()).requestRemoteRssi(eq(bluetoothDevice), eq(false))
+            verify(bleGattManager, never()).requestRemoteRssi(eq(bluetoothDevice))
             assertThat(callbackSucceed).isTrue()
         }
 
@@ -389,12 +400,13 @@ class BleProximityNotificationTest {
             givenScannerStartedWithSuccess()
             givenAdvertiserStartedWithSuccess()
             givenGattPayload(bluetoothDevice, payload)
-            doReturn(rssi).whenever(bleGattManager).requestRemoteRssi(eq(bluetoothDevice), eq(false))
+            doReturn(Result.Success(rssi)).whenever(bleGattManager)
+                .requestRemoteRssi(eq(bluetoothDevice))
 
             // When
             var callbackSucceed = false
             val callback = object : ProximityNotificationCallback {
-                override fun onProximity(proximityInfo: ProximityInfo) {
+                override suspend fun onProximity(proximityInfo: ProximityInfo) {
                     assertThat(proximityInfo.payload).isEqualTo(payload.proximityPayload)
                     assertThat(proximityInfo.timestamp).isAtLeast(now)
                     with(proximityInfo.metadata as BleProximityMetadata) {
@@ -412,14 +424,14 @@ class BleProximityNotificationTest {
                     callbackSucceed = true
                 }
 
-                override fun onError(error: ProximityNotificationError) {
+                override suspend fun onError(error: ProximityNotificationError) {
                     Assert.fail()
                 }
             }
             onStart(callback)
 
             // Then
-            verify(bleGattManager, atLeastOnce()).requestRemoteRssi(eq(bluetoothDevice), eq(false))
+            verify(bleGattManager, atLeastOnce()).requestRemoteRssi(eq(bluetoothDevice))
             assertThat(callbackSucceed).isTrue()
         }
 
@@ -456,16 +468,16 @@ class BleProximityNotificationTest {
 
         // Given
         val callback = object : ProximityNotificationCallback {
-            override fun onProximity(proximityInfo: ProximityInfo) {
+            override suspend fun onProximity(proximityInfo: ProximityInfo) {
             }
 
-            override fun onError(error: ProximityNotificationError) {
+            override suspend fun onError(error: ProximityNotificationError) {
             }
         }
         onStart(callback)
 
         // When
-        bleProximityNotification.notifyPayloadUpdated()
+        bleProximityNotification.notifyPayloadUpdated(proximityPayload())
 
         // Then
         verify(bleAdvertiser, times(1)).stop()
@@ -482,13 +494,19 @@ class BleProximityNotificationTest {
             proximityPayloadProvider = object : ProximityPayloadProvider {
                 override suspend fun current() = proximityPayload()
             },
+            proximityPayloadIdProvider = object : ProximityPayloadIdProvider {
+                override suspend fun fromProximityPayload(proximityPayload: ProximityPayload): ProximityPayloadId {
+                    return proximityPayload.data
+                }
+            },
             callback = callback
         )
-        bleProximityNotification.start()
+
+        runBlocking { bleProximityNotification.start() }
     }
 
     private fun onStop() {
-        bleProximityNotification.stop()
+        runBlocking { bleProximityNotification.stop() }
     }
 
     private fun givenScan(scannedDevice: BleScannedDevice) {
@@ -526,7 +544,7 @@ class BleProximityNotificationTest {
     private fun givenGattPayload(bluetoothDevice: BluetoothDevice, payload: BlePayload) {
         whenever(bleGattManager.start(any())).thenAnswer {
             val callback = it.arguments[0] as BleGattManager.Callback
-            runBlocking { callback.onWritePayloadRequest(bluetoothDevice, payload.toByteArray()) }
+            runBlocking { callback.onPayloadReceived(bluetoothDevice, payload.toByteArray()) }
             true
         }
     }

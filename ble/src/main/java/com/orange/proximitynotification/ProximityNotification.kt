@@ -15,12 +15,12 @@ interface ProximityNotification {
 
     fun setUp(
         proximityPayloadProvider: ProximityPayloadProvider,
+        proximityPayloadIdProvider: ProximityPayloadIdProvider,
         callback: ProximityNotificationCallback
     )
 
-    fun start()
+    suspend fun start()
+    suspend fun stop()
 
-    fun stop()
-
-    fun notifyPayloadUpdated()
+    suspend fun notifyPayloadUpdated(proximityPayload: ProximityPayload)
 }

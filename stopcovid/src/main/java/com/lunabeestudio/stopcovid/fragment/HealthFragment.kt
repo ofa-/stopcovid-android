@@ -79,7 +79,7 @@ class HealthFragment : TimeMainFragment() {
     override fun getItems(): List<GenericItem> {
         return when {
             robertManager.isRegistered -> registeredItems()
-            ProximityManager.getDeviceSetup(requireContext()) == DeviceSetup.NO_BLE -> noBleItems()
+            ProximityManager.getDeviceSetup(requireContext(), robertManager) == DeviceSetup.NO_BLE -> noBleItems()
             else -> notRegisteredItems()
         }
     }

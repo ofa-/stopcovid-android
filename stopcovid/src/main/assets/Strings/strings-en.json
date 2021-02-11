@@ -2,7 +2,7 @@
     "app.name": "TousAntiCovid",
     "onboarding.welcomeController.title": "Welcome",
     "onboarding.welcomeController.mainMessage.title": "Receive alerts and alert others about possible exposure to COVID-19",
-    "onboarding.welcomeController.mainMessage.subtitle": "Use TousAntiCovid to help fight the pandemic by reducing the risk of transmission.",
+    "onboarding.welcomeController.mainMessage.subtitle": "Use TousAntiCovid to help fight the pandemic by reducing the risk of transmission.\n\n\nThis application was created in collaboration with the Ministère des Solidarités et de la Santé (French Ministry of Solidarity and Health) and Santé Publique France with regard to health and medical recommendations.",
     "onboarding.welcomeController.howDoesItWork": "I'm in!",
     "onboarding.explanationsController.title": "It’s easy!",
     "onboarding.explanationsController.stepFollow.title": "Activate the app",
@@ -371,7 +371,7 @@
     "keyfigure.reffectif.colorCode.light": "#0141DD",
     "keyfigure.reffectif.colorCode.dark": "#429DFF",
     "keyfigure.tauxincidence.colorCode.light": "#A05A03",
-    "keyfigure.tauxincidence.colorCode.dark": "#FED708",
+    "keyfigure.tauxincidence.colorCode.dark": "#B79E1C",
     "keyfigure.tauxpositivite.colorCode.light": "#3734A3",
     "keyfigure.tauxpositivite.colorCode.dark": "#7D7BFF",
     "keyfigure.tauxoccupation.colorCode.light": "#0271A4",
@@ -733,6 +733,9 @@
    
       
    "keyFigureDetailController.section.evolution.subtitle": "%@.\nDernière valeur du %@ : %@",
-   "keyFigureDetailController.section.evolution.subtitle2Charts": "%@.\nDernière valeur du %@ : %@ (France : %@)"
+   "keyFigureDetailController.section.evolution.subtitle2Charts": "%@.\nDernière valeur du %@ : %@ (France : %@)",
+   "home.activationExplanation.title": "Attention",
+   "home.activationExplanation.message": "Votre téléphone ne supportant pas l'advertising, TousAntiCovid va redémarrer le Bluetooth de votre téléphone régulièrement pour fonctionner",
+   "accessibility.hint.keyFigure.chart.share": "Partager le graphique du chiffre clé"
 
 }

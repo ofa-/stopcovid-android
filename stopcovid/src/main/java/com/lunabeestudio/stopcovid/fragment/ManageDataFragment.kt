@@ -101,7 +101,6 @@ class ManageDataFragment : MainFragment() {
             showSnackBar(strings["manageDataController.quitStopCovid.success"] ?: "")
             sharedPreferences.edit {
                 remove(Constants.SharedPrefs.ON_BOARDING_DONE)
-                remove(Constants.SharedPrefs.IS_ADVERTISEMENT_AVAILABLE)
                 remove(Constants.SharedPrefs.PRIVATE_EVENT_QR_CODE_GENERATION_DATE)
                 remove(Constants.SharedPrefs.PRIVATE_EVENT_QR_CODE)
             }
@@ -131,7 +130,7 @@ class ManageDataFragment : MainFragment() {
             spaceDividerItems(items)
         }
 
-        val deviceSetup = ProximityManager.getDeviceSetup(requireContext())
+        val deviceSetup = ProximityManager.getDeviceSetup(requireContext(), robertManager)
 
         if (deviceSetup != DeviceSetup.NO_BLE) {
             eraseLocalHistoryItems(items)

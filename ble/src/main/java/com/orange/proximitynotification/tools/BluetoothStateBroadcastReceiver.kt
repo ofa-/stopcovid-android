@@ -10,7 +10,11 @@
 
 package com.orange.proximitynotification.tools
 
-import android.bluetooth.BluetoothAdapter.*
+import android.bluetooth.BluetoothAdapter.EXTRA_PREVIOUS_STATE
+import android.bluetooth.BluetoothAdapter.EXTRA_STATE
+import android.bluetooth.BluetoothAdapter.STATE_OFF
+import android.bluetooth.BluetoothAdapter.STATE_ON
+import android.bluetooth.BluetoothAdapter.STATE_TURNING_OFF
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent

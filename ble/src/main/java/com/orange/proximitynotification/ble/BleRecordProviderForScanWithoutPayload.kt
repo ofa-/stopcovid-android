@@ -14,7 +14,7 @@ import android.bluetooth.BluetoothDevice
 import com.orange.proximitynotification.ble.scanner.BleScannedDevice
 import com.orange.proximitynotification.tools.ExpiringCache
 
-internal class RecordProviderForScanWithoutPayload(
+internal class BleRecordProviderForScanWithoutPayload(
     settings: BleSettings,
     private val maxCacheSize: Int = 1000
 ) : BleRecordProvider() {
@@ -37,20 +37,17 @@ internal class RecordProviderForScanWithoutPayload(
         val deviceId = device.deviceId()
         lastPayloadByDeviceId.put(deviceId, payload)
 
-        return lastScanByDeviceId[deviceId]?.let {
-            buildRecord(payload, it)
-        }
+        return lastScanByDeviceId[deviceId]?.let { buildRecord(payload, it) }
     }
 
     @Synchronized
-    fun fromScan(scannedDevice: BleScannedDevice, payload: BlePayload?): BleRecord? {
+    fun fromScan(scannedDevice: BleScannedDevice): BleRecord? {
         cleanCacheIfNeeded()
 
         val deviceId = scannedDevice.deviceId()
         lastScanByDeviceId.put(deviceId, scannedDevice)
 
-        return (payload ?: lastPayloadByDeviceId[deviceId])
-            ?.let { buildRecord(it, scannedDevice) }
+        return lastPayloadByDeviceId[deviceId]?.let { buildRecord(it, scannedDevice) }
     }
 
     private fun cleanCacheIfNeeded() {

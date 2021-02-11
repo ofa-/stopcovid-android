@@ -10,8 +10,10 @@
 
 package com.orange.proximitynotification.tools
 
-class CSVReader(private val fileName: String,
-    private val delimiter: String = ";") {
+class CSVReader(
+    private val fileName: String,
+    private val delimiter: String = ";"
+) {
 
     fun readLines(valuesAction: (List<String>) -> Unit) {
 

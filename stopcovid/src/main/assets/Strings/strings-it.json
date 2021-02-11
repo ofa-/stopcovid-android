@@ -371,7 +371,7 @@
     "keyfigure.reffectif.colorCode.light": "#0141DD",
     "keyfigure.reffectif.colorCode.dark": "#429DFF",
     "keyfigure.tauxincidence.colorCode.light": "#A05A03",
-    "keyfigure.tauxincidence.colorCode.dark": "#FED708",
+    "keyfigure.tauxincidence.colorCode.dark": "#B79E1C",
     "keyfigure.tauxpositivite.colorCode.light": "#3734A3",
     "keyfigure.tauxpositivite.colorCode.dark": "#7D7BFF",
     "keyfigure.tauxoccupation.colorCode.light": "#0271A4",
@@ -733,6 +733,9 @@
    
       
    "keyFigureDetailController.section.evolution.subtitle": "%@.\nDernière valeur du %@ : %@",
-   "keyFigureDetailController.section.evolution.subtitle2Charts": "%@.\nDernière valeur du %@ : %@ (France : %@)"
+   "keyFigureDetailController.section.evolution.subtitle2Charts": "%@.\nDernière valeur du %@ : %@ (France : %@)",
+   "home.activationExplanation.title": "Attention",
+   "home.activationExplanation.message": "Votre téléphone ne supportant pas l'advertising, TousAntiCovid va redémarrer le Bluetooth de votre téléphone régulièrement pour fonctionner",
+   "accessibility.hint.keyFigure.chart.share": "Partager le graphique du chiffre clé"
 
 }

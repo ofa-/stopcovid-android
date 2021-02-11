@@ -18,6 +18,7 @@ internal fun Collection<Number>.softmax(factor: Double): Double {
         return 0.0
     }
 
-    val exponentialSum = fold(0.0) { accumulator, input -> accumulator + exp(input.toDouble() / factor) }
+    val exponentialSum =
+        fold(0.0) { accumulator, input -> accumulator + exp(input.toDouble() / factor) }
     return factor * ln(exponentialSum / size)
 }

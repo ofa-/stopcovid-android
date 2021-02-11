@@ -19,13 +19,13 @@ import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.util.Base64
 import androidx.core.content.edit
+import androidx.core.util.AtomicFile
 import com.lunabeestudio.framework.utils.SelfDestroyCipherInputStream
 import com.lunabeestudio.framework.utils.SelfDestroyCipherOutputStream
 import com.lunabeestudio.robert.extension.randomize
 import com.lunabeestudio.robert.model.SecretKeyAlreadyGeneratedException
 import timber.log.Timber
 import java.io.ByteArrayOutputStream
-import java.io.File
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
@@ -76,14 +76,14 @@ class LocalCryptoManager(private val appContext: Context) {
         return Base64.encodeToString(encrypt(passphrase, clearPassphrase), Base64.NO_WRAP)
     }
 
-    fun encryptToFile(clearText: String, targetFile: File) {
-        val tmpFile = createTempFile(directory = targetFile.parentFile)
-        createCipherOutputStream(tmpFile.outputStream()).use { output ->
+    fun encryptToFile(clearText: String, targetFile: AtomicFile) {
+        val fileOutputStream = targetFile.startWrite()
+        createCipherOutputStream(fileOutputStream).use { output ->
             clearText.byteInputStream().use { input ->
                 input.copyTo(output, BUFFER_SIZE)
             }
         }
-        tmpFile.renameTo(targetFile)
+        targetFile.finishWrite(fileOutputStream)
     }
 
     @Synchronized
@@ -110,8 +110,8 @@ class LocalCryptoManager(private val appContext: Context) {
 
     fun decryptToString(encryptedText: String): String = String(decrypt(encryptedText))
 
-    fun decryptToString(file: File): String {
-        val fis = file.inputStream()
+    fun decryptToString(file: AtomicFile): String {
+        val fis = file.openRead()
         val cis = createCipherInputStream(fis)
 
         return cis.reader().use { reader ->
@@ -181,9 +181,11 @@ class LocalCryptoManager(private val appContext: Context) {
                 }
                 generator.generateKey()
             } else {
-                Timber.e("Secret key couldn't be found in the KeyStore but data are already encrypted with it\nkeystore aliases = ${
-                    keyStore.aliases().toList()
-                }")
+                Timber.e(
+                    "Secret key couldn't be found in the KeyStore but data are already encrypted with it\nkeystore aliases = ${
+                        keyStore.aliases().toList()
+                    }"
+                )
                 throw SecretKeyAlreadyGeneratedException()
             }
         } else {

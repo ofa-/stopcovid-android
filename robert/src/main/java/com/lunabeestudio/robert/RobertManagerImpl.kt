@@ -375,7 +375,7 @@ class RobertManagerImpl(
         }
     }
 
-    override fun clearOldData() {
+    override suspend fun clearOldData() {
         Timber.v("clear old data")
         val ephemeralBluetoothIdentifierExpiredTime = System.currentTimeMillis().unixTimeMsToNtpTimeS()
         ephemeralBluetoothIdentifierRepository.removeUntilTimeKeepLast(ephemeralBluetoothIdentifierExpiredTime)
@@ -471,7 +471,7 @@ class RobertManagerImpl(
         localProximityRepository.save(*localProximity)
     }
 
-    private fun getSSU(prefix: Byte): RobertResultData<ServerStatusUpdate> {
+    private suspend fun getSSU(prefix: Byte): RobertResultData<ServerStatusUpdate> {
         val ephemeralBluetoothIdentifier = ephemeralBluetoothIdentifierRepository.getForTime()
             ?: ephemeralBluetoothIdentifierRepository.getAll().lastOrNull()
 
@@ -485,7 +485,7 @@ class RobertManagerImpl(
         }
     }
 
-    override fun getCurrentHelloBuilder(): RobertResultData<HelloBuilder> {
+    override suspend fun getCurrentHelloBuilder(): RobertResultData<HelloBuilder> {
         val ephemeralBluetoothIdentifier = ephemeralBluetoothIdentifierRepository.getForTime()
 
         return if (ephemeralBluetoothIdentifier != null) {
@@ -546,7 +546,7 @@ class RobertManagerImpl(
         }
     }
 
-    override fun clearLocalData(application: RobertApplication) {
+    override suspend fun clearLocalData(application: RobertApplication) {
         stopStatusWorker(application.getAppContext())
         deactivateProximity(application)
         ephemeralBluetoothIdentifierRepository.removeAll()

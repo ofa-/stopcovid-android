@@ -14,11 +14,11 @@ import com.lunabeestudio.robert.model.ErrorCode
 import com.lunabeestudio.robert.model.RobertException
 import com.lunabeestudio.stopcovid.model.BLEAdvertiserException
 import com.lunabeestudio.stopcovid.model.BLEGattException
-import com.lunabeestudio.stopcovid.model.BLEProximityNotificationException
 import com.lunabeestudio.stopcovid.model.BLEScannerException
 import com.lunabeestudio.stopcovid.model.BackendException
 import com.lunabeestudio.stopcovid.model.CovidException
 import com.lunabeestudio.stopcovid.model.ForbiddenException
+import com.lunabeestudio.stopcovid.model.InvalidEphemeralBluetoothIdentifierForEpoch
 import com.lunabeestudio.stopcovid.model.NoEphemeralBluetoothIdentifierFound
 import com.lunabeestudio.stopcovid.model.NoEphemeralBluetoothIdentifierFoundForEpoch
 import com.lunabeestudio.stopcovid.model.NoInternetException
@@ -41,13 +41,13 @@ fun RobertException?.toCovidException(): CovidException = if (this != null) {
         ErrorCode.NO_INTERNET -> NoInternetException(message)
         ErrorCode.PROXIMITY_UNKNOWN -> ProximityException((this as? com.lunabeestudio.robert.model.ProximityException)?.throwable, message)
         ErrorCode.KEYSTORE_NO_KEY -> NoKeyException(message)
+        ErrorCode.ROBERT_INVALID_EBID_FOR_EPOCH -> InvalidEphemeralBluetoothIdentifierForEpoch(message)
         ErrorCode.ROBERT_NO_EBID_FOR_EPOCH -> NoEphemeralBluetoothIdentifierFoundForEpoch(message)
         ErrorCode.ROBERT_NO_EBID -> NoEphemeralBluetoothIdentifierFound(message)
         ErrorCode.ROBERT_UNKNOWN -> RobertUnknownException(message)
         ErrorCode.DECRYPT_FAIL -> ServerDecryptException(message)
         ErrorCode.BLE_ADVERTISER -> BLEAdvertiserException(message)
         ErrorCode.BLE_SCANNER -> BLEScannerException(message)
-        ErrorCode.BLE_PROXIMITY_NOTIFICATION -> BLEProximityNotificationException(message)
         ErrorCode.BLE_GATT -> BLEGattException(message)
         ErrorCode.TIME_NOT_ALIGNED -> TimeNotAlignedException(message)
         ErrorCode.REPORT_DELAY -> ReportDelayException(message)

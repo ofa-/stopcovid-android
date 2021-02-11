@@ -5,12 +5,19 @@ import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.components.YAxis
 import com.github.mikephil.charting.data.LineDataSet
+import com.lunabeestudio.stopcovid.Constants
 
 // Chart extensions :
 fun LineDataSet.setupStyle(lineColor: Int) {
     setDrawValues(false)
-    lineWidth = 2.0f
-    circleRadius = 4.0f
+    val circleCount = values.size.toFloat()
+    ((Constants.Chart.DEFAULT_CIRCLE_SIZE * Constants.Chart.RESIZE_START_CIRCLE_COUNT) / circleCount).coerceIn(
+        Constants.Chart.MIN_CIRCLE_RADIUS_SIZE,
+        Constants.Chart.DEFAULT_CIRCLE_SIZE
+    ).let { radius ->
+        circleRadius = radius
+        lineWidth = radius / Constants.Chart.CIRCLE_LINE_RATIO
+    }
     color = lineColor
     setCircleColor(color)
     setDrawCircleHole(false)
@@ -20,7 +27,7 @@ fun LineChart.setupStyle() {
     legend.isEnabled = false
     description.isEnabled = false
     setTouchEnabled(false)
-    extraBottomOffset = 16f
+    extraBottomOffset = Constants.Chart.EXTRA_BOTTOM_OFFSET
 
     axisRight.apply {
         isEnabled = false
@@ -31,10 +38,10 @@ fun YAxis.setupStyle() {
     setDrawAxisLine(false)
     setDrawLabels(true)
     setDrawGridLines(true)
-    gridColor = android.graphics.Color.LTGRAY
-    setLabelCount(3, true)
-    textSize = 15F
-    textColor = android.graphics.Color.GRAY
+    gridColor = Color.LTGRAY
+    setLabelCount(Constants.Chart.Y_AXIS_LABEL_COUNT, true)
+    textSize = Constants.Chart.AXIS_LABEL_TEXT_SIZE
+    textColor = Color.GRAY
     setDrawTopYLabelEntry(true)
     setDrawZeroLine(true)
 }
@@ -45,7 +52,7 @@ fun XAxis.setupStyle() {
     setDrawGridLines(false)
     setDrawLabels(true)
     setAvoidFirstLastClipping(true)
-    setLabelCount(2, true)
-    textSize = 15F
+    setLabelCount(Constants.Chart.X_AXIS_LABEL_COUNT, true)
+    textSize = Constants.Chart.AXIS_LABEL_TEXT_SIZE
     textColor = Color.GRAY
 }

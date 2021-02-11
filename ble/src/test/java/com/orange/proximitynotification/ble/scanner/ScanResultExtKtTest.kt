@@ -33,7 +33,7 @@ class ScanResultExtKtTest {
     )
     fun toBleScannedDevice_should_create_BLEScannedDevice(data: String?) {
         // Given
-        val uuid = UUID.randomUUID()
+        val uuid = ParcelUuid(UUID.randomUUID())
         val device = mock<BluetoothDevice>()
         val rssi = -65
         val expected = BleScannedDevice(
@@ -57,6 +57,7 @@ class ScanResultExtKtTest {
         assertThat(result).isEqualTo(expected.copy(timestamp = result.timestamp))
     }
 
+
     private fun givenScanResult(
         device: BluetoothDevice = mock(),
         rssi: Int = 0,
@@ -71,6 +72,7 @@ class ScanResultExtKtTest {
         whenever(scanResult.timestampNanos).thenReturn(timestampNanos)
         return scanResult
     }
+
 
     private fun givenScanRecord(data: ByteArray? = null): ScanRecord {
         val scanRecord = mock<ScanRecord>()

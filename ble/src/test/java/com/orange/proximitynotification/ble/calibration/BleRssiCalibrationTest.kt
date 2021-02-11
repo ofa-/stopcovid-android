@@ -15,6 +15,7 @@ import com.googlecode.zohhak.api.TestWith
 import com.googlecode.zohhak.api.runners.ZohhakRunner
 import org.junit.runner.RunWith
 
+
 @RunWith(ZohhakRunner::class)
 class BleRssiCalibrationTest {
 

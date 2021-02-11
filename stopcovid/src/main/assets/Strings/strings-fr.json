@@ -1,8 +1,8 @@
-{
+{ 
    "app.name":"TousAntiCovid",
    "onboarding.welcomeController.title":"Bienvenue",
    "onboarding.welcomeController.mainMessage.title":"Soyez alertés et alertez les autres en cas d’exposition à la COVID-19",
-   "onboarding.welcomeController.mainMessage.subtitle":"Avec TousAntiCovid, participez à la lutte contre l’épidémie en réduisant les risques de transmission.",
+   "onboarding.welcomeController.mainMessage.subtitle":"Avec TousAntiCovid, participez à la lutte contre l’épidémie en réduisant les risques de transmission.\n\n\nCette application a été réalisée en collaboration avec le Ministère des Solidarités et de la Santé et Santé Publique France quant aux consignes sanitaires.",
    "onboarding.welcomeController.howDoesItWork":"Je veux participer",
    "onboarding.explanationsController.title":"C'est simple !",
    "onboarding.explanationsController.stepFollow.title":"J'active l'application",
@@ -371,7 +371,7 @@
    "keyfigure.reffectif.colorCode.light":"#0141DD",
    "keyfigure.reffectif.colorCode.dark":"#429DFF",
    "keyfigure.tauxincidence.colorCode.light":"#A05A03",
-   "keyfigure.tauxincidence.colorCode.dark":"#FED708",
+   "keyfigure.tauxincidence.colorCode.dark":"#B79E1C",
    "keyfigure.tauxpositivite.colorCode.light":"#3734A3",
    "keyfigure.tauxpositivite.colorCode.dark":"#7D7BFF",
    "keyfigure.tauxoccupation.colorCode.light":"#0271A4",
@@ -776,7 +776,6 @@
    
    "keyFigureDetailController.section.evolution.title": "Evolution",
    "keyFigureDetailController.section.evolution.chartInfos": "%@ : %d dernières valeurs depuis le %@",
-      
    "keyfigure.nombrecas.learnMore":"Les données rapportées en début de semaine sont souvent moins élevées en raison d’une diminution des activités liées au dépistage le week-end.\n\nCet indicateur est seulement disponible au niveau national ; il est très sensible aux variations quotidiennes des activités de dépistage qui sont remontées à Santé publique France et ne constitue pas un bon reflet de la situation sanitaire.",
    "keyFigureDetailController.section.learnmore.title": "En savoir plus",
    
@@ -786,7 +785,10 @@
    
       
    "keyFigureDetailController.section.evolution.subtitle": "%@.\nDernière valeur du %@ : %@",
-   "keyFigureDetailController.section.evolution.subtitle2Charts": "%@.\nDernière valeur du %@ : %@ (France : %@)"
-
+   "keyFigureDetailController.section.evolution.subtitle2Charts": "%@.\nDernière valeur du %@ : %@ (France : %@)",
+   "home.activationExplanation.title": "Attention",
+   "home.activationExplanation.message": "Votre téléphone ne supportant pas l'advertising, TousAntiCovid va redémarrer le Bluetooth de votre téléphone régulièrement pour fonctionner",
+   "accessibility.hint.keyFigure.chart.share": "Partager le graphique du chiffre clé"
+   
    
 }

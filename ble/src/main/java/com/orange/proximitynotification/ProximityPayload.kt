@@ -38,4 +38,5 @@ data class ProximityPayload(val data: ByteArray) {
         return data.contentHashCode()
     }
 
+
 }

@@ -39,9 +39,4 @@
         app:navGraph="@navigation/nav_on_boarding" />
 
     <include layout="@layout/layout_button_bottom_sheet" />
-
-    <com.lunabeestudio.stopcovid.coreui.custom.BlockingContentLoadingProgressBar
-        android:id="@+id/blockingProgressBar"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

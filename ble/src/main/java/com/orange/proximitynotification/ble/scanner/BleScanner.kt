@@ -56,5 +56,8 @@ interface BleScanner {
     }
 
     fun start(callback: Callback): Boolean
+    fun startForDevice(deviceAddress: String, callback: Callback): Boolean
     fun stop()
+
+    fun flushScans()
 }

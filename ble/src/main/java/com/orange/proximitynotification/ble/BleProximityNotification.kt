@@ -15,38 +15,33 @@ import com.orange.proximitynotification.ProximityInfo
 import com.orange.proximitynotification.ProximityNotification
 import com.orange.proximitynotification.ProximityNotificationCallback
 import com.orange.proximitynotification.ProximityNotificationError
+import com.orange.proximitynotification.ProximityPayload
+import com.orange.proximitynotification.ProximityPayloadIdProvider
 import com.orange.proximitynotification.ProximityPayloadProvider
-import com.orange.proximitynotification.ble.advertiser.BleAdvertiser
-import com.orange.proximitynotification.ble.gatt.BleGattManager
+import com.orange.proximitynotification.ble.calibration.BleRssiCalibration
 import com.orange.proximitynotification.ble.scanner.BleScannedDevice
-import com.orange.proximitynotification.ble.scanner.BleScanner
 import com.orange.proximitynotification.tools.CoroutineContextProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 
-class BleProximityNotification(
-    private val bleScanner: BleScanner,
-    private val bleAdvertiser: BleAdvertiser,
-    private val bleGattManager: BleGattManager,
-    private val settings: BleSettings,
-    private val coroutineScope: CoroutineScope,
-    private val coroutineContextProvider: CoroutineContextProvider = CoroutineContextProvider.Default()
+internal abstract class BleProximityNotification(
+    protected val settings: BleSettings,
+    protected val coroutineScope: CoroutineScope,
+    protected val coroutineContextProvider: CoroutineContextProvider = CoroutineContextProvider.Default()
 ) : ProximityNotification {
 
-    companion object {
-        private const val VERSION = 1
-    }
-
-    private val bleRecordProviderForScanWithPayload = RecordProviderForScanWithPayload()
+    private val bleRecordProviderForScanWithPayload = BleRecordProviderForScanWithPayload()
     private val bleRecordProviderForScanWithoutPayload =
-        RecordProviderForScanWithoutPayload(settings)
+        BleRecordProviderForScanWithoutPayload(settings)
     private val bleRecordMapper = BleRecordMapper(settings)
     private val bleScannedDeviceFilter = BleScannedDeviceFilter()
 
-    private lateinit var proximityPayloadProvider: ProximityPayloadProvider
+    protected lateinit var proximityPayloadProvider: ProximityPayloadProvider
+    protected lateinit var proximityPayloadIdProvider: ProximityPayloadIdProvider
     private lateinit var callback: ProximityNotificationCallback
+
+    abstract val shouldRestartBluetooth : Boolean
 
     private var _isRunning = false
     override val isRunning: Boolean
@@ -54,152 +49,72 @@ class BleProximityNotification(
 
     override fun setUp(
         proximityPayloadProvider: ProximityPayloadProvider,
+        proximityPayloadIdProvider: ProximityPayloadIdProvider,
         callback: ProximityNotificationCallback
     ) {
         this.proximityPayloadProvider = proximityPayloadProvider
+        this.proximityPayloadIdProvider = proximityPayloadIdProvider
         this.callback = callback
     }
 
-    override fun start() {
-        startAdvertiser()
-        startGattServer()
-        startScanner()
-
+    override suspend fun start() {
         _isRunning = true
     }
 
-    override fun stop() {
+    override suspend fun stop() {
         _isRunning = false
-
-        stopScanner()
-        stopGattServer()
-        stopAdvertiser()
     }
 
-    override fun notifyPayloadUpdated() {
-        if (isRunning) {
-            stopAdvertiser()
-            startAdvertiser()
-        }
-    }
+    protected fun bleRecordFromPayload(device: BluetoothDevice, payload: BlePayload): BleRecord? {
+        bleRecordProviderForScanWithoutPayload.fromPayload(device, payload)?.let { return it }
 
-    private fun startAdvertiser() {
-        val status = bleAdvertiser.start(
-            data = buildPayload(),
-            callback = object : BleAdvertiser.Callback {
-                override fun onError(errorCode: Int) {
-                    callback.onError(
-                        ProximityNotificationError(
-                            ProximityNotificationError.Type.BLE_ADVERTISER,
-                            errorCode
-                        )
-                    )
-                }
-            })
-
-        if (!status) {
-            callback.onError(
-                ProximityNotificationError(
-                    ProximityNotificationError.Type.BLE_ADVERTISER,
-                    cause = "Failed to start advertiser"
-                )
+        if (payload.calibratedRssi != null) {
+            val rssi = BleRssiCalibration.calibrate(
+                payload.calibratedRssi,
+                0,
+                settings.txCompensationGain
             )
+
+            return bleRecordProviderForScanWithPayload.fromRssi(payload, rssi, true)
+        }
+
+        return null
+    }
+
+    protected suspend fun notifyProximity(scannedDevice: BleScannedDevice, payload: BlePayload) {
+        withContext(coroutineContextProvider.default) {
+            notifyProximity(bleRecordProviderForScanWithPayload.fromScan(scannedDevice, payload))
         }
     }
 
-    private fun startGattServer() {
-        val status = bleGattManager.start(callback = object : BleGattManager.Callback {
-            override suspend fun onWritePayloadRequest(device: BluetoothDevice, value: ByteArray) {
-
-                withContext(coroutineContextProvider.default) {
-
-                    decodePayload(value)?.let { payload ->
-
-                        // Try to match record from payload
-                        bleRecordProviderForScanWithoutPayload.fromPayload(device, payload) ?: run {
-
-                            // If not try to request remote rssi to complete record
-                            bleGattManager.requestRemoteRssi(device, false)?.let { rssi ->
-                                val scannedDevice =
-                                    BleScannedDevice(device = device, rssi = rssi)
-                                bleRecordProviderForScanWithPayload.fromScan(
-                                    scannedDevice,
-                                    payload
-                                )
-                            }
-                        }
-                    }?.let {
-                        // Notify in another coroutine in order to free the gatt callback
-                        coroutineScope.launch(coroutineContextProvider.default) { notifyProximity(it) }
-                    }
-                }
-            }
-        })
-
-        if (!status) {
-            callback.onError(
-                ProximityNotificationError(
-                    ProximityNotificationError.Type.BLE_GATT,
-                    cause = "Failed to start GATT"
-                )
-            )
-        }
-
-    }
-
-    private fun startScanner() {
-        val status = bleScanner.start(callback = object : BleScanner.Callback {
-            override fun onResult(results: List<BleScannedDevice>) {
-                if (results.isNotEmpty()) {
-                    coroutineScope.launch(coroutineContextProvider.default) {
-                        handleScanResults(bleScannedDeviceFilter.filter(results))
-                    }
-                }
-            }
-
-            override fun onError(errorCode: Int) {
-                callback.onError(
-                    ProximityNotificationError(
-                        ProximityNotificationError.Type.BLE_SCANNER,
-                        errorCode
-                    )
-                )
-            }
-        })
-
-        if (!status) {
-            callback.onError(
-                ProximityNotificationError(
-                    ProximityNotificationError.Type.BLE_SCANNER,
-                    cause = "Failed to start scanner"
-                )
-            )
+    protected suspend fun notifyProximity(bleRecord: BleRecord) {
+        withContext(coroutineContextProvider.default) {
+            notifyProximity(bleRecordMapper.toProximityInfo(bleRecord))
         }
     }
 
-    private fun stopAdvertiser() {
-        bleAdvertiser.stop()
-    }
-
-    private fun stopGattServer() {
-        bleGattManager.stop()
-    }
-
-    private fun stopScanner() {
-        bleScanner.stop()
-    }
-
-    private fun notifyProximity(bleRecord: BleRecord) {
-        notifyProximity(bleRecordMapper.toProximityInfo(bleRecord))
-    }
-
-    private fun notifyProximity(proximityInfo: ProximityInfo) {
+    private suspend fun notifyProximity(proximityInfo: ProximityInfo) {
         callback.onProximity(proximityInfo)
     }
 
-    private suspend fun handleScanResults(results: List<BleScannedDevice>) =
-        withContext(coroutineContextProvider.default) {
+    protected suspend fun notifyError(error: ProximityNotificationError) {
+        callback.onError(error)
+    }
 
+    protected fun notifyErrorAsync(error: ProximityNotificationError) {
+        coroutineScope.launch { notifyError(error) }
+    }
+
+    protected fun checkAndHandleScanResults(results: List<BleScannedDevice>) {
+        if (results.isNotEmpty()) {
+            coroutineScope.launch(coroutineContextProvider.default) {
+                handleScanResults(bleScannedDeviceFilter.filter(results))
+            }
+        }
+    }
+
+    protected open suspend fun handleScanResults(results: List<BleScannedDevice>) {
+        withContext(coroutineContextProvider.default) {
             results.mapNotNull { scannedDevice ->
                 val serviceData = scannedDevice.serviceData
 
@@ -210,20 +125,24 @@ class BleProximityNotification(
                     }
                 } else {
                     // iOS case
-                    bleRecordProviderForScanWithoutPayload.fromScan(scannedDevice, null)
+                    bleRecordProviderForScanWithoutPayload.fromScan(scannedDevice)
                 }
             }.forEach { notifyProximity(it) }
         }
+    }
 
-    private fun decodePayload(value: ByteArray) = BlePayload.fromOrNull(value)
+    protected fun decodePayload(value: ByteArray) = BlePayload.fromOrNull(value)
 
-    private fun buildPayload() = BlePayload(
-        proximityPayload = runBlocking { proximityPayloadProvider.current() },
-        version = VERSION,
-        txPowerLevel = settings.txCompensationGain
+    protected fun buildPayload(
+        proximityPayload: ProximityPayload,
+        calibratedRssi: Int? = null
+    ) = BlePayload(
+        proximityPayload = proximityPayload,
+        txPowerLevel = settings.txCompensationGain,
+        calibratedRssi = calibratedRssi
     ).toByteArray()
-
 }
+
 
 
 

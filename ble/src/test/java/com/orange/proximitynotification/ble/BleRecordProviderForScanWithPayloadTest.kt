@@ -18,9 +18,9 @@ import org.junit.runner.RunWith
 import java.util.Date
 
 @RunWith(AndroidJUnit4::class)
-class RecordProviderForScanWithPayloadTest {
+class BleRecordProviderForScanWithPayloadTest {
 
-    private val bleRecordProvider = RecordProviderForScanWithPayload()
+    private val bleRecordProvider = BleRecordProviderForScanWithPayload()
 
     @Test
     fun fromScan_with_payload_should_return_new_record() {

@@ -66,6 +66,7 @@ internal class RiskComputer(
     }
 }
 
+
 private fun List<TimestampedRssi>.sampleByTimeInterval(
     timeInterval: Int,
     timeSlotCount: Int,

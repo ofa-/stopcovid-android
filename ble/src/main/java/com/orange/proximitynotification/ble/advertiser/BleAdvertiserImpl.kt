@@ -60,6 +60,8 @@ class BleAdvertiserImpl(
                 message = "Failed to start advertising",
                 cause = it
             )
+
+            doStop()
         }.isSuccess
     }
 

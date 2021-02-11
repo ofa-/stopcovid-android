@@ -17,39 +17,38 @@ import android.bluetooth.BluetoothGattServer
 import android.bluetooth.BluetoothGattServerCallback
 import android.bluetooth.BluetoothGattService
 import android.bluetooth.BluetoothManager
+import android.bluetooth.BluetoothProfile
 import android.content.Context
 import com.orange.proximitynotification.ProximityNotificationEventId
 import com.orange.proximitynotification.ProximityNotificationLogger
 import com.orange.proximitynotification.ble.BleSettings
-import com.orange.proximitynotification.tools.CoroutineContextProvider
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.SupervisorJob
+import com.orange.proximitynotification.ble.gatt.BleGattManager.Callback.PayloadReceivedStatus.INVALID_PAYLOAD
+import com.orange.proximitynotification.ble.gatt.BleGattManager.Callback.PayloadReceivedStatus.PAYLOAD_HANDLED
+import com.orange.proximitynotification.ble.gatt.BleGattManager.Callback.PayloadReceivedStatus.UNKNOWN_DEVICE_REQUEST_RSSI_NEEDED
+import com.orange.proximitynotification.tools.Result
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.TimeoutCancellationException
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
-import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.EmptyCoroutineContext
 
 internal class BleGattManagerImpl(
     override val settings: BleSettings,
     private val context: Context,
     private val bluetoothManager: BluetoothManager,
-    private val gattClientProvider: BleGattClientProvider,
-    private val coroutineContextProvider: CoroutineContextProvider = CoroutineContextProvider.Default()
-) : BleGattManager, CoroutineScope {
+    private val gattClientProvider: BleGattClientProvider
+) : BleGattManager {
 
-    private var job: Job? = null
-    override val coroutineContext: CoroutineContext
-        get() = coroutineContextProvider.io + (job ?: EmptyCoroutineContext)
-
-    private val bleOperationLock = Mutex()
+    companion object {
+        private const val GATT_APPLICATION_ERROR = 80
+    }
 
     private var bluetoothGattServer: BluetoothGattServer? = null
+
+    private val gattConnectedDevices: Set<BluetoothDevice>
+        get() = bluetoothManager.getConnectedDevices(BluetoothProfile.GATT)
+            .plus(bluetoothManager.getConnectedDevices(BluetoothProfile.GATT_SERVER))
+            .toSet()
 
     // Characteristic used to read payload
     private val payloadCharacteristic = BluetoothGattCharacteristic(
@@ -79,12 +78,11 @@ internal class BleGattManagerImpl(
     }
 
     private fun doStart(callback: BleGattManager.Callback): Boolean {
-        job = SupervisorJob()
-
         return runCatching {
             bluetoothGattServer =
                 bluetoothManager.openGattServer(context, GattServerCallback(callback))?.apply {
                     try {
+                        gattConnectedDevices.forEach { cancelConnection(it) }
                         clearServices()
                         addService(buildGattService())
                     } catch (t: Throwable) {
@@ -93,19 +91,11 @@ internal class BleGattManagerImpl(
                     }
                 }
 
-            if (bluetoothGattServer == null) {
-                ProximityNotificationLogger.error(
-                    eventId = ProximityNotificationEventId.BLE_GATT_START_ERROR,
-                    message = "Failed to start GATT server (openGattServer returned null)"
-                )
-                false
-            } else {
-                ProximityNotificationLogger.info(
-                    eventId = ProximityNotificationEventId.BLE_GATT_START_SUCCESS,
-                    message = "Succeed to start GATT server"
-                )
-                true
-            }
+            requireNotNull(bluetoothGattServer) { "openGattServer returned null" }
+            ProximityNotificationLogger.info(
+                eventId = ProximityNotificationEventId.BLE_GATT_START_SUCCESS,
+                message = "Succeed to start GATT server"
+            )
 
         }.onFailure {
             ProximityNotificationLogger.error(
@@ -113,7 +103,9 @@ internal class BleGattManagerImpl(
                 message = "Failed to start GATT server",
                 cause = it
             )
-        }.getOrDefault(false)
+
+            doStop()
+        }.isSuccess
     }
 
     private fun doStop() {
@@ -134,14 +126,10 @@ internal class BleGattManagerImpl(
             )
         }
         bluetoothGattServer = null
-
-        job?.cancel()
-        job = null
     }
 
-    override suspend fun requestRemoteRssi(device: BluetoothDevice, close: Boolean): Int? {
-        return withContext(coroutineContextProvider.io) {
-            val client = gattClientProvider.fromDevice(device)
+    override suspend fun requestRemoteRssi(device: BluetoothDevice): Result<Int> {
+        return withContext(Dispatchers.IO) {
 
             try {
                 ProximityNotificationLogger.debug(
@@ -149,16 +137,16 @@ internal class BleGattManagerImpl(
                     message = "Requesting remote RSSI"
                 )
 
-                withTimeout(settings.connectionTimeout) { client.open() }
-
-                val rssi = bleOperation { client.readRemoteRssi() }
+                val rssi = withConnectedClient(device) {
+                    withTimeout(settings.readRemoteRssiTimeout) { it.readRemoteRssi() }
+                }
 
                 ProximityNotificationLogger.debug(
                     eventId = ProximityNotificationEventId.BLE_GATT_REQUEST_REMOTE_RSSI_SUCCESS,
                     message = "Succeed to request remote RSSI"
                 )
 
-                rssi
+                Result.Success(rssi)
 
             } catch (e: TimeoutCancellationException) {
 
@@ -168,7 +156,7 @@ internal class BleGattManagerImpl(
                     cause = e
                 )
 
-                null
+                Result.Failure(e)
             } catch (t: Throwable) {
 
                 ProximityNotificationLogger.error(
@@ -177,20 +165,118 @@ internal class BleGattManagerImpl(
                     cause = t
                 )
 
-                null
-            } finally {
-                if (close) {
-                    bleOperation { client.close() }
-                }
+                Result.Failure(t)
             }
         }
-
     }
 
-    private suspend fun <T> bleOperation(operation: suspend () -> T): T {
-        return bleOperationLock.withLock {
-            withContext(coroutineContextProvider.main) {
-                operation()
+    override suspend fun exchangePayload(
+        device: BluetoothDevice,
+        value: ByteArray,
+        shouldReadRemotePayload: Boolean
+    ): Result<RemoteRssiAndPayload?> = withContext(Dispatchers.IO) {
+
+        try {
+            ProximityNotificationLogger.debug(
+                eventId = ProximityNotificationEventId.BLE_GATT_EXCHANGE_PAYLOAD,
+                message = "Exchange payload"
+            )
+
+            val result = withConnectedClient(device) { client ->
+
+                val remoteServices =
+                    withTimeout(settings.discoverServicesTimeout) { client.discoverServices() }
+
+                remoteServices.firstOrNull { it.uuid == settings.serviceUuid }
+                    ?.getCharacteristic(payloadCharacteristic.uuid)
+                    ?.let { payloadCharacteristic ->
+
+                        val properties = payloadCharacteristic.properties
+
+                        require(properties and BluetoothGattCharacteristic.PROPERTY_WRITE == BluetoothGattCharacteristic.PROPERTY_WRITE) {
+                            "payload characteristic is not writeable (properties=$properties)"
+                        }
+
+                        payloadCharacteristic.value = value.copyOf()
+                        payloadCharacteristic.writeType =
+                            BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
+                        withTimeout(settings.writeRemotePayloadTimeout) {
+                            client.writeCharacteristic(payloadCharacteristic)
+                        }
+
+                        if (shouldReadRemotePayload
+                            && (properties and BluetoothGattCharacteristic.PROPERTY_READ == BluetoothGattCharacteristic.PROPERTY_READ)
+                        ) {
+
+                            val rssi =
+                                withTimeout(settings.readRemoteRssiTimeout) { client.readRemoteRssi() }
+                            val remotePayload = withTimeout(settings.readRemotePayloadTimeout) {
+                                client.readCharacteristic(payloadCharacteristic)
+                            }
+
+                            RemoteRssiAndPayload(rssi, remotePayload.value)
+                        } else {
+                            null
+                        }
+                    }
+
+            }
+            ProximityNotificationLogger.debug(
+                eventId = ProximityNotificationEventId.BLE_GATT_EXCHANGE_PAYLOAD_SUCCESS,
+                message = "Succeed to exchange payload"
+            )
+
+            Result.Success(result)
+
+        } catch (e: TimeoutCancellationException) {
+            ProximityNotificationLogger.error(
+                eventId = ProximityNotificationEventId.BLE_GATT_EXCHANGE_PAYLOAD_TIMEOUT,
+                message = "Failed to exchange payload. Connection timeout",
+                cause = e
+            )
+
+            Result.Failure(e)
+        } catch (t: Throwable) {
+
+            ProximityNotificationLogger.error(
+                eventId = ProximityNotificationEventId.BLE_GATT_EXCHANGE_PAYLOAD_ERROR,
+                message = "Failed to exchange payload. Exception thrown",
+                cause = t
+            )
+
+            Result.Failure(t)
+        }
+    }
+
+    private suspend fun <T> withConnectedClient(
+        device: BluetoothDevice,
+        action: suspend (BleGattClient) -> T
+    ): T {
+        val client: BleGattClient = gattClientProvider.fromDevice(device)
+
+        return try {
+            try {
+                withTimeout(settings.connectionTimeout) { client.open() }
+
+                ProximityNotificationLogger.debug(
+                    eventId = ProximityNotificationEventId.BLE_GATT_CONNECT_SUCCESS,
+                    message = "Succeed to connect"
+                )
+            } catch (t: Throwable) {
+                ProximityNotificationLogger.error(
+                    eventId = ProximityNotificationEventId.BLE_GATT_CONNECT_ERROR,
+                    message = "Failed to connect",
+                    cause = t
+                )
+
+                throw BleGattConnectionException(cause = t)
+            }
+
+            action(client)
+
+        } finally {
+            withContext(NonCancellable) {
+                client.close()
             }
         }
     }
@@ -216,74 +302,84 @@ internal class BleGattManagerImpl(
             offset: Int,
             value: ByteArray?
         ) {
-            val exceptionHandler = CoroutineExceptionHandler { _, exception ->
+            super.onCharacteristicWriteRequest(
+                device,
+                requestId,
+                characteristic,
+                preparedWrite,
+                responseNeeded,
+                offset,
+                value
+            )
 
-                ProximityNotificationLogger.error(
-                    eventId = ProximityNotificationEventId.BLE_GATT_ON_CHARACTERISTIC_WRITE_REQUEST_ERROR,
-                    message = "onCharacteristicWriteRequest failed",
-                    cause = exception
-                )
-            }
+            ProximityNotificationLogger.debug(
+                eventId = ProximityNotificationEventId.BLE_GATT_ON_CHARACTERISTIC_WRITE_REQUEST,
+                message = "onCharacteristicWriteRequest"
+            )
 
-            val clonedValue = value?.copyOf()
-
-            launch(coroutineContextProvider.io + exceptionHandler) {
-                super.onCharacteristicWriteRequest(
-                    device,
-                    requestId,
-                    characteristic,
-                    preparedWrite,
-                    responseNeeded,
-                    offset,
-                    value
-                )
-
-                ProximityNotificationLogger.debug(
-                    eventId = ProximityNotificationEventId.BLE_GATT_ON_CHARACTERISTIC_WRITE_REQUEST,
-                    message = "onCharacteristicWriteRequest"
-                )
-
-                val result = when (characteristic.uuid) {
-                    payloadCharacteristic.uuid -> {
-                        if (offset != 0) {
-                            BluetoothGatt.GATT_INVALID_OFFSET
-                        } else {
-                            clonedValue?.let { callback.onWritePayloadRequest(device, it) }
-                            BluetoothGatt.GATT_SUCCESS
-                        }
-                    }
-                    else -> BluetoothGatt.GATT_FAILURE
-                }
-
-                ProximityNotificationLogger.debug(
-                    eventId = ProximityNotificationEventId.BLE_GATT_ON_CHARACTERISTIC_WRITE_REQUEST_SUCCESS,
-                    message = "onCharacteristicWriteRequest result=$result"
-                )
-
-                if (responseNeeded) {
-                    bleOperation {
-                        // It could happen that this call throws NullPointerException
-                        // if client is disconnected
-                        runCatching {
-                            bluetoothGattServer?.sendResponse(
-                                device,
-                                requestId,
-                                result,
-                                offset,
-                                null
-                            )
-                        }.onFailure { throwable ->
+            val result = when {
+                value == null || characteristic.uuid != payloadCharacteristic.uuid -> BluetoothGatt.GATT_FAILURE
+                offset != 0 -> BluetoothGatt.GATT_INVALID_OFFSET
+                else -> {
+                    val clonedValue = value.copyOf()
+                    val result = callback.runCatching { onPayloadReceived(device, clonedValue) }
+                        .onFailure {
                             ProximityNotificationLogger.error(
                                 eventId = ProximityNotificationEventId.BLE_GATT_ON_CHARACTERISTIC_WRITE_REQUEST_ERROR,
-                                message = "onCharacteristicWriteRequest failed to send response",
-                                cause = throwable
+                                message = "onCharacteristicWriteRequest failed to handle payload",
+                                cause = it
                             )
                         }
+                        .onSuccess {
+                            ProximityNotificationLogger.debug(
+                                eventId = ProximityNotificationEventId.BLE_GATT_ON_CHARACTERISTIC_WRITE_REQUEST_SUCCESS,
+                                message = "onCharacteristicWriteRequest succeed to handle payload, result=$it"
+                            )
+                        }
+                        .getOrNull()
+
+                    when (result) {
+                        null -> BluetoothGatt.GATT_FAILURE
+                        INVALID_PAYLOAD -> BluetoothGatt.GATT_FAILURE
+                        UNKNOWN_DEVICE_REQUEST_RSSI_NEEDED -> {
+                            // Specific case.
+                            // In that case we need to request remote rssi
+                            // so we want to inform remote to keep the connection alive
+                            // We used for that GATT application error
+                            GATT_APPLICATION_ERROR
+                        }
+                        PAYLOAD_HANDLED -> BluetoothGatt.GATT_SUCCESS
                     }
                 }
-
             }
+
+            if (responseNeeded) {
+                runCatching {
+                    val sendResponseResult =
+                        bluetoothGattServer?.sendResponse(device, requestId, result, offset, value)
+                            ?: true
+                    check(sendResponseResult) { "Failed to send response" }
+                }.onFailure { throwable ->
+                    ProximityNotificationLogger.error(
+                        eventId = ProximityNotificationEventId.BLE_GATT_ON_CHARACTERISTIC_WRITE_REQUEST_ERROR,
+                        message = "onCharacteristicWriteRequest failed to send response",
+                        cause = throwable
+                    )
+                }.onSuccess {
+                    ProximityNotificationLogger.debug(
+                        eventId = ProximityNotificationEventId.BLE_GATT_ON_CHARACTERISTIC_WRITE_REQUEST_SUCCESS,
+                        message = "onCharacteristicWriteRequest succeed (with response)"
+                    )
+                }
+            } else {
+                ProximityNotificationLogger.debug(
+                    eventId = ProximityNotificationEventId.BLE_GATT_ON_CHARACTERISTIC_WRITE_REQUEST_SUCCESS,
+                    message = "onCharacteristicWriteRequest succeed (without response)"
+                )
+            }
+
         }
     }
+
 
 }

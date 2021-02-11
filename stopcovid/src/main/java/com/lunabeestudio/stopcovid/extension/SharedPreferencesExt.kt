@@ -29,15 +29,6 @@ var SharedPreferences.lastInfoCenterFetch: Duration
     get() = getLong(Constants.SharedPrefs.LAST_INFO_CENTER_FETCH, 0L).milliseconds
     set(value) = edit { putLong(Constants.SharedPrefs.LAST_INFO_CENTER_FETCH, value.toLongMilliseconds()) }
 
-fun SharedPreferences.isAdvertisementAvailable(defValue: Boolean): Boolean = getBoolean(
-    Constants.SharedPrefs.IS_ADVERTISEMENT_AVAILABLE,
-    defValue
-)
-
-fun SharedPreferences.setAdvertisementAvailable(value: Boolean) = edit {
-    putBoolean(Constants.SharedPrefs.IS_ADVERTISEMENT_AVAILABLE, value)
-}
-
 var SharedPreferences.areInfoNotificationsEnabled: Boolean
     get() = getBoolean(Constants.SharedPrefs.ARE_INFO_NOTIFICATIONS_ENABLED, true)
     set(value) = edit { putBoolean(Constants.SharedPrefs.ARE_INFO_NOTIFICATIONS_ENABLED, value) }

@@ -17,12 +17,14 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import com.github.mikephil.charting.data.Entry
+import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.extension.isNightMode
 import com.lunabeestudio.stopcovid.coreui.extension.viewLifecycleOwnerOrNull
 import com.lunabeestudio.stopcovid.coreui.fastitem.cardWithActionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
+import com.lunabeestudio.stopcovid.databinding.ItemKeyFigureChartCardBinding
 import com.lunabeestudio.stopcovid.extension.brighterColor
 import com.lunabeestudio.stopcovid.extension.chosenPostalCode
 import com.lunabeestudio.stopcovid.extension.colorStringKey
@@ -128,6 +130,10 @@ class KeyFigureDetailsFragment : KeyFigureGenericFragment() {
                         globalData(figure, departmentKeyFigure != null)
                     ).filterNotNull().toTypedArray()
                     chartExplanationLabel = chartExplanationLabel(figure, chartData)
+                    shareContentDescription = strings["accessibility.hint.keyFigure.chart.share"]
+                    onShareCard = { binding ->
+                        shareChart(binding)
+                    }
                 }
             } else {
                 if (departmentKeyFigure != null) {
@@ -136,6 +142,10 @@ class KeyFigureDetailsFragment : KeyFigureGenericFragment() {
                             localData(figure)
                         ).filterNotNull().toTypedArray()
                         chartExplanationLabel = chartExplanationLabel(figure, chartData.plus(globalData(figure, true)))
+                        shareContentDescription = strings["accessibility.hint.keyFigure.chart.share"]
+                        onShareCard = { binding ->
+                            shareChart(binding)
+                        }
                     }
                     items += spaceItem {
                         spaceRes = R.dimen.spacing_medium
@@ -147,6 +157,10 @@ class KeyFigureDetailsFragment : KeyFigureGenericFragment() {
                         globalData(figure, departmentKeyFigure != null)
                     )
                     chartExplanationLabel = chartExplanationLabel(figure, chartData)
+                    shareContentDescription = strings["accessibility.hint.keyFigure.chart.share"]
+                    onShareCard = { binding ->
+                        shareChart(binding)
+                    }
                 }
             }
 
@@ -175,6 +189,17 @@ class KeyFigureDetailsFragment : KeyFigureGenericFragment() {
         }
 
         return items
+    }
+
+    private fun shareChart(binding: ItemKeyFigureChartCardBinding) {
+        viewLifecycleOwnerOrNull()?.lifecycleScope?.launch {
+            val uri = getShareCaptureUri(binding, Constants.Chart.SHARE_CHART_FILENAME)
+            withContext(Dispatchers.Main) {
+                ShareManager.shareImageAndText(requireContext(), uri, null) {
+                    strings["common.error.unknown"]?.let { showErrorSnackBar(it) }
+                }
+            }
+        }
     }
 
     @ExperimentalTime
@@ -212,11 +237,7 @@ class KeyFigureDetailsFragment : KeyFigureGenericFragment() {
     }
 
     private fun globalData(figure: KeyFigure, isSecondary: Boolean) = ChartData(
-        description = if (isSecondary) {
-            strings["common.country.france"]
-        } else {
-            null
-        },
+        description = strings["common.country.france"],
         currentValueToDisplay = figure.valueGlobalToDisplay,
         entries = figure.series.map {
             Entry(it.date.toFloat(), it.value.toFloat())

@@ -24,15 +24,16 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.File
 import java.util.concurrent.CancellationException
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.max
 
 open class SecureFileLocalProximityDataSource(
     private val storageDir: File,
-    private val cryptoManager: LocalCryptoManager) : LocalLocalProximityDataSource {
+    private val cryptoManager: LocalCryptoManager,
+) : LocalLocalProximityDataSource {
 
     protected val daySinceNtp: Long
         get() = System.currentTimeMillis().unixTimeMsToNtpTimeS() / (60 * 60 * 24)
@@ -49,8 +50,8 @@ open class SecureFileLocalProximityDataSource(
     protected val cacheMtx: Mutex = Mutex()
     protected val localProximityList: MutableList<LocalProximity> = mutableListOf()
 
-    private var dumpRequested = false
-    private var dumpDelayRunning = false
+    private var dumpRequested: AtomicBoolean = AtomicBoolean(false)
+    private var dumpDelayRunning: AtomicBoolean = AtomicBoolean(false)
 
     private var dumpJob: Job? = null
 
@@ -77,8 +78,14 @@ open class SecureFileLocalProximityDataSource(
         cacheMtx.withLock {
             localProximityList += localProximity
         }
-        dumpJob = CoroutineScope(Dispatchers.IO).launch {
-            dumpCache()
+        if (dumpDelayRunning.get()) {
+            dumpRequested.set(true)
+            Timber.v("Dump delay running.")
+        } else {
+            dumpJob?.cancel()
+            dumpJob = CoroutineScope(Dispatchers.IO).launch {
+                dumpCache()
+            }
         }
     }
 
@@ -118,46 +125,39 @@ open class SecureFileLocalProximityDataSource(
     }
 
     private suspend fun dumpCache() {
-        if (dumpDelayRunning) {
-            dumpRequested = true
-            Timber.v("Dump delay running.")
-            return
-        }
-
-        dumpRequested = true
+        dumpRequested.set(true)
 
         @Suppress("BlockingMethodInNonBlockingContext") val doDump = suspend {
             var lastDumpedIndex: Int
             var dumpTime = System.currentTimeMillis()
 
-            withContext(Dispatchers.IO) {
-                val tmpFile = createTempFile(directory = encryptedFile.parentFile)
-                cryptoManager.createCipherOutputStream(tmpFile.outputStream()).use { cos ->
-                    val proto = cacheMtx.withLock {
-                        Timber.v("Start dumping ${localProximityList.size} items to ${encryptedFile.absolutePath}")
-                        lastDumpedIndex = (localProximityList.size - 1).coerceAtLeast(0)
-                        localProximityList.toProto()
-                    }
-                    proto.writeTo(cos)
+            val tmpFile = createTempFile(directory = encryptedFile.parentFile)
+            cryptoManager.createCipherOutputStream(tmpFile.outputStream()).use { cos ->
+                val proto = cacheMtx.withLock {
+                    Timber.v("Start dumping ${localProximityList.size} items to ${encryptedFile.absolutePath}")
+                    lastDumpedIndex = (localProximityList.size - 1).coerceAtLeast(0)
+                    localProximityList.toProto()
                 }
-                tmpFile.renameTo(encryptedFile)
-
-                dumpTime = System.currentTimeMillis() - dumpTime
-                Timber.v("Dumping cache to ${encryptedFile.absolutePath} done in ${dumpTime}ms")
+                proto.writeTo(cos)
             }
+            tmpFile.renameTo(encryptedFile)
+
+            dumpTime = System.currentTimeMillis() - dumpTime
+            Timber.v("Dumping cache to ${encryptedFile.absolutePath} done in ${dumpTime}ms")
 
             Pair(lastDumpedIndex, dumpTime)
         }
 
-        while (dumpRequested) {
-            dumpDelayRunning = true
-            dumpRequested = false
+        while (dumpRequested.getAndSet(false)) {
+            dumpDelayRunning.set(true)
             val dumpResult = doDump()
             updateEncryptedFolderIfNeeded(dumpResult.first)
             val delayMillis = max(dumpResult.second * DUMP_DELAY_FACTOR, DUMP_MIN_DELAY_MS)
             Timber.v("Delaying dumps for ${delayMillis}ms")
             delay(delayMillis)
-            dumpDelayRunning = false
+            if (!dumpRequested.get()) {
+                dumpDelayRunning.set(false)
+            }
         }
     }
 
@@ -175,7 +175,7 @@ open class SecureFileLocalProximityDataSource(
     }
 
     companion object {
-        private const val DUMP_FILE_MAX_ENTRIES: Long = 10000
+        private const val DUMP_FILE_MAX_ENTRIES: Long = 5000
         private const val DUMP_DELAY_FACTOR: Int = 3
         private const val DUMP_MIN_DELAY_MS: Long = 15 * 1000
     }

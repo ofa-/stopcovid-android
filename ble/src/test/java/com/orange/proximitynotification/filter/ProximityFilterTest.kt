@@ -29,7 +29,8 @@ class ProximityFilterTest {
         val timestampRssis = emptyList<TimestampedRssi>()
 
         // When
-        val output = proximityFilter.filter(timestampRssis, Date(0), 2 * 60, ProximityFilter.Mode.FULL)
+        val output =
+            proximityFilter.filter(timestampRssis, Date(0), 2 * 60, ProximityFilter.Mode.FULL)
 
         // Then
         assertThat(output).isEqualTo(ProximityFilter.Output.Rejected)
@@ -45,7 +46,8 @@ class ProximityFilterTest {
         )
 
         // When
-        val output = proximityFilter.filter(timestampRssis, Date(0), 2 * 60, ProximityFilter.Mode.FULL)
+        val output =
+            proximityFilter.filter(timestampRssis, Date(0), 2 * 60, ProximityFilter.Mode.FULL)
 
         // Then
         assertThat(output).isEqualTo(ProximityFilter.Output.Rejected)
