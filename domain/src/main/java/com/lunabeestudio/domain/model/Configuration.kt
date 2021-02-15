@@ -51,4 +51,5 @@ class Configuration(
     val allowNoAdvertisingDevice: Boolean,
     val unsupportedDevices: List<String>?,
     val vaccinationCentersCount: Int,
+    val scanReportDelay: Int,
 )

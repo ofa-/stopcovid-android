@@ -25,6 +25,7 @@ import com.lunabeestudio.stopcovid.coreui.extension.showPermissionRationale
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
+import com.lunabeestudio.stopcovid.extension.openInExternalBrowser
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.fastitem.logoItem
@@ -101,9 +102,20 @@ class OnBoardingProximityFragment : OnBoardingFragment() {
                     startNextController()
                 }
             } else if (!shouldShowRequestPermissionRationale(ProximityManager.getManifestLocationPermission())) {
-                context?.showPermissionRationale(strings, "common.needLocalisationAccessToScan", "common.settings", true, {
-                    openAppSettings()
-                }, null)
+                context?.showPermissionRationale(
+                    strings = strings,
+                    messageKey = "common.needLocalisationAccessToScan",
+                    positiveKey = "common.settings",
+                    neutralKey = "common.readMore",
+                    cancelable = true,
+                    positiveAction = {
+                        openAppSettings()
+                    },
+                    neutralAction = {
+                        strings["common.privacyPolicy"]?.openInExternalBrowser(requireContext())
+                    },
+                    negativeAction = null
+                )
             }
         } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults)

@@ -6,7 +6,7 @@
     },
     {
       "name": "version",
-      "value": 24
+      "value": 26
     },
     {
       "name": "app.apiVersion",
@@ -171,6 +171,10 @@
     {
       "name": "ble.filterMode",
       "value": "RISKS"
+    },
+    {
+      "name": "ble.scanReportDelay",
+      "value": 5
     },
     {
       "name": "ble.dontUseScannerHardwareBatching",

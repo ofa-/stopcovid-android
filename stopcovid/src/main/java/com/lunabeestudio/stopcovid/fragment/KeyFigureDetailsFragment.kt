@@ -31,6 +31,7 @@ import com.lunabeestudio.stopcovid.extension.colorStringKey
 import com.lunabeestudio.stopcovid.extension.formatNumberIfNeeded
 import com.lunabeestudio.stopcovid.extension.getKeyFigureForPostalCode
 import com.lunabeestudio.stopcovid.extension.getRelativeDateShortString
+import com.lunabeestudio.stopcovid.extension.hasAverageChart
 import com.lunabeestudio.stopcovid.extension.itemForFigure
 import com.lunabeestudio.stopcovid.extension.labelShortStringKey
 import com.lunabeestudio.stopcovid.extension.labelStringKey
@@ -164,6 +165,22 @@ class KeyFigureDetailsFragment : KeyFigureGenericFragment() {
                 }
             }
 
+            if (figure.hasAverageChart()) {
+                items += keyFigureCardChartItem {
+                    chartData = arrayOf(
+                        avgGlobalData(figure, departmentKeyFigure != null)
+                    )
+                    chartExplanationLabel = stringsFormat(
+                        "keyFigureDetailController.section.evolutionAvg.subtitle",
+                        strings["${figure.labelKey}.label"]
+                    )
+                    shareContentDescription = strings["accessibility.hint.keyFigure.chart.share"]
+                    onShareCard = { binding ->
+                        shareChart(binding)
+                    }
+                }
+            }
+
             items += spaceItem {
                 spaceRes = R.dimen.spacing_large
                 identifier = "after_chart_space".hashCode().toLong()
@@ -228,9 +245,9 @@ class KeyFigureDetailsFragment : KeyFigureGenericFragment() {
             ChartData(
                 description = figure.getKeyFigureForPostalCode(sharedPrefs.chosenPostalCode)?.dptLabel,
                 currentValueToDisplay = departmentKeyFigure.valueToDisplay,
-                entries = departmentKeyFigure.series.map {
-                    Entry(it.date.toFloat(), it.value.toFloat())
-                },
+                entries = departmentKeyFigure.series
+                    .sortedBy { it.date }
+                    .map { Entry(it.date.toFloat(), it.value.toFloat()) },
                 color = Color.parseColor(strings[figure.colorStringKey(requireContext().isNightMode())])
             )
         }
@@ -239,9 +256,23 @@ class KeyFigureDetailsFragment : KeyFigureGenericFragment() {
     private fun globalData(figure: KeyFigure, isSecondary: Boolean) = ChartData(
         description = strings["common.country.france"],
         currentValueToDisplay = figure.valueGlobalToDisplay,
-        entries = figure.series.map {
-            Entry(it.date.toFloat(), it.value.toFloat())
-        },
+        entries = figure.series
+            .sortedBy { it.date }
+            .map { Entry(it.date.toFloat(), it.value.toFloat()) },
+        color = if (isSecondary) {
+            Color.parseColor(strings[figure.colorStringKey(requireContext().isNightMode())]).brighterColor()
+        } else {
+            Color.parseColor(strings[figure.colorStringKey(requireContext().isNightMode())])
+        }
+    )
+
+    private fun avgGlobalData(figure: KeyFigure, isSecondary: Boolean) = ChartData(
+        description = stringsFormat("keyFigureDetailController.section.evolutionAvg.legendWithLocation", strings["common.country.france"]),
+        currentValueToDisplay = figure.valueGlobalToDisplay,
+        entries = figure.avgSeries
+            ?.sortedBy { it.date }
+            ?.map { Entry(it.date.toFloat(), it.value.toFloat()) }
+            ?: emptyList(),
         color = if (isSecondary) {
             Color.parseColor(strings[figure.colorStringKey(requireContext().isNightMode())]).brighterColor()
         } else {

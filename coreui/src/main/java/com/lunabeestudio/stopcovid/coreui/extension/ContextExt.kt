@@ -55,21 +55,29 @@ fun Context.showPermissionRationale(
     strings: Map<String, String>,
     messageKey: String,
     positiveKey: String,
+    neutralKey: String?,
     cancelable: Boolean,
     positiveAction: () -> Unit,
     negativeAction: (() -> Unit)?,
+    neutralAction: (() -> Unit)?,
 ) {
-    MaterialAlertDialogBuilder(this)
-        .setTitle(strings["common.permissionsNeeded"])
-        .setMessage(strings[messageKey])
-        .setCancelable(cancelable)
-        .setPositiveButton(strings[positiveKey]) { _, _ ->
+    MaterialAlertDialogBuilder(this).apply {
+        setTitle(strings["common.permissionsNeeded"])
+        setMessage(strings[messageKey])
+        setCancelable(cancelable)
+        setPositiveButton(strings[positiveKey]) { _, _ ->
             positiveAction()
         }
-        .setNegativeButton(strings["common.cancel"]) { _, _ ->
+        if (!neutralKey.isNullOrBlank() && neutralAction != null) {
+            setNeutralButton(strings[neutralKey]) { _, _ ->
+                neutralAction()
+            }
+        }
+        setNegativeButton(strings["common.cancel"]) { _, _ ->
             negativeAction?.invoke()
         }
-        .show()
+        show()
+    }
 }
 
 fun Context.getFirstSupportedLanguage(): String {

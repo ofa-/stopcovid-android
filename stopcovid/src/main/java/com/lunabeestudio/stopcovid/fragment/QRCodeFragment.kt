@@ -25,6 +25,7 @@ import com.lunabeestudio.stopcovid.coreui.extension.openAppSettings
 import com.lunabeestudio.stopcovid.coreui.extension.showPermissionRationale
 import com.lunabeestudio.stopcovid.coreui.fragment.BaseFragment
 import com.lunabeestudio.stopcovid.databinding.FragmentQrCodeBinding
+import com.lunabeestudio.stopcovid.extension.openInExternalBrowser
 
 abstract class QRCodeFragment : BaseFragment() {
 
@@ -51,28 +52,32 @@ abstract class QRCodeFragment : BaseFragment() {
             if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED) {
                 if (!showingRationale) {
-                    if (shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)) {
-                        showingRationale = true
-                        context?.showPermissionRationale(strings, "common.needCameraAccessToScan", "common.ok", false, {
+                    showingRationale = true
+                    context?.showPermissionRationale(
+                        strings = strings,
+                        messageKey = "common.needCameraAccessToScan",
+                        positiveKey = "common.ok",
+                        neutralKey = "common.readMore",
+                        cancelable = false,
+                        positiveAction = {
                             requestPermissions(
                                 arrayOf(Manifest.permission.CAMERA),
                                 UiConstants.Permissions.CAMERA.ordinal
                             )
                             showingRationale = false
-                        }) {
+                        },
+                        neutralAction = {
+                            strings["common.privacyPolicy"]?.openInExternalBrowser(requireContext())
+                            showingRationale = false
+                        },
+                        negativeAction = {
                             findNavControllerOrNull()?.navigateUp()
                             showingRationale = false
                         }
-                        showingRationale = false
-                    } else {
-                        requestPermissions(
-                            arrayOf(Manifest.permission.CAMERA),
-                            UiConstants.Permissions.CAMERA.ordinal
-                        )
-                    }
+                    )
+                } else {
+                    resumeQrCodeReader()
                 }
-            } else {
-                resumeQrCodeReader()
             }
         }
     }
@@ -104,13 +109,25 @@ abstract class QRCodeFragment : BaseFragment() {
                 resumeQrCodeReader()
             } else if (!shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)) {
                 showingRationale = true
-                context?.showPermissionRationale(strings, "common.needCameraAccessToScan", "common.settings", false, {
-                    openAppSettings()
-                    showingRationale = false
-                }) {
-                    findNavControllerOrNull()?.navigateUp()
-                    showingRationale = false
-                }
+                context?.showPermissionRationale(
+                    strings = strings,
+                    messageKey = "common.needCameraAccessToScan",
+                    positiveKey = "common.settings",
+                    neutralKey = "common.readMore",
+                    cancelable = false,
+                    positiveAction = {
+                        openAppSettings()
+                        showingRationale = false
+                    },
+                    neutralAction = {
+                        strings["common.privacyPolicy"]?.openInExternalBrowser(requireContext())
+                        showingRationale = false
+                    },
+                    negativeAction = {
+                        findNavControllerOrNull()?.navigateUp()
+                        showingRationale = false
+                    }
+                )
             }
         } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults)

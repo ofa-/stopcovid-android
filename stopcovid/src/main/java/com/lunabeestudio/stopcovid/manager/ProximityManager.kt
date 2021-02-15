@@ -44,6 +44,7 @@ object ProximityManager {
             && hasFeatureBLE(context, robertManager)
             && isBluetoothOn(context, robertManager)
             && isBatteryOptimizationOff(context)
+            && isAdvertisingValid(robertManager)
             && !needLocalisationTurnedOn(context) -> DeviceSetup.BLE
         !hasFeatureBLE(context, robertManager) -> DeviceSetup.NO_BLE
         else -> DeviceSetup.NOT_SETUP
@@ -51,10 +52,13 @@ object ProximityManager {
 
     fun hasFeatureBLE(context: Context, robertManager: RobertManager): Boolean {
         val hasBLESystemFeature = context.packageManager.hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)
-        val isAdvertisingValid = BluetoothAdapter.getDefaultAdapter()?.bluetoothLeAdvertiser != null
-            || robertManager.configuration.allowNoAdvertisingDevice
         val isDeviceSupported = robertManager.configuration.unsupportedDevices?.contains(Build.MODEL) != true
-        return isDeviceSupported && isAdvertisingValid && hasBLESystemFeature
+        return isDeviceSupported && hasBLESystemFeature
+    }
+
+    fun isAdvertisingValid(robertManager: RobertManager): Boolean {
+        return BluetoothAdapter.getDefaultAdapter()?.bluetoothLeAdvertiser != null
+            || robertManager.configuration.allowNoAdvertisingDevice
     }
 
     fun hasUnstableBluetooth(): Boolean {
@@ -111,6 +115,7 @@ object ProximityManager {
             val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
             fragment.startActivity(enableBtIntent)
         }
+        !isAdvertisingValid(robertManager) -> null
         !isBatteryOptimizationOff(fragment.requireContext()) -> View.OnClickListener {
             requestIgnoreBatteryOptimization(fragment)
         }
@@ -206,6 +211,7 @@ object ProximityManager {
         !isNotificationOn(fragment.requireContext()) -> strings["proximityController.error.noNotifications"]
         !isLocalisationGranted(fragment.requireContext()) -> strings["proximityController.error.noLocalisation"]
         !isBluetoothOn(fragment.requireContext(), robertManager) -> strings["proximityController.error.noBluetooth"]
+        !isAdvertisingValid(robertManager) -> strings["proximityController.error.noAdvertising"]
         !isBatteryOptimizationOff(fragment.requireContext()) -> strings["proximityController.error.noBattery"]
         needLocalisationTurnedOn(fragment.requireContext()) -> strings["proximityController.error.batchLocalisation"]
         !robertManager.isProximityActive -> strings["proximityController.error.activateProximity"]

@@ -96,6 +96,8 @@ internal class ApiConfiguration(
     val unsupportedDevices: String?,
     @SerializedName("app.vaccinationCentersCount")
     val vaccinationCentersCount: Int,
+    @SerializedName("ble.scanReportDelay")
+    val scanReportDelay: Int,
 )
 
 internal fun ApiConfiguration.toDomain(gson: Gson) = Configuration(
@@ -148,4 +150,5 @@ internal fun ApiConfiguration.toDomain(gson: Gson) = Configuration(
         object : TypeToken<List<String>?>() {}.type
     ),
     vaccinationCentersCount = vaccinationCentersCount,
+    scanReportDelay = scanReportDelay,
 )

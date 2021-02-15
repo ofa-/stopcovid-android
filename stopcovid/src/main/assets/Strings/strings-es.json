@@ -581,11 +581,6 @@
     "onboarding.venuesController.bottomButton": "Continuar",
     "onboarding.venuesController.mainMessage.title": "Romper la cadena de transmisión en los establecimientos públicos",
     "onboarding.venuesController.mainMessage.subtitle": "Escanea el código QR de estos establecimientos y recibe un aviso en caso de que alguien que haya coincidido contigo en este lugar comunique un positivo por COVID-19.",
-    "venueType.l": "Sala de espectáculos",
-    "erp.confirmationMessage.n.title": "¡Buen provecho 🍽!",
-    "erp.confirmationMessage.n.message": "Has añadido esta ubicación a tu historial. Recibirás un aviso en caso de que alguien que haya coincidido contigo en este lugar, durante su periodo infectivo, comunique un positivo COVID-19.",
-    "erp.confirmationMessage.l.title": "¡Disfruta del espectáculo!",
-    "erp.confirmationMessage.l.message": "Has añadido esta ubicación a tu historial. Recibirás un aviso en caso de que alguien que haya coincidido contigo en este lugar, durante su periodo infectivo, comunique un positivo COVID-19.",
     "home.healthSection.warningContact.cellTitle": "Posible exposición de riesgo",
     "home.healthSection.warningContact.cellSubtitle": "Consulta nuestras recomendaciones",
     "sickController.state.warning.title": "Posiblemente haya estado expuesto, por lo menos, a un usuario diagnosticado de COVID-19 en los últimos días.",
@@ -705,9 +700,9 @@
    "home.vaccinationSection.cellSubtitle": "Vérifiez votre éligibilité et trouvez un centre près de chez vous pour vous faire vacciner.",
    "vaccinationController.title": "Vaccination",
    "vaccinationController.eligibility.title": "Suis-je prioritaire pour me faire vacciner ?",
-   "vaccinationController.eligibility.subtitle": "Aujourd’hui, les publics prioritaires définis par les autorités sanitaires sont :\n- Les personnes âgées de plus de 75 ans,\n- Les personnes ayant une pathologie qui les expose à un très haut risque face à la Covid-19 disposant d’une ordonnance médicale pour se faire vacciner prioritairement,\n- Les personnes âgées résidant en établissements (par exemple EHPAD, USLD),\n- Les professionnels y exerçant et présentant un risque élevé (âge supérieur à 50 ans, pathologies),\n- Tous les professionnels de santé, y compris libéraux, les pompiers et les aides-à-domicile de plus de 50 ans et/ou atteints de comorbidités,\n- Les personnes en situation de handicap hébergées en établissement et les personnels y exerçant âgés de 50 ans et plus et/ou atteints de comorbidités",
+   "vaccinationController.eligibility.subtitle": "Aujourd’hui, les publics prioritaires définis par les autorités sanitaires sont :\n- NOUVEAU 👉🏻 Les professionnels de santé (et autres professionnels des établissements de santé et des établissements médico-sociaux intervenant auprès de personnes vulnérables) de moins de 65 ans, peuvent désormais bénéficier du vaccin AstraZeneca (depuis le 6 février)\n- Les personnes âgées de plus de 75 ans,\n- Les personnes ayant une pathologie qui les expose à un très haut risque face à la Covid-19 disposant d’une ordonnance médicale pour se faire vacciner prioritairement,\n- Les personnes âgées résidant en établissements (par exemple EHPAD, USLD),\n- Les professionnels y exerçant et présentant un risque élevé (âge supérieur à 50 ans, pathologies),\n- Tous les professionnels de santé, y compris libéraux, les pompiers et les aides-à-domicile de plus de 50 ans et/ou atteints de comorbidités,\n- Les personnes en situation de handicap hébergées en établissement et les personnels y exerçant âgés de 50 ans et plus et/ou atteints de comorbidités",
    "vaccinationController.eligibility.buttonTitle": "En savoir plus",
-   "vaccinationController.eligibility.url": "https://solidarites-sante.gouv.fr/actualites/presse/communiques-de-presse/article/le-gouvernement-ouvre-la-vaccination-aux-patients-vulnerables",
+   "vaccinationController.eligibility.url": "https://solidarites-sante.gouv.fr/grands-dossiers/vaccin-covid-19/article/la-strategie-vaccinale",
    "vaccinationController.vaccinationLocation.title": "Trouver un centre pour me faire vacciner",
    "vaccinationController.vaccinationLocation.subtitle": "Rendez vous sur www.Santé.fr pour trouver les centres de vaccination.",
    "vaccinationController.vaccinationLocation.buttonTitle": "Aller sur Santé.fr",
@@ -754,6 +749,16 @@
    "vaccinationController.vaccinationCenter.actionSheet.alert.sharing.text.tel": "Tél : %@",
    "vaccinationController.vaccinationCenter.actionSheet.alert.sharing.text.url": "Prise de rendez-vous sur le web : %@",
    "vaccinationController.vaccinationLocation.vaccinationCenterNotFound": "Aucun centre de vaccination n'a été trouvé",
-   "vaccinationController.vaccinationLocation.explanation": "Avec un code postal, l'application vous donnera une liste des %d centres de vaccination les plus proches de ce code postal."
+   "vaccinationController.vaccinationLocation.explanation": "Avec un code postal, l'application vous donnera une liste des %d centres de vaccination les plus proches de ce code postal.",
+   
+   "keyFigureDetailController.section.evolutionAvg.subtitle": "%@.\nMoyenne glissante sur 7 jours.",
+   "keyFigureDetailController.section.evolutionAvg.legendWithLocation": "%@ (moyenne glissante)",
+   "keyfigure.reffectif.limitLine": "R=1",
+   "error.cryptoIssue.explanation.title": "Sécurité",
+   "error.cryptoIssue.explanation.message": "Pour des raisons de sécurité, il est nécessaire de vous enregistrer à nouveau. Si vous n’êtes pas à jour, il est nécessaire d'installer la dernière version de TousAntiCovid maintenant.",
+   "error.cryptoIssue.explanation.register": "M'enregistrer",
+   "error.cryptoIssue.explanation.goToStore": "Aller sur le store",
+   "proximityController.error.noAdvertising": "Votre téléphone ne possédant pas le Bluetooth advertising, il n'est pas compatible avec l’alerte des personnes contacts via Bluetooth malheureusement.",
+   "common.privacyPolicy": "https://bonjour.tousanticovid.gouv.fr/privacy.html"
 
 }

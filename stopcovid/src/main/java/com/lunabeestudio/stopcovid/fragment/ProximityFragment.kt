@@ -445,20 +445,29 @@ class ProximityFragment : TimeMainFragment() {
                 identifier = items.count().toLong()
             }
 
-            if (robertManager.isRegistered) {
-                proximityButtonItem?.let { items += it }
-            } else {
-                items += cardWithActionItem(CardTheme.Primary) {
-                    mainBody = strings["home.activationExplanation"]
-                    onCardClick = {
-                        onProximityButtonClick(deviceSetup)
+            when {
+                robertManager.isRegistered -> {
+                    proximityButtonItem?.let { items += it }
+                }
+                !ProximityManager.isAdvertisingValid(robertManager) -> {
+                    items += cardWithActionItem(CardTheme.Primary) {
+                        mainBody = strings["proximityController.error.noAdvertising"] ?: "no advertising"
+                        identifier = items.count().toLong()
                     }
-                    identifier = items.count().toLong()
-                    actions = listOf(
-                        Action(label = strings["home.mainButton.activate"]) {
+                }
+                else -> {
+                    items += cardWithActionItem(CardTheme.Primary) {
+                        mainBody = strings["home.activationExplanation"]
+                        onCardClick = {
                             onProximityButtonClick(deviceSetup)
                         }
-                    )
+                        identifier = items.count().toLong()
+                        actions = listOf(
+                            Action(label = strings["home.mainButton.activate"]) {
+                                onProximityButtonClick(deviceSetup)
+                            }
+                        )
+                    }
                 }
             }
 

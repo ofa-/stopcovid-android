@@ -17,12 +17,8 @@ import com.lunabeestudio.stopcovid.coreui.extension.isNightMode
 import com.lunabeestudio.stopcovid.coreui.extension.stringsFormat
 import com.lunabeestudio.stopcovid.fastitem.KeyFigureCardItem
 import com.lunabeestudio.stopcovid.fastitem.keyFigureCardItem
-import com.lunabeestudio.stopcovid.manager.ShareManager
 import com.lunabeestudio.stopcovid.model.DepartmentKeyFigure
 import com.lunabeestudio.stopcovid.model.KeyFigure
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import kotlinx.coroutines.yield
 import java.text.NumberFormat
 import kotlin.time.ExperimentalTime
 import kotlin.time.seconds
@@ -51,6 +47,8 @@ fun KeyFigure.colorStringKey(dark: Boolean?): String = if (dark == true) {
 } else {
     "$labelKey.colorCode.light"
 }
+
+fun KeyFigure.hasAverageChart(): Boolean = !avgSeries.isNullOrEmpty()
 
 fun KeyFigure.getKeyFigureForPostalCode(postalCode: String?): DepartmentKeyFigure? {
     var key = postalCode?.take(2)

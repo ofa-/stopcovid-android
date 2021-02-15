@@ -26,6 +26,7 @@ import com.lunabeestudio.stopcovid.extension.chosenPostalCode
 import com.lunabeestudio.stopcovid.extension.currentVaccinationReferenceDepartmentCode
 import com.lunabeestudio.stopcovid.extension.currentVaccinationReferenceLatitude
 import com.lunabeestudio.stopcovid.extension.currentVaccinationReferenceLongitude
+import com.lunabeestudio.stopcovid.extension.hasChosenPostalCode
 import com.lunabeestudio.stopcovid.extension.location
 import com.lunabeestudio.stopcovid.model.PostalCodeDetails
 import com.lunabeestudio.stopcovid.model.VaccinationCenter
@@ -70,9 +71,11 @@ object VaccinationCenterManager {
     }
 
     private suspend fun loadLocalAndRefresh(context: Context, sharedPreferences: SharedPreferences) {
-        loadLocal(context, sharedPreferences)?.let { vaccinationCenters ->
-            if (_vaccinationCenters.value?.peekContent() != vaccinationCenters) {
-                _vaccinationCenters.postValue(Event(vaccinationCenters))
+        if (sharedPreferences.hasChosenPostalCode) {
+            loadLocal(context, sharedPreferences)?.let { vaccinationCenters ->
+                if (_vaccinationCenters.value?.peekContent() != vaccinationCenters) {
+                    _vaccinationCenters.postValue(Event(vaccinationCenters))
+                }
             }
         }
     }
@@ -149,8 +152,10 @@ object VaccinationCenterManager {
     }
 
     private suspend fun fetchLastAndRefresh(context: Context, sharedPreferences: SharedPreferences) {
-        if (fetchLast(context, sharedPreferences)) {
-            loadLocalAndRefresh(context, sharedPreferences)
+        if (sharedPreferences.hasChosenPostalCode) {
+            if (fetchLast(context, sharedPreferences)) {
+                loadLocalAndRefresh(context, sharedPreferences)
+            }
         }
     }
 
