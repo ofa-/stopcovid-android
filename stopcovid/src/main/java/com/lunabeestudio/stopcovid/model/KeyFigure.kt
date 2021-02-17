@@ -26,7 +26,8 @@ data class KeyFigure(
     val valuesDepartments: List<DepartmentKeyFigure>?,
     val trend: Int?,
     val displayOnSameChart: Boolean,
-    val series: List<KeyFigureSeriesItem>
+    val series: List<KeyFigureSeriesItem>,
+    val avgSeries: List<KeyFigureSeriesItem>?
 )
 
 data class DepartmentKeyFigure(

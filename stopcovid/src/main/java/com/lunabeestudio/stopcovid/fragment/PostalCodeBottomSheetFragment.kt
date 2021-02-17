@@ -15,15 +15,19 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
 import com.lunabeestudio.stopcovid.databinding.FragmentPostalCodeBottomSheetBinding
 import com.lunabeestudio.stopcovid.extension.chosenPostalCode
 import com.lunabeestudio.stopcovid.extension.showPostalCodeDialog
+import com.lunabeestudio.stopcovid.manager.VaccinationCenterManager
+import kotlinx.coroutines.launch
 
 class PostalCodeBottomSheetFragment : BottomSheetDialogFragment() {
 
@@ -47,7 +51,12 @@ class PostalCodeBottomSheetFragment : BottomSheetDialogFragment() {
             text = strings["home.infoSection.updatePostalCode.alert.deletePostalCode"]
             setOnClickListener {
                 sharedPrefs.chosenPostalCode = null
-                dismissDialog(true)
+                viewLifecycleOwner.lifecycleScope.launch {
+                    (activity as? MainActivity)?.showProgress(true)
+                    VaccinationCenterManager.postalCodeDidUpdate(requireContext(), sharedPrefs, null)
+                    (activity as? MainActivity)?.showProgress(false)
+                    dismissDialog(true)
+                }
             }
         }
 
@@ -67,7 +76,12 @@ class PostalCodeBottomSheetFragment : BottomSheetDialogFragment() {
         ) { postalCode ->
             if (sharedPrefs.chosenPostalCode != postalCode) {
                 sharedPrefs.chosenPostalCode = postalCode
-                dismissDialog(true)
+                viewLifecycleOwner.lifecycleScope.launch {
+                    (activity as? MainActivity)?.showProgress(true)
+                    VaccinationCenterManager.postalCodeDidUpdate(requireContext(), sharedPrefs, postalCode)
+                    (activity as? MainActivity)?.showProgress(false)
+                    dismissDialog(true)
+                }
             } else {
                 dismissDialog(false)
             }

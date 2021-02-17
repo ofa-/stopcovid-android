@@ -17,12 +17,11 @@ import java.util.Date
 
 class BleScannedDeviceFilterTest {
 
-    private val filter = BleScannedDeviceFilter()
-
     @Test
-    fun filter_with_empty_should_return_empty() {
+    fun filter_with_empty_scanned_devices_should_return_empty() {
 
         // Given
+        val filter = BleScannedDeviceFilter()
         val scans: List<BleScannedDevice> = emptyList()
 
         // When
@@ -33,15 +32,44 @@ class BleScannedDeviceFilterTest {
     }
 
     @Test
-    fun filter_with_different_device_scans_should_return_same_device_scans() {
+    fun filter_with_old_scanned_devices_should_return_empty() {
 
         // Given
         val now = Date()
+        val filter = BleScannedDeviceFilter(now)
+
+        val device1 = bluetoothDevice("Device1")
+        val device2 = bluetoothDevice("Device2")
+
         val scans: List<BleScannedDevice> = listOf(
-            bleScannedDevice(bluetoothDevice("Device1"), timestamp = now, serviceData = null),
-            bleScannedDevice(bluetoothDevice("Device2"), timestamp = now, serviceData = null),
-            bleScannedDevice(bluetoothDevice("Device3"), timestamp = now, serviceData = byteArrayOf(1)),
-            bleScannedDevice(bluetoothDevice("Device4"), timestamp = now, serviceData = byteArrayOf(2))
+            bleScannedDevice(device1, timestamp = now.minus(1), serviceData = null),
+            bleScannedDevice(device2, timestamp = now, serviceData = null)
+        )
+
+        // When
+        val result = filter.filter(scans)
+
+        // Then
+        assertThat(result).isEmpty()
+    }
+
+    @Test
+    fun filter_with_different_scanned_devices_should_return_same_scanned_devices() {
+
+        // Given
+        val now = Date()
+        val filter = BleScannedDeviceFilter(now.minus(1))
+
+        val device1 = bluetoothDevice("Device1")
+        val device2 = bluetoothDevice("Device2")
+        val device3 = bluetoothDevice("Device3")
+        val device4 = bluetoothDevice("Device4")
+
+        val scans: List<BleScannedDevice> = listOf(
+            bleScannedDevice(device1, timestamp = now, serviceData = null),
+            bleScannedDevice(device2, timestamp = now, serviceData = null),
+            bleScannedDevice(device3, timestamp = now, serviceData = byteArrayOf(1)),
+            bleScannedDevice(device4, timestamp = now, serviceData = byteArrayOf(2))
         )
 
         // When
@@ -52,15 +80,17 @@ class BleScannedDeviceFilterTest {
     }
 
     @Test
-    fun filter_with_different_device_scans_but_same_service_data_should_squash() {
+    fun filter_with_different_scanned_devices_having_same_service_data_should_squash() {
 
         // Given
         val now = Date()
+        val filter = BleScannedDeviceFilter(now.minus(1))
 
         val device1 = bluetoothDevice("Device1")
         val device2 = bluetoothDevice("Device2")
         val device3 = bluetoothDevice("Device3")
         val device4 = bluetoothDevice("Device4")
+
 
         val scans: List<BleScannedDevice> = listOf(
             bleScannedDevice(device1, timestamp = now, serviceData = null),
@@ -81,20 +111,22 @@ class BleScannedDeviceFilterTest {
     }
 
     @Test
-    fun filter_with_same_devices_scans_should_keep_most_recent_scans_and_order_them_by_timestamp() {
+    fun filter_with_same_scanned_devices_should_keep_most_recent_scans_and_order_them_by_timestamp() {
 
         // Given
+        val now = Date()
+        val filter = BleScannedDeviceFilter(now)
+
         val device1 = bluetoothDevice("Device1")
         val device2 = bluetoothDevice("Device2")
         val serviceData = byteArrayOf(1)
-        val now = Date()
 
         val scans: List<BleScannedDevice> = listOf(
-            bleScannedDevice(device = device2, serviceData = null, timestamp = now.minus(5)),
-            bleScannedDevice(device = device2, serviceData = null, timestamp = now.minus(4)),
-            bleScannedDevice(device = device1, serviceData = serviceData, timestamp = now.minus(3)),
-            bleScannedDevice(device = device1, serviceData = serviceData, timestamp = now.minus(2)),
-            bleScannedDevice(device = device1, serviceData = serviceData, timestamp = now.minus(1))
+            bleScannedDevice(device = device2, serviceData = null, timestamp = now.plus(5)),
+            bleScannedDevice(device = device2, serviceData = null, timestamp = now.plus(4)),
+            bleScannedDevice(device = device1, serviceData = serviceData, timestamp = now.plus(3)),
+            bleScannedDevice(device = device1, serviceData = serviceData, timestamp = now.plus(2)),
+            bleScannedDevice(device = device1, serviceData = serviceData, timestamp = now.plus(1))
         )
 
         // When
@@ -102,8 +134,8 @@ class BleScannedDeviceFilterTest {
 
         // Then
         assertThat(result).containsExactly(
-            bleScannedDevice(device = device1, serviceData = serviceData, timestamp = now.minus(1)),
-            bleScannedDevice(device = device2, serviceData = null, timestamp = now.minus(4))
+            bleScannedDevice(device = device1, serviceData = serviceData, timestamp = now.plus(3)),
+            bleScannedDevice(device = device2, serviceData = null, timestamp = now.plus(5))
         )
     }
 
@@ -112,20 +144,23 @@ class BleScannedDeviceFilterTest {
 
         // Given
         val now = Date()
-
-        val scansBefore: List<BleScannedDevice> = listOf(
-            bleScannedDevice(bluetoothDevice("Device-skipped-1"), timestamp = now.minus(1_001), serviceData = null),
-            bleScannedDevice(bluetoothDevice("Device-skipped-2"), timestamp = now.minus(1_000), serviceData = null)
-        )
-        filter.filter(scansBefore)
+        val filter = BleScannedDeviceFilter(now)
 
         val device1 = bluetoothDevice("Device1")
         val device2 = bluetoothDevice("Device2")
         val device3 = bluetoothDevice("Device3")
+
+        val scansBefore: List<BleScannedDevice> = listOf(
+            bleScannedDevice(device1, timestamp = now.plus(1_000), serviceData = null),
+            bleScannedDevice(device2, timestamp = now.plus(1_001), serviceData = null)
+        )
+        filter.filter(scansBefore)
+
+
         val scans: List<BleScannedDevice> = listOf(
-            bleScannedDevice(device1, timestamp = now.minus(1_001), serviceData = null),
-            bleScannedDevice(device2, timestamp = now.minus(1_000), serviceData = null),
-            bleScannedDevice(device3, timestamp = now.minus(999), serviceData = null)
+            bleScannedDevice(device1, timestamp = now.plus(1_000), serviceData = null),
+            bleScannedDevice(device2, timestamp = now.plus(1_001), serviceData = null),
+            bleScannedDevice(device3, timestamp = now.plus(1_002), serviceData = null)
         )
 
         // When
@@ -133,10 +168,8 @@ class BleScannedDeviceFilterTest {
 
         // Then
         assertThat(result).containsExactly(
-            bleScannedDevice(device3, timestamp = now.minus(999), serviceData = null)
+            bleScannedDevice(device3, timestamp = now.plus(1_002), serviceData = null)
         )
     }
-
-    private fun Date.minus(millis: Long) = Date(time - millis)
 
 }

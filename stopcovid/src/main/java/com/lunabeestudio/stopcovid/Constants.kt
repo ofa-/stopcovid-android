@@ -23,13 +23,15 @@ object Constants {
         const val LAST_INFO_CENTER_FETCH: String = "Last.Info.Center.Fetch"
         const val HAS_NEWS: String = "Has.News"
         const val CHOSEN_POSTAL_CODE: String = "Chosen.Postal.Code"
-        const val IS_ADVERTISEMENT_AVAILABLE: String = "Is.Advertisement.Available"
         const val ARE_INFO_NOTIFICATIONS_ENABLED: String = "Are.Info.Notifications.Enabled"
         const val LAST_VERSION_CODE: String = "Last.Version.Code"
         const val PRIVATE_EVENT_QR_CODE: String = "Private.Event.QR.Code"
         const val PRIVATE_EVENT_QR_CODE_GENERATION_DATE: String = "Private.Event.QR.Code.Generation.Data"
         const val VENUES_ON_BOARDING_DONE: String = "isVenueOnBoardingDone"
         const val VENUES_FEATURED_ACTIVATED: String = "venuesFeaturedWasActivatedAtLeastOneTime"
+        const val CURRENT_VACCINATION_REFERENCE_DEPARTMENT_CODE: String = "currentVaccinationReferenceDepartmentCode"
+        const val CURRENT_VACCINATION_REFERENCE_LATITUDE: String = "currentVaccinationReferenceLatitude"
+        const val CURRENT_VACCINATION_REFERENCE_LONGITUDE: String = "currentVaccinationReferenceLongitude"
     }
 
     object Notification {
@@ -62,5 +64,18 @@ object Constants {
 
     object Android {
         const val ANIMATION_DELAY: Long = 500L
+        const val FORCE_LOADING_DELAY: Long = 2000L
+    }
+
+    object Chart {
+        const val SHARE_CHART_FILENAME: String = "chart.jpg"
+        const val MIN_CIRCLE_RADIUS_SIZE: Float = 1.75f
+        const val RESIZE_START_CIRCLE_COUNT: Float = 25f
+        const val DEFAULT_CIRCLE_SIZE: Float = 4f
+        const val CIRCLE_LINE_RATIO: Float = 2f
+        const val Y_AXIS_LABEL_COUNT: Int = 3
+        const val X_AXIS_LABEL_COUNT: Int = 2
+        const val AXIS_LABEL_TEXT_SIZE: Float = 15f
+        const val EXTRA_BOTTOM_OFFSET: Float = 16f
     }
 }

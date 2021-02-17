@@ -34,7 +34,18 @@ class ProximityFilter(private val config: Config) {
     data class Config(
         val durationThreshold: Long = 5 * 60,
         val rssiThreshold: Int = 0,
-        val deltas: List<Double> = listOf(39.0, 27.0, 23.0, 21.0, 20.0, 19.0, 18.0, 17.0, 16.0, 15.0),
+        val deltas: List<Double> = listOf(
+            39.0,
+            27.0,
+            23.0,
+            21.0,
+            20.0,
+            19.0,
+            18.0,
+            17.0,
+            16.0,
+            15.0
+        ),
         val p0: Double = -66.0,
         val a: Double = 10 / ln(10.0),
         val b: Double = 0.1,
@@ -42,6 +53,7 @@ class ProximityFilter(private val config: Config) {
         val timeOverlap: Int = 60,
         val riskThreshold: Double = 0.2
     )
+
 
     /**
      * Processing output
@@ -160,6 +172,7 @@ class ProximityFilter(private val config: Config) {
             risk = risk
         )
     }
+
 
 }
 

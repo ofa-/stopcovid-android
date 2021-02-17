@@ -8,6 +8,7 @@
   ~ Created by Lunabee Studio / Date - 2020/04/05 - for the TOUS-ANTI-COVID project
   -->
 <resources>
+    <item name="item_add_postal_code_card" type="id" />
     <item name="item_attestation_qr_code" type="id" />
     <item name="item_audio" type="id" />
     <item name="item_big_title" type="id" />
@@ -23,12 +24,14 @@
     <item name="item_icon_title" type="id" />
     <item name="item_image" type="id" />
     <item name="item_image_background_card" type="id" />
+    <item name="item_isolation_boolean_radio_group" type="id" />
     <item name="item_isolation_card" type="id" />
     <item name="item_isolation_state_radio_group" type="id" />
     <item name="item_image_card" type="id" />
     <item name="item_info_center_card" type="id" />
     <item name="item_info_center_detail_card" type="id" />
     <item name="item_key_figure_card" type="id" />
+    <item name="item_key_figure_chart_card" type="id" />
     <item name="item_highlighted_number_card" type="id" />
     <item name="item_link" type="id" />
     <item name="item_link_card" type="id" />
@@ -43,7 +46,5 @@
     <item name="item_proximity_button" type="id" />
     <item name="item_selection" type="id" />
     <item name="item_tag" type="id" />
-    <item name="item_add_postal_code_card" type="id" />
-    <item name="item_isolation_boolean_radio_group" type="id" />
-    <item name="item_key_figure_chart_card" type="id" />
+    <item name="item_vaccination_center_card" type="id" />
 </resources>

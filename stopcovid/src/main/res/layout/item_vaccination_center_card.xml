@@ -1,0 +1,77 @@
+<!--
+  ~ This Source Code Form is subject to the terms of the Mozilla Public
+  ~ License, v. 2.0. If a copy of the MPL was not distributed with this
+  ~ file, You can obtain one at https://mozilla.org/MPL/2.0/.
+  ~
+  ~ Authors
+  ~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ Created by Lunabee Studio / Date - 2020/04/05 - for the TOUS-ANTI-COVID project
+  -->
+
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="@dimen/spacing_large"
+    android:foreground="?selectableItemBackground"
+    android:theme="@style/ShapeAppearance.StopCovid.MediumComponent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/spacing_large">
+
+        <TextView
+            android:id="@+id/titleTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.StopCovid.Title"
+            android:textIsSelectable="false"
+            tools:text="@tools:sample/lorem[2]" />
+
+        <TextView
+            android:id="@+id/modalityTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.StopCovid.Caption.Bold"
+            android:textColor="?colorAccent"
+            android:textIsSelectable="false"
+            tools:text="@tools:sample/lorem[2]" />
+
+        <TextView
+            android:id="@+id/addressTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="@dimen/spacing_medium"
+            android:textAppearance="@style/TextAppearance.StopCovid.Caption"
+            android:textIsSelectable="false"
+            tools:text="@tools:sample/lorem[8]" />
+
+        <TextView
+            android:id="@+id/openingDateHeaderTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.StopCovid.Caption.Small.Grey"
+            android:textIsSelectable="false"
+            tools:text="@tools:sample/lorem[2]" />
+
+        <TextView
+            android:id="@+id/openingDateTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.StopCovid.Caption"
+            android:textIsSelectable="false"
+            tools:text="@tools:sample/lorem[2]" />
+
+        <TextView
+            android:id="@+id/openingTimeTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.StopCovid.Caption"
+            android:textIsSelectable="false"
+            tools:text="@tools:sample/lorem[0]" />
+
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

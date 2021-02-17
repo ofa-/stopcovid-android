@@ -18,6 +18,7 @@ import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Test
 import org.junit.runner.RunWith
 
+
 @RunWith(AndroidJUnit4::class)
 class ExpiringCacheTest {
 
@@ -95,6 +96,7 @@ class ExpiringCacheTest {
         assertThat(cache[key1]).isNull()
         assertThat(cache[key2]).isEqualTo(value2)
     }
+
 
     private fun <K, V> ExpiringCache<K, V>.advanceBy(timeout: Long) {
         doReturn(timeout).whenever(this).elapsedRealtime()

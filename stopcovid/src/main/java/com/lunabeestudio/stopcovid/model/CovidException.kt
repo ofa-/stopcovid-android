@@ -21,6 +21,7 @@ enum class ErrorCode {
     NEED_REGISTER,
     PROXIMITY_UNKNOWN,
     ROBERT_UNKNOWN,
+    ROBERT_INVALID_EBID_FOR_EPOCH,
     ROBERT_NO_EBID_FOR_EPOCH,
     ROBERT_NO_EBID,
     DECRYPT_FAIL,
@@ -67,6 +68,9 @@ class NoKeyException(message: String = "No key found") :
 class NoEphemeralBluetoothIdentifierFoundForEpoch(message: String = "No EphemeralBluetoothIdentifier found the requested time") :
     CovidException(ErrorCode.ROBERT_NO_EBID_FOR_EPOCH, message)
 
+class InvalidEphemeralBluetoothIdentifierForEpoch(message: String? = null) :
+    CovidException(ErrorCode.ROBERT_INVALID_EBID_FOR_EPOCH, message ?: "EphemeralBluetoothIdentifier is not valid for the requested time")
+
 class NoEphemeralBluetoothIdentifierFound(message: String? = null) :
     CovidException(ErrorCode.ROBERT_NO_EBID, message ?: "No EphemeralBluetoothIdentifier found")
 
@@ -78,9 +82,6 @@ class BLEAdvertiserException(message: String = "An error occurs in BLE advertise
 
 class BLEScannerException(message: String = "An error occurs in BLE scanner") :
     CovidException(ErrorCode.BLE_SCANNER, message)
-
-class BLEProximityNotificationException(message: String = "An error occurs in BLE proximity notification") :
-    CovidException(ErrorCode.BLE_PROXIMITY_NOTIFICATION, message)
 
 class BLEGattException(message: String = "An error occurs in BLE GATT") :
     CovidException(ErrorCode.BLE_GATT, message)

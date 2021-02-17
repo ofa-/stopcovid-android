@@ -44,6 +44,8 @@ internal class ApiConfiguration(
     val maxHourContactNotif: Int,
     @SerializedName("app.keyfigures.displayDepartmentLevel")
     val displayDepartmentLevel: Boolean,
+    @SerializedName("ble.dontUseScannerHardwareBatching")
+    val dontUseScannerHardwareBatching: String?,
     @SerializedName("ble.calibration")
     val calibration: String,
     @SerializedName("ble.filterConfig")
@@ -88,6 +90,14 @@ internal class ApiConfiguration(
     val postIsolationDuration: Long,
     @SerializedName("app.venuesSalt")
     val venuesSalt: Int,
+    @SerializedName("app.allowNoAdvertisingDevice")
+    val allowNoAdvertisingDevice: Boolean,
+    @SerializedName("app.unsupportedDevices")
+    val unsupportedDevices: String?,
+    @SerializedName("app.vaccinationCentersCount")
+    val vaccinationCentersCount: Int,
+    @SerializedName("ble.scanReportDelay")
+    val scanReportDelay: Int,
 )
 
 internal fun ApiConfiguration.toDomain(gson: Gson) = Configuration(
@@ -105,8 +115,14 @@ internal fun ApiConfiguration.toDomain(gson: Gson) = Configuration(
     minHourContactNotif = minHourContactNotif,
     maxHourContactNotif = maxHourContactNotif,
     displayDepartmentLevel = displayDepartmentLevel,
-    calibration = gson.fromJson<List<ApiDeviceParameterCorrection>>(calibration,
-        object : TypeToken<List<ApiDeviceParameterCorrection>>() {}.type).map { it.toDomain() },
+    dontUseScannerHardwareBatching = gson.fromJson(
+        dontUseScannerHardwareBatching,
+        object : TypeToken<List<String>?>() {}.type
+    ),
+    calibration = gson.fromJson<List<ApiDeviceParameterCorrection>>(
+        calibration,
+        object : TypeToken<List<ApiDeviceParameterCorrection>>() {}.type
+    ).map { it.toDomain() },
     filterConfig = filterConfig,
     filterMode = filterMode,
     serviceUUID = serviceUUID,
@@ -127,5 +143,12 @@ internal fun ApiConfiguration.toDomain(gson: Gson) = Configuration(
     positiveSampleSpan = positiveSampleSpan,
     isolationDuration = isolationDuration,
     postIsolationDuration = postIsolationDuration,
-    venuesSalt = venuesSalt
+    venuesSalt = venuesSalt,
+    allowNoAdvertisingDevice = allowNoAdvertisingDevice,
+    unsupportedDevices = gson.fromJson(
+        unsupportedDevices,
+        object : TypeToken<List<String>?>() {}.type
+    ),
+    vaccinationCentersCount = vaccinationCentersCount,
+    scanReportDelay = scanReportDelay,
 )

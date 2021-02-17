@@ -16,7 +16,7 @@ import android.util.LruCache
 private data class ExpiringValue<V>(val value: V, val expireTime: Long)
 
 /**
- * ExpiringCache uses LruCache to store values and keeping them depending on 2 conditions:
+ * ExpiringCache uses [LruCache] to store values and keeping them depending on 2 conditions:
  * - max size is not exceeded
  * - expireTime for a value is expired
  */

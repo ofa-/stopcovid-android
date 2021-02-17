@@ -55,8 +55,8 @@ android {
         applicationId "fr.gouv.android.stopcovid"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 142
-        versionName "2.2.3"
+        versionCode 164
+        versionName "2.2.6"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
@@ -71,6 +71,9 @@ android {
         buildConfigField 'String', 'MORE_KEY_FIGURES_FOLDER', '"MoreKeyFigures/"'
         buildConfigField 'String', 'KEY_FIGURES_PATH', '"/infos/key-figures.json"'
         buildConfigField 'String', 'FORM_PATH', '"/Attestations/form.json"'
+        buildConfigField 'String', 'VACCINATION_CENTER_PATH', '"/infos/dep/"'
+        buildConfigField 'String', 'VACCINATION_CENTER_FILENAME', '"centres-vaccination.json"'
+        buildConfigField 'String', 'VACCINATION_CENTER_LAST_UPDATE_FILENAME', '"lastUpdate.json"'
         buildConfigField 'String', 'APP_STORE_URL', '"https://play.google.com/store/apps/details?id=fr.gouv.android.stopcovid"'
     }
 

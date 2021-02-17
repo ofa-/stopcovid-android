@@ -659,5 +659,29 @@
     <fragment
         android:id="@+id/vaccinationFragment"
         android:name="com.lunabeestudio.stopcovid.fragment.VaccinationFragment"
-        tools:layout="@layout/fragment_recycler_view" />
+        tools:layout="@layout/fragment_recycler_view">
+        <action
+            android:id="@+id/action_vaccinationFragment_to_postalCodeBottomSheetFragment"
+            app:destination="@id/postalCodeBottomSheetFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_vaccinationFragment_to_vaccinationActionsBottomSheetFragment"
+            app:destination="@id/vaccinationActionsBottomSheetFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+    </fragment>
+    <dialog
+        android:id="@+id/vaccinationActionsBottomSheetFragment"
+        android:name="com.lunabeestudio.stopcovid.fragment.VaccinationActionsBottomSheetFragment"
+        tools:layout="@layout/fragment_vaccination_actions_bottom_sheet">
+        <argument
+            android:name="vaccinationCenter"
+            app:argType="com.lunabeestudio.stopcovid.model.VaccinationCenter"
+            app:nullable="false" />
+    </dialog>
 </navigation>

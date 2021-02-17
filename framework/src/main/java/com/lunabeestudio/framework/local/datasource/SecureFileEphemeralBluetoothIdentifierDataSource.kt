@@ -12,11 +12,14 @@ package com.lunabeestudio.framework.local.datasource
 
 import android.content.Context
 import androidx.annotation.WorkerThread
+import androidx.core.util.AtomicFile
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.lunabeestudio.domain.model.EphemeralBluetoothIdentifier
 import com.lunabeestudio.framework.local.LocalCryptoManager
 import com.lunabeestudio.robert.datasource.LocalEphemeralBluetoothIdentifierDataSource
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import timber.log.Timber
 import java.io.File
 
@@ -25,13 +28,14 @@ class SecureFileEphemeralBluetoothIdentifierDataSource(
     private val cryptoManager: LocalCryptoManager,
 ) : LocalEphemeralBluetoothIdentifierDataSource {
 
-    private val epochFile = File(context.filesDir, "epochs")
+    private val epochFile = AtomicFile(File(context.filesDir, "epochs"))
+    private val mutex: Mutex = Mutex()
 
     private var cache: List<EphemeralBluetoothIdentifier>? = null
         @Synchronized
         get() {
             if (field.isNullOrEmpty()) {
-                field = getAll()
+                field = getAllWithoutMutex()
             }
             return field
         }
@@ -39,10 +43,16 @@ class SecureFileEphemeralBluetoothIdentifierDataSource(
     private val gsonEphemeralBluetoothIdentifierListType = object : TypeToken<List<EphemeralBluetoothIdentifier>>() {}.type
     private val gson: Gson = Gson()
 
+    override suspend fun getAll(): List<EphemeralBluetoothIdentifier> {
+        return mutex.withLock {
+            getAllWithoutMutex()
+        }
+    }
+
     @WorkerThread
-    override fun getAll(): List<EphemeralBluetoothIdentifier> {
+    private fun getAllWithoutMutex(): List<EphemeralBluetoothIdentifier> {
         return try {
-            if (epochFile.exists()) {
+            if (epochFile.baseFile.exists()) {
                 val json = cryptoManager.decryptToString(epochFile)
                 gson.fromJson(json, gsonEphemeralBluetoothIdentifierListType)
             } else {
@@ -54,12 +64,19 @@ class SecureFileEphemeralBluetoothIdentifierDataSource(
         }
     }
 
-    override fun getForTime(ntpTimeS: Long): EphemeralBluetoothIdentifier? {
-        return cache?.firstOrNull { it.ntpStartTimeS <= ntpTimeS && ntpTimeS < it.ntpEndTimeS }
+    override suspend fun getForTime(ntpTimeS: Long): EphemeralBluetoothIdentifier? {
+        return mutex.withLock { cache?.firstOrNull { it.ntpStartTimeS <= ntpTimeS && ntpTimeS < it.ntpEndTimeS } }
     }
 
     @WorkerThread
-    override fun saveAll(vararg ephemeralBluetoothIdentifier: EphemeralBluetoothIdentifier) {
+    override suspend fun saveAll(vararg ephemeralBluetoothIdentifier: EphemeralBluetoothIdentifier) {
+        mutex.withLock {
+            saveAllWithoutMutex(ephemeralBluetoothIdentifier)
+        }
+    }
+
+    @WorkerThread
+    private fun saveAllWithoutMutex(ephemeralBluetoothIdentifier: Array<out EphemeralBluetoothIdentifier>) {
         if (ephemeralBluetoothIdentifier.isNotEmpty()) {
             val json = gson.toJson(ephemeralBluetoothIdentifier)
             cryptoManager.encryptToFile(json, epochFile)
@@ -70,20 +87,24 @@ class SecureFileEphemeralBluetoothIdentifierDataSource(
         }
     }
 
-    override fun removeUntilTimeKeepLast(ntpTimeS: Long) {
-        cache?.let { cache ->
-            val last = cache.maxByOrNull { it.ntpEndTimeS }
-            val updatedCache = cache
-                .filter {
-                    it.ntpEndTimeS > ntpTimeS || it == last
-                }.toTypedArray()
+    override suspend fun removeUntilTimeKeepLast(ntpTimeS: Long) {
+        mutex.withLock {
+            cache?.let { cache ->
+                val last = cache.maxByOrNull { it.ntpEndTimeS }
+                val updatedCache = cache
+                    .filter {
+                        it.ntpEndTimeS > ntpTimeS || it == last
+                    }.toTypedArray()
 
-            saveAll(*updatedCache)
+                saveAllWithoutMutex(updatedCache)
+            }
         }
     }
 
-    override fun removeAll() {
-        epochFile.delete()
-        cache = null
+    override suspend fun removeAll() {
+        mutex.withLock {
+            epochFile.delete()
+            cache = null
+        }
     }
 }

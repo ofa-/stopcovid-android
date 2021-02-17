@@ -29,9 +29,12 @@ import com.lunabeestudio.robert.RobertApplication
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.robert.RobertManagerImpl
 import com.lunabeestudio.robert.model.BLEAdvertiserException
+import com.lunabeestudio.robert.model.BLEGattException
+import com.lunabeestudio.robert.model.BLEScannerException
+import com.lunabeestudio.robert.model.InvalidEphemeralBluetoothIdentifierForEpoch
 import com.lunabeestudio.robert.model.RobertException
+import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.activity.MainActivity
-import com.lunabeestudio.stopcovid.coreui.R
 import com.lunabeestudio.stopcovid.coreui.UiConstants
 import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
 import com.lunabeestudio.stopcovid.extension.robertManager
@@ -48,9 +51,9 @@ import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 import kotlin.math.pow
 
-class ProximityService : RobertProximityService() {
+open class ProximityService : RobertProximityService() {
 
-    var onError: ((RobertException) -> Unit)? = null
+    var onError: ((RobertException?) -> Unit)? = null
 
     private var lastError: RobertException? = null
 
@@ -63,7 +66,7 @@ class ProximityService : RobertProximityService() {
         robertManager()
     }
 
-    override fun onProximity(proximityInfo: ProximityInfo) {
+    override suspend fun onProximity(proximityInfo: ProximityInfo) {
         sendNotification(proximityInfo)
         updateDisseminatedEbids()
         storeLocalProximity(proximityInfo)
@@ -84,7 +87,7 @@ class ProximityService : RobertProximityService() {
     }
 
     private var lastEbid: EphemeralBluetoothIdentifier? = null
-    private fun updateDisseminatedEbids() {
+    private suspend fun updateDisseminatedEbids() {
         val currentEbid = (robertManager as RobertManagerImpl).getCurrentEbid()
             ?: return
         if (lastEbid == currentEbid)
@@ -176,30 +179,46 @@ class ProximityService : RobertProximityService() {
     }
 
     override fun onError(error: RobertException) {
-        if (error is BLEAdvertiserException && !ProximityManager.isBluetoothOn(this)) {
+        noNewErrorJob?.cancel()
+        if (!ProximityManager.isBluetoothOn(this, robertManager)) {
             sendErrorBluetoothNotification()
-            doStop()
         } else {
-            Timber.e(error)
             sendErrorNotification()
+            Timber.e(error)
+        }
+        lastError = error
+        // Send error in case service binding didn't have time to happen
+        if (onError == null) {
+            sendBroadcast(
+                Intent()
+                    .setAction(com.lunabeestudio.stopcovid.Constants.Notification.SERVICE_ERROR)
+                    .putExtra(com.lunabeestudio.stopcovid.Constants.Notification.SERVICE_ERROR_EXTRA, error)
+            )
+        }
+        onError?.invoke(error)
+        if (System.currentTimeMillis() - creationDate < STOP_SERVICE_ERROR_DELAY_MS
+            || error.isCritical()) {
             robertManager.deactivateProximity(applicationContext as RobertApplication)
-            lastError = error
-            onError?.invoke(error)
-            // Send error in case service binding didn't have time to happen
-            if (onError == null) {
-                sendBroadcast(
-                    Intent()
-                        .setAction(com.lunabeestudio.stopcovid.Constants.Notification.SERVICE_ERROR)
-                        .putExtra(com.lunabeestudio.stopcovid.Constants.Notification.SERVICE_ERROR_EXTRA, error)
-                )
+        } else if ((error as? BLEAdvertiserException)?.shouldRestartBle == true) {
+            launch(Dispatchers.IO) {
+                restartBluetooth()
             }
         }
     }
 
-    fun consumeLastError(): RobertException? {
-        val error = lastError
-        lastError = null
-        return error
+    private fun RobertException.isCritical(): Boolean {
+        return when (this) {
+            is BLEAdvertiserException,
+            is BLEScannerException,
+            is BLEGattException,
+            is InvalidEphemeralBluetoothIdentifierForEpoch,
+            -> false
+            else -> true
+        }
+    }
+
+    fun getLastError(): RobertException? {
+        return lastError
     }
 
     override fun onBind(intent: Intent?): IBinder? {
@@ -274,6 +293,13 @@ class ProximityService : RobertProximityService() {
         }
     }
 
+    override fun clearErrorNotification() {
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.cancel(UiConstants.Notification.ERROR.notificationId)
+        lastError = null
+        onError?.invoke(null)
+    }
+
     override fun sendErrorBluetoothNotification() {
         CoroutineScope(Dispatchers.Main).launch {
             if (strings.isEmpty()) {
@@ -314,7 +340,10 @@ class ProximityService : RobertProximityService() {
     }
 
     companion object {
+        private const val STOP_SERVICE_ERROR_DELAY_MS: Long = 1 * 1000
+
         fun intent(context: Context): Intent = Intent(context, ProximityService::class.java)
+
         fun start(context: Context): Unit = ContextCompat.startForegroundService(context, intent(context))
         fun stop(context: Context): Boolean = context.stopService(intent(context))
         const val proximityNotificationTimeout = 20 * 1000L

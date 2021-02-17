@@ -206,7 +206,7 @@
     "onboarding.proximityController.allowProximity.warning": "انتبه: سيطلب نظام Android منك الوصول إلى مكان تواجد هذا الجهاز. لن يستعمل TousAntiCovid غير كشف الهواتف الموجودة في محيطه بواسطة Bluetooth، دون تحديد الموقع الجغرافي بتاتًا",
     "common.understand": "موافق",
     "onboarding.gesturesController.gesture5": "تجنب لمس وجهك",
-    "onboarding.gesturesController.gesture6": "احتفظ بمسافة لا تقل عن متر 1 بينك وبين الآخرين",
+    "onboarding.gesturesController.gesture6": "احتفظ بمسافة لا تقل عن متر 2 بينك وبين الآخرين",
     "common.bravo": "مُفعَّل",
     "proximityController.button.activateProximity": "أقوم بتفعيل TousAntiCovid",
     "proximityController.button.deactivateProximity": "أوقف تفعيل TousAntiCovid",
@@ -379,7 +379,7 @@
     "keyfigure.reffectif.colorCode.light": "#0141DD",
     "keyfigure.reffectif.colorCode.dark": "#429DFF",
     "keyfigure.tauxincidence.colorCode.light": "#A05A03",
-    "keyfigure.tauxincidence.colorCode.dark": "#FED708",
+    "keyfigure.tauxincidence.colorCode.dark": "#B79E1C",
     "keyfigure.tauxpositivite.colorCode.light": "#3734A3",
     "keyfigure.tauxpositivite.colorCode.dark": "#7D7BFF",
     "keyfigure.tauxoccupation.colorCode.light": "#0271A4",
@@ -589,11 +589,7 @@
     "onboarding.venuesController.bottomButton": "أواصل",
     "onboarding.venuesController.mainMessage.title": "كسر سلسلسة الإصابة في الأماكن المفتوحة للجمهور",
     "onboarding.venuesController.mainMessage.subtitle": "امسح رمز الاستجابة السريعة لتلك المواقع ليتمّ إعلامك إن قام شخص تردد الى هذه المواقع بالاعلان عن اصابته بفيروس الكوفيد19. \n\nهل أنت بصدد تنظيم مناسبة خاصة؟ قم بإنشاء رمز الاستجابة السريعة QR لهذه المناسبة وشاركه مع ضيوفك لحماية أنفسكم دون الكشف عن هوياتكم.\n",
-    "venueType.l": "مسرح",
-    "erp.confirmationMessage.n.title": "شهية طيّبة 🍽 !",
-    "erp.confirmationMessage.n.message": "قمت باضافة هذا المكان إلى سجلك. سيتم إخطارك إن قام شخص تردد الى هذا المكان خلال الفترة التي كان فيها معديًا بالاعلان عن اصابته بالكوفيد19 في نفس الوقت الذي كنت مُتواجداً به.",
-    "erp.confirmationMessage.l.title": "حفل ممتع !",
-    "erp.confirmationMessage.l.message": "قمت باضافة هذا المكان إلى سجلك. سيتم إخطارك إن قام شخص تردد الى هذا المكان خلال الفترة التي كان فيها معديًا بالاعلان عن اصابته بالكوفيد19 في نفس الوقت الذي كنت مُتواجداً به.",
+    
     "home.healthSection.warningContact.cellTitle": "تعرّض محتمل للخطر",
     "home.healthSection.warningContact.cellSubtitle": "اطّلع على توصياتنا",
     "sickController.state.warning.title": "ربما تعرضت لمستخدم واحد على الأقل تم تشخيص إصابته بـالكوفيد19 خلال الأيام الأخيرة.",
@@ -713,12 +709,12 @@
    "home.vaccinationSection.cellSubtitle": "Vérifiez votre éligibilité et trouvez un centre près de chez vous pour vous faire vacciner.",
    "vaccinationController.title": "Vaccination",
    "vaccinationController.eligibility.title": "Suis-je prioritaire pour me faire vacciner ?",
-   "vaccinationController.eligibility.subtitle": "Aujourd’hui, les publics prioritaires définis par les autorités sanitaires sont :\n- Les personnes âgées de plus de 75 ans,\n- Les personnes ayant une pathologie qui les expose à un très haut risque face à la Covid-19 disposant d’une ordonnance médicale pour se faire vacciner prioritairement,\n- Les personnes âgées résidant en établissements (par exemple EHPAD, USLD),\n- Les professionnels y exerçant et présentant un risque élevé (âge supérieur à 50 ans, pathologies),\n- Tous les professionnels de santé, y compris libéraux, les pompiers et les aides-à-domicile de plus de 50 ans et/ou atteints de comorbidités,\n- Les personnes en situation de handicap hébergées en établissement et les personnels y exerçant âgés de 50 ans et plus et/ou atteints de comorbidités",
+   "vaccinationController.eligibility.subtitle": "Aujourd’hui, les publics prioritaires définis par les autorités sanitaires sont :\n- NOUVEAU 👉🏻 Les professionnels de santé (et autres professionnels des établissements de santé et des établissements médico-sociaux intervenant auprès de personnes vulnérables) de moins de 65 ans, peuvent désormais bénéficier du vaccin AstraZeneca (depuis le 6 février)\n- Les personnes âgées de plus de 75 ans,\n- Les personnes ayant une pathologie qui les expose à un très haut risque face à la Covid-19 disposant d’une ordonnance médicale pour se faire vacciner prioritairement,\n- Les personnes âgées résidant en établissements (par exemple EHPAD, USLD),\n- Les professionnels y exerçant et présentant un risque élevé (âge supérieur à 50 ans, pathologies),\n- Tous les professionnels de santé, y compris libéraux, les pompiers et les aides-à-domicile de plus de 50 ans et/ou atteints de comorbidités,\n- Les personnes en situation de handicap hébergées en établissement et les personnels y exerçant âgés de 50 ans et plus et/ou atteints de comorbidités",
    "vaccinationController.eligibility.buttonTitle": "En savoir plus",
-   "vaccinationController.eligibility.url": "https://solidarites-sante.gouv.fr/actualites/presse/communiques-de-presse/article/le-gouvernement-ouvre-la-vaccination-aux-patients-vulnerables",
+   "vaccinationController.eligibility.url": "https://solidarites-sante.gouv.fr/grands-dossiers/vaccin-covid-19/article/la-strategie-vaccinale",
    "vaccinationController.vaccinationLocation.title": "Trouver un centre pour me faire vacciner",
    "vaccinationController.vaccinationLocation.subtitle": "Rendez vous sur www.Santé.fr pour trouver les centres de vaccination.",
-   "vaccinationController.vaccinationLocation.buttonTitle": "Trouver un centre",
+   "vaccinationController.vaccinationLocation.buttonTitle": "Aller sur Santé.fr",
    "vaccinationController.vaccinationLocation.url": "https://www.sante.fr/carte-vaccination-covid?source=TousAntiCovid",
    "contactUs.url": "https://bonjour.tousanticovid.gouv.fr/contact.html",
    
@@ -741,6 +737,37 @@
    
       
    "keyFigureDetailController.section.evolution.subtitle": "%@.\nDernière valeur du %@ : %@",
-   "keyFigureDetailController.section.evolution.subtitle2Charts": "%@.\nDernière valeur du %@ : %@ (France : %@)"
+   "keyFigureDetailController.section.evolution.subtitle2Charts": "%@.\nDernière valeur du %@ : %@ (France : %@)",
+   "home.activationExplanation.title": "Attention",
+   "home.activationExplanation.message": "Votre téléphone ne supportant pas l'advertising, TousAntiCovid va redémarrer le Bluetooth de votre téléphone régulièrement pour fonctionner",
+   "accessibility.hint.keyFigure.chart.share": "Partager le graphique du chiffre clé",
+   
+   "keyfigure.nombrevaccinations.learnMore":"Le nombre d’injections réalisées depuis le début de la campagne de vaccination est dorénavant dénombré par Vaccin Covid (au 26 janvier, 1 136 906 injections réalisées, dont 6 153 deuxièmes injections).\n\nAu 26 janvier, les données issues des Agences Régionales de Santé (ARS) faisaient état de 1 184 510 injections réalisées depuis le début de la campagne de vaccination. Cet écart constaté de 53 757 injections correspond aux injections effectuées mais non encore enregistrées dans Vaccin Covid, et qui seront progressivement rattrapées.",
+
+   "vaccinationController.vaccinationLocation.newPostalCode": "Renseigner un code postal",
+   "vaccinationController.vaccinationLocation.updatePostalCode": "Changer de code postal",
+   "vaccinationController.vaccinationLocation.footer": "Si vous ne trouvez pas un centre de vaccination qui vous convient, retrouvez tous les centres sur Santé.fr",
+   "vaccinationCenterCell.openingDate.title": "Horaires",
+   "vaccinationCenterCell.openingDate.from": "À partir du",
+   "vaccinationController.vaccinationLocation.section.title": "Où me faire vacciner ?",
+
+   "vaccinationController.vaccinationCenter.actionSheet.alert.sharing": "Partager les infos",
+   "vaccinationController.vaccinationCenter.actionSheet.alert.website": "Prendre rdv sur internet",
+   "vaccinationController.vaccinationCenter.actionSheet.alert.mapLocation": "Localiser sur une carte",
+   "vaccinationController.vaccinationCenter.actionSheet.alert.call": "Appeler (%@)",
+   "vaccinationController.vaccinationCenter.actionSheet.alert.sharing.text.tel": "Tél : %@",
+   "vaccinationController.vaccinationCenter.actionSheet.alert.sharing.text.url": "Prise de rendez-vous sur le web : %@",
+   "vaccinationController.vaccinationLocation.vaccinationCenterNotFound": "Aucun centre de vaccination n'a été trouvé",
+   "vaccinationController.vaccinationLocation.explanation": "Avec un code postal, l'application vous donnera une liste des %d centres de vaccination les plus proches de ce code postal.",
+   
+   "keyFigureDetailController.section.evolutionAvg.subtitle": "%@.\nMoyenne glissante sur 7 jours.",
+   "keyFigureDetailController.section.evolutionAvg.legendWithLocation": "%@ (moyenne glissante)",
+   "keyfigure.reffectif.limitLine": "R=1",
+   "error.cryptoIssue.explanation.title": "Sécurité",
+   "error.cryptoIssue.explanation.message": "Pour des raisons de sécurité, il est nécessaire de vous enregistrer à nouveau. Si vous n’êtes pas à jour, il est nécessaire d'installer la dernière version de TousAntiCovid maintenant.",
+   "error.cryptoIssue.explanation.register": "M'enregistrer",
+   "error.cryptoIssue.explanation.goToStore": "Aller sur le store",
+   "proximityController.error.noAdvertising": "Votre téléphone ne possédant pas le Bluetooth advertising, il n'est pas compatible avec l’alerte des personnes contacts via Bluetooth malheureusement.",
+   "common.privacyPolicy": "https://bonjour.tousanticovid.gouv.fr/privacy.html"
 
 }

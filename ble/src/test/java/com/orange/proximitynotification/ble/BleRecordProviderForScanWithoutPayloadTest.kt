@@ -20,50 +20,18 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.shadows.ShadowSystemClock
 import java.time.Duration
-import java.util.Date
 
 @RunWith(AndroidJUnit4::class)
-class RecordProviderForScanWithoutPayloadTest {
+class BleRecordProviderForScanWithoutPayloadTest {
 
     companion object {
         private const val CACHE_TIMEOUT = 500L
         private const val MAX_CACHE_SIZE = 4
     }
 
-    private val bleRecordProvider = RecordProviderForScanWithoutPayload(mock {
+    private val bleRecordProvider = BleRecordProviderForScanWithoutPayload(mock {
         on { cacheTimeout } doReturn CACHE_TIMEOUT
     }, maxCacheSize = MAX_CACHE_SIZE)
-
-    @Test
-    fun fromScan_with_payload_should_return_new_record() {
-        // Given
-        val payload = payload()
-        val device1Scan1 = bleScannedDevice(serviceData = payload.proximityPayload.data)
-
-        // When
-        val result = bleRecordProvider.fromScan(device1Scan1, payload)
-
-        // Then
-        val expected = record(payload, device1Scan1)
-        assertThat(result).isEqualTo(expected)
-    }
-
-    @Test
-    fun fromScan_with_payload_given_previous_scan_should_return_new_record() {
-        // Given
-        val payload = payload()
-        val device1Scan1 = bleScannedDevice(serviceData = payload.proximityPayload.data)
-        val device1Scan2 = device1Scan1.copy(timestamp = Date(device1Scan1.timestamp.time + 1000))
-
-        givenScanAndPayload(device1Scan1, payload)
-
-        // When
-        val result = bleRecordProvider.fromScan(device1Scan2, payload)
-
-        // Then
-        val expected = record(payload, device1Scan2)
-        assertThat(result).isEqualTo(expected)
-    }
 
     @Test
     fun fromScan_without_payload_should_return_null() {
@@ -71,7 +39,7 @@ class RecordProviderForScanWithoutPayloadTest {
         val device1Scan1 = bleScannedDevice(serviceData = null)
 
         // When
-        val result = bleRecordProvider.fromScan(device1Scan1, null)
+        val result = bleRecordProvider.fromScan(device1Scan1)
 
         // Then
         assertThat(result).isNull()
@@ -87,7 +55,7 @@ class RecordProviderForScanWithoutPayloadTest {
         givenPayload(device, payload)
 
         // When
-        val result = bleRecordProvider.fromScan(device1Scan1, null)
+        val result = bleRecordProvider.fromScan(device1Scan1)
 
         // Then
         val expected = record(payload, device1Scan1)
@@ -106,7 +74,7 @@ class RecordProviderForScanWithoutPayloadTest {
 
         // When
         val device1Scan2 = bleScannedDevice(device = device, rssi = 2, serviceData = null)
-        val result = bleRecordProvider.fromScan(device1Scan2, null)
+        val result = bleRecordProvider.fromScan(device1Scan2)
 
         // Then
         val expected = record(payload, device1Scan2)
@@ -227,7 +195,7 @@ class RecordProviderForScanWithoutPayloadTest {
 
         assertThat(bleRecordProvider.lastPayloadByDeviceId.size()).isEqualTo(4)
         val device4Scan1 = bleScannedDevice(device4, serviceData = null)
-        val result = bleRecordProvider.fromScan(device4Scan1, payload = null)
+        val result = bleRecordProvider.fromScan(device4Scan1)
 
         // Then
         val expected = record(payload, device4Scan1)
@@ -249,7 +217,7 @@ class RecordProviderForScanWithoutPayloadTest {
 
         assertThat(bleRecordProvider.lastPayloadByDeviceId.size()).isEqualTo(2)
         val device2Scan1 = bleScannedDevice(device2, serviceData = null)
-        val result = bleRecordProvider.fromScan(device2Scan1, payload = null)
+        val result = bleRecordProvider.fromScan(device2Scan1)
 
         // Then
         val expected = record(payload, device2Scan1)
@@ -257,12 +225,9 @@ class RecordProviderForScanWithoutPayloadTest {
         assertThat(bleRecordProvider.lastPayloadByDeviceId.size()).isEqualTo(2)
     }
 
-    private fun givenScanAndPayload(scannedDevices: BleScannedDevice, payload: BlePayload) {
-        bleRecordProvider.fromScan(scannedDevices, payload)
-    }
 
     private fun givenScanAndNoPayload(scannedDevice: BleScannedDevice) {
-        bleRecordProvider.fromScan(scannedDevice, null)
+        bleRecordProvider.fromScan(scannedDevice)
     }
 
     private fun givenPayload(device: BluetoothDevice, payload: BlePayload) {

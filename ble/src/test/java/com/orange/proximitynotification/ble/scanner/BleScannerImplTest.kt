@@ -65,6 +65,31 @@ class BleScannerImplTest {
     }
 
     @Test
+    fun startForDevice_should_return_true() {
+
+        // Given
+
+        // When
+        val result = bleScanner.startForDevice("01:02:03:AB:CD:EF", mock())
+
+        // Then
+        assertThat(result).isTrue()
+    }
+
+    @Test
+    fun startForDevice_given_exception_should_return_false() {
+
+        // Given
+        doThrow(RuntimeException::class).whenever(bluetoothScanner).startScan(any(), any(), any())
+
+        // When
+        val result = bleScanner.startForDevice("01:02:03:AB:CD:EF", mock())
+
+        // Then
+        assertThat(result).isFalse()
+    }
+
+    @Test
     fun stop_given_exception_should_not_throw_exception() {
 
         // Given

@@ -23,11 +23,13 @@ internal class BleRecordMapper(private val settings: BleSettings) {
 
     private fun BleRecord.toProximityMetadata() = BleProximityMetadata(
         rawRssi = rssi,
-        calibratedRssi = BleRssiCalibration.calibrate(
-            rssi = rssi,
-            txCompensationGain = txPowerLevel,
-            rxCompensationGain = settings.rxCompensationGain
-        ),
+        calibratedRssi = if (isRssiCalibrated) rssi else {
+            BleRssiCalibration.calibrate(
+                rssi = rssi,
+                txCompensationGain = txPowerLevel,
+                rxCompensationGain = settings.rxCompensationGain
+            )
+        },
         txPowerLevel = txPowerLevel
     )
 }

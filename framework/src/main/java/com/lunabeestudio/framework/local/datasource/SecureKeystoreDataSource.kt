@@ -188,7 +188,12 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
     // GENERIC METHODS
     private fun <T> getEncryptedValue(key: String, type: Type, useCache: Boolean = true): T? {
         @Suppress("UNCHECKED_CAST")
-        return (cache[key] as? T?).takeIf { useCache } ?: run {
+        val cachedValue = if (useCache) {
+            cache[key] as? T?
+        } else {
+            null
+        }
+        return cachedValue ?: run {
             val encryptedText = sharedPreferences.getString(key, null)
             return if (encryptedText != null) {
                 val result = kotlin.runCatching {

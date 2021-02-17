@@ -23,7 +23,9 @@ fun CovidException.getString(strings: Map<String, String>): String = when (this.
     ErrorCode.NEED_REGISTER -> strings["common.error.needRegister"] ?: message
     ErrorCode.PROXIMITY_UNKNOWN -> listOfNotNull(strings["common.error.proximityUnknown"], message).joinToString("\n")
     ErrorCode.ROBERT_UNKNOWN -> listOfNotNull(strings["common.error.robertUnknown"], message).joinToString("\n")
-    ErrorCode.ROBERT_NO_EBID_FOR_EPOCH -> listOfNotNull(strings["common.error.robertNoEbidForEpoch"], message).joinToString("\n")
+    ErrorCode.ROBERT_NO_EBID_FOR_EPOCH,
+    ErrorCode.ROBERT_INVALID_EBID_FOR_EPOCH,
+    -> listOfNotNull(strings["common.error.robertNoEbidForEpoch"], message).joinToString("\n")
     ErrorCode.ROBERT_NO_EBID -> listOfNotNull(strings["common.error.robertNoEbid"], message).joinToString("\n")
     ErrorCode.KEYSTORE_NO_KEY -> listOfNotNull(strings["common.error.keystoreNoKey"], message).joinToString("\n")
     ErrorCode.DECRYPT_FAIL -> listOfNotNull(strings["common.error.decryptFail"], message).joinToString("\n")

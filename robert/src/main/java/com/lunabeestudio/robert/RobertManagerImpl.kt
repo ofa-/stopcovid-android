@@ -55,6 +55,7 @@ import com.lunabeestudio.robert.repository.RemoteServiceRepository
 import com.lunabeestudio.robert.utils.Event
 import com.lunabeestudio.robert.worker.StatusWorker
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
@@ -383,7 +384,7 @@ class RobertManagerImpl(
         }
     }
 
-    override fun clearOldData() {
+    override suspend fun clearOldData() {
         Timber.v("clear old data")
         val ephemeralBluetoothIdentifierExpiredTime = System.currentTimeMillis().unixTimeMsToNtpTimeS()
         ephemeralBluetoothIdentifierRepository.removeUntilTimeKeepLast(ephemeralBluetoothIdentifierExpiredTime)
@@ -479,7 +480,7 @@ class RobertManagerImpl(
         localProximityRepository.save(*localProximity)
     }
 
-    private fun getSSU(prefix: Byte): RobertResultData<ServerStatusUpdate> {
+    private suspend fun getSSU(prefix: Byte): RobertResultData<ServerStatusUpdate> {
         val ephemeralBluetoothIdentifier = ephemeralBluetoothIdentifierRepository.getForTime()
             ?: ephemeralBluetoothIdentifierRepository.getAll().lastOrNull()
 
@@ -493,7 +494,7 @@ class RobertManagerImpl(
         }
     }
 
-    override fun getCurrentHelloBuilder(): RobertResultData<HelloBuilder> {
+    override suspend fun getCurrentHelloBuilder(): RobertResultData<HelloBuilder> {
         val ephemeralBluetoothIdentifier = ephemeralBluetoothIdentifierRepository.getForTime()
 
         return if (ephemeralBluetoothIdentifier != null) {
@@ -556,7 +557,7 @@ class RobertManagerImpl(
         }
     }
 
-    override fun clearLocalData(application: RobertApplication) {
+    override suspend fun clearLocalData(application: RobertApplication) {
         stopStatusWorker(application.getAppContext())
         deactivateProximity(application)
         ephemeralBluetoothIdentifierRepository.removeAll()
@@ -583,12 +584,12 @@ class RobertManagerImpl(
         return localProximityRepository.getUntilTime(timeMs)
     }
 
-    /*suspend*/ fun getLocalEbids(): List<EphemeralBluetoothIdentifier> {
+    suspend fun getLocalEbids(): List<EphemeralBluetoothIdentifier> {
         return ephemeralBluetoothIdentifierRepository.getAll()
     }
 
     fun getCurrentEbid(): EphemeralBluetoothIdentifier? {
-        return ephemeralBluetoothIdentifierRepository.getForTime()
+        return runBlocking { ephemeralBluetoothIdentifierRepository.getForTime() }
     }
 
     private fun startStatusWorker(context: Context) {

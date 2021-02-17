@@ -59,15 +59,15 @@ class BlePayloadTest {
     }
 
     @Test
-    fun from_should_return_expected_payload() {
+    fun from_given_version_1_payload_should_return_expected_payload() {
 
         // Given
         val proximityPayload = proximityPayload()
-        val version = 2
+        val version = 1
         val txCompensationGain = -1
         val payload: ByteArray =
             proximityPayload.data + byteArrayOf(version.toByte()) + byteArrayOf(txCompensationGain.toByte())
-        val expected = payload(proximityPayload = proximityPayload, version = 2, txPowerLevel = -1)
+        val expected = payload(proximityPayload = proximityPayload, version = 1, txPowerLevel = -1)
 
         // When
         val result = BlePayload.from(payload)
@@ -80,13 +80,61 @@ class BlePayloadTest {
     }
 
     @Test
-    fun toByteArray_should_match() {
+    fun from_given_version_2_payload_with_calibrated_rssi_should_return_expected_payload() {
+
+        // Given
+        val proximityPayload = proximityPayload()
+        val version = 2
+        val txCompensationGain = -1
+        val calibratedRssi = 30
+        val payload: ByteArray =
+            proximityPayload.data + byteArrayOf(version.toByte()) + byteArrayOf(
+                txCompensationGain.toByte(),
+                calibratedRssi.toByte()
+            )
+        val expected =
+            payload(proximityPayload = proximityPayload, version = 2, txPowerLevel = -1, 30)
+
+        // When
+        val result = BlePayload.from(payload)
+
+        // Then
+        assertThat(result).isEqualTo(expected)
+        assertThat(result.proximityPayload).isEqualTo(proximityPayload)
+        assertThat(result.version).isEqualTo(version)
+        assertThat(result.txPowerLevel).isEqualTo(txCompensationGain)
+        assertThat(result.calibratedRssi).isEqualTo(calibratedRssi)
+    }
+
+    @Test
+    fun toByteArray_given_version_1_payload_should_match() {
 
         // Given
         val proximityPayload = ProximityPayload((1..16).map { it.toByte() }.toByteArray())
-        val payload = payload(proximityPayload = proximityPayload, version = 2, txPowerLevel = -1)
+        val payload = payload(proximityPayload = proximityPayload, version = 1, txPowerLevel = -1)
         val expected: ByteArray =
-            byteArrayOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 2, -1)
+            byteArrayOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 1, -1)
+
+        // When
+        val result = payload.toByteArray()
+
+        // Then
+        assertThat(result).isEqualTo(expected)
+    }
+
+    @Test
+    fun toByteArray_given_version_2_payload_with_calibrated_rssi_should_match() {
+
+        // Given
+        val proximityPayload = ProximityPayload((1..16).map { it.toByte() }.toByteArray())
+        val payload = payload(
+            proximityPayload = proximityPayload,
+            version = 2,
+            txPowerLevel = -1,
+            calibratedRssi = 30
+        )
+        val expected: ByteArray =
+            byteArrayOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 2, -1, 30)
 
         // When
         val result = payload.toByteArray()

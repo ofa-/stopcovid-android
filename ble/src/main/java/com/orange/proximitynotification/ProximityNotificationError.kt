@@ -10,7 +10,19 @@
 
 package com.orange.proximitynotification
 
-data class ProximityNotificationError(val type: Type, val rootErrorCode: Int? = null, val cause: String? = null) {
+data class ProximityNotificationError(
+    val type: Type,
+    val rootErrorCode: Int? = null,
+    val cause: String? = null
+) {
+
+    companion object {
+        /**
+         * Root error code when too much BLE operation fail which may indicate that Bluetooth Stack
+         * is unhealthy.
+         */
+        const val UNHEALTHY_BLUETOOTH_ERROR_CODE = 1000
+    }
 
     enum class Type {
         /**
@@ -27,10 +39,5 @@ data class ProximityNotificationError(val type: Type, val rootErrorCode: Int? = 
          * BLE gatt error
          */
         BLE_GATT,
-
-        /**
-         * BLE proximity notification component error
-         */
-        BLE_PROXIMITY_NOTIFICATION
     }
 }

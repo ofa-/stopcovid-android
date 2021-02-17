@@ -13,6 +13,7 @@ package com.lunabeestudio.stopcovid.coreui.extension
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import androidx.core.util.AtomicFile
 import androidx.emoji.text.EmojiCompat
 import com.lunabeestudio.stopcovid.coreui.BuildConfig
 import com.lunabeestudio.stopcovid.coreui.network.OkHttpClient
@@ -22,6 +23,7 @@ import okhttp3.Request
 import retrofit2.HttpException
 import retrofit2.Response
 import java.io.File
+import java.io.FileOutputStream
 
 @Suppress("BlockingMethodInNonBlockingContext")
 suspend fun String.saveTo(context: Context, file: File) {
@@ -37,6 +39,26 @@ suspend fun String.saveTo(context: Context, file: File) {
                     input.copyTo(output, 4 * 1024)
                 }
             }
+        } else {
+            throw HttpException(Response.error<Any>(response.body!!, response))
+        }
+    }
+}
+
+@Suppress("BlockingMethodInNonBlockingContext")
+suspend fun String.saveTo(context: Context, atomicFile: AtomicFile): FileOutputStream? {
+    return withContext(Dispatchers.IO) {
+        val okHttpClient = OkHttpClient.getDefaultOKHttpClient(context, this@saveTo, BuildConfig.SERVER_CERTIFICATE_SHA256)
+        val request: Request = Request.Builder()
+            .url(this@saveTo)
+            .build()
+        val response = okHttpClient.newCall(request).execute()
+        if (response.isSuccessful && response.body != null) {
+            val fileOutputStream = atomicFile.startWrite()
+            response.body!!.string().byteInputStream().use { input ->
+                input.copyTo(fileOutputStream, 4 * 1024)
+            }
+            fileOutputStream
         } else {
             throw HttpException(Response.error<Any>(response.body!!, response))
         }

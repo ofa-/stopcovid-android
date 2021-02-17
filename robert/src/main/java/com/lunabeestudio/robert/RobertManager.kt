@@ -77,9 +77,9 @@ interface RobertManager {
 
     suspend fun updateStatus(robertApplication: RobertApplication): RobertResult
 
-    fun clearOldData()
+    suspend fun clearOldData()
 
-    fun clearLocalData(application: RobertApplication)
+    suspend fun clearLocalData(application: RobertApplication)
 
     suspend fun report(
         token: String,
@@ -92,7 +92,7 @@ interface RobertManager {
 
     suspend fun storeLocalProximity(vararg localProximity: LocalProximity)
 
-    fun getCurrentHelloBuilder(): RobertResultData<HelloBuilder>
+    suspend fun getCurrentHelloBuilder(): RobertResultData<HelloBuilder>
 
     suspend fun eraseLocalHistory(): RobertResult
 

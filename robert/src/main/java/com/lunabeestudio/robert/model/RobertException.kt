@@ -10,7 +10,7 @@
 
 package com.lunabeestudio.robert.model
 
-abstract class RobertException(
+sealed class RobertException(
     val errorCode: ErrorCode,
     override val message: String,
 ) : Exception(message)
@@ -23,13 +23,13 @@ enum class ErrorCode {
     BACKEND,
     PROXIMITY_UNKNOWN,
     ROBERT_UNKNOWN,
+    ROBERT_INVALID_EBID_FOR_EPOCH,
     ROBERT_NO_EBID_FOR_EPOCH,
     ROBERT_NO_EBID,
     DECRYPT_FAIL,
     KEYSTORE_NO_KEY,
     BLE_ADVERTISER,
     BLE_SCANNER,
-    BLE_PROXIMITY_NOTIFICATION,
     BLE_GATT,
     TIME_NOT_ALIGNED,
     REPORT_DELAY,
@@ -66,20 +66,20 @@ class NoKeyException(message: String = "No key found") :
 class NoEphemeralBluetoothIdentifierFoundForEpoch(message: String = "No EphemeralBluetoothIdentifier found for the requested time") :
     RobertException(ErrorCode.ROBERT_NO_EBID_FOR_EPOCH, message)
 
+class InvalidEphemeralBluetoothIdentifierForEpoch(message: String? = null) :
+    RobertException(ErrorCode.ROBERT_INVALID_EBID_FOR_EPOCH, message ?: "EphemeralBluetoothIdentifier is not valid for the requested time")
+
 class NoEphemeralBluetoothIdentifierFound(message: String? = null) :
     RobertException(ErrorCode.ROBERT_NO_EBID, message ?: "No EphemeralBluetoothIdentifier found")
 
 class RobertUnknownException(message: String = "Unknown error occurred") :
     RobertException(ErrorCode.ROBERT_UNKNOWN, message)
 
-class BLEAdvertiserException(message: String = "An error occurs in BLE advertiser") :
+class BLEAdvertiserException(message: String = "An error occurs in BLE advertiser", val shouldRestartBle : Boolean = false) :
     RobertException(ErrorCode.BLE_ADVERTISER, message)
 
 class BLEScannerException(message: String = "An error occurs in BLE scanner") :
     RobertException(ErrorCode.BLE_SCANNER, message)
-
-class BLEProximityNotificationException(message: String = "An error occurs in BLE proximity notification") :
-    RobertException(ErrorCode.BLE_PROXIMITY_NOTIFICATION, message)
 
 class BLEGattException(message: String = "An error occurs in BLE gatt") :
     RobertException(ErrorCode.BLE_GATT, message)

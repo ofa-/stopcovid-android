@@ -25,6 +25,7 @@ class Configuration(
     val minHourContactNotif: Int,
     val maxHourContactNotif: Int,
     var displayDepartmentLevel: Boolean,
+    val dontUseScannerHardwareBatching: List<String>?,
     val calibration: List<DeviceParameterCorrection>,
     val filterConfig: String,
     val filterMode: String,
@@ -47,4 +48,8 @@ class Configuration(
     val isolationDuration: Long,
     val postIsolationDuration: Long,
     val venuesSalt: Int,
+    val allowNoAdvertisingDevice: Boolean,
+    val unsupportedDevices: List<String>?,
+    val vaccinationCentersCount: Int,
+    val scanReportDelay: Int,
 )

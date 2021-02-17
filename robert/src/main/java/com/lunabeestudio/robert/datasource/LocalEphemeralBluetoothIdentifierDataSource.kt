@@ -13,9 +13,9 @@ package com.lunabeestudio.robert.datasource
 import com.lunabeestudio.domain.model.EphemeralBluetoothIdentifier
 
 interface LocalEphemeralBluetoothIdentifierDataSource {
-    fun getAll(): List<EphemeralBluetoothIdentifier>
-    fun getForTime(ntpTimeS: Long): EphemeralBluetoothIdentifier?
-    fun saveAll(vararg ephemeralBluetoothIdentifier: EphemeralBluetoothIdentifier)
-    fun removeUntilTimeKeepLast(ntpTimeS: Long)
-    fun removeAll()
+    suspend fun getAll(): List<EphemeralBluetoothIdentifier>
+    suspend fun getForTime(ntpTimeS: Long): EphemeralBluetoothIdentifier?
+    suspend fun saveAll(vararg ephemeralBluetoothIdentifier: EphemeralBluetoothIdentifier)
+    suspend fun removeUntilTimeKeepLast(ntpTimeS: Long)
+    suspend fun removeAll()
 }

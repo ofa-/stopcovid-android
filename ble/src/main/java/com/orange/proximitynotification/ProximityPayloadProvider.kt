@@ -11,16 +11,16 @@
 package com.orange.proximitynotification
 
 /**
- * Provides the ProximityPayload to exchange
+ * Provides the [ProximityPayload] to exchange
  *
  * @see ProximityPayload
  */
 interface ProximityPayloadProvider {
 
     /**
-     * Return the current ProximityPayload
+     * Return the current [ProximityPayload]
      *
-     * @return ProximityPayload to exchange
+     * @return [ProximityPayload] to exchange
      */
     suspend fun current(): ProximityPayload
 }

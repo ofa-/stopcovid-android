@@ -17,18 +17,21 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import com.github.mikephil.charting.data.Entry
+import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.extension.isNightMode
 import com.lunabeestudio.stopcovid.coreui.extension.viewLifecycleOwnerOrNull
 import com.lunabeestudio.stopcovid.coreui.fastitem.cardWithActionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
+import com.lunabeestudio.stopcovid.databinding.ItemKeyFigureChartCardBinding
 import com.lunabeestudio.stopcovid.extension.brighterColor
 import com.lunabeestudio.stopcovid.extension.chosenPostalCode
 import com.lunabeestudio.stopcovid.extension.colorStringKey
 import com.lunabeestudio.stopcovid.extension.formatNumberIfNeeded
 import com.lunabeestudio.stopcovid.extension.getKeyFigureForPostalCode
 import com.lunabeestudio.stopcovid.extension.getRelativeDateShortString
+import com.lunabeestudio.stopcovid.extension.hasAverageChart
 import com.lunabeestudio.stopcovid.extension.itemForFigure
 import com.lunabeestudio.stopcovid.extension.labelShortStringKey
 import com.lunabeestudio.stopcovid.extension.labelStringKey
@@ -128,6 +131,10 @@ class KeyFigureDetailsFragment : KeyFigureGenericFragment() {
                         globalData(figure, departmentKeyFigure != null)
                     ).filterNotNull().toTypedArray()
                     chartExplanationLabel = chartExplanationLabel(figure, chartData)
+                    shareContentDescription = strings["accessibility.hint.keyFigure.chart.share"]
+                    onShareCard = { binding ->
+                        shareChart(binding)
+                    }
                 }
             } else {
                 if (departmentKeyFigure != null) {
@@ -136,6 +143,10 @@ class KeyFigureDetailsFragment : KeyFigureGenericFragment() {
                             localData(figure)
                         ).filterNotNull().toTypedArray()
                         chartExplanationLabel = chartExplanationLabel(figure, chartData.plus(globalData(figure, true)))
+                        shareContentDescription = strings["accessibility.hint.keyFigure.chart.share"]
+                        onShareCard = { binding ->
+                            shareChart(binding)
+                        }
                     }
                     items += spaceItem {
                         spaceRes = R.dimen.spacing_medium
@@ -147,6 +158,26 @@ class KeyFigureDetailsFragment : KeyFigureGenericFragment() {
                         globalData(figure, departmentKeyFigure != null)
                     )
                     chartExplanationLabel = chartExplanationLabel(figure, chartData)
+                    shareContentDescription = strings["accessibility.hint.keyFigure.chart.share"]
+                    onShareCard = { binding ->
+                        shareChart(binding)
+                    }
+                }
+            }
+
+            if (figure.hasAverageChart()) {
+                items += keyFigureCardChartItem {
+                    chartData = arrayOf(
+                        avgGlobalData(figure, departmentKeyFigure != null)
+                    )
+                    chartExplanationLabel = stringsFormat(
+                        "keyFigureDetailController.section.evolutionAvg.subtitle",
+                        strings["${figure.labelKey}.label"]
+                    )
+                    shareContentDescription = strings["accessibility.hint.keyFigure.chart.share"]
+                    onShareCard = { binding ->
+                        shareChart(binding)
+                    }
                 }
             }
 
@@ -177,6 +208,17 @@ class KeyFigureDetailsFragment : KeyFigureGenericFragment() {
         return items
     }
 
+    private fun shareChart(binding: ItemKeyFigureChartCardBinding) {
+        viewLifecycleOwnerOrNull()?.lifecycleScope?.launch {
+            val uri = getShareCaptureUri(binding, Constants.Chart.SHARE_CHART_FILENAME)
+            withContext(Dispatchers.Main) {
+                ShareManager.shareImageAndText(requireContext(), uri, null) {
+                    strings["common.error.unknown"]?.let { showErrorSnackBar(it) }
+                }
+            }
+        }
+    }
+
     @ExperimentalTime
     private fun chartExplanationLabel(figure: KeyFigure, chartData: Array<ChartData>): String? {
         return when {
@@ -203,24 +245,34 @@ class KeyFigureDetailsFragment : KeyFigureGenericFragment() {
             ChartData(
                 description = figure.getKeyFigureForPostalCode(sharedPrefs.chosenPostalCode)?.dptLabel,
                 currentValueToDisplay = departmentKeyFigure.valueToDisplay,
-                entries = departmentKeyFigure.series.map {
-                    Entry(it.date.toFloat(), it.value.toFloat())
-                },
+                entries = departmentKeyFigure.series
+                    .sortedBy { it.date }
+                    .map { Entry(it.date.toFloat(), it.value.toFloat()) },
                 color = Color.parseColor(strings[figure.colorStringKey(requireContext().isNightMode())])
             )
         }
     }
 
     private fun globalData(figure: KeyFigure, isSecondary: Boolean) = ChartData(
-        description = if (isSecondary) {
-            strings["common.country.france"]
-        } else {
-            null
-        },
+        description = strings["common.country.france"],
         currentValueToDisplay = figure.valueGlobalToDisplay,
-        entries = figure.series.map {
-            Entry(it.date.toFloat(), it.value.toFloat())
-        },
+        entries = figure.series
+            .sortedBy { it.date }
+            .map { Entry(it.date.toFloat(), it.value.toFloat()) },
+        color = if (isSecondary) {
+            Color.parseColor(strings[figure.colorStringKey(requireContext().isNightMode())]).brighterColor()
+        } else {
+            Color.parseColor(strings[figure.colorStringKey(requireContext().isNightMode())])
+        }
+    )
+
+    private fun avgGlobalData(figure: KeyFigure, isSecondary: Boolean) = ChartData(
+        description = stringsFormat("keyFigureDetailController.section.evolutionAvg.legendWithLocation", strings["common.country.france"]),
+        currentValueToDisplay = figure.valueGlobalToDisplay,
+        entries = figure.avgSeries
+            ?.sortedBy { it.date }
+            ?.map { Entry(it.date.toFloat(), it.value.toFloat()) }
+            ?: emptyList(),
         color = if (isSecondary) {
             Color.parseColor(strings[figure.colorStringKey(requireContext().isNightMode())]).brighterColor()
         } else {

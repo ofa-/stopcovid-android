@@ -29,7 +29,7 @@ internal class EphemeralBluetoothIdentifierRepository(
 ) {
     @OptIn(ExperimentalStdlibApi::class)
     @Throws(NullPointerException::class, NoKeyException::class)
-    fun save(tuples: ByteArray) {
+    suspend fun save(tuples: ByteArray) {
         val rawEbid = localKeystoreDataSource.kEA?.let {
             try {
                 sharedCryptoDataSource.decrypt(it, tuples).decodeToString()
@@ -47,19 +47,19 @@ internal class EphemeralBluetoothIdentifierRepository(
         localEphemeralBluetoothIdentifierDataSource.saveAll(*ebids.toTypedArray())
     }
 
-    fun getAll(): List<EphemeralBluetoothIdentifier> {
+    suspend fun getAll(): List<EphemeralBluetoothIdentifier> {
         return localEphemeralBluetoothIdentifierDataSource.getAll()
     }
 
-    fun getForTime(ntpTimeS: Long = System.currentTimeMillis().unixTimeMsToNtpTimeS()): EphemeralBluetoothIdentifier? {
+    suspend fun getForTime(ntpTimeS: Long = System.currentTimeMillis().unixTimeMsToNtpTimeS()): EphemeralBluetoothIdentifier? {
         return localEphemeralBluetoothIdentifierDataSource.getForTime(ntpTimeS)
     }
 
-    fun removeUntilTimeKeepLast(ntpTimeS: Long) {
+    suspend fun removeUntilTimeKeepLast(ntpTimeS: Long) {
         localEphemeralBluetoothIdentifierDataSource.removeUntilTimeKeepLast(ntpTimeS)
     }
 
-    fun removeAll() {
+    suspend fun removeAll() {
         localEphemeralBluetoothIdentifierDataSource.removeAll()
     }
 }

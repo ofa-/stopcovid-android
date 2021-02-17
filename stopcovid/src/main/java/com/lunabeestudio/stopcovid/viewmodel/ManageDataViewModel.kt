@@ -26,7 +26,6 @@ import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.StopCovid
 import com.lunabeestudio.stopcovid.coreui.UiConstants
 import com.lunabeestudio.stopcovid.coreui.utils.SingleLiveEvent
-import com.lunabeestudio.stopcovid.extension.chosenPostalCode
 import com.lunabeestudio.stopcovid.extension.toCovidException
 import com.lunabeestudio.stopcovid.manager.IsolationManager
 import com.lunabeestudio.stopcovid.manager.VenuesManager
@@ -144,7 +143,6 @@ class ManageDataViewModel(
                             eraseVenues(application, false)
                             (application.getAppContext() as StopCovid).cancelActivateReminder()
                             eraseIsolation(false)
-                            PreferenceManager.getDefaultSharedPreferences(application.getAppContext()).chosenPostalCode = null
                             quitStopCovidSuccess.postValue(null)
                         }
                         is RobertResult.Failure -> covidException.postValue(result.error.toCovidException())

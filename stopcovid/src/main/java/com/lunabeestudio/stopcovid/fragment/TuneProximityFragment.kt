@@ -50,17 +50,21 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        localEbids.addAll(robertManager.getLocalEbids())
         setTopBarOnclick()
         updateLastNotification()
         refreshItems()
-        application.registerListener(this)
         initLocalProximityItems()
+    }
+
+    private suspend fun initLocalEbids() {
+        localEbids.addAll(robertManager.getLocalEbids())
+        application.registerListener(this)
     }
 
     private fun initLocalProximityItems() {
         val anim = loadingAnimation()
         CoroutineScope(Dispatchers.Default).launch {
+            initLocalEbids()
             val items = getLocalProximityData()
             anim.cancel()
             localProximityItems = items

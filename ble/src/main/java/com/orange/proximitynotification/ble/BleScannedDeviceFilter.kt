@@ -13,17 +13,18 @@ package com.orange.proximitynotification.ble
 import com.orange.proximitynotification.ble.scanner.BleScannedDevice
 import java.util.Date
 
-internal class BleScannedDeviceFilter {
-
-    private var mostRecentScanTimestamp = Date(0)
+internal class BleScannedDeviceFilter(
+    private var mostRecentScanTimestamp: Date = Date()
+) {
 
     fun filter(scannedDevices: List<BleScannedDevice>): List<BleScannedDevice> {
 
-        val results = scannedDevices.sortedByDescending { it.timestamp }
+        val results = scannedDevices
+            .filter { it.timestamp > mostRecentScanTimestamp }
+            .sortedByDescending { it.timestamp }
             .distinctBy {
                 it.serviceData?.contentHashCode() ?: run { it.device.address }
             }
-            .filter { it.timestamp > mostRecentScanTimestamp }
 
         results.firstOrNull()?.let { this.mostRecentScanTimestamp = it.timestamp }
         return results

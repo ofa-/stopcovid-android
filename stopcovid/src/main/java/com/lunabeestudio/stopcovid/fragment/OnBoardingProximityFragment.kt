@@ -12,40 +12,31 @@ package com.lunabeestudio.stopcovid.fragment
 
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
-import android.bluetooth.le.AdvertiseCallback
-import android.bluetooth.le.AdvertiseData
-import android.bluetooth.le.AdvertiseSettings
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.os.ParcelUuid
 import android.view.Gravity
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.lifecycleScope
-import androidx.preference.PreferenceManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.UiConstants
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.extension.openAppSettings
 import com.lunabeestudio.stopcovid.coreui.extension.showPermissionRationale
-import com.lunabeestudio.stopcovid.coreui.extension.viewLifecycleOwnerOrNull
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
+import com.lunabeestudio.stopcovid.extension.openInExternalBrowser
+import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
-import com.lunabeestudio.stopcovid.extension.setAdvertisementAvailable
 import com.lunabeestudio.stopcovid.fastitem.logoItem
 import com.lunabeestudio.stopcovid.manager.ProximityManager
 import com.mikepenz.fastadapter.GenericItem
-import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.coroutines.withTimeoutOrNull
-import timber.log.Timber
-import java.util.UUID
-import kotlin.coroutines.resume
-import kotlin.time.ExperimentalTime
-import kotlin.time.seconds
 
 class OnBoardingProximityFragment : OnBoardingFragment() {
+
+    private val robertManager by lazy {
+        requireContext().robertManager()
+    }
 
     override fun getTitleKey(): String = "onboarding.proximityController.title"
     override fun getButtonTitleKey(): String = "onboarding.proximityController.allowProximity"
@@ -62,7 +53,10 @@ class OnBoardingProximityFragment : OnBoardingFragment() {
                     )
                 }
                 .show()
-        } else if (ProximityManager.hasFeatureBLE(requireContext()) && !ProximityManager.isBluetoothOn(requireContext())) {
+        } else if (ProximityManager.hasFeatureBLE(requireContext(), robertManager) && !ProximityManager.isBluetoothOn(
+                requireContext(),
+                robertManager
+            )) {
             val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
             startActivityForResult(enableBtIntent, UiConstants.Activity.BLUETOOTH.ordinal)
         } else {
@@ -98,16 +92,30 @@ class OnBoardingProximityFragment : OnBoardingFragment() {
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         if (requestCode == UiConstants.Permissions.LOCATION.ordinal) {
             if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                if (ProximityManager.hasFeatureBLE(requireContext()) && !ProximityManager.isBluetoothOn(requireContext())) {
+                if (ProximityManager.hasFeatureBLE(requireContext(), robertManager) && !ProximityManager.isBluetoothOn(
+                        requireContext(),
+                        robertManager
+                    )) {
                     val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
                     startActivityForResult(enableBtIntent, UiConstants.Activity.BLUETOOTH.ordinal)
                 } else {
                     startNextController()
                 }
             } else if (!shouldShowRequestPermissionRationale(ProximityManager.getManifestLocationPermission())) {
-                context?.showPermissionRationale(strings, "common.needLocalisationAccessToScan", "common.settings", true, {
-                    openAppSettings()
-                }, null)
+                context?.showPermissionRationale(
+                    strings = strings,
+                    messageKey = "common.needLocalisationAccessToScan",
+                    positiveKey = "common.settings",
+                    neutralKey = "common.readMore",
+                    cancelable = true,
+                    positiveAction = {
+                        openAppSettings()
+                    },
+                    neutralAction = {
+                        strings["common.privacyPolicy"]?.openInExternalBrowser(requireContext())
+                    },
+                    negativeAction = null
+                )
             }
         } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults)
@@ -125,14 +133,8 @@ class OnBoardingProximityFragment : OnBoardingFragment() {
     }
 
     private fun startNextController() {
-        viewLifecycleOwnerOrNull()?.lifecycleScope?.launchWhenResumed {
-            getActivityBinding().blockingProgressBar.show()
-            val success = isAdvertisementAvailable()
-            getActivityBinding().blockingProgressBar.hide()
-
-            PreferenceManager.getDefaultSharedPreferences(context).setAdvertisementAvailable(success)
-
-            if (success) {
+        context?.let { context ->
+            if (ProximityManager.hasFeatureBLE(context, robertManager)) {
                 if (!ProximityManager.isBatteryOptimizationOff(requireContext())) {
                     findNavControllerOrNull()
                         ?.safeNavigate(OnBoardingProximityFragmentDirections.actionOnBoardingProximityFragmentToOnBoardingBatteryFragment())
@@ -145,56 +147,5 @@ class OnBoardingProximityFragment : OnBoardingFragment() {
                     ?.safeNavigate(OnBoardingProximityFragmentDirections.actionOnBoardingProximityFragmentToOnBoardingNoBleFragment())
             }
         }
-    }
-
-    @OptIn(ExperimentalTime::class)
-    private suspend fun isAdvertisementAvailable(): Boolean {
-        return withTimeoutOrNull(ADVERTISEMENT_AVAILABLE_TIMEOUT) {
-            suspendCancellableCoroutine { continuation ->
-                val bluetoothLeAdvertiser = BluetoothAdapter.getDefaultAdapter()?.bluetoothLeAdvertiser
-                if (bluetoothLeAdvertiser != null) {
-                    bluetoothLeAdvertiser.startAdvertising(
-                        buildAdvertiseSettings(),
-                        buildAdvertiseData(),
-                        object : AdvertiseCallback() {
-                            override fun onStartSuccess(settingsInEffect: AdvertiseSettings?) {
-                                bluetoothLeAdvertiser.stopAdvertising(this)
-                                continuation.resume(true)
-                            }
-
-                            override fun onStartFailure(errorCode: Int) {
-                                bluetoothLeAdvertiser.stopAdvertising(this)
-                                Timber.e("Advertisement not supported (Error code : $errorCode)")
-                                continuation.resume(errorCode != ADVERTISE_FAILED_FEATURE_UNSUPPORTED)
-                            }
-                        }
-                    )
-                } else {
-                    continuation.resume(false)
-                }
-            }
-        } ?: false
-    }
-
-    private fun buildAdvertiseSettings(): AdvertiseSettings {
-        return AdvertiseSettings.Builder()
-            .setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_LOW_LATENCY)
-            .setConnectable(true)
-            .setTxPowerLevel(AdvertiseSettings.ADVERTISE_TX_POWER_MEDIUM)
-            .setTimeout(0)
-            .build()
-    }
-
-    private fun buildAdvertiseData(): AdvertiseData {
-        return AdvertiseData.Builder()
-            .addServiceUuid(ParcelUuid(UUID.randomUUID()))
-            .setIncludeDeviceName(false)
-            .setIncludeTxPowerLevel(false)
-            .build()
-    }
-
-    companion object {
-        @OptIn(ExperimentalTime::class)
-        private val ADVERTISEMENT_AVAILABLE_TIMEOUT = 8.seconds
     }
 }
