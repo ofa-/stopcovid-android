@@ -19,15 +19,21 @@ import com.lunabeestudio.stopcovid.service.ProximityService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class UpgradeReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
-        if (intent.action == Intent.ACTION_MY_PACKAGE_REPLACED && context.robertManager().isProximityActive) {
-            GlobalScope.launch(Dispatchers.Main) {
-                StringsManager.initialize(context)
-                ProximityService.start(context)
+        try {
+            if (intent.action == Intent.ACTION_MY_PACKAGE_REPLACED && context.robertManager().isProximityActive) {
+                GlobalScope.launch(Dispatchers.Main) {
+                    StringsManager.initialize(context)
+                    ProximityService.start(context)
+                }
             }
+        } catch (t: Throwable) {
+            // Keychain may not be fully initialized
+            Timber.e(t)
         }
     }
 }

@@ -11,7 +11,6 @@
 package com.lunabeestudio.stopcovid.activity
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -27,6 +26,7 @@ import com.lunabeestudio.stopcovid.BuildConfig
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
 import com.lunabeestudio.stopcovid.databinding.ActivityAppMaintenanceBinding
+import com.lunabeestudio.stopcovid.extension.openInExternalBrowser
 import com.lunabeestudio.stopcovid.manager.AppMaintenanceManager
 import com.lunabeestudio.stopcovid.model.Info
 import kotlinx.coroutines.launch
@@ -64,7 +64,7 @@ class AppMaintenanceActivity : AppCompatActivity() {
         if (info.buttonTitle != null && info.buttonUrl != null) {
             binding.button.text = info.buttonTitle
             binding.button.setOnClickListener {
-                startActivity(Intent(Intent.ACTION_VIEW).setData(Uri.parse(BuildConfig.APP_STORE_URL)))
+                startOpenInStore()
             }
             binding.button.visibility = View.VISIBLE
         } else {
@@ -116,6 +116,14 @@ class AppMaintenanceActivity : AppCompatActivity() {
                         binding.swipeRefreshLayout.isRefreshing = false
                         fillScreen(info)
                     })
+            }
+        }
+    }
+
+    private fun startOpenInStore() {
+        if (!BuildConfig.PLAY_STORE_URL.openInExternalBrowser(this, false)) {
+            if (!BuildConfig.APP_GALLERY_URL.openInExternalBrowser(this, false)) {
+                BuildConfig.BONJOUR_WEBSITE_URL.openInExternalBrowser(this)
             }
         }
     }

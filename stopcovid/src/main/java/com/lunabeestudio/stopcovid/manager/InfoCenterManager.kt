@@ -287,6 +287,7 @@ object InfoCenterManager {
             .setContentTitle(strings["info.notification.newsAvailable.title"])
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setAutoCancel(true)
+            .setOnlyAlertOnce(true)
             .setSmallIcon(com.lunabeestudio.stopcovid.coreui.R.drawable.ic_notification_bar)
             .setStyle(
                 NotificationCompat.BigTextStyle()

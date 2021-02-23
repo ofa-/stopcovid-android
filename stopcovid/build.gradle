@@ -43,8 +43,8 @@ android {
         applicationId "fr.gouv.android.stopcovid"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 164
-        versionName "2.2.6"
+        versionCode 172
+        versionName "2.2.7"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
@@ -59,7 +59,9 @@ android {
         buildConfigField 'String', 'VACCINATION_CENTER_PATH', '"/infos/dep/"'
         buildConfigField 'String', 'VACCINATION_CENTER_FILENAME', '"centres-vaccination.json"'
         buildConfigField 'String', 'VACCINATION_CENTER_LAST_UPDATE_FILENAME', '"lastUpdate.json"'
-        buildConfigField 'String', 'APP_STORE_URL', '"https://play.google.com/store/apps/details?id=fr.gouv.android.stopcovid"'
+        buildConfigField 'String', 'PLAY_STORE_URL', '"market://details?id=fr.gouv.android.stopcovid"'
+        buildConfigField 'String', 'APP_GALLERY_URL', '"appmarket://details?id=fr.gouv.android.stopcovid"'
+        buildConfigField 'String', 'BONJOUR_WEBSITE_URL', '"https://bonjour.tousanticovid.gouv.fr"'
     }
 
     lintOptions {

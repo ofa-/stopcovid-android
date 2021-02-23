@@ -27,7 +27,6 @@ import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
 import com.lunabeestudio.stopcovid.extension.openInExternalBrowser
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
-import com.lunabeestudio.stopcovid.extension.startEmailIntent
 import com.lunabeestudio.stopcovid.fastitem.logoItem
 import com.mikepenz.fastadapter.GenericItem
 

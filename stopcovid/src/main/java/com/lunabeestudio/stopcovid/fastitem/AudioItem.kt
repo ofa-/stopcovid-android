@@ -32,18 +32,25 @@ class AudioItem(context: Context, audioFile: File) : BaseItem<AudioItem.ViewHold
         super.bindView(holder, payloads)
         holder.imageView1.contentDescription = playTalkbackText
         holder.imageView2.contentDescription = pauseTalkbackText
-        holder.imageSwitcher.setOnClickListener {
-            if (holder.imageSwitcher.currentView == holder.imageView1) {
-                audioMediaPlayer.start()
-                audioMediaPlayer.setOnCompletionListener {
-                    holder.imageSwitcher.showNext()
-                }
-            } else {
-                audioMediaPlayer.pause()
-                audioMediaPlayer.setOnCompletionListener(null)
-            }
-            holder.imageSwitcher.showNext()
+        holder.imageView1.setOnClickListener {
+            onClick(holder)
         }
+        holder.imageView2.setOnClickListener {
+            onClick(holder)
+        }
+    }
+
+    private fun onClick(holder: ViewHolder) {
+        if (holder.imageSwitcher.currentView == holder.imageView1) {
+            audioMediaPlayer.start()
+            audioMediaPlayer.setOnCompletionListener {
+                holder.imageSwitcher.showNext()
+            }
+        } else {
+            audioMediaPlayer.pause()
+            audioMediaPlayer.setOnCompletionListener(null)
+        }
+        holder.imageSwitcher.showNext()
     }
 
     override fun unbindView(holder: ViewHolder) {

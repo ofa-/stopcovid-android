@@ -120,7 +120,7 @@
     "common.yes": "Yes",
     "common.no": "No",
     "common.tryAgain": "Try again",
-    "common.needCameraAccessToScan": "The app needs to access the camera in order to scan the QR Code",
+    "common.needCameraAccessToScan": "The app needs to access the camera in order to scan the QR Code. You can also read our privacy policy regarding this camera permission.",
     "common.needLocalisationAccessToScan": "The app needs access to your location in order to be able to scan neighbouring devices",
     "common.settings": "Settings",
     "common.permissionsNeeded": "Important message",
@@ -550,8 +550,8 @@
     "home.activation.sick.alert.message": "The alert for exposure to COVID-19 cannot be activated for 2 months after you declare yourself positive for COVID-19.\n\nFor 2 months after testing positive for COVID-19, you will not be considered as being \"at-risk of infection\".",
     "common.error.secretKey": "Database encryption failure. Please try again or restart your phone.",
     "home.venuesSection.title": "Locations",
-    "home.venuesSection.recordCell.title": "Scan a location QR code",
-    "home.venuesSection.recordCell.subtitle": "Record a history of all the locations you have been to",
+    "home.venuesSection.recordCell.title": "Scan a venue QR code",
+    "home.venuesSection.recordCell.subtitle": "Be alerted in case of exposure in a venue (currently being deployed)",
     "home.venuesSection.privateCell.title": "Are you organising a private event?",
     "home.venuesSection.privateCell.subtitle": "Protect your guests by creating your own code",
     "home.moreSection.venuesHistory": "Location history",
@@ -730,7 +730,7 @@
    "keyFigureDetailController.section.evolution.subtitle": "%@.\nDernière valeur du %@ : %@",
    "keyFigureDetailController.section.evolution.subtitle2Charts": "%@.\nDernière valeur du %@ : %@ (France : %@)",
    "home.activationExplanation.title": "Attention",
-   "home.activationExplanation.message": "Votre téléphone ne supportant pas l'advertising, TousAntiCovid va redémarrer le Bluetooth de votre téléphone régulièrement pour fonctionner",
+   "home.activationExplanation.message": "Votre téléphone ne supportant pas complètement le Bluetooth Low Energy (BLE), TousAntiCovid va  redémarrer le Bluetooth de votre téléphone assez fréquemment pour fonctionner correctement.",
    "accessibility.hint.keyFigure.chart.share": "Partager le graphique du chiffre clé",
    
    "keyfigure.nombrevaccinations.learnMore":"Le nombre d’injections réalisées depuis le début de la campagne de vaccination est dorénavant dénombré par Vaccin Covid (au 26 janvier, 1 136 906 injections réalisées, dont 6 153 deuxièmes injections).\n\nAu 26 janvier, les données issues des Agences Régionales de Santé (ARS) faisaient état de 1 184 510 injections réalisées depuis le début de la campagne de vaccination. Cet écart constaté de 53 757 injections correspond aux injections effectuées mais non encore enregistrées dans Vaccin Covid, et qui seront progressivement rattrapées.",
@@ -759,6 +759,8 @@
    "error.cryptoIssue.explanation.register": "M'enregistrer",
    "error.cryptoIssue.explanation.goToStore": "Aller sur le store",
    "proximityController.error.noAdvertising": "Votre téléphone ne possédant pas le Bluetooth advertising, il n'est pas compatible avec l’alerte des personnes contacts via Bluetooth malheureusement.",
-   "common.privacyPolicy": "https://bonjour.tousanticovid.gouv.fr/privacy.html"
+   "common.privacyPolicy": "https://bonjour.tousanticovid.gouv.fr/privacy-en.html#camera",
+   "common.updatePostalCode":"Code postal: %@",
+   "common.updatePostalCode.end":"Changer"
 
 }

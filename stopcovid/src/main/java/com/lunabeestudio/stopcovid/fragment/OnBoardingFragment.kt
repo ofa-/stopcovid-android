@@ -12,10 +12,10 @@ package com.lunabeestudio.stopcovid.fragment
 
 import android.os.Bundle
 import android.view.View
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.updatePadding
 import com.google.android.material.appbar.AppBarLayout
 import com.lunabeestudio.stopcovid.activity.OnBoardingActivity
+import com.lunabeestudio.stopcovid.coreui.extension.appCompatActivity
 import com.lunabeestudio.stopcovid.coreui.extension.registerToAppBarLayoutForLiftOnScroll
 import com.lunabeestudio.stopcovid.coreui.extension.safeEmojiSpanify
 import com.lunabeestudio.stopcovid.coreui.fragment.FastAdapterFragment
@@ -41,7 +41,7 @@ abstract class OnBoardingFragment : FastAdapterFragment() {
 
     override fun refreshScreen() {
         super.refreshScreen()
-        (activity as AppCompatActivity).supportActionBar?.title = strings[getTitleKey()]
+        appCompatActivity?.supportActionBar?.title = strings[getTitleKey()]
         getActivityMergeBinding().bottomSheetButton.text = strings[getButtonTitleKey()].safeEmojiSpanify()
     }
 

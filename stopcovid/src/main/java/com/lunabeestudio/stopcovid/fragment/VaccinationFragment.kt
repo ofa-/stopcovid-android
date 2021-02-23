@@ -36,6 +36,7 @@ import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.extension.showPostalCodeDialog
 import com.lunabeestudio.stopcovid.extension.toItem
 import com.lunabeestudio.stopcovid.fastitem.bigTitleItem
+import com.lunabeestudio.stopcovid.fastitem.changePostalCodeItem
 import com.lunabeestudio.stopcovid.fastitem.linkCardItem
 import com.lunabeestudio.stopcovid.fastitem.linkItem
 import com.lunabeestudio.stopcovid.manager.VaccinationCenterManager
@@ -115,20 +116,26 @@ class VaccinationFragment : MainFragment() {
     private fun getNoPostalCodeItems(): List<GenericItem> {
         val items = arrayListOf<GenericItem>()
 
-        items += cardWithActionItem(CardTheme.Default) {
-            mainBody = stringsFormat(
+        items += captionItem {
+            text = stringsFormat(
                 "vaccinationController.vaccinationLocation.explanation",
                 robertManager.configuration.vaccinationCentersCount
             )
-            actions = listOf(
-                Action(
-                    label = strings["vaccinationController.vaccinationLocation.newPostalCode"],
-                    icon = R.drawable.ic_map,
-                ) {
-                    showPostalCodeDialog()
-                }
-            )
-            identifier = "vaccinationController.vaccinationLocation.section.title".hashCode().toLong()
+            identifier = "vaccinationController.vaccinationLocation.explanation".hashCode().toLong()
+        }
+
+        items += spaceItem {
+            spaceRes = R.dimen.spacing_small
+            identifier = items.count().toLong()
+        }
+
+        items += linkCardItem {
+            label = strings["vaccinationController.vaccinationLocation.newPostalCode"]
+            iconRes = R.drawable.ic_map
+            onClickListener = View.OnClickListener {
+                showPostalCodeDialog()
+            }
+            identifier = "vaccinationController.vaccinationLocation.newPostalCode".hashCode().toLong()
         }
 
         return items
@@ -137,17 +144,15 @@ class VaccinationFragment : MainFragment() {
     private fun getPostalCodeItems(): List<GenericItem> {
         val items = arrayListOf<GenericItem>()
 
-        items += cardWithActionItem(CardTheme.Default) {
-            actions = listOf(
-                Action(
-                    label = strings["vaccinationController.vaccinationLocation.updatePostalCode"],
-                    icon = R.drawable.ic_map,
-                ) {
-                    findNavControllerOrNull()
-                        ?.safeNavigate(VaccinationFragmentDirections.actionVaccinationFragmentToPostalCodeBottomSheetFragment())
-                }
-            )
-            identifier = "vaccinationController.vaccinationLocation.section.title".hashCode().toLong()
+        items += changePostalCodeItem {
+            label = stringsFormat("common.updatePostalCode", sharedPrefs.chosenPostalCode)
+            endLabel = strings["common.updatePostalCode.end"]
+            iconRes = R.drawable.ic_map
+            onClickListener = View.OnClickListener {
+                findNavControllerOrNull()
+                    ?.safeNavigate(VaccinationFragmentDirections.actionVaccinationFragmentToPostalCodeBottomSheetFragment())
+            }
+            identifier = "common.updatePostalCode".hashCode().toLong()
         }
 
         items += spaceItem {
@@ -188,7 +193,7 @@ class VaccinationFragment : MainFragment() {
             vaccinationCenters.forEach { vaccinationCenter ->
                 items += vaccinationCenter.toItem(strings) {
                     findNavControllerOrNull()
-                        ?.navigate(
+                        ?.safeNavigate(
                             VaccinationFragmentDirections.actionVaccinationFragmentToVaccinationActionsBottomSheetFragment(
                                 vaccinationCenter
                             )

@@ -16,6 +16,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
+import com.lunabeestudio.framework.local.datasource.SecureKeystoreDataSource
 import com.lunabeestudio.robert.RobertApplication
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.robert.datasource.LocalKeystoreDataSource
@@ -34,14 +35,15 @@ import kotlin.time.ExperimentalTime
 class ProximityViewModel(
     private val robertManager: RobertManager,
     isolationManager: IsolationManager,
-    keystoreDataSource: LocalKeystoreDataSource,
-) : ViewModel() {
+    keystoreDataSource: SecureKeystoreDataSource,
+) : CommonDataViewModel(keystoreDataSource, robertManager, isolationManager) {
 
     val activateProximitySuccess: SingleLiveEvent<Unit> = SingleLiveEvent()
     val covidException: SingleLiveEvent<CovidException?> = SingleLiveEvent()
     val loadingInProgress: MutableLiveData<Boolean> = MutableLiveData(false)
     val isolationFormState: LiveData<Event<IsolationFormStateEnum?>> = isolationManager.currentFormState
     val isolationDataChanged: SingleLiveEvent<Unit> = isolationManager.changedEvent
+    val clearDataSuccess: SingleLiveEvent<Unit> = SingleLiveEvent()
 
     @OptIn(ExperimentalTime::class)
     val activeAttestationCount: LiveData<Event<Int>> = keystoreDataSource.attestationsLiveData.map {
@@ -79,12 +81,21 @@ class ProximityViewModel(
             loadingInProgress.postValue(false)
         }
     }
+
+    fun clearData(application: RobertApplication) {
+        loadingInProgress.postValue(true)
+        viewModelScope.launch(Dispatchers.IO) {
+            clearLocalData(application)
+            loadingInProgress.postValue(false)
+            clearDataSuccess.postValue(null)
+        }
+    }
 }
 
 class ProximityViewModelFactory(
     private val robertManager: RobertManager,
     private val isolationManager: IsolationManager,
-    private val keystoreDataSource: LocalKeystoreDataSource,
+    private val keystoreDataSource: SecureKeystoreDataSource,
 ) :
     ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {

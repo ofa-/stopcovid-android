@@ -1,0 +1,62 @@
+<!--
+  ~ This Source Code Form is subject to the terms of the Mozilla Public
+  ~ License, v. 2.0. If a copy of the MPL was not distributed with this
+  ~ file, You can obtain one at https://mozilla.org/MPL/2.0/.
+  ~
+  ~ Authors
+  ~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ Created by Lunabee Studio / Date - 2020/10/27 - for the TOUS-ANTI-COVID project
+  -->
+
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="@dimen/spacing_large"
+    android:layout_marginVertical="@dimen/spacing_small">
+
+    <LinearLayout
+        android:id="@+id/rootLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="@dimen/spacing_large"
+        tools:ignore="Overdraw">
+
+        <ImageView
+            android:id="@+id/leftIconImageView"
+            android:layout_width="@dimen/icon_size"
+            android:layout_height="@dimen/icon_size"
+            android:layout_marginEnd="@dimen/spacing_medium"
+            android:scaleType="center"
+            app:tint="?colorPrimary"
+            tools:ignore="ContentDescription"
+            tools:src="@drawable/ic_about" />
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textAppearance="@style/TextAppearance.StopCovid.Title"
+            android:textIsSelectable="false"
+            tools:text="@tools:sample/lorem[3]" />
+
+        <TextView
+            android:id="@+id/endTextView"
+            style="@style/Theme.StopCovid.Link.Normal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/spacing_small"
+            app:tint="?colorControlNormal"
+            tools:ignore="ContentDescription"
+            tools:text="@tools:sample/lorem[1]" />
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

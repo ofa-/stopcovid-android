@@ -13,6 +13,7 @@ package com.lunabeestudio.stopcovid.coreui.extension
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavController
@@ -46,3 +47,6 @@ fun Fragment.viewLifecycleOwnerOrNull(): LifecycleOwner? =
         Timber.e(e, "Failed to get lifecycle owner")
         null
     }
+
+val Fragment.appCompatActivity: AppCompatActivity?
+    get() = activity as? AppCompatActivity

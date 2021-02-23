@@ -42,6 +42,9 @@ val KeyFigure.descriptionStringKey: String
 val KeyFigure.learnMoreStringKey: String
     get() = "$labelKey.learnMore"
 
+val KeyFigure.limitLineStringKey: String
+    get() = "$labelKey.limitLine"
+
 fun KeyFigure.colorStringKey(dark: Boolean?): String = if (dark == true) {
     "$labelKey.colorCode.dark"
 } else {

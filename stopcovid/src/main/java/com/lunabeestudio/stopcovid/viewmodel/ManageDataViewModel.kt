@@ -10,35 +10,27 @@
 
 package com.lunabeestudio.stopcovid.viewmodel
 
-import android.app.NotificationManager
-import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.preference.PreferenceManager
-import androidx.work.WorkManager
 import com.lunabeestudio.framework.local.datasource.SecureKeystoreDataSource
 import com.lunabeestudio.robert.RobertApplication
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.robert.model.RobertResult
-import com.lunabeestudio.stopcovid.Constants
-import com.lunabeestudio.stopcovid.StopCovid
-import com.lunabeestudio.stopcovid.coreui.UiConstants
 import com.lunabeestudio.stopcovid.coreui.utils.SingleLiveEvent
 import com.lunabeestudio.stopcovid.extension.toCovidException
 import com.lunabeestudio.stopcovid.manager.IsolationManager
-import com.lunabeestudio.stopcovid.manager.VenuesManager
 import com.lunabeestudio.stopcovid.model.CovidException
 import com.lunabeestudio.stopcovid.model.NeedRegisterException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class ManageDataViewModel(
-    private val secureKeystoreDataSource: SecureKeystoreDataSource,
+    secureKeystoreDataSource: SecureKeystoreDataSource,
     private val robertManager: RobertManager,
-    private val isolationManager: IsolationManager,
-) : ViewModel() {
+    isolationManager: IsolationManager,
+) : CommonDataViewModel(secureKeystoreDataSource, robertManager, isolationManager) {
 
     val eraseAttestationsSuccess: SingleLiveEvent<Unit> = SingleLiveEvent()
     val eraseIsolationSuccess: SingleLiveEvent<Unit> = SingleLiveEvent()
@@ -50,27 +42,19 @@ class ManageDataViewModel(
     val covidException: SingleLiveEvent<CovidException> = SingleLiveEvent()
     val loadingInProgress: MutableLiveData<Boolean> = MutableLiveData(false)
 
-    fun eraseVenues(application: RobertApplication, postValue: Boolean = true) {
-        VenuesManager.clearAllData(PreferenceManager.getDefaultSharedPreferences(application.getAppContext()), secureKeystoreDataSource)
-        if (postValue) {
-            eraseVenuesSuccess.postValue(null)
-        }
+    override fun eraseVenues(application: RobertApplication) {
+        super.eraseVenues(application)
+        eraseVenuesSuccess.postValue(null)
     }
 
-    fun eraseAttestations(postValue: Boolean = true) {
-        secureKeystoreDataSource.savedAttestationData = null
-        secureKeystoreDataSource.saveAttestationData = null
-        secureKeystoreDataSource.attestations = null
-        if (postValue) {
-            eraseAttestationsSuccess.postValue(null)
-        }
+    override fun eraseAttestations() {
+        super.eraseAttestations()
+        eraseAttestationsSuccess.postValue(null)
     }
 
-    fun eraseIsolation(postValue: Boolean = true) {
-        isolationManager.resetData()
-        if (postValue) {
-            eraseIsolationSuccess.postValue(null)
-        }
+    override fun eraseIsolation() {
+        super.eraseIsolation()
+        eraseIsolationSuccess.postValue(null)
     }
 
     fun eraseLocalHistory() {
@@ -134,15 +118,7 @@ class ManageDataViewModel(
                     loadingInProgress.postValue(true)
                     when (val result = robertManager.quitStopCovid(application)) {
                         is RobertResult.Success -> {
-                            WorkManager.getInstance(application.getAppContext())
-                                .cancelUniqueWork(Constants.WorkerNames.AT_RISK_NOTIFICATION)
-                            WorkManager.getInstance(application.getAppContext())
-                                .cancelUniqueWork(Constants.WorkerNames.WARNING_NOTIFICATION)
-                            clearNotifications(application)
-                            eraseAttestations(false)
-                            eraseVenues(application, false)
-                            (application.getAppContext() as StopCovid).cancelActivateReminder()
-                            eraseIsolation(false)
+                            clearLocalData(application)
                             quitStopCovidSuccess.postValue(null)
                         }
                         is RobertResult.Failure -> covidException.postValue(result.error.toCovidException())
@@ -153,13 +129,6 @@ class ManageDataViewModel(
         } else {
             covidException.postValue(NeedRegisterException())
         }
-    }
-
-    private fun clearNotifications(application: RobertApplication) {
-        val notificationManager = application.getAppContext().getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.cancel(UiConstants.Notification.ERROR.notificationId)
-        notificationManager.cancel(UiConstants.Notification.TIME.notificationId)
-        notificationManager.cancel(UiConstants.Notification.AT_RISK.notificationId)
     }
 }
 

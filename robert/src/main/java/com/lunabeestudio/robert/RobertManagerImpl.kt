@@ -471,7 +471,7 @@ class RobertManagerImpl(
         localProximityRepository.save(*localProximity)
     }
 
-    private suspend fun getSSU(prefix: Byte): RobertResultData<ServerStatusUpdate> {
+    override suspend fun getSSU(prefix: Byte): RobertResultData<ServerStatusUpdate> {
         val ephemeralBluetoothIdentifier = ephemeralBluetoothIdentifierRepository.getForTime()
             ?: ephemeralBluetoothIdentifierRepository.getAll().lastOrNull()
 

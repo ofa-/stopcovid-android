@@ -22,24 +22,18 @@ import java.text.NumberFormat
 import java.util.Locale
 import java.util.regex.Pattern
 
-fun String.openInExternalBrowser(context: Context) {
+fun String.openInExternalBrowser(context: Context, showToast: Boolean = true): Boolean {
     val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(this))
     val activityInfo: ActivityInfo? = browserIntent.resolveActivityInfo(context.packageManager, browserIntent.flags)
-    if (activityInfo?.exported == true) {
+    return if (activityInfo?.exported == true) {
         context.startActivity(browserIntent)
+        true
     } else {
         Timber.e("No activity to open url")
-        Toast.makeText(context, "Unable to open url", Toast.LENGTH_SHORT).show()
-    }
-}
-
-fun String.startEmailIntent(context: Context) {
-    val emailIntent = Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", this, null))
-    try {
-        context.startActivity(emailIntent)
-    } catch (e: Exception) {
-        Timber.e(e)
-        Toast.makeText(context, "Unable to send email", Toast.LENGTH_SHORT).show()
+        if (showToast) {
+            Toast.makeText(context, "Unable to open url", Toast.LENGTH_SHORT).show()
+        }
+        false
     }
 }
 
@@ -85,7 +79,7 @@ fun String.formatNumberIfNeeded(numberFormat: NumberFormat): String {
 @SuppressWarnings("DefaultLocale")
 fun String.capitalizeWords(): String = split(" ").joinToString(" ") { it.capitalize(Locale.getDefault()) }
 
-fun String.sha256() = MessageDigest
+fun String.sha256(): String = MessageDigest
     .getInstance("SHA-256")
     .digest(this.toByteArray())
     .fold("", { str, it -> str + "%02x".format(it) })

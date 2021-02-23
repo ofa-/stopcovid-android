@@ -14,6 +14,7 @@ import androidx.lifecycle.LiveData
 import com.lunabeestudio.domain.model.Configuration
 import com.lunabeestudio.domain.model.HelloBuilder
 import com.lunabeestudio.domain.model.LocalProximity
+import com.lunabeestudio.domain.model.ServerStatusUpdate
 import com.lunabeestudio.robert.manager.LocalProximityFilter
 import com.lunabeestudio.robert.model.AtRiskStatus
 import com.lunabeestudio.robert.model.RobertResult
@@ -101,6 +102,8 @@ interface RobertManager {
     suspend fun eraseRemoteAlert(): RobertResult
 
     suspend fun quitStopCovid(application: RobertApplication): RobertResult
+
+    suspend fun getSSU(prefix: Byte): RobertResultData<ServerStatusUpdate>
 
     fun refreshAtRisk()
 }

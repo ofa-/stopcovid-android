@@ -16,10 +16,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.journeyapps.barcodescanner.BarcodeResult
 import com.lunabeestudio.stopcovid.coreui.UiConstants
+import com.lunabeestudio.stopcovid.coreui.extension.appCompatActivity
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.extension.openAppSettings
 import com.lunabeestudio.stopcovid.coreui.extension.showPermissionRationale
@@ -75,9 +75,9 @@ abstract class QRCodeFragment : BaseFragment() {
                             showingRationale = false
                         }
                     )
-                } else {
-                    resumeQrCodeReader()
                 }
+            } else {
+                resumeQrCodeReader()
             }
         }
     }
@@ -99,7 +99,7 @@ abstract class QRCodeFragment : BaseFragment() {
     }
 
     override fun refreshScreen() {
-        (activity as AppCompatActivity).supportActionBar?.title = strings[getTitleKey()]
+        appCompatActivity?.supportActionBar?.title = strings[getTitleKey()]
         binding?.title?.text = strings[getExplanationKey()]
     }
 

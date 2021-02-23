@@ -15,11 +15,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
-import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.navArgs
 import com.google.zxing.BarcodeFormat
 import com.journeyapps.barcodescanner.BarcodeEncoder
 import com.lunabeestudio.stopcovid.R
+import com.lunabeestudio.stopcovid.coreui.extension.appCompatActivity
 import com.lunabeestudio.stopcovid.coreui.extension.toDimensSize
 import com.lunabeestudio.stopcovid.coreui.fragment.BaseFragment
 import com.lunabeestudio.stopcovid.databinding.FragmentFullscreenAttestationBinding
@@ -41,7 +41,7 @@ class FullscreenAttestationFragment : BaseFragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentFullscreenAttestationBinding.inflate(inflater, container, false)
-        (activity as AppCompatActivity).supportActionBar?.title = null
+        appCompatActivity?.supportActionBar?.title = null
         return binding?.root
     }
 

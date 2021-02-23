@@ -37,7 +37,6 @@ import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
 import android.widget.FrameLayout
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ShareCompat
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.view.ViewCompat
@@ -59,6 +58,7 @@ import com.lunabeestudio.stopcovid.StopCovid
 import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.UiConstants
 import com.lunabeestudio.stopcovid.coreui.extension.addRipple
+import com.lunabeestudio.stopcovid.coreui.extension.appCompatActivity
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.extension.isNightMode
 import com.lunabeestudio.stopcovid.coreui.extension.refreshLift
@@ -79,7 +79,7 @@ import com.lunabeestudio.stopcovid.extension.getString
 import com.lunabeestudio.stopcovid.extension.hasChosenPostalCode
 import com.lunabeestudio.stopcovid.extension.isolationManager
 import com.lunabeestudio.stopcovid.extension.labelShortStringKey
-import com.lunabeestudio.stopcovid.extension.labelStringKey
+import com.lunabeestudio.stopcovid.extension.openInExternalBrowser
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
@@ -91,6 +91,7 @@ import com.lunabeestudio.stopcovid.fastitem.OnOffLottieItem
 import com.lunabeestudio.stopcovid.fastitem.ProximityButtonItem
 import com.lunabeestudio.stopcovid.fastitem.State
 import com.lunabeestudio.stopcovid.fastitem.bigTitleItem
+import com.lunabeestudio.stopcovid.fastitem.changePostalCodeItem
 import com.lunabeestudio.stopcovid.fastitem.highlightedNumberCardItem
 import com.lunabeestudio.stopcovid.fastitem.logoItem
 import com.lunabeestudio.stopcovid.fastitem.numbersCardItem
@@ -105,6 +106,7 @@ import com.lunabeestudio.stopcovid.model.CaptchaNextFragment
 import com.lunabeestudio.stopcovid.model.CovidException
 import com.lunabeestudio.stopcovid.model.DeviceSetup
 import com.lunabeestudio.stopcovid.model.KeyFigure
+import com.lunabeestudio.stopcovid.model.NoEphemeralBluetoothIdentifierFound
 import com.lunabeestudio.stopcovid.service.ProximityService
 import com.lunabeestudio.stopcovid.viewmodel.ProximityViewModel
 import com.lunabeestudio.stopcovid.viewmodel.ProximityViewModelFactory
@@ -324,11 +326,30 @@ class ProximityFragment : TimeMainFragment() {
         }
         viewModel.covidException.observe(viewLifecycleOwner) { covidException ->
             covidException?.let {
-                showErrorSnackBar(it.getString(strings))
+                if (it is NoEphemeralBluetoothIdentifierFound) {
+                    MaterialAlertDialogBuilder(requireContext())
+                        .setTitle(strings["error.cryptoIssue.explanation.title"])
+                        .setMessage(strings["error.cryptoIssue.explanation.message"])
+                        .setPositiveButton(strings["error.cryptoIssue.explanation.register"]) { _, _ ->
+                            viewModel.clearData(requireContext().applicationContext as RobertApplication)
+                        }
+                        .setNeutralButton(strings["error.cryptoIssue.explanation.goToStore"]) { _, _ ->
+                            context?.let { context ->
+                                "${Constants.Url.PLAY_STORE_URL}${context.packageName}".openInExternalBrowser(context)
+                            }
+                        }
+                        .setNegativeButton(strings["common.cancel"], null)
+                        .show()
+                } else {
+                    showErrorSnackBar(it.getString(strings))
+                }
             }
             refreshItems(context?.let {
                 ProximityManager.getDeviceSetup(it, robertManager)
             })
+        }
+        viewModel.clearDataSuccess.observe(viewLifecycleOwner) {
+            activateProximity()
         }
         viewModel.activateProximitySuccess.observe(viewLifecycleOwner) {
             refreshItems(context?.let {
@@ -451,7 +472,7 @@ class ProximityFragment : TimeMainFragment() {
                 }
                 !ProximityManager.isAdvertisingValid(robertManager) -> {
                     items += cardWithActionItem(CardTheme.Primary) {
-                        mainBody = strings["proximityController.error.noAdvertising"] ?: "no advertising"
+                        mainBody = strings["proximityController.error.noAdvertising"]
                         identifier = items.count().toLong()
                     }
                 }
@@ -679,7 +700,7 @@ class ProximityFragment : TimeMainFragment() {
 
         KeyFiguresManager.highlightedFigures?.let { figure ->
             items += highlightedNumberCardItem {
-                label = strings[figure.labelStringKey]
+                label = "${strings[figure.labelShortStringKey]} (${strings["common.country.france"]})"
                 updatedAt = strings["keyfigure.dailyUpdates"]
                 value = figure.valueGlobalToDisplay.formatNumberIfNeeded(numberFormat)
                 onClickListener = View.OnClickListener {
@@ -757,11 +778,15 @@ class ProximityFragment : TimeMainFragment() {
                     identifier = "home.infoSection.newPostalCode".hashCode().toLong()
                 }
             } else {
-                items += cardWithActionItem {
-                    actions = listOf(Action(R.drawable.ic_map, strings["home.infoSection.updatePostalCode"]) {
-                        findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToPostalCodeBottomSheetFragment())
-                    })
-                    identifier = "home.infoSection.updatePostalCode".hashCode().toLong()
+                items += changePostalCodeItem {
+                    label = stringsFormat("common.updatePostalCode", sharedPrefs.chosenPostalCode)
+                    endLabel = strings["common.updatePostalCode.end"]
+                    iconRes = R.drawable.ic_map
+                    onClickListener = View.OnClickListener {
+                        findNavControllerOrNull()
+                            ?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToPostalCodeBottomSheetFragment())
+                    }
+                    identifier = "common.updatePostalCode".hashCode().toLong()
                 }
             }
             items += spaceItem {
@@ -1007,7 +1032,7 @@ class ProximityFragment : TimeMainFragment() {
 
     private fun refreshTitleAndErrorLayout() {
         context?.let { context ->
-            (activity as AppCompatActivity).supportActionBar?.title = strings[getTitleKey()]
+            appCompatActivity?.supportActionBar?.title = strings[getTitleKey()]
             updateErrorLayout(getActivityBinding()?.errorLayout, ProximityManager.getDeviceSetup(context, robertManager))
         }
     }

@@ -180,7 +180,7 @@ class IsolationManager(
     val positiveCaseIsolationEndDate: Long?
         get() {
             return positiveCaseIsolationStartDate?.let {
-                it + (robertManager.configuration.isolationDuration) * 1000
+                it + (robertManager.configuration.covidIsolationDuration) * 1000
             }.roundTimestampToStartOfDay()
         }
 
@@ -192,7 +192,7 @@ class IsolationManager(
     private val positiveCasePostIsolationEndDate: Long?
         get() {
             return positiveCaseIsolationStartDate?.let {
-                it + (robertManager.configuration.isolationDuration + robertManager.configuration.postIsolationDuration) * 1000
+                it + (robertManager.configuration.covidIsolationDuration + robertManager.configuration.postIsolationDuration) * 1000
             }.roundTimestampToStartOfDay()
         }
 

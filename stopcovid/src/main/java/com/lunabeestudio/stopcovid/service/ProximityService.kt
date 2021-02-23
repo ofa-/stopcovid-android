@@ -110,12 +110,6 @@ open class ProximityService : RobertProximityService() {
 
     override fun onError(error: RobertException) {
         noNewErrorJob?.cancel()
-        if (!ProximityManager.isBluetoothOn(this, robertManager)) {
-            sendErrorBluetoothNotification()
-        } else {
-            sendErrorNotification()
-            Timber.e(error)
-        }
         lastError = error
         // Send error in case service binding didn't have time to happen
         if (onError == null) {
@@ -133,6 +127,9 @@ open class ProximityService : RobertProximityService() {
             launch(Dispatchers.IO) {
                 restartBluetooth()
             }
+        } else if (ProximityManager.isBluetoothOn(this, robertManager) && shouldShowError()) {
+            sendErrorNotification()
+            Timber.e(error)
         }
     }
 
@@ -188,6 +185,7 @@ open class ProximityService : RobertProximityService() {
                 .setContentTitle(strings["notification.error.title"])
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setAutoCancel(true)
+                .setOnlyAlertOnce(true)
                 .setSmallIcon(R.drawable.ic_notification_bar)
                 .setStyle(
                     NotificationCompat.BigTextStyle()
@@ -234,6 +232,7 @@ open class ProximityService : RobertProximityService() {
                 .setContentTitle(strings["notification.error.title"])
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setAutoCancel(true)
+                .setOnlyAlertOnce(true)
                 .setSmallIcon(R.drawable.ic_notification_bar)
                 .setStyle(
                     NotificationCompat.BigTextStyle()

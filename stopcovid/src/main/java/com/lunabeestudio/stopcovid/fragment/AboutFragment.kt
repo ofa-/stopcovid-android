@@ -11,15 +11,12 @@
 package com.lunabeestudio.stopcovid.fragment
 
 import android.view.Gravity
-import android.view.View
 import com.lunabeestudio.stopcovid.BuildConfig
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.dividerItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
-import com.lunabeestudio.stopcovid.extension.openInExternalBrowser
-import com.lunabeestudio.stopcovid.extension.startEmailIntent
 import com.lunabeestudio.stopcovid.fastitem.linkItem
 import com.lunabeestudio.stopcovid.fastitem.logoItem
 import com.mikepenz.fastadapter.GenericItem
