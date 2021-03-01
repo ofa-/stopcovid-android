@@ -47,6 +47,7 @@ class Configuration(
     val positiveSampleSpan: Int,
     val isolationDuration: Long,
     val postIsolationDuration: Long,
+    val covidIsolationDuration: Long,
     val venuesSalt: Int,
     val allowNoAdvertisingDevice: Boolean,
     val unsupportedDevices: List<String>?,

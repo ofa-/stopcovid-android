@@ -88,6 +88,8 @@ internal class ApiConfiguration(
     val isolationDuration: Long,
     @SerializedName("app.postIsolation.duration")
     val postIsolationDuration: Long,
+    @SerializedName("app.isolation.durationCovid")
+    val covidIsolationDuration: Long,
     @SerializedName("app.venuesSalt")
     val venuesSalt: Int,
     @SerializedName("app.allowNoAdvertisingDevice")
@@ -143,6 +145,7 @@ internal fun ApiConfiguration.toDomain(gson: Gson) = Configuration(
     positiveSampleSpan = positiveSampleSpan,
     isolationDuration = isolationDuration,
     postIsolationDuration = postIsolationDuration,
+    covidIsolationDuration = covidIsolationDuration,
     venuesSalt = venuesSalt,
     allowNoAdvertisingDevice = allowNoAdvertisingDevice,
     unsupportedDevices = gson.fromJson(

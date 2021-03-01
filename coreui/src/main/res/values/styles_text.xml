@@ -77,6 +77,10 @@
         <item name="android:textAllCaps">false</item>
     </style>
 
+    <style name="Theme.StopCovid.Link.Normal">
+        <item name="android:textStyle">normal</item>
+    </style>
+
     <style name="Theme.StopCovid.Link.Inverse">
         <item name="android:textColor">?colorOnPrimary</item>
     </style>

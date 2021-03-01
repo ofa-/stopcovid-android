@@ -6,7 +6,11 @@
     },
     {
       "name": "version",
-      "value": 26
+      "value": 29
+    },
+    {
+      "name": "versionCalibrationBle",
+      "value": 2
     },
     {
       "name": "app.apiVersion",
@@ -39,6 +43,10 @@
     {
       "name": "app.postIsolation.duration",
       "value": 691200
+    },
+    {
+      "name": "app.isolation.durationCovid",
+      "value": 864000
     },
     {
       "name": "app.displayRecordVenues",
@@ -146,7 +154,7 @@
     },
     {
       "name": "app.allowNoAdvertisingDevice",
-      "value": false
+      "value": true
     },
     {
       "name": "app.unsupportedDevices",

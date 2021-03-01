@@ -26,6 +26,8 @@ data class KeyFigure(
     val valuesDepartments: List<DepartmentKeyFigure>?,
     val trend: Int?,
     val displayOnSameChart: Boolean,
+    val limitLine: Number?,
+    val chartType: KeyFigureChartType = KeyFigureChartType.LINES,
     val series: List<KeyFigureSeriesItem>,
     val avgSeries: List<KeyFigureSeriesItem>?
 )
@@ -34,7 +36,7 @@ data class DepartmentKeyFigure(
     val dptNb: String,
     val dptLabel: String,
     val extractDate: Long,
-    val value: Double,
+    val value: Number,
     val valueToDisplay: String?,
     val color: String,
     val trend: Int?,
@@ -43,7 +45,7 @@ data class DepartmentKeyFigure(
 
 data class KeyFigureSeriesItem(
     val date: Long,
-    val value: Double
+    val value: Number
 )
 
 enum class Trend(@DrawableRes val imageRes: Int, val hint: String?) {
@@ -61,3 +63,10 @@ enum class KeyFigureCategory {
 
     UNKNOWN
 }
+
+enum class KeyFigureChartType {
+    @SerializedName("bars")
+    BARS,
+    LINES
+}
+

@@ -10,6 +10,7 @@ import org.junit.Before
 import org.junit.Test
 import java.security.KeyStore
 import java.util.concurrent.TimeUnit
+import kotlin.time.ExperimentalTime
 
 class IsolationManagerTest {
 
@@ -57,24 +58,30 @@ class IsolationManagerTest {
     @Test
     fun initCaseWithWarning() {
         notifyWarning(7)
-        assertState(isolationManager.currentRecommendationState,
-            IsolationRecommendationStateEnum.INITIAL_CASE_AT_RISK_OR_SICK)
+        assertState(
+            isolationManager.currentRecommendationState,
+            IsolationRecommendationStateEnum.INITIAL_CASE_AT_RISK_OR_SICK
+        )
         cancelNotifyWarning()
     }
 
     @Test
     fun initCaseWithAtRisk() {
         notifyRisk()
-        assertState(isolationManager.currentRecommendationState,
-            IsolationRecommendationStateEnum.INITIAL_CASE_AT_RISK_OR_SICK)
+        assertState(
+            isolationManager.currentRecommendationState,
+            IsolationRecommendationStateEnum.INITIAL_CASE_AT_RISK_OR_SICK
+        )
         cancelNotifyRisk()
     }
 
     @Test
     fun initCaseWithReport() {
         report(1, true, 2)
-        assertState(isolationManager.currentRecommendationState,
-            IsolationRecommendationStateEnum.INITIAL_CASE_AT_RISK_OR_SICK)
+        assertState(
+            isolationManager.currentRecommendationState,
+            IsolationRecommendationStateEnum.INITIAL_CASE_AT_RISK_OR_SICK
+        )
         cancelReport()
     }
 
@@ -84,8 +91,10 @@ class IsolationManagerTest {
         assert(isolationManager.currentFormStateValue == IsolationFormStateEnum.ALL_GOOD) {
             "current form state should be all good"
         }
-        assertState(isolationManager.currentRecommendationState,
-            IsolationRecommendationStateEnum.ALL_GOOD)
+        assertState(
+            isolationManager.currentRecommendationState,
+            IsolationRecommendationStateEnum.ALL_GOOD
+        )
         assert(isolationManager.currentIsolationEndDate == null) {
             "current form state should be null"
         }
@@ -94,95 +103,145 @@ class IsolationManagerTest {
     @Test
     fun symptomsCase() {
         isolationManager.updateState(IsolationFormStateEnum.SYMPTOMS)
-        assertState(isolationManager.currentRecommendationState,
-            IsolationRecommendationStateEnum.SYMPTOMS)
+        assertState(
+            isolationManager.currentRecommendationState,
+            IsolationRecommendationStateEnum.SYMPTOMS
+        )
         isolationManager.setNegativeTest()
-        assertState(isolationManager.currentRecommendationState,
-            IsolationRecommendationStateEnum.SYMPTOMS_TESTED)
+        assertState(
+            isolationManager.currentRecommendationState,
+            IsolationRecommendationStateEnum.SYMPTOMS_TESTED
+        )
     }
 
     @Test
     fun contactCaseUnknownIndexTested() {
         contactCase()
         isolationManager.setIsKnownIndexAtHome(false)
-        assertState(isolationManager.currentRecommendationState,
-            IsolationRecommendationStateEnum.CONTACT_CASE_UNKNOWN_INDEX)
+        assertState(
+            isolationManager.currentRecommendationState,
+            IsolationRecommendationStateEnum.CONTACT_CASE_UNKNOWN_INDEX
+        )
         isolationManager.setNegativeTest()
-        assertState(isolationManager.currentRecommendationState,
-            IsolationRecommendationStateEnum.CONTACT_CASE_POST_ISOLATION_PERIOD)
+        assertState(
+            isolationManager.currentRecommendationState,
+            IsolationRecommendationStateEnum.CONTACT_CASE_POST_ISOLATION_PERIOD
+        )
     }
 
     @Test
     fun contactCaseKnownIndexTested() {
         contactCase()
         isolationManager.setIsKnownIndexAtHome(true)
-        assertState(isolationManager.currentRecommendationState,
-            IsolationRecommendationStateEnum.CONTACT_CASE_KNOWN_INDEX_NOT_TESTED)
+        assertState(
+            isolationManager.currentRecommendationState,
+            IsolationRecommendationStateEnum.CONTACT_CASE_KNOWN_INDEX_NOT_TESTED
+        )
         isolationManager.setNegativeTest()
-        assertState(isolationManager.currentRecommendationState,
-            IsolationRecommendationStateEnum.INDETERMINATE)
+        assertState(
+            isolationManager.currentRecommendationState,
+            IsolationRecommendationStateEnum.INDETERMINATE
+        )
         isolationManager.setKnowsIndexSymptomsEndDate(false)
-        assertState(isolationManager.currentRecommendationState,
-            IsolationRecommendationStateEnum.CONTACT_CASE_KNOWN_INDEX_TESTED_UNKNOWN_DATE)
+        assertState(
+            isolationManager.currentRecommendationState,
+            IsolationRecommendationStateEnum.CONTACT_CASE_KNOWN_INDEX_TESTED_UNKNOWN_DATE
+        )
         isolationManager.setKnowsIndexSymptomsEndDate(true)
-        assertState(isolationManager.currentRecommendationState,
-            IsolationRecommendationStateEnum.INDETERMINATE)
+        assertState(
+            isolationManager.currentRecommendationState,
+            IsolationRecommendationStateEnum.INDETERMINATE
+        )
         setIndexEndSymptomDate()
-        assertState(isolationManager.currentRecommendationState,
-            IsolationRecommendationStateEnum.CONTACT_CASE_KNOWN_INDEX_TESTED_KNOWN_DATE)
+        assertState(
+            isolationManager.currentRecommendationState,
+            IsolationRecommendationStateEnum.CONTACT_CASE_KNOWN_INDEX_TESTED_KNOWN_DATE
+        )
         setIndexEndSymptomDate(8)
-        assertState(isolationManager.currentRecommendationState,
-            IsolationRecommendationStateEnum.CONTACT_CASE_POST_ISOLATION_PERIOD)
+        assertState(
+            isolationManager.currentRecommendationState,
+            IsolationRecommendationStateEnum.CONTACT_CASE_POST_ISOLATION_PERIOD
+        )
         setIndexEndSymptomDate(8 + 8)
-        assertState(isolationManager.currentRecommendationState,
-            IsolationRecommendationStateEnum.INITIAL_CASE_SAFE)
+        assertState(
+            isolationManager.currentRecommendationState,
+            IsolationRecommendationStateEnum.INITIAL_CASE_SAFE
+        )
     }
 
+    @OptIn(ExperimentalTime::class)
     @Test
     fun positiveCaseNoSymptoms() {
         positiveCase()
-        assertState(isolationManager.currentRecommendationState,
-            IsolationRecommendationStateEnum.INDETERMINATE)
+        assertState(
+            isolationManager.currentRecommendationState,
+            IsolationRecommendationStateEnum.INDETERMINATE
+        )
         setPositiveTestingDate()
-        assertState(isolationManager.currentRecommendationState,
-            IsolationRecommendationStateEnum.INDETERMINATE)
+        assertState(
+            isolationManager.currentRecommendationState,
+            IsolationRecommendationStateEnum.INDETERMINATE
+        )
         isolationManager.setIsHavingSymptoms(false)
-        assertState(isolationManager.currentRecommendationState,
-            IsolationRecommendationStateEnum.POSITIVE_CASE_NO_SYMPTOMS)
-        setPositiveTestingDate(8)
-        assertState(isolationManager.currentRecommendationState,
-            IsolationRecommendationStateEnum.POSITIVE_CASE_POST_ISOLATION_PERIOD)
-        setPositiveTestingDate(8 + 8)
-        assertState(isolationManager.currentRecommendationState,
-            IsolationRecommendationStateEnum.INITIAL_CASE_SAFE)
+        assertState(
+            isolationManager.currentRecommendationState,
+            IsolationRecommendationStateEnum.POSITIVE_CASE_NO_SYMPTOMS
+        )
+        setPositiveTestingDate(11)
+        assertState(
+            isolationManager.currentRecommendationState,
+            IsolationRecommendationStateEnum.POSITIVE_CASE_POST_ISOLATION_PERIOD
+        )
+        setPositiveTestingDate(11 + 8)
+        assertState(
+            isolationManager.currentRecommendationState,
+            IsolationRecommendationStateEnum.INITIAL_CASE_SAFE
+        )
     }
 
+    @OptIn(ExperimentalTime::class)
     @Test
     fun positiveCaseWithSymptoms() {
         positiveCase()
-        assertState(isolationManager.currentRecommendationState,
-            IsolationRecommendationStateEnum.INDETERMINATE)
+        assertState(
+            isolationManager.currentRecommendationState,
+            IsolationRecommendationStateEnum.INDETERMINATE
+        )
         setPositiveTestingDate()
-        assertState(isolationManager.currentRecommendationState,
-            IsolationRecommendationStateEnum.INDETERMINATE)
+        assertState(
+            isolationManager.currentRecommendationState,
+            IsolationRecommendationStateEnum.INDETERMINATE
+        )
         isolationManager.setIsHavingSymptoms(true)
-        assertState(isolationManager.currentRecommendationState,
-            IsolationRecommendationStateEnum.INDETERMINATE)
+        assertState(
+            isolationManager.currentRecommendationState,
+            IsolationRecommendationStateEnum.INDETERMINATE
+        )
         setSymptomsStartDate()
-        assertState(isolationManager.currentRecommendationState,
-            IsolationRecommendationStateEnum.POSITIVE_CASE_SYMPTOMS_DURING_ISOLATION)
-        setSymptomsStartDate(8)
-        assertState(isolationManager.currentRecommendationState,
-            IsolationRecommendationStateEnum.POSITIVE_CASE_SYMPTOMS_AFTER_ISOLATION)
+        assertState(
+            isolationManager.currentRecommendationState,
+            IsolationRecommendationStateEnum.POSITIVE_CASE_SYMPTOMS_DURING_ISOLATION
+        )
+        setSymptomsStartDate(11)
+        assertState(
+            isolationManager.currentRecommendationState,
+            IsolationRecommendationStateEnum.POSITIVE_CASE_SYMPTOMS_AFTER_ISOLATION
+        )
         isolationManager.setStillHavingFever(true)
-        assertState(isolationManager.currentRecommendationState,
-            IsolationRecommendationStateEnum.POSITIVE_CASE_SYMPTOMS_AFTER_ISOLATION_STILL_HAVING_FEVER)
+        assertState(
+            isolationManager.currentRecommendationState,
+            IsolationRecommendationStateEnum.POSITIVE_CASE_SYMPTOMS_AFTER_ISOLATION_STILL_HAVING_FEVER
+        )
         isolationManager.setStillHavingFever(false)
-        assertState(isolationManager.currentRecommendationState,
-            IsolationRecommendationStateEnum.POSITIVE_CASE_POST_ISOLATION_PERIOD)
-        setSymptomsStartDate(8 + 8)
-        assertState(isolationManager.currentRecommendationState,
-            IsolationRecommendationStateEnum.INITIAL_CASE_SAFE)
+        assertState(
+            isolationManager.currentRecommendationState,
+            IsolationRecommendationStateEnum.POSITIVE_CASE_POST_ISOLATION_PERIOD
+        )
+        setSymptomsStartDate(11 + 8)
+        assertState(
+            isolationManager.currentRecommendationState,
+            IsolationRecommendationStateEnum.INITIAL_CASE_SAFE
+        )
     }
 
     private fun assertState(has: IsolationRecommendationStateEnum, shouldHave: IsolationRecommendationStateEnum) {

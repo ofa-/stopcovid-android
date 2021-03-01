@@ -134,9 +134,7 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
         super.onCreate()
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
 
-        if (BuildConfig.DEBUG) {
-            Timber.plant(Timber.DebugTree())
-        }
+        Timber.plant(WarnTree())
 
         if (sharedPrefs.lastVersionCode < BuildConfig.VERSION_CODE) {
             MoreKeyFiguresManager.clearLocal(this)
@@ -188,7 +186,6 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
         startAppMaintenanceWorker(false)
         AboutFragment.Downloader(applicationContext).autoDeleteFile()
 
-        File("${cacheDir.absolutePath}/shared_images").deleteRecursively()
         sharedPrefs.lastVersionCode = BuildConfig.VERSION_CODE
     }
 
@@ -343,6 +340,7 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
             .setContentTitle(strings["common.error.clockNotAligned.title"])
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
+            .setOnlyAlertOnce(true)
             .setSmallIcon(com.lunabeestudio.stopcovid.coreui.R.drawable.ic_notification_bar)
             .setStyle(
                 NotificationCompat.BigTextStyle()
@@ -446,6 +444,7 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setVisibility(NotificationCompat.VISIBILITY_SECRET)
             .setAutoCancel(true)
+            .setOnlyAlertOnce(true)
             .setSmallIcon(com.lunabeestudio.stopcovid.coreui.R.drawable.ic_notification_bar)
             .setStyle(
                 NotificationCompat.BigTextStyle()

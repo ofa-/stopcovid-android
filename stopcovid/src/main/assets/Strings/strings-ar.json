@@ -483,7 +483,7 @@
     "attestationsController.attestationWebSite": "موقع تحميل الإفادة",
     "attestationsController.termsOfUse.alert.title": "شروط الاستعمال",
     "attestationsController.termsOfUse.alert.message": "لا تخضع المعلومات التي يتم إدخالها في برنامج إصدار الإفادة لأي معالجة من طرف مسؤول تطبيق TousAntiCovid.",
-    "attestationsController.termsOfUse.url": "https://bonjour.tousanticovid.gouv.fr/privacy.html",
+    "attestationsController.termsOfUse.url": "https://bonjour.tousanticovid.gouv.fr/privacy-en.html#camera",
     "newAttestationController.title": "إفادة جديدة",
     "newAttestationController.generate": "إصدار الإفادة",
     "newAttestationController.saveMyData": "حفظ بياناتي",
@@ -739,7 +739,7 @@
    "keyFigureDetailController.section.evolution.subtitle": "%@.\nDernière valeur du %@ : %@",
    "keyFigureDetailController.section.evolution.subtitle2Charts": "%@.\nDernière valeur du %@ : %@ (France : %@)",
    "home.activationExplanation.title": "Attention",
-   "home.activationExplanation.message": "Votre téléphone ne supportant pas l'advertising, TousAntiCovid va redémarrer le Bluetooth de votre téléphone régulièrement pour fonctionner",
+   "home.activationExplanation.message": "Votre téléphone ne supportant pas complètement le Bluetooth Low Energy (BLE), TousAntiCovid va  redémarrer le Bluetooth de votre téléphone assez fréquemment pour fonctionner correctement.",
    "accessibility.hint.keyFigure.chart.share": "Partager le graphique du chiffre clé",
    
    "keyfigure.nombrevaccinations.learnMore":"Le nombre d’injections réalisées depuis le début de la campagne de vaccination est dorénavant dénombré par Vaccin Covid (au 26 janvier, 1 136 906 injections réalisées, dont 6 153 deuxièmes injections).\n\nAu 26 janvier, les données issues des Agences Régionales de Santé (ARS) faisaient état de 1 184 510 injections réalisées depuis le début de la campagne de vaccination. Cet écart constaté de 53 757 injections correspond aux injections effectuées mais non encore enregistrées dans Vaccin Covid, et qui seront progressivement rattrapées.",
@@ -768,6 +768,8 @@
    "error.cryptoIssue.explanation.register": "M'enregistrer",
    "error.cryptoIssue.explanation.goToStore": "Aller sur le store",
    "proximityController.error.noAdvertising": "Votre téléphone ne possédant pas le Bluetooth advertising, il n'est pas compatible avec l’alerte des personnes contacts via Bluetooth malheureusement.",
-   "common.privacyPolicy": "https://bonjour.tousanticovid.gouv.fr/privacy.html"
+   "common.privacyPolicy": "https://bonjour.tousanticovid.gouv.fr/privacy-en.html#camera",
+   "common.updatePostalCode":"Code postal: %@",
+   "common.updatePostalCode.end":"Changer"
 
 }

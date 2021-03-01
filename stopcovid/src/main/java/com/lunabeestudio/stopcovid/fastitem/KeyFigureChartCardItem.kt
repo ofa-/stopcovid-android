@@ -14,26 +14,27 @@ import android.annotation.SuppressLint
 import android.content.res.ColorStateList
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.GONE
 import android.view.ViewGroup
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.view.ViewCompat
-import androidx.core.view.isGone
-import androidx.core.view.isVisible
-import androidx.core.view.marginTop
-import androidx.core.view.updateLayoutParams
 import androidx.core.widget.TextViewCompat
+import com.github.mikephil.charting.components.LimitLine
+import com.github.mikephil.charting.components.XAxis
+import com.github.mikephil.charting.components.YAxis
+import com.github.mikephil.charting.data.BarData
+import com.github.mikephil.charting.data.BarDataSet
+import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.formatter.ValueFormatter
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.setTextOrHide
-import com.lunabeestudio.stopcovid.coreui.extension.toDimensSize
-import com.lunabeestudio.stopcovid.databinding.ItemKeyFigureCardBinding
 import com.lunabeestudio.stopcovid.databinding.ItemKeyFigureChartCardBinding
 import com.lunabeestudio.stopcovid.extension.formatCompact
 import com.lunabeestudio.stopcovid.extension.getRelativeDateShortString
 import com.lunabeestudio.stopcovid.extension.setupStyle
 import com.lunabeestudio.stopcovid.model.ChartData
+import com.lunabeestudio.stopcovid.model.KeyFigureChartType
+import com.lunabeestudio.stopcovid.model.LimitLineData
 import com.mikepenz.fastadapter.binding.AbstractBindingItem
 import kotlin.time.ExperimentalTime
 import kotlin.time.seconds
@@ -43,15 +44,17 @@ class KeyFigureChartCardItem : AbstractBindingItem<ItemKeyFigureChartCardBinding
 
     var chartExplanationLabel: String? = null
     var chartData: Array<ChartData> = emptyArray()
+    var limitLineData: LimitLineData? = null
     var shareContentDescription: String? = null
     var onShareCard: ((binding: ItemKeyFigureChartCardBinding) -> Unit)? = null
+    var chartType: KeyFigureChartType? = null
 
     override fun createBinding(inflater: LayoutInflater, parent: ViewGroup?): ItemKeyFigureChartCardBinding {
         return ItemKeyFigureChartCardBinding.inflate(inflater, parent, false)
     }
 
-    @SuppressLint("NewApi")
     @ExperimentalTime
+    @SuppressLint("NewApi")
     override fun bindView(binding: ItemKeyFigureChartCardBinding, payloads: List<Any>) {
         super.bindView(binding, payloads)
 
@@ -70,45 +73,89 @@ class KeyFigureChartCardItem : AbstractBindingItem<ItemKeyFigureChartCardBinding
                 TextViewCompat.setCompoundDrawableTintList(this, ColorStateList.valueOf(chartData[1].color))
             }
         } else {
-            binding.chartSerie2LegendTextView.visibility = View.GONE
+            binding.chartSerie2LegendTextView.visibility = GONE
         }
 
-        val dataSetArray = chartData.map {
-            LineDataSet(it.entries, it.description).apply {
-                setupStyle(it.color)
-            }
-        }.toTypedArray()
+        binding.keyFigureBarChart.visibility = GONE
+        binding.keyFigureLineChart.visibility = GONE
 
-        binding.keyFigureChart.apply {
-            data = LineData(*dataSetArray)
+        if (chartType == KeyFigureChartType.BARS) {
+            val dataSetArray = chartData.map { data ->
+                BarDataSet(data.entries.mapIndexed { idx, entry ->
+                    BarEntry(entry.x, entry.y)
+                }, data.description).apply {
+                    setupStyle(data.color)
+                }
+            }.toTypedArray()
+
+            binding.keyFigureBarChart.apply {
+                data = BarData(*dataSetArray).apply {
+                    val xValueDiff = (xMax - xMin).toFloat()
+                    val spacing = 0.05f
+                    val entriesCount = dataSetArray[0].entryCount
+                    barWidth = xValueDiff / (entriesCount) - (spacing * xValueDiff / (entriesCount + 1))
+                }
+                setupStyle()
+
+                setupXAxis(binding, xAxis)
+                setupYAxis(axisLeft)
+            }
+            binding.keyFigureBarChart.visibility = View.VISIBLE
+
+        } else {
+            val dataSetArray = chartData.map {
+                LineDataSet(it.entries, it.description).apply {
+                    setupStyle(it.color)
+                }
+            }.toTypedArray()
+
+            binding.keyFigureLineChart.apply {
+                data = LineData(*dataSetArray)
+                setupStyle()
+
+                setupXAxis(binding, xAxis)
+                setupYAxis(axisLeft)
+            }
+            binding.keyFigureLineChart.visibility = View.VISIBLE
+        }
+    }
+
+    override fun unbindView(binding: ItemKeyFigureChartCardBinding) {
+        super.unbindView(binding)
+        binding.keyFigureLineChart.visibility = GONE
+        binding.keyFigureBarChart.visibility = GONE
+    }
+
+    @ExperimentalTime
+    private fun setupXAxis(binding: ItemKeyFigureChartCardBinding, xAxis: XAxis) {
+        xAxis.apply {
             setupStyle()
-
-            axisLeft.apply {
-                setupStyle()
-                valueFormatter = object : ValueFormatter() {
-                    override fun getFormattedValue(value: Float): String {
-                        return value.formatCompact()
-                    }
-                }
-            }
-
-            xAxis.apply {
-                setupStyle()
-                valueFormatter = object : ValueFormatter() {
-                    override fun getFormattedValue(value: Float): String {
-                        return value.toLong().seconds.getRelativeDateShortString(context) ?: ""
-                    }
-                }
-            }
-            updateLayoutParams<ConstraintLayout.LayoutParams> {
-                topMargin = if (binding.chartSerie1LegendTextView.isGone && binding.chartSerie2LegendTextView.isGone) {
-                    R.dimen.spacing_xlarge.toDimensSize(this@apply.context).toInt()
-                } else {
-                    0
+            valueFormatter = object : ValueFormatter() {
+                override fun getFormattedValue(value: Float): String {
+                    return value.toLong().seconds.getRelativeDateShortString(binding.root.context) ?: ""
                 }
             }
         }
     }
+
+    private fun setupYAxis(yAxis: YAxis) {
+        yAxis.apply {
+            setupStyle()
+            removeAllLimitLines()
+            valueFormatter = object : ValueFormatter() {
+                override fun getFormattedValue(value: Float): String {
+                    return value.formatCompact()
+                }
+            }
+
+            limitLineData?.let {
+                val limitLine = LimitLine(it.limitLine.toFloat(), it.description)
+                limitLine.setupStyle(it.color)
+                addLimitLine(limitLine)
+            }
+        }
+    }
+
 }
 
 fun keyFigureCardChartItem(block: (KeyFigureChartCardItem.() -> Unit)): KeyFigureChartCardItem = KeyFigureChartCardItem().apply(

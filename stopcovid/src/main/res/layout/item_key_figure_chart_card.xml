@@ -47,7 +47,7 @@
             android:layout_marginBottom="@dimen/spacing_medium"
             android:textAppearance="@style/TextAppearance.StopCovid.Caption.Bold"
             app:drawableStartCompat="@drawable/ic_chart_marker"
-            app:layout_constraintBottom_toTopOf="@id/keyFigureChart"
+            app:layout_constraintBottom_toTopOf="@id/chartContainer"
             app:layout_constraintEnd_toStartOf="@id/shareButton"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/chartSerie1LegendTextView"
@@ -67,15 +67,30 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="ContentDescription" />
 
-        <com.github.mikephil.charting.charts.LineChart
-            android:id="@+id/keyFigureChart"
-            android:layout_width="0dp"
-            android:layout_height="@dimen/key_figure_chart_height"
-            android:layout_marginHorizontal="@dimen/spacing_large"
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/chartContainer"
             app:layout_constraintBottom_toTopOf="@id/chartDescriptionTextView"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/chartSerie2LegendTextView" />
+            app:layout_constraintTop_toBottomOf="@id/chartSerie2LegendTextView">
+
+            <com.github.mikephil.charting.charts.LineChart
+                android:id="@+id/keyFigureLineChart"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/key_figure_chart_height"
+                android:layout_marginHorizontal="@dimen/spacing_large"
+                android:visibility="gone" />
+
+            <com.github.mikephil.charting.charts.BarChart
+                android:id="@+id/keyFigureBarChart"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/key_figure_chart_height"
+                android:layout_marginHorizontal="@dimen/spacing_large"
+                android:visibility="gone" />
+
+        </FrameLayout>
 
         <TextView
             android:id="@+id/chartDescriptionTextView"
@@ -88,7 +103,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/keyFigureChart"
+            app:layout_constraintTop_toBottomOf="@id/chartContainer"
             tools:text="@tools:sample/lorem[2]" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

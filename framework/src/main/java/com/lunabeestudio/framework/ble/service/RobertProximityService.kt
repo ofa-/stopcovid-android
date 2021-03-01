@@ -43,6 +43,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.util.UUID
+import java.util.concurrent.atomic.AtomicInteger
 import kotlin.time.ExperimentalTime
 import kotlin.time.seconds
 
@@ -56,6 +57,7 @@ abstract class RobertProximityService : ProximityNotificationService() {
 
     // Clear errors if the service is working as expected
     protected var noNewErrorJob: Job? = null
+    private val nonCriticalErrorInARow = AtomicInteger(0)
 
     // Help to distinguish between between error at the beginning of the service and after some time
     protected var creationDate: Long = System.currentTimeMillis()
@@ -215,6 +217,8 @@ abstract class RobertProximityService : ProximityNotificationService() {
                                 val shouldRestartProximityService: Boolean =
                                     robertManager.shouldReloadBleSettings
                                         || (RESTART_SERVICE_ON_EBID_CHANGE && validUntilTimeMs - System.currentTimeMillis() < 0L)
+                                        || nonCriticalErrorInARow.get() > 0
+                                Timber.v("shouldRestartProximityService = $shouldRestartProximityService; nonCriticalErrorInARow = $nonCriticalErrorInARow")
                                 startWaitForErrorOrClear()
                                 if (shouldRestartProximityService) {
                                     restart()
@@ -253,6 +257,8 @@ abstract class RobertProximityService : ProximityNotificationService() {
             if (isActive) {
                 // No new error detected, we can clear the errors
                 clearErrorNotification()
+                nonCriticalErrorInARow.set(0)
+                Timber.v("Clear nonCriticalErrorInARow")
             }
         }
     }
@@ -293,12 +299,19 @@ abstract class RobertProximityService : ProximityNotificationService() {
         }
     }
 
+    protected fun shouldShowError(): Boolean {
+        val shouldShowError = nonCriticalErrorInARow.incrementAndGet() >= NON_CRITICAL_ERROR_BEFORE_NOTIFICATION
+        Timber.v("Incrementing nonCriticalErrorInARow = $nonCriticalErrorInARow; shouldShowError = $shouldShowError")
+        return shouldShowError
+    }
+
     companion object {
         private const val HELLO_REFRESH_MAX_DELAY_MS: Long = 30 * 1000
-        private const val CLEAR_ERROR_DELAY_MS: Long = 1 * 1000
+        private const val CLEAR_ERROR_DELAY_MS: Long = 3 * 1000
         private const val RESTART_SERVICE_ON_EBID_CHANGE: Boolean = true
         private const val FALLBACK_TX: Double = -6.52
         private const val FALLBACK_RX: Double = -19.71
+        private const val NON_CRITICAL_ERROR_BEFORE_NOTIFICATION: Int = 5
     }
 }
 

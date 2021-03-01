@@ -13,12 +13,12 @@ package com.lunabeestudio.stopcovid.fragment
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import com.github.mikephil.charting.data.Entry
 import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.R
+import com.lunabeestudio.stopcovid.coreui.extension.appCompatActivity
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.extension.isNightMode
 import com.lunabeestudio.stopcovid.coreui.extension.viewLifecycleOwnerOrNull
@@ -36,6 +36,7 @@ import com.lunabeestudio.stopcovid.extension.itemForFigure
 import com.lunabeestudio.stopcovid.extension.labelShortStringKey
 import com.lunabeestudio.stopcovid.extension.labelStringKey
 import com.lunabeestudio.stopcovid.extension.learnMoreStringKey
+import com.lunabeestudio.stopcovid.extension.limitLineStringKey
 import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.fastitem.bigTitleItem
 import com.lunabeestudio.stopcovid.fastitem.keyFigureCardChartItem
@@ -43,6 +44,8 @@ import com.lunabeestudio.stopcovid.manager.KeyFiguresManager
 import com.lunabeestudio.stopcovid.manager.ShareManager
 import com.lunabeestudio.stopcovid.model.ChartData
 import com.lunabeestudio.stopcovid.model.KeyFigure
+import com.lunabeestudio.stopcovid.model.KeyFigureChartType
+import com.lunabeestudio.stopcovid.model.LimitLineData
 import com.mikepenz.fastadapter.GenericItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -130,6 +133,8 @@ class KeyFigureDetailsFragment : KeyFigureGenericFragment() {
                         localData(figure),
                         globalData(figure, departmentKeyFigure != null)
                     ).filterNotNull().toTypedArray()
+                    chartType = KeyFigureChartType.LINES
+                    limitLineData = limitLineData(figure)
                     chartExplanationLabel = chartExplanationLabel(figure, chartData)
                     shareContentDescription = strings["accessibility.hint.keyFigure.chart.share"]
                     onShareCard = { binding ->
@@ -147,6 +152,8 @@ class KeyFigureDetailsFragment : KeyFigureGenericFragment() {
                         onShareCard = { binding ->
                             shareChart(binding)
                         }
+                        chartType = figure.chartType
+                        limitLineData = limitLineData(figure)
                     }
                     items += spaceItem {
                         spaceRes = R.dimen.spacing_medium
@@ -155,20 +162,22 @@ class KeyFigureDetailsFragment : KeyFigureGenericFragment() {
                 }
                 items += keyFigureCardChartItem {
                     chartData = arrayOf(
-                        globalData(figure, departmentKeyFigure != null)
+                        globalData(figure, false)
                     )
                     chartExplanationLabel = chartExplanationLabel(figure, chartData)
                     shareContentDescription = strings["accessibility.hint.keyFigure.chart.share"]
                     onShareCard = { binding ->
                         shareChart(binding)
                     }
+                    chartType = figure.chartType
+                    limitLineData = limitLineData(figure)
                 }
             }
 
             if (figure.hasAverageChart()) {
                 items += keyFigureCardChartItem {
                     chartData = arrayOf(
-                        avgGlobalData(figure, departmentKeyFigure != null)
+                        avgGlobalData(figure, false)
                     )
                     chartExplanationLabel = stringsFormat(
                         "keyFigureDetailController.section.evolutionAvg.subtitle",
@@ -178,6 +187,8 @@ class KeyFigureDetailsFragment : KeyFigureGenericFragment() {
                     onShareCard = { binding ->
                         shareChart(binding)
                     }
+                    limitLineData = limitLineData(figure)
+                    chartType = KeyFigureChartType.LINES
                 }
             }
 
@@ -280,8 +291,18 @@ class KeyFigureDetailsFragment : KeyFigureGenericFragment() {
         }
     )
 
+    private fun limitLineData(figure: KeyFigure): LimitLineData? {
+        return figure.limitLine?.let {
+            LimitLineData(
+                it.toFloat(),
+                strings[figure.limitLineStringKey],
+                Color.parseColor(strings[figure.colorStringKey(requireContext().isNightMode())])
+            )
+        }
+    }
+
     fun setTitle(title: String) {
-        (activity as AppCompatActivity).supportActionBar?.title = title
+        appCompatActivity?.supportActionBar?.title = title
     }
 
     override fun showPostalCodeBottomSheet() {

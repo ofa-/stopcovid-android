@@ -13,6 +13,7 @@
     <item name="item_audio" type="id" />
     <item name="item_big_title" type="id" />
     <item name="item_button_card" type="id" />
+    <item name="item_change_postal_code" type="id" />
     <item name="item_contact" type="id" />
     <item name="item_danger_button" type="id" />
     <item name="item_date" type="id" />

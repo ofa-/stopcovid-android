@@ -102,10 +102,7 @@ class ManageDataFragment : MainFragment() {
             showSnackBar(strings["manageDataController.quitStopCovid.success"] ?: "")
             sharedPreferences.edit {
                 remove(Constants.SharedPrefs.ON_BOARDING_DONE)
-                remove(Constants.SharedPrefs.PRIVATE_EVENT_QR_CODE_GENERATION_DATE)
-                remove(Constants.SharedPrefs.PRIVATE_EVENT_QR_CODE)
             }
-            VaccinationCenterManager.clearAllData(sharedPreferences)
             findNavControllerOrNull()?.safeNavigate(ManageDataFragmentDirections.actionGlobalOnBoardingActivity())
             activity?.finishAndRemoveTask()
         }

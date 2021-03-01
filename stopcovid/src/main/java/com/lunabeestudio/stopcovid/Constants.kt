@@ -13,6 +13,7 @@ package com.lunabeestudio.stopcovid
 import java.util.concurrent.TimeUnit
 
 object Constants {
+
     object SharedPrefs {
         const val ON_BOARDING_DONE: String = "On.Boarding.Done"
         const val LAST_PRIVACY_REFRESH: String = "Last.Privacy.Refresh"
@@ -60,6 +61,7 @@ object Constants {
 
     object Url {
         const val VENUE_ROOT_URL: String = "https://tac.gouv.fr/"
+        const val PLAY_STORE_URL: String = "https://play.google.com/store/apps/details?id="
     }
 
     object Android {
@@ -68,6 +70,7 @@ object Constants {
     }
 
     object Chart {
+        const val LIMIT_LINE_TEXT_SIZE: Float = 15f
         const val SHARE_CHART_FILENAME: String = "chart.jpg"
         const val MIN_CIRCLE_RADIUS_SIZE: Float = 1.75f
         const val RESIZE_START_CIRCLE_COUNT: Float = 25f

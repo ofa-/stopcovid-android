@@ -24,11 +24,12 @@ object ShareManager {
 
     fun getShareCaptureUriFromBitmap(context: Context, bitmap: Bitmap, filenameWithoutExt: String): Uri {
         val shareImagesDir = File("${context.cacheDir}/shared_images")
-        shareImagesDir.mkdir()
+        shareImagesDir.mkdirs()
         val shareImageFile = File(shareImagesDir, "$filenameWithoutExt.jpeg")
         shareImageFile.outputStream().use { stream ->
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream)
         }
+        shareImageFile.deleteOnExit()
         return FileProvider.getUriForFile(context, "${BuildConfig.APPLICATION_ID}.share", shareImageFile)
     }
 

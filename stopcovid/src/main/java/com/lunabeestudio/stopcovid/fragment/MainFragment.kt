@@ -12,9 +12,9 @@ package com.lunabeestudio.stopcovid.fragment
 
 import android.os.Bundle
 import android.view.View
-import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.appbar.AppBarLayout
 import com.lunabeestudio.stopcovid.activity.MainActivity
+import com.lunabeestudio.stopcovid.coreui.extension.appCompatActivity
 import com.lunabeestudio.stopcovid.coreui.extension.registerToAppBarLayoutForLiftOnScroll
 import com.lunabeestudio.stopcovid.coreui.fragment.FastAdapterFragment
 import com.lunabeestudio.stopcovid.databinding.ActivityMainBinding
@@ -40,7 +40,7 @@ abstract class MainFragment : FastAdapterFragment() {
     }
 
     protected open fun setTitle() {
-        (activity as AppCompatActivity).supportActionBar?.title = strings[getTitleKey()]
+        appCompatActivity?.supportActionBar?.title = strings[getTitleKey()]
     }
 
     protected fun showSnackBar(message: String) {
