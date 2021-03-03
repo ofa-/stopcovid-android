@@ -202,8 +202,7 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
 
     private fun currentEbidAsString(): String {
         return robertManager.getCurrentEbid()?.short
-            ?: "❣️ " + localEbids.lastOrNull()?.short
-            ?: " 🐭 "
+            ?: "❣️  " + (localEbids.lastOrNull()?.short ?: " 🐭 ")
     }
 
     private val nbDisplayedItems = 300
