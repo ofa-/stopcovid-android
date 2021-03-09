@@ -11,28 +11,20 @@
 package com.lunabeestudio.stopcovid.manager
 
 import android.content.Context
-import android.util.MalformedJsonException
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.lunabeestudio.robert.utils.Event
-import com.lunabeestudio.stopcovid.BuildConfig
-import com.lunabeestudio.stopcovid.coreui.extension.saveTo
+import com.lunabeestudio.stopcovid.coreui.ConfigConstant
 import com.lunabeestudio.stopcovid.model.KeyFigure
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import timber.log.Timber
-import java.io.File
 import java.lang.reflect.Type
 
-object KeyFiguresManager {
+object KeyFiguresManager : RemoteFileManager<List<KeyFigure>>() {
 
-    private var gson: Gson = Gson()
-
-    private const val cacheFileName: String = "key-figures.json"
-    private const val url: String = com.lunabeestudio.stopcovid.coreui.BuildConfig.BASE_URL + BuildConfig.KEY_FIGURES_PATH
-    private val typeKeyFigure: Type = object : TypeToken<List<KeyFigure>>() {}.type
+    override val type: Type = object : TypeToken<List<KeyFigure>>() {}.type
+    override val localFileName: String = ConfigConstant.KeyFigures.MASTER_LOCAL_FILENAME
+    override val remoteFileUrl: String = ConfigConstant.KeyFigures.MASTER_URL
+    override val assetFilePath: String? = null
 
     private val _figures: MutableLiveData<Event<List<KeyFigure>>> = MutableLiveData()
     val figures: LiveData<Event<List<KeyFigure>>>
@@ -58,53 +50,6 @@ object KeyFiguresManager {
                 if (_figures.value?.peekContent() != figures) {
                     _figures.postValue(Event(figures))
                 }
-            }
-        }
-    }
-
-    private suspend fun loadLocal(context: Context): List<KeyFigure>? {
-        val keyFiguresFile = File(context.filesDir, cacheFileName)
-        return if (keyFiguresFile.exists()) {
-            withContext(Dispatchers.IO) {
-                try {
-                    Timber.v("Loading $keyFiguresFile to object")
-                    gson.fromJson<List<KeyFigure>>(File(context.filesDir, cacheFileName).readText(), typeKeyFigure)
-                } catch (e: Exception) {
-                    Timber.e(e)
-                    null
-                }
-            }
-        } else {
-            Timber.v("Nothing to load")
-            null
-        }
-    }
-
-    private suspend fun fetchLast(context: Context): Boolean {
-        val filename = "$cacheFileName.bck"
-        val tmpFile = File(context.filesDir, filename)
-        return try {
-            Timber.v("Fetching remote data at $url")
-            url.saveTo(context, tmpFile)
-            if (fileNotCorrupted(context, filename)) {
-                tmpFile.copyTo(File(context.filesDir, cacheFileName), overwrite = true, bufferSize = 4 * 1024)
-            } else {
-                throw MalformedJsonException("Failed to parse key figure JSON")
-            }
-            true
-        } catch (e: Exception) {
-            Timber.e(e, "Fetching failed")
-            false
-        } finally {
-            tmpFile.delete()
-        }
-    }
-
-    private suspend fun fileNotCorrupted(context: Context, filename: String): Boolean {
-        return withContext(Dispatchers.IO) {
-            val content = gson.fromJson<List<KeyFigure?>>(File(context.filesDir, filename).readText(), typeKeyFigure)
-            content.none {
-                it == null
             }
         }
     }

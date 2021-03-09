@@ -10,46 +10,52 @@
 
 package com.lunabeestudio.stopcovid.fastitem
 
+import android.graphics.drawable.GradientDrawable
 import android.view.View
 import android.widget.ImageButton
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.button.MaterialButton
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.safeEmojiSpanify
 import com.lunabeestudio.stopcovid.coreui.fastitem.BaseItem
 import com.lunabeestudio.stopcovid.extension.setTextOrHide
 
-class ContactItem(layoutRes: Int) : BaseItem<ContactItem.ViewHolder>(
+class HealthCardItem(layoutRes: Int) : BaseItem<HealthCardItem.ViewHolder>(
     layoutRes, ::ViewHolder, R.id.item_contact + layoutRes
 ) {
     var header: String? = null
     var title: String? = null
     var caption: String? = null
-    var more: String? = null
-    var atRisk: Boolean? = null
-    var moreClickListener: View.OnClickListener? = null
-    var actionClickListener: View.OnClickListener? = null
-    var actionContentDescription: String? = null
+    var dateLabel: String? = null
+    var dateValue: String? = null
+
+    // Gradient background, override theme
+    var gradientBackground: GradientDrawable? = null
 
     override fun bindView(holder: ViewHolder, payloads: List<Any>) {
         super.bindView(holder, payloads)
         holder.headerTextView.setTextOrHide(header.safeEmojiSpanify())
         holder.titleTextView.setTextOrHide(title.safeEmojiSpanify())
         holder.captionTextView.setTextOrHide(caption.safeEmojiSpanify())
-        holder.moreButton.setTextOrHide(more.safeEmojiSpanify())
-        holder.moreButton.setOnClickListener(moreClickListener)
-        holder.actionButton.setOnClickListener(actionClickListener)
-        holder.actionButton.contentDescription = actionContentDescription
+        holder.dateLabelTextView.setTextOrHide(dateLabel.safeEmojiSpanify())
+        holder.dateValueTextView.setTextOrHide(dateValue.safeEmojiSpanify())
+        gradientBackground?.let { holder.rootLayout.background = it }
+    }
+
+    override fun unbindView(holder: ViewHolder) {
+        super.unbindView(holder)
+        holder.rootLayout.background = null
     }
 
     class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {
         val headerTextView: TextView = v.findViewById(R.id.headerTextView)
         val titleTextView: TextView = v.findViewById(R.id.titleTextView)
         val captionTextView: TextView = v.findViewById(R.id.captionTextView)
-        val moreButton: MaterialButton = v.findViewById(R.id.learnMoreButton)
-        val actionButton: ImageButton = v.findViewById(R.id.actionButton)
+        val dateLabelTextView: TextView = v.findViewById(R.id.dateLabelTextView)
+        val dateValueTextView: TextView = v.findViewById(R.id.dateValueTextView)
+        val rootLayout: ConstraintLayout = v.findViewById(R.id.rootLayout)
     }
 }
 
-fun contactItem(layoutRes: Int, block: (ContactItem.() -> Unit)): ContactItem = ContactItem(layoutRes).apply(block)
+fun healthCardItem(layoutRes: Int, block: (HealthCardItem.() -> Unit)): HealthCardItem = HealthCardItem(layoutRes).apply(block)

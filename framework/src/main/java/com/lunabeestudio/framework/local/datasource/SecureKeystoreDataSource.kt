@@ -17,11 +17,13 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.lunabeestudio.domain.model.Calibration
 import com.lunabeestudio.domain.model.Configuration
 import com.lunabeestudio.domain.model.FormEntry
 import com.lunabeestudio.domain.model.VenueQrCode
 import com.lunabeestudio.framework.local.LocalCryptoManager
 import com.lunabeestudio.robert.datasource.LocalKeystoreDataSource
+import com.lunabeestudio.robert.model.AtRiskStatus
 import java.lang.reflect.Type
 
 class SecureKeystoreDataSource(context: Context, private val cryptoManager: LocalCryptoManager) : LocalKeystoreDataSource {
@@ -33,6 +35,10 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
     override var configuration: Configuration?
         get() = getValue(SHARED_PREF_KEY_CONFIGURATION, Configuration::class.java)
         set(value) = setValue(SHARED_PREF_KEY_CONFIGURATION, value)
+
+    override var calibration: Calibration?
+        get() = getValue(SHARED_PREF_KEY_CALIBRATION, Calibration::class.java)
+        set(value) = setValue(SHARED_PREF_KEY_CALIBRATION, value)
 
     override var shouldReloadBleSettings: Boolean?
         get() = getEncryptedValue(SHARED_PREF_KEY_SHOULD_RELOAD_BLE_SETTINGS, Boolean::class.java)
@@ -62,10 +68,6 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
         get() = getAndMigrateOldUnencryptedLong(SHARED_PREF_KEY_TIME_START, SHARED_PREF_KEY_TIME_START_ENCRYPTED)
         set(value) = setEncryptedValue(SHARED_PREF_KEY_TIME_START_ENCRYPTED, value)
 
-    override var isWarningAtRisk: Boolean?
-        get() = getEncryptedValue(SHARED_PREF_KEY_IS_WARNING_AT_RISK, Boolean::class.java, useCache = false)
-        set(value) = setEncryptedValue(SHARED_PREF_KEY_IS_WARNING_AT_RISK, value, useCache = false)
-
     override var atRiskLastRefresh: Long?
         get() = getEncryptedValue(SHARED_PREF_KEY_AT_RISK_LAST_REFRESH, Long::class.java)
         set(value) = setEncryptedValue(SHARED_PREF_KEY_AT_RISK_LAST_REFRESH, value)
@@ -74,11 +76,27 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
         get() = getEncryptedValue(SHARED_PREF_KEY_AT_RISK_LAST_ERROR, Long::class.java)
         set(value) = setEncryptedValue(SHARED_PREF_KEY_AT_RISK_LAST_ERROR, value)
 
-    override var lastRiskReceivedDate: Long?
+    override var atRiskStatus: AtRiskStatus?
+        get() = getEncryptedValue(SHARED_PREF_KEY_AT_RISK_STATUS, AtRiskStatus::class.java)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_AT_RISK_STATUS, value)
+
+    override var currentRobertAtRiskStatus: AtRiskStatus?
+        get() = getEncryptedValue(SHARED_PREF_KEY_CURRENT_ROBERT_AT_RISK_STATUS, AtRiskStatus::class.java)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_CURRENT_ROBERT_AT_RISK_STATUS, value)
+
+    override var currentWarningAtRiskStatus: AtRiskStatus?
+        get() = getEncryptedValue(SHARED_PREF_KEY_CURRENT_WARNING_AT_RISK_STATUS, AtRiskStatus::class.java)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_CURRENT_WARNING_AT_RISK_STATUS, value)
+
+    override var atRiskModelVersion: Int?
+        get() = getEncryptedValue(SHARED_PREF_KEY_AT_RISK_MODEL_VERSION, Int::class.java)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_AT_RISK_MODEL_VERSION, value)
+
+    override var deprecatedLastRiskReceivedDate: Long?
         get() = getEncryptedValue(SHARED_PREF_KEY_LAST_RISK_RECEIVED_DATE, Long::class.java)
         set(value) = setEncryptedValue(SHARED_PREF_KEY_LAST_RISK_RECEIVED_DATE, value)
 
-    override var lastExposureTimeframe: Int?
+    override var deprecatedLastExposureTimeframe: Int?
         get() = getEncryptedValue(SHARED_PREF_KEY_LAST_EXPOSURE_TIMEFRAME, Int::class.java, useCache = false)
         set(value) = setEncryptedValue(SHARED_PREF_KEY_LAST_EXPOSURE_TIMEFRAME, value, useCache = false)
 
@@ -132,9 +150,9 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
         get() = getEncryptedValue(SHARED_PREF_KEY_REPORT_SYMPTOMS_DATE, Long::class.java)
         set(value) = setEncryptedValue(SHARED_PREF_KEY_REPORT_SYMPTOMS_DATE, value)
 
-    override var lastWarningReceivedDate: Long?
-        get() = getEncryptedValue(SHARED_PREF_KEY_WARNING_RECEIVED_DATE, Long::class.java)
-        set(value) = setEncryptedValue(SHARED_PREF_KEY_WARNING_RECEIVED_DATE, value)
+    override var declarationToken: String?
+        get() = getEncryptedValue(SHARED_PREF_KEY_DECLARATION_TOKEN, String::class.java)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_DECLARATION_TOKEN, value)
 
     // Isolation vars
     override var isolationFormState: Int?
@@ -198,6 +216,7 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
             return if (encryptedText != null) {
                 val result = kotlin.runCatching {
                     if (type == ByteArray::class.java) {
+                        @Suppress("UNCHECKED_CAST")
                         cryptoManager.decrypt(encryptedText) as? T
                     } else {
                         val decryptedString = cryptoManager.decryptToString(encryptedText)
@@ -286,15 +305,19 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
     companion object {
         private const val SHARED_PREF_NAME = "robert_prefs"
         private const val SHARED_PREF_KEY_CONFIGURATION = "shared.pref.configuration"
+        private const val SHARED_PREF_KEY_CALIBRATION = "shared.pref.calibration"
         private const val SHARED_PREF_KEY_SHOULD_RELOAD_BLE_SETTINGS = "shared.pref.should_reload_ble_settings"
         private const val SHARED_PREF_KEY_IS_REGISTERED = "shared.pref.is_registered"
         private const val SHARED_PREF_KEY_KA = "shared.pref.ka"
         private const val SHARED_PREF_KEY_KEA = "shared.pref.kea"
         private const val SHARED_PREF_KEY_TIME_START = "shared.pref.time_start"
         private const val SHARED_PREF_KEY_TIME_START_ENCRYPTED = "shared.pref.time_start_encrypted"
-        private const val SHARED_PREF_KEY_IS_WARNING_AT_RISK = "shared.pref.is_warning_at_risk"
         private const val SHARED_PREF_KEY_AT_RISK_LAST_REFRESH = "shared.pref.at_risk_last_refresh"
         private const val SHARED_PREF_KEY_AT_RISK_LAST_ERROR = "shared.pref.at_risk_last_error"
+        private const val SHARED_PREF_KEY_AT_RISK_STATUS = "shared.pref.at_risk_status"
+        private const val SHARED_PREF_KEY_CURRENT_ROBERT_AT_RISK_STATUS = "shared.pref.current_robert_at_risk_status"
+        private const val SHARED_PREF_KEY_CURRENT_WARNING_AT_RISK_STATUS = "shared.pref.current_warning_at_risk_status"
+        private const val SHARED_PREF_KEY_AT_RISK_MODEL_VERSION = "shared.pref.at_risk_model_version"
         private const val SHARED_PREF_KEY_LAST_RISK_RECEIVED_DATE = "shared.pref.last_risk_received_date"
         private const val SHARED_PREF_KEY_LAST_EXPOSURE_TIMEFRAME = "shared.pref.last_exposure_timeframe"
         private const val SHARED_PREF_KEY_PROXIMITY_ACTIVE = "shared.pref.proximity_active"
@@ -307,11 +330,11 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
         private const val SHARED_PREF_KEY_SAVE_DATA_VENUES_QR_CODE = "shared.pref.venues_qr_code"
         private const val SHARED_PREF_KEY_REPORT_VALIDATION_TOKEN = "shared.pref.report_validation_token"
         private const val SHARED_PREF_KEY_REPORT_TO_SEND_TIME = "shared.pref.report_to_send_time"
+        private const val SHARED_PREF_KEY_DECLARATION_TOKEN = "shared.pref.declaration_token"
 
         // Add on to ROBERT for isolation
         private const val SHARED_PREF_KEY_REPORT_SYMPTOMS_DATE = "shared.pref.reportSymptomsDate"
         private const val SHARED_PREF_KEY_REPORT_POSITIVE_TEST_DATE = "shared.pref.reportPositiveTestDate"
-        private const val SHARED_PREF_KEY_WARNING_RECEIVED_DATE = "shared.pref.warningReceivedDate"
 
         // Isolation keys
         private const val SHARED_PREF_KEY_ISOLATION_FORM_STATE = "shared.pref.isolationFormState"

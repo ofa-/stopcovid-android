@@ -58,16 +58,28 @@
 	            "code":"handicap"
             },
             {
-               "code":"convocation"
+               "code":"judiciaire"
             },
             {
                "code":"missions"
             },
             {
-               "code":"transits"
+               "code":"transit"
             },
             {
 	            "code":"animaux"
+            },
+            {
+	            "code":"courses"
+            },
+            {
+	            "code":"sport"
+            },
+            {
+	            "code":"rassemblement"
+            },
+            {
+	            "code":"demarche"
             }
          ]
       }

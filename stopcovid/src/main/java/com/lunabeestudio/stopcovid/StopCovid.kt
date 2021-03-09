@@ -48,11 +48,17 @@ import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.robert.RobertManagerImpl
 import com.lunabeestudio.stopcovid.`interface`.IsolationApplication
 import com.lunabeestudio.stopcovid.activity.MainActivity
+import com.lunabeestudio.stopcovid.coreui.ConfigConstant
+import com.lunabeestudio.stopcovid.coreui.EnvConstant
 import com.lunabeestudio.stopcovid.coreui.UiConstants
+import com.lunabeestudio.stopcovid.coreui.manager.CalibrationManager
 import com.lunabeestudio.stopcovid.coreui.manager.ConfigManager
 import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
+import com.lunabeestudio.stopcovid.extension.alertRiskLevelChanged
+import com.lunabeestudio.stopcovid.extension.hideRiskStatus
 import com.lunabeestudio.stopcovid.extension.lastVersionCode
 import com.lunabeestudio.stopcovid.manager.AppMaintenanceManager
+import com.lunabeestudio.stopcovid.manager.CalibDataSource
 import com.lunabeestudio.stopcovid.manager.ConfigDataSource
 import com.lunabeestudio.stopcovid.manager.FormManager
 import com.lunabeestudio.stopcovid.manager.InfoCenterManager
@@ -62,6 +68,7 @@ import com.lunabeestudio.stopcovid.manager.LinksManager
 import com.lunabeestudio.stopcovid.manager.MoreKeyFiguresManager
 import com.lunabeestudio.stopcovid.manager.PrivacyManager
 import com.lunabeestudio.stopcovid.manager.ProximityManager
+import com.lunabeestudio.stopcovid.manager.RisksLevelManager
 import com.lunabeestudio.stopcovid.manager.VaccinationCenterManager
 import com.lunabeestudio.stopcovid.manager.VenuesManager
 import com.lunabeestudio.stopcovid.model.DeviceSetup
@@ -117,9 +124,17 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
             SecureFileEphemeralBluetoothIdentifierDataSource(this, cryptoManager),
             secureKeystoreDataSource,
             SecureFileLocalProximityDataSource(File(filesDir, LOCAL_PROXIMITY_DIR), cryptoManager),
-            ServiceDataSource(this),
+            ServiceDataSource(
+                this,
+                EnvConstant.Prod.baseUrl,
+                EnvConstant.Prod.warningBaseUrl,
+                EnvConstant.Prod.certificateSha256,
+                EnvConstant.Prod.warningCertificateSha256,
+            ),
             BouncyCastleCryptoDataSource(),
             ConfigDataSource,
+            CalibDataSource,
+            EnvConstant.Prod.serverPublicKey,
             LocalProximityFilterImpl()
         )
     }
@@ -140,8 +155,12 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
             PrivacyManager.clearLocal(this)
             StringsManager.clearLocal(this)
             ConfigManager.clearLocal(this)
+            CalibrationManager.clearLocal(this)
             FormManager.clearLocal(this)
             secureKeystoreDataSource.configuration = secureKeystoreDataSource.configuration?.apply {
+                version = 0
+            }
+            secureKeystoreDataSource.calibration = secureKeystoreDataSource.calibration?.apply {
                 version = 0
             }
         }
@@ -162,20 +181,23 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
             InfoCenterManager.initialize(this@StopCovid)
         }
         appCoroutineScope.launch {
-            KeyFiguresManager.initialize(this@StopCovid)
-        }
-        appCoroutineScope.launch {
             FormManager.initialize(this@StopCovid)
         }
         appCoroutineScope.launch {
             VaccinationCenterManager.initialize(this@StopCovid, sharedPrefs)
         }
         appCoroutineScope.launch {
+            KeyFiguresManager.initialize(this@StopCovid)
+        }
+        appCoroutineScope.launch {
+            RisksLevelManager.initialize(this@StopCovid)
+        }
+        appCoroutineScope.launch {
             AppMaintenanceManager.initialize(
                 this@StopCovid,
                 R.drawable.maintenance,
                 R.drawable.maintenance,
-                BuildConfig.APP_MAINTENANCE_URL
+                ConfigConstant.Maintenance.URL
             )
         }
 
@@ -212,6 +234,9 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
             KeyFiguresManager.onAppForeground(this@StopCovid)
         }
         appCoroutineScope.launch {
+            RisksLevelManager.onAppForeground(this@StopCovid)
+        }
+        appCoroutineScope.launch {
             FormManager.onAppForeground(this@StopCovid)
         }
         appCoroutineScope.launch {
@@ -243,29 +268,24 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
         }
     }
 
-    override fun atRiskDetected() {
-        val inputData = Data.Builder()
-            .putString(AtRiskNotificationWorker.INPUT_DATA_TITLE_KEY, "notification.atRisk.title")
-            .putString(AtRiskNotificationWorker.INPUT_DATA_MESSAGE_KEY, "notification.atRisk.message")
-            .build()
-        sendAtRiskNotification(
-            OneTimeWorkRequestBuilder<AtRiskNotificationWorker>().setInputData(inputData),
-            Constants.WorkerNames.AT_RISK_NOTIFICATION
-        )
+    override fun notifyAtRiskLevelChange() {
+        RisksLevelManager.getCurrentLevel(robertManager.atRiskStatus?.riskLevel)?.let { riskLevel ->
+            val inputData = Data.Builder()
+                .putString(AtRiskNotificationWorker.INPUT_DATA_TITLE_KEY, riskLevel.labels.notifTitle)
+                .putString(AtRiskNotificationWorker.INPUT_DATA_MESSAGE_KEY, riskLevel.labels.notifBody)
+                .build()
+            sendAtRiskNotification(
+                OneTimeWorkRequestBuilder<AtRiskNotificationWorker>().setInputData(inputData)
+            )
+        }
     }
 
-    override fun warningAtRiskDetected() {
-        val inputData = Data.Builder()
-            .putString(AtRiskNotificationWorker.INPUT_DATA_TITLE_KEY, "notification.atWarning.title")
-            .putString(AtRiskNotificationWorker.INPUT_DATA_MESSAGE_KEY, "notification.atWarning.message")
-            .build()
-        sendAtRiskNotification(
-            OneTimeWorkRequestBuilder<AtRiskNotificationWorker>().setInputData(inputData),
-            Constants.WorkerNames.WARNING_NOTIFICATION
-        )
+    override fun alertAtRiskLevelChange() {
+        sharedPrefs.alertRiskLevelChanged = true
+        sharedPrefs.hideRiskStatus = false
     }
 
-    private fun sendAtRiskNotification(oneTimeWorkRequestBuilder: OneTimeWorkRequest.Builder, workerId: String) {
+    private fun sendAtRiskNotification(oneTimeWorkRequestBuilder: OneTimeWorkRequest.Builder) {
         val minHour = robertManager.configuration.minHourContactNotif
         val maxHour = robertManager.configuration.maxHourContactNotif
 
@@ -299,7 +319,7 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
         }
 
         WorkManager.getInstance(applicationContext)
-            .enqueueUniqueWork(workerId, ExistingWorkPolicy.KEEP, statusWorkRequest)
+            .enqueueUniqueWork(Constants.WorkerNames.AT_RISK_NOTIFICATION, ExistingWorkPolicy.REPLACE, statusWorkRequest)
     }
 
     override suspend fun sendClockNotAlignedNotification() {

@@ -16,7 +16,7 @@ apply plugin: 'androidx.navigation.safeargs.kotlin'
 
 android {
     compileSdkVersion 30
-    buildToolsVersion '30.0.2'
+    buildToolsVersion '30.0.3'
 
     buildTypes {
         release {
@@ -43,25 +43,10 @@ android {
         applicationId "fr.gouv.android.stopcovid"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 172
-        versionName "2.2.7"
+        versionCode 178
+        versionName "2.3.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-
-        buildConfigField 'String', 'CAPTCHA_API_KEY', '"6LettPsUAAAAAHYaFdRBOilHUgmTMSIPKNZN4D7l"'
-        buildConfigField 'String', 'CAPTCHA_URL', '"https://stopcovid.gouv.fr"'
-        buildConfigField 'String', 'APP_MAINTENANCE_CERTIFICATE_SHA256', '"sha256/sXQojvwsiyblrpMQIVRXGC5u7AgknzTJm+VIK1kQmD8="'
-        buildConfigField 'String', 'APP_MAINTENANCE_URL', '"https://app.stopcovid.gouv.fr/maintenance/info-maintenance-v2.json"'
-        buildConfigField 'String', 'INFO_CENTER_FOLDER', '"InfoCenter/"'
-        buildConfigField 'String', 'MORE_KEY_FIGURES_FOLDER', '"MoreKeyFigures/"'
-        buildConfigField 'String', 'KEY_FIGURES_PATH', '"/infos/key-figures.json"'
-        buildConfigField 'String', 'FORM_PATH', '"/Attestations/form.json"'
-        buildConfigField 'String', 'VACCINATION_CENTER_PATH', '"/infos/dep/"'
-        buildConfigField 'String', 'VACCINATION_CENTER_FILENAME', '"centres-vaccination.json"'
-        buildConfigField 'String', 'VACCINATION_CENTER_LAST_UPDATE_FILENAME', '"lastUpdate.json"'
-        buildConfigField 'String', 'PLAY_STORE_URL', '"market://details?id=fr.gouv.android.stopcovid"'
-        buildConfigField 'String', 'APP_GALLERY_URL', '"appmarket://details?id=fr.gouv.android.stopcovid"'
-        buildConfigField 'String', 'BONJOUR_WEBSITE_URL', '"https://bonjour.tousanticovid.gouv.fr"'
     }
 
     lintOptions {

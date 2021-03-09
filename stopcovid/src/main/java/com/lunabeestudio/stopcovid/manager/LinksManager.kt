@@ -10,10 +10,10 @@
 
 package com.lunabeestudio.stopcovid.manager
 
-import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.lunabeestudio.stopcovid.Constants
+import com.lunabeestudio.stopcovid.coreui.ConfigConstant
 import com.lunabeestudio.stopcovid.model.Section
 
 object LinksManager : SectionManager() {
@@ -28,8 +28,8 @@ object LinksManager : SectionManager() {
         }
     }
 
-    override fun folderName(): String = "Links"
-    override fun prefix(context: Context): String = "links-"
-    override fun urlFolderName(): String = "Links/"
-    override fun lastRefreshSharedPrefsKey(): String = Constants.SharedPrefs.LAST_LINKS_REFRESH
+    override val url: String = ConfigConstant.Links.URL
+    override val folderName: String = ConfigConstant.Links.FOLDER
+    override val prefix: String = ConfigConstant.Links.FILE_PREFIX
+    override val lastRefreshSharedPrefsKey: String = Constants.SharedPrefs.LAST_LINKS_REFRESH
 }

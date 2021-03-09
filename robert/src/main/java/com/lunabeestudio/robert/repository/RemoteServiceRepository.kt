@@ -13,6 +13,7 @@ package com.lunabeestudio.robert.repository
 import android.content.Context
 import android.util.Base64
 import androidx.annotation.WorkerThread
+import com.lunabeestudio.domain.model.Calibration
 import com.lunabeestudio.domain.model.Configuration
 import com.lunabeestudio.domain.model.LocalProximity
 import com.lunabeestudio.domain.model.RegisterReport
@@ -23,6 +24,7 @@ import com.lunabeestudio.domain.model.VenueQrCode
 import com.lunabeestudio.domain.model.WStatusReport
 import com.lunabeestudio.robert.BuildConfig
 import com.lunabeestudio.robert.RobertConstant
+import com.lunabeestudio.robert.datasource.CalibrationDataSource
 import com.lunabeestudio.robert.datasource.ConfigurationDataSource
 import com.lunabeestudio.robert.datasource.LocalKeystoreDataSource
 import com.lunabeestudio.robert.datasource.RemoteServiceDataSource
@@ -35,7 +37,9 @@ internal class RemoteServiceRepository(
     private val remoteServiceDataSource: RemoteServiceDataSource,
     private val sharedCryptoDataSource: SharedCryptoDataSource,
     private val keystoreDataSource: LocalKeystoreDataSource,
-    private val configurationDataSource: ConfigurationDataSource
+    private val configurationDataSource: ConfigurationDataSource,
+    private val calibrationDataSource: CalibrationDataSource,
+    private val serverPublicKey: String,
 ) {
 
     suspend fun generateCaptcha(apiVersion: String, type: String, local: String): RobertResultData<String> =
@@ -55,7 +59,7 @@ internal class RemoteServiceRepository(
 
         if (registerResult is RobertResultData.Success) {
             sharedCryptoDataSource.getEncryptionKeys(
-                rawServerPublicKey = Base64.decode(BuildConfig.SERVER_PUBLIC_KEY, Base64.NO_WRAP),
+                rawServerPublicKey = Base64.decode(serverPublicKey, Base64.NO_WRAP),
                 rawLocalPrivateKey = keyPair.private.encoded,
                 kADerivation = RobertConstant.KA_STRING_INPUT.toByteArray(),
                 kEADerivation = RobertConstant.KEA_STRING_INPUT.toByteArray()
@@ -92,4 +96,10 @@ internal class RemoteServiceRepository(
 
     fun loadConfig(context: Context): Configuration =
         configurationDataSource.loadConfig(context)
+
+    suspend fun fetchOrLoadCalibration(context: Context): RobertResultData<Calibration> =
+        calibrationDataSource.fetchOrLoadCalibration(context)
+
+    fun loadCalibration(context: Context): Calibration =
+        calibrationDataSource.loadCalibration(context)
 }

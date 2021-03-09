@@ -13,13 +13,13 @@ apply plugin: 'kotlin-android-extensions'
 
 android {
     compileSdkVersion 30
-    buildToolsVersion '30.0.2'
+    buildToolsVersion '30.0.3'
 
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 30
 
-        buildConfigField 'String', 'BLE_VERSION', '"2.1.1"'
+        buildConfigField 'String', 'BLE_VERSION', '"2.1.2"'
     }
 
     compileOptions {

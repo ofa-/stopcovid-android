@@ -31,26 +31,26 @@ import java.util.concurrent.TimeUnit
 
 object RetrofitClient {
 
-    internal fun <T> getService(context: Context, baseUrl: String, clazz: Class<T>): T {
+    internal fun <T> getService(context: Context, baseUrl: String, certificateSHA256: String, clazz: Class<T>): T {
         return Retrofit.Builder()
             .baseUrl(baseUrl.toHttpUrl())
             .addConverterFactory(GsonConverterFactory.create(GsonBuilder().create()))
-            .client(getDefaultOKHttpClient(context, baseUrl, BuildConfig.CERTIFICATE_SHA256))
+            .client(getDefaultOKHttpClient(context, baseUrl, certificateSHA256))
             .build().create(clazz)
     }
 
-    internal fun <T> getWarningService(context: Context, warningBaseUrl: String, clazz: Class<T>): T {
+    internal fun <T> getWarningService(context: Context, warningBaseUrl: String, warningCertificateSHA256: String, clazz: Class<T>): T {
         return Retrofit.Builder()
             .baseUrl(warningBaseUrl.toHttpUrl())
             .addConverterFactory(GsonConverterFactory.create(GsonBuilder().create()))
-            .client(getDefaultOKHttpClient(context, warningBaseUrl, BuildConfig.WARNING_CERTIFICATE_SHA256))
+            .client(getDefaultOKHttpClient(context, warningBaseUrl, warningCertificateSHA256))
             .build().create(clazz)
     }
 
-    internal fun <T> getFileService(context: Context, baseUrl: String, clazz: Class<T>): T {
+    internal fun <T> getFileService(context: Context, baseUrl: String, certificateSHA256: String, clazz: Class<T>): T {
         return Retrofit.Builder()
             .baseUrl(baseUrl.toHttpUrl())
-            .client(getFileOKHttpClient(context, baseUrl, BuildConfig.CERTIFICATE_SHA256))
+            .client(getFileOKHttpClient(context, baseUrl, certificateSHA256))
             .build().create(clazz)
     }
 

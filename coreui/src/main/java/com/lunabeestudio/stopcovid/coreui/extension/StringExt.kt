@@ -15,7 +15,7 @@ import android.content.Intent
 import android.net.Uri
 import androidx.core.util.AtomicFile
 import androidx.emoji.text.EmojiCompat
-import com.lunabeestudio.stopcovid.coreui.BuildConfig
+import com.lunabeestudio.stopcovid.coreui.ConfigConstant
 import com.lunabeestudio.stopcovid.coreui.network.OkHttpClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -28,7 +28,7 @@ import java.io.FileOutputStream
 @Suppress("BlockingMethodInNonBlockingContext")
 suspend fun String.saveTo(context: Context, file: File) {
     withContext(Dispatchers.IO) {
-        val okHttpClient = OkHttpClient.getDefaultOKHttpClient(context, this@saveTo, BuildConfig.SERVER_CERTIFICATE_SHA256)
+        val okHttpClient = OkHttpClient.getDefaultOKHttpClient(context, this@saveTo, ConfigConstant.SERVER_CERTIFICATE_SHA256)
         val request: Request = Request.Builder()
             .url(this@saveTo)
             .build()
@@ -46,9 +46,9 @@ suspend fun String.saveTo(context: Context, file: File) {
 }
 
 @Suppress("BlockingMethodInNonBlockingContext")
-suspend fun String.saveTo(context: Context, atomicFile: AtomicFile): FileOutputStream? {
+suspend fun String.saveTo(context: Context, atomicFile: AtomicFile): FileOutputStream {
     return withContext(Dispatchers.IO) {
-        val okHttpClient = OkHttpClient.getDefaultOKHttpClient(context, this@saveTo, BuildConfig.SERVER_CERTIFICATE_SHA256)
+        val okHttpClient = OkHttpClient.getDefaultOKHttpClient(context, this@saveTo, ConfigConstant.SERVER_CERTIFICATE_SHA256)
         val request: Request = Request.Builder()
             .url(this@saveTo)
             .build()

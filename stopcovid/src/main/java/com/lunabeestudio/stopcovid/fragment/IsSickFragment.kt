@@ -41,12 +41,12 @@ class IsSickFragment : AboutMainFragment() {
             identifier = items.size.toLong()
         }
         items += titleItem {
-            text = strings["sickController.sick.mainMessage.title"]
+            text = strings["myHealthController.sick.mainMessage.title"]
             gravity = Gravity.CENTER
             identifier = items.count().toLong()
         }
         items += captionItem {
-            text = strings["sickController.sick.mainMessage.subtitle"]
+            text = strings["myHealthController.sick.mainMessage.subtitle"]
             gravity = Gravity.CENTER
             identifier = items.count().toLong()
         }
@@ -55,15 +55,15 @@ class IsSickFragment : AboutMainFragment() {
             identifier = items.size.toLong()
         }
         items += buttonItem {
-            text = strings["sickController.button.recommendations"]
+            text = strings["myHealthController.button.recommendations"]
             gravity = Gravity.CENTER
             onClickListener = View.OnClickListener {
-                strings["sickController.button.recommendations.url"]?.openInExternalBrowser(requireContext())
+                strings["myHealthController.button.recommendations.url"]?.openInExternalBrowser(requireContext())
             }
             identifier = items.count().toLong()
         }
         items += buttonItem {
-            text = strings["informationController.step.appointment.buttonTitle"]
+            text = strings["myHealthController.step.appointment.buttonTitle"]
             gravity = Gravity.CENTER
             onClickListener = View.OnClickListener {
                 strings["callCenter.phoneNumber"]?.callPhone(requireContext())
@@ -71,7 +71,7 @@ class IsSickFragment : AboutMainFragment() {
             identifier = items.count().toLong()
         }
         items += buttonItem {
-            text = strings["sickController.button.cautionMeasures"]
+            text = strings["myHealthController.button.cautionMeasures"]
             gravity = Gravity.CENTER
             onClickListener = View.OnClickListener {
                 findNavControllerOrNull()?.safeNavigate(IsSickFragmentDirections.actionIsSickFragmentToGestureFragment())

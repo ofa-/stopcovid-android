@@ -33,6 +33,8 @@ object Constants {
         const val CURRENT_VACCINATION_REFERENCE_DEPARTMENT_CODE: String = "currentVaccinationReferenceDepartmentCode"
         const val CURRENT_VACCINATION_REFERENCE_LATITUDE: String = "currentVaccinationReferenceLatitude"
         const val CURRENT_VACCINATION_REFERENCE_LONGITUDE: String = "currentVaccinationReferenceLongitude"
+        const val ALERT_RISK_LEVEL_CHANGED: String = "alertRiskLevelChanged"
+        const val HIDE_RISK_STATUS: String = "hideRiskStatus"
     }
 
     object Notification {
@@ -43,7 +45,6 @@ object Constants {
 
     object WorkerNames {
         const val AT_RISK_NOTIFICATION: String = "StopCovid.AtRisk.Notification.Worker"
-        const val WARNING_NOTIFICATION: String = "StopCovid.Warning.Notification.Worker"
         const val ACTIVATE_REMINDER: String = "StopCovid.Activate.Reminder.Worker"
         const val ISOLATION_REMINDER: String = "StopCovid.Isolation.Reminder.Worker"
         const val TIME_CHANGED: String = "StopCovid.TimeChanged.Worker"

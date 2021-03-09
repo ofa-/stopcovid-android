@@ -140,11 +140,11 @@ class IsolationManager(
             return (isolationIndexSymptomsEndDate ?: contactCaseIsolationContactCalculatedDate).roundTimestampToStartOfDay()
         }
 
-    private val contactCaseIsolationContactCalculatedDate: Long?
+    private val contactCaseIsolationContactCalculatedDate: Long
         get() {
             return when {
                 robertManager.isSick -> isolationLastContactDate
-                else -> isolationLastContactDate ?: robertManager.lastRiskReceivedDate ?: robertManager.lastWarningReceivedDate
+                else -> isolationLastContactDate
             } ?: System.currentTimeMillis()
         }
 
@@ -292,7 +292,7 @@ class IsolationManager(
     fun updateStateBasedOnAppMainStateIfNeeded() {
         when {
             robertManager.isSick -> IsolationFormStateEnum.POSITIVE
-            robertManager.isAtRisk == true || robertManager.isWarningAtRisk == true -> IsolationFormStateEnum.CONTACT
+            isAtRisk == true -> IsolationFormStateEnum.CONTACT
             else -> null
         }?.let {
             updateState(it)
@@ -311,12 +311,17 @@ class IsolationManager(
 
     private fun calculateInitialCase(): IsolationRecommendationStateEnum {
         return when {
-            robertManager.isAtRisk == true || robertManager.isSick || robertManager.isWarningAtRisk == true -> {
+            isAtRisk == true || robertManager.isSick -> {
                 IsolationRecommendationStateEnum.INITIAL_CASE_AT_RISK_OR_SICK
             }
             else -> IsolationRecommendationStateEnum.INITIAL_CASE_SAFE
         }
     }
+
+    private val isAtRisk: Boolean?
+        get() = with(robertManager) {
+            atRiskStatus?.riskLevel?.let { it >= configuration.isolationMinRiskLevel }
+        }
 
     private fun calculateSymptomsRecommendationState(): IsolationRecommendationStateEnum {
         return when (isolationIsTestNegative) {

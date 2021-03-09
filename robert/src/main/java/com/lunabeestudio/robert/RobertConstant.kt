@@ -17,6 +17,7 @@ object RobertConstant {
     const val EPOCH_DURATION_S: Int = 15 * 60
     const val KA_STRING_INPUT: String = "mac"
     const val KEA_STRING_INPUT: String = "tuples"
+    const val DEFAULT_CALIBRATION_KEY: String = "DEFAULT"
     const val REGISTER_DELAY_MONTH: Int = 2
     val BLE_FILTER_MODE: LocalProximityFilter.Mode = LocalProximityFilter.Mode.RISKS
 

@@ -10,10 +10,10 @@
 
 package com.lunabeestudio.stopcovid.manager
 
-import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.lunabeestudio.stopcovid.Constants
+import com.lunabeestudio.stopcovid.coreui.ConfigConstant
 import com.lunabeestudio.stopcovid.model.Section
 
 object PrivacyManager : SectionManager() {
@@ -28,7 +28,8 @@ object PrivacyManager : SectionManager() {
         }
     }
 
-    override fun folderName(): String = "Privacy"
-    override fun prefix(context: Context): String = "privacy-"
-    override fun lastRefreshSharedPrefsKey(): String = Constants.SharedPrefs.LAST_PRIVACY_REFRESH
+    override val url: String = ConfigConstant.Privacy.URL
+    override val folderName: String = ConfigConstant.Privacy.ASSET_FOLDER_NAME
+    override val prefix: String = ConfigConstant.Privacy.FILE_PREFIX
+    override val lastRefreshSharedPrefsKey: String = Constants.SharedPrefs.LAST_PRIVACY_REFRESH
 }

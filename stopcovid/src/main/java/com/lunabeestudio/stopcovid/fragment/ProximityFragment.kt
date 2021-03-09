@@ -73,10 +73,12 @@ import com.lunabeestudio.stopcovid.extension.chosenPostalCode
 import com.lunabeestudio.stopcovid.extension.colorStringKey
 import com.lunabeestudio.stopcovid.extension.formatNumberIfNeeded
 import com.lunabeestudio.stopcovid.extension.getDepartmentLabel
+import com.lunabeestudio.stopcovid.extension.getGradientBackground
 import com.lunabeestudio.stopcovid.extension.getKeyFigureForPostalCode
 import com.lunabeestudio.stopcovid.extension.getRelativeDateTimeString
 import com.lunabeestudio.stopcovid.extension.getString
 import com.lunabeestudio.stopcovid.extension.hasChosenPostalCode
+import com.lunabeestudio.stopcovid.extension.hideRiskStatus
 import com.lunabeestudio.stopcovid.extension.isolationManager
 import com.lunabeestudio.stopcovid.extension.labelShortStringKey
 import com.lunabeestudio.stopcovid.extension.openInExternalBrowser
@@ -100,6 +102,7 @@ import com.lunabeestudio.stopcovid.fastitem.proximityButtonItem
 import com.lunabeestudio.stopcovid.manager.InfoCenterManager
 import com.lunabeestudio.stopcovid.manager.KeyFiguresManager
 import com.lunabeestudio.stopcovid.manager.ProximityManager
+import com.lunabeestudio.stopcovid.manager.RisksLevelManager
 import com.lunabeestudio.stopcovid.manager.VaccinationCenterManager
 import com.lunabeestudio.stopcovid.manager.VenuesManager
 import com.lunabeestudio.stopcovid.model.CaptchaNextFragment
@@ -363,7 +366,7 @@ class ProximityFragment : TimeMainFragment() {
         viewModel.isolationDataChanged.observe(viewLifecycleOwner) {
             refreshScreen()
         }
-        robertManager.atRiskStatus.observeEventAndConsume(viewLifecycleOwner) {
+        robertManager.liveAtRiskStatus.observeEventAndConsume(viewLifecycleOwner) {
             refreshScreen()
         }
         InfoCenterManager.infos.observeEventAndConsume(viewLifecycleOwner) {
@@ -412,7 +415,7 @@ class ProximityFragment : TimeMainFragment() {
         addActivateButtonItems(items, deviceSetup)
 
         // Health items
-        addHealthItems(items, isSick, deviceSetup)
+        addHealthItems(items, isSick)
         if (robertManager.configuration.displayIsolation) {
             addIsolationItems(items)
         }
@@ -524,7 +527,7 @@ class ProximityFragment : TimeMainFragment() {
         }
     }
 
-    private fun addHealthItems(items: ArrayList<GenericItem>, isSick: Boolean, deviceSetup: DeviceSetup?) {
+    private fun addHealthItems(items: ArrayList<GenericItem>, isSick: Boolean) {
         items += bigTitleItem {
             text = strings["home.healthSection.title"]
             identifier = "home.healthSection.title".hashCode().toLong()
@@ -532,18 +535,6 @@ class ProximityFragment : TimeMainFragment() {
         }
 
         when {
-            deviceSetup == DeviceSetup.NO_BLE && !robertManager.configuration.displayRecordVenues -> {
-                healthItem = null
-                items += cardWithActionItem(CardTheme.Healthy) {
-                    mainImage = R.drawable.health_card
-                    mainTitle = strings["myHealthController.alert.atitudeToAdopt"]
-                    mainBody = strings["home.healthSection.noContact.cellSubtitle"]
-                    onCardClick = {
-                        findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToHealthFragment())
-                    }
-                    identifier = R.drawable.health_card.toLong()
-                }
-            }
             isSick -> {
                 healthItem = null
                 items += cardWithActionItem(CardTheme.Sick) {
@@ -555,22 +546,16 @@ class ProximityFragment : TimeMainFragment() {
                     identifier = R.drawable.health_card.toLong()
                 }
             }
-            else -> {
-                if (robertManager.isAtRisk != null || robertManager.isWarningAtRisk != null) {
-                    val cardTheme = when {
-                        robertManager.isAtRisk == true -> CardTheme.Danger
-                        robertManager.isWarningAtRisk == true -> CardTheme.Warning
-                        else -> CardTheme.Healthy
-                    }
-                    healthItem = cardWithActionItem(cardTheme) {
+            !sharedPrefs.hideRiskStatus -> {
+                healthItem = RisksLevelManager.getCurrentLevel(robertManager.atRiskStatus?.riskLevel)?.let {
+                    cardWithActionItem(CardTheme.Color) {
                         mainImage = R.drawable.health_card
+                        gradientBackground = it.getGradientBackground()
                         onCardClick = {
                             findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToHealthFragment())
                         }
                         identifier = R.drawable.health_card.toLong()
                     }
-                } else {
-                    healthItem = null
                 }
 
                 healthItem?.let { healthItem ->
@@ -1065,27 +1050,14 @@ class ProximityFragment : TimeMainFragment() {
     @OptIn(ExperimentalTime::class)
     private fun refreshHealthItem(context: Context) {
         healthItem?.apply {
-            val isAtRisk = robertManager.isAtRisk
-            val isWarningAtRisk = robertManager.isWarningAtRisk ?: false
-
             mainHeader = stringsFormat(
                 "myHealthController.notification.update",
                 robertManager.atRiskLastRefresh?.milliseconds?.getRelativeDateTimeString(context, strings["common.justNow"]) ?: ""
             )
 
-            when {
-                isAtRisk == true -> {
-                    mainTitle = strings["home.healthSection.contact.cellTitle"]
-                    mainBody = strings["home.healthSection.contact.cellSubtitle"]
-                }
-                isWarningAtRisk -> {
-                    mainTitle = strings["home.healthSection.warningContact.cellTitle"]
-                    mainBody = strings["home.healthSection.warningContact.cellSubtitle"]
-                }
-                else -> {
-                    mainTitle = strings["home.healthSection.noContact.cellTitle"]
-                    mainBody = strings["home.healthSection.noContact.cellSubtitle"]
-                }
+            RisksLevelManager.getCurrentLevel(robertManager.atRiskStatus?.riskLevel)?.let {
+                mainTitle = strings[it.labels.homeTitle]
+                mainBody = strings[it.labels.homeSub]
             }
         }
     }

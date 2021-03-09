@@ -14,7 +14,7 @@
         "links": [
 	        {
                 "label": "Trouver où se faire dépister",
-                "url": "https://sante.fr/recherche/trouver/DepistageCovid"
+                "url": "https://sante.fr/recherche/trouver/DepistageCovid?source=TousAntiCovid"
             }
         ]
     },
@@ -50,11 +50,25 @@
     },
     {
         "section": "Cnam.BriserLaChaine.org",
-        "description" : "En collaboration avec l'Assurance Maladie, le site internet Cnam.BriserLaChaine.org peut vous aider à vous souvenir de toutes les personnes que vous avez croisées",
+        "description" : "En collaboration avec l'Assurance Maladie, le site internet Cnam.BriserLaChaine.org peut vous aider à vous souvenir de toutes les personnes que vous avez croisées.",
         "links": [
 	        {
                 "label": "Aller sur Cnam.BriserLaChaine.org",
                 "url": "https://cnam.briserlachaine.org/accueil"
+            }
+        ]
+    },
+    {
+        "section": "Isolement",
+        "description" : "Le Ministère des Solidarités et de la Santé a mis à disposition des informations sur l'isolement.",
+        "links": [
+	        {
+                "label": "Les consignes d’isolement",
+                "url": "https://solidarites-sante.gouv.fr/soins-et-maladies/maladies/maladies-infectieuses/coronavirus/professionnels-de-sante/article/ressources-documentaires-a-destination-des-professionnels-de-sante"
+            },
+            {
+                "label": "Isolement, test : que faire ?",
+                "url": "https://solidarites-sante.gouv.fr/IMG/pdf/arbre_de_cisionnel_covid_2909.pdf"
             }
         ]
     }

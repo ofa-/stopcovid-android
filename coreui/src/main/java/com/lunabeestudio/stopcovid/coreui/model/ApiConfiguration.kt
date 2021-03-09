@@ -18,6 +18,8 @@ import com.lunabeestudio.domain.model.Configuration
 internal class ApiConfiguration(
     @SerializedName("version")
     val version: Int,
+    @SerializedName("versionCalibrationBle")
+    val versionCalibrationBle: Int,
     @SerializedName("app.apiVersion")
     val apiVersion: String,
     @SerializedName("app.warningApiVersion")
@@ -46,8 +48,6 @@ internal class ApiConfiguration(
     val displayDepartmentLevel: Boolean,
     @SerializedName("ble.dontUseScannerHardwareBatching")
     val dontUseScannerHardwareBatching: String?,
-    @SerializedName("ble.calibration")
-    val calibration: String,
     @SerializedName("ble.filterConfig")
     val filterConfig: String,
     @SerializedName("ble.filterMode")
@@ -82,6 +82,8 @@ internal class ApiConfiguration(
     val displayPrivateEvent: Boolean,
     @SerializedName("app.displayIsolation")
     val displayIsolation: Boolean,
+    @SerializedName("app.isolationMinRiskLevel")
+    val isolationMinRiskLevel: Float,
     @SerializedName("app.positiveSampleSpan")
     val positiveSampleSpan: Int,
     @SerializedName("app.isolation.duration")
@@ -104,6 +106,7 @@ internal class ApiConfiguration(
 
 internal fun ApiConfiguration.toDomain(gson: Gson) = Configuration(
     version = version,
+    versionCalibrationBle = versionCalibrationBle,
     apiVersion = apiVersion,
     warningApiVersion = warningApiVersion,
     displayAttestation = displayAttestation,
@@ -121,10 +124,6 @@ internal fun ApiConfiguration.toDomain(gson: Gson) = Configuration(
         dontUseScannerHardwareBatching,
         object : TypeToken<List<String>?>() {}.type
     ),
-    calibration = gson.fromJson<List<ApiDeviceParameterCorrection>>(
-        calibration,
-        object : TypeToken<List<ApiDeviceParameterCorrection>>() {}.type
-    ).map { it.toDomain() },
     filterConfig = filterConfig,
     filterMode = filterMode,
     serviceUUID = serviceUUID,
@@ -142,6 +141,7 @@ internal fun ApiConfiguration.toDomain(gson: Gson) = Configuration(
     displayRecordVenues = displayRecordVenues,
     displayPrivateEvent = displayPrivateEvent,
     displayIsolation = displayIsolation,
+    isolationMinRiskLevel = isolationMinRiskLevel,
     positiveSampleSpan = positiveSampleSpan,
     isolationDuration = isolationDuration,
     postIsolationDuration = postIsolationDuration,

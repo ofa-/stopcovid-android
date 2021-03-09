@@ -54,8 +54,6 @@ abstract class CommonDataViewModel(
         robertManager.clearLocalData(application)
         WorkManager.getInstance(application.getAppContext())
             .cancelUniqueWork(Constants.WorkerNames.AT_RISK_NOTIFICATION)
-        WorkManager.getInstance(application.getAppContext())
-            .cancelUniqueWork(Constants.WorkerNames.WARNING_NOTIFICATION)
         clearNotifications(application)
         eraseAttestations()
         eraseVenues(application)

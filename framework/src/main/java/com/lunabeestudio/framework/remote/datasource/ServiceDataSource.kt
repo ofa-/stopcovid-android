@@ -18,7 +18,6 @@ import com.lunabeestudio.domain.model.ServerStatusUpdate
 import com.lunabeestudio.domain.model.StatusReport
 import com.lunabeestudio.domain.model.VenueQrCode
 import com.lunabeestudio.domain.model.WStatusReport
-import com.lunabeestudio.framework.BuildConfig
 import com.lunabeestudio.framework.remote.RetrofitClient
 import com.lunabeestudio.framework.remote.extension.remoteToRobertException
 import com.lunabeestudio.framework.remote.model.ApiCommonRS
@@ -44,13 +43,20 @@ import java.io.File
 
 class ServiceDataSource(
     context: Context,
-    baseUrl: String = BuildConfig.BASE_URL,
-    warningBaseUrl: String = BuildConfig.WARNING_BASE_URL,
+    baseUrl: String,
+    warningBaseUrl: String,
+    certificateSha256: String,
+    warningCertificateSha256: String,
 ) : RemoteServiceDataSource {
 
-    private var api: StopCovidApi = RetrofitClient.getService(context, baseUrl, StopCovidApi::class.java)
-    private var warningApi: StopCovidWarningApi = RetrofitClient.getWarningService(context, warningBaseUrl, StopCovidWarningApi::class.java)
-    private var fileApi: StopCovidApi = RetrofitClient.getFileService(context, baseUrl, StopCovidApi::class.java)
+    private var api: StopCovidApi = RetrofitClient.getService(context, baseUrl, certificateSha256, StopCovidApi::class.java)
+    private var warningApi: StopCovidWarningApi = RetrofitClient.getWarningService(
+        context,
+        warningBaseUrl,
+        warningCertificateSha256,
+        StopCovidWarningApi::class.java
+    )
+    private var fileApi: StopCovidApi = RetrofitClient.getFileService(context, baseUrl, certificateSha256, StopCovidApi::class.java)
 
     override suspend fun generateCaptcha(apiVersion: String, type: String, language: String): RobertResultData<String> {
         val result = tryCatchRequestData {

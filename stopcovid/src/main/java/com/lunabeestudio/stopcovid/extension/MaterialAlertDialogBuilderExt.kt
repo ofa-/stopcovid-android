@@ -11,6 +11,7 @@
 package com.lunabeestudio.stopcovid.extension
 
 import android.annotation.SuppressLint
+import android.content.SharedPreferences
 import android.view.LayoutInflater
 import android.view.inputmethod.EditorInfo
 import android.widget.DatePicker
@@ -20,6 +21,7 @@ import androidx.core.widget.doOnTextChanged
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.databinding.DialogPostalCodeEditTextBinding
+import com.lunabeestudio.stopcovid.model.RisksUILevel
 import com.lunabeestudio.stopcovid.manager.KeyFiguresManager
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -62,7 +64,8 @@ fun MaterialAlertDialogBuilder.showPostalCodeDialog(
     positiveButton.setOnClickListener {
         val result = postalCodeEditTextBinding.textInputEditText.text.toString()
 
-        if (result.isPostalCode() && KeyFiguresManager.figures.value?.peekContent().postalCodeExists(result)) {
+        if (result.isPostalCode() && KeyFiguresManager.figures.value?.peekContent()
+                .postalCodeExists(result)) {
             onPositiveButton(postalCodeEditTextBinding.textInputEditText.text.toString())
             dialog.dismiss()
         } else {
@@ -180,4 +183,24 @@ fun MaterialAlertDialogBuilder.showSymptomConfirmationDialog(
         strings["myHealthController.covidAdvices.url"]?.openInExternalBrowser(context)
     }
     show()
+}
+
+fun MaterialAlertDialogBuilder.showAlertRiskLevelChanged(
+    strings: Map<String, String>,
+    sharedPreferences: SharedPreferences,
+    risksUILevel: RisksUILevel?,
+) {
+    if (risksUILevel != null
+        && risksUILevel.labels.notifTitle != null
+        && risksUILevel.labels.notifBody != null) {
+        setTitle(strings[risksUILevel.labels.notifTitle])
+        setMessage(strings[risksUILevel.labels.notifBody])
+        setPositiveButton(strings["common.ok"]) { _, _ ->
+            sharedPreferences.alertRiskLevelChanged = false
+        }
+        setCancelable(false)
+        show()
+    } else {
+        sharedPreferences.alertRiskLevelChanged = false
+    }
 }

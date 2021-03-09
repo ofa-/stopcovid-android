@@ -97,3 +97,11 @@ var SharedPreferences.currentVaccinationReferenceLongitude: Double?
             remove(Constants.SharedPrefs.CURRENT_VACCINATION_REFERENCE_LONGITUDE)
         }
     }
+
+var SharedPreferences.alertRiskLevelChanged: Boolean
+    get() = getBoolean(Constants.SharedPrefs.ALERT_RISK_LEVEL_CHANGED, false)
+    set(value) = edit { putBoolean(Constants.SharedPrefs.ALERT_RISK_LEVEL_CHANGED, value) }
+
+var SharedPreferences.hideRiskStatus: Boolean
+    get() = getBoolean(Constants.SharedPrefs.HIDE_RISK_STATUS, false)
+    set(value) = edit { putBoolean(Constants.SharedPrefs.HIDE_RISK_STATUS, value) }

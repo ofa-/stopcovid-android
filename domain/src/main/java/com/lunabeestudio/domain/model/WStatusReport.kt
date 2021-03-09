@@ -11,5 +11,6 @@
 package com.lunabeestudio.domain.model
 
 class WStatusReport(
-    val atRisk: Boolean,
+    val riskLevel: Float,
+    val ntpLastContactS: Long?,
 )

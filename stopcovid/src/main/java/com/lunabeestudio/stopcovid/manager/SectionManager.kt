@@ -49,5 +49,5 @@ abstract class SectionManager : ServerManager() {
         }
     }
 
-    override fun type(): Type = object : TypeToken<List<Section>>() {}.type
+    override val type: Type = object : TypeToken<List<Section>>() {}.type
 }

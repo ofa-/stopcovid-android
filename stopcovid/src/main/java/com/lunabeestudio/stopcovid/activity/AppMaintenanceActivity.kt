@@ -22,8 +22,8 @@ import com.github.razir.progressbutton.bindProgressButton
 import com.github.razir.progressbutton.hideProgress
 import com.github.razir.progressbutton.showProgress
 import com.google.gson.Gson
-import com.lunabeestudio.stopcovid.BuildConfig
 import com.lunabeestudio.stopcovid.R
+import com.lunabeestudio.stopcovid.coreui.ConfigConstant
 import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
 import com.lunabeestudio.stopcovid.databinding.ActivityAppMaintenanceBinding
 import com.lunabeestudio.stopcovid.extension.openInExternalBrowser
@@ -121,9 +121,9 @@ class AppMaintenanceActivity : AppCompatActivity() {
     }
 
     private fun startOpenInStore() {
-        if (!BuildConfig.PLAY_STORE_URL.openInExternalBrowser(this, false)) {
-            if (!BuildConfig.APP_GALLERY_URL.openInExternalBrowser(this, false)) {
-                BuildConfig.BONJOUR_WEBSITE_URL.openInExternalBrowser(this)
+        if (!ConfigConstant.Store.GOOGLE.openInExternalBrowser(this, false)) {
+            if (!ConfigConstant.Store.HUAWEI.openInExternalBrowser(this, false)) {
+                ConfigConstant.Store.WEBSITE.openInExternalBrowser(this)
             }
         }
     }

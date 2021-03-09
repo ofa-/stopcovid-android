@@ -9,10 +9,6 @@
   -->
 <resources>
 
-    <style name="TextAppearance.StopCovid.Header" parent="TextAppearance.MaterialComponents.Headline5">
-        <item name="android:textSize">@dimen/header_font_size</item>
-    </style>
-
     <style name="TextAppearance.StopCovid.Title" parent="TextAppearance.MaterialComponents.Headline6">
         <item name="fontFamily">@font/marianne_bold</item>
         <item name="android:textSize">@dimen/title_font_size</item>

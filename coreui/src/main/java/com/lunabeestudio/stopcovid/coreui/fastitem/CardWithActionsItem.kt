@@ -1,6 +1,7 @@
 package com.lunabeestudio.stopcovid.coreui.fastitem
 
 import android.content.res.ColorStateList
+import android.graphics.drawable.GradientDrawable
 import android.util.LayoutDirection
 import android.view.LayoutInflater
 import android.view.View
@@ -34,6 +35,9 @@ class CardWithActionsItem(private val cardTheme: CardTheme) : AbstractBindingIte
     @ColorInt
     var cardTitleColorInt: Int? = null
 
+    // Gradient background, override theme
+    var gradientBackground: GradientDrawable? = null
+
     var mainTitle: String? = null
     var mainHeader: String? = null
     var mainBody: String? = null
@@ -52,7 +56,6 @@ class CardWithActionsItem(private val cardTheme: CardTheme) : AbstractBindingIte
         val context = inflater.context
         val themedInflater = LayoutInflater.from(ContextThemeWrapper(context, cardTheme.themeId))
         val itemCardWithActionsBinding = ItemCardWithActionsBinding.inflate(themedInflater, parent, false)
-        itemCardWithActionsBinding.rootLayout.background = cardTheme.backgroundDrawableRes?.let { ContextCompat.getDrawable(context, it) }
         return itemCardWithActionsBinding
     }
 
@@ -120,6 +123,14 @@ class CardWithActionsItem(private val cardTheme: CardTheme) : AbstractBindingIte
             if (!binding.actionsLinearLayout.isVisible) {
                 binding.actionsLinearLayout.visibility = View.VISIBLE
             }
+        }
+
+        gradientBackground?.let {
+            binding.rootLayout.background = it
+        }
+
+        binding.rootLayout.background = gradientBackground ?: cardTheme.backgroundDrawableRes?.let {
+            ContextCompat.getDrawable(binding.rootLayout.context, it)
         }
     }
 

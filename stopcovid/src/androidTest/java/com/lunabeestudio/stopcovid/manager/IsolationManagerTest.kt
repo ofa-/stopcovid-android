@@ -2,7 +2,9 @@ package com.lunabeestudio.stopcovid.manager
 
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
+import com.lunabeestudio.domain.extension.unixTimeMsToNtpTimeS
 import com.lunabeestudio.framework.local.datasource.SecureKeystoreDataSource
+import com.lunabeestudio.robert.model.AtRiskStatus
 import com.lunabeestudio.stopcovid.StopCovid
 import com.lunabeestudio.stopcovid.model.IsolationRecommendationStateEnum
 import org.junit.After
@@ -53,16 +55,6 @@ class IsolationManagerTest {
         assert(isolationManager.currentIsolationEndDate == null) {
             "current form state should be null"
         }
-    }
-
-    @Test
-    fun initCaseWithWarning() {
-        notifyWarning(7)
-        assertState(
-            isolationManager.currentRecommendationState,
-            IsolationRecommendationStateEnum.INITIAL_CASE_AT_RISK_OR_SICK
-        )
-        cancelNotifyWarning()
     }
 
     @Test
@@ -276,21 +268,16 @@ class IsolationManagerTest {
         isolationManager.updateIndexSymptomsEndDate(daysAgo(nDaysAgo))
     }
 
-    private fun notifyWarning(nDaysAgo: Int? = null) {
-        secureKeystoreDataSource.isWarningAtRisk = true
-        secureKeystoreDataSource.lastWarningReceivedDate = daysAgo(nDaysAgo)
-    }
-
-    private fun cancelNotifyWarning() {
-        secureKeystoreDataSource.lastWarningReceivedDate = null
-    }
-
     private fun notifyRisk(nDaysAgo: Int? = null) {
-        secureKeystoreDataSource.lastRiskReceivedDate = daysAgo(nDaysAgo)
+        secureKeystoreDataSource.atRiskStatus = AtRiskStatus(
+            4f,
+            daysAgo(nDaysAgo).unixTimeMsToNtpTimeS(),
+            daysAgo(nDaysAgo).unixTimeMsToNtpTimeS()
+        )
     }
 
     private fun cancelNotifyRisk() {
-        secureKeystoreDataSource.lastRiskReceivedDate = null
+        secureKeystoreDataSource.atRiskStatus = null
     }
 
     private fun report(nDaysAgo: Int?, withSymptoms: Boolean = false, symptomsStartedDaysAgo: Int? = null) {

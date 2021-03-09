@@ -12,6 +12,7 @@ package com.lunabeestudio.domain.model
 
 class Configuration(
     var version: Int,
+    val versionCalibrationBle: Int,
     val apiVersion: String,
     val warningApiVersion: String,
     var displayAttestation: Boolean,
@@ -26,7 +27,6 @@ class Configuration(
     val maxHourContactNotif: Int,
     var displayDepartmentLevel: Boolean,
     val dontUseScannerHardwareBatching: List<String>?,
-    val calibration: List<DeviceParameterCorrection>,
     val filterConfig: String,
     val filterMode: String,
     val serviceUUID: String,
@@ -44,6 +44,7 @@ class Configuration(
     var displayRecordVenues: Boolean,
     var displayPrivateEvent: Boolean,
     var displayIsolation: Boolean,
+    var isolationMinRiskLevel: Float,
     val positiveSampleSpan: Int,
     val isolationDuration: Long,
     val postIsolationDuration: Long,

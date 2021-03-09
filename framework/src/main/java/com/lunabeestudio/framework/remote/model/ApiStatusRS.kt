@@ -13,15 +13,19 @@ package com.lunabeestudio.framework.remote.model
 import com.lunabeestudio.domain.model.StatusReport
 
 internal class ApiStatusRS(
-    val atRisk: Boolean,
-    val lastExposureTimeframe: Int?,
+    val riskLevel: Float,
+    val lastContactDate: String?,
+    val lastRiskScoringDate: String?,
     val message: String?,
     val tuples: String,
+    val declarationToken: String?,
 )
 
 internal fun ApiStatusRS.toDomain() = StatusReport(
-    atRisk = atRisk,
-    lastExposureTimeframe = lastExposureTimeframe,
+    riskLevel = riskLevel,
+    ntpLastContactS = lastContactDate?.toLongOrNull(),
+    ntpLastRiskScoringS = lastRiskScoringDate?.toLongOrNull(),
     message = message,
-    tuples = tuples
+    tuples = tuples,
+    declarationToken = declarationToken,
 )

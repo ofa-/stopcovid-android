@@ -30,6 +30,7 @@ import com.lunabeestudio.stopcovid.coreui.fastitem.switchItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
 import com.lunabeestudio.stopcovid.extension.areInfoNotificationsEnabled
 import com.lunabeestudio.stopcovid.extension.getString
+import com.lunabeestudio.stopcovid.extension.hideRiskStatus
 import com.lunabeestudio.stopcovid.extension.isolationManager
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
@@ -37,7 +38,6 @@ import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
 import com.lunabeestudio.stopcovid.extension.venuesFeaturedWasActivatedAtLeastOneTime
 import com.lunabeestudio.stopcovid.fastitem.dangerButtonItem
 import com.lunabeestudio.stopcovid.manager.ProximityManager
-import com.lunabeestudio.stopcovid.manager.VaccinationCenterManager
 import com.lunabeestudio.stopcovid.manager.VenuesManager
 import com.lunabeestudio.stopcovid.model.DeviceSetup
 import com.lunabeestudio.stopcovid.viewmodel.ManageDataViewModel
@@ -113,6 +113,8 @@ class ManageDataFragment : MainFragment() {
 
         manageNotificationsItems(items)
         spaceDividerItems(items)
+        hideRiskStatusItems(items)
+        spaceDividerItems(items)
         eraseAttestationItems(items)
         spaceDividerItems(items)
         if (robertManager.configuration.displayIsolation) {
@@ -135,8 +137,6 @@ class ManageDataFragment : MainFragment() {
             eraseLocalHistoryItems(items)
             spaceDividerItems(items)
             eraseRemoteContactItems(items)
-            spaceDividerItems(items)
-            eraseRemoteAlertItems(items)
             spaceDividerItems(items)
         }
 
@@ -316,7 +316,7 @@ class ManageDataFragment : MainFragment() {
         }
     }
 
-    private fun eraseRemoteAlertItems(items: MutableList<GenericItem>) {
+    private fun hideRiskStatusItems(items: MutableList<GenericItem>) {
         items += titleItem {
             text = strings["manageDataController.eraseRemoteAlert.title"]
             identifier = items.count().toLong()
@@ -328,17 +328,11 @@ class ManageDataFragment : MainFragment() {
             text = strings["manageDataController.eraseRemoteAlert.subtitle"]
             identifier = items.count().toLong()
         }
-        items += lightButtonItem {
-            text = strings["manageDataController.eraseRemoteAlert.button"]
-            onClickListener = View.OnClickListener {
-                MaterialAlertDialogBuilder(requireContext())
-                    .setTitle(strings["manageDataController.eraseRemoteAlert.confirmationDialog.title"])
-                    .setMessage(strings["manageDataController.eraseRemoteAlert.confirmationDialog.message"])
-                    .setNegativeButton(strings["common.cancel"], null)
-                    .setPositiveButton(strings["common.confirm"]) { _, _ ->
-                        viewModel.eraseRemoteAlert(requireContext().applicationContext as RobertApplication)
-                    }
-                    .show()
+        items += switchItem {
+            title = strings["manageDataController.eraseRemoteAlert.button"]
+            isChecked = sharedPreferences.hideRiskStatus
+            onCheckChange = { isChecked ->
+                sharedPreferences.hideRiskStatus = isChecked
             }
             identifier = items.count().toLong()
         }

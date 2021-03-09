@@ -11,6 +11,7 @@
 package com.lunabeestudio.robert
 
 import androidx.lifecycle.LiveData
+import com.lunabeestudio.domain.model.Calibration
 import com.lunabeestudio.domain.model.Configuration
 import com.lunabeestudio.domain.model.HelloBuilder
 import com.lunabeestudio.domain.model.LocalProximity
@@ -24,6 +25,8 @@ import com.lunabeestudio.robert.utils.Event
 interface RobertManager {
     val configuration: Configuration
 
+    val calibration: Calibration
+
     var shouldReloadBleSettings: Boolean
 
     val canActivateProximity: Boolean
@@ -32,19 +35,11 @@ interface RobertManager {
 
     val isProximityActive: Boolean
 
-    val isAtRisk: Boolean?
+    val liveAtRiskStatus: LiveData<Event<AtRiskStatus>>
 
-    val isWarningAtRisk: Boolean?
-
-    val lastWarningReceivedDate: Long?
-
-    val atRiskStatus: LiveData<Event<AtRiskStatus>>
+    val atRiskStatus: AtRiskStatus?
 
     val atRiskLastRefresh: Long?
-
-    val lastExposureTimeframe: Int
-
-    val lastRiskReceivedDate: Long?
 
     val isSick: Boolean
 
@@ -99,7 +94,7 @@ interface RobertManager {
 
     suspend fun eraseRemoteExposureHistory(application: RobertApplication): RobertResult
 
-    suspend fun eraseRemoteAlert(): RobertResult
+    fun eraseRemoteAlert(): RobertResult
 
     suspend fun quitStopCovid(application: RobertApplication): RobertResult
 

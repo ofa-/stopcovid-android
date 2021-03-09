@@ -217,21 +217,17 @@ class BleScannerImpl(
         )
     }
 
-
     private fun ScanResult.isServiceScan() = scanRecord?.run {
-        isServiceScan() || isIOSInBackgroundServiceScan()
-    } ?: false
-
-    /**
-     * Android / iOS service scan in foreground
-     */
-    private fun ScanRecord.isServiceScan() = serviceData?.get(serviceParcelUuid) != null
+        hasServiceUuid(serviceParcelUuid) || isIOSInBackgroundServiceScan()
+    } == true
 
     /**
      * iOS service scan in background
      */
     private fun ScanRecord.isIOSInBackgroundServiceScan() =
-        (serviceData == null && manufacturerSpecificData?.get(APPLE_MANUFACTURER_ID)
-            .contentEquals(settings.backgroundServiceManufacturerDataIOS))
+        serviceData == null && matchesManufacturerDataMask(
+            APPLE_MANUFACTURER_ID,
+            settings.backgroundServiceManufacturerDataIOS
+        )
 
 }

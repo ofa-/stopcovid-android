@@ -10,36 +10,44 @@
 
 package com.lunabeestudio.stopcovid.fragment
 
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.Gravity
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.widget.PopupMenu
 import androidx.fragment.app.viewModels
+import androidx.preference.PreferenceManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.lunabeestudio.domain.extension.ntpTimeSToUnixTimeMs
 import com.lunabeestudio.robert.extension.observeEventAndConsume
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
-import com.lunabeestudio.stopcovid.coreui.fastitem.dividerItem
+import com.lunabeestudio.stopcovid.coreui.fastitem.cardWithActionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
+import com.lunabeestudio.stopcovid.coreui.model.Action
+import com.lunabeestudio.stopcovid.extension.getGradientBackground
 import com.lunabeestudio.stopcovid.extension.getRelativeDateTimeString
 import com.lunabeestudio.stopcovid.extension.getString
+import com.lunabeestudio.stopcovid.extension.hideRiskStatus
+import com.lunabeestudio.stopcovid.extension.openInExternalBrowser
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
-import com.lunabeestudio.stopcovid.fastitem.contactItem
-import com.lunabeestudio.stopcovid.fastitem.linkItem
+import com.lunabeestudio.stopcovid.fastitem.healthCardItem
 import com.lunabeestudio.stopcovid.fastitem.logoItem
-import com.lunabeestudio.stopcovid.manager.ProximityManager
-import com.lunabeestudio.stopcovid.model.DeviceSetup
+import com.lunabeestudio.stopcovid.manager.RisksLevelManager
+import com.lunabeestudio.stopcovid.model.ContactDateFormat
+import com.lunabeestudio.stopcovid.model.LinkType
+import com.lunabeestudio.stopcovid.model.RisksUILevelSectionLink
 import com.lunabeestudio.stopcovid.viewmodel.HealthViewModel
 import com.lunabeestudio.stopcovid.viewmodel.HealthViewModelFactory
 import com.mikepenz.fastadapter.GenericItem
 import java.text.DateFormat
 import java.text.SimpleDateFormat
-import java.util.Calendar
+import java.util.Date
 import java.util.Locale
 import kotlin.time.ExperimentalTime
 import kotlin.time.milliseconds
@@ -48,6 +56,10 @@ class HealthFragment : TimeMainFragment() {
 
     private val robertManager by lazy {
         requireContext().robertManager()
+    }
+
+    private val sharedPreferences: SharedPreferences by lazy {
+        PreferenceManager.getDefaultSharedPreferences(requireContext())
     }
 
     private val viewModel: HealthViewModel by viewModels { HealthViewModelFactory(robertManager) }
@@ -71,130 +83,15 @@ class HealthFragment : TimeMainFragment() {
         viewModel.covidException.observe(viewLifecycleOwner) { covidException ->
             showErrorSnackBar(covidException.getString(strings))
         }
-        robertManager.atRiskStatus.observeEventAndConsume(viewLifecycleOwner) {
+        robertManager.liveAtRiskStatus.observeEventAndConsume(viewLifecycleOwner) {
             refreshScreen()
         }
     }
 
     override fun getItems(): List<GenericItem> {
-        return when {
-            robertManager.isRegistered -> registeredItems()
-            ProximityManager.getDeviceSetup(requireContext(), robertManager) == DeviceSetup.NO_BLE -> noBleItems()
-            else -> notRegisteredItems()
-        }
-    }
-
-    private fun showMenu(v: View) {
-        PopupMenu(requireContext(), v).apply {
-            setOnMenuItemClickListener(::onMenuItemClick)
-
-            inflate(R.menu.notification_menu)
-
-            menu.findItem(R.id.notification_menu_delete).title = strings["sickController.state.deleteNotification"]
-            menu.findItem(R.id.notification_menu_learnmore).title = strings["myHealthController.alert.atitudeToAdopt"]
-
-            show()
-        }
-    }
-
-    private fun onMenuItemClick(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.notification_menu_delete -> {
-                MaterialAlertDialogBuilder(requireContext())
-                    .setTitle(strings["sickController.state.deleteNotification"])
-                    .setMessage(strings["sickController.state.deleteNotification.alert.title"])
-                    .setNegativeButton(strings["common.cancel"], null)
-                    .setPositiveButton(strings["common.confirm"]) { _, _ ->
-                        viewModel.clearNotification()
-                    }
-                    .show()
-                true
-            }
-            R.id.notification_menu_learnmore -> {
-                findNavControllerOrNull()?.safeNavigate(HealthFragmentDirections.actionHealthFragmentToInformationFragment())
-                true
-            }
-            else -> false
-        }
-    }
-
-    private fun noBleItems(): List<GenericItem> {
-        val items = ArrayList<GenericItem>()
-
-        items += logoItem {
-            imageRes = R.drawable.diagnosis
-            identifier = items.count().toLong()
-        }
-
-        // Covid Advices
-        items += titleItem {
-            text = strings["myHealthController.covidAdvices.title"]
-            gravity = Gravity.START
-            identifier = items.count().toLong()
-        }
-        items += captionItem {
-            text = strings["myHealthController.covidAdvices.subtitle"]
-            gravity = Gravity.START
-            identifier = items.count().toLong()
-        }
-        items += linkItem {
-            text = strings["myHealthController.alert.atitudeToAdopt"]
-            onClickListener = View.OnClickListener {
-                findNavControllerOrNull()?.safeNavigate(HealthFragmentDirections.actionHealthFragmentToInformationFragment())
-            }
-            identifier = items.size.toLong()
-        }
-        items += linkItem {
-            text = strings["myHealthController.covidAdvices.buttonTitle"]
-            url = strings["myHealthController.covidAdvices.url"]
-            identifier = items.size.toLong()
-        }
-        items += dividerItem {}
-        items += spaceItem {
-            spaceRes = R.dimen.spacing_large
-            identifier = items.count().toLong()
-        }
-
-        // Testing sites
-        items += titleItem {
-            text = strings["myHealthController.testingSites.title"]
-            gravity = Gravity.START
-            identifier = items.count().toLong()
-        }
-        items += captionItem {
-            text = strings["myHealthController.testingSites.subtitle"]
-            gravity = Gravity.START
-            identifier = items.count().toLong()
-        }
-        items += linkItem {
-            text = strings["myHealthController.testingSites.buttonTitle"]
-            url = strings["myHealthController.testingSites.url"]
-            identifier = items.size.toLong()
-        }
-        items += dividerItem {}
-        items += spaceItem {
-            spaceRes = R.dimen.spacing_large
-            identifier = items.count().toLong()
-        }
-
-        // Your department
-        items += titleItem {
-            text = strings["myHealthController.yourDepartment.title"]
-            gravity = Gravity.START
-            identifier = items.count().toLong()
-        }
-        items += captionItem {
-            text = strings["myHealthController.yourDepartment.subtitle"]
-            gravity = Gravity.START
-            identifier = items.count().toLong()
-        }
-        items += linkItem {
-            text = strings["myHealthController.yourDepartment.buttonTitle"]
-            url = strings["myHealthController.yourDepartment.url"]
-            identifier = items.size.toLong()
-        }
-
-        return items
+        return RisksLevelManager.getCurrentLevel(robertManager.atRiskStatus?.riskLevel)?.let {
+            registeredItems()
+        } ?: notRegisteredItems()
     }
 
     private fun notRegisteredItems(): ArrayList<GenericItem> {
@@ -228,186 +125,88 @@ class HealthFragment : TimeMainFragment() {
             identifier = items.count().toLong()
         }
 
-        when {
-            robertManager.isAtRisk == true -> {
-                val endExposureCalendar = Calendar.getInstance()
-                endExposureCalendar.add(
-                    Calendar.DAY_OF_YEAR,
-                    robertManager.configuration.quarantinePeriod - robertManager.lastExposureTimeframe
-                )
-                val endExposureDate = endExposureCalendar.time
+        RisksLevelManager.getCurrentLevel(robertManager.atRiskStatus?.riskLevel)?.let {
+            if (!sharedPreferences.hideRiskStatus) {
+                items += healthCardItem(R.layout.item_health_card) {
+                    header = stringsFormat(
+                        "myHealthController.notification.update",
+                        robertManager.atRiskLastRefresh?.milliseconds?.getRelativeDateTimeString(requireContext(),
+                            strings["common.justNow"])
+                            ?: ""
+                    )
+                    title = strings[it.labels.detailTitle]
+                    caption = strings[it.labels.detailSubtitle]
+                    gradientBackground = it.getGradientBackground()
+                    identifier = items.count().toLong()
 
-                items += contactItem(R.layout.item_contact) {
-                    header = stringsFormat(
-                        "myHealthController.notification.update",
-                        robertManager.atRiskLastRefresh?.milliseconds?.getRelativeDateTimeString(
-                            requireContext(),
-                            strings["common.justNow"]
-                        )
-                    )
-                    title = strings["sickController.state.contact.title"]
-                    caption = stringsFormat("sickController.state.contact.subtitle", dateFormat.format(endExposureDate))
-                    more = strings["myHealthController.alert.atitudeToAdopt"]
-                    moreClickListener = View.OnClickListener {
-                        findNavControllerOrNull()?.safeNavigate(HealthFragmentDirections.actionHealthFragmentToInformationFragment())
+                    dateValue()?.let {
+                        dateLabel = strings["myHealthStateHeaderCell.exposureDate.title"]
+                        dateValue = it
                     }
-                    actionClickListener = View.OnClickListener {
-                        showMenu(it)
-                    }
-                    actionContentDescription = strings["accessibility.hint.otherActions"]
+                }
+
+                items += spaceItem {
+                    spaceRes = R.dimen.spacing_medium
                     identifier = items.count().toLong()
                 }
             }
-            robertManager.isWarningAtRisk == true -> {
-                items += contactItem(R.layout.item_warning_contact) {
-                    header = stringsFormat(
-                        "myHealthController.notification.update",
-                        robertManager.atRiskLastRefresh?.milliseconds?.getRelativeDateTimeString(
-                            requireContext(),
-                            strings["common.justNow"]
+            it.sections.forEach {
+                items += cardWithActionItem {
+                    mainTitle = strings[it.section]
+                    mainBody = strings[it.description]
+
+                    it.link?.let { link ->
+                        actions = listOf(
+                            Action(
+                                icon = null,
+                                label = strings[link.label],
+                                showBadge = false,
+                                onClickListener = actionForLink(link)
+                            )
                         )
-                    )
-                    title = strings["sickController.state.warning.title"]
-                    caption = strings["sickController.state.warning.subtitle"]
-                    more = strings["myHealthController.alert.atitudeToAdopt"]
-                    moreClickListener = View.OnClickListener {
-                        findNavControllerOrNull()?.safeNavigate(HealthFragmentDirections.actionHealthFragmentToInformationFragment())
                     }
-                    actionClickListener = View.OnClickListener {
-                        showMenu(it)
-                    }
-                    actionContentDescription = strings["accessibility.hint.otherActions"]
-                    identifier = items.count().toLong()
-                }
-            }
-            robertManager.isAtRisk == false -> {
-                items += contactItem(R.layout.item_no_contact) {
-                    header = stringsFormat(
-                        "myHealthController.notification.update",
-                        robertManager.atRiskLastRefresh?.milliseconds?.getRelativeDateTimeString(
-                            requireContext(),
-                            strings["common.justNow"]
-                        )
-                    )
-                    title = strings["sickController.state.nothing.title"]
-                    caption = strings["sickController.state.nothing.subtitle"]
-                    more = strings["myHealthController.alert.atitudeToAdopt"]
-                    moreClickListener = View.OnClickListener {
-                        findNavControllerOrNull()?.safeNavigate(HealthFragmentDirections.actionHealthFragmentToInformationFragment())
-                    }
-                    actionClickListener = View.OnClickListener {
-                        showMenu(it)
-                    }
-                    actionContentDescription = strings["accessibility.hint.otherActions"]
                     identifier = items.count().toLong()
                 }
 
                 items += spaceItem {
-                    spaceRes = R.dimen.spacing_xlarge
+                    spaceRes = R.dimen.spacing_medium
                     identifier = items.count().toLong()
                 }
-                items += titleItem {
-                    text = strings["myHealthController.notification.title"]
-                    gravity = Gravity.START
-                    identifier = items.count().toLong()
-                }
-                items += captionItem {
-                    text = strings["myHealthController.notification.subtitle"]
-                    gravity = Gravity.START
-                    identifier = items.count().toLong()
-                }
-                items += spaceItem {
-                    spaceRes = R.dimen.spacing_large
-                    identifier = items.count().toLong()
-                }
-                items += dividerItem {}
             }
-            else -> {
-                items += titleItem {
-                    text = strings["myHealthController.notification.title"]
-                    gravity = Gravity.START
-                    identifier = items.count().toLong()
-                }
-                items += captionItem {
-                    text = strings["myHealthController.notification.subtitle"]
-                    gravity = Gravity.START
-                    identifier = items.count().toLong()
-                }
-                items += spaceItem {
-                    spaceRes = R.dimen.spacing_large
-                    identifier = items.count().toLong()
-                }
-                items += dividerItem {}
-            }
-        }
-
-        items += spaceItem {
-            spaceRes = R.dimen.spacing_large
-            identifier = items.count().toLong()
-        }
-
-        // Covid Advices
-        items += titleItem {
-            text = strings["myHealthController.covidAdvices.title"]
-            gravity = Gravity.START
-            identifier = items.count().toLong()
-        }
-        items += captionItem {
-            text = strings["myHealthController.covidAdvices.subtitle"]
-            gravity = Gravity.START
-            identifier = items.count().toLong()
-        }
-        items += linkItem {
-            text = strings["myHealthController.covidAdvices.buttonTitle"]
-            url = strings["myHealthController.covidAdvices.url"]
-            identifier = items.size.toLong()
-        }
-        items += dividerItem {}
-        items += spaceItem {
-            spaceRes = R.dimen.spacing_large
-            identifier = items.count().toLong()
-        }
-
-        // Testing sites
-        items += titleItem {
-            text = strings["myHealthController.testingSites.title"]
-            gravity = Gravity.START
-            identifier = items.count().toLong()
-        }
-        items += captionItem {
-            text = strings["myHealthController.testingSites.subtitle"]
-            gravity = Gravity.START
-            identifier = items.count().toLong()
-        }
-        items += linkItem {
-            text = strings["myHealthController.testingSites.buttonTitle"]
-            url = strings["myHealthController.testingSites.url"]
-            identifier = items.size.toLong()
-        }
-        items += dividerItem {}
-        items += spaceItem {
-            spaceRes = R.dimen.spacing_large
-            identifier = items.count().toLong()
-        }
-
-        // Your department
-        items += titleItem {
-            text = strings["myHealthController.yourDepartment.title"]
-            gravity = Gravity.START
-            identifier = items.count().toLong()
-        }
-        items += captionItem {
-            text = strings["myHealthController.yourDepartment.subtitle"]
-            gravity = Gravity.START
-            identifier = items.count().toLong()
-        }
-        items += linkItem {
-            text = strings["myHealthController.yourDepartment.buttonTitle"]
-            url = strings["myHealthController.yourDepartment.url"]
-            identifier = items.size.toLong()
         }
 
         return items
+    }
+
+    private fun actionForLink(link: RisksUILevelSectionLink): View.OnClickListener {
+        return when (link.type) {
+            LinkType.WEB -> View.OnClickListener {
+                strings[link.action]?.openInExternalBrowser(it.context, true)
+            }
+            LinkType.CONTROLLER -> View.OnClickListener {
+                findNavControllerOrNull()?.safeNavigate(HealthFragmentDirections.actionHealthFragmentToGestureFragment())
+            }
+        }
+    }
+
+    private fun dateValue(): String? {
+        return robertManager.atRiskStatus?.ntpLastContactS?.ntpTimeSToUnixTimeMs()?.let { lastContactDate ->
+            when (RisksLevelManager.getCurrentLevel(robertManager.atRiskStatus?.riskLevel)?.contactDateFormat) {
+                ContactDateFormat.DATE -> dateFormat.format(Date(lastContactDate))
+                ContactDateFormat.RANGE -> {
+                    RisksLevelManager.getLastContactDateFrom(robertManager.atRiskStatus?.riskLevel, lastContactDate)?.let { dateFrom ->
+                        RisksLevelManager.getLastContactDateTo(robertManager.atRiskStatus?.riskLevel, lastContactDate)?.let { dateTo ->
+                            stringsFormat(
+                                "myHealthStateHeaderCell.exposureDate.range",
+                                dateFormat.format(Date(dateFrom)),
+                                dateFormat.format(Date(dateTo))
+                            )
+                        }
+                    }
+                }
+                else -> null
+            }
+        }
     }
 
     override fun timeRefresh() {

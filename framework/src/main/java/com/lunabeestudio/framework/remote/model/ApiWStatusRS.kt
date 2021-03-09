@@ -13,9 +13,11 @@ package com.lunabeestudio.framework.remote.model
 import com.lunabeestudio.domain.model.WStatusReport
 
 internal class ApiWStatusRS(
-    val atRisk: Boolean,
+    val riskLevel: Float,
+    val lastContactDate: String?,
 )
 
 internal fun ApiWStatusRS.toDomain() = WStatusReport(
-    atRisk = atRisk
+    riskLevel = riskLevel,
+    ntpLastContactS = lastContactDate?.toLongOrNull(),
 )

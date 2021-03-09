@@ -13,13 +13,11 @@ apply plugin: 'kotlin-android-extensions'
 
 android {
     compileSdkVersion 30
-    buildToolsVersion '30.0.2'
+    buildToolsVersion '30.0.3'
 
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 30
-
-        buildConfigField 'String', 'SERVER_PUBLIC_KEY', '"MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEAc9IDt6qJq453SwyWPB94JaLB2VfTAcL43YVtMr3HhDCd22gKaQXIbX1d+tNhfvaKM51sxeaXziPjntUzbTNiw=="'
     }
 
     kotlinOptions.jvmTarget = JavaVersion.VERSION_1_8.toString()
