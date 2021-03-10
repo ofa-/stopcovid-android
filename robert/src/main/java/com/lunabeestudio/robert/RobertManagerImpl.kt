@@ -284,14 +284,14 @@ class RobertManagerImpl(
     }
 
     private fun handleConfigChange(configuration: Configuration) {
-        if (configuration.version != keystoreRepository.configuration?.version ?: -1) {
+        if (configuration.version <= keystoreRepository.configuration?.version ?: -1) {
             return
         }
         keystoreRepository.configuration = configuration
     }
 
     private fun handleCalibrationChange(calibration: Calibration) {
-        if (calibration.version != keystoreRepository.calibration?.version ?: -1) {
+        if (calibration.version <= keystoreRepository.calibration?.version ?: -1) {
             return
         }
         keystoreRepository.calibration = calibration
