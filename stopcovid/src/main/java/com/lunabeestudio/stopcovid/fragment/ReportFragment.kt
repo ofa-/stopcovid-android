@@ -64,12 +64,12 @@ class ReportFragment : MainFragment() {
         }
         if (robertManager.isRegistered) {
             items += titleItem {
-                text = strings["sickController.message.testedPositive.title"]
+                text = strings["declareController.message.testedPositive.title"]
                 gravity = Gravity.CENTER
                 identifier = items.count().toLong()
             }
             items += captionItem {
-                text = strings["sickController.message.testedPositive.subtitle"]
+                text = strings["declareController.message.testedPositive.subtitle"]
                 gravity = Gravity.CENTER
                 identifier = items.count().toLong()
             }
@@ -97,7 +97,7 @@ class ReportFragment : MainFragment() {
             }
             items += buttonItem {
                 width = ViewGroup.LayoutParams.MATCH_PARENT
-                text = strings["sickController.button.flash"]
+                text = strings["declareController.button.flash"]
                 onClickListener = View.OnClickListener {
                     findNavControllerOrNull()?.safeNavigate(ReportFragmentDirections.actionReportFragmentToReportQrCodeFragment())
                 }
@@ -105,7 +105,7 @@ class ReportFragment : MainFragment() {
             }
             items += lightButtonItem {
                 width = ViewGroup.LayoutParams.MATCH_PARENT
-                text = strings["sickController.button.tap"]
+                text = strings["declareController.button.tap"]
                 onClickListener = View.OnClickListener {
                     findNavControllerOrNull()?.safeNavigate(ReportFragmentDirections.actionReportFragmentToCodeFragment())
                 }

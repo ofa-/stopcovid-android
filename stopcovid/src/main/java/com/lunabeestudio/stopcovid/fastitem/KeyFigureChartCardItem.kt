@@ -80,11 +80,11 @@ class KeyFigureChartCardItem : AbstractBindingItem<ItemKeyFigureChartCardBinding
         binding.keyFigureLineChart.visibility = GONE
 
         if (chartType == KeyFigureChartType.BARS) {
-            val dataSetArray = chartData.map { data ->
-                BarDataSet(data.entries.mapIndexed { idx, entry ->
+            val dataSetArray = chartData.map { (description, _, entries, color) ->
+                BarDataSet(entries.mapIndexed { _, entry ->
                     BarEntry(entry.x, entry.y)
-                }, data.description).apply {
-                    setupStyle(data.color)
+                }, description).apply {
+                    setupStyle(color)
                 }
             }.toTypedArray()
 

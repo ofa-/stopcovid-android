@@ -11,6 +11,7 @@
 package com.lunabeestudio.stopcovid.activity
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
 import android.view.accessibility.AccessibilityEvent
@@ -19,6 +20,8 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
 import androidx.navigation.ui.NavigationUI.setupActionBarWithNavController
+import androidx.preference.PreferenceManager
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.lunabeestudio.robert.extension.observeEventAndConsume
 import com.lunabeestudio.stopcovid.R
@@ -26,6 +29,10 @@ import com.lunabeestudio.stopcovid.coreui.extension.applyAndConsumeWindowInsetBo
 import com.lunabeestudio.stopcovid.coreui.extension.showSnackBar
 import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
 import com.lunabeestudio.stopcovid.databinding.ActivityMainBinding
+import com.lunabeestudio.stopcovid.extension.alertRiskLevelChanged
+import com.lunabeestudio.stopcovid.extension.robertManager
+import com.lunabeestudio.stopcovid.extension.showAlertRiskLevelChanged
+import com.lunabeestudio.stopcovid.manager.RisksLevelManager
 
 class MainActivity : BaseActivity() {
 
@@ -33,6 +40,10 @@ class MainActivity : BaseActivity() {
 
     private val navController: NavController by lazy {
         supportFragmentManager.findFragmentById(R.id.navHostFragment)!!.findNavController()
+    }
+
+    private val sharedPrefs: SharedPreferences by lazy {
+        PreferenceManager.getDefaultSharedPreferences(this)
     }
 
     private var strings: HashMap<String, String> = StringsManager.strings
@@ -58,6 +69,17 @@ class MainActivity : BaseActivity() {
 
         initStringsObserver()
         handleIntent(intent)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (sharedPrefs.alertRiskLevelChanged) {
+            MaterialAlertDialogBuilder(this).showAlertRiskLevelChanged(
+                strings,
+                sharedPrefs,
+                RisksLevelManager.getCurrentLevel(robertManager().atRiskStatus?.riskLevel),
+            )
+        }
     }
 
     private fun handleIntent(intent: Intent?) {

@@ -12,10 +12,6 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
 android {
-    defaultConfig {
-        buildConfigField 'String', 'SERVER_PUBLIC_KEY', '"MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEAc9IDt6qJq453SwyWPB94JaLB2VfTAcL43YVtMr3HhDCd22gKaQXIbX1d+tNhfvaKM51sxeaXziPjntUzbTNiw=="'
-    }
-
     kotlinOptions.jvmTarget = JavaVersion.VERSION_1_8.toString()
 
     kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"

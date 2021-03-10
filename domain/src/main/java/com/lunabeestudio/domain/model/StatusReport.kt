@@ -11,8 +11,10 @@
 package com.lunabeestudio.domain.model
 
 class StatusReport(
-    val atRisk: Boolean,
-    val lastExposureTimeframe: Int?,
+    val riskLevel: Float,
+    val ntpLastContactS: Long?,
+    val ntpLastRiskScoringS: Long?,
     val message: String?,
-    val tuples: String?
+    val tuples: String?,
+    val declarationToken: String?,
 )

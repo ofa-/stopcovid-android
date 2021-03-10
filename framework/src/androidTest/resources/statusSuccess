@@ -1,6 +1,8 @@
 {
-    "atRisk": true,
-    "lastExposureTimeframe": 0,
-    "message": "Votre test COVID-19 est positif. Merci de respecter la période de quatorzaine. Prenez soin de vous et de vos proches.",
-    "tuples": ""
+    "riskLevel": 0,
+    "lastContactDate": "3814601612",
+    "lastRiskScoringDate": "3814601613",
+    "message": "message",
+    "tuples": "tuples",
+    "declarationToken": "declarationToken"
 }

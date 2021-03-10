@@ -12,13 +12,14 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:showIn="@layout/item_contact">
+    tools:showIn="@layout/item_health_card">
 
     <TextView
         android:id="@+id/headerTextView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/spacing_large"
+        android:paddingVertical="@dimen/spacing_large"
+        android:layout_marginHorizontal="@dimen/spacing_large"
         android:textAppearance="@style/TextAppearance.StopCovid.Caption"
         android:textColor="@color/color_on_status_notification"
         android:textIsSelectable="false"
@@ -27,17 +28,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="@tools:sample/lorem[5]" />
-
-    <ImageButton
-        android:id="@+id/actionButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@drawable/ripple_rounded"
-        android:padding="@dimen/spacing_large"
-        android:src="@drawable/ic_more"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="ContentDescription" />
 
     <TextView
         android:id="@+id/titleTextView"
@@ -62,22 +52,39 @@
         android:textAppearance="@style/TextAppearance.StopCovid.Caption"
         android:textColor="@color/color_on_status_notification"
         android:textIsSelectable="false"
-        app:layout_constraintBottom_toTopOf="@id/learnMoreButton"
+        app:layout_constraintBottom_toTopOf="@id/dateLabelTextView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/titleTextView"
         tools:text="@tools:sample/lorem[15]" />
 
-    <Button
-        android:id="@+id/learnMoreButton"
-        style="@style/Widget.StopCovid.Button.LearnMore"
-        android:layout_width="wrap_content"
+    <TextView
+        android:id="@+id/dateLabelTextView"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/spacing_large"
-        android:drawableEnd="@drawable/ic_info"
-        app:drawableTint="@color/color_on_status_notification"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginHorizontal="@dimen/spacing_large"
+        android:layout_marginTop="@dimen/spacing_large"
+        android:textAppearance="@style/TextAppearance.StopCovid.Caption"
+        android:textColor="@color/color_on_status_notification"
+        android:textIsSelectable="false"
+        app:layout_constraintBottom_toTopOf="@id/dateValueTextView"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/captionTextView"
-        tools:text="Learn more" />
+        tools:text="@tools:sample/lorem[1]" />
+
+    <TextView
+        android:id="@+id/dateValueTextView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/spacing_large"
+        android:textAppearance="@style/TextAppearance.StopCovid.Caption.Bold"
+        android:textColor="@color/color_on_status_notification"
+        android:textIsSelectable="false"
+        app:layout_constraintBottom_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/dateLabelTextView"
+        tools:text="@tools:sample/lorem[1]" />
+
 </merge>

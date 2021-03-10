@@ -17,6 +17,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.WorkManager
 import com.lunabeestudio.domain.extension.unixTimeMsToNtpTimeS
+import com.lunabeestudio.domain.model.Calibration
 import com.lunabeestudio.domain.model.Configuration
 import com.lunabeestudio.domain.model.EphemeralBluetoothIdentifier
 import com.lunabeestudio.domain.model.HelloBuilder
@@ -27,6 +28,7 @@ import com.lunabeestudio.domain.model.SSUBuilder
 import com.lunabeestudio.domain.model.SSUSettings
 import com.lunabeestudio.domain.model.ServerStatusUpdate
 import com.lunabeestudio.domain.model.VenueQrCode
+import com.lunabeestudio.robert.datasource.CalibrationDataSource
 import com.lunabeestudio.robert.datasource.ConfigurationDataSource
 import com.lunabeestudio.robert.datasource.LocalEphemeralBluetoothIdentifierDataSource
 import com.lunabeestudio.robert.datasource.LocalKeystoreDataSource
@@ -34,7 +36,6 @@ import com.lunabeestudio.robert.datasource.LocalLocalProximityDataSource
 import com.lunabeestudio.robert.datasource.RemoteServiceDataSource
 import com.lunabeestudio.robert.datasource.SharedCryptoDataSource
 import com.lunabeestudio.robert.extension.safeEnumValueOf
-import com.lunabeestudio.robert.extension.toAtRiskStatus
 import com.lunabeestudio.robert.extension.use
 import com.lunabeestudio.robert.manager.LocalProximityFilter
 import com.lunabeestudio.robert.model.AtRiskStatus
@@ -65,9 +66,11 @@ import java.util.Calendar
 import java.util.concurrent.TimeUnit
 import kotlin.math.abs
 import kotlin.math.min
+import kotlin.random.Random
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
+import kotlin.time.days
 
 class RobertManagerImpl(
     application: RobertApplication,
@@ -77,6 +80,8 @@ class RobertManagerImpl(
     serviceDataSource: RemoteServiceDataSource,
     sharedCryptoDataSource: SharedCryptoDataSource,
     configurationDataSource: ConfigurationDataSource,
+    calibrationDataSource: CalibrationDataSource,
+    serverPublicKey: String,
     private val localProximityFilter: LocalProximityFilter,
 ) : RobertManager {
     val disseminatedEbidsFile = File(application.getAppContext().filesDir, "disseminatedEbids.txt")
@@ -94,12 +99,18 @@ class RobertManagerImpl(
             serviceDataSource,
             sharedCryptoDataSource,
             localKeystoreDataSource,
-            configurationDataSource
+            configurationDataSource,
+            calibrationDataSource,
+            serverPublicKey
         )
 
-    private var _configuration: Configuration
+    private var _configuration: Configuration = remoteServiceRepository.loadConfig(application.getAppContext())
     override val configuration: Configuration
         get() = keystoreRepository.configuration ?: _configuration
+
+    private var _calibration: Calibration = remoteServiceRepository.loadCalibration(application.getAppContext())
+    override val calibration: Calibration
+        get() = keystoreRepository.calibration ?: _calibration
 
     override var shouldReloadBleSettings: Boolean
         get() = keystoreRepository.shouldReloadBleSettings
@@ -126,28 +137,13 @@ class RobertManagerImpl(
         get() = keystoreRepository.proximityActive ?: false
 
     private val atRiskMutableLiveData: MutableLiveData<Event<AtRiskStatus>> = MutableLiveData()
-    override val atRiskStatus: LiveData<Event<AtRiskStatus>> = atRiskMutableLiveData
+    override val liveAtRiskStatus: LiveData<Event<AtRiskStatus>> = atRiskMutableLiveData
 
-    override val isAtRisk: Boolean?
-        get() = keystoreRepository.lastRiskReceivedDate?.let {
-            // if last time we've been notified is older than quarantine period minus the last exposure time frame :
-            System.currentTimeMillis() - it < TimeUnit.DAYS.toMillis((configuration.quarantinePeriod - lastExposureTimeframe).toLong())
-        } ?: atRiskLastRefresh?.let { false }
-
-    override val lastRiskReceivedDate: Long?
-        get() = keystoreRepository.lastRiskReceivedDate
-
-    override val isWarningAtRisk: Boolean?
-        get() = keystoreRepository.isWarningAtRisk
-
-    override val lastWarningReceivedDate: Long?
-        get() = keystoreRepository.lastWarningReceivedDate
+    override val atRiskStatus: AtRiskStatus?
+        get() = keystoreRepository.atRiskStatus
 
     override val atRiskLastRefresh: Long?
         get() = keystoreRepository.atRiskLastRefresh
-
-    override val lastExposureTimeframe: Int
-        get() = keystoreRepository.lastExposureTimeframe ?: 0
 
     override val isSick: Boolean
         get() = keystoreRepository.isSick ?: false
@@ -165,10 +161,31 @@ class RobertManagerImpl(
         get() = keystoreRepository.reportPositiveTestDate
 
     init {
-        _configuration = remoteServiceRepository.loadConfig(application.getAppContext())
         if (isRegistered) {
             startStatusWorker(application.getAppContext())
+            migrateOldIsAtRisk()
         }
+    }
+
+    private fun migrateOldIsAtRisk() {
+        if (keystoreRepository.atRiskModelVersion != AT_RISK_MODEL_VERSION) {
+            if (keystoreRepository.atRiskStatus == null && (keystoreRepository.atRiskModelVersion ?: 0) < 1) {
+                val wasAtRisk = keystoreRepository.deprecatedLastRiskReceivedDate?.let {
+                    // if last time we've been notified is older than quarantine period minus the last exposure time frame :
+                    System.currentTimeMillis() - it < TimeUnit.DAYS.toMillis(
+                        (configuration.quarantinePeriod - (keystoreRepository.deprecatedLastExposureTimeframe ?: 0)).toLong()
+                    )
+                } ?: atRiskLastRefresh?.let { false }
+                keystoreRepository.atRiskStatus = when (wasAtRisk) {
+                    true -> AtRiskStatus(4f, keystoreRepository.deprecatedLastRiskReceivedDate?.unixTimeMsToNtpTimeS(), null)
+                    false -> AtRiskStatus(0f, null, null)
+                    else -> null
+                }
+                keystoreRepository.deprecatedLastRiskReceivedDate = null
+                keystoreRepository.deprecatedLastExposureTimeframe = null
+            }
+        }
+        keystoreRepository.atRiskModelVersion = AT_RISK_MODEL_VERSION
     }
 
     override suspend fun refreshConfig(application: RobertApplication): RobertResult {
@@ -177,7 +194,7 @@ class RobertManagerImpl(
             is RobertResultData.Success -> {
                 try {
                     handleConfigChange(configResult.data)
-                    RobertResult.Success()
+                    refreshCalibration(application)
                 } catch (e: Exception) {
                     Timber.e(e)
                     if (e is RobertException) {
@@ -190,6 +207,32 @@ class RobertManagerImpl(
             is RobertResultData.Failure -> {
                 RobertResult.Failure(configResult.error)
             }
+        }
+    }
+
+    private suspend fun refreshCalibration(application: RobertApplication): RobertResult {
+        return if (configuration.versionCalibrationBle == calibration.version) {
+            val calibrationResult = remoteServiceRepository.fetchOrLoadCalibration(application.getAppContext())
+            when (calibrationResult) {
+                is RobertResultData.Success -> {
+                    try {
+                        handleCalibrationChange(calibrationResult.data)
+                        RobertResult.Success()
+                    } catch (e: Exception) {
+                        Timber.e(e)
+                        if (e is RobertException) {
+                            RobertResult.Failure(e)
+                        } else {
+                            RobertResult.Failure(RobertUnknownException())
+                        }
+                    }
+                }
+                is RobertResultData.Failure -> {
+                    RobertResult.Failure(calibrationResult.error)
+                }
+            }
+        } else {
+            RobertResult.Success()
         }
     }
 
@@ -256,6 +299,13 @@ class RobertManagerImpl(
         keystoreRepository.configuration = configuration
     }
 
+    private fun handleCalibrationChange(calibration: Calibration) {
+        if (calibration.version <= keystoreRepository.calibration?.version ?: -1) {
+            return
+        }
+        keystoreRepository.calibration = calibration
+    }
+
     override suspend fun activateProximity(application: RobertApplication, statusTried: Boolean): RobertResult {
         return if (!canActivateProximity) {
             RobertResult.Failure(ReportDelayException())
@@ -312,65 +362,9 @@ class RobertManagerImpl(
                 val shouldRefreshStatus = lastSuccessLongEnough || lastErrorLongEnough
                 if (shouldRefreshStatus) {
                     if (ssu is RobertResultData.Success) {
-                        val venueQrCodeList: List<VenueQrCode>? = robertApplication.getVenueQrCodeList(null)
-                        if (!venueQrCodeList.isNullOrEmpty()) {
-                            val wResult = remoteServiceRepository.wstatus(configuration.warningApiVersion, venueQrCodeList)
-                            when (wResult) {
-                                is RobertResultData.Success -> {
-                                    keystoreRepository.atRiskLastRefresh = System.currentTimeMillis()
-                                    if (keystoreRepository.isWarningAtRisk != wResult.data.atRisk && wResult.data.atRisk) {
-                                        robertApplication.warningAtRiskDetected()
-                                        keystoreRepository.lastWarningReceivedDate = System.currentTimeMillis()
-                                    }
-                                    keystoreRepository.isWarningAtRisk = wResult.data.atRisk
-                                }
-                                is RobertResultData.Failure -> {
-                                    Timber.e(wResult.error)
-                                }
-                            }
-                        }
-                        val result = remoteServiceRepository.status(apiVersion, ssu.data)
-                        when (result) {
-                            is RobertResultData.Success -> {
-                                try {
-                                    keystoreRepository.atRiskLastRefresh = System.currentTimeMillis()
-                                    ephemeralBluetoothIdentifierRepository.save(Base64.decode(result.data.tuples, Base64.NO_WRAP))
-                                    // Only notify at risk became true every 24h
-                                    val atRiskDelayOK = keystoreRepository.lastRiskReceivedDate?.let {
-                                        it < System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1L)
-                                    } ?: true
-                                    if (result.data.atRisk && atRiskDelayOK) {
-                                        keystoreRepository.lastRiskReceivedDate = System.currentTimeMillis()
-                                        keystoreRepository.lastExposureTimeframe = result.data.lastExposureTimeframe
-                                        robertApplication.atRiskDetected()
-                                    }
-                                    keystoreRepository.shouldReloadBleSettings = true
-
-                                    Timber.v("Updating worker status to new random date")
-                                    StatusWorker.scheduleStatusWorker(
-                                        robertApplication.getAppContext(),
-                                        this@RobertManagerImpl,
-                                        ExistingPeriodicWorkPolicy.REPLACE
-                                    )
-
-                                    RobertResult.Success()
-                                } catch (e: Exception) {
-                                    keystoreRepository.atRiskLastError = System.currentTimeMillis()
-                                    when (e) {
-                                        is RobertException -> {
-                                            RobertResult.Failure(e)
-                                        }
-                                        else -> {
-                                            RobertResult.Failure(RobertUnknownException())
-                                        }
-                                    }
-                                }
-                            }
-                            is RobertResultData.Failure -> {
-                                keystoreRepository.atRiskLastError = System.currentTimeMillis()
-                                RobertResult.Failure(result.error)
-                            }
-                        }
+                        val statusResult = status(ssu)
+                        val wstatusResult = wstatus(robertApplication)
+                        processStatusResults(robertApplication, statusResult, wstatusResult)
                     } else {
                         val error = ssu as RobertResultData.Failure
                         Timber.e("hello or timeStart not found (${error.error?.message})")
@@ -381,6 +375,119 @@ class RobertManagerImpl(
                     RobertResult.Failure(UnknownException())
                 }
             }
+        }
+    }
+
+    private suspend fun status(
+        ssu: RobertResultData.Success<ServerStatusUpdate>,
+    ): RobertResultData<AtRiskStatus> {
+        val result = remoteServiceRepository.status(apiVersion, ssu.data)
+        return when (result) {
+            is RobertResultData.Success -> {
+                try {
+                    keystoreRepository.atRiskLastRefresh = System.currentTimeMillis()
+                    keystoreRepository.declarationToken = result.data.declarationToken
+                    ephemeralBluetoothIdentifierRepository.save(Base64.decode(result.data.tuples, Base64.NO_WRAP))
+                    keystoreRepository.shouldReloadBleSettings = true
+                    RobertResultData.Success(
+                        AtRiskStatus(
+                            result.data.riskLevel,
+                            result.data.ntpLastRiskScoringS,
+                            result.data.ntpLastContactS
+                        )
+                    )
+                } catch (e: Exception) {
+                    when (e) {
+                        is RobertException -> {
+                            RobertResultData.Failure(e)
+                        }
+                        else -> {
+                            RobertResultData.Failure(RobertUnknownException())
+                        }
+                    }
+                }
+            }
+            is RobertResultData.Failure -> {
+                RobertResultData.Failure(result.error)
+            }
+        }
+    }
+
+    @OptIn(ExperimentalTime::class)
+    private suspend fun wstatus(robertApplication: RobertApplication): RobertResultData<AtRiskStatus> {
+        val venueQrCodeList: List<VenueQrCode>? = robertApplication.getVenueQrCodeList(null)
+        return if (!venueQrCodeList.isNullOrEmpty()) {
+            val wResult = remoteServiceRepository.wstatus(configuration.warningApiVersion, venueQrCodeList)
+            when (wResult) {
+                is RobertResultData.Success -> {
+                    val riskLevel = wResult.data.riskLevel
+                    val lastRiskScoringDate = wResult.data.ntpLastContactS
+                    var lastContactDate: Long? = null
+                    wResult.data.ntpLastContactS?.let { lastDate ->
+                        lastContactDate = min(
+                            lastDate + (Random.nextInt(-1, 1) * 1.days.toLongMilliseconds().unixTimeMsToNtpTimeS()),
+                            (System.currentTimeMillis() - 1.days.toLongMilliseconds()).unixTimeMsToNtpTimeS()
+                        )
+                    }
+
+                    RobertResultData.Success(AtRiskStatus(riskLevel, lastRiskScoringDate, lastContactDate))
+                }
+                is RobertResultData.Failure -> {
+                    Timber.e(wResult.error)
+                    keystoreRepository.atRiskLastError = System.currentTimeMillis()
+                    RobertResultData.Failure(wResult.error)
+                }
+            }
+        } else {
+            RobertResultData.Success(AtRiskStatus(0f, null, null))
+        }
+    }
+
+    fun processStatusResults(
+        robertApplication: RobertApplication,
+        statusResult: RobertResultData<AtRiskStatus>,
+        wstatusResult: RobertResultData<AtRiskStatus>
+    ): RobertResult {
+        return if (statusResult is RobertResultData.Success && wstatusResult is RobertResultData.Success) {
+            keystoreRepository.atRiskLastRefresh = System.currentTimeMillis()
+
+            val prevAtRiskStatus = atRiskStatus
+            if (statusResult.data.ntpLastRiskScoringS == null
+                || (statusResult.data.ntpLastRiskScoringS ?: 0) > (keystoreRepository.currentRobertAtRiskStatus?.ntpLastRiskScoringS
+                    ?: -1)) {
+                keystoreRepository.currentRobertAtRiskStatus = statusResult.data
+            }
+            if (wstatusResult.data.ntpLastRiskScoringS == null
+                || (wstatusResult.data.ntpLastRiskScoringS ?: 0) > (keystoreRepository.currentWarningAtRiskStatus?.ntpLastRiskScoringS
+                    ?: -1)) {
+                keystoreRepository.currentWarningAtRiskStatus = wstatusResult.data
+            }
+
+            val newStatusList = listOfNotNull(keystoreRepository.currentRobertAtRiskStatus, keystoreRepository.currentWarningAtRiskStatus)
+            val newAtRiskStatus: AtRiskStatus = newStatusList.maxByOrNull { it.riskLevel }!!
+            keystoreRepository.atRiskStatus = newAtRiskStatus
+            if (!isSick) {
+                if (prevAtRiskStatus?.ntpLastRiskScoringS != newAtRiskStatus.ntpLastRiskScoringS) {
+                    robertApplication.alertAtRiskLevelChange()
+                }
+                if (newAtRiskStatus.riskLevel > 0f
+                    && ((prevAtRiskStatus?.riskLevel ?: 0f) < newAtRiskStatus.riskLevel
+                        || (prevAtRiskStatus?.riskLevel == newAtRiskStatus.riskLevel
+                        && prevAtRiskStatus.ntpLastRiskScoringS ?: 0L < newAtRiskStatus.ntpLastRiskScoringS ?: 0L))) {
+                    robertApplication.notifyAtRiskLevelChange()
+                }
+            }
+
+            Timber.v("Updating worker status to new random date")
+            StatusWorker.scheduleStatusWorker(
+                robertApplication.getAppContext(),
+                this@RobertManagerImpl,
+                ExistingPeriodicWorkPolicy.REPLACE
+            )
+            RobertResult.Success()
+        } else {
+            keystoreRepository.atRiskLastError = System.currentTimeMillis()
+            RobertResult.Failure((statusResult as? RobertResultData.Failure)?.error ?: (wstatusResult as? RobertResultData.Failure)?.error)
         }
     }
 
@@ -530,11 +637,12 @@ class RobertManagerImpl(
         }
     }
 
-    override suspend fun eraseRemoteAlert(): RobertResult {
-        keystoreRepository.lastRiskReceivedDate = null
+    override fun eraseRemoteAlert(): RobertResult {
         keystoreRepository.atRiskLastRefresh = null
-        keystoreRepository.lastExposureTimeframe = null
-        keystoreRepository.isWarningAtRisk = null
+        keystoreRepository.atRiskStatus = null
+        keystoreRepository.currentRobertAtRiskStatus = null
+        keystoreRepository.currentWarningAtRiskStatus = null
+        keystoreRepository.declarationToken = null
         return RobertResult.Success()
     }
 
@@ -566,18 +674,23 @@ class RobertManagerImpl(
         keystoreRepository.kA = null
         keystoreRepository.kEA = null
         keystoreRepository.timeStart = null
-        keystoreRepository.lastRiskReceivedDate = null
         keystoreRepository.atRiskLastRefresh = null
-        keystoreRepository.lastExposureTimeframe = null
+        keystoreRepository.atRiskStatus = null
+        keystoreRepository.currentRobertAtRiskStatus = null
+        keystoreRepository.currentWarningAtRiskStatus = null
+        keystoreRepository.deprecatedLastRiskReceivedDate = null
+        keystoreRepository.deprecatedLastExposureTimeframe = null
         keystoreRepository.proximityActive = null
         keystoreRepository.isSick = null
         keystoreRepository.reportDate = null
         keystoreRepository.configuration = configuration.apply { version = 0 }
+        keystoreRepository.calibration = calibration.apply { version = 0 }
         keystoreRepository.reportPositiveTestDate = null
         keystoreRepository.reportSymptomsStartDate = null
-        keystoreRepository.isWarningAtRisk = null
         keystoreRepository.reportValidationToken = null
         keystoreRepository.reportToSendTime = null
+        keystoreRepository.declarationToken = null
+        keystoreRepository.atRiskModelVersion = AT_RISK_MODEL_VERSION
     }
 
     /*suspend*/ fun getLocalProximityItems(timeMs : Long = 0): List<LocalProximity> {
@@ -603,10 +716,14 @@ class RobertManagerImpl(
     }
 
     override fun refreshAtRisk() {
-        isAtRisk.toAtRiskStatus(isWarningAtRisk).let { atRisk ->
+        atRiskStatus?.let { atRisk ->
             if (atRiskMutableLiveData.value == null || atRiskMutableLiveData.value?.peekContent() != atRisk) {
                 atRiskMutableLiveData.postValue(Event(atRisk))
             }
         }
+    }
+
+    companion object {
+        private const val AT_RISK_MODEL_VERSION: Int = 1
     }
 }

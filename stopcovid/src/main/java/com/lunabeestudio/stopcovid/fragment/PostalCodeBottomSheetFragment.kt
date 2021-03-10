@@ -16,7 +16,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -37,7 +36,7 @@ class PostalCodeBottomSheetFragment : BottomSheetDialogFragment() {
 
     private val strings: HashMap<String, String> = StringsManager.strings
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val binding = FragmentPostalCodeBottomSheetBinding.inflate(inflater, container, false)
 
         binding.changeButton.apply {
@@ -52,10 +51,12 @@ class PostalCodeBottomSheetFragment : BottomSheetDialogFragment() {
             setOnClickListener {
                 sharedPrefs.chosenPostalCode = null
                 viewLifecycleOwner.lifecycleScope.launch {
-                    (activity as? MainActivity)?.showProgress(true)
-                    VaccinationCenterManager.postalCodeDidUpdate(requireContext(), sharedPrefs, null)
-                    (activity as? MainActivity)?.showProgress(false)
-                    dismissDialog(true)
+                    context?.let { context ->
+                        (activity as? MainActivity)?.showProgress(true)
+                        VaccinationCenterManager.postalCodeDidUpdate(context, sharedPrefs, null)
+                        (activity as? MainActivity)?.showProgress(false)
+                        dismissDialog(true)
+                    }
                 }
             }
         }
@@ -70,20 +71,24 @@ class PostalCodeBottomSheetFragment : BottomSheetDialogFragment() {
     }
 
     private fun showPostalCodeDialog() {
-        MaterialAlertDialogBuilder(requireContext()).showPostalCodeDialog(
-            layoutInflater,
-            strings
-        ) { postalCode ->
-            if (sharedPrefs.chosenPostalCode != postalCode) {
-                sharedPrefs.chosenPostalCode = postalCode
-                viewLifecycleOwner.lifecycleScope.launch {
-                    (activity as? MainActivity)?.showProgress(true)
-                    VaccinationCenterManager.postalCodeDidUpdate(requireContext(), sharedPrefs, postalCode)
-                    (activity as? MainActivity)?.showProgress(false)
-                    dismissDialog(true)
+        context?.let {
+            MaterialAlertDialogBuilder(it).showPostalCodeDialog(
+                layoutInflater,
+                strings
+            ) { postalCode ->
+                if (sharedPrefs.chosenPostalCode != postalCode) {
+                    sharedPrefs.chosenPostalCode = postalCode
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        context?.let { context ->
+                            (activity as? MainActivity)?.showProgress(true)
+                            VaccinationCenterManager.postalCodeDidUpdate(context, sharedPrefs, postalCode)
+                            (activity as? MainActivity)?.showProgress(false)
+                            dismissDialog(true)
+                        }
+                    }
+                } else {
+                    dismissDialog(false)
                 }
-            } else {
-                dismissDialog(false)
             }
         }
     }

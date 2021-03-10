@@ -108,13 +108,6 @@
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
         <action
-            android:id="@+id/action_proximityFragment_to_informationFragment"
-            app:destination="@id/informationFragment"
-            app:enterAnim="@anim/nav_default_enter_anim"
-            app:exitAnim="@anim/nav_default_exit_anim"
-            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
-            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
-        <action
             android:id="@+id/action_proximityFragment_to_isSickFragment"
             app:destination="@id/isSickFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
@@ -337,8 +330,8 @@
         android:name="com.lunabeestudio.stopcovid.fragment.HealthFragment"
         tools:layout="@layout/fragment_recycler_view">
         <action
-            android:id="@+id/action_healthFragment_to_informationFragment"
-            app:destination="@id/informationFragment"
+            android:id="@+id/action_healthFragment_to_gestureFragment"
+            app:destination="@id/gestureFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
@@ -590,18 +583,6 @@
         android:id="@+id/tuneProximityFragment"
         android:name="com.lunabeestudio.stopcovid.fragment.TuneProximityFragment"
         tools:layout="@layout/fragment_recycler_view" />
-    <fragment
-        android:id="@+id/informationFragment"
-        android:name="com.lunabeestudio.stopcovid.fragment.InformationFragment"
-        tools:layout="@layout/fragment_recycler_view">
-        <action
-            android:id="@+id/action_informationFragment_to_gestureFragment"
-            app:destination="@id/gestureFragment"
-            app:enterAnim="@anim/nav_default_enter_anim"
-            app:exitAnim="@anim/nav_default_exit_anim"
-            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
-            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
-    </fragment>
     <fragment
         android:id="@+id/gestureFragment"
         android:name="com.lunabeestudio.stopcovid.fragment.GestureFragment"

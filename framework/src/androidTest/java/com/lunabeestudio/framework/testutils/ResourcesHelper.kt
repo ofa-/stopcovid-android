@@ -15,9 +15,4 @@ object ResourcesHelper {
         this.javaClass.classLoader!!.getResourceAsStream(filename).use {
             it.bufferedReader().readText()
         }
-
-    fun readTestFile(filename: String): ByteArray =
-        this.javaClass.classLoader!!.getResourceAsStream(filename).use {
-            it.readBytes()
-        }
 }

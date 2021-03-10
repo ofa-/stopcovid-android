@@ -40,6 +40,9 @@ class ServiceTest {
             ApplicationProvider.getApplicationContext(),
             server.url("/api/v1.0/").toString(),
             server.url("/api/v1.0/").toString(),
+            "",
+            "",
+            null,
         )
     }
 
@@ -91,11 +94,12 @@ class ServiceTest {
             dataSource.status("", ServerStatusUpdate("", 0L, "", ""))
         }
         assertThat(result).isInstanceOf(RobertResultData.Success::class.java)
-        assertThat((result as RobertResultData.Success).data.atRisk)
-        assertThat(result.data.lastExposureTimeframe).isEqualTo(0)
-        assertThat(result.data.message)
-            .isEqualTo("Votre test COVID-19 est positif. Merci de respecter la période de quatorzaine. Prenez soin de vous et de vos proches.")
-        assertThat(result.data.tuples).isNotNull()
+        assertThat((result as RobertResultData.Success).data.riskLevel).isEqualTo(0)
+        assertThat(result.data.ntpLastContactS).isEqualTo(3814601612L)
+        assertThat(result.data.ntpLastRiskScoringS).isEqualTo(3814601613L)
+        assertThat(result.data.message).isEqualTo("message")
+        assertThat(result.data.tuples).isEqualTo("tuples")
+        assertThat(result.data.declarationToken).isEqualTo("declarationToken")
 
         testDataErrors {
             dataSource.status("", ServerStatusUpdate("", 0L, "", ""))
@@ -112,7 +116,8 @@ class ServiceTest {
             dataSource.wstatus("", emptyList())
         }
         assertThat(result).isInstanceOf(RobertResultData.Success::class.java)
-        assertThat((result as RobertResultData.Success).data.atRisk)
+        assertThat((result as RobertResultData.Success).data.riskLevel).isEqualTo(0)
+        assertThat(result.data.ntpLastContactS).isEqualTo(3814601613L)
 
         testDataErrors {
             dataSource.wstatus("", emptyList())

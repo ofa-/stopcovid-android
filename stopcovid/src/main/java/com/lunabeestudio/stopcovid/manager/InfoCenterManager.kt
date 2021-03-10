@@ -24,10 +24,10 @@ import androidx.preference.PreferenceManager
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.lunabeestudio.robert.utils.Event
-import com.lunabeestudio.stopcovid.BuildConfig
 import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.StopCovid
 import com.lunabeestudio.stopcovid.activity.MainActivity
+import com.lunabeestudio.stopcovid.coreui.ConfigConstant
 import com.lunabeestudio.stopcovid.coreui.UiConstants
 import com.lunabeestudio.stopcovid.coreui.extension.fixFormatter
 import com.lunabeestudio.stopcovid.coreui.extension.getFirstSupportedLanguage
@@ -54,12 +54,12 @@ object InfoCenterManager {
 
     private var gson: Gson = Gson()
 
-    private const val lastUpdatePrefix: String = "info-center-lastupdate"
-    private const val infosPrefix: String = "info-center"
-    private const val tagsPrefix: String = "info-tags"
-    private const val stringPrefix: String = "info-labels-"
-    private const val stringFallbackFileName: String = "info-labels-en.json"
-    private val url: String = com.lunabeestudio.stopcovid.coreui.BuildConfig.SERVER_URL + BuildConfig.INFO_CENTER_FOLDER
+    private const val lastUpdatePrefix: String = ConfigConstant.InfoCenter.LAST_UPDATE_PREFIX
+    private const val infosPrefix: String = ConfigConstant.InfoCenter.INFOS_PREFIX
+    private const val tagsPrefix: String = ConfigConstant.InfoCenter.TAGS_PREFIX
+    private const val stringPrefix: String = ConfigConstant.InfoCenter.STRINGS_PREFIX
+    private const val stringFallbackFileName: String = ConfigConstant.InfoCenter.LOCAL_FALLBACK_FILENAME
+    private val url: String = ConfigConstant.InfoCenter.URL
     private val typeInfoCenterLastUpdatedAt: Type = object : TypeToken<InfoCenterLastUpdatedAt>() {}.type
     private val typeInfoCenterEntry: Type = object : TypeToken<List<InfoCenterEntry>>() {}.type
     private val typeInfoCenterTag: Type = object : TypeToken<List<InfoCenterTag>>() {}.type

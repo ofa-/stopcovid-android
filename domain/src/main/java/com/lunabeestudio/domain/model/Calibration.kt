@@ -5,13 +5,12 @@
  *
  * Authors
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Created by Lunabee Studio / Date - 2020/28/05 - for the TOUS-ANTI-COVID project
+ * Created by Lunabee Studio / Date - 2020/04/05 - for the TOUS-ANTI-COVID project
  */
 
 package com.lunabeestudio.domain.model
 
-class DeviceParameterCorrection(
-    val deviceHandsetModel: String,
-    val txRssCorrectionFactor: Double,
-    val rxRssCorrectionFactor: Double
+class Calibration(
+    var version: Int,
+    val entry: CalibrationEntry?
 )

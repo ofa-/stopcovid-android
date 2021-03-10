@@ -21,22 +21,13 @@ enum class CardTheme {
         override val themeId: Int = R.style.ShapeAppearance_StopCovid_MediumComponent_Primary
         override val backgroundDrawableRes: Int? = null
     },
-    Healthy {
-        override val themeId: Int = R.style.ShapeAppearance_StopCovid_MediumComponent_Primary
-        override val backgroundDrawableRes: Int = R.drawable.bg_no_risk
-    },
     Sick {
         override val themeId: Int = R.style.ShapeAppearance_StopCovid_MediumComponent_Primary
         override val backgroundDrawableRes: Int = R.drawable.bg_sick
     },
-    Danger {
-        override val themeId: Int = R.style.ShapeAppearance_StopCovid_MediumComponent_Primary
-        override val backgroundDrawableRes: Int = R.drawable.bg_risk
-    },
-    Warning {
-        override val themeId: Int = R.style.ShapeAppearance_StopCovid_MediumComponent_Primary
-        override val backgroundDrawableRes: Int = R.drawable.bg_warning_risk
-
+    Color {
+        override val themeId: Int = R.style.ShapeAppearance_StopCovid_MediumComponent_Color
+        override val backgroundDrawableRes: Int = R.drawable.bg_no_risk
     };
 
     @StyleRes

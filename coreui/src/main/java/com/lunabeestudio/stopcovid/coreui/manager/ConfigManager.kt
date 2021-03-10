@@ -13,7 +13,8 @@ package com.lunabeestudio.stopcovid.coreui.manager
 import android.content.Context
 import com.google.gson.Gson
 import com.lunabeestudio.domain.model.Configuration
-import com.lunabeestudio.stopcovid.coreui.BuildConfig
+import com.lunabeestudio.stopcovid.coreui.ConfigConstant
+import com.lunabeestudio.stopcovid.coreui.EnvConstant
 import com.lunabeestudio.stopcovid.coreui.extension.saveTo
 import com.lunabeestudio.stopcovid.coreui.model.ApiConfiguration
 import com.lunabeestudio.stopcovid.coreui.model.ConfigurationWrapper
@@ -27,15 +28,13 @@ import java.io.File
 
 object ConfigManager {
 
-    private const val URL: String = BuildConfig.SERVER_URL + BuildConfig.CONFIG_JSON
-
     private val gson = Gson()
 
     suspend fun fetchOrLoad(context: Context): Configuration {
-        val file = File(context.filesDir, BuildConfig.CONFIG_JSON)
-        Timber.v("Fetching remote config at $URL")
+        val file = File(context.filesDir, ConfigConstant.Config.LOCAL_FILENAME)
+        Timber.v("Fetching remote config at ${getUrl()}")
         try {
-            URL.saveTo(context, file)
+            getUrl().saveTo(context, file)
         } catch (e: Exception) {
             Timber.e(e)
         }
@@ -43,7 +42,7 @@ object ConfigManager {
     }
 
     fun load(context: Context): Configuration {
-        val file = File(context.filesDir, BuildConfig.CONFIG_JSON)
+        val file = File(context.filesDir, ConfigConstant.Config.LOCAL_FILENAME)
         Timber.v("Pre load local config")
         return runBlocking { loadLocal(context, file) }
     }
@@ -66,13 +65,21 @@ object ConfigManager {
         }
     }
 
+    private fun getUrl(): String {
+        return ConfigConstant.Config.URL + EnvConstant.Prod.configFilename
+    }
+
     private suspend fun getDefaultAssetFile(context: Context): Configuration {
         @Suppress("BlockingMethodInNonBlockingContext")
         return withContext(Dispatchers.IO) {
-            context.assets.open("Config/${BuildConfig.CONFIG_JSON}").use {
+            context.assets.open(getAssetPath()).use {
                 it.readBytes().toString(Charsets.UTF_8).apiToConfiguration()
             }
         }
+    }
+
+    private fun getAssetPath(): String {
+        return ConfigConstant.Config.FOLDER + EnvConstant.Prod.configFilename
     }
 
     private fun String.apiToConfiguration(): Configuration {
@@ -85,6 +92,6 @@ object ConfigManager {
     }
 
     fun clearLocal(context: Context) {
-        File(context.filesDir, BuildConfig.CONFIG_JSON).delete()
+        File(context.filesDir, ConfigConstant.Config.LOCAL_FILENAME).delete()
     }
 }

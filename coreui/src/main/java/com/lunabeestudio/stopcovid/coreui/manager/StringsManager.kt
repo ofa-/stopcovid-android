@@ -15,7 +15,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.reflect.TypeToken
 import com.lunabeestudio.robert.utils.Event
-import com.lunabeestudio.stopcovid.coreui.R
+import com.lunabeestudio.stopcovid.coreui.ConfigConstant
 import com.lunabeestudio.stopcovid.coreui.UiConstants
 import com.lunabeestudio.stopcovid.coreui.extension.fixFormatter
 import com.lunabeestudio.stopcovid.coreui.extension.getFirstSupportedLanguage
@@ -69,9 +69,10 @@ object StringsManager : ServerManager() {
         }
     }
 
-    override fun folderName(): String = "Strings"
-    override fun prefix(context: Context): String = context.getString(R.string.string_prefix)
-    override fun type(): Type = object : TypeToken<HashMap<String, String>>() {}.type
-    override fun lastRefreshSharedPrefsKey(): String = UiConstants.SharePrefs.LAST_STRINGS_REFRESH
+    override val url: String = ConfigConstant.Labels.URL
+    override val folderName: String = ConfigConstant.Labels.FOLDER
+    override val prefix: String = ConfigConstant.Labels.FILE_PREFIX
+    override val type: Type = object : TypeToken<HashMap<String, String>>() {}.type
+    override val lastRefreshSharedPrefsKey: String = UiConstants.SharePrefs.LAST_STRINGS_REFRESH
     override fun transform(input: String): String = input.fixFormatter()
 }

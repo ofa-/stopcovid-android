@@ -6,7 +6,7 @@
     },
     {
       "name": "version",
-      "value": 29
+      "value": 32
     },
     {
       "name": "versionCalibrationBle",
@@ -14,11 +14,15 @@
     },
     {
       "name": "app.apiVersion",
-      "value": "v4"
+      "value": "v5"
     },
     {
       "name": "app.warningApiVersion",
-      "value": "v1"
+      "value": "v2"
+    },
+    {
+	    "name" : "ameliUrl",
+	    "url" : "https://declare.ameli.fr/tousanticovid/t/%@/"
     },
     {
       "name": "app.keyfigures.displayDepartmentLevel",
@@ -27,6 +31,10 @@
     {
       "name": "app.displayIsolation",
       "value": true
+    },
+    {
+      "name": "app.isolationMinRiskLevel",
+      "value": 3.0
     },
     {
       "name": "app.displayVaccination",
@@ -126,7 +134,7 @@
     },
     {
       "name": "app.quarantinePeriod",
-      "value": 14
+      "value": 7
     },
     {
       "name": "app.randomStatusHour",
@@ -186,7 +194,7 @@
     },
     {
       "name": "ble.dontUseScannerHardwareBatching",
-      "value": [ "G3121", "E5603", "SM-G981B", "CDY-NX9A", "SM-J530F", "SM-G770F", "SM-G780F", "SM-G781B", "SM-G960F", "SM-G965F", "SM-G970F", "SM-G973F", "SM-G975F", "SM-G977B", "SM-G980F", "SM-G981B", "SM-G985F", "SM-G986B", "SM-G988B", "SM-G991B", "SM-G996B", "SM-G998B", "SM-N770F", "SM-N970F", "SM-N975F", "SM-N976B", "SM-N980F", "SM-N981B", "SM-N985F", "SM-N986B", "SM-F700F", "SM-F707B", "SM-F900F", "SM-F916B", "SM-A025G", "SM-A125F", "SM-A326B", "SM-A415F", "SM-A415FN", "SM-A505FN", "SM-A525F", "SM-A526B", "SM-A715F" ]
+      "value": [ "G3121", "E5603", "SM-G981B", "CDY-NX9A", "SM-J530F", "SM-G770F", "SM-G780F", "SM-G781B", "SM-G960F", "SM-G965F", "SM-G970F", "SM-G973F", "SM-G975F", "SM-G977B", "SM-G980F",  "SM-G981B", "SM-G985F", "SM-G986B", "SM-G988B", "SM-G991B", "SM-G996B", "SM-G998B", "SM-N770F", "SM-N970F", "SM-N975F", "SM-N976B", "SM-N980F", "SM-N981B", "SM-N985F", "SM-N986B", "SM-F700F", "SM-F707B", "SM-F900F", "SM-F916B", "SM-A025G", "SM-A125F", "SM-A326B", "SM-A415F", "SM-A415FN", "SM-A505FN", "SM-A525F", "SM-A526B", "SM-A715F", "SM-A805F", "SM-M115F", "SM-M315F", "SM-M317F", "SM-M515F", "SM-A202F", "SM-A207F", "SM-G715FN", "SM-J730F" ]
 	},
     {
       "name": "ble.calibration",
@@ -344,331 +352,6 @@
  {
    "device_handset_model": "iPhone9,4",
    "tx_RSS_correction_factor": -15,
-   "rx_RSS_correction_factor": -5
- },
- {
-   "device_handset_model": "CLT-L09",
-   "tx_RSS_correction_factor": -30,
-   "rx_RSS_correction_factor": 0
- },
- {
-   "device_handset_model": "CPH1921",
-   "tx_RSS_correction_factor": -25,
-   "rx_RSS_correction_factor": -5
- },
- {
-   "device_handset_model": "FIG-LX1",
-   "tx_RSS_correction_factor": -15,
-   "rx_RSS_correction_factor": -5
- },
- {
-   "device_handset_model": "MAR-LX1A",
-   "tx_RSS_correction_factor": -25,
-   "rx_RSS_correction_factor": -5
- },
- {
-   "device_handset_model": "Mi 9 SE",
-   "tx_RSS_correction_factor": -30,
-   "rx_RSS_correction_factor": 0
- },
- {
-   "device_handset_model": "Moto G (5)",
-   "tx_RSS_correction_factor": -25,
-   "rx_RSS_correction_factor": -5
- },
- {
-   "device_handset_model": "moto g(6) play",
-   "tx_RSS_correction_factor": -25,
-   "rx_RSS_correction_factor": -5
- },
- {
-   "device_handset_model": "MRD-LX1N",
-   "tx_RSS_correction_factor": -20,
-   "rx_RSS_correction_factor": -5
- },
- {
-   "device_handset_model": "Nexus 6",
-   "tx_RSS_correction_factor": -30,
-   "rx_RSS_correction_factor": -5
- },
- {
-   "device_handset_model": "Pixel 2",
-   "tx_RSS_correction_factor": -30,
-   "rx_RSS_correction_factor": -5
- },
- {
-   "device_handset_model": "Pixel 3",
-   "tx_RSS_correction_factor": -30,
-   "rx_RSS_correction_factor": -5
- },
- {
-   "device_handset_model": "Pixel 3 XL",
-   "tx_RSS_correction_factor": -30,
-   "rx_RSS_correction_factor": -5
- },
- {
-   "device_handset_model": "Pixel 3a",
-   "tx_RSS_correction_factor": -30,
-   "rx_RSS_correction_factor": -5
- },
- {
-   "device_handset_model": "Pixel 3a XL",
-   "tx_RSS_correction_factor": -30,
-   "rx_RSS_correction_factor": -5
- },
- {
-   "device_handset_model": "Pixel 4",
-   "tx_RSS_correction_factor": -35,
-   "rx_RSS_correction_factor": -5
- },
- {
-   "device_handset_model": "POT-LX1",
-   "tx_RSS_correction_factor": -20,
-   "rx_RSS_correction_factor": -5
- },
- {
-   "device_handset_model": "Redmi 7A",
-   "tx_RSS_correction_factor": -30,
-   "rx_RSS_correction_factor": -5
- },
- {
-   "device_handset_model": "SM-A105FN",
-   "tx_RSS_correction_factor": -25,
-   "rx_RSS_correction_factor": -5
- },
- {
-   "device_handset_model": "SM-A202F",
-   "tx_RSS_correction_factor": -25,
-   "rx_RSS_correction_factor": 0
- },
- {
-   "device_handset_model": "SM-A310F",
-   "tx_RSS_correction_factor": -25,
-   "rx_RSS_correction_factor": 0
- },
- {
-   "device_handset_model": "SM-A320FL",
-   "tx_RSS_correction_factor": -25,
-   "rx_RSS_correction_factor": 0
- },
- {
-   "device_handset_model": "SM-A405FN",
-   "tx_RSS_correction_factor": -25,
-   "rx_RSS_correction_factor": 0
- },
- {
-   "device_handset_model": "SM-A505F",
-   "tx_RSS_correction_factor": -25,
-   "rx_RSS_correction_factor": -5
- },
- {
-   "device_handset_model": "SM-A505FN",
-   "tx_RSS_correction_factor": -25,
-   "rx_RSS_correction_factor": -5
- },
- {
-   "device_handset_model": "SM-A510F",
-   "tx_RSS_correction_factor": -25,
-   "rx_RSS_correction_factor": -5
- },
- {
-   "device_handset_model": "SM-A520F",
-   "tx_RSS_correction_factor": -25,
-   "rx_RSS_correction_factor": -5
- },
- {
-   "device_handset_model": "SM-A530F",
-   "tx_RSS_correction_factor": -25,
-   "rx_RSS_correction_factor": 0
- },
- {
-   "device_handset_model": "SM-A600F",
-   "tx_RSS_correction_factor": -30,
-   "rx_RSS_correction_factor": -5
- },
- {
-   "device_handset_model": "SM-A600FN",
-   "tx_RSS_correction_factor": -30,
-   "rx_RSS_correction_factor": -5
- },
- {
-   "device_handset_model": "SM-A705F",
-   "tx_RSS_correction_factor": -35,
-   "rx_RSS_correction_factor": -5
- },
- {
-   "device_handset_model": "SM-A705FN",
-   "tx_RSS_correction_factor": -35,
-   "rx_RSS_correction_factor": -5
- },
- {
-   "device_handset_model": "SM-A750F",
-   "tx_RSS_correction_factor": -25,
-   "rx_RSS_correction_factor": -5
- },
- {
-   "device_handset_model": "SM-A750FN",
-   "tx_RSS_correction_factor": -25,
-   "rx_RSS_correction_factor": -5
- },
- {
-   "device_handset_model": "SM-F700F",
-   "tx_RSS_correction_factor": -25,
-   "rx_RSS_correction_factor": -5
- },
- {
-   "device_handset_model": "SM-F900F",
-   "tx_RSS_correction_factor": -25,
-   "rx_RSS_correction_factor": -5
- },
- {
-   "device_handset_model": "SM-G390F",
-   "tx_RSS_correction_factor": -25,
-   "rx_RSS_correction_factor": -5
- },
- {
-   "device_handset_model": "SM-G398FN",
-   "tx_RSS_correction_factor": -25,
-   "rx_RSS_correction_factor": -5
- },
- {
-   "device_handset_model": "SM-G920F",
-   "tx_RSS_correction_factor": -25,
-   "rx_RSS_correction_factor": -10
- },
- {
-   "device_handset_model": "SM-G925F",
-   "tx_RSS_correction_factor": -25,
-   "rx_RSS_correction_factor": -10
- },
- {
-   "device_handset_model": "SM-G930F",
-   "tx_RSS_correction_factor": -30,
-   "rx_RSS_correction_factor": -10
- },
- {
-   "device_handset_model": "SM-G935F",
-   "tx_RSS_correction_factor": -30,
-   "rx_RSS_correction_factor": -10
- },
- {
-   "device_handset_model": "SM-G950F",
-   "tx_RSS_correction_factor": -30,
-   "rx_RSS_correction_factor": -10
- },
- {
-   "device_handset_model": "SM-G955F",
-   "tx_RSS_correction_factor": -30,
-   "rx_RSS_correction_factor": -10
- },
- {
-   "device_handset_model": "SM-G960F",
-   "tx_RSS_correction_factor": -30,
-   "rx_RSS_correction_factor": -10
- },
- {
-   "device_handset_model": "SM-G965F",
-   "tx_RSS_correction_factor": -30,
-   "rx_RSS_correction_factor": -10
- },
- {
-   "device_handset_model": "SM-G970F",
-   "tx_RSS_correction_factor": -25,
-   "rx_RSS_correction_factor": -5
- },
- {
-   "device_handset_model": "SM-G973F",
-   "tx_RSS_correction_factor": -30,
-   "rx_RSS_correction_factor": 0
- },
- {
-   "device_handset_model": "SM-G975F",
-   "tx_RSS_correction_factor": -30,
-   "rx_RSS_correction_factor": 0
- },
- {
-   "device_handset_model": "SM-G980F",
-   "tx_RSS_correction_factor": -25,
-   "rx_RSS_correction_factor": -5
- },
- {
-   "device_handset_model": "SM-J330FN",
-   "tx_RSS_correction_factor": -25,
-   "rx_RSS_correction_factor": 0
- },
- {
-   "device_handset_model": "SM-J415F",
-   "tx_RSS_correction_factor": -25,
-   "rx_RSS_correction_factor": -5
- },
- {
-   "device_handset_model": "SM-J415FN",
-   "tx_RSS_correction_factor": -25,
-   "rx_RSS_correction_factor": -5
- },
- {
-   "device_handset_model": "SM-J510F",
-   "tx_RSS_correction_factor": -25,
-   "rx_RSS_correction_factor": -5
- },
- {
-   "device_handset_model": "SM-J510FN",
-   "tx_RSS_correction_factor": -20,
-   "rx_RSS_correction_factor": 0
- },
- {
-   "device_handset_model": "SM-J530F",
-   "tx_RSS_correction_factor": -25,
-   "rx_RSS_correction_factor": -5
- },
- {
-   "device_handset_model": "SM-J600F",
-   "tx_RSS_correction_factor": -25,
-   "rx_RSS_correction_factor": -5
- },
- {
-   "device_handset_model": "SM-J600FN",
-   "tx_RSS_correction_factor": -25,
-   "rx_RSS_correction_factor": -5
- },
- {
-   "device_handset_model": "SM-J610F",
-   "tx_RSS_correction_factor": -25,
-   "rx_RSS_correction_factor": -5
- },
- {
-   "device_handset_model": "SM-J610FN",
-   "tx_RSS_correction_factor": -25,
-   "rx_RSS_correction_factor": -5
- },
- {
-   "device_handset_model": "SM-N950F",
-   "tx_RSS_correction_factor": -25,
-   "rx_RSS_correction_factor": -5
- },
- {
-   "device_handset_model": "SM-N960F",
-   "tx_RSS_correction_factor": -25,
-   "rx_RSS_correction_factor": -5
- },
- {
-   "device_handset_model": "SM-N975F",
-   "tx_RSS_correction_factor": -25,
-   "rx_RSS_correction_factor": -5
- },
- {
-   "device_handset_model": "SNE-LX1",
-   "tx_RSS_correction_factor": -20,
-   "rx_RSS_correction_factor": -5
- },
- {
-   "device_handset_model": "WAS-LX1A",
-   "tx_RSS_correction_factor": -10,
-   "rx_RSS_correction_factor": 0
- },
- {
-   "device_handset_model": "Trekker-4",
-   "tx_RSS_correction_factor": -30,
    "rx_RSS_correction_factor": -5
  }
 ]

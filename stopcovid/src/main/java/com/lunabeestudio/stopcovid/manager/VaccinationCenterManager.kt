@@ -20,7 +20,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.robert.utils.Event
-import com.lunabeestudio.stopcovid.BuildConfig
+import com.lunabeestudio.stopcovid.coreui.ConfigConstant
 import com.lunabeestudio.stopcovid.coreui.extension.saveTo
 import com.lunabeestudio.stopcovid.extension.chosenPostalCode
 import com.lunabeestudio.stopcovid.extension.currentVaccinationReferenceDepartmentCode
@@ -42,11 +42,10 @@ import kotlin.math.abs
 object VaccinationCenterManager {
 
     private var gson: Gson = Gson()
-    private const val zipGeolocFilePath: String = "VaccinationCenter/zip-geoloc.json"
     private val postalCodesDetailsType: Type = object : TypeToken<Map<String, PostalCodeDetails>>() {}.type
-    private const val centersFileName: String = BuildConfig.VACCINATION_CENTER_FILENAME
-    private const val lastUpdateFileName: String = BuildConfig.VACCINATION_CENTER_LAST_UPDATE_FILENAME
-    private const val url: String = com.lunabeestudio.stopcovid.coreui.BuildConfig.BASE_URL + BuildConfig.VACCINATION_CENTER_PATH
+    private const val centersFileName: String = ConfigConstant.Vaccination.CENTER_FILENAME
+    private const val lastUpdateFileName: String = ConfigConstant.Vaccination.CENTER_LAST_UPDATE_FILENAME
+    private val url: String = ConfigConstant.Vaccination.URL
     private val vaccinationCentersType: Type = object : TypeToken<List<VaccinationCenter>>() {}.type
 
     private val _vaccinationCenters: MutableLiveData<Event<List<VaccinationCenter>>> = MutableLiveData()
@@ -141,7 +140,7 @@ object VaccinationCenterManager {
     @Suppress("BlockingMethodInNonBlockingContext")
     private suspend fun postalCodesDetails(context: Context): Map<String, PostalCodeDetails>? {
         return withContext(Dispatchers.IO) {
-            gson.fromJson<Map<String, PostalCodeDetails>>(context.assets.open(zipGeolocFilePath).use {
+            gson.fromJson<Map<String, PostalCodeDetails>>(context.assets.open(ConfigConstant.Vaccination.ASSET_ZIP_GEOLOC_FILE_PATH).use {
                 it.readBytes().toString(Charsets.UTF_8)
             }, postalCodesDetailsType)
         }
@@ -267,11 +266,11 @@ object VaccinationCenterManager {
 
     private fun localCentersFile(context: Context, sharedPreferences: SharedPreferences): File = File(
         context.filesDir,
-        "${sharedPreferences.currentVaccinationReferenceDepartmentCode}-centers.json"
+        "${sharedPreferences.currentVaccinationReferenceDepartmentCode}${ConfigConstant.Vaccination.CENTER_SUFFIX}"
     )
 
     private fun localLastUpdateFile(context: Context, sharedPreferences: SharedPreferences): File = File(
         context.filesDir,
-        "${sharedPreferences.currentVaccinationReferenceDepartmentCode}-lastUpdate.json"
+        "${sharedPreferences.currentVaccinationReferenceDepartmentCode}${ConfigConstant.Vaccination.LAST_UPDATE_SUFFIX}"
     )
 }

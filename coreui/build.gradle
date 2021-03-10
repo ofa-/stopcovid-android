@@ -23,12 +23,6 @@ android {
             buildConfigField 'long', 'REFRESH_STRING_MIN_DURATION_MS', '60_000L'
         }
     }
-    defaultConfig {
-        buildConfigField 'String', 'BASE_URL', '"https://app.stopcovid.gouv.fr"'
-        buildConfigField 'String', 'SERVER_URL', 'BASE_URL+"/json/version-26/"'
-        buildConfigField 'String', 'SERVER_CERTIFICATE_SHA256', '"sha256/sXQojvwsiyblrpMQIVRXGC5u7AgknzTJm+VIK1kQmD8="'
-        buildConfigField 'String', 'CONFIG_JSON', '"config.json"'
-    }
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -49,9 +43,9 @@ dependencies {
     api 'androidx.appcompat:appcompat:_'
     api 'androidx.constraintlayout:constraintlayout:_'
     api 'androidx.core:core-ktx:_'
-    api 'androidx.lifecycle:lifecycle-extensions:_'
     api 'androidx.lifecycle:lifecycle-viewmodel-ktx:_'
     api 'androidx.lifecycle:lifecycle-livedata-ktx:_'
+    api 'androidx.lifecycle:lifecycle-process:_'
     api "androidx.lifecycle:lifecycle-viewmodel-savedstate:_"
     api "androidx.navigation:navigation-fragment-ktx:_"
     api "androidx.navigation:navigation-ui-ktx:_"

@@ -185,95 +185,125 @@ class VenuesManagerTest {
 
     @Test
     fun venue_url_parsing() {
-        assertNull(VenuesManager.processVenueUrl(
-            robertManager = context.robertManager(),
-            secureKeystoreDataSource = keystoreDataSource,
-            ""
-        )) { "Invalid format" }
+        assertNull(
+            VenuesManager.processVenueUrl(
+                robertManager = context.robertManager(),
+                secureKeystoreDataSource = keystoreDataSource,
+                ""
+            )
+        ) { "Invalid format" }
 
-        assertNull(VenuesManager.processVenueUrl(
-            robertManager = context.robertManager(),
-            secureKeystoreDataSource = keystoreDataSource,
-            "test"
-        )) { "Invalid format" }
+        assertNull(
+            VenuesManager.processVenueUrl(
+                robertManager = context.robertManager(),
+                secureKeystoreDataSource = keystoreDataSource,
+                "test"
+            )
+        ) { "Invalid format" }
 
-        assertNull(VenuesManager.processVenueUrl(
-            robertManager = context.robertManager(),
-            secureKeystoreDataSource = keystoreDataSource,
-            "https://www.google.com"
-        )) { "Invalid format" }
+        assertNull(
+            VenuesManager.processVenueUrl(
+                robertManager = context.robertManager(),
+                secureKeystoreDataSource = keystoreDataSource,
+                "https://www.google.com"
+            )
+        ) { "Invalid format" }
 
-        assertNull(VenuesManager.processVenueUrl(
-            robertManager = context.robertManager(),
-            secureKeystoreDataSource = keystoreDataSource,
-            "https://tac.gouv.fr/0/491ab3/GA/4/400/"
-        )) { "Invalid format" }
+        assertNull(
+            VenuesManager.processVenueUrl(
+                robertManager = context.robertManager(),
+                secureKeystoreDataSource = keystoreDataSource,
+                "https://tac.gouv.fr/0/491ab3/GA/4/400/"
+            )
+        ) { "Invalid format" }
 
-        assertNull(VenuesManager.processVenueUrl(
-            robertManager = context.robertManager(),
-            secureKeystoreDataSource = keystoreDataSource,
-            "https://tac.gouv.fr/491ab3ae-ad35-4301-8dd9-414ecf210712/0/GA/4/400/"
-        )) { "Invalid format (wrong argument position" }
+        assertNull(
+            VenuesManager.processVenueUrl(
+                robertManager = context.robertManager(),
+                secureKeystoreDataSource = keystoreDataSource,
+                "https://tac.gouv.fr/491ab3ae-ad35-4301-8dd9-414ecf210712/0/GA/4/400/"
+            )
+        ) { "Invalid format (wrong argument position" }
 
-        assertNull(VenuesManager.processVenueUrl(
-            robertManager = context.robertManager(),
-            secureKeystoreDataSource = keystoreDataSource,
-            "https://tac.gouv.fr/-1/491ab3ae-ad35-4301-8dd9-414ecf210712/GA/4/400/"
-        )) { "Invalid QR code type" }
+        assertNull(
+            VenuesManager.processVenueUrl(
+                robertManager = context.robertManager(),
+                secureKeystoreDataSource = keystoreDataSource,
+                "https://tac.gouv.fr/-1/491ab3ae-ad35-4301-8dd9-414ecf210712/GA/4/400/"
+            )
+        ) { "Invalid QR code type" }
 
-        assertNull(VenuesManager.processVenueUrl(
-            robertManager = context.robertManager(),
-            secureKeystoreDataSource = keystoreDataSource,
-            "https://tac.gouv.fr/2/491ab3ae-ad35-4301-8dd9-414ecf210712/GA/4/400/"
-        )) { "Invalid QR code type" }
+        assertNull(
+            VenuesManager.processVenueUrl(
+                robertManager = context.robertManager(),
+                secureKeystoreDataSource = keystoreDataSource,
+                "https://tac.gouv.fr/2/491ab3ae-ad35-4301-8dd9-414ecf210712/GA/4/400/"
+            )
+        ) { "Invalid QR code type" }
 
-        assertNull(VenuesManager.processVenueUrl(
-            robertManager = context.robertManager(),
-            secureKeystoreDataSource = keystoreDataSource,
-            "https://tac.gouv.fr/0/491ab3ae-ad35-4301-8dd9-414ecf21071/GA/4/400/"
-        )) { "Invalid UUID" }
+        assertNull(
+            VenuesManager.processVenueUrl(
+                robertManager = context.robertManager(),
+                secureKeystoreDataSource = keystoreDataSource,
+                "https://tac.gouv.fr/0/491ab3ae-ad35-4301-8dd9-414ecf21071/GA/4/400/"
+            )
+        ) { "Invalid UUID" }
 
-        assertNull(VenuesManager.processVenueUrl(
-            robertManager = context.robertManager(),
-            secureKeystoreDataSource = keystoreDataSource,
-            "https://tac.gouv.fr/0/491ab3ae-ad35-4301-8dd9-414ecf210712//4/400/"
-        )) { "Invalid venue type not enough character" }
+        assertNull(
+            VenuesManager.processVenueUrl(
+                robertManager = context.robertManager(),
+                secureKeystoreDataSource = keystoreDataSource,
+                "https://tac.gouv.fr/0/491ab3ae-ad35-4301-8dd9-414ecf210712//4/400/"
+            )
+        ) { "Invalid venue type not enough character" }
 
-        assertNull(VenuesManager.processVenueUrl(
-            robertManager = context.robertManager(),
-            secureKeystoreDataSource = keystoreDataSource,
-            "https://tac.gouv.fr/0/491ab3ae-ad35-4301-8dd9-414ecf210712/1234/4/400/"
-        )) { "Invalid venue type too many character" }
+        assertNull(
+            VenuesManager.processVenueUrl(
+                robertManager = context.robertManager(),
+                secureKeystoreDataSource = keystoreDataSource,
+                "https://tac.gouv.fr/0/491ab3ae-ad35-4301-8dd9-414ecf210712/1234/4/400/"
+            )
+        ) { "Invalid venue type too many character" }
 
-        assertNull(VenuesManager.processVenueUrl(
-            robertManager = context.robertManager(),
-            secureKeystoreDataSource = keystoreDataSource,
-            "https://tac.gouv.fr/0/491ab3ae-ad35-4301-8dd9-414ecf210712/1/-1/400/"
-        )) { "Invalid venue category should be > 0" }
+        assertNull(
+            VenuesManager.processVenueUrl(
+                robertManager = context.robertManager(),
+                secureKeystoreDataSource = keystoreDataSource,
+                "https://tac.gouv.fr/0/491ab3ae-ad35-4301-8dd9-414ecf210712/1/-1/400/"
+            )
+        ) { "Invalid venue category should be > 0" }
 
-        assertNull(VenuesManager.processVenueUrl(
-            robertManager = context.robertManager(),
-            secureKeystoreDataSource = keystoreDataSource,
-            "https://tac.gouv.fr/0/491ab3ae-ad35-4301-8dd9-414ecf210712/1/6/400/"
-        )) { "Invalid venue category should be < 6" }
+        assertNull(
+            VenuesManager.processVenueUrl(
+                robertManager = context.robertManager(),
+                secureKeystoreDataSource = keystoreDataSource,
+                "https://tac.gouv.fr/0/491ab3ae-ad35-4301-8dd9-414ecf210712/1/6/400/"
+            )
+        ) { "Invalid venue category should be < 6" }
 
-        assertNull(VenuesManager.processVenueUrl(
-            robertManager = context.robertManager(),
-            secureKeystoreDataSource = keystoreDataSource,
-            "https://tac.gouv.fr/0/491ab3ae-ad35-4301-8dd9-414ecf210712/1/6/-400/"
-        )) { "Invalid venue capacity should be > 0" }
+        assertNull(
+            VenuesManager.processVenueUrl(
+                robertManager = context.robertManager(),
+                secureKeystoreDataSource = keystoreDataSource,
+                "https://tac.gouv.fr/0/491ab3ae-ad35-4301-8dd9-414ecf210712/1/6/-400/"
+            )
+        ) { "Invalid venue capacity should be > 0" }
 
-        assertNull(VenuesManager.processVenueUrl(
-            robertManager = context.robertManager(),
-            secureKeystoreDataSource = keystoreDataSource,
-            "https://tac.gousv.fr/0/491ab3ae-ad35-4301-8dd9-414ecf210712/l"
-        )) { "Invalid root url" }
+        assertNull(
+            VenuesManager.processVenueUrl(
+                robertManager = context.robertManager(),
+                secureKeystoreDataSource = keystoreDataSource,
+                "https://tac.gousv.fr/0/491ab3ae-ad35-4301-8dd9-414ecf210712/l"
+            )
+        ) { "Invalid root url" }
 
-        assert(VenuesManager.processVenueUrl(
-            robertManager = context.robertManager(),
-            secureKeystoreDataSource = keystoreDataSource,
-            "https://tac.gouv.fr/0/491ab3ae-ad35-4301-8dd9-414ecf210712/l"
-        ) == "L")
+        assert(
+            VenuesManager.processVenueUrl(
+                robertManager = context.robertManager(),
+                secureKeystoreDataSource = keystoreDataSource,
+                "https://tac.gouv.fr/0/491ab3ae-ad35-4301-8dd9-414ecf210712/l"
+            ) == "L"
+        )
 
         val venueQrCode = VenuesManager.getVenuesQrCode(keystoreDataSource)?.get(0)
         assertNotNull("venue QR code should exist", venueQrCode)
@@ -286,11 +316,13 @@ class VenuesManagerTest {
         assertNotNull("Venue category should be null", venueQrCode.venueCategory)
         assertNotNull("Venue capacity should be null", venueQrCode.venueCapacity)
 
-        assert(VenuesManager.processVenueUrl(
-            robertManager = context.robertManager(),
-            secureKeystoreDataSource = keystoreDataSource,
-            "https://tac.gouv.fr/1/491ab3ae-ad35-4301-8dd9-414ecf210713/GA/-/400/"
-        ) == "GA")
+        assert(
+            VenuesManager.processVenueUrl(
+                robertManager = context.robertManager(),
+                secureKeystoreDataSource = keystoreDataSource,
+                "https://tac.gouv.fr/1/491ab3ae-ad35-4301-8dd9-414ecf210713/GA/-/400/"
+            ) == "GA"
+        )
         val venue2QrCode = VenuesManager.getVenuesQrCode(keystoreDataSource)?.get(1)
         assertNotNull("venue QR code should exist", venue2QrCode)
         assert(venue2QrCode!!.id == "491ab3ae-ad35-4301-8dd9-414ecf210713${venue2QrCode.ntpTimestamp}") { "id is wrong" }
@@ -300,11 +332,13 @@ class VenuesManagerTest {
         assert(venue2QrCode.venueCategory == 0) { "Venue category is wrong" }
         assert(venue2QrCode.venueCapacity == 400) { "Venue capacity is wrong" }
 
-        assert(VenuesManager.processVenueUrl(
-            robertManager = context.robertManager(),
-            secureKeystoreDataSource = keystoreDataSource,
-            "https://tac.gouv.fr/1/491ab3ae-ad35-4301-8dd9-414ecf210714/GA/4/400/"
-        ) == "GA")
+        assert(
+            VenuesManager.processVenueUrl(
+                robertManager = context.robertManager(),
+                secureKeystoreDataSource = keystoreDataSource,
+                "https://tac.gouv.fr/1/491ab3ae-ad35-4301-8dd9-414ecf210714/GA/4/400/"
+            ) == "GA"
+        )
         val venue3QrCode = VenuesManager.getVenuesQrCode(keystoreDataSource)?.get(2)
         assertNotNull("venue QR code should exist", venue3QrCode)
         assert(venue3QrCode!!.id == "491ab3ae-ad35-4301-8dd9-414ecf210714${venue3QrCode.ntpTimestamp}") { "id is wrong" }
@@ -314,11 +348,13 @@ class VenuesManagerTest {
         assert(venue3QrCode.venueCategory == 4) { "Venue category is wrong" }
         assert(venue3QrCode.venueCapacity == 400) { "Venue capacity is wrong" }
 
-        assert(VenuesManager.processVenueUrl(
-            robertManager = context.robertManager(),
-            secureKeystoreDataSource = keystoreDataSource,
-            "https://tac.gouv.fr/1/491ab3ae-ad35-4301-8dd9-414ecf210715/GA/4/-/"
-        ) == "GA")
+        assert(
+            VenuesManager.processVenueUrl(
+                robertManager = context.robertManager(),
+                secureKeystoreDataSource = keystoreDataSource,
+                "https://tac.gouv.fr/1/491ab3ae-ad35-4301-8dd9-414ecf210715/GA/4/-/"
+            ) == "GA"
+        )
         val venue4QrCode = VenuesManager.getVenuesQrCode(keystoreDataSource)?.get(3)
         assertNotNull("venue QR code should exist", venue4QrCode)
         assert(venue4QrCode!!.id == "491ab3ae-ad35-4301-8dd9-414ecf210715${venue4QrCode.ntpTimestamp}") { "id is wrong" }
@@ -328,11 +364,13 @@ class VenuesManagerTest {
         assert(venue4QrCode.venueCategory == 4) { "Venue category is wrong" }
         assert(venue4QrCode.venueCapacity == 0) { "Venue capacity is wrong" }
 
-        assert(VenuesManager.processVenueUrl(
-            robertManager = context.robertManager(),
-            secureKeystoreDataSource = keystoreDataSource,
-            "https://tac.gouv.fr/1/491ab3ae-ad35-4301-8dd9-414ecf210716/GA/-/-/"
-        ) == "GA")
+        assert(
+            VenuesManager.processVenueUrl(
+                robertManager = context.robertManager(),
+                secureKeystoreDataSource = keystoreDataSource,
+                "https://tac.gouv.fr/1/491ab3ae-ad35-4301-8dd9-414ecf210716/GA/-/-/"
+            ) == "GA"
+        )
         val venue5QrCode = VenuesManager.getVenuesQrCode(keystoreDataSource)?.get(4)
         assertNotNull("venue QR code should exist", venue5QrCode)
         assert(venue5QrCode!!.id == "491ab3ae-ad35-4301-8dd9-414ecf210716${venue5QrCode.ntpTimestamp}") { "id is wrong" }
@@ -342,11 +380,13 @@ class VenuesManagerTest {
         assert(venue5QrCode.venueCategory == 0) { "Venue category is wrong" }
         assert(venue5QrCode.venueCapacity == 0) { "Venue capacity is wrong" }
 
-        assert(VenuesManager.processVenueUrl(
-            robertManager = context.robertManager(),
-            secureKeystoreDataSource = keystoreDataSource,
-            "https://tac.gouv.fr/1/491ab3ae-ad35-4301-8dd9-414ecf210717/GA/-/-/1610621656"
-        ) == "GA")
+        assert(
+            VenuesManager.processVenueUrl(
+                robertManager = context.robertManager(),
+                secureKeystoreDataSource = keystoreDataSource,
+                "https://tac.gouv.fr/1/491ab3ae-ad35-4301-8dd9-414ecf210717/GA/-/-/1614712702"
+            ) == "GA"
+        )
         val venue6QrCode = VenuesManager.getVenuesQrCode(keystoreDataSource)?.get(5)
         assertNotNull("venue QR code should exist", venue6QrCode)
         assert(venue6QrCode!!.id == "491ab3ae-ad35-4301-8dd9-414ecf210717${venue6QrCode.ntpTimestamp}") { "id is wrong" }
@@ -355,36 +395,46 @@ class VenuesManagerTest {
         assert(venue6QrCode.venueType == "GA") { "Venue type is wrong" }
         assert(venue6QrCode.venueCategory == 0) { "Venue category is wrong" }
         assert(venue6QrCode.venueCapacity == 0) { "Venue capacity is wrong" }
-        assert(venue6QrCode.ntpTimestamp == Date(1610621656000)
-            .roundedTimeIntervalSince1900(context.robertManager().configuration.venuesTimestampRoundingInterval.toLong())) {
-            "Venue capacity is wrong"
+        assert(
+            venue6QrCode.ntpTimestamp == Date(1614712702000)
+                .roundedTimeIntervalSince1900(context.robertManager().configuration.venuesTimestampRoundingInterval.toLong())
+        ) {
+            "Venue timestamp is wrong"
         }
     }
 
     @OptIn(ExperimentalTime::class)
     @Test
     fun is_venue_expired() {
-        assert(!VenuesManager.isVenueUrlExpired(
-            robertManager = context.robertManager(),
-            "https://tac.gouv.fr/0/491ab3/GA/4/400/"
-        )) { "Invalid format" }
+        assert(
+            !VenuesManager.isVenueUrlExpired(
+                robertManager = context.robertManager(),
+                "https://tac.gouv.fr/0/491ab3/GA/4/400/"
+            )
+        ) { "Invalid format" }
 
-        assert(!VenuesManager.isVenueUrlExpired(
-            robertManager = context.robertManager(),
-            "https://tac.gouv.fr/1/491ab3ae-ad35-4301-8dd9-414ecf210717/GA/-/-"
-        )) { "Not date shouldn't be expired" }
+        assert(
+            !VenuesManager.isVenueUrlExpired(
+                robertManager = context.robertManager(),
+                "https://tac.gouv.fr/1/491ab3ae-ad35-4301-8dd9-414ecf210717/GA/-/-"
+            )
+        ) { "Not date shouldn't be expired" }
 
         val expiredTimestamp = (System.currentTimeMillis() - context.robertManager().configuration.venuesRetentionPeriod.days.toLongMilliseconds()) / 1000
-        assert(VenuesManager.isVenueUrlExpired(
-            robertManager = context.robertManager(),
-            "https://tac.gouv.fr/1/491ab3ae-ad35-4301-8dd9-414ecf210717/GA/-/-/$expiredTimestamp"
-        )) { "Timestamp before retention date should be expired" }
+        assert(
+            VenuesManager.isVenueUrlExpired(
+                robertManager = context.robertManager(),
+                "https://tac.gouv.fr/1/491ab3ae-ad35-4301-8dd9-414ecf210717/GA/-/-/$expiredTimestamp"
+            )
+        ) { "Timestamp before retention date should be expired" }
 
         val notExpiredTimestamp = expiredTimestamp + 1
-        assert(!VenuesManager.isVenueUrlExpired(
-            robertManager = context.robertManager(),
-            "https://tac.gouv.fr/1/491ab3ae-ad35-4301-8dd9-414ecf210717/GA/-/-/$notExpiredTimestamp"
-        )) { "Expired +1s shouldn't be expired" }
+        assert(
+            !VenuesManager.isVenueUrlExpired(
+                robertManager = context.robertManager(),
+                "https://tac.gouv.fr/1/491ab3ae-ad35-4301-8dd9-414ecf210717/GA/-/-/$notExpiredTimestamp"
+            )
+        ) { "Expired +1s shouldn't be expired" }
     }
 
     @OptIn(ExperimentalTime::class)
@@ -444,14 +494,20 @@ class VenuesManagerTest {
         assert(VenuesManager.getVenuesQrCode(keystoreDataSource)?.count() == 3) { "Should have 3 element" }
         VenuesManager.removeVenue(keystoreDataSource, VenuesManager.getVenuesQrCode(keystoreDataSource)?.get(1)?.id ?: "")
         assert(VenuesManager.getVenuesQrCode(keystoreDataSource)?.count() == 2) { "Should have 2 element" }
-        assert(VenuesManager.getVenuesQrCode(keystoreDataSource)
-            ?.get(0)?.uuid == "491ab3ae-ad35-4301-8dd9-414ecf210711") { "First element shouldn't be removed" }
-        assert(VenuesManager.getVenuesQrCode(keystoreDataSource)
-            ?.get(1)?.uuid == "491ab3ae-ad35-4301-8dd9-414ecf210713") { "Third element shouldn't be removed" }
+        assert(
+            VenuesManager.getVenuesQrCode(keystoreDataSource)
+                ?.get(0)?.uuid == "491ab3ae-ad35-4301-8dd9-414ecf210711"
+        ) { "First element shouldn't be removed" }
+        assert(
+            VenuesManager.getVenuesQrCode(keystoreDataSource)
+                ?.get(1)?.uuid == "491ab3ae-ad35-4301-8dd9-414ecf210713"
+        ) { "Third element shouldn't be removed" }
         VenuesManager.removeVenue(keystoreDataSource, VenuesManager.getVenuesQrCode(keystoreDataSource)?.get(0)?.id ?: "")
         assert(VenuesManager.getVenuesQrCode(keystoreDataSource)?.count() == 1) { "Should have 1 element" }
-        assert(VenuesManager.getVenuesQrCode(keystoreDataSource)
-            ?.get(0)?.uuid == "491ab3ae-ad35-4301-8dd9-414ecf210713") { "Second element shouldn't be removed" }
+        assert(
+            VenuesManager.getVenuesQrCode(keystoreDataSource)
+                ?.get(0)?.uuid == "491ab3ae-ad35-4301-8dd9-414ecf210713"
+        ) { "Second element shouldn't be removed" }
         VenuesManager.removeVenue(keystoreDataSource, VenuesManager.getVenuesQrCode(keystoreDataSource)?.get(0)?.id ?: "")
         assert(VenuesManager.getVenuesQrCode(keystoreDataSource)?.count() == 0) { "Should be empty" }
     }

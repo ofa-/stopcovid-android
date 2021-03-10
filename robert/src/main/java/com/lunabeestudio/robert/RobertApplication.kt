@@ -17,7 +17,6 @@ interface RobertApplication {
     val robertManager: RobertManager
     fun getAppContext(): Context
     fun refreshProximityService()
-    fun atRiskDetected()
 
     interface Listener {
         fun notify(notification: Any)
@@ -25,7 +24,8 @@ interface RobertApplication {
     fun registerListener(listener: Listener?)
     fun notifyListener(notification: Any)
 
-    fun warningAtRiskDetected()
+    fun notifyAtRiskLevelChange()
+    fun alertAtRiskLevelChange()
     suspend fun sendClockNotAlignedNotification()
     fun refreshInfoCenter()
     fun getVenueQrCodeList(startTime: Long?): List<VenueQrCode>?

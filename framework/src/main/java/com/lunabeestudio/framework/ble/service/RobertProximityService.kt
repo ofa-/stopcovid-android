@@ -12,7 +12,7 @@ package com.lunabeestudio.framework.ble.service
 
 import androidx.annotation.WorkerThread
 import com.lunabeestudio.domain.extension.ntpTimeSToUnixTimeMs
-import com.lunabeestudio.domain.model.DeviceParameterCorrection
+import com.lunabeestudio.domain.model.CalibrationEntry
 import com.lunabeestudio.domain.model.Hello
 import com.lunabeestudio.domain.model.HelloBuilder
 import com.lunabeestudio.framework.ble.extension.toLocalProximity
@@ -116,11 +116,7 @@ abstract class RobertProximityService : ProximityNotificationService() {
         get() {
             Timber.v("Fetch new BLE settings")
 
-            val deviceParameterCorrection = robertManager.configuration.calibration.firstOrNull {
-                it.deviceHandsetModel == android.os.Build.MODEL
-            } ?: robertManager.configuration.calibration.firstOrNull {
-                it.deviceHandsetModel == "DEFAULT"
-            } ?: DeviceParameterCorrection("", FALLBACK_TX, FALLBACK_RX)
+            val calibrationEntry = robertManager.calibration.entry ?: CalibrationEntry("UNKNOWN", FALLBACK_TX, FALLBACK_RX)
 
             val useScannerHardwareBatching =
                 robertManager.configuration.dontUseScannerHardwareBatching?.contains(android.os.Build.MODEL) != true
@@ -140,8 +136,8 @@ abstract class RobertProximityService : ProximityNotificationService() {
                 serviceUuid = UUID.fromString(serviceUUID),
                 servicePayloadCharacteristicUuid = UUID.fromString(robertManager.configuration.characteristicUUID),
                 backgroundServiceManufacturerDataIOS = backgroundServiceManufacturerData.splitToByteArray(),
-                txCompensationGain = deviceParameterCorrection.txRssCorrectionFactor.toInt(),
-                rxCompensationGain = deviceParameterCorrection.rxRssCorrectionFactor.toInt(),
+                txCompensationGain = calibrationEntry.txRSSCorrectionFactor.toInt(),
+                rxCompensationGain = calibrationEntry.rxRSSCorrectionFactor.toInt(),
                 useScannerHardwareBatching = useScannerHardwareBatching,
                 scanReportDelay = robertManager.configuration.scanReportDelay.seconds.toLongMilliseconds()
             )
@@ -309,8 +305,8 @@ abstract class RobertProximityService : ProximityNotificationService() {
         private const val HELLO_REFRESH_MAX_DELAY_MS: Long = 30 * 1000
         private const val CLEAR_ERROR_DELAY_MS: Long = 3 * 1000
         private const val RESTART_SERVICE_ON_EBID_CHANGE: Boolean = true
-        private const val FALLBACK_TX: Double = -6.52
-        private const val FALLBACK_RX: Double = -19.71
+        private const val FALLBACK_TX: Double = -30.0
+        private const val FALLBACK_RX: Double = -5.0
         private const val NON_CRITICAL_ERROR_BEFORE_NOTIFICATION: Int = 5
     }
 }

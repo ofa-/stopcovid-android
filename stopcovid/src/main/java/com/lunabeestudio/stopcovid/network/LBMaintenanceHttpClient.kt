@@ -12,8 +12,8 @@ package com.lunabeestudio.stopcovid.network
 
 import android.content.Context
 import com.lunabeestudio.framework.remote.RetrofitClient
-import com.lunabeestudio.stopcovid.BuildConfig
 import com.lunabeestudio.stopcovid.StopCovid
+import com.lunabeestudio.stopcovid.coreui.ConfigConstant
 import com.lunabeestudio.stopcovid.manager.TimeCheckManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -35,7 +35,7 @@ object LBMaintenanceHttpClient {
         onSuccess: suspend (result: String) -> Unit,
         onFailure: suspend (e: Exception) -> Unit) {
         try {
-            val okHttpClient = RetrofitClient.getDefaultOKHttpClient(context, urlString, BuildConfig.APP_MAINTENANCE_CERTIFICATE_SHA256)
+            val okHttpClient = RetrofitClient.getDefaultOKHttpClient(context, urlString, ConfigConstant.Maintenance.CERTIFICATE_SHA256)
             val request: Request = Request.Builder()
                 .url(urlString)
                 .build()

@@ -10,9 +10,11 @@
 
 package com.lunabeestudio.robert.repository
 
+import com.lunabeestudio.domain.model.Calibration
 import com.lunabeestudio.domain.model.Configuration
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.robert.datasource.LocalKeystoreDataSource
+import com.lunabeestudio.robert.model.AtRiskStatus
 
 internal class KeystoreRepository(
     private val keystoreDataSource: LocalKeystoreDataSource,
@@ -22,6 +24,12 @@ internal class KeystoreRepository(
         get() = keystoreDataSource.configuration
         set(value) {
             keystoreDataSource.configuration = value
+        }
+
+    var calibration: Calibration?
+        get() = keystoreDataSource.calibration
+        set(value) {
+            keystoreDataSource.calibration = value
         }
 
     var reportPositiveTestDate: Long?
@@ -66,24 +74,24 @@ internal class KeystoreRepository(
             keystoreDataSource.timeStart = value
         }
 
-    var lastRiskReceivedDate: Long?
-        get() = keystoreDataSource.lastRiskReceivedDate
+    var atRiskStatus: AtRiskStatus?
+        get() = keystoreDataSource.atRiskStatus
         set(value) {
-            keystoreDataSource.lastRiskReceivedDate = value
+            keystoreDataSource.atRiskStatus = value
             robertManager.refreshAtRisk()
         }
 
-    var isWarningAtRisk: Boolean?
-        get() = keystoreDataSource.isWarningAtRisk
+    var currentRobertAtRiskStatus: AtRiskStatus?
+        get() = keystoreDataSource.currentRobertAtRiskStatus
         set(value) {
-            keystoreDataSource.isWarningAtRisk = value
+            keystoreDataSource.currentRobertAtRiskStatus = value
             robertManager.refreshAtRisk()
         }
 
-    var lastWarningReceivedDate: Long?
-        get() = keystoreDataSource.lastWarningReceivedDate
+    var currentWarningAtRiskStatus: AtRiskStatus?
+        get() = keystoreDataSource.currentWarningAtRiskStatus
         set(value) {
-            keystoreDataSource.lastWarningReceivedDate = value
+            keystoreDataSource.currentWarningAtRiskStatus = value
             robertManager.refreshAtRisk()
         }
 
@@ -101,10 +109,23 @@ internal class KeystoreRepository(
             robertManager.refreshAtRisk()
         }
 
-    var lastExposureTimeframe: Int?
-        get() = keystoreDataSource.lastExposureTimeframe
+    var atRiskModelVersion: Int?
+        get() = keystoreDataSource.atRiskModelVersion
         set(value) {
-            keystoreDataSource.lastExposureTimeframe = value
+            keystoreDataSource.atRiskModelVersion = value
+        }
+
+    var deprecatedLastRiskReceivedDate: Long?
+        get() = keystoreDataSource.deprecatedLastRiskReceivedDate
+        set(value) {
+            keystoreDataSource.deprecatedLastRiskReceivedDate = value
+            robertManager.refreshAtRisk()
+        }
+
+    var deprecatedLastExposureTimeframe: Int?
+        get() = keystoreDataSource.deprecatedLastExposureTimeframe
+        set(value) {
+            keystoreDataSource.deprecatedLastExposureTimeframe = value
             robertManager.refreshAtRisk()
         }
 
@@ -136,5 +157,11 @@ internal class KeystoreRepository(
         get() = keystoreDataSource.reportToSendTime
         set(value) {
             keystoreDataSource.reportToSendTime = value
+        }
+
+    var declarationToken: String?
+        get() = keystoreDataSource.declarationToken
+        set(value) {
+            keystoreDataSource.declarationToken = value
         }
 }

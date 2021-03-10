@@ -11,24 +11,30 @@
 package com.lunabeestudio.robert.datasource
 
 import androidx.lifecycle.LiveData
+import com.lunabeestudio.domain.model.Calibration
 import com.lunabeestudio.domain.model.Configuration
 import com.lunabeestudio.domain.model.FormEntry
 import com.lunabeestudio.domain.model.VenueQrCode
+import com.lunabeestudio.robert.model.AtRiskStatus
 
 interface LocalKeystoreDataSource {
     var configuration: Configuration?
+    var calibration: Calibration?
     var shouldReloadBleSettings: Boolean?
     var isRegistered: Boolean
     var kA: ByteArray?
     var kEA: ByteArray?
     var timeStart: Long?
-    var isWarningAtRisk: Boolean?
     var atRiskLastRefresh: Long?
     var atRiskLastError: Long?
-    var lastExposureTimeframe: Int?
     var proximityActive: Boolean?
     var isSick: Boolean?
-    var lastRiskReceivedDate: Long?
+    var atRiskStatus: AtRiskStatus?
+    var currentRobertAtRiskStatus: AtRiskStatus?
+    var currentWarningAtRiskStatus: AtRiskStatus?
+    var atRiskModelVersion: Int?
+    var deprecatedLastRiskReceivedDate: Long?
+    var deprecatedLastExposureTimeframe: Int?
     val attestationsLiveData: LiveData<List<Map<String, FormEntry>>?>
     var attestations: List<Map<String, FormEntry>>?
     var savedAttestationData: Map<String, FormEntry>?
@@ -37,10 +43,10 @@ interface LocalKeystoreDataSource {
     var reportValidationToken: String?
     var reportToSendTime: Long?
     var venuesQrCode: List<VenueQrCode>?
+    var declarationToken: String?
 
     var reportPositiveTestDate: Long?
     var reportSymptomsStartDate: Long?
-    var lastWarningReceivedDate: Long?
 
     // Isolation vars
     var isolationLastContactDate: Long?
