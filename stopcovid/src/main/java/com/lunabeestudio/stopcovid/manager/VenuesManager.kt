@@ -2,7 +2,6 @@ package com.lunabeestudio.stopcovid.manager
 
 import android.content.SharedPreferences
 import com.lunabeestudio.domain.extension.ntpTimeSToUnixTimeMs
-import com.lunabeestudio.domain.extension.unixTimeMsToNtpTimeS
 import com.lunabeestudio.domain.model.VenueQrCode
 import com.lunabeestudio.domain.model.VenueQrType
 import com.lunabeestudio.framework.local.datasource.SecureKeystoreDataSource
@@ -144,11 +143,12 @@ object VenuesManager {
     fun getVenuesQrCode(
         keystoreDataSource: SecureKeystoreDataSource,
         startNtpTimestamp: Long? = null,
-        includingFuture: Boolean = false,
+        endNtpTimestamp: Long? = null,
     ): List<VenueQrCode>? = (startNtpTimestamp ?: Long.MIN_VALUE).let { forcedStartNtpTimestamp ->
-        val currentNtpTimestamp = System.currentTimeMillis().unixTimeMsToNtpTimeS()
-        keystoreDataSource.venuesQrCode?.filter {
-            it.ntpTimestamp >= forcedStartNtpTimestamp && (includingFuture || it.ntpTimestamp <= currentNtpTimestamp)
+        (endNtpTimestamp ?: Long.MAX_VALUE).let { forcedEndNtpTimestamp ->
+            keystoreDataSource.venuesQrCode?.filter {
+                it.ntpTimestamp in forcedStartNtpTimestamp..forcedEndNtpTimestamp
+            }
         }
     }
 

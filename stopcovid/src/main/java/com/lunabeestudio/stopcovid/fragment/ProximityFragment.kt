@@ -583,13 +583,13 @@ class ProximityFragment : TimeMainFragment() {
 
             if (displayRecordVenues) {
                 items += cardWithActionItem(CardTheme.Primary) {
-                    mainImage = R.drawable.shops_card
+                    mainImage = R.drawable.signal_card
                     onCardClick = {
                         startRecordVenue()
                     }
                     mainTitle = strings["home.venuesSection.recordCell.title"]
                     mainBody = strings["home.venuesSection.recordCell.subtitle"]
-                    identifier = R.drawable.shops_card.toLong()
+                    identifier = R.drawable.signal_card.toLong()
                 }
 
                 items += spaceItem {
@@ -902,7 +902,6 @@ class ProximityFragment : TimeMainFragment() {
                 }.takeIf {
                     !robertManager.isSick && (robertManager.configuration.displayRecordVenues || !VenuesManager.getVenuesQrCode(
                         requireContext().secureKeystoreDataSource(),
-                        includingFuture = true
                     ).isNullOrEmpty())
                 },
                 Action(R.drawable.ic_settings, strings["common.settings"]) {

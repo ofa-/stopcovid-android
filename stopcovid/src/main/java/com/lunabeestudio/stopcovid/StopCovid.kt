@@ -368,9 +368,10 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
         }
     }
 
-    override fun getVenueQrCodeList(startTime: Long?): List<VenueQrCode>? = VenuesManager.getVenuesQrCode(
+    override fun getVenueQrCodeList(startTime: Long?, endTime: Long?): List<VenueQrCode>? = VenuesManager.getVenuesQrCode(
         secureKeystoreDataSource,
-        startTime
+        startTime,
+        endTime,
     )
 
     override fun clearVenueQrCodeList() {

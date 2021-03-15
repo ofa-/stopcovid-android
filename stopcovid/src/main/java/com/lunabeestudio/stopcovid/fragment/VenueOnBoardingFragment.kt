@@ -47,8 +47,8 @@ class VenueOnBoardingFragment : BottomSheetMainFragment() {
         val items = ArrayList<GenericItem>()
 
         items += logoItem {
-            imageRes = R.drawable.shops
-            identifier = R.drawable.shops.toLong()
+            imageRes = R.drawable.signal
+            identifier = R.drawable.signal.toLong()
         }
         items += spaceItem {
             spaceRes = R.dimen.spacing_xlarge

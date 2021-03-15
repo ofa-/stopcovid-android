@@ -18,4 +18,6 @@
     <item name="item_clickable_row" type="id" />
     <item name="item_switch" type="id" />
     <item name="item_card_with_actions" type="id" />
+    <!--Attempt to fix crash with notification on App upgrade-->
+    <item name="ic_notification_bar" type="drawable" />
 </resources>

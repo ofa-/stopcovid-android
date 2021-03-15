@@ -49,6 +49,8 @@ interface RobertManager {
 
     val filteringMode: LocalProximityFilter.Mode
 
+    val declarationToken: String?
+
     suspend fun refreshConfig(application: RobertApplication): RobertResult
 
     suspend fun generateCaptcha(type: String, local: String): RobertResultData<String>

@@ -2,11 +2,11 @@
   "config": [
 	{
       "name": "lastUpdate",
-      "value": "3 february 2021"
+      "value": "9 march 2021"
     },
     {
       "name": "version",
-      "value": 32
+      "value": 38
     },
     {
       "name": "versionCalibrationBle",
@@ -21,8 +21,8 @@
       "value": "v2"
     },
     {
-	    "name" : "ameliUrl",
-	    "url" : "https://declare.ameli.fr/tousanticovid/t/%@/"
+	    "name" : "app.ameliUrl",
+	    "value" : ""
     },
     {
       "name": "app.keyfigures.displayDepartmentLevel",
@@ -110,7 +110,7 @@
     },
     {
       "name": "app.venuesSalt",
-      "value": 2
+      "value": 100
     },
     {
       "name": "app.venuesTimestampRoundingInterval",
@@ -131,6 +131,10 @@
     {
       "name": "app.positiveSampleSpan",
       "value": 7
+    },
+    {
+      "name": "app.contagiousSpan",
+      "value": 10
     },
     {
       "name": "app.quarantinePeriod",
@@ -182,7 +186,7 @@
     },
     {
       "name": "ble.filterConfig",
-      "value": "{\"a\":4.3429448190325175,\"b\":0.1,\"deltas\":[29.6,20.9,18.5,17.6,16.9,15.5,15.0,15.0,15.0,15.0],\"durationThreshold\":90,\"p0\":-66.0,\"rssiThreshold\":-25,\"timeOverlap\":60,\"timeWindow\":120,\"riskThreshold\":0.1}"
+      "value": "{\"a\":4.3429448190325175,\"b\":0.1,\"deltas\":[39.0,27.0,23.0,21.0,20.0,19.0,18.0,17.0,16.0,15.0],\"durationThreshold\":90,\"p0\":-66.0,\"rssiThreshold\":-25,\"timeOverlap\":60,\"timeWindow\":120,\"riskThreshold\":0.1}"
     },
     {
       "name": "ble.filterMode",

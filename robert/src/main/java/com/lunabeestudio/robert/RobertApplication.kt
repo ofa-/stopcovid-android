@@ -21,6 +21,6 @@ interface RobertApplication {
     fun alertAtRiskLevelChange()
     suspend fun sendClockNotAlignedNotification()
     fun refreshInfoCenter()
-    fun getVenueQrCodeList(startTime: Long?): List<VenueQrCode>?
+    fun getVenueQrCodeList(startTime: Long?, endTime: Long?): List<VenueQrCode>?
     fun clearVenueQrCodeList()
 }

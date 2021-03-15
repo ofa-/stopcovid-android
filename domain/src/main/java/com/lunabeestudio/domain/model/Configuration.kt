@@ -54,4 +54,6 @@ class Configuration(
     val unsupportedDevices: List<String>?,
     val vaccinationCentersCount: Int,
     val scanReportDelay: Int,
+    val contagiousSpan: Int,
+    val ameliUrl: String?,
 )

@@ -40,7 +40,7 @@ class VenuesHistoryFragment : MainFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding?.emptyImageView?.setImageResourceOrHide(R.drawable.shops)
+        binding?.emptyImageView?.setImageResourceOrHide(R.drawable.signal)
         binding?.emptyTitleTextView?.isVisible = false
         binding?.emptyButton?.isVisible = false
 
@@ -49,7 +49,7 @@ class VenuesHistoryFragment : MainFragment() {
     override fun getItems(): List<GenericItem> {
         val items = arrayListOf<GenericItem>()
 
-        items.addAll(VenuesManager.getVenuesQrCode(requireContext().secureKeystoreDataSource(), includingFuture = true)
+        items.addAll(VenuesManager.getVenuesQrCode(requireContext().secureKeystoreDataSource())
             ?.reversed()
             ?.map { venueQrCode ->
                 val venueType = strings["venueType.${venueQrCode.venueType}"] ?: strings["venueType.default"] ?: ""

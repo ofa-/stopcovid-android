@@ -17,6 +17,7 @@ import androidx.core.content.edit
 import androidx.fragment.app.viewModels
 import androidx.preference.PreferenceManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.lunabeestudio.domain.extension.unixTimeMsToNtpTimeS
 import com.lunabeestudio.robert.RobertApplication
 import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.R
@@ -95,9 +96,6 @@ class ManageDataFragment : MainFragment() {
         viewModel.eraseRemoteSuccess.observe(viewLifecycleOwner) {
             showSnackBar(strings["manageDataController.eraseRemoteContact.success"] ?: "")
         }
-        viewModel.eraseAlertSuccess.observe(viewLifecycleOwner) {
-            showSnackBar(strings["manageDataController.eraseRemoteAlert.success"] ?: "")
-        }
         viewModel.quitStopCovidSuccess.observe(viewLifecycleOwner) {
             showSnackBar(strings["manageDataController.quitStopCovid.success"] ?: "")
             sharedPreferences.edit {
@@ -125,7 +123,6 @@ class ManageDataFragment : MainFragment() {
             || robertManager.configuration.displayRecordVenues
             || !VenuesManager.getVenuesQrCode(
                 requireContext().secureKeystoreDataSource(),
-                includingFuture = false
             ).isNullOrEmpty()) {
             eraseVenuesItems(items)
             spaceDividerItems(items)
@@ -318,20 +315,21 @@ class ManageDataFragment : MainFragment() {
 
     private fun hideRiskStatusItems(items: MutableList<GenericItem>) {
         items += titleItem {
-            text = strings["manageDataController.eraseRemoteAlert.title"]
+            text = strings["manageDataController.hideStatus.title"]
             identifier = items.count().toLong()
         }
         items += spaceItem {
             spaceRes = R.dimen.spacing_medium
         }
         items += captionItem {
-            text = strings["manageDataController.eraseRemoteAlert.subtitle"]
+            text = strings["manageDataController.hideStatus.subtitle"]
             identifier = items.count().toLong()
         }
         items += switchItem {
-            title = strings["manageDataController.eraseRemoteAlert.button"]
+            title = strings["manageDataController.hideStatus.button"]
             isChecked = sharedPreferences.hideRiskStatus
             onCheckChange = { isChecked ->
+                viewModel.eraseRemoteAlert(requireContext().applicationContext as RobertApplication)
                 sharedPreferences.hideRiskStatus = isChecked
             }
             identifier = items.count().toLong()

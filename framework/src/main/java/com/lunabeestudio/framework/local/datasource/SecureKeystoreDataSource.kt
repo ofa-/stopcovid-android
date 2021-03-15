@@ -138,9 +138,13 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
         get() = getEncryptedValue(SHARED_PREF_KEY_SAVE_DATA_VENUES_QR_CODE, object : TypeToken<List<VenueQrCode>>() {}.type)
         set(value) = setEncryptedValue(SHARED_PREF_KEY_SAVE_DATA_VENUES_QR_CODE, value)
 
-    override var reportToSendTime: Long?
-        get() = getEncryptedValue(SHARED_PREF_KEY_REPORT_TO_SEND_TIME, Long::class.java)
-        set(value) = setEncryptedValue(SHARED_PREF_KEY_REPORT_TO_SEND_TIME, value)
+    override var reportToSendStartTime: Long?
+        get() = getEncryptedValue(SHARED_PREF_KEY_REPORT_TO_SEND_START_TIME, Long::class.java)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_REPORT_TO_SEND_START_TIME, value)
+
+    override var reportToSendEndTime: Long?
+        get() = getEncryptedValue(SHARED_PREF_KEY_REPORT_TO_SEND_END_TIME, Long::class.java)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_REPORT_TO_SEND_END_TIME, value)
 
     override var reportPositiveTestDate: Long?
         get() = getEncryptedValue(SHARED_PREF_KEY_REPORT_POSITIVE_TEST_DATE, Long::class.java)
@@ -329,7 +333,8 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
         private const val SHARED_PREF_KEY_REPORT_DATE_ENCRYPTED = "shared.pref.report_date_encrypted"
         private const val SHARED_PREF_KEY_SAVE_DATA_VENUES_QR_CODE = "shared.pref.venues_qr_code"
         private const val SHARED_PREF_KEY_REPORT_VALIDATION_TOKEN = "shared.pref.report_validation_token"
-        private const val SHARED_PREF_KEY_REPORT_TO_SEND_TIME = "shared.pref.report_to_send_time"
+        private const val SHARED_PREF_KEY_REPORT_TO_SEND_START_TIME = "shared.pref.report_to_send_start_time"
+        private const val SHARED_PREF_KEY_REPORT_TO_SEND_END_TIME = "shared.pref.report_to_send_end_time"
         private const val SHARED_PREF_KEY_DECLARATION_TOKEN = "shared.pref.declaration_token"
 
         // Add on to ROBERT for isolation

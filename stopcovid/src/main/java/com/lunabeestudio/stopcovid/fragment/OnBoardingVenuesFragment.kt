@@ -33,7 +33,7 @@ class OnBoardingVenuesFragment : OnBoardingFragment() {
         val items = arrayListOf<GenericItem>()
 
         items += logoItem {
-            imageRes = R.drawable.shops
+            imageRes = R.drawable.signal
             identifier = items.size.toLong()
         }
         items += spaceItem {

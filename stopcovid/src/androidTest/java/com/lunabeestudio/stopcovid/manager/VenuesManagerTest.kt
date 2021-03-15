@@ -122,17 +122,34 @@ class VenuesManagerTest {
         saveVenueMethod.invoke(VenuesManager, *parameters)
         parameters[1] = venue4
         saveVenueMethod.invoke(VenuesManager, *parameters)
-        assert(VenuesManager.getVenuesQrCode(keystoreDataSource)?.count() == 2)
+        assert(
+            VenuesManager.getVenuesQrCode(
+                keystoreDataSource,
+                endNtpTimestamp = System.currentTimeMillis().unixTimeMsToNtpTimeS(),
+            )?.count() == 2
+        )
         assert(VenuesManager.getVenuesQrCode(keystoreDataSource)?.get(0) == venue1)
         assert(VenuesManager.getVenuesQrCode(keystoreDataSource)?.get(1) == venue2)
-        assert(VenuesManager.getVenuesQrCode(keystoreDataSource, 0L)?.count() == 2)
-        assert(VenuesManager.getVenuesQrCode(keystoreDataSource, 2L)?.count() == 1)
-        assert(VenuesManager.getVenuesQrCode(keystoreDataSource, includingFuture = true)?.count() == 3)
-        assert(VenuesManager.getVenuesQrCode(keystoreDataSource, 2L, true)?.count() == 2)
+        assert(
+            VenuesManager.getVenuesQrCode(
+                keystoreDataSource,
+                startNtpTimestamp = 0L,
+                endNtpTimestamp = System.currentTimeMillis().unixTimeMsToNtpTimeS(),
+            )?.count() == 2
+        )
+        assert(
+            VenuesManager.getVenuesQrCode(
+                keystoreDataSource,
+                startNtpTimestamp = 2L,
+                endNtpTimestamp = System.currentTimeMillis().unixTimeMsToNtpTimeS(),
+            )?.count() == 1
+        )
+        assert(VenuesManager.getVenuesQrCode(keystoreDataSource)?.count() == 3)
+        assert(VenuesManager.getVenuesQrCode(keystoreDataSource, 2L)?.count() == 2)
 
         VenuesManager.clearAllData(sharedPrefs, keystoreDataSource)
         assert(VenuesManager.getVenuesQrCode(keystoreDataSource)?.count() ?: 0 == 0)
-        assert(VenuesManager.getVenuesQrCode(keystoreDataSource, includingFuture = true)?.count() ?: 0 == 0)
+        assert(VenuesManager.getVenuesQrCode(keystoreDataSource)?.count() ?: 0 == 0)
     }
 
     @OptIn(ExperimentalTime::class)
