@@ -56,7 +56,7 @@ class SecureFileLocalProximityDataSourceTest {
             delay(250)
         }
 
-        val getList = secureFileLocalProximityDataSource.getUntilTime(0)
+        val getList = secureFileLocalProximityDataSource.getBetweenTime(0, Long.MAX_VALUE)
 
         assertThat(getList).isEqualTo(list)
     }
@@ -71,7 +71,7 @@ class SecureFileLocalProximityDataSourceTest {
 
         secureFileLocalProximityDataSource.removeAll()
 
-        val removedList = secureFileLocalProximityDataSource.getUntilTime(0)
+        val removedList = secureFileLocalProximityDataSource.getBetweenTime(0, Long.MAX_VALUE)
         assertThat(removedList).isEmpty()
     }
 
@@ -84,13 +84,13 @@ class SecureFileLocalProximityDataSourceTest {
             delay(250)
         }
 
-        val getList = secureFileLocalProximityDataSource.getUntilTime(0)
+        val getList = secureFileLocalProximityDataSource.getBetweenTime(0, Long.MAX_VALUE)
 
         assertThat(getList).isEmpty()
     }
 
     @Test
-    fun get_until() {
+    fun get_between() {
         val proximityNumber = 10L
         val dayNumber = 10
         val sessionNumber = 10
@@ -105,10 +105,55 @@ class SecureFileLocalProximityDataSourceTest {
             }
         }
 
-        assertThat(secureFileLocalProximityDataSource.getUntilTime(5 * 60 * 60 * 24)).hasSize(5 * dayNumber * sessionNumber)
-        assertThat(secureFileLocalProximityDataSource.getUntilTime(9 * 60 * 60 * 24)).hasSize(dayNumber * sessionNumber)
-        assertThat(secureFileLocalProximityDataSource.getUntilTime(10 * 60 * 60 * 24)).hasSize(0)
-        assertThat(secureFileLocalProximityDataSource.getUntilTime(0L)).hasSize((proximityNumber * dayNumber * sessionNumber).toInt())
+        assertThat(
+            secureFileLocalProximityDataSource.getBetweenTime(
+                ntpStartTimeS = 5 * 60 * 60 * 24,
+                ntpEndTimeS = Long.MAX_VALUE,
+            )
+        ).hasSize(5 * dayNumber * sessionNumber)
+        assertThat(
+            secureFileLocalProximityDataSource.getBetweenTime(
+                ntpStartTimeS = 9 * 60 * 60 * 24,
+                ntpEndTimeS = Long.MAX_VALUE,
+            )
+        ).hasSize(dayNumber * sessionNumber)
+        assertThat(
+            secureFileLocalProximityDataSource.getBetweenTime(
+                ntpStartTimeS = 10 * 60 * 60 * 24,
+                ntpEndTimeS = Long.MAX_VALUE,
+            )
+        ).hasSize(0)
+        assertThat(
+            secureFileLocalProximityDataSource.getBetweenTime(
+                ntpStartTimeS = 0L,
+                ntpEndTimeS = Long.MAX_VALUE,
+            )
+        ).hasSize((proximityNumber * dayNumber * sessionNumber).toInt())
+
+        assertThat(
+            secureFileLocalProximityDataSource.getBetweenTime(
+                ntpStartTimeS = 0L,
+                ntpEndTimeS = 0L,
+            )
+        ).hasSize(dayNumber * sessionNumber)
+        assertThat(
+            secureFileLocalProximityDataSource.getBetweenTime(
+                ntpStartTimeS = 0L,
+                ntpEndTimeS = 60 * 60 * 24,
+            )
+        ).hasSize(2 * dayNumber * sessionNumber)
+        assertThat(
+            secureFileLocalProximityDataSource.getBetweenTime(
+                ntpStartTimeS = 0L,
+                ntpEndTimeS = 4 * 60 * 60 * 24,
+            )
+        ).hasSize(5 * dayNumber * sessionNumber)
+        assertThat(
+            secureFileLocalProximityDataSource.getBetweenTime(
+                ntpStartTimeS = 0L,
+                ntpEndTimeS = 9 * 60 * 60 * 24,
+            )
+        ).hasSize((proximityNumber * dayNumber * sessionNumber).toInt())
     }
 
     @Test

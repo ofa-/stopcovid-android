@@ -13,22 +13,21 @@ package com.lunabeestudio.stopcovid.fragment
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.Gravity
-import android.view.MenuItem
 import android.view.View
-import androidx.appcompat.widget.PopupMenu
 import androidx.fragment.app.viewModels
 import androidx.preference.PreferenceManager
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.lunabeestudio.domain.extension.ntpTimeSToUnixTimeMs
 import com.lunabeestudio.robert.extension.observeEventAndConsume
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
+import com.lunabeestudio.stopcovid.coreui.extension.fixFormatter
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.cardWithActionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
 import com.lunabeestudio.stopcovid.coreui.model.Action
+import com.lunabeestudio.stopcovid.coreui.model.CardTheme
 import com.lunabeestudio.stopcovid.extension.getGradientBackground
 import com.lunabeestudio.stopcovid.extension.getRelativeDateTimeString
 import com.lunabeestudio.stopcovid.extension.getString
@@ -39,15 +38,18 @@ import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.fastitem.healthCardItem
 import com.lunabeestudio.stopcovid.fastitem.logoItem
 import com.lunabeestudio.stopcovid.manager.RisksLevelManager
+import com.lunabeestudio.stopcovid.manager.ShareManager
 import com.lunabeestudio.stopcovid.model.ContactDateFormat
 import com.lunabeestudio.stopcovid.model.LinkType
 import com.lunabeestudio.stopcovid.model.RisksUILevelSectionLink
 import com.lunabeestudio.stopcovid.viewmodel.HealthViewModel
 import com.lunabeestudio.stopcovid.viewmodel.HealthViewModelFactory
 import com.mikepenz.fastadapter.GenericItem
+import timber.log.Timber
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.IllegalFormatException
 import java.util.Locale
 import kotlin.time.ExperimentalTime
 import kotlin.time.milliseconds
@@ -64,7 +66,9 @@ class HealthFragment : TimeMainFragment() {
 
     private val viewModel: HealthViewModel by viewModels { HealthViewModelFactory(robertManager) }
 
-    private val dateFormat: DateFormat = SimpleDateFormat("dd LLLL", Locale.getDefault())
+    private val fromDateFormat: DateFormat = SimpleDateFormat("dd LLL", Locale.getDefault())
+    private val toDateFormat: DateFormat = SimpleDateFormat("dd LLL yyyy", Locale.getDefault())
+    private val longDateFormat: DateFormat = SimpleDateFormat.getDateInstance(DateFormat.LONG)
 
     override fun getTitleKey(): String = "myHealthController.title"
 
@@ -130,24 +134,67 @@ class HealthFragment : TimeMainFragment() {
                 items += healthCardItem(R.layout.item_health_card) {
                     header = stringsFormat(
                         "myHealthController.notification.update",
-                        robertManager.atRiskLastRefresh?.milliseconds?.getRelativeDateTimeString(requireContext(),
-                            strings["common.justNow"])
-                            ?: ""
+                        robertManager.atRiskLastRefresh?.milliseconds?.getRelativeDateTimeString(
+                            requireContext(),
+                            strings["common.justNow"]
+                        ) ?: ""
                     )
                     title = strings[it.labels.detailTitle]
                     caption = strings[it.labels.detailSubtitle]
                     gradientBackground = it.getGradientBackground()
                     identifier = items.count().toLong()
 
-                    dateValue()?.let {
+                    dateValue()?.let { date ->
                         dateLabel = strings["myHealthStateHeaderCell.exposureDate.title"]
-                        dateValue = it
+                        dateValue = date
                     }
                 }
 
                 items += spaceItem {
                     spaceRes = R.dimen.spacing_medium
                     identifier = items.count().toLong()
+                }
+            }
+            robertManager.configuration.ameliUrl?.takeIf { url -> url.isNotBlank() }?.let { ameliUrl ->
+                robertManager.declarationToken?.takeIf { token -> token.isNotBlank() }?.let { declarationToken ->
+                    items += cardWithActionItem(CardTheme.Primary) {
+                        cardTitle = strings["myHealthController.workStopping.title"]
+                        cardTitleIcon = R.drawable.ic_recommendation
+                        mainBody = strings["myHealthController.workStopping.message"]
+                        actions = listOf(
+                            Action(
+                                label = strings["myHealthController.workStopping.link"],
+                                onClickListener = {
+                                    context?.let { context ->
+                                        ameliWithDeclarationUrl(ameliUrl, declarationToken)?.openInExternalBrowser(
+                                            context,
+                                            showToast = true
+                                        )
+                                    }
+                                }
+                            ),
+                            Action(
+                                label = strings["myHealthController.workStopping.share"],
+                                onClickListener = {
+                                    context?.let { context ->
+                                        ShareManager.shareImageAndText(
+                                            context,
+                                            null,
+                                            ameliWithDeclarationUrl(ameliUrl, declarationToken)
+                                        ) {
+                                            strings["common.error.unknown"]?.let { errorString -> showErrorSnackBar(errorString) }
+                                        }
+                                    }
+                                }
+                            )
+                        )
+                        identifier = "workStopping".hashCode().toLong()
+                    }
+
+                    items += spaceItem {
+                        spaceRes = R.dimen.spacing_medium
+                        identifier = items.count().toLong()
+                    }
                 }
             }
             it.sections.forEach {
@@ -178,6 +225,15 @@ class HealthFragment : TimeMainFragment() {
         return items
     }
 
+    private fun ameliWithDeclarationUrl(ameliUrl: String, declarationToken: String): String? {
+        return try {
+            String.format(ameliUrl.fixFormatter(), declarationToken)
+        } catch (e: IllegalFormatException) {
+            Timber.e(e)
+            null
+        }
+    }
+
     private fun actionForLink(link: RisksUILevelSectionLink): View.OnClickListener {
         return when (link.type) {
             LinkType.WEB -> View.OnClickListener {
@@ -192,14 +248,14 @@ class HealthFragment : TimeMainFragment() {
     private fun dateValue(): String? {
         return robertManager.atRiskStatus?.ntpLastContactS?.ntpTimeSToUnixTimeMs()?.let { lastContactDate ->
             when (RisksLevelManager.getCurrentLevel(robertManager.atRiskStatus?.riskLevel)?.contactDateFormat) {
-                ContactDateFormat.DATE -> dateFormat.format(Date(lastContactDate))
+                ContactDateFormat.DATE -> longDateFormat.format(Date(lastContactDate))
                 ContactDateFormat.RANGE -> {
                     RisksLevelManager.getLastContactDateFrom(robertManager.atRiskStatus?.riskLevel, lastContactDate)?.let { dateFrom ->
                         RisksLevelManager.getLastContactDateTo(robertManager.atRiskStatus?.riskLevel, lastContactDate)?.let { dateTo ->
                             stringsFormat(
                                 "myHealthStateHeaderCell.exposureDate.range",
-                                dateFormat.format(Date(dateFrom)),
-                                dateFormat.format(Date(dateTo))
+                                fromDateFormat.format(Date(dateFrom)),
+                                toDateFormat.format(Date(dateTo))
                             )
                         }
                     }

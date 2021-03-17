@@ -153,10 +153,16 @@ internal class KeystoreRepository(
             keystoreDataSource.reportValidationToken = value
         }
 
-    var reportToSendTime: Long?
-        get() = keystoreDataSource.reportToSendTime
+    var reportToSendStartTime: Long?
+        get() = keystoreDataSource.reportToSendStartTime
         set(value) {
-            keystoreDataSource.reportToSendTime = value
+            keystoreDataSource.reportToSendStartTime = value
+        }
+
+    var reportToSendEndTime: Long?
+        get() = keystoreDataSource.reportToSendEndTime
+        set(value) {
+            keystoreDataSource.reportToSendEndTime = value
         }
 
     var declarationToken: String?

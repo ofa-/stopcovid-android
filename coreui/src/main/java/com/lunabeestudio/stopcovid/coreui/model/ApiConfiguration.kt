@@ -102,6 +102,10 @@ internal class ApiConfiguration(
     val vaccinationCentersCount: Int,
     @SerializedName("ble.scanReportDelay")
     val scanReportDelay: Int,
+    @SerializedName("app.contagiousSpan")
+    val contagiousSpan: Int,
+    @SerializedName("app.ameliUrl")
+    val ameliUrl: String?
 )
 
 internal fun ApiConfiguration.toDomain(gson: Gson) = Configuration(
@@ -154,4 +158,6 @@ internal fun ApiConfiguration.toDomain(gson: Gson) = Configuration(
     ),
     vaccinationCentersCount = vaccinationCentersCount,
     scanReportDelay = scanReportDelay,
+    contagiousSpan = contagiousSpan,
+    ameliUrl = ameliUrl,
 )

@@ -98,6 +98,10 @@ var SharedPreferences.currentVaccinationReferenceLongitude: Double?
         }
     }
 
+var SharedPreferences.zipGeolocVersion: Int
+    get() = getInt(Constants.SharedPrefs.ZIP_GEOLOC_VERSION, 0)
+    set(value) = edit { putInt(Constants.SharedPrefs.ZIP_GEOLOC_VERSION, value) }
+
 var SharedPreferences.alertRiskLevelChanged: Boolean
     get() = getBoolean(Constants.SharedPrefs.ALERT_RISK_LEVEL_CHANGED, false)
     set(value) = edit { putBoolean(Constants.SharedPrefs.ALERT_RISK_LEVEL_CHANGED, value) }

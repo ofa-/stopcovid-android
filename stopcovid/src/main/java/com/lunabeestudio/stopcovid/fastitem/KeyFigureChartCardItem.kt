@@ -13,9 +13,8 @@ package com.lunabeestudio.stopcovid.fastitem
 import android.annotation.SuppressLint
 import android.content.res.ColorStateList
 import android.view.LayoutInflater
-import android.view.View
-import android.view.View.GONE
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.core.widget.TextViewCompat
 import com.github.mikephil.charting.components.LimitLine
 import com.github.mikephil.charting.components.XAxis
@@ -62,22 +61,24 @@ class KeyFigureChartCardItem : AbstractBindingItem<ItemKeyFigureChartCardBinding
         binding.shareButton.contentDescription = shareContentDescription
         binding.shareButton.setOnClickListener { onShareCard?.invoke(binding) }
 
-        binding.chartSerie1LegendTextView.setTextOrHide(chartData[0].description) {
-            setTextColor(chartData[0].color)
-            TextViewCompat.setCompoundDrawableTintList(this, ColorStateList.valueOf(chartData[0].color))
+        if (chartData.isNotEmpty()) {
+            binding.chartSerie1LegendTextView.setTextOrHide(chartData[0].description) {
+                setTextColor(chartData[0].color)
+                TextViewCompat.setCompoundDrawableTintList(this, ColorStateList.valueOf(chartData[0].color))
+            }
         }
+        binding.chartSerie1LegendTextView.isVisible = chartData.isNotEmpty()
 
         if (chartData.size > 1) {
             binding.chartSerie2LegendTextView.setTextOrHide(chartData[1].description) {
                 setTextColor(chartData[1].color)
                 TextViewCompat.setCompoundDrawableTintList(this, ColorStateList.valueOf(chartData[1].color))
             }
-        } else {
-            binding.chartSerie2LegendTextView.visibility = GONE
         }
+        binding.chartSerie2LegendTextView.isVisible = chartData.size > 1
 
-        binding.keyFigureBarChart.visibility = GONE
-        binding.keyFigureLineChart.visibility = GONE
+        binding.keyFigureBarChart.isVisible = false
+        binding.keyFigureLineChart.isVisible = false
 
         if (chartType == KeyFigureChartType.BARS) {
             val dataSetArray = chartData.map { (description, _, entries, color) ->
@@ -88,19 +89,21 @@ class KeyFigureChartCardItem : AbstractBindingItem<ItemKeyFigureChartCardBinding
                 }
             }.toTypedArray()
 
-            binding.keyFigureBarChart.apply {
-                data = BarData(*dataSetArray).apply {
-                    val xValueDiff = (xMax - xMin).toFloat()
-                    val spacing = 0.05f
-                    val entriesCount = dataSetArray[0].entryCount
-                    barWidth = xValueDiff / (entriesCount) - (spacing * xValueDiff / (entriesCount + 1))
-                }
-                setupStyle()
+            if (dataSetArray.isNotEmpty()) {
+                binding.keyFigureBarChart.apply {
+                    data = BarData(*dataSetArray).apply {
+                        val xValueDiff = xMax - xMin
+                        val spacing = 0.05f
+                        val entriesCount = dataSetArray[0].entryCount
+                        barWidth = xValueDiff / (entriesCount) - (spacing * xValueDiff / (entriesCount + 1))
+                    }
+                    setupStyle()
 
-                setupXAxis(binding, xAxis)
-                setupYAxis(axisLeft)
+                    setupXAxis(binding, xAxis)
+                    setupYAxis(axisLeft)
+                }
+                binding.keyFigureBarChart.isVisible = true
             }
-            binding.keyFigureBarChart.visibility = View.VISIBLE
 
         } else {
             val dataSetArray = chartData.map {
@@ -116,14 +119,14 @@ class KeyFigureChartCardItem : AbstractBindingItem<ItemKeyFigureChartCardBinding
                 setupXAxis(binding, xAxis)
                 setupYAxis(axisLeft)
             }
-            binding.keyFigureLineChart.visibility = View.VISIBLE
+            binding.keyFigureLineChart.isVisible = true
         }
     }
 
     override fun unbindView(binding: ItemKeyFigureChartCardBinding) {
         super.unbindView(binding)
-        binding.keyFigureLineChart.visibility = GONE
-        binding.keyFigureBarChart.visibility = GONE
+        binding.keyFigureLineChart.isVisible = false
+        binding.keyFigureBarChart.isVisible = false
     }
 
     @ExperimentalTime

@@ -17,6 +17,7 @@ import androidx.navigation.fragment.navArgs
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.fastitem.buttonItem
+import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
 import com.lunabeestudio.stopcovid.extension.robertManager
@@ -43,14 +44,14 @@ class ConfirmVenueQrCodeFragment : MainFragment() {
         val items = arrayListOf<GenericItem>()
 
         items += logoItem {
-            imageRes = R.drawable.shops
-            identifier = R.drawable.shops.toLong()
+            imageRes = R.drawable.signal
+            identifier = R.drawable.signal.toLong()
         }
         items += spaceItem {
             spaceRes = R.dimen.spacing_large
             identifier = items.count().toLong()
         }
-        items += titleItem {
+        items += captionItem {
             text = strings["confirmVenueQrCodeController.explanation.title"]
             gravity = Gravity.CENTER
             identifier = "confirmVenueQrCodeController.explanation.title".hashCode().toLong()

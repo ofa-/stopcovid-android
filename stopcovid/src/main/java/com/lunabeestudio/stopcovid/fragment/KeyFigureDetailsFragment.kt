@@ -177,7 +177,7 @@ class KeyFigureDetailsFragment : KeyFigureGenericFragment() {
             if (figure.hasAverageChart()) {
                 items += keyFigureCardChartItem {
                     chartData = arrayOf(
-                        avgGlobalData(figure, false)
+                        avgGlobalData(figure)
                     )
                     chartExplanationLabel = stringsFormat(
                         "keyFigureDetailController.section.evolutionAvg.subtitle",
@@ -240,12 +240,13 @@ class KeyFigureDetailsFragment : KeyFigureGenericFragment() {
                 chartData[0].currentValueToDisplay?.formatNumberIfNeeded(numberFormat),
                 chartData[1].currentValueToDisplay?.formatNumberIfNeeded(numberFormat)
             )
-            else -> stringsFormat(
+            chartData.isNotEmpty() -> stringsFormat(
                 "keyFigureDetailController.section.evolution.subtitle",
                 strings["${figure.labelKey}.label"],
                 chartData[0].entries.last().x.toLong().seconds.getRelativeDateShortString(requireContext()),
                 chartData[0].currentValueToDisplay?.formatNumberIfNeeded(numberFormat)
             )
+            else -> null
         }
     }
 
@@ -277,18 +278,14 @@ class KeyFigureDetailsFragment : KeyFigureGenericFragment() {
         }
     )
 
-    private fun avgGlobalData(figure: KeyFigure, isSecondary: Boolean) = ChartData(
+    private fun avgGlobalData(figure: KeyFigure) = ChartData(
         description = stringsFormat("keyFigureDetailController.section.evolutionAvg.legendWithLocation", strings["common.country.france"]),
         currentValueToDisplay = figure.valueGlobalToDisplay,
         entries = figure.avgSeries
             ?.sortedBy { it.date }
             ?.map { Entry(it.date.toFloat(), it.value.toFloat()) }
             ?: emptyList(),
-        color = if (isSecondary) {
-            Color.parseColor(strings[figure.colorStringKey(requireContext().isNightMode())]).brighterColor()
-        } else {
-            Color.parseColor(strings[figure.colorStringKey(requireContext().isNightMode())])
-        }
+        color = Color.parseColor(strings[figure.colorStringKey(requireContext().isNightMode())])
     )
 
     private fun limitLineData(figure: KeyFigure): LimitLineData? {

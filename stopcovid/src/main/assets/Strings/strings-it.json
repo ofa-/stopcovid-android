@@ -784,13 +784,13 @@
    "common.updatePostalCode":"Code postal: %@",
    "common.updatePostalCode.end":"Changer",
 
-   "myHealthStateHeaderCell.exposureDate.title": "Date d'exposition approximative :",
+   "myHealthStateHeaderCell.exposureDate.title": "Date de contact approximative :",
    "myHealthStateHeaderCell.exposureDate.range": "Entre le %@ et %@",
     
-   "notification.lowRisk.title":"Info : contacts",
-   "notification.lowRisk.message":"Vous avez des contacts avec des personnes qui se sont déclarées positifs COVID-19, sans risque. Continuez de bien respecter les mesures barrières !",
+   "notification.lowRisk.title":"Info : restez vigilant",
+   "notification.lowRisk.message":"Restez vigilant, vous croisez régulièrement des personnes positives et contagieuses. Continuez de bien respecter les mesures barrières !",
    
-   "notification.atHighWarning.title": "Alerte : exposition à risque",
+   "notification.atHighWarning.title": "Alerte : contact à risque dans un lieu",
    "notification.atHighWarning.message": "Vous avez fréquenté le même lieu ou événement qu’au moins un utilisateur testé positif à la COVID-19 et contagieux ces derniers jours. Si vous êtes un mineur, discutez-en avec vos parents ou vos responsables légaux.",
    
    "manageDataController.hideStatus.title": "Mon statut de risque",
@@ -798,7 +798,7 @@
    "manageDataController.hideStatus.button": "Masquer mon statut",
 	
 	"risk.section.measures.title" : "Respectez les mesures barrières",
-	"risk.section.measures.body" : "Veuillez à respecter les mesures barrières pour freiner la propagation du virus.",
+	"risk.section.measures.body" : "Veillez à respecter les mesures barrières pour freiner la propagation du virus.",
 	"risk.section.measures.button" : "Les mesures barrières",
 	
 	"risk.section.mcc.title" : "Mes Conseils Covid",
@@ -810,60 +810,61 @@
 	"risk.section.limit.body" : "Veillez à limiter vos contacts en particulier avec les personnes à risque de forme grave.",
 	
 	"risk.section.test.title" : "Faites-vous tester",
-	"risk.section.test.body" : "Pour savoir quel jour est le plus adéquat pour vous faire tester en fonction de votre situation, actualisez votre état dans le module \"Recommandation isolement et test\". Vous bénéficiez d'un accès prioritaire au test.\n\nContactez votre médecin traitant en cas de doute.\n\nSi vous n'avez pas de médecin, appelez le 0 800 130 000 afin d'être orienté vers un médecin (service gratuit + appel gratuit).",
+	"risk.section.test.body" : "Vous bénéficiez d'un accès prioritaire au test. Il vous est recommandé de vous faire tester immédiatement et 7 jours après votre date de contact.\n\nPour savoir quel jour est le plus adéquat pour vous faire tester en fonction de votre situation, actualisez votre état dans le module \"Recommandation isolement\".\n\nContactez votre médecin traitant en cas de doute.\n\nSi vous n'avez pas de médecin, appelez le 0 800 130 000 afin d'être orienté vers un médecin (service gratuit + appel gratuit).",
 	"risk.section.test.button":"Trouver un centre",
 	"risk.section.test.url":"https://www.sante.fr/covid19/external/depistage?source=TousAntiCovid",
 	
 	"risk.section.symptoms.title" : "Apparition de symptômes",
-	"risk.section.symptoms.body" : "En cas de doute, n'hésitez pas à effectuer le questionnaire d'orientation sur Mes Conseils Covid ou appeler votre médecin.\n\nSi vous avez des symptômes compatibles avec la COVID-19, vous pouvez également actualiser votre état dans le module \"Recommandation isolement et test\" afin de savoir si votre durée d'isolement doit être modifiée.",
+	"risk.section.symptoms.body" : "En cas de doute, n'hésitez pas à effectuer le questionnaire d'orientation sur Mes Conseils Covid ou appeler votre médecin.\n\nSi vous avez des symptômes compatibles avec la COVID-19, vous pouvez également actualiser votre état dans le module \"Recommandation isolement\" afin de savoir si votre durée d'isolement doit être modifiée.",
 	
 	"risk.section.isolate.title" : "Isolez-vous",
 	"risk.section.isolate.body" : "Pour calculer la durée d'isolement nécessaire selon votre situation et protéger les autres, vous pouvez vous rendre sur le module \"Recommandation isolement\".\n\nVous pouvez bénéficer d'un arrêt de travail auprès de l'Assurance Maladie.\n\nVeillez à limiter vos contacts en particulier avec les personnes à risque de forme grave. Soyez extrêmement vigilant sur le respect strict des mesures barrières.",
 	
-	"risk0.home.title" : "Pas d'exposition à risque détectée",
+	"risk0.home.title" : "Pas de contact à risque détecté",
 	"risk0.home.sub" : "Appuyez pour avoir des conseils, savoir où se faire dépister et plus",
-	"risk0.details.title" : "Pas d'exposition à risque détectée",
+	"risk0.details.title" : "Pas de contact à risque détectée",
 	"risk0.details.sub" : "N'oubliez pas pour autant les mesures barrières et les recommandations sanitaires",
 	"risk0.section1.title" : "Votre risque",
-	"risk0.section1.body" : "Vous n'avez pas été à proximité d'un utilisateur testé positif et contagieux ni partagé un même lieu.\n\nVous serez averti si vous avez été à proximité (distance estimée à moins de deux mètres) ou dans le même lieu à risque qu'un utilisateur déclaré comme un cas de COVID-19.\n\nLa vérification de votre état se fait toutes les 24h.\n\nTousAntiCovid vous donnera alors les recommandations du ministère des Solidarités et de la Santé.",
+	"risk0.section1.body" : "Vous n'avez pas été à proximité d'un utilisateur testé positif et contagieux.\n\nVous serez averti si vous avez été à proximité (distance estimée à moins de deux mètres) d'un utilisateur déclaré comme un cas de COVID-19.\n\nLa vérification de votre état se fait environ toutes les 24h.\n\nTousAntiCovid vous donnera alors les recommandations du ministère des Solidarités et de la Santé.",
 	
 	"risk1.notif.title" : "Info : restez vigilant",
 	"risk1.notif.sub" : "Vous croisez régulièrement des personnes positives et contagieuses. Consultez nos recommandations.",
 	"risk1.home.title" : "Restez vigilant",
 	"risk1.home.sub" : "Vous croisez régulièrement des personnes positives et contagieuses. Consultez nos recommandations.",
-	"risk1.details.title" : "Pas d'exposition à risque détectée, mais restez vigilant",
+	"risk1.details.title" : "Pas de contact à risque détecté, mais restez vigilant",
 	"risk1.details.sub" : "N'oubliez pas les mesures barrières et les recommandations sanitaires",
 	"risk1.section1.title" : "Votre risque",
-	"risk1.section1.body" : "Vous n'avez pas été à proximité d'un utilisateur testé positif et contagieux ni déclaré avoir partagé un même lieu, mais vous croisez régulièrement des personnes positives et contagieuses.\n\nVous serez averti si vous avez été à proximité (distance estimée à moins de deux mètres) ou dans le même lieu à risque qu'un utilisateur déclaré comme un cas de COVID-19.\n\nLa vérification de votre état se fait toutes les 24h.\n\nTousAntiCovid vous donnera alors les recommandations du ministère des Solidarités et de la Santé.",
-	
-	
-	"risk2.notif.title" : "Info lieu",
-	"risk2.notif.sub" : "Vous avez partagé le même lieu qu'au moins une personne contagieuse. Si vous êtes un mineur, discutez-en avec vos parents ou vos responsables légaux.",
+	"risk1.section1.body" : "Vous n'avez pas été à proximité d'un utilisateur testé positif et contagieux, mais vous croisez régulièrement des personnes positives et contagieuses.\n\nVous serez averti si vous avez été à proximité (distance estimée à moins de deux mètres) ou dans le même lieu à risque qu'un utilisateur déclaré comme un cas de COVID-19.\n\nLa vérification de votre état se fait environ toutes les 24 heures.\n\nTousAntiCovid vous donnera alors les recommandations du ministère des Solidarités et de la Santé.",
+
+	"risk2.notif.title" : "Info: lieu à risque",
+	"risk2.notif.sub" : "Vous avez été exposé à un risque de contamination modéré suite à la fréquentation d’un même lieu qu'une personne contagieuse. Si vous êtes un mineur, discutez-en avec vos parents ou vos responsables légaux",
 	"risk2.home.title" : "Info lieu : risque de contamination modéré",
 	"risk2.home.sub" : "Consultez nos recommandations",
 	"risk2.details.title" : "Vous avez fréquenté un lieu avec un risque de contamination modéré",
 	"risk2.details.sub" : "Faites-vous tester et respectez les mesures barrières !",
 	"risk2.section1.title" : "Votre risque",
-	"risk2.section1.body" : "Vous avez partagé le même lieu à risque modéré qu'au moins une personne contagieuse et qui se serait déclarée positive dans l'application.\n\nFaites-vous tester et respectez les mesures barrières!\"\n\nIl vous est recommandé de vous faire tester 7 jours après votre date d'exposition. Pour en savoir plus, allez sur le module \"recommandation isolement et test\". Vous bénéficiez d'un accès prioritaire au test.\n\nSi vous avez le moindre doute notamment sur votre exposition à risque, contactez votre médecin en l'informant que vous avez été été dans un lieu avec un risque de contamination modéré.\n\nVous serez averti si vous avez été à proximité (distance estimée à moins de deux mètres) ou dans le même lieu à risque qu'un utilisateur déclaré comme un cas de COVID-19.",
+	"risk2.section1.body" : "Vous avez été exposé à un risque de contamination modéré suite à la fréquentation d’un même lieu qu’une personne contagieuse et qui s'est déclarée positive dans l'application.\n\nLa date de contact affichée est approximative à plus ou moins un jour, pour préserver l’anonymat des personnes s'étant déclarées positives.\n\nSi vous avez le moindre doute notamment sur votre exposition à risque, contactez votre médecin en l'informant que vous avez été dans un lieu avec un risque de contamination modéré.",
 	
-	
-	"risk3.notif.title" : "Alerte lieu",
-	"risk3.notif.sub" : "Vous avez partagé le même lieu qu'au moins une personne contagieuse et qui se serait déclarée positive dans l'application. Si vous êtes un mineur, discutez-en avec vos parents ou vos responsables légaux.",
-	"risk3.home.title" : "Alerte : exposition à risque élevée dans un lieu",
+	"risk3.notif.title" : "Alerte : lieu à risque",
+	"risk3.notif.sub" : "Vous avez été exposé à un risque de contamination élevé suite à la fréquentation d’un même lieu qu' une personne contagieuse. Si vous êtes un mineur, discutez-en avec vos parents ou vos responsables légaux.",
+	"risk3.home.title" : "Alerte : contact à risque élevé dans un lieu",
 	"risk3.home.sub" : "Consultez nos recommandations",
-	"risk3.details.title" : "Exposition à risque élevée dans un lieu : vous êtes un contact à risque",
+	"risk3.details.title" : "Vous avez fréquenté un lieu avec un risque de contamination élevé : vous êtes un contact à risque",
 	"risk3.details.sub" : "Isolez-vous et faites-vous tester !",
 	"risk3.section1.title" : "Votre risque",
-	"risk3.section1.body" : "Vous avez partagé le même lieu qu'au moins une personne contagieuse et qui se serait déclarée positive dans l’application et avez été exposé à un risque élevé de contamination. Vous êtes un contact à risque.\n\nIsolez vous et faites vous tester!\n\nIl vous est recommandé de vous faire tester 7 jours après votre date d'exposition. Pour en savoir plus, allez sur le module \"recommandation isolement et test\". Vous bénéficiez d'un accès prioritaire au test et pouvez également bénéficier d'un arrêt de travail auprès de l'Assurance Maladie grâce au token (expliquer où il se trouve).\n\nSi vous avez le moindre doute notamment sur votre exposition à risque, contactez votre médecin en l'informant que vous avez été été dans un lieu avec un risque de contamination modéré.\n\nVous serez averti si vous avez été à proximité (distance estimée à moins de deux mètres) ou dans le même lieu à risque qu'un utilisateur déclaré comme un cas de COVID-19.",
+	"risk3.section1.body" : "Vous avez été exposé à un risque de contamination élevé suite à la fréquentation d’un même lieu qu’une personne contagieuse et qui s'est déclarée positive dans l'application. Vous êtes un contact à risque.\n\nLa date de contact affichée est approximative à plus ou moins un jour, pour préserver l’anonymat des personnes s'étant déclarées positives.\n\nSi vous avez le moindre doute notamment sur votre exposition à risque, contactez votre médecin en l'informant que vous avez été dans un lieu avec un risque de contamination modéré.",
 	
-	
-	"risk4.notif.title" : "Alerte exposition",
+	"risk4.notif.title" : "Alerte : contact à risque",
 	"risk4.notif.sub" : "Vous avez été exposé à au moins un utilisateur testé positif et contagieux. Si vous êtes un mineur, discutez-en avec vos parents ou vos responsables légaux.",
-	"risk4.home.title" : "Vous êtes un contact à risque",
+	"risk4.home.title" : "Alerte : exposition à risque élevée suite à un contact",
 	"risk4.home.sub" : "Consultez nos recommandations",
-	"risk4.details.title" : "Exposition à risque à proximité : vous êtes un contact à risque",
-	"risk4.details.sub" : "Isolez vous et faites-vous tester !",
+	"risk4.details.title" : "Exposition à risque suite à un contact : vous êtes un contact à risque",
+	"risk4.details.sub" : "Isolez-vous et faites-vous tester !",
 	"risk4.section1.title" : "Votre risque",
-	"risk4.section1.body" : "Vous avez été exposé à au moins un utilisateur testé positif et contagieux, vous êtes un contact à risque.\n\nPour savoir combien de temps vous isoler et quand vous faire tester, allez sur le module \"recommandation isolement et test\". Vous bénéficiez d'un accès prioritaire au test et pouvez également bénéficier d'un arrêt de travail auprès de l'Assurance Maladie grâce au token (expliquer où il se trouve).\n\nSi vous avez le moindre doute notamment sur votre exposition à risque, contactez votre médecin en l'informant que vous avez été à proximité d'au moins un utilisateur testé positif et contagieux."
+	"risk4.section1.body" : "Vous avez été exposé à au moins un utilisateur testé positif et contagieux, vous êtes un contact à risque.\n\nLa date de contact affichée est approximative à plus ou moins un jour, pour préserver l’anonymat des personnes s'étant déclarées positives.\n\nSi vous avez le moindre doute notamment sur votre exposition à risque, contactez votre médecin en l'informant que vous avez été à proximité d'au moins un utilisateur testé positif et contagieux.",
 
+  "myHealthController.workStopping.title": "Arrêt de travail",
+  "myHealthController.workStopping.message": "Vous avez ici un lien unique qui vous permet de faire une demande d'arrêt de travail sur Ameli.fr.\nVous pouvez réaliser cette demande à partir de votre smartphone, ou bien vous envoyer le lien pour faire la demande sur votre ordinateur.",
+  "myHealthController.workStopping.link": "Commencer la demande d'arrêt",
+  "myHealthController.workStopping.share": "M'envoyer le lien unique"
 }

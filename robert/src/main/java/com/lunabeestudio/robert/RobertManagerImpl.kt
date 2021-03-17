@@ -65,6 +65,7 @@ import java.io.File
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
 import kotlin.math.abs
+import kotlin.math.max
 import kotlin.math.min
 import kotlin.random.Random
 import kotlin.time.Duration
@@ -159,6 +160,9 @@ class RobertManagerImpl(
 
     override val reportPositiveTestDate: Long?
         get() = keystoreRepository.reportPositiveTestDate
+
+    override val declarationToken: String?
+        get() = keystoreRepository.declarationToken
 
     init {
         if (isRegistered) {
@@ -415,7 +419,7 @@ class RobertManagerImpl(
 
     @OptIn(ExperimentalTime::class)
     private suspend fun wstatus(robertApplication: RobertApplication): RobertResultData<AtRiskStatus> {
-        val venueQrCodeList: List<VenueQrCode>? = robertApplication.getVenueQrCodeList(null)
+        val venueQrCodeList: List<VenueQrCode>? = robertApplication.getVenueQrCodeList(null, null)
         return if (!venueQrCodeList.isNullOrEmpty()) {
             val wResult = remoteServiceRepository.wstatus(configuration.warningApiVersion, venueQrCodeList)
             when (wResult) {
@@ -510,22 +514,31 @@ class RobertManagerImpl(
     ): RobertResult {
         // Max take hello 14 days from now
         var originDayInPast = configuration.dataRetentionPeriod.toLong()
+        // Min take hello before now
+        var endDayInPast = 0L
         when {
             firstSymptoms != null -> {
                 // if symptoms take `preSymptomsSpan` days before first symptoms
                 val preSymptomsSpan = configuration.preSymptomsSpan.toLong()
                 originDayInPast = min(originDayInPast, firstSymptoms.toLong() + preSymptomsSpan)
+                // to `contagiousSpan` days after first symptoms
+                endDayInPast = abs(min(endDayInPast, -firstSymptoms.toLong() + configuration.contagiousSpan))
             }
             positiveTest != null -> {
                 // if positive test take `positiveSampleSpan` days before positive test
                 val positiveSampleSpan = configuration.positiveSampleSpan.toLong()
                 originDayInPast = min(originDayInPast, positiveTest.toLong() + positiveSampleSpan)
+                // to `contagiousSpan` days after positive test
+                endDayInPast = abs(min(endDayInPast, -positiveTest.toLong() + configuration.contagiousSpan))
             }
         }
+        Timber.d("Will report data from $originDayInPast days to $endDayInPast days from now")
         val reportStartTime = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(originDayInPast)
+        val reportEndTime = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(endDayInPast)
         val firstProximityToSendTime = reportStartTime.unixTimeMsToNtpTimeS()
+        val lastProximityToSendTime = reportEndTime.unixTimeMsToNtpTimeS()
 
-        val localProximityList = localProximityRepository.getUntilTime(firstProximityToSendTime)
+        val localProximityList = localProximityRepository.getBetweenTime(firstProximityToSendTime, lastProximityToSendTime)
         val filteredLocalProximityList = localProximityFilter.filter(
             localProximityList,
             filteringMode,
@@ -543,7 +556,8 @@ class RobertManagerImpl(
                 keystoreRepository.reportSymptomsStartDate = firstSymptoms?.let { System.currentTimeMillis() - TimeUnit.DAYS.toMillis(it.toLong()) }
                 keystoreRepository.reportPositiveTestDate = positiveTest?.let { System.currentTimeMillis() - TimeUnit.DAYS.toMillis(it.toLong()) }
                 keystoreRepository.reportValidationToken = result.data.reportValidationToken
-                keystoreRepository.reportToSendTime = firstProximityToSendTime
+                keystoreRepository.reportToSendStartTime = firstProximityToSendTime
+                keystoreRepository.reportToSendEndTime = lastProximityToSendTime
                 wreportIfNeeded(application, true)
                 RobertResult.Success()
             }
@@ -553,22 +567,25 @@ class RobertManagerImpl(
 
     override suspend fun wreportIfNeeded(application: RobertApplication, shouldRetry: Boolean) {
         val wToken = keystoreRepository.reportValidationToken
-        val reportToSendTime = keystoreRepository.reportToSendTime
-        if (wToken != null && reportToSendTime != null) {
-            val venueQrCodeList = application.getVenueQrCodeList(reportToSendTime)
+        val reportToSendStartTime = keystoreRepository.reportToSendStartTime
+        val reportToSendEndTime = keystoreRepository.reportToSendEndTime
+        if (wToken != null && reportToSendStartTime != null && reportToSendEndTime != null) {
+            val venueQrCodeList = application.getVenueQrCodeList(reportToSendStartTime, reportToSendEndTime)
             if (!venueQrCodeList.isNullOrEmpty()) {
                 val result = remoteServiceRepository.wreport(configuration.warningApiVersion, wToken, venueQrCodeList)
                 when (result) {
                     is RobertResult.Success -> {
                         keystoreRepository.reportValidationToken = null
-                        keystoreRepository.reportToSendTime = null
+                        keystoreRepository.reportToSendStartTime = null
+                        keystoreRepository.reportToSendEndTime = null
                         application.clearVenueQrCodeList()
                     }
                     is RobertResult.Failure -> {
                         // 403 means token invalid, erase token
                         if (result.error is ForbiddenException) {
                             keystoreRepository.reportValidationToken = null
-                            keystoreRepository.reportToSendTime = null
+                            keystoreRepository.reportToSendStartTime = null
+                            keystoreRepository.reportToSendEndTime = null
                             application.clearVenueQrCodeList()
                         } else if (shouldRetry) {
                             wreportIfNeeded(application, false)
@@ -577,7 +594,8 @@ class RobertManagerImpl(
                 }
             } else {
                 keystoreRepository.reportValidationToken = null
-                keystoreRepository.reportToSendTime = null
+                keystoreRepository.reportToSendStartTime = null
+                keystoreRepository.reportToSendEndTime = null
                 application.clearVenueQrCodeList()
             }
         }
@@ -688,13 +706,14 @@ class RobertManagerImpl(
         keystoreRepository.reportPositiveTestDate = null
         keystoreRepository.reportSymptomsStartDate = null
         keystoreRepository.reportValidationToken = null
-        keystoreRepository.reportToSendTime = null
+        keystoreRepository.reportToSendStartTime = null
+        keystoreRepository.reportToSendEndTime = null
         keystoreRepository.declarationToken = null
         keystoreRepository.atRiskModelVersion = AT_RISK_MODEL_VERSION
     }
 
     /*suspend*/ fun getLocalProximityItems(timeMs : Long = 0): List<LocalProximity> {
-        return localProximityRepository.getUntilTime(timeMs)
+        return localProximityRepository.getBetweenTime(0, timeMs)
     }
 
     suspend fun getLocalEbids(): List<EphemeralBluetoothIdentifier> {

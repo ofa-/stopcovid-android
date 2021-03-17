@@ -41,7 +41,8 @@ interface LocalKeystoreDataSource {
     var saveAttestationData: Boolean?
     var reportDate: Long?
     var reportValidationToken: String?
-    var reportToSendTime: Long?
+    var reportToSendStartTime: Long?
+    var reportToSendEndTime: Long?
     var venuesQrCode: List<VenueQrCode>?
     var declarationToken: String?
 

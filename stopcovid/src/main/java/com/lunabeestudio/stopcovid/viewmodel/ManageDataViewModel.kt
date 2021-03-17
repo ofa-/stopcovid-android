@@ -37,7 +37,6 @@ class ManageDataViewModel(
     val eraseVenuesSuccess: SingleLiveEvent<Unit> = SingleLiveEvent()
     val eraseLocalSuccess: SingleLiveEvent<Unit> = SingleLiveEvent()
     val eraseRemoteSuccess: SingleLiveEvent<Unit> = SingleLiveEvent()
-    val eraseAlertSuccess: SingleLiveEvent<Unit> = SingleLiveEvent()
     val quitStopCovidSuccess: SingleLiveEvent<Unit> = SingleLiveEvent()
     val covidException: SingleLiveEvent<CovidException> = SingleLiveEvent()
     val loadingInProgress: MutableLiveData<Boolean> = MutableLiveData(false)
@@ -92,23 +91,7 @@ class ManageDataViewModel(
     }
 
     fun eraseRemoteAlert(application: RobertApplication) {
-        if (robertManager.isRegistered) {
-            if (loadingInProgress.value == false) {
-                viewModelScope.launch(Dispatchers.IO) {
-                    loadingInProgress.postValue(true)
-                    when (val result = robertManager.eraseRemoteAlert()) {
-                        is RobertResult.Success -> {
-                            clearNotifications(application)
-                            eraseAlertSuccess.postValue(null)
-                        }
-                        is RobertResult.Failure -> covidException.postValue(result.error.toCovidException())
-                    }
-                    loadingInProgress.postValue(false)
-                }
-            }
-        } else {
-            covidException.postValue(NeedRegisterException())
-        }
+        clearNotifications(application)
     }
 
     fun quitStopCovid(application: RobertApplication) {

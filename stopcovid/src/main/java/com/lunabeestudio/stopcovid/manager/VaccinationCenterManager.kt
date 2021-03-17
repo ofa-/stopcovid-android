@@ -28,6 +28,7 @@ import com.lunabeestudio.stopcovid.extension.currentVaccinationReferenceLatitude
 import com.lunabeestudio.stopcovid.extension.currentVaccinationReferenceLongitude
 import com.lunabeestudio.stopcovid.extension.hasChosenPostalCode
 import com.lunabeestudio.stopcovid.extension.location
+import com.lunabeestudio.stopcovid.extension.zipGeolocVersion
 import com.lunabeestudio.stopcovid.model.PostalCodeDetails
 import com.lunabeestudio.stopcovid.model.VaccinationCenter
 import com.lunabeestudio.stopcovid.model.VaccinationCenterLastUpdate
@@ -47,6 +48,7 @@ object VaccinationCenterManager {
     private const val lastUpdateFileName: String = ConfigConstant.Vaccination.CENTER_LAST_UPDATE_FILENAME
     private val url: String = ConfigConstant.Vaccination.URL
     private val vaccinationCentersType: Type = object : TypeToken<List<VaccinationCenter>>() {}.type
+    private const val ZIP_GEOLOC_VERSION: Int = 1
 
     private val _vaccinationCenters: MutableLiveData<Event<List<VaccinationCenter>>> = MutableLiveData()
     val vaccinationCenters: LiveData<Event<List<VaccinationCenter>>>
@@ -80,7 +82,8 @@ object VaccinationCenterManager {
     }
 
     private suspend fun initializeCurrentDepartmentIfNeeded(context: Context, sharedPreferences: SharedPreferences) {
-        if (sharedPreferences.currentVaccinationReferenceDepartmentCode == null
+        if ((sharedPreferences.currentVaccinationReferenceDepartmentCode == null
+                || sharedPreferences.zipGeolocVersion < ZIP_GEOLOC_VERSION)
             && sharedPreferences.chosenPostalCode != null) {
             postalCodeDidUpdate(context, sharedPreferences, sharedPreferences.chosenPostalCode)
         }
@@ -97,6 +100,7 @@ object VaccinationCenterManager {
             val foundDetails: PostalCodeDetails? = postalCodeDetails(context, postalCode)
             sharedPreferences.currentVaccinationReferenceLatitude = foundDetails?.latitude
             sharedPreferences.currentVaccinationReferenceLongitude = foundDetails?.longitude
+            sharedPreferences.zipGeolocVersion = ZIP_GEOLOC_VERSION
             if (foundDetails?.department != sharedPreferences.currentVaccinationReferenceDepartmentCode
                 || _vaccinationCenters.value?.peekContent().isNullOrEmpty()) {
                 // Department changed, let's download the new infos

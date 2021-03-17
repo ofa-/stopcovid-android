@@ -55,12 +55,12 @@ open class SecureFileLocalProximityDataSource(
 
     private var dumpJob: Job? = null
 
-    override fun getUntilTime(ntpTimeS: Long): List<LocalProximity> {
+    override fun getBetweenTime(ntpStartTimeS: Long, ntpEndTimeS: Long): List<LocalProximity> {
         return storageDir.listFiles { file ->
             file.isDirectory && file.name.toIntOrNull() != null
         }?.mapNotNull { file ->
             val dirDay = file.name.toInt()
-            if (dirDay >= ntpTimeS / (60 * 60 * 24)) {
+            if (dirDay >= ntpStartTimeS / (60 * 60 * 24) && dirDay <= ntpEndTimeS / (60 * 60 * 24)) {
                 file
             } else {
                 null
