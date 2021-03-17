@@ -60,6 +60,8 @@ object StringsManager : ServerManager() {
             }
         }
 
+        return // don't fetch strings from server
+
         val hasFetch = fetchLast(context, languageHasChanged)
         if (hasFetch) {
             loadLocal<HashMap<String, String>>(context)?.let {
