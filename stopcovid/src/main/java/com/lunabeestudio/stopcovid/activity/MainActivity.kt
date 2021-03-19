@@ -21,9 +21,12 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
 import androidx.navigation.ui.NavigationUI.setupActionBarWithNavController
 import androidx.preference.PreferenceManager
+import androidx.work.ExistingWorkPolicy
+import androidx.work.WorkManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.lunabeestudio.robert.extension.observeEventAndConsume
+import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.applyAndConsumeWindowInsetBottom
 import com.lunabeestudio.stopcovid.coreui.extension.showSnackBar
@@ -74,6 +77,8 @@ class MainActivity : BaseActivity() {
     override fun onResume() {
         super.onResume()
         if (sharedPrefs.alertRiskLevelChanged) {
+            WorkManager.getInstance(applicationContext).cancelUniqueWork(Constants.WorkerNames.AT_RISK_NOTIFICATION)
+
             MaterialAlertDialogBuilder(this).showAlertRiskLevelChanged(
                 strings,
                 sharedPrefs,
