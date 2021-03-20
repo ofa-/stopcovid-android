@@ -154,7 +154,7 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
             MoreKeyFiguresManager.clearLocal(this)
             LinksManager.clearLocal(this)
             PrivacyManager.clearLocal(this)
-            StringsManager.clearLocal(this)
+            //StringsManager.clearLocal(this)
             ConfigManager.clearLocal(this)
             CalibrationManager.clearLocal(this)
             FormManager.clearLocal(this)
