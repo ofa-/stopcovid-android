@@ -10,6 +10,9 @@ ls:
 rm:
 	$(ADB) rm $(FILES)/localProximity.txt
 
+fix-le-smooth:
+	$(ADB) tee $(FILES)/strings-fr.json < stopcovid/src/main/assets/Strings/strings-fr.json
+
 cp:
 	$(ADB) cat $(FILES)/localProximity.txt		> data.txt
 	$(ADB) cat $(FILES)/disseminatedEbids.txt	> ebids.txt
