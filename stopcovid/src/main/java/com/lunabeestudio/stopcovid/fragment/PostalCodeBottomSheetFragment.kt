@@ -21,6 +21,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
+import com.lunabeestudio.stopcovid.coreui.manager.LocalizedStrings
 import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
 import com.lunabeestudio.stopcovid.databinding.FragmentPostalCodeBottomSheetBinding
 import com.lunabeestudio.stopcovid.extension.chosenPostalCode
@@ -34,7 +35,7 @@ class PostalCodeBottomSheetFragment : BottomSheetDialogFragment() {
         PreferenceManager.getDefaultSharedPreferences(requireContext())
     }
 
-    private val strings: HashMap<String, String> = StringsManager.strings
+    private val strings: LocalizedStrings = StringsManager.strings
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val binding = FragmentPostalCodeBottomSheetBinding.inflate(inflater, container, false)

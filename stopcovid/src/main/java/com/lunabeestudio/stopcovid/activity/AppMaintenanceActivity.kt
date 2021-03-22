@@ -24,6 +24,7 @@ import com.github.razir.progressbutton.showProgress
 import com.google.gson.Gson
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.ConfigConstant
+import com.lunabeestudio.stopcovid.coreui.manager.LocalizedStrings
 import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
 import com.lunabeestudio.stopcovid.databinding.ActivityAppMaintenanceBinding
 import com.lunabeestudio.stopcovid.extension.openInExternalBrowser
@@ -38,7 +39,7 @@ class AppMaintenanceActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAppMaintenanceBinding
 
-    private var strings: HashMap<String, String> = StringsManager.strings
+    private var strings: LocalizedStrings = StringsManager.strings
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

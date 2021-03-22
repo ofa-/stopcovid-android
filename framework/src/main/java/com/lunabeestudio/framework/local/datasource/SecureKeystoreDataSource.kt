@@ -17,6 +17,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.lunabeestudio.domain.model.Attestation
 import com.lunabeestudio.domain.model.Calibration
 import com.lunabeestudio.domain.model.Configuration
 import com.lunabeestudio.domain.model.FormEntry
@@ -116,14 +117,21 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
         get() = getEncryptedValue(SHARED_PREF_KEY_SAVED_ATTESTATION_DATA, object : TypeToken<Map<String, FormEntry>>() {}.type)
         set(value) = setEncryptedValue(SHARED_PREF_KEY_SAVED_ATTESTATION_DATA, value)
 
-    private var _attestationsLiveData: MutableLiveData<List<Map<String, FormEntry>>?> = MutableLiveData(attestations)
-    override val attestationsLiveData: LiveData<List<Map<String, FormEntry>>?>
+    private var _attestationsLiveData: MutableLiveData<List<Attestation>?> = MutableLiveData(attestations)
+    override val attestationsLiveData: LiveData<List<Attestation>?>
         get() = _attestationsLiveData
-    override var attestations: List<Map<String, FormEntry>>?
-        get() = getEncryptedValue(SHARED_PREF_KEY_ATTESTATIONS, object : TypeToken<List<Map<String, FormEntry>>>() {}.type)
+
+    override var attestations: List<Attestation>?
+        get() = getEncryptedValue(SHARED_PREF_KEY_ATTESTATIONS, object : TypeToken<List<Attestation>>() {}.type)
         set(value) {
             setEncryptedValue(SHARED_PREF_KEY_ATTESTATIONS, value)
             _attestationsLiveData.postValue(value)
+        }
+
+    override var deprecatedAttestations: List<Map<String, FormEntry>>?
+        get() = getEncryptedValue(SHARED_PREF_KEY_DEPRECTATED_ATTESTATIONS, object : TypeToken<List<Map<String, FormEntry>>>() {}.type)
+        set(value) {
+            setEncryptedValue(SHARED_PREF_KEY_DEPRECTATED_ATTESTATIONS, value)
         }
 
     override var reportDate: Long?
@@ -328,7 +336,8 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
         private const val SHARED_PREF_KEY_IS_SICK = "shared.pref.is_sick"
         private const val SHARED_PREF_KEY_SAVE_ATTESTATION_DATA = "shared.pref.save_attestation_data"
         private const val SHARED_PREF_KEY_SAVED_ATTESTATION_DATA = "shared.pref.saved_attestation_data"
-        private const val SHARED_PREF_KEY_ATTESTATIONS = "shared.pref.attestations"
+        private const val SHARED_PREF_KEY_ATTESTATIONS = "shared.pref.attestations_v2"
+        private const val SHARED_PREF_KEY_DEPRECTATED_ATTESTATIONS = "shared.pref.attestations"
         private const val SHARED_PREF_KEY_REPORT_DATE = "shared.pref.report_date"
         private const val SHARED_PREF_KEY_REPORT_DATE_ENCRYPTED = "shared.pref.report_date_encrypted"
         private const val SHARED_PREF_KEY_SAVE_DATA_VENUES_QR_CODE = "shared.pref.venues_qr_code"

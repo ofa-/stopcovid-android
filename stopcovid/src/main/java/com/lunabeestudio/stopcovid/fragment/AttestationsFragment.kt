@@ -16,14 +16,14 @@ import androidx.fragment.app.viewModels
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.zxing.BarcodeFormat
 import com.journeyapps.barcodescanner.BarcodeEncoder
+import com.lunabeestudio.domain.model.Attestation
 import com.lunabeestudio.robert.RobertManager
+import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.extension.toDimensSize
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
-import com.lunabeestudio.stopcovid.extension.attestationLongLabelFromKey
-import com.lunabeestudio.stopcovid.extension.attestationShortLabelFromKey
 import com.lunabeestudio.stopcovid.extension.isExpired
 import com.lunabeestudio.stopcovid.extension.openInExternalBrowser
 import com.lunabeestudio.stopcovid.extension.robertManager
@@ -35,13 +35,9 @@ import com.lunabeestudio.stopcovid.fastitem.bigTitleItem
 import com.lunabeestudio.stopcovid.fastitem.linkCardItem
 import com.lunabeestudio.stopcovid.fastitem.linkItem
 import com.lunabeestudio.stopcovid.manager.ShareManager
-import com.lunabeestudio.stopcovid.model.AttestationMap
 import com.lunabeestudio.stopcovid.viewmodel.AttestationsViewModel
 import com.lunabeestudio.stopcovid.viewmodel.AttestationsViewModelFactory
 import com.mikepenz.fastadapter.GenericItem
-import java.text.DateFormat
-import java.text.SimpleDateFormat
-import java.util.Date
 import kotlin.time.ExperimentalTime
 
 import com.lunabeestudio.stopcovid.viewmodel.NewAttestationViewModel
@@ -58,8 +54,6 @@ class AttestationsFragment : MainFragment() {
 
     private val viewModel: AttestationsViewModel by viewModels { AttestationsViewModelFactory(requireContext().secureKeystoreDataSource()) }
 
-    private val dateFormat: DateFormat = SimpleDateFormat.getDateInstance(DateFormat.SHORT)
-    private val timeFormat: DateFormat = SimpleDateFormat.getTimeInstance(DateFormat.SHORT)
     private val barcodeEncoder = BarcodeEncoder()
     private val qrCodeSize by lazy {
         R.dimen.qr_code_size.toDimensSize(requireContext()).toInt()
@@ -91,9 +85,9 @@ class AttestationsFragment : MainFragment() {
         val navm: NewAttestationViewModel by activityViewModels {
             NewAttestationViewModelFactory(requireContext().secureKeystoreDataSource())
         }
-        navm.infos.put("datetime", FormEntry(System.currentTimeMillis().toString(), "datetime"))
-        navm.infos.put("reason", FormEntry(reasonMap[typ], "list"))
-        navm.generateQrCode()
+        navm.infos.put("datetime", FormEntry(System.currentTimeMillis().toString(), "datetime", Constants.Attestation.KEY_DATE_TIME))
+        navm.infos.put("reason", FormEntry(reasonMap[typ], "list", Constants.Attestation.DATA_KEY_REASON))
+        navm.generateQrCode(robertManager, strings)
         refreshScreen()
     }
 
@@ -139,15 +133,21 @@ class AttestationsFragment : MainFragment() {
             }
             identifier = label.hashCode().toLong()
         }
+
+        items += spaceItem {
+            spaceRes = R.dimen.spacing_large
+            identifier = items.size.toLong()
+        }
+
         val validAttestations = viewModel.attestations.value?.filter { attestation ->
             !attestation.isExpired(robertManager)
         }?.sortedByDescending { attestation ->
-            attestation["datetime"]?.value?.toLongOrNull() ?: 0L
+            attestation.timestamp
         }
         val expiredAttestations = viewModel.attestations.value?.filter { attestation ->
             attestation.isExpired(robertManager)
         }?.sortedByDescending { attestation ->
-            attestation["datetime"]?.value?.toLongOrNull() ?: 0L
+            attestation.timestamp
         }
 
         if (!validAttestations.isNullOrEmpty()) {
@@ -199,23 +199,23 @@ class AttestationsFragment : MainFragment() {
         return items
     }
 
-    private fun qrCodeItemFromAttestation(attestation: AttestationMap, allowShare: Boolean): AttestationQrCodeItem {
+    private fun qrCodeItemFromAttestation(attestation: Attestation, allowShare: Boolean): AttestationQrCodeItem {
         val bitmap = barcodeEncoder.encodeBitmap(
-            attestationToFormattedString(attestation),
+            attestation.qrCode,
             BarcodeFormat.QR_CODE,
             qrCodeSize,
             qrCodeSize
         )
         return attestationQrCodeItem {
             qrCodeBitmap = bitmap
-            text = attestationToFooterString(attestation)
+            text = attestation.footer
             share = strings["attestationsController.menu.share"]
             delete = strings["attestationsController.menu.delete"]
             this.allowShare = allowShare
             onShare = {
                 val uri = ShareManager.getShareCaptureUriFromBitmap(requireContext(), bitmap, "qrCode")
                 val text = listOf(
-                    attestationToFormattedStringDisplayed(attestation),
+                    attestation.qrCodeString,
                     strings["attestationsController.menu.share.text"]
                 ).joinToString("\n\n")
                 ShareManager.shareImageAndText(requireContext(), uri, text) {
@@ -236,8 +236,8 @@ class AttestationsFragment : MainFragment() {
             onClick = {
                 findNavControllerOrNull()?.safeNavigate(
                     AttestationsFragmentDirections.actionAttestationsFragmentToFullscreenAttestationFragment(
-                        attestationToFormattedString(attestation),
-                        attestationToFormattedStringDisplayed(attestation)
+                        attestation.qrCode,
+                        attestation.qrCodeString
                     )
                 )
             }
@@ -246,62 +246,4 @@ class AttestationsFragment : MainFragment() {
         }
     }
 
-    private fun attestationToFormattedString(attestation: AttestationMap): String {
-        return robertManager.configuration.qrCodeFormattedString
-            .attestationReplaceKnownValue(attestation)
-            .attestationReplaceUnknownValues()
-    }
-
-    private fun attestationToFormattedStringDisplayed(attestation: AttestationMap): String {
-        return robertManager.configuration.qrCodeFormattedStringDisplayed
-            .attestationReplaceKnownValue(attestation)
-            .attestationReplaceUnknownValues()
-    }
-
-    private fun attestationToFooterString(attestation: AttestationMap): String {
-        return robertManager.configuration.qrCodeFooterString
-            .attestationReplaceKnownValue(attestation)
-            .attestationReplaceUnknownValues()
-    }
-
-    private fun String.attestationReplaceKnownValue(attestation: AttestationMap): String {
-        var result = this
-        attestation.keys.forEach { key ->
-            when (attestation[key]?.type) {
-                "date" -> {
-                    attestation[key]?.value?.toLongOrNull()?.let { timestamp ->
-                        val date = Date(timestamp)
-                        result = result.replace("<$key>", dateFormat.format(date))
-                    }
-                }
-                "datetime" -> {
-                    attestation[key]?.value?.toLongOrNull()?.let { timestamp ->
-                        val date = Date(timestamp)
-                        result = result.replace("<$key>", "${dateFormat.format(date)}, ${timeFormat.format(date)}")
-                            .replace("<$key-day>", dateFormat.format(date))
-                            .replace("<$key-hour>", timeFormat.format(date))
-                    }
-                }
-                "list" -> {
-                    result = result.replace("<$key>", attestation[key]?.value ?: strings["qrCode.infoNotAvailable"] ?: "")
-                        .replace("<$key-code>", attestation[key]?.value ?: strings["qrCode.infoNotAvailable"] ?: "")
-                        .replace(
-                            "<$key-shortlabel>",
-                            strings[attestation[key]?.value?.attestationShortLabelFromKey()] ?: strings["qrCode.infoNotAvailable"] ?: ""
-                        )
-                        .replace(
-                            "<$key-longlabel>",
-                            strings[attestation[key]?.value?.attestationLongLabelFromKey()] ?: strings["qrCode.infoNotAvailable"] ?: ""
-                        )
-                }
-                else -> result = result.replace("<$key>", attestation[key]?.value ?: strings["qrCode.infoNotAvailable"] ?: "")
-            }
-        }
-        return result
-    }
-
-    private fun String.attestationReplaceUnknownValues(): String = replace(
-        regex = Regex("<[a-zA-Z0-9\\-]+>"),
-        strings["qrCode.infoNotAvailable"] ?: ""
-    )
 }

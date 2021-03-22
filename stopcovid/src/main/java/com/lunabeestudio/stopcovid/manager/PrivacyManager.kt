@@ -14,15 +14,14 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.coreui.ConfigConstant
-import com.lunabeestudio.stopcovid.model.Section
 
 object PrivacyManager : SectionManager() {
 
-    private val _privacySections: MutableLiveData<List<Section>> = MutableLiveData()
-    val privacySections: LiveData<List<Section>>
+    private val _privacySections: MutableLiveData<Sections> = MutableLiveData()
+    val privacySections: LiveData<Sections>
         get() = _privacySections
 
-    override fun setSections(sections: List<Section>) {
+    override fun setSections(sections: Sections) {
         if (this.privacySections.value != sections) {
             _privacySections.postValue(sections)
         }

@@ -36,6 +36,7 @@ import com.lunabeestudio.robert.model.RobertException
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.UiConstants
+import com.lunabeestudio.stopcovid.coreui.manager.LocalizedStrings
 import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.manager.ProximityManager
@@ -59,7 +60,7 @@ open class ProximityService : RobertProximityService() {
 
     private val binder = ProximityBinder()
 
-    private val strings: HashMap<String, String>
+    private val strings: LocalizedStrings
         get() = StringsManager.strings
 
     override val robertManager: RobertManager by lazy {

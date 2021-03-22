@@ -14,6 +14,7 @@ import android.content.Context
 import androidx.core.content.edit
 import androidx.preference.PreferenceManager
 import com.google.gson.Gson
+import com.google.gson.JsonSyntaxException
 import com.lunabeestudio.stopcovid.coreui.BuildConfig
 import com.lunabeestudio.stopcovid.coreui.UiConstants
 import com.lunabeestudio.stopcovid.coreui.extension.getFirstSupportedLanguage
@@ -25,7 +26,7 @@ import java.io.File
 import java.lang.reflect.Type
 import kotlin.math.abs
 
-abstract class ServerManager {
+abstract class ServerManager<T> {
 
     private var gson: Gson = Gson()
 
@@ -46,7 +47,7 @@ abstract class ServerManager {
         }
     }
 
-    protected suspend fun <T> loadLocal(context: Context): T? {
+    protected suspend fun loadLocal(context: Context): T? {
         val currentLanguage = context.getFirstSupportedLanguage()
 
         return loadFromAssets(context, currentLanguage)
@@ -54,18 +55,24 @@ abstract class ServerManager {
     }
 
     private suspend fun fetchLast(context: Context, languageCode: String): Boolean {
+        val filename = "$prefix$languageCode$extension"
+        val tmpFile = File(context.filesDir, "$filename.bck")
         return try {
-            val filename = "$prefix$languageCode$extension"
-            "$url$filename".saveTo(context, File(context.filesDir, filename))
-            saveLastRefresh(context)
-            true
+            "$url$filename".saveTo(context, tmpFile)
+            if (fileNotCorrupted(tmpFile)) {
+                tmpFile.copyTo(File(context.filesDir, filename), overwrite = true, bufferSize = 4 * 1024)
+                saveLastRefresh(context)
+                true
+            } else {
+                false
+            }
         } catch (e: Exception) {
             Timber.e(e, "Fetching fail for $languageCode")
             false
         }
     }
 
-    private suspend fun <T> loadFromFiles(context: Context, languageCode: String): T? {
+    private suspend fun loadFromFiles(context: Context, languageCode: String): T? {
         val fileName = "$prefix$languageCode$extension"
         val file = File(context.filesDir, fileName)
         return if (!file.exists()) {
@@ -84,11 +91,12 @@ abstract class ServerManager {
         }
     }
 
-    private suspend fun <T> loadFromAssets(context: Context, languageCode: String): T? {
+    private suspend fun loadFromAssets(context: Context, languageCode: String): T? {
         val fileName = "$prefix$languageCode$extension"
         @Suppress("BlockingMethodInNonBlockingContext")
         return withContext(Dispatchers.IO) {
-            if (context.assets.list(folderName)?.contains(fileName) != true) {
+            // Remove suffix to fix list asset issue with older API
+            if (context.assets.list(folderName.removeSuffix("/"))?.contains(fileName) != true) {
                 null
             } else {
                 gson.fromJson<T>(context.assets.open("$folderName$fileName").use {
@@ -107,6 +115,18 @@ abstract class ServerManager {
     private fun saveLastRefresh(context: Context) {
         PreferenceManager.getDefaultSharedPreferences(context).edit {
             putLong(lastRefreshSharedPrefsKey, System.currentTimeMillis())
+        }
+    }
+
+    private suspend fun fileNotCorrupted(file: File): Boolean {
+        return withContext(Dispatchers.IO) {
+            try {
+                gson.fromJson<T>(transform(file.readText()), type)
+                true
+            } catch (e: JsonSyntaxException) {
+                Timber.e(e, "Fetched corrupted file ${file.name}")
+                false
+            }
         }
     }
 

@@ -11,6 +11,7 @@
 package com.lunabeestudio.robert.datasource
 
 import androidx.lifecycle.LiveData
+import com.lunabeestudio.domain.model.Attestation
 import com.lunabeestudio.domain.model.Calibration
 import com.lunabeestudio.domain.model.Configuration
 import com.lunabeestudio.domain.model.FormEntry
@@ -35,8 +36,9 @@ interface LocalKeystoreDataSource {
     var atRiskModelVersion: Int?
     var deprecatedLastRiskReceivedDate: Long?
     var deprecatedLastExposureTimeframe: Int?
-    val attestationsLiveData: LiveData<List<Map<String, FormEntry>>?>
-    var attestations: List<Map<String, FormEntry>>?
+    val attestationsLiveData: LiveData<List<Attestation>?>
+    var attestations: List<Attestation>?
+    var deprecatedAttestations: List<Map<String, FormEntry>>?
     var savedAttestationData: Map<String, FormEntry>?
     var saveAttestationData: Boolean?
     var reportDate: Long?

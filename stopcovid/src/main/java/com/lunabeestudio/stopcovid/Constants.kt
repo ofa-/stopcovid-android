@@ -56,8 +56,10 @@ object Constants {
     }
 
     object Attestation {
-        const val KEY_REASON: String = "reason"
+        const val DATA_KEY_REASON: String = "reason"
         const val KEY_DATE_TIME: String = "datetime"
+        const val KEY_CREATION_DATE: String = "creationDate"
+        const val KEY_CREATION_HOUR: String = "creationHour"
         const val VALUE_REASON_SPORT: String = "sport_animaux"
     }
 

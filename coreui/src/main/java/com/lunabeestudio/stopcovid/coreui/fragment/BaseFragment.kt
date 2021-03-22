@@ -14,13 +14,14 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import com.lunabeestudio.stopcovid.coreui.extension.stringsFormat
+import com.lunabeestudio.stopcovid.coreui.manager.LocalizedStrings
 import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
 
 abstract class BaseFragment : Fragment() {
 
     abstract fun refreshScreen()
 
-    val strings: HashMap<String, String>
+    val strings: LocalizedStrings
         get() = StringsManager.strings
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

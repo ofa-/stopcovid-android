@@ -23,6 +23,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.lunabeestudio.domain.model.FormEntry
+import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.robert.extension.observeEventAndConsume
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
@@ -30,9 +31,10 @@ import com.lunabeestudio.stopcovid.coreui.extension.hideSoftKeyBoard
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.switchItem
-import com.lunabeestudio.stopcovid.extension.attestationLabelFromKey
-import com.lunabeestudio.stopcovid.extension.attestationPlaceholderFromKey
+import com.lunabeestudio.stopcovid.extension.attestationLabel
+import com.lunabeestudio.stopcovid.extension.attestationPlaceholder
 import com.lunabeestudio.stopcovid.extension.attestationShortLabelFromKey
+import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
 import com.lunabeestudio.stopcovid.extension.showSpinnerDatePicker
@@ -56,6 +58,10 @@ class NewAttestationFragment : MainFragment() {
     private val viewModel: NewAttestationViewModel by activityViewModels { NewAttestationViewModelFactory(requireContext().secureKeystoreDataSource()) }
     private val dateFormat: DateFormat = SimpleDateFormat.getDateInstance(DateFormat.LONG)
     private val dateTimeFormat: DateFormat = SimpleDateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.SHORT, Locale.getDefault())
+
+    private val robertManager: RobertManager by lazy {
+        requireContext().robertManager()
+    }
 
     override fun getTitleKey(): String = "newAttestationController.title"
 
@@ -96,7 +102,7 @@ class NewAttestationFragment : MainFragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return if (item.itemId == R.id.item_text) {
             if (viewModel.areInfosValid()) {
-                        viewModel.generateQrCode()
+                        viewModel.generateQrCode(robertManager, strings)
                         findNavControllerOrNull()?.navigateUp()
             } else {
                 MaterialAlertDialogBuilder(requireContext())
@@ -165,62 +171,67 @@ class NewAttestationFragment : MainFragment() {
     private fun itemForFormField(formField: FormField): GenericItem {
         return when (formField.type) {
             "date" -> pickerEditTextItem {
-                placeholder = strings[formField.key.attestationPlaceholderFromKey()]
-                hint = strings[formField.key.attestationLabelFromKey()]
-                text = viewModel.infos[formField.key]?.value?.toLongOrNull()?.let { timestamp ->
+                placeholder = strings[formField.attestationPlaceholder()]
+                hint = strings[formField.attestationLabel()]
+                text = viewModel.infos[formField.dataKeyValue]?.value?.toLongOrNull()?.let { timestamp ->
                     dateFormat.format(Date(timestamp))
                 }
                 onClick = {
-                    val initialTimestamp = viewModel.infos[formField.key]?.value?.toLongOrNull()
+                    val initialTimestamp = viewModel.infos[formField.dataKeyValue]?.value?.toLongOrNull()
                         ?: Calendar.getInstance().apply {
                             timeInMillis = System.currentTimeMillis()
                             set(Calendar.YEAR, get(Calendar.YEAR) - 18)
                         }.timeInMillis
                     MaterialAlertDialogBuilder(requireContext()).showSpinnerDatePicker(strings, initialTimestamp) { newDate ->
                         text = dateFormat.format(Date(newDate))
-                        viewModel.infos[formField.key] = FormEntry(newDate.toString(), formField.type)
+                        viewModel.infos[formField.dataKeyValue] = FormEntry(newDate.toString(), formField.type, formField.key)
                         binding?.recyclerView?.adapter?.notifyDataSetChanged()
                     }
                 }
             }
             "datetime" -> {
-                if (viewModel.infos[formField.key] == null) {
-                    viewModel.infos[formField.key] = FormEntry(System.currentTimeMillis().toString(), formField.type)
+                if (viewModel.infos[formField.dataKeyValue] == null) {
+                    viewModel.infos[formField.dataKeyValue] = FormEntry(
+                        System.currentTimeMillis().toString(),
+                        formField.type,
+                        formField.key
+                    )
                 }
                 pickerEditTextItem {
-                    placeholder = strings[formField.key.attestationPlaceholderFromKey()]
-                    hint = strings[formField.key.attestationLabelFromKey()]
-                    text = viewModel.infos[formField.key]?.value?.toLongOrNull()?.let { timestamp ->
+                    placeholder = strings[formField.attestationPlaceholder()]
+                    hint = strings[formField.attestationLabel()]
+                    text = viewModel.infos[formField.dataKeyValue]?.value?.toLongOrNull()?.let { timestamp ->
                         dateTimeFormat.format(Date(timestamp))
                     }
                     onClick = {
-                        val initialTimestamp = viewModel.infos[formField.key]?.value?.toLongOrNull()
+                        val initialTimestamp = viewModel.infos[formField.dataKeyValue]?.value?.toLongOrNull()
                             ?: System.currentTimeMillis()
                         showDateTimePicker(initialTimestamp) { newDate ->
                             text = dateTimeFormat.format(Date(newDate))
-                            viewModel.infos[formField.key] = FormEntry(newDate.toString(), formField.type)
+                            viewModel.infos[formField.dataKeyValue] = FormEntry(newDate.toString(), formField.type, formField.key)
                             binding?.recyclerView?.adapter?.notifyDataSetChanged()
                         }
                     }
                 }
             }
             "list" -> pickerEditTextItem {
-                placeholder = strings[formField.key.attestationPlaceholderFromKey()]
-                hint = strings[formField.key.attestationLabelFromKey()]
-                text = strings[viewModel.infos[formField.key]?.value?.attestationShortLabelFromKey()]
+                placeholder = strings[formField.attestationPlaceholder()]
+                hint = strings[formField.attestationLabel()]
+                text = strings[viewModel.getInfoForFormField(formField)?.value?.attestationShortLabelFromKey()]
                 onClick = {
                     findNavControllerOrNull()?.safeNavigate(
                         NewAttestationFragmentDirections.actionNewAttestationFragmentToNewAttestationPickerFragment(
                             formField.key,
-                            viewModel.infos[formField.key]?.value
+                            formField.dataKeyValue,
+                            viewModel.getInfoForFormField(formField)?.value
                         )
                     )
                 }
             }
             else -> editTextItem {
-                placeholder = strings[formField.key.attestationPlaceholderFromKey()]
-                hint = strings[formField.key.attestationLabelFromKey()]
-                text = viewModel.infos[formField.key]?.value
+                placeholder = strings[formField.attestationPlaceholder()]
+                hint = strings[formField.attestationLabel()]
+                text = viewModel.infos[formField.dataKeyValue]?.value
                 textInputType = when (formField.type) {
                     "text" -> when (formField.contentType) {
                         "firstName", "lastName" -> EditorInfo.TYPE_CLASS_TEXT or EditorInfo.TYPE_TEXT_VARIATION_PERSON_NAME
@@ -233,7 +244,7 @@ class NewAttestationFragment : MainFragment() {
                 textImeOptions = EditorInfo.IME_ACTION_NEXT
                 onTextChange = { newValue ->
                     text = newValue.toString()
-                    viewModel.infos[formField.key] = FormEntry(newValue.toString(), formField.type)
+                    viewModel.infos[formField.dataKeyValue] = FormEntry(newValue.toString(), formField.type, formField.key)
                 }
             }
         }

@@ -59,6 +59,7 @@ import com.lunabeestudio.stopcovid.extension.hideRiskStatus
 import com.lunabeestudio.stopcovid.extension.lastVersionCode
 import com.lunabeestudio.stopcovid.fragment.AboutFragment
 import com.lunabeestudio.stopcovid.manager.AppMaintenanceManager
+import com.lunabeestudio.stopcovid.manager.AttestationsManager
 import com.lunabeestudio.stopcovid.manager.CalibDataSource
 import com.lunabeestudio.stopcovid.manager.ConfigDataSource
 import com.lunabeestudio.stopcovid.manager.FormManager
@@ -177,6 +178,7 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
         }
         appCoroutineScope.launch {
             StringsManager.initialize(this@StopCovid)
+            migrateAttestationsIfNeeded()
         }
         appCoroutineScope.launch {
             InfoCenterManager.initialize(this@StopCovid)
@@ -208,6 +210,10 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
         AboutFragment.Downloader(applicationContext).autoDeleteFile()
 
         sharedPrefs.lastVersionCode = BuildConfig.VERSION_CODE
+    }
+
+    private fun migrateAttestationsIfNeeded() {
+        AttestationsManager.migrateAttestationsIfNeeded(robertManager, secureKeystoreDataSource, StringsManager.strings)
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
@@ -503,7 +509,7 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
             DurationUnit.HOURS,
             DurationUnit.MILLISECONDS
         )
-        secureKeystoreDataSource.attestations = secureKeystoreDataSource.attestations?.filter { attestation ->
+        secureKeystoreDataSource.deprecatedAttestations = secureKeystoreDataSource.deprecatedAttestations?.filter { attestation ->
             (attestation["datetime"]?.value?.toLongOrNull() ?: 0L) > expiredMilliSeconds
         }
     }

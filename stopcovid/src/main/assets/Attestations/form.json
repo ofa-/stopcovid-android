@@ -42,44 +42,76 @@
          "type":"datetime"
       },
       {
-         "key":"reason",
+         "key":"reason_curfew",
+         "dataKey": "reason",
          "type":"list",
          "items":[
             {
-               "code":"travail"
+               "code":"reason_curfew.travail"
             },
             {
-               "code":"sante"
+               "code":"reason_curfew.sante"
             },
             {
-               "code":"famille"
+               "code":"reason_curfew.famille"
             },
             {
-	            "code":"handicap"
+	            "code":"reason_curfew.handicap"
             },
             {
-               "code":"judiciaire"
+               "code":"reason_curfew.judiciaire"
             },
             {
-               "code":"missions"
+               "code":"reason_curfew.missions"
             },
             {
-               "code":"transit"
+               "code":"reason_curfew.transit"
             },
             {
-	            "code":"animaux"
+	            "code":"reason_curfew.animaux"
+            }
+         ]
+      },
+      {
+         "key":"reason_lockdown",
+         "dataKey": "reason",         
+         "type":"list",
+         "items":[
+            {
+               "code":"reason_lockdown.sport"
             },
             {
-	            "code":"courses"
+               "code":"reason_lockdown.achats"
             },
             {
-	            "code":"sport"
+               "code":"reason_lockdown.enfants"
             },
             {
-	            "code":"rassemblement"
+	            "code":"reason_lockdown.culte_culturel"
             },
             {
-	            "code":"demarche"
+	            "code":"reason_lockdown.demarche"
+            },
+            {
+	            "code":"reason_lockdown.travail"
+            },
+            {
+	            "code":"reason_lockdown.sante"
+            },
+            {
+	            "code":"reason_lockdown.famille"
+            },
+            {
+	            "code":"reason_lockdown.handicap"
+            },
+            {
+	            "code":"reason_lockdown.judiciaire"
+            },
+            {
+	            "code":"reason_lockdown.demenagement"
+            },
+            {
+	            "code":"reason_lockdown.transit"
             }
          ]
       }
