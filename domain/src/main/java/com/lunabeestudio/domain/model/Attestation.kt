@@ -5,13 +5,15 @@
  *
  * Authors
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Created by Lunabee Studio / Date - 2020/29/10 - for the STOP-COVID project
+ * Created by Lunabee Studio / Date - 2021/22/03 - for the TOUS-ANTI-COVID project
  */
 
 package com.lunabeestudio.domain.model
 
-data class FormEntry(
-    val value: String?,
-    val type: String,
-    val key: String
+class Attestation(
+    val qrCode: String,
+    val footer: String,
+    val qrCodeString: String,
+    val timestamp: Long,
+    val reason: String
 )

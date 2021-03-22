@@ -11,7 +11,6 @@
 package com.lunabeestudio.stopcovid.fragment
 
 import androidx.fragment.app.activityViewModels
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.lunabeestudio.domain.model.FormEntry
 import com.lunabeestudio.stopcovid.R
@@ -32,10 +31,18 @@ class NewAttestationPickerFragment : MainFragment() {
 
     private val args: NewAttestationPickerFragmentArgs by navArgs()
 
-    override fun getTitleKey(): String = "attestation.form.${args.key}.label"
+    override fun getTitleKey(): String = "attestation.form.${args.key}.title"
 
     override fun getItems(): List<GenericItem> {
         val items = ArrayList<GenericItem>()
+
+        if (!strings["attestation.form.${args.key}.header"].isNullOrBlank()) {
+            items += captionItem {
+                text = strings["attestation.form.${args.key}.header"]
+                textAppearance = R.style.TextAppearance_StopCovid_Caption_Small_Grey
+                identifier = text.hashCode().toLong()
+            }
+        }
 
         FormManager.form.value?.peekContent()?.let { form ->
             form.forEach { section ->
@@ -48,7 +55,7 @@ class NewAttestationPickerFragment : MainFragment() {
                         caption = strings[formEntryItem.code.attestationLongLabelFromKey()]
                         showSelection = formEntryItem.code == args.selectedCode
                         onClick = {
-                            viewModel.infos[args.key] = FormEntry(formEntryItem.code, formEntry.type)
+                            viewModel.pickFormEntry(args.dataKey, FormEntry(formEntryItem.code, formEntry.type, args.key))
                             findNavControllerOrNull()?.popBackStack()
                         }
                         identifier = title.hashCode().toLong()
@@ -56,9 +63,9 @@ class NewAttestationPickerFragment : MainFragment() {
                 }
             }
         }
-        if (!strings["attestationFieldItemChoiceController.footer"].isNullOrBlank()) {
+        if (!strings["attestation.form.${args.key}.footer"].isNullOrBlank()) {
             items += captionItem {
-                text = strings["attestationFieldItemChoiceController.footer"]
+                text = strings["attestation.form.${args.key}.footer"]
                 textAppearance = R.style.TextAppearance_StopCovid_Caption_Small_Grey
                 identifier = text.hashCode().toLong()
             }

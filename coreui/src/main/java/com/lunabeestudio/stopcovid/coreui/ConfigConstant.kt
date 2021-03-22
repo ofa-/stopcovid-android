@@ -12,7 +12,7 @@ package com.lunabeestudio.stopcovid.coreui
 
 object ConfigConstant {
     private const val BASE_URL: String = "https://app.stopcovid.gouv.fr/"
-    private const val VERSION_PATH: String = "json/version-28/"
+    private const val VERSION_PATH: String = "json/version-29/"
     private const val VERSIONED_SERVER_URL: String = BASE_URL + VERSION_PATH
     const val SERVER_CERTIFICATE_SHA256: String = "sha256/sXQojvwsiyblrpMQIVRXGC5u7AgknzTJm+VIK1kQmD8="
 

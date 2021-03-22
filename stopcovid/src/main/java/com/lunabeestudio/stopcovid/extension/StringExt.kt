@@ -52,10 +52,6 @@ fun String.isPostalCode(): Boolean {
     return length == 5 && this.isDigitsOnly()
 }
 
-fun String.attestationLabelFromKey(): String = "attestation.form.$this.label"
-
-fun String.attestationPlaceholderFromKey(): String = "attestation.form.$this.placeholder"
-
 fun String.attestationShortLabelFromKey(): String = "attestation.form.$this.shortLabel"
 
 fun String.attestationLongLabelFromKey(): String = "attestation.form.$this.longLabel"

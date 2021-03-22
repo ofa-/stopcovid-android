@@ -15,8 +15,12 @@ data class FormField(
     val type: String,
     val value: String,
     val contentType: String?,
-    val items: List<FormEntryItem>?
-)
+    val items: List<FormEntryItem>?,
+    val dataKey: String?
+) {
+    val dataKeyValue: String
+        get() = dataKey ?: key
+}
 
 data class FormEntryItem(
     val code: String

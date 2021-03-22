@@ -445,10 +445,10 @@
    "attestation.form.sport_animaux.longLabel":"Déplacements en plein air ou vers un lieu de plein air, sans changement du lieu de résidence, dans la limite de trois heures quotidiennes et dans un rayon maximal de vingt kilomètres autour du domicile, liés soit à l’activité physique ou aux loisirs individuels, à l’exclusion de toute pratique sportive collective et de toute proximité avec d’autres personnes, soit à la promenade avec les seules personnes regroupées dans un même domicile, soit aux besoins des animaux de compagnie",
    
    "attestation.form.convocation.shortLabel":"5. Convocation judiciaire ou administrative",
-   "attestation.form.convocation.longLabel":"Déplacements pour répondre à une convocation judiciaire ou administrative",
+   "attestation.form.convocation.longLabel":"Déplacements pour répondre à une convocation judiciaire ou administrative, déplacements pour se rendre chez un professionnel du droit, pour un acte ou une démarche qui ne peuvent être réalisés à distance",
    
    "attestation.form.judiciaire.shortLabel":"5. Convocation judiciaire ou administrative",
-   "attestation.form.judiciaire.longLabel":"Déplacements pour répondre à une convocation judiciaire ou administrative",
+   "attestation.form.judiciaire.longLabel":"Déplacements pour répondre à une convocation judiciaire ou administrative, déplacements pour se rendre chez un professionnel du droit, pour un acte ou une démarche qui ne peuvent être réalisés à distance",
    
    "attestation.form.missions.shortLabel":"6. Missions d'intérêt général",
    "attestation.form.missions.longLabel":"Déplacements pour participer à des missions d’intérêt général sur demande de l’autorité administrative",
@@ -460,7 +460,7 @@
    "attestation.form.transit.longLabel":"Déplacements liés à des transits ferroviaires, aériens ou en bus pour des déplacements de longues distances",
    
    "attestation.form.animaux.shortLabel":"8. Animaux de compagnie",
-   "attestation.form.animaux.longLabel":"Déplacements brefs autour du domicile pour les besoins des animaux de compagnie [2]",
+   "attestation.form.animaux.longLabel":"Déplacements brefs dans un rayon maximal d’un kilomètre autour du domicile pour les besoins des animaux de compagnie",
    
    "attestation.form.enfants.shortLabel":"Enfants à l’école",
    "attestation.form.enfants.longLabel":"Déplacements pour chercher les enfants à l’école et à l’occasion de leurs activités périscolaires",
@@ -475,7 +475,7 @@
    "attestation.form.rassemblement.longLabel":"Déplacements à destination ou en provenance d'un lieu de culte, participation à des rassemblements, réunions ou activités sur la voie publique ou dans un lieu ouvert au public qui ne sont pas interdits en application de l'article 3\n👉 motif pour les territoires soumis à un confinement le week-end [1]",
    
    "attestation.form.demarche.shortLabel":"12. Démarches administratives ou juridiques",
-   "attestation.form.demarche.longLabel":"Déplacements pour se rendre dans un service public ou chez un professionnel du droit, pour un acte ou une démarche qui ne peuvent être réalisés à distance.\n👉 motif pour les territoires soumis à un confinement le week-end [1]",
+   "attestation.form.demarche.longLabel":"Déplacements pour se rendre dans un service public.\n👉 motif pour les territoires soumis à un confinement le week-end [1]",
    
    
     "accessibility.keyFigures.noValueAvailable": "المعلومة غير متوفرة",
@@ -511,7 +511,7 @@
     "newAttestationController.generate.alert.validate": "التأكيد",
     "newAttestationController.missingInfo.alert.title": "انتبه",
     "newAttestationController.missingInfo.alert.message": "عليك ملء جميع الخانات للتمكن من إصدار الإفادة.",
-    "attestationController.footer": "ويسعك أيضًا استعمال موقع وزارة الداخلية لإصدار الإفادة في ملف PDF:",
+    "attestationController.footer":"Vous pouvez également utiliser l'attestation web sur le site web du Ministère de l’Intérieur :",
     "attestationsController.validAttestationsSection.title": "إفاداتي",
     "attestationsController.validAttestationsSection.subtitle": "هذه الإفادات سارية المفعول.",
     "attestationsController.expiredSection.title": "منتهية الصلاحية",
@@ -522,7 +522,7 @@
     "newAttestationController.generate.error.alert.title": "انتبه",
     "newAttestationController.generate.error.alert.message": "وقع خطأ أثناء إصدار الإفادة",
     "accessibility.hint.otherActions": "أفعال أخرى",
-    "attestationFieldItemChoiceController.footer":"Les personnes souhaitant bénéficier de l'une de ces exceptions doivent se munir s'il y a lieu, lors de leurs déplacements hors de leur domicile, d'un document leur permettant de justifier que le déplacement considéré entre dans le champ de l'une de ces exceptions.\n\n[1] Motifs supplémentaires applicables uniquement de 6h à 18h dans les territoires soumis à un confinement le week-end\n\n[2] La distance autorisée pour ces déplacements peut varier.\n\n[3] La distance et la durée autorisées peuvent varier en fonction des mesures locales.",
+    "attestationFieldItemChoiceController.footer":"Les personnes souhaitant bénéficier de l'une de ces exceptions doivent se munir s'il y a lieu, lors de leurs déplacements hors de leur domicile, d'un document leur permettant de justifier que le déplacement considéré entre dans le champ de l'une de ces exceptions.",
     "keyFiguresController.explanation": "لمزيد من المعلومات",
     "keyFiguresController.explanation.alert.title": "الأرقام الأساسية",
     "keyFiguresController.explanation.alert.message": "يجب تفسير المؤشرات بحذر وفي ضوء أنشطة التشخيص والسياق الصحي وخصائص السكان (العمر ، كثافة السكان ، العوامل المضاعفة للخطر ، إلخ) ووفقا لجودة البيانات وتواترها مع تحليلها بشكل شامل . لمزيد من المعلومات بشأن تحليل الوضع الصحي السائد يرجى الاستناد إلى بيان الوباء الأسبوعي لـ ( Santé publique France) (SpF)المتاح على الوقع santepubliquefrance.fr\n\nيتم حساب R الفعال على مدى 7 أيام ابتداء من  يوم-9 الى يوم-3.  تتوقّف البيانات يوم الثلاثاء وتُنشر مرة  في الأسبوع (يوم الخميس). يتوفر R الفعال على المستوى الوطني (فرنسا الحضرية) وعلى المستوى الإقليمي (المناطق الحضرية وأقاليم ما وراء البحار). يتم تحديث باقي المؤشرات يوميًا ، بعد دمجها من قبل SpF ووزارة التضامن والصحة. أمّا على المستوى الوطني فيتم وقف معدل الإصابة ومعدل الإيجابية عند يوم-3 ، كما يتم حسابهما على أساس متوسط  الأيام السبعة الأخيرة [يوم9 ؛ يوم 3] بغية مراعاة جل المتغيرات. يتوقّف عدّ مؤشّر الحالات الجديدة  لدى يوم-1 ، وبالتالي من دون امكانية الأخذ بعين الاعتبار جلّ السياق لاعتباره يعكس حقيقة الوضع الصحي السائد",
@@ -534,7 +534,7 @@
     "home.healthSection.isSick.subtitle": "للمزيد من المعلومات",
     "myHealthController.sick.title": "التوصيات الصحية",
     "home.attestationSection.title": "انتبه",
-    "home.attestationSection.cell.title":"Vos attestations (couvre-feu et confinement week-end)",
+    "home.attestationSection.cell.title":"Vos attestations (nouveau !)",
     "home.attestationSection.cell.subtitle.noAttestations": "اضغط هنا",
     "home.attestationSection.cell.subtitle.oneAttestation": "الافادة 1",
     "home.attestationSection.cell.subtitle.multipleAttestations": "%d الافادات ",
@@ -560,7 +560,7 @@
     "sendHistoryController.successAlert.message": "شكرا على اعلانك عبر منصة TousAntiCovid واعلامك المستخدمين الذين تواجدوا على مقربة منك خلال الفترة التي كنت فيها مُعدياً.\n\nبفضلك سيتمكّن أولئك المستخدمون من اتخاذ التدابير الضرورية لحماية أنفسهم وغيرهم. شكرا لاسهامك في مكافحة جائحة الكوفيد.",
     "sendHistoryController.successAlert.button.learnMore": "لمزيد من المعلومات",
     "keyFiguresExplanationsController.title": "تفسير الأرقام",
-    "keyFiguresController.section.health.subtitle": "اضغط على \"القراءة الآن\" لتعرف المزيد بشأن مصادر البيانات الصحية وتفسيرها وتحديثها.",
+    "keyFiguresController.section.health.subtitle": "⚠️ Suite à des incidents techniques dans la chaine de remontée de données vers Santé publique France, tous les indicateurs épidémiologiques quotidiens ne pourront être produits aujourd’hui. Seuls les indicateurs sur la situation en réanimation et le nombre total de personnes vaccinées au niveau national seront disponibles aujourd’hui.\n\nاضغط على \"القراءة الآن\" لتعرف المزيد بشأن مصادر البيانات الصحية وتفسيرها وتحديثها.",
     "keyFiguresController.section.health.button": "القراءة الآن",
     "home.activation.sick.alert.title": "معلومات",
     "home.activation.sick.alert.message": "لا يمكنك تشغيل الانذار في حال تعرّضك الى الكوفيد-19 خلال الشهرين المواليين لاعلانك عن ايجابيتك للكوفيد19\n\nاذ أنّه لا يمكن اعتبارك \"من الحالات التي قد تتعرّض  للاصابة\" خلال الشهرين المواليين لتحليل ايجابي للكوفيد19\n\n",
@@ -715,20 +715,20 @@
    "home.vaccinationSection.cellSubtitle": "Vérifiez votre éligibilité et trouvez un centre près de chez vous pour vous faire vacciner.",
    "vaccinationController.title": "Vaccination",
    "vaccinationController.eligibility.title": "Suis-je prioritaire pour me faire vacciner ?",
-   "vaccinationController.eligibility.subtitle": "Aujourd’hui, les publics prioritaires définis par les autorités sanitaires sont :\n- NOUVEAU 👉 Les personnes de 50 à 64 ans inclus, souffrant d’une ou plusieurs des comorbidités (appuyez sur \"En savoir plus\" pour plus de détails)\n- Les résidents de 60 ans et plus dans les foyers de travailleurs migrants (FTM)\n- Les professionnels du secteur de la santé et du secteur médico-social appartenant aux catégories prioritaires (appuyez sur \"En savoir plus\" pour plus de détails),\n- Les personnes âgées de plus de 75 ans,\n- Les personnes vulnérables ayant une pathologie qui les expose à un très haut risque face à la Covid-19 disposant d’une ordonnance médicale pour se faire vacciner prioritairement,\n- Les personnes âgées résidant en établissements (par exemple EHPAD, USLD),\n- Les personnes en situation de handicap hébergées en établissement",
+   "vaccinationController.eligibility.subtitle": "Aujourd’hui, les publics prioritaires définis par les autorités sanitaires sont :\n- Les personnes de 50 à 74 ans inclus, souffrant d’une ou plusieurs des comorbidités (appuyez sur \"En savoir plus\" pour plus de détails)\n- Les résidents de 60 ans et plus dans les foyers de travailleurs migrants (FTM)\n- Les professionnels du secteur de la santé et du secteur médico-social appartenant aux catégories prioritaires (appuyez sur \"En savoir plus\" pour plus de détails),\n- Les personnes âgées de plus de 75 ans,\n- Les personnes vulnérables ayant une pathologie qui les expose à un très haut risque face à la COVID-19,\n- Les personnes âgées résidant en établissements (par exemple EHPAD, USLD),\n- Les personnes en situation de handicap hébergées en établissement",
    "vaccinationController.eligibility.buttonTitle": "En savoir plus",
    "vaccinationController.eligibility.url": "https://solidarites-sante.gouv.fr/grands-dossiers/vaccin-covid-19/article/la-strategie-vaccinale-et-la-liste-des-publics-prioritaires",
    "vaccinationController.vaccinationLocation.title": "Trouver un centre pour me faire vacciner",
    "vaccinationController.vaccinationLocation.subtitle": "Rendez vous sur www.Santé.fr pour trouver les centres de vaccination.",
    "vaccinationController.vaccinationLocation.buttonTitle": "Aller sur Santé.fr",
-   "vaccinationController.vaccinationLocation.url": "https://www.sante.fr/carte-vaccination-covid?source=TousAntiCovid",
+   "vaccinationController.vaccinationLocation.url": "https://www.sante.fr/cf/centres-vaccination-covid.html?source=TousAntiCovid",
    "contactUs.url": "https://bonjour.tousanticovid.gouv.fr/contact.html",
    
    "keyfigure.nombrevaccinations.colorCode.light":"#34C859",
    "keyfigure.nombrevaccinations.colorCode.dark":"#31D158",
    "keyfigure.nombrevaccinations.label":"Nombre total de personnes vaccinées",
    "keyfigure.nombrevaccinations.shortLabel":"Total vaccinés",
-   "keyfigure.nombrevaccinations.description":"Cet indicateur représente le nombre total de personnes primo-vaccinées (personnes ayant reçu une première injection). Les données sont consolidées le lendemain de leur remontée pour tenir compte des dernières données de vaccination de la veille au soir.",
+   "keyfigure.nombrevaccinations.description":"Cet indicateur représente le nombre total de personnes primo-vaccinées (personnes ayant reçu une première injection).\nLes données sont consolidées le lendemain de leur remontée pour tenir compte des dernières données de vaccination de la veille au soir.",
    "enterCodeController.alert.expiredCode.title":"Expiré",
    "enterCodeController.alert.expiredCode.message":"Votre présence dans ce lieu date de plus de 14 jours. Il n'est donc plus utile d'un point de vue sanitaire de l'ajouter à votre historique.",
    
@@ -748,7 +748,7 @@
    "home.activationExplanation.message": "Votre téléphone ne supportant pas complètement le Bluetooth Low Energy (BLE), TousAntiCovid va  redémarrer le Bluetooth de votre téléphone assez fréquemment pour fonctionner correctement.",
    "accessibility.hint.keyFigure.chart.share": "Partager le graphique du chiffre clé",
    
-   "keyfigure.nombrevaccinations.learnMore":"Le nombre cumulé de personnes vaccinées en France est obtenu quotidiennement via l’outil \"Vaccin Covid\" dans lequel le nombre de personnes vaccinées est enregistré directement. Les données sont ensuite consolidées par Santé publique France puis publiées sur data.gouv. Les données sont disponibles au niveau régional et national de manière quotidienne.",
+   "keyfigure.nombrevaccinations.learnMore":"Le nombre cumulé de personnes vaccinées en France est obtenu quotidiennement via l’outil \"Vaccin Covid\" dans lequel le nombre de personnes vaccinées est enregistré directement.\n\nLes données sont ensuite consolidées par Santé publique France puis publiées sur data.gouv.\n\nLes données sont disponibles au niveau régional et national de manière quotidienne.",
 
    "vaccinationController.vaccinationLocation.newPostalCode": "Renseigner un code postal",
    "vaccinationController.vaccinationLocation.updatePostalCode": "Changer de code postal",
@@ -816,7 +816,8 @@
 	
 	"risk0.home.title" : "Pas de contact à risque détecté",
 	"risk0.home.sub" : "Appuyez pour avoir des conseils, savoir où se faire dépister et plus",
-	"risk0.details.title" : "Pas de contact à risque détectée",
+	"risk0.details.title" : "Pas de contact à risque détecté",
+	"risk0.widget.longTitle" : "Pas de contact à risque détecté. Appuyez pour avoir des conseils, savoir où se faire dépister et plus",
 	"risk0.details.sub" : "N'oubliez pas pour autant les mesures barrières et les recommandations sanitaires",
 	"risk0.section1.title" : "Votre risque",
 	"risk0.section1.body" : "Vous n'avez pas été à proximité d'un utilisateur testé positif et contagieux.\n\nVous serez averti si vous avez été à proximité (distance estimée à moins de deux mètres) d'un utilisateur déclaré comme un cas de COVID-19.\n\nLa vérification de votre état se fait environ toutes les 24h.\n\nTousAntiCovid vous donnera alors les recommandations du ministère des Solidarités et de la Santé.",
@@ -858,8 +859,91 @@
 	"risk4.section1.body" : "Vous avez été exposé à au moins un utilisateur testé positif et contagieux, vous êtes un contact à risque.\n\nLa date de contact affichée est approximative à plus ou moins un jour, pour préserver l’anonymat des personnes s'étant déclarées positives.\n\nSi vous avez le moindre doute notamment sur votre exposition à risque, contactez votre médecin en l'informant que vous avez été à proximité d'au moins un utilisateur testé positif et contagieux.",
 
   "myHealthController.workStopping.title": "Arrêt de travail",
-  "myHealthController.workStopping.message": "Vous avez ici un lien unique qui vous permet de faire une demande d'arrêt de travail sur Ameli.fr.\nVous pouvez réaliser cette demande à partir de votre smartphone, ou bien vous envoyer le lien pour faire la demande sur votre ordinateur.",
-  "myHealthController.workStopping.link": "Commencer la demande d'arrêt",
-  "myHealthController.workStopping.share": "M'envoyer le lien unique"
+  "myHealthController.workStopping.message": "Vous avez ici un lien unique qui vous permet de faire une demande d'arrêt de travail sur Ameli.fr, pendant 7 jours uniquement après la date de contact.\nVous pouvez réaliser cette demande à partir de votre smartphone, ou bien vous envoyer le lien pour faire la demande sur votre ordinateur.",
+  "myHealthController.workStopping.link": "Demander un arrêt",
+  "myHealthController.workStopping.share": "M'envoyer le lien unique",
+  
+  
+  
+  
+   "attestation.form.reason_curfew.label":"Motif de couvre-feu (19h-6h)",
+   "attestation.form.reason_curfew.placeholder":"-",
+   
+   "attestation.form.reason_curfew.travail.shortLabel":"1. Activité professionnelle enseignement et formation",
+   "attestation.form.reason_curfew.travail.longLabel":"Déplacements entre le domicile et le lieu d’exercice de l’activité professionnelle ou le lieu d’enseignement et de formation, déplacements professionnels ne pouvant être différés",
+   
+    "attestation.form.reason_curfew.sante.shortLabel":"2. Consultations et soins",
+   "attestation.form.reason_curfew.sante.longLabel":"Déplacements pour des consultations, examens, actes de prévention (dont vaccination) et soins ne pouvant être assurés à distance ou pour l’achat de produits de santé",
+   
+   "attestation.form.reason_curfew.famille.shortLabel":"3. Motif familial impérieux, personnes vulnérables ou précaires ou gardes d'enfants",
+   "attestation.form.reason_curfew.famille.longLabel":"Déplacements pour motif familial impérieux, pour l’assistance aux personnes vulnérables ou précaires ou pour la garde d’enfants",
+   
+   "attestation.form.reason_curfew.handicap.shortLabel":"4. Situation de handicap",
+   "attestation.form.reason_curfew.handicap.longLabel":"Déplacements des personnes en situation de handicap et de leur accompagnant",
+   
+   "attestation.form.reason_curfew.judiciaire.shortLabel":"5. Convocation judiciaire ou administrative",
+   "attestation.form.reason_curfew.judiciaire.longLabel":"Déplacements pour répondre à une convocation judiciaire ou administrative, déplacements pour se rendre chez un professionnel du droit, pour un acte ou une démarche qui ne peuvent être réalisés à distance",
+   
+   "attestation.form.reason_curfew.missions.shortLabel":"6. Missions d'intérêt général",
+   "attestation.form.reason_curfew.missions.longLabel":"Déplacements pour participer à des missions d’intérêt général sur demande de l’autorité administrative",
+   
+   "attestation.form.reason_curfew.transit.shortLabel":"7. Déplacements de transit et longue distance",
+   "attestation.form.reason_curfew.transit.longLabel":"Déplacements liés à des transits ferroviaires, aériens ou en bus pour des déplacements de longues distances",
+   
+   
+   "attestation.form.reason_curfew.animaux.shortLabel":"8. Animaux de compagnie",
+   "attestation.form.reason_curfew.animaux.longLabel":"Déplacements brefs dans un rayon maximal d’un kilomètre autour du domicile pour les besoins des animaux de compagnie",
+   
+   "attestation.form.reason_curfew.title":"Motifs couvre-feu",
+   
+    "attestation.form.reason_curfew.header":"Choisissez le motif couvre-feu (19h-6h) :",
+    
+   "attestation.form.reason_curfew.footer":"Les personnes souhaitant bénéficier de l'une de ces exceptions doivent se munir s'il y a lieu, lors de leurs déplacements hors de leur domicile, d'un document leur permettant de justifier que le déplacement considéré entre dans le champ de l'une de ces exceptions.",
+   
+   
+   "attestation.form.reason_lockdown.label":"Motif de journée (6h-19h)",
+   "attestation.form.reason_lockdown.placeholder":"-",
+   
+   "attestation.form.reason_lockdown.sport.shortLabel":"1. Activité physique et promenade",
+   "attestation.form.reason_lockdown.sport.longLabel":"Déplacements liés soit à la promenade, soit à l'activité physique individuelle des personnes\n\n👉 Attestation à remplir seulement à défaut de pouvoir présenter un justificatif de domicile.\nDéplacement dans la limite de 10 kilomètres de son domicile",
+   
+   "attestation.form.reason_lockdown.achats.shortLabel":"2. Achats",
+   "attestation.form.reason_lockdown.achats.longLabel":"Déplacements pour effectuer des achats de première nécessité ou des retraits de commandes\n\n👉 Déplacement au sein du département de résidence [1]",
+   
+   "attestation.form.reason_lockdown.enfants.shortLabel":"3. Accompagnement des enfants à l’école",
+   "attestation.form.reason_lockdown.enfants.longLabel":"Déplacements pour emmener et aller chercher les enfants à l’école et à l’occasion de leurs activités péri-scolaires\n\n👉 Déplacement au sein du département de résidence [1]",
+   
+   "attestation.form.reason_lockdown.culte_culturel.shortLabel":"4. Etablissement culturel ou lieu de culte",
+   "attestation.form.reason_lockdown.culte_culturel.longLabel":"Déplacements pour se rendre dans un établissement culturel (bibliothèques et médiathèques) ou un lieu de culte\n\n👉 Déplacement au sein du département de résidence [1]",
+   
+   "attestation.form.reason_lockdown.demarche.shortLabel":"5. Démarches administratives ou juridiques",
+   "attestation.form.reason_lockdown.demarche.longLabel":"Déplacements pour se rendre dans un service public pour un acte ou une démarche qui ne peuvent être réalisés à distance\n\n👉 Déplacement au sein du département de résidence [1]",
+   
+   "attestation.form.reason_lockdown.travail.shortLabel":"6. Activité professionnelle, enseignement et formation, mission d’intérêt général",
+   "attestation.form.reason_lockdown.travail.longLabel":"Déplacements entre le domicile et le lieu d’exercice de l’activité professionnelle ou le lieu d’enseignement et de formation, déplacements professionnels ne pouvant être différés, livraisons à domicile, déplacements pour effectuer des achats de fournitures nécessaires à l'activité professionnelle, déplacements liés à des missions d’intérêt général sur demande de l’autorité administrative\n\n👉 Déplacement sans limitation de distance",
+   
+   "attestation.form.reason_lockdown.sante.shortLabel":"7. Santé (consultations et soins)",
+   "attestation.form.reason_lockdown.sante.longLabel":"Déplacements pour des consultations, examens, actes de prévention (dont vaccination) et soins ne pouvant être assurés à distance ou pour l’achat de produits de santé\n\n👉 Déplacement sans limitation de distance",
+   
+   "attestation.form.reason_lockdown.famille.shortLabel":"8. Motif familial impérieux, personnes vulnérables ou précaires ou gardes d’enfants",
+   "attestation.form.reason_lockdown.famille.longLabel":"Déplacements pour motif familial impérieux, pour l’assistance aux personnes vulnérables ou précaires ou pour la garde d’enfants\n\n👉 Déplacement sans limitation de distance",
+   
+   "attestation.form.reason_lockdown.handicap.shortLabel":"9. Situation de handicap",
+   "attestation.form.reason_lockdown.handicap.longLabel":"Déplacements des personnes en situation de handicap et de leur accompagnant\n\n👉 Déplacement sans limitation de distance",
+   
+   "attestation.form.reason_lockdown.judiciaire.shortLabel":"10. Convocation judiciaire ou administrative",
+   "attestation.form.reason_lockdown.judiciaire.longLabel":"Déplacements pour répondre à une convocation judiciaire ou administrative, déplacements pour se rendre chez un professionnel du droit, pour un acte ou une démarche qui ne peuvent être réalisés à distance\n\n👉 Déplacement sans limitation de distance",
+   
+   "attestation.form.reason_lockdown.demenagement.shortLabel":"11. Déménagement",
+   "attestation.form.reason_lockdown.demenagement.longLabel":"Déplacements liés à un déménagement résultant d'un changement de domicile et déplacements indispensables à l'acquisition ou à la location d’une résidence principale, insusceptibles d'être différés\n\n👉 Déplacement sans limitation de distance",
+   
+   "attestation.form.reason_lockdown.transit.shortLabel":"12. Déplacement de transit vers les gares et les aéroports",
+   "attestation.form.reason_lockdown.transit.longLabel":"👉 Déplacement sans limitation de distance",
+    
+   "attestation.form.reason_lockdown.title":"Motifs journée",
+   
+    "attestation.form.reason_lockdown.header":"Pour les personnes résidant dans les départements soumis à des mesures renforcées, choisissez le motif journée (6h-19h) :",
+    
+   "attestation.form.reason_lockdown.footer":"Les déplacements sont autorisés sous réserve de justifier de l’un des motifs prévus dans la présente attestation.\n\nDans un rayon de 10 km autour du lieu de résidence, les déplacements correspondant peuvent se faire sans attestation sous réserve de pouvoir présenter un justificatif de domicile.\n\nPour les déplacements à l’extérieur des limites du département de résidence, ils ne sont possibles que pour les seuls motifs impérieux mentionnés aux 6 à 12 de la présente attestation.\n\nCes motifs autorisent également les personnes résidant hors des départements soumis à des mesures renforcées à se rendre dans les départements concernés par ces mesures.\n\n[1] Pour les personnes résidant aux frontières d’un département, une tolérance de 30 kms au-delà du département est acceptée"
 
 }

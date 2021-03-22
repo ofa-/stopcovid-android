@@ -14,7 +14,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.lunabeestudio.domain.model.FormEntry
 import com.lunabeestudio.framework.local.datasource.SecureKeystoreDataSource
+import com.lunabeestudio.robert.RobertManager
+import com.lunabeestudio.stopcovid.Constants
+import com.lunabeestudio.stopcovid.coreui.manager.LocalizedStrings
+import com.lunabeestudio.stopcovid.manager.AttestationsManager
 import com.lunabeestudio.stopcovid.manager.FormManager
+import com.lunabeestudio.stopcovid.model.FormField
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -26,23 +31,37 @@ class NewAttestationViewModel(private val secureKeystoreDataSource: SecureKeysto
     private val dateFormat: DateFormat = SimpleDateFormat.getDateInstance(DateFormat.SHORT)
     private val timeFormat: DateFormat = SimpleDateFormat.getTimeInstance(DateFormat.SHORT)
 
-    fun generateQrCode() {
+    fun getInfoForFormField(formField: FormField): FormEntry? {
+        return infos[formField.dataKeyValue]?.takeIf { it.key == formField.key }
+    }
+
+    fun generateQrCode(robertManager: RobertManager, strings: LocalizedStrings) {
         secureKeystoreDataSource.saveAttestationData = shouldSaveInfos
         infos.keys.forEach { key ->
-            infos[key] = FormEntry(infos[key]?.value?.trim(), infos[key]!!.type)
+            infos[key] = FormEntry(infos[key]?.value?.trim(), infos[key]!!.type, key)
         }
         val infosCopy = infos.toMutableMap()
         val now = Date()
-        infosCopy["creationDate"] = FormEntry(dateFormat.format(now), "text")
-        infosCopy["creationHour"] = FormEntry(timeFormat.format(now), "text")
-        secureKeystoreDataSource.attestations = (secureKeystoreDataSource.attestations?.toMutableList() ?: mutableListOf()).apply {
-            add(infosCopy)
-        }
+        infosCopy[Constants.Attestation.KEY_CREATION_DATE] = FormEntry(
+            dateFormat.format(now),
+            "text",
+            Constants.Attestation.KEY_CREATION_DATE
+        )
+        infosCopy[Constants.Attestation.KEY_CREATION_HOUR] = FormEntry(
+            timeFormat.format(now),
+            "text",
+            Constants.Attestation.KEY_CREATION_HOUR
+        )
+        AttestationsManager.addAttestation(robertManager, secureKeystoreDataSource, strings, infosCopy)
         if (shouldSaveInfos) {
-            infos.remove("datetime")
-            infos.remove("reason")
+            infos.remove(Constants.Attestation.KEY_DATE_TIME)
+            infos.remove(Constants.Attestation.DATA_KEY_REASON)
             secureKeystoreDataSource.savedAttestationData = infos
         }
+    }
+
+    fun pickFormEntry(key: String, formEntry: FormEntry) {
+        infos[key] = formEntry
     }
 
     fun resetInfos() {
@@ -53,7 +72,7 @@ class NewAttestationViewModel(private val secureKeystoreDataSource: SecureKeysto
     fun areInfosValid(): Boolean {
         return FormManager.form.value?.peekContent()?.all { formFields ->
             formFields.all { formField ->
-                !infos[formField.key]?.value.isNullOrBlank()
+                !infos[formField.dataKeyValue]?.value.isNullOrBlank()
             }
         } ?: false
     }

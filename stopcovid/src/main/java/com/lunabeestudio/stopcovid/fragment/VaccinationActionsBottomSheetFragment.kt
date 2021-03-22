@@ -22,6 +22,7 @@ import androidx.navigation.fragment.navArgs
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.lunabeestudio.stopcovid.coreui.extension.callPhone
 import com.lunabeestudio.stopcovid.coreui.extension.stringsFormat
+import com.lunabeestudio.stopcovid.coreui.manager.LocalizedStrings
 import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
 import com.lunabeestudio.stopcovid.databinding.FragmentVaccinationActionsBottomSheetBinding
 import com.lunabeestudio.stopcovid.extension.location
@@ -32,7 +33,7 @@ class VaccinationActionsBottomSheetFragment : BottomSheetDialogFragment() {
 
     val args: VaccinationActionsBottomSheetFragmentArgs by navArgs()
 
-    private val strings: HashMap<String, String> = StringsManager.strings
+    private val strings: LocalizedStrings = StringsManager.strings
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val binding = FragmentVaccinationActionsBottomSheetBinding.inflate(inflater, container, false)

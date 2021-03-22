@@ -11,6 +11,7 @@ import androidx.preference.PreferenceManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.lunabeestudio.robert.utils.Event
 import com.lunabeestudio.stopcovid.R
+import com.lunabeestudio.stopcovid.coreui.manager.LocalizedStrings
 import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
 import com.lunabeestudio.stopcovid.databinding.ActivitySplashScreenBinding
 import com.lunabeestudio.stopcovid.extension.isOnBoardingDone
@@ -50,8 +51,8 @@ class SplashScreenActivity : BaseActivity() {
         setContentView(splashScreenBinding.root)
 
         if (StringsManager.strings.isEmpty()) {
-            val stringsObserver = object : Observer<Event<HashMap<String, String>>> {
-                override fun onChanged(strings: Event<HashMap<String, String>>?) {
+            val stringsObserver = object : Observer<Event<LocalizedStrings>> {
+                override fun onChanged(strings: Event<LocalizedStrings>?) {
                     if (!strings?.peekContent().isNullOrEmpty()) {
                         StringsManager.liveStrings.removeObserver(this)
                         startOnBoardingOrMain(onBoardingDone)

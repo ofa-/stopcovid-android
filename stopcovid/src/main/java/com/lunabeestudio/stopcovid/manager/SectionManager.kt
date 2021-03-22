@@ -17,37 +17,39 @@ import com.lunabeestudio.stopcovid.coreui.manager.ServerManager
 import com.lunabeestudio.stopcovid.model.Section
 import java.lang.reflect.Type
 
-abstract class SectionManager : ServerManager() {
+typealias Sections = List<Section>
+
+abstract class SectionManager : ServerManager<Sections>() {
 
     private var prevLanguage: String? = null
 
     suspend fun initialize(context: Context) {
         prevLanguage = context.getFirstSupportedLanguage()
-        loadLocal<List<Section>>(context)?.let {
+        loadLocal(context)?.let {
             setSections(it)
         }
     }
 
-    abstract fun setSections(sections: List<Section>)
+    abstract fun setSections(sections: Sections)
 
     suspend fun onAppForeground(context: Context) {
         val newLanguage = context.getFirstSupportedLanguage()
         val languageHasChanged = prevLanguage != newLanguage
 
         if (languageHasChanged) {
-            loadLocal<List<Section>>(context)?.let {
+            loadLocal(context)?.let {
                 setSections(it)
             }
         }
 
         val hasFetch = fetchLast(context, languageHasChanged)
         if (hasFetch) {
-            loadLocal<List<Section>>(context)?.let {
+            loadLocal(context)?.let {
                 prevLanguage = newLanguage
                 setSections(it)
             }
         }
     }
 
-    override val type: Type = object : TypeToken<List<Section>>() {}.type
+    override val type: Type = object : TypeToken<Sections>() {}.type
 }

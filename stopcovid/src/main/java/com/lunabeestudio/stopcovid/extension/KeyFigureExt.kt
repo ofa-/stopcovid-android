@@ -15,6 +15,7 @@ import android.content.SharedPreferences
 import android.graphics.Color
 import com.lunabeestudio.stopcovid.coreui.extension.isNightMode
 import com.lunabeestudio.stopcovid.coreui.extension.stringsFormat
+import com.lunabeestudio.stopcovid.coreui.manager.LocalizedStrings
 import com.lunabeestudio.stopcovid.fastitem.KeyFigureCardItem
 import com.lunabeestudio.stopcovid.fastitem.keyFigureCardItem
 import com.lunabeestudio.stopcovid.model.DepartmentKeyFigure
@@ -85,7 +86,7 @@ fun List<KeyFigure>?.getDepartmentLabel(postalCode: String?): String? {
 fun KeyFigure.itemForFigure(context: Context,
     sharedPrefs: SharedPreferences,
     numberFormat: NumberFormat,
-    strings: HashMap<String, String>,
+    strings: LocalizedStrings,
     useDateTime: Boolean,
     block: (KeyFigureCardItem.() -> Unit)): KeyFigureCardItem {
     return keyFigureCardItem {

@@ -228,6 +228,10 @@
             app:argType="string"
             app:nullable="false" />
         <argument
+            android:name="dataKey"
+            app:argType="string"
+            app:nullable="false" />
+        <argument
             android:name="selectedCode"
             app:argType="string"
             app:nullable="true" />

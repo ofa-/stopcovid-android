@@ -14,10 +14,10 @@ import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.fastitem.cardWithActionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.model.Action
-import com.lunabeestudio.stopcovid.model.Section
+import com.lunabeestudio.stopcovid.manager.Sections
 import com.mikepenz.fastadapter.GenericItem
 
-fun List<Section>.fillItems(items: MutableList<GenericItem>) {
+fun Sections.fillItems(items: MutableList<GenericItem>) {
     items += spaceItem {
         spaceRes = R.dimen.spacing_large
         identifier = items.count().toLong()

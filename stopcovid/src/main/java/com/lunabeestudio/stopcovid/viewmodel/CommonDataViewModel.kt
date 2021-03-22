@@ -43,6 +43,7 @@ abstract class CommonDataViewModel(
         secureKeystoreDataSource.savedAttestationData = null
         secureKeystoreDataSource.saveAttestationData = null
         secureKeystoreDataSource.attestations = null
+        secureKeystoreDataSource.deprecatedAttestations = null
     }
 
     @CallSuper

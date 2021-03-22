@@ -21,9 +21,11 @@ import com.lunabeestudio.stopcovid.coreui.extension.fixFormatter
 import com.lunabeestudio.stopcovid.coreui.extension.getFirstSupportedLanguage
 import java.lang.reflect.Type
 
-object StringsManager : ServerManager() {
+typealias LocalizedStrings = HashMap<String, String>
 
-    var strings: HashMap<String, String> = hashMapOf()
+object StringsManager : ServerManager<LocalizedStrings>() {
+
+    var strings: LocalizedStrings = hashMapOf()
         private set(value) {
             if (field != value) {
                 _liveStrings.postValue(Event(value))
@@ -31,15 +33,15 @@ object StringsManager : ServerManager() {
             field = value
         }
 
-    private val _liveStrings: MutableLiveData<Event<HashMap<String, String>>> = MutableLiveData()
-    val liveStrings: LiveData<Event<HashMap<String, String>>>
+    private val _liveStrings: MutableLiveData<Event<LocalizedStrings>> = MutableLiveData()
+    val liveStrings: LiveData<Event<LocalizedStrings>>
         get() = _liveStrings
 
     private var prevLanguage: String? = null
 
     suspend fun initialize(context: Context) {
         prevLanguage = context.getFirstSupportedLanguage()
-        loadLocal<HashMap<String, String>>(context)?.let {
+        loadLocal(context)?.let {
             strings = it
         }
     }
@@ -49,14 +51,14 @@ object StringsManager : ServerManager() {
         val languageHasChanged = prevLanguage != newLanguage
 
         if (languageHasChanged) {
-            loadLocal<HashMap<String, String>>(context)?.let {
+            loadLocal(context)?.let {
                 strings = it
             }
         }
 
         val hasFetch = fetchLast(context, languageHasChanged)
         if (hasFetch) {
-            loadLocal<HashMap<String, String>>(context)?.let {
+            loadLocal(context)?.let {
                 prevLanguage = newLanguage
                 strings = it
             }
@@ -66,7 +68,7 @@ object StringsManager : ServerManager() {
     override val url: String = ConfigConstant.Labels.URL
     override val folderName: String = ConfigConstant.Labels.FOLDER
     override val prefix: String = ConfigConstant.Labels.FILE_PREFIX
-    override val type: Type = object : TypeToken<HashMap<String, String>>() {}.type
+    override val type: Type = object : TypeToken<LocalizedStrings>() {}.type
     override val lastRefreshSharedPrefsKey: String = UiConstants.SharePrefs.LAST_STRINGS_REFRESH
     override fun transform(input: String): String = input.fixFormatter()
 }

@@ -27,6 +27,7 @@ import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.dividerItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
+import com.lunabeestudio.stopcovid.coreui.manager.LocalizedStrings
 import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.fastitem.linkItem
@@ -40,7 +41,7 @@ class ReminderBottomSheetDialogFragment : BottomSheetDialogFragment() {
         requireContext().robertManager()
     }
 
-    private val strings: HashMap<String, String>
+    private val strings: LocalizedStrings
         get() = StringsManager.strings
 
     private var binding: FragmentRecyclerViewBinding? = null

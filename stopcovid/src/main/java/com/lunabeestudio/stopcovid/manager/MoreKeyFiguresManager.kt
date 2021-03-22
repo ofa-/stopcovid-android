@@ -14,15 +14,14 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.coreui.ConfigConstant
-import com.lunabeestudio.stopcovid.model.Section
 
 object MoreKeyFiguresManager : SectionManager() {
 
-    private val _moreKeyFiguresSections: MutableLiveData<List<Section>> = MutableLiveData()
-    val moreKeyFiguresSections: LiveData<List<Section>>
+    private val _moreKeyFiguresSections: MutableLiveData<Sections> = MutableLiveData()
+    val moreKeyFiguresSections: LiveData<Sections>
         get() = _moreKeyFiguresSections
 
-    override fun setSections(sections: List<Section>) {
+    override fun setSections(sections: Sections) {
         if (this.moreKeyFiguresSections.value != sections) {
             _moreKeyFiguresSections.postValue(sections)
         }

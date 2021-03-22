@@ -30,6 +30,7 @@ import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.applyAndConsumeWindowInsetBottom
 import com.lunabeestudio.stopcovid.coreui.extension.showSnackBar
+import com.lunabeestudio.stopcovid.coreui.manager.LocalizedStrings
 import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
 import com.lunabeestudio.stopcovid.databinding.ActivityMainBinding
 import com.lunabeestudio.stopcovid.extension.alertRiskLevelChanged
@@ -49,7 +50,7 @@ class MainActivity : BaseActivity() {
         PreferenceManager.getDefaultSharedPreferences(this)
     }
 
-    private var strings: HashMap<String, String> = StringsManager.strings
+    private var strings: LocalizedStrings = StringsManager.strings
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
