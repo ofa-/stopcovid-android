@@ -62,8 +62,6 @@ object StringsManager : ServerManager<LocalizedStrings>() {
             }
         }
 
-        return // don't fetch strings from server
-
         val hasFetch = fetchLast(context, languageHasChanged)
         if (hasFetch) {
             loadLocal(context)?.let {
