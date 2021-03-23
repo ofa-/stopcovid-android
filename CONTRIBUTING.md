@@ -1,8 +1,8 @@
 Contributing
 ============
 
-Testing
--------
+Use the app !
+-------------
 
 1. install the [latest release apk][release] on your phone
 2. play with the app
@@ -10,7 +10,7 @@ Testing
 
 
 [release]: ../../releases/latest/download/stopcovid-release.apk
-[tracker]: ../../issues  
+[tracker]: ../../issues
 
 
 Fixing things
@@ -64,4 +64,6 @@ Installing the app
 Checking the log live with adb
 ------------------------------
 
-	adb logcat | grep `adb shell ps | grep fr.gouv  | awk '{print $2}'`
+   ```
+	make log
+   ```
