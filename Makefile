@@ -24,6 +24,8 @@ load: data.load.txt
 	$(MAKE) cp rm --ignore-errors --quiet
 	$(ADB) tee -a $(FILES)/localProximity.txt	< data.load.txt \
 							> /dev/null
+log:
+	adb logcat | grep `adb shell ps | grep fr.gouv  | awk '{print $$2}'`
 
 tar:
 	$(ADB) tar c $(FILES)/local_proximity		> data.tar
