@@ -13,9 +13,13 @@ rm:
 fix-le-smooth:
 	$(ADB) tee $(FILES)/strings-fr.json < stopcovid/src/main/assets/Strings/strings-fr.json
 
-cp:
+save:
 	$(ADB) cat $(FILES)/localProximity.txt		> data.txt
 	$(ADB) cat $(FILES)/disseminatedEbids.txt	> ebids.txt
+
+restore:
+	$(ADB) tee $(FILES)/localProximity.txt		< data.txt
+	$(ADB) tee $(FILES)/disseminatedEbids.txt	< ebids.txt
 
 cat.%:
 	@$(ADB) cat $(FILES)/$*
