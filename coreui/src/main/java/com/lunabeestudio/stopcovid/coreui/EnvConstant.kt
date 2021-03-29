@@ -13,9 +13,9 @@ package com.lunabeestudio.stopcovid.coreui
 enum class EnvConstant {
     Prod {
         override val captchaApiKey: String = "6LettPsUAAAAAHYaFdRBOilHUgmTMSIPKNZN4D7l"
-        override val baseUrl: String = "https://api.stopcovid.gouv.fr"
+        override val baseUrl: String = "https://api.tousanticovid.gouv.fr"
         override val warningBaseUrl: String = "https://tacw.tousanticovid.gouv.fr"
-        override val certificateSha256: String = "sha256/Up+TDyVDu8vKvd22TeAnXYxQqfPd2oNOU9Y04JahHpQ="
+        override val certificateSha256: String = "sha256/xrPKKhmYeHgk4v57GcqYPrFpnI3f1FTmEfol9WIicaI="
         override val warningCertificateSha256: String = "sha256/b7w+uqyD+XILNIlRc3XVmEROwFCVTv5yOchb2i5FJbo="
         override val configFilename: String = "config.json"
         override val calibrationFilename: String = "calibrationBle.json"

@@ -11,13 +11,12 @@
 package com.lunabeestudio.stopcovid.coreui
 
 object ConfigConstant {
-    private const val BASE_URL: String = "https://app.stopcovid.gouv.fr/"
+    private const val BASE_URL: String = "https://app.tousanticovid.gouv.fr/"
     private const val VERSION_PATH: String = "json/version-29/"
     private const val VERSIONED_SERVER_URL: String = BASE_URL + VERSION_PATH
-    const val SERVER_CERTIFICATE_SHA256: String = "sha256/sXQojvwsiyblrpMQIVRXGC5u7AgknzTJm+VIK1kQmD8="
+    const val SERVER_CERTIFICATE_SHA256: String = "sha256/ckVocY6+T4RvpXWtbqOF45qEvNls4oFWi83BryOQgOk="
 
     object Maintenance {
-        const val CERTIFICATE_SHA256: String = "sha256/sXQojvwsiyblrpMQIVRXGC5u7AgknzTJm+VIK1kQmD8="
         private const val FOLDER: String = "maintenance/"
         private const val FILENAME: String = "info-maintenance-v2.json"
         const val URL: String = BASE_URL + FOLDER + FILENAME

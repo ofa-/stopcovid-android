@@ -11,14 +11,19 @@
 buildscript {
     repositories {
         google()
-        jcenter()
+        mavenCentral()
+        jcenter {
+            content {
+                // https://issuetracker.google.com/issues/179291081 & https://youtrack.jetbrains.com/issue/KT-44730
+                includeModule("org.jetbrains.trove4j", "trove4j")
+            }
+        }
     }
     dependencies {
         classpath "com.android.tools.build:gradle:_"
         classpath "androidx.navigation:navigation-safe-args-gradle-plugin:_"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:_"
         classpath "com.google.protobuf:protobuf-gradle-plugin:_"
-        classpath "io.realm:realm-gradle-plugin:_"
 
         // https://issuetracker.google.com/issues/159151549#comment3
         classpath "org.ow2.asm:asm:_"
@@ -30,8 +35,14 @@ buildscript {
 allprojects {
     repositories {
         google()
-        jcenter()
+        mavenCentral()
         maven { url 'https://jitpack.io' }
+        jcenter {
+            content {
+                // https://issuetracker.google.com/issues/179291081 & https://youtrack.jetbrains.com/issue/KT-44730
+                includeModule("org.jetbrains.trove4j", "trove4j")
+            }
+        }
     }
 }
 
