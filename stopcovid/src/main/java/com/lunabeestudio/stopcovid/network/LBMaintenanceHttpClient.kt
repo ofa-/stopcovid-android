@@ -35,7 +35,7 @@ object LBMaintenanceHttpClient {
         onSuccess: suspend (result: String) -> Unit,
         onFailure: suspend (e: Exception) -> Unit) {
         try {
-            val okHttpClient = RetrofitClient.getDefaultOKHttpClient(context, urlString, ConfigConstant.Maintenance.CERTIFICATE_SHA256)
+            val okHttpClient = RetrofitClient.getDefaultOKHttpClient(context, urlString, ConfigConstant.SERVER_CERTIFICATE_SHA256)
             val request: Request = Request.Builder()
                 .url(urlString)
                 .build()
