@@ -77,12 +77,13 @@ open class ProximityService : RobertProximityService() {
     }
 
     private fun sendNotification(proximityInfo: ProximityInfo) {
+        val shortEbid = proximityInfo.toLocalProximity()?.ebidBase64?.substring(0..5)
         val calibratedRssi = (proximityInfo.metadata as BleProximityMetadata).calibratedRssi
         val rssi1m = -70
         val bleAtt = 2.2
         val estimatedDistance = 10.0.pow((rssi1m - calibratedRssi) / (10.0 * bleAtt))
 
-        val message = "rssi: " + calibratedRssi + "dBm, dist: %.1f".format(estimatedDistance) +"m"
+        val message = "${shortEbid} / ${calibratedRssi}dBm (${"%.0f".format(estimatedDistance)}m)"
 
         sendNotification(message)
     }

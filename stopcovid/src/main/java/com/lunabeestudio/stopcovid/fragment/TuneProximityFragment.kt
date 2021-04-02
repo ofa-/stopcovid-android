@@ -177,7 +177,7 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
     }
 
     private fun updateLastNotification(notification: LocalProximity) {
-        updateLastNotification("rssi: " + notification.calibratedRssi + "dBm")
+        updateLastNotification("${notification.shortEbid} / ${notification.calibratedRssi}dBm")
     }
 
     private fun updateLastNotification(text: String = "-") {
