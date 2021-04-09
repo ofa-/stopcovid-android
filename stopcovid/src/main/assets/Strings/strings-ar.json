@@ -74,6 +74,8 @@
     "proximityController.title": "التقارب",
     "proximityController.tuneProximity": "القرب",
     "proximityController.toast.copied": "نسخ",
+    "proximityController.stats.long": "طويل",
+    "proximityController.stats.short": "قصير",
     "proximityController.switch.subtitle.activated":   "💕  🐭   StopCoviiid   🐱  💋",
     "proximityController.switch.subtitle.deactivated": "💋  🐱   StopCoviiid   🐭  💕",
     "proximityController.error.noNotifications": "للتعرف على مخاطر التعرض لمرض كوفيد-19، يجب تفعيل الإشعارات في الإعدادات بالنقر على هذه الخانة 👉",

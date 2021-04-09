@@ -72,6 +72,8 @@
     "aboutController.toast.errorFetchingUpdates": "🐰   network error   🎃",
     "proximityController.tuneProximity": "Proximity",
     "proximityController.toast.copied": "copied",
+    "proximityController.stats.long": "long",
+    "proximityController.stats.short": "short",
     "proximityController.switch.subtitle.activated":   "💕  🐭   StopCoviiid   🐱  💋",
     "proximityController.switch.subtitle.deactivated": "💋  🐱   StopCoviiid   🐭  💕",
 

@@ -73,6 +73,8 @@
     "proximityController.title": "Proximité",
     "proximityController.tuneProximity": "Proximité",
     "proximityController.toast.copied": "copié",
+    "proximityController.stats.long": "long",
+    "proximityController.stats.short": "court",
     "proximityController.switch.subtitle.activated":   "💕  🐭   StopCoviiid   🐱  💋",
     "proximityController.switch.subtitle.deactivated": "💋  🐱   StopCoviiid   🐭  💕",
    "proximityController.error.noBLE":"Votre téléphone ne possédant pas le Bluetooth Low Energy, il n'est pas compatible avec l’alerte des personnes contacts via Bluetooth malheureusement.",

@@ -259,10 +259,13 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
     }
 
     private fun statsLine(lpe: Int, pde: Int): String {
+        val long = strings["proximityController.stats.long"]
+        val short = strings["proximityController.stats.short"]
+
         return if (pde == 0) ""
         else
             (if (pde != lpe) "\n" else "") +
-            "(%d ebids, %d long, %d short)\n" .format(pde, pde-lpe, lpe)
+            "(%d ebids, %d ${long}, %d ${short})\n" .format(pde, pde-lpe, lpe)
     }
 
     private fun showRemainingEbids() {

@@ -74,6 +74,8 @@
     "proximityController.title": "Proximidad",
     "proximityController.tuneProximity": "Proximidad",
     "proximityController.toast.copied": "copiado",
+    "proximityController.stats.long": "largo",
+    "proximityController.stats.short": "corto",
     "proximityController.switch.subtitle.activated":   "💕  🐭   StopCoviiid   🐱  💋",
     "proximityController.switch.subtitle.deactivated": "💋  🐱   StopCoviiid   🐭  💕",
     "proximityController.error.noNotifications": "Para recibir avisos en caso de exposición al COVID-19, debes activar las notificaciones en los ajustes pulsando aquí 👉",
