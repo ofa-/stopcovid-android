@@ -3,9 +3,12 @@ StopCovid Android
 
 _Extended_ StopCovid app, featuring:
 
-- notifications on "ping"
 - proximity info screen
-- ui beautification
+- proximity notifications
+- proximity data availability
+- venues QR code screens
+- one-click attestations
+- no "maintenance" mode
 
 This repo is a fork of [upstream gitlab][upstream]
 `stopcovid-android` and is compatible with [StopCovid][StopCovid].
