@@ -195,6 +195,7 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
         appCoroutineScope.launch {
             RisksLevelManager.initialize(this@StopCovid)
         }
+/*
         appCoroutineScope.launch {
             AppMaintenanceManager.initialize(
                 this@StopCovid,
@@ -203,10 +204,11 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
                 ConfigConstant.Maintenance.URL
             )
         }
+*/
 
         val config = BundledEmojiCompatConfig(this)
         EmojiCompat.init(config)
-        startAppMaintenanceWorker(false)
+//      startAppMaintenanceWorker(false)
         AboutFragment.Downloader(applicationContext).autoDeleteFile()
 
         sharedPrefs.lastVersionCode = BuildConfig.VERSION_CODE
@@ -220,9 +222,11 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
     fun onAppResume() {
         isAppInForeground = true
 
+/*
         appCoroutineScope.launch {
             AppMaintenanceManager.checkForMaintenanceUpgrade(this@StopCovid)
         }
+*/
         appCoroutineScope.launch {
             MoreKeyFiguresManager.onAppForeground(this@StopCovid)
         }
