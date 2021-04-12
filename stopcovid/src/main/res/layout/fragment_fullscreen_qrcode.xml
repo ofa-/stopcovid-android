@@ -35,9 +35,24 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/spacing_large"
-            android:layout_marginBottom="@dimen/spacing_medium"
+            android:layout_marginBottom="@dimen/spacing_large"
             android:adjustViewBounds="true"
-            tools:ignore="ContentDescription" />
+            android:paddingHorizontal="@dimen/spacing_large"
+            tools:ignore="ContentDescription"
+            tools:layout_height="@dimen/qr_code_fullscreen_size"
+            tools:layout_width="@dimen/qr_code_fullscreen_size"
+            tools:src="@tools:sample/avatars" />
+
+        <TextView
+            android:id="@+id/formatTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/spacing_large"
+            android:layout_marginTop="@dimen/spacing_medium"
+            android:layout_marginBottom="@dimen/spacing_large"
+            android:gravity="center"
+            android:textAppearance="@style/TextAppearance.StopCovid.Title.Bold"
+            tools:text="@tools:sample/lorem[2]" />
 
         <TextView
             android:id="@+id/textView"

@@ -32,7 +32,10 @@ enum class ErrorCode {
     BLE_GATT,
     TIME_NOT_ALIGNED,
     REPORT_DELAY,
-    SECRET_KEY_ALREADY_GENERATED
+    SECRET_KEY_ALREADY_GENERATED,
+    WALLET_CERTIFICATE_MALFORMED,
+    WALLET_CERTIFICATE_INVALID_SIGNATURE,
+    WALLET_CERTIFICATE_UNKNOWN_ERROR
 }
 
 class UnknownException(message: String = "Unknown error occurred") :
@@ -94,3 +97,12 @@ class ReportDelayException(message: String = "You need to wait before you can us
 
 class SecretKeyAlreadyGeneratedException(message: String = "Secret key was already generated but can't be found in the KeyStore") :
     CovidException(ErrorCode.SECRET_KEY_ALREADY_GENERATED, message)
+
+class WalletCertificateMalformedException(message: String = "Invalid certificate code") :
+    CovidException(ErrorCode.WALLET_CERTIFICATE_MALFORMED, message)
+
+class WalletCertificateInvalidSignatureException(message: String = "Invalid certificate signature") :
+    CovidException(ErrorCode.WALLET_CERTIFICATE_INVALID_SIGNATURE, message)
+
+class WalletCertificateUnknownError(message: String = "Unknown error for the certificate") :
+    CovidException(ErrorCode.WALLET_CERTIFICATE_UNKNOWN_ERROR, message)

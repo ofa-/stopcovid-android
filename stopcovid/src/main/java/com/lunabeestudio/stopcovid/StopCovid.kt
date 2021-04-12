@@ -36,13 +36,13 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.lunabeestudio.domain.model.VenueQrCode
+import com.lunabeestudio.framework.crypto.BouncyCastleCryptoDataSource
 import com.lunabeestudio.framework.local.LocalCryptoManager
 import com.lunabeestudio.framework.local.datasource.SecureFileEphemeralBluetoothIdentifierDataSource
 import com.lunabeestudio.framework.local.datasource.SecureFileLocalProximityDataSource
 import com.lunabeestudio.framework.local.datasource.SecureKeystoreDataSource
 import com.lunabeestudio.framework.manager.LocalProximityFilterImpl
 import com.lunabeestudio.framework.remote.datasource.ServiceDataSource
-import com.lunabeestudio.framework.sharedcrypto.BouncyCastleCryptoDataSource
 import com.lunabeestudio.robert.RobertApplication
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.robert.RobertManagerImpl
@@ -72,6 +72,7 @@ import com.lunabeestudio.stopcovid.manager.ProximityManager
 import com.lunabeestudio.stopcovid.manager.RisksLevelManager
 import com.lunabeestudio.stopcovid.manager.VaccinationCenterManager
 import com.lunabeestudio.stopcovid.manager.VenuesManager
+import com.lunabeestudio.stopcovid.manager.WalletManager
 import com.lunabeestudio.stopcovid.model.DeviceSetup
 import com.lunabeestudio.stopcovid.service.ProximityService
 import com.lunabeestudio.stopcovid.worker.ActivateReminderNotificationWorker
@@ -202,6 +203,8 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
                 ConfigConstant.Maintenance.URL
             )
         }
+
+        WalletManager.initialize(ProcessLifecycleOwner.get(), secureKeystoreDataSource)
 
         val config = BundledEmojiCompatConfig(this)
         EmojiCompat.init(config)

@@ -52,7 +52,6 @@ class KeyFigureChartCardItem : AbstractBindingItem<ItemKeyFigureChartCardBinding
         return ItemKeyFigureChartCardBinding.inflate(inflater, parent, false)
     }
 
-    @ExperimentalTime
     @SuppressLint("NewApi")
     override fun bindView(binding: ItemKeyFigureChartCardBinding, payloads: List<Any>) {
         super.bindView(binding, payloads)
@@ -129,7 +128,7 @@ class KeyFigureChartCardItem : AbstractBindingItem<ItemKeyFigureChartCardBinding
         binding.keyFigureBarChart.isVisible = false
     }
 
-    @ExperimentalTime
+    @OptIn(ExperimentalTime::class)
     private fun setupXAxis(binding: ItemKeyFigureChartCardBinding, xAxis: XAxis) {
         xAxis.apply {
             setupStyle()

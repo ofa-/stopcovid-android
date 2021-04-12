@@ -804,7 +804,7 @@ class ProximityFragment : TimeMainFragment() {
             importantForAccessibility = ViewCompat.IMPORTANT_FOR_ACCESSIBILITY_NO
         }
 
-        items += cardWithActionItem(CardTheme.Primary) {
+        items += cardWithActionItem {
             mainImage = R.drawable.attestation_card
             onCardClick = {
                 findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToAttestationsFragment())
@@ -817,6 +817,24 @@ class ProximityFragment : TimeMainFragment() {
                 else -> stringsFormat("home.attestationSection.cell.subtitle.multipleAttestations", count)
             }
             identifier = R.drawable.attestation_card.toLong()
+        }
+
+        if (robertManager.configuration.displaySanitaryCertificatesWallet) {
+            items += spaceItem {
+                spaceRes = R.dimen.spacing_medium
+                identifier = items.count().toLong()
+            }
+
+            items += cardWithActionItem(CardTheme.Primary) {
+                mainImage = R.drawable.wallet_card
+                mainLayoutDirection = LayoutDirection.RTL
+                onCardClick = {
+                    findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToWalletFragment())
+                }
+                mainTitle = strings["home.attestationSection.sanitaryCertificates.cell.title"]
+                mainBody = strings["home.attestationSection.sanitaryCertificates.cell.subtitle"]
+                identifier = R.drawable.wallet_card.toLong()
+            }
         }
 
         items += spaceItem {
@@ -906,6 +924,11 @@ class ProximityFragment : TimeMainFragment() {
                 },
                 Action(R.drawable.ic_settings, strings["common.settings"]) {
                     findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToManageDataFragment())
+                },
+                Action(R.drawable.ic_2d_doc, strings["home.moreSection.verifySanitaryCertificate"]) {
+                    findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToVerifyWalletQRCodeFragment())
+                }.takeIf {
+                    robertManager.configuration.displaySanitaryCertificatesValidation
                 },
                 Action(R.drawable.ic_privacy, strings["home.moreSection.privacy"]) {
                     findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToPrivacyFragment())

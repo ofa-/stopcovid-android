@@ -2,11 +2,11 @@
   "config": [
 	{
       "name": "lastUpdate",
-      "value": "9 march 2021"
+      "value": "16 march 2021"
     },
     {
       "name": "version",
-      "value": 38
+      "value": 40
     },
     {
       "name": "versionCalibrationBle",
@@ -22,7 +22,11 @@
     },
     {
 	    "name" : "app.ameliUrl",
-	    "value" : ""
+	    "value" : "https://declare.ameli.fr/tousanticovid/t/%@/"
+    },
+    {
+        "name" : "app.contagiousSpan",
+        "value" : 10
     },
     {
       "name": "app.keyfigures.displayDepartmentLevel",
@@ -43,6 +47,49 @@
     {
       "name": "app.vaccinationCentersCount",
       "value": 10
+    },
+    {
+      "name": "app.displaySanitaryCertificatesWallet",
+      "value": false
+    },
+    {
+      "name": "app.displaySanitaryCertificatesValidation",
+      "value": false
+    },
+    {
+      "name": "app.wallet.oldCertificateThresholdInDays",
+      "value": {
+        "b2": 3
+      }
+    },
+    {
+      "name": "app.wallet.testCertificateValidityThresholdInHours",
+      "value": 72
+    },
+    {
+      "name": "app.walletPubKeys",
+      "value": [
+        {
+          "auth": "DHI0",
+          "pubKeys": {
+            "TST1": "-----BEGIN PUBLIC KEY-----MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE6lPsrLPPis5Wl9u8Y7THfNIIfeEyq3q72MpzUm3gvr6ctYk4d3OQhn76GKSjSYX/0ZRC/cYO9479K0SUzYZ9yg==-----END PUBLIC KEY-----"
+          }
+        },
+        {
+          "auth": "FR00",
+          "pubKeys": {
+            "0001": "-----BEGIN PUBLIC KEY-----MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEqY8NfM1igIiTvsTUNuedGDSh1uAB1w8cTNzNnZ4v4in3JAUU6N3AypjQx0QMnMSShJoPvac/w5L02grgf4TCPA==-----END PUBLIC KEY-----"
+          }
+        },
+        {
+          "auth": "FR03",
+          "pubKeys":
+          	{
+	          	"AHP1": "-----BEGIN PUBLIC KEY-----MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEPnxJntwNwme9uHSasmGFFwdC0FWNEpucgzhjr+/AZ6UuTm3kL3ogEUAwKU0tShEVmZNK4/lM05h+0ZvtboJM/A==-----END PUBLIC KEY-----",
+	            "AHP2": "-----BEGIN PUBLIC KEY-----MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEOYUgmx8pKu0UbyqQ/kt4+PXSpUprkO2YLHmzzoN66XjDW0AnSzXorFPe556p73Vawqaoy3qQKDIDB62IBYWBuA==-----END PUBLIC KEY-----"
+            }
+        }
+      ]
     },
     {
       "name": "app.isolation.duration",
@@ -106,7 +153,7 @@
     },
     {
       "name": "app.qrCode.footerString",
-      "value": "<firstname> <lastname>\n<datetime-day>, <datetime-hour> <reason-shortlabel>"
+      "value": "<firstname> - <datetime-day>, <datetime-hour>\n<reason-shortlabel>"
     },
     {
       "name": "app.venuesSalt",

@@ -14,6 +14,7 @@ import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import com.google.gson.reflect.TypeToken
 import com.lunabeestudio.domain.model.Configuration
+import com.lunabeestudio.domain.model.WalletPublicKey
 
 internal class ApiConfiguration(
     @SerializedName("version")
@@ -105,7 +106,17 @@ internal class ApiConfiguration(
     @SerializedName("app.contagiousSpan")
     val contagiousSpan: Int,
     @SerializedName("app.ameliUrl")
-    val ameliUrl: String?
+    val ameliUrl: String?,
+    @SerializedName("app.displaySanitaryCertificatesWallet")
+    val displaySanitaryCertificatesWallet: Boolean,
+    @SerializedName("app.wallet.oldCertificateThresholdInDays")
+    val walletOldCertificateThresholdInDays: String,
+    @SerializedName("app.walletPubKeys")
+    val walletPublicKeys: String,
+    @SerializedName("app.wallet.testCertificateValidityThresholdInHours")
+    val testCertificateValidityThresholdInHours: Int,
+    @SerializedName("app.displaySanitaryCertificatesValidation")
+    val displaySanitaryCertificatesValidation: Boolean
 )
 
 internal fun ApiConfiguration.toDomain(gson: Gson) = Configuration(
@@ -160,4 +171,15 @@ internal fun ApiConfiguration.toDomain(gson: Gson) = Configuration(
     scanReportDelay = scanReportDelay,
     contagiousSpan = contagiousSpan,
     ameliUrl = ameliUrl,
+    displaySanitaryCertificatesWallet = displaySanitaryCertificatesWallet,
+    walletOldCertificateThresholdInDays = gson.fromJson(
+        walletOldCertificateThresholdInDays,
+        object : TypeToken<Map<String, Float>?>() {}.type
+    ),
+    walletPublicKeys = gson.fromJson(
+        walletPublicKeys,
+        object : TypeToken<List<WalletPublicKey>?>() {}.type
+    ),
+    testCertificateValidityThresholdInHours = testCertificateValidityThresholdInHours,
+    displaySanitaryCertificatesValidation = displaySanitaryCertificatesValidation
 )

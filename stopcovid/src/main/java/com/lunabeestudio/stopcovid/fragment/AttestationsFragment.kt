@@ -15,12 +15,10 @@ import android.view.View
 import androidx.fragment.app.viewModels
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.zxing.BarcodeFormat
-import com.journeyapps.barcodescanner.BarcodeEncoder
 import com.lunabeestudio.domain.model.Attestation
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
-import com.lunabeestudio.stopcovid.coreui.extension.toDimensSize
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.extension.isExpired
@@ -28,29 +26,24 @@ import com.lunabeestudio.stopcovid.extension.openInExternalBrowser
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
-import com.lunabeestudio.stopcovid.fastitem.AttestationQrCodeItem
-import com.lunabeestudio.stopcovid.fastitem.attestationQrCodeItem
+import com.lunabeestudio.stopcovid.fastitem.QrCodeCardItem
 import com.lunabeestudio.stopcovid.fastitem.bigTitleItem
 import com.lunabeestudio.stopcovid.fastitem.linkCardItem
 import com.lunabeestudio.stopcovid.fastitem.linkItem
+import com.lunabeestudio.stopcovid.fastitem.qrCodeCardItem
 import com.lunabeestudio.stopcovid.manager.ShareManager
 import com.lunabeestudio.stopcovid.viewmodel.AttestationsViewModel
 import com.lunabeestudio.stopcovid.viewmodel.AttestationsViewModelFactory
 import com.mikepenz.fastadapter.GenericItem
 import kotlin.time.ExperimentalTime
 
-class AttestationsFragment : MainFragment() {
+class AttestationsFragment : QRCodeListFragment() {
 
     private val robertManager: RobertManager by lazy {
         requireContext().robertManager()
     }
 
     private val viewModel: AttestationsViewModel by viewModels { AttestationsViewModelFactory(requireContext().secureKeystoreDataSource()) }
-
-    private val barcodeEncoder = BarcodeEncoder()
-    private val qrCodeSize by lazy {
-        R.dimen.qr_code_size.toDimensSize(requireContext()).toInt()
-    }
 
     override fun getTitleKey(): String = "attestationsController.title"
 
@@ -122,6 +115,11 @@ class AttestationsFragment : MainFragment() {
             validAttestations.forEach { attestation ->
                 items += qrCodeItemFromAttestation(attestation, true)
             }
+
+            items += spaceItem {
+                spaceRes = R.dimen.spacing_large
+                identifier = items.count().toLong()
+            }
         }
 
         if (!expiredAttestations.isNullOrEmpty()) {
@@ -136,14 +134,16 @@ class AttestationsFragment : MainFragment() {
             expiredAttestations.forEach { attestation ->
                 items += qrCodeItemFromAttestation(attestation, false)
             }
+
+            items += spaceItem {
+                spaceRes = R.dimen.spacing_large
+                identifier = items.count().toLong()
+            }
         }
 
-        items += spaceItem {
-            spaceRes = R.dimen.spacing_medium
-            identifier = items.count().toLong()
-        }
         items += captionItem {
             text = strings["attestationController.footer"]
+            textAppearance = R.style.TextAppearance_StopCovid_Caption_Small_Grey
             identifier = text.hashCode().toLong()
         }
         items += linkItem {
@@ -159,14 +159,14 @@ class AttestationsFragment : MainFragment() {
         return items
     }
 
-    private fun qrCodeItemFromAttestation(attestation: Attestation, allowShare: Boolean): AttestationQrCodeItem {
+    private fun qrCodeItemFromAttestation(attestation: Attestation, allowShare: Boolean): QrCodeCardItem {
         val bitmap = barcodeEncoder.encodeBitmap(
             attestation.qrCode,
             BarcodeFormat.QR_CODE,
             qrCodeSize,
             qrCodeSize
         )
-        return attestationQrCodeItem {
+        return qrCodeCardItem {
             qrCodeBitmap = bitmap
             text = attestation.footer
             share = strings["attestationsController.menu.share"]
@@ -195,8 +195,9 @@ class AttestationsFragment : MainFragment() {
             }
             onClick = {
                 findNavControllerOrNull()?.safeNavigate(
-                    AttestationsFragmentDirections.actionAttestationsFragmentToFullscreenAttestationFragment(
+                    AttestationsFragmentDirections.actionAttestationsFragmentToFullscreenQRCodeFragment(
                         attestation.qrCode,
+                        BarcodeFormat.QR_CODE,
                         attestation.qrCodeString
                     )
                 )

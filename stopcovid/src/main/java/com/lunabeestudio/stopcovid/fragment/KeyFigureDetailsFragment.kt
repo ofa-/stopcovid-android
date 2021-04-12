@@ -73,7 +73,6 @@ class KeyFigureDetailsFragment : KeyFigureGenericFragment() {
         }
     }
 
-    @ExperimentalTime
     override fun getItems(): List<GenericItem> {
         if (keyFigure == null) {
             return emptyList()
@@ -230,7 +229,7 @@ class KeyFigureDetailsFragment : KeyFigureGenericFragment() {
         }
     }
 
-    @ExperimentalTime
+    @OptIn(ExperimentalTime::class)
     private fun chartExplanationLabel(figure: KeyFigure, chartData: Array<ChartData>): String? {
         return when {
             chartData.size > 1 -> stringsFormat(

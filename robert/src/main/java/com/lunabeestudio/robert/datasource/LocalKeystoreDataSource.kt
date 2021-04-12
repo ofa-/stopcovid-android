@@ -15,6 +15,7 @@ import com.lunabeestudio.domain.model.Attestation
 import com.lunabeestudio.domain.model.Calibration
 import com.lunabeestudio.domain.model.Configuration
 import com.lunabeestudio.domain.model.FormEntry
+import com.lunabeestudio.domain.model.RawWalletCertificate
 import com.lunabeestudio.domain.model.VenueQrCode
 import com.lunabeestudio.robert.model.AtRiskStatus
 
@@ -38,6 +39,8 @@ interface LocalKeystoreDataSource {
     var deprecatedLastExposureTimeframe: Int?
     val attestationsLiveData: LiveData<List<Attestation>?>
     var attestations: List<Attestation>?
+    var rawWalletCertificates: List<RawWalletCertificate>?
+    val rawWalletCertificatesLiveData: LiveData<List<RawWalletCertificate>?>
     var deprecatedAttestations: List<Map<String, FormEntry>>?
     var savedAttestationData: Map<String, FormEntry>?
     var saveAttestationData: Boolean?

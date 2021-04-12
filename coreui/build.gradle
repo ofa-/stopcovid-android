@@ -61,6 +61,8 @@ dependencies {
     api 'androidx.emoji:emoji-appcompat:_'
     api 'androidx.emoji:emoji-bundled:_'
 
+    implementation "androidx.fragment:fragment-ktx:_"
+
     api 'com.google.android.material:material:_'
     api 'com.google.code.gson:gson:_'
 

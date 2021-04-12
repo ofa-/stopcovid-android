@@ -14,7 +14,6 @@ import android.graphics.Bitmap
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.lunabeestudio.stopcovid.R
-import com.lunabeestudio.stopcovid.databinding.ItemAttestationQrCodeBinding
 import com.lunabeestudio.stopcovid.databinding.ItemPrivateVenueQrCodeBinding
 import com.mikepenz.fastadapter.binding.AbstractBindingItem
 

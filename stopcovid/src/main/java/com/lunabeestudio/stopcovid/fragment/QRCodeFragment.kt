@@ -82,7 +82,7 @@ abstract class QRCodeFragment : BaseFragment() {
         }
     }
 
-    private fun resumeQrCodeReader() {
+    fun resumeQrCodeReader() {
         binding?.qrCodeReaderView?.resume()
         binding?.qrCodeReaderView?.decodeContinuous { result: BarcodeResult? ->
             binding?.qrCodeReaderView?.stopDecoding()

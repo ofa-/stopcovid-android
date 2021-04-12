@@ -397,11 +397,12 @@ class VenuesManagerTest {
         assert(venue5QrCode.venueCategory == 0) { "Venue category is wrong" }
         assert(venue5QrCode.venueCapacity == 0) { "Venue capacity is wrong" }
 
+        val timestamp = System.currentTimeMillis()
         assert(
             VenuesManager.processVenueUrl(
                 robertManager = context.robertManager(),
                 secureKeystoreDataSource = keystoreDataSource,
-                "https://tac.gouv.fr/1/491ab3ae-ad35-4301-8dd9-414ecf210717/GA/-/-/1614712702"
+                "https://tac.gouv.fr/1/491ab3ae-ad35-4301-8dd9-414ecf210717/GA/-/-/${timestamp / 1000}"
             ) == "GA"
         )
         val venue6QrCode = VenuesManager.getVenuesQrCode(keystoreDataSource)?.get(5)
@@ -413,7 +414,7 @@ class VenuesManagerTest {
         assert(venue6QrCode.venueCategory == 0) { "Venue category is wrong" }
         assert(venue6QrCode.venueCapacity == 0) { "Venue capacity is wrong" }
         assert(
-            venue6QrCode.ntpTimestamp == Date(1614712702000)
+            venue6QrCode.ntpTimestamp == Date(timestamp)
                 .roundedTimeIntervalSince1900(context.robertManager().configuration.venuesTimestampRoundingInterval.toLong())
         ) {
             "Venue timestamp is wrong"
