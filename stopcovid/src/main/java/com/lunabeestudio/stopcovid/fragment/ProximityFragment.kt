@@ -942,6 +942,7 @@ class ProximityFragment : TimeMainFragment() {
                 Action(R.drawable.ic_history, strings["home.moreSection.venuesHistory"]) {
                     findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToVenuesHistoryFragment())
                 }.takeIf {
+                    true ||
                     !robertManager.isSick && (robertManager.configuration.displayRecordVenues || !VenuesManager.getVenuesQrCode(
                         requireContext().secureKeystoreDataSource(),
                     ).isNullOrEmpty())
