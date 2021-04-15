@@ -840,7 +840,8 @@ class ProximityFragment : TimeMainFragment() {
             identifier = R.drawable.attestation_card.toLong()
         }
 
-        if (robertManager.configuration.displaySanitaryCertificatesWallet) {
+        if (true ||
+            robertManager.configuration.displaySanitaryCertificatesWallet) {
             items += spaceItem {
                 spaceRes = R.dimen.spacing_medium
                 identifier = items.count().toLong()

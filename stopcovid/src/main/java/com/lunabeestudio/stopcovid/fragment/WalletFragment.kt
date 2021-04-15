@@ -91,9 +91,11 @@ class WalletFragment : QRCodeListFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+/*
         if (!robertManager.configuration.displaySanitaryCertificatesWallet) {
             findNavControllerOrNull()?.navigateUp()
         }
+*/
 
         confirmationAsked = savedInstanceState?.getBoolean(CONFIRMATION_ASKED_KEY) == true
 
