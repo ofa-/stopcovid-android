@@ -910,13 +910,13 @@
    
    
     "attestation.form.reason_curfew.handicap.shortLabel":"4. Situation de handicap",
-   "attestation.form.reason_curfew.handicap.longLabel":"🙂 Mise à jour en cours, merci de relancer l'app dans quelques instants",
+   "attestation.form.reason_curfew.handicap.longLabel":"Déplacements des personnes en situation de handicap et de leur accompagnant",
    "attestation.form.reason_curfew.judiciaire.shortLabel":"5. Convocation judiciaire ou administrative",
-   "attestation.form.reason_curfew.judiciaire.longLabel":"🙂 Mise à jour en cours, merci de relancer l'app dans quelques instants",
+   "attestation.form.reason_curfew.judiciaire.longLabel":"Déplacements pour répondre à une convocation judiciaire ou administrative, déplacements pour se rendre chez un professionnel du droit, pour un acte ou une démarche qui ne peuvent être réalisés à distance",
     "attestation.form.reason_curfew.missions.shortLabel":"6. Missions d'intérêt général",
-   "attestation.form.reason_curfew.missions.longLabel":"🙂 Mise à jour en cours, merci de relancer l'app dans quelques instants",
+   "attestation.form.reason_curfew.missions.longLabel":"Déplacements pour participer à des missions d’intérêt général sur demande de l’autorité administrative",
    "attestation.form.reason_curfew.transit.shortLabel":"7. Déplacements de transit et longue distance",
-   "attestation.form.reason_curfew.transit.longLabel":"🙂 Mise à jour en cours, merci de relancer l'app dans quelques instants",
+   "attestation.form.reason_curfew.transit.longLabel":"Déplacements liés à des transits ferroviaires, aériens ou en bus pour des déplacements de longues distances",
    
    
    "attestation.form.reason_curfew.title":"Between 7pm & 6am",
@@ -951,19 +951,19 @@
    "attestation.form.reason_lockdown.sport.longLabel":"- Travel connected to walking, individual physical activities, open-air activities and the needs of pet animals.\n👉 You should only complete the certificate for this reason if you are unable to present proof of address.",
    
    "attestation.form.reason_lockdown.achats.shortLabel":"2. Achats",
-   "attestation.form.reason_lockdown.achats.longLabel":"🙂 Mise à jour en cours, merci de relancer l'app dans quelques instants",
+   "attestation.form.reason_lockdown.achats.longLabel":"Déplacements pour effectuer des achats de première nécessité ou des retraits de commandes\n\n👉 Déplacement au sein du département de résidence [1]",
    "attestation.form.reason_lockdown.enfants.shortLabel":"3. Accompagnement des enfants à l’école",
-   "attestation.form.reason_lockdown.enfants.longLabel":"🙂 Mise à jour en cours, merci de relancer l'app dans quelques instants",
+   "attestation.form.reason_lockdown.enfants.longLabel":"Déplacements pour emmener et aller chercher les enfants à l’école et à l’occasion de leurs activités péri-scolaires\n\n👉 Déplacement au sein du département de résidence [1]",
     "attestation.form.reason_lockdown.culte_culturel.shortLabel":"4. Etablissement culturel ou lieu de culte",
-   "attestation.form.reason_lockdown.culte_culturel.longLabel":"🙂 Mise à jour en cours, merci de relancer l'app dans quelques instants",
+   "attestation.form.reason_lockdown.culte_culturel.longLabel":"Déplacements pour se rendre dans un établissement culturel (bibliothèques et médiathèques) ou un lieu de culte\n\n👉 Déplacement au sein du département de résidence [1]",
    "attestation.form.reason_lockdown.demarche.shortLabel":"5. Démarches administratives ou juridiques",
-   "attestation.form.reason_lockdown.demarche.longLabel":"🙂 Mise à jour en cours, merci de relancer l'app dans quelques instants",
+   "attestation.form.reason_lockdown.demarche.longLabel":"Déplacements pour se rendre dans un service public pour un acte ou une démarche qui ne peuvent être réalisés à distance\n\n👉 Déplacement au sein du département de résidence [1]",
     "attestation.form.reason_lockdown.handicap.shortLabel":"9. Situation de handicap",
-   "attestation.form.reason_lockdown.handicap.longLabel":"🙂 Mise à jour en cours, merci de relancer l'app dans quelques instants",
+   "attestation.form.reason_lockdown.handicap.longLabel":"Déplacements des personnes en situation de handicap et de leur accompagnant\n\n👉 Déplacement sans limitation de distance",
    "attestation.form.reason_lockdown.judiciaire.shortLabel":"10. Convocation judiciaire ou administrative",
-   "attestation.form.reason_lockdown.judiciaire.longLabel":"🙂 Mise à jour en cours, merci de relancer l'app dans quelques instants",
+   "attestation.form.reason_lockdown.judiciaire.longLabel":"Déplacements pour répondre à une convocation judiciaire ou administrative, déplacements pour se rendre chez un professionnel du droit, pour un acte ou une démarche qui ne peuvent être réalisés à distance\n\n👉 Déplacement sans limitation de distance",
    "attestation.form.reason_lockdown.transit.shortLabel":"12. Déplacement de transit vers les gares et les aéroports",
-   "attestation.form.reason_lockdown.transit.longLabel":"🙂 Mise à jour en cours, merci de relancer l'app dans quelques instants",
+   "attestation.form.reason_lockdown.transit.longLabel":"👉 Déplacement sans limitation de distance",
 
 
    "attestation.form.reason_lockdown.title":"Between 6am & 7pm",
