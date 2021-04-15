@@ -365,7 +365,7 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
     }
 
     private val deactivated get() = "(%s)".format(
-        strings["accessibility.hint.proximity.buttonState.deactivated"]
+        strings["proximityController.switch.subtext.deactivated"]
     )
 
     private val nbItemsCaption = captionItem {

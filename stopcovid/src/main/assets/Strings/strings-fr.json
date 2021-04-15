@@ -77,6 +77,8 @@
     "proximityController.stats.short": "court",
     "proximityController.switch.subtitle.activated":   "💕  🐭   StopCoviiid   🐱  💋",
     "proximityController.switch.subtitle.deactivated": "💋  🐱   StopCoviiid   🐭  💕",
+    "proximityController.switch.subtext.activated": "activé",
+    "proximityController.switch.subtext.deactivated": "désactivé",
    "proximityController.error.noBLE":"Votre téléphone ne possédant pas le Bluetooth Low Energy, il n'est pas compatible avec l’alerte des personnes contacts via Bluetooth malheureusement.",
    "proximityController.error.noNotifications":"Pour être prévenu en cas d’exposition à la COVID-19, les notifications doivent être activées dans les paramètres en appuyant ici 👉",
    "proximityController.error.noBattery":"Pour que le contact Bluetooth fonctionne, veuillez autoriser l'exécution en arrière-plan en appuyant ici 👉",

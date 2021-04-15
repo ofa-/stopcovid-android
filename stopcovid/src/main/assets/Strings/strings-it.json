@@ -77,6 +77,8 @@
     "proximityController.stats.short": "breve",
     "proximityController.switch.subtitle.activated":   "💕  🐭   StopCoviiid   🐱  💋",
     "proximityController.switch.subtitle.deactivated": "💋  🐱   StopCoviiid   🐭  💕",
+    "proximityController.switch.subtext.activated": "attivato",
+    "proximityController.switch.subtext.deactivated": "disattivato",
     "proximityController.error.noBLE": "Your phone does not have Bluetooth Low Energy. Unfortunately, this means it is not compatible with Bluetooth contact alerts.",
     "proximityController.error.noNotifications": "To be notified of exposure to COVID-19, you must activate push notifications in settings by tapping here 👉",
     "proximityController.error.noBattery": "In order for the Bluetooth contact to work, you need to allow it to run as a background app by tapping here 👉",

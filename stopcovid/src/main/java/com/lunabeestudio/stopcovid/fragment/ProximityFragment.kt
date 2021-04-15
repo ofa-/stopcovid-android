@@ -1049,10 +1049,10 @@ class ProximityFragment : TimeMainFragment() {
 
             subTitleItem.text = if (isProximityOn) {
                 strings["proximityController.switch.subtitle.activated"] + "\n" +
-                strings["accessibility.hint.proximity.buttonState.activated"]
+                strings["proximityController.switch.subtext.activated"]
             } else {
                 strings["proximityController.switch.subtitle.deactivated"] + "\n" +
-                strings["accessibility.hint.proximity.buttonState.deactivated"]
+                strings["proximityController.switch.subtext.deactivated"]
             }
 
             if (binding?.recyclerView?.isComputingLayout == false) {
