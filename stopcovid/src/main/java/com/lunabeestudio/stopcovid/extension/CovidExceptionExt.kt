@@ -36,4 +36,7 @@ fun CovidException.getString(strings: Map<String, String>): String = when (this.
     ErrorCode.TIME_NOT_ALIGNED -> strings["common.error.clockNotAligned.message"] ?: message
     ErrorCode.REPORT_DELAY -> strings["home.activation.sick.alert.message"] ?: message
     ErrorCode.SECRET_KEY_ALREADY_GENERATED -> strings["common.error.secretKey"] ?: message
+    ErrorCode.WALLET_CERTIFICATE_MALFORMED -> strings["wallet.proof.error.1.message"] ?: message
+    ErrorCode.WALLET_CERTIFICATE_INVALID_SIGNATURE -> strings["wallet.proof.error.2.message"] ?: message
+    ErrorCode.WALLET_CERTIFICATE_UNKNOWN_ERROR -> message
 }

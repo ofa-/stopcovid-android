@@ -21,20 +21,18 @@ import com.lunabeestudio.robert.model.RobertResult
 import com.lunabeestudio.stopcovid.coreui.utils.SingleLiveEvent
 import com.lunabeestudio.stopcovid.extension.toCovidException
 import com.lunabeestudio.stopcovid.manager.IsolationManager
+import com.lunabeestudio.stopcovid.manager.WalletManager
 import com.lunabeestudio.stopcovid.model.CovidException
 import com.lunabeestudio.stopcovid.model.NeedRegisterException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class ManageDataViewModel(
-    secureKeystoreDataSource: SecureKeystoreDataSource,
+    private val secureKeystoreDataSource: SecureKeystoreDataSource,
     private val robertManager: RobertManager,
     isolationManager: IsolationManager,
 ) : CommonDataViewModel(secureKeystoreDataSource, robertManager, isolationManager) {
 
-    val eraseAttestationsSuccess: SingleLiveEvent<Unit> = SingleLiveEvent()
-    val eraseIsolationSuccess: SingleLiveEvent<Unit> = SingleLiveEvent()
-    val eraseVenuesSuccess: SingleLiveEvent<Unit> = SingleLiveEvent()
     val eraseLocalSuccess: SingleLiveEvent<Unit> = SingleLiveEvent()
     val eraseRemoteSuccess: SingleLiveEvent<Unit> = SingleLiveEvent()
     val quitStopCovidSuccess: SingleLiveEvent<Unit> = SingleLiveEvent()
@@ -43,17 +41,17 @@ class ManageDataViewModel(
 
     override fun eraseVenues(application: RobertApplication) {
         super.eraseVenues(application)
-        eraseVenuesSuccess.postValue(null)
+        eraseLocalSuccess.postValue(null)
     }
 
     override fun eraseAttestations() {
         super.eraseAttestations()
-        eraseAttestationsSuccess.postValue(null)
+        eraseLocalSuccess.postValue(null)
     }
 
     override fun eraseIsolation() {
         super.eraseIsolation()
-        eraseIsolationSuccess.postValue(null)
+        eraseLocalSuccess.postValue(null)
     }
 
     fun eraseLocalHistory() {
@@ -112,6 +110,11 @@ class ManageDataViewModel(
         } else {
             covidException.postValue(NeedRegisterException())
         }
+    }
+
+    fun eraseCertificates() {
+        WalletManager.deleteAllCertificates(secureKeystoreDataSource)
+        eraseLocalSuccess.postValue(null)
     }
 }
 

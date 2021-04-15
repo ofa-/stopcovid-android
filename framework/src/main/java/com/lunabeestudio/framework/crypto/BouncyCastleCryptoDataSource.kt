@@ -8,7 +8,7 @@
  * Created by Lunabee Studio / Date - 2020/20/05 - for the TOUS-ANTI-COVID project
  */
 
-package com.lunabeestudio.framework.sharedcrypto
+package com.lunabeestudio.framework.crypto
 
 import com.lunabeestudio.domain.extension.safeUse
 import com.lunabeestudio.robert.datasource.SharedCryptoDataSource

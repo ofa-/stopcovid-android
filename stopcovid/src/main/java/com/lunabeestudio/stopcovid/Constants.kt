@@ -85,4 +85,8 @@ object Constants {
         const val AXIS_LABEL_TEXT_SIZE: Float = 15f
         const val EXTRA_BOTTOM_OFFSET: Float = 16f
     }
+
+    object QrCode {
+        const val FORMAT_2D_DOC: String = "2D-DOC"
+    }
 }

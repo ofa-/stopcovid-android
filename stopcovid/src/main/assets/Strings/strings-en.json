@@ -168,14 +168,12 @@
     "manageDataController.eraseRemoteContact.success": "Data successfully deleted",
     "manageDataController.eraseRemoteContact.confirmationDialog.title": "Confirmation",
     "manageDataController.eraseRemoteContact.confirmationDialog.message": "This cannot be undone. Are you sure you want to delete your temporary user IDs from the server?",
-   
     "manageDataController.eraseRemoteAlert.title": "My risk status",
     "manageDataController.eraseRemoteAlert.subtitle": "This action will temporarily hide your risk status in the app.",
     "manageDataController.eraseRemoteAlert.button": "Hide my status",
     "manageDataController.eraseRemoteAlert.success": "Status successfully hidden",
     "manageDataController.eraseRemoteAlert.confirmationDialog.title": "Please note",
     "manageDataController.eraseRemoteAlert.confirmationDialog.message": "This cannot be undone. Are you sure you want to hide your status?",
-    
     "manageDataController.quitStopCovid.title": "Exit TousAntiCovid",
     "manageDataController.quitStopCovid.subtitle": "You can stop using TousAntiCovid and delete all of your personal information at any time.",
     "manageDataController.quitStopCovid.button": "Unsubscribe",
@@ -207,6 +205,7 @@
     "notification.channel.error.title": "Error",
     "notification.error.title": "TousAntiCovid needs you",
     "notification.error.message": "Please restart TousAntiCovid as soon as possible to ensure it works properly. Thank you!",
+    
     "myHealthController.sick.mainMessage.title": "Stay safe!",
     "myHealthController.sick.mainMessage.subtitle": "Here are the health recommendations.\n\nMake sure you follow self-isolation guidelines in order to stop the spread of the virus.\n\nCall your doctor if you have any doubts regarding the progress of the disease. If you don't have a doctor, call the number below to find a doctor (free service, toll free call).\n\n If you are having trouble breathing, call 15 immediately (or 114 for the hearing impaired).",
     "enterCodeController.alert.invalidCode.title": "Code not valid",
@@ -328,7 +327,7 @@
     "home.healthSection.noContact.cellSubtitle": "Tap here for advice, to find out where to get tested and more",
     "home.healthSection.contact.cellTitle": "High-risk exposure detected",
     "home.healthSection.contact.cellSubtitle": "Read our recommendations",
-    "keyfigure.registered.label": "Net recordings",
+    "keyfigure.registered.label": "Net activations",
     "keyfigure.registered.description": "The number of people who have downloaded and activated the app since 2nd June 2020.",
     "keyfigure.notification.label": "Notified by the application",
     "keyfigure.notification.description": "The number of people notified by the app following exposure to COVID-19 since 2nd June 2020.",
@@ -348,7 +347,7 @@
     "keyfigure.tauxoccupation.description": "This indicator reflects the occupancy rates of hospital ICUs, and is expressed as the number of patients with COVID-19 who are currently in ICU out of the total number of ICU beds available prior to the crisis.",
     "keyfigure.nombrecas.label": "New cases",
     "keyfigure.nombrecas.shortLabel": "New cases",
-    "keyfigure.nombrecas.description": "This indicator, which is only available at a national level, corresponds to the number of confirmed new cases (RT-PCR and antigen tests) over the last 24 hours. Figures reported at the start of the week will often be higher as a result of a drop in testing activity over the weekend.",
+    "keyfigure.nombrecas.description":"⚠️ Suite à l’incident survenu hier sur le flux des données de la base SI-DEP, le nombre total de cas confirmés publié ce jour intègre un rattrapage des données non publiées la veille.\n\nIl n’est donc pas à interpréter comme une augmentation exceptionnelle du nombre de cas quotidien.\n\nLes 84 999 cas positifs sont des résultats de tests positifs en date de prélèvement du 05 avril (1 542 cas), du 06 avril (49 754 cas) et du 07 avril (30 785 cas) ou des jours précédents.\n\nNous remercions chacun de ceux qui utilisent quotidiennement ces indicateurs de leur compréhension 👍",
     "keyfigure.nombrecasj3.label": "Positive cases identified D-3",
     "keyfigure.nombrecasj3.shortLabel": "Positive cases identified D-3",
     "keyfigure.nombrecasj3.description": "This indicator corresponds to the number of new cases (RT-PCR and antigen tests) of COVID-19, recorded by test date, and reflects the situation three days ago. This provides enough time to ensure that the data gives an accurate reflection of the epidemiological situation three days ago.",
@@ -390,19 +389,19 @@
     "home.moreSection.curfewCertificate": "Exemption form",
     "home.moreSection.curfewCertificate.url": "https://media.interieur.gouv.fr/attestation-deplacement-derogatoire-covid-19/",
     "home.infoSection.newPostalCode": "Local health situation",
-    "home.infoSection.newPostalCode.subtitle": "You can access key data at a local level by entering your postcode.",
-    "home.infoSection.newPostalCode.button": "Enter a postcode",
-    "home.infoSection.newPostalCode.alert.title": "Postcode",
-    "home.infoSection.newPostalCode.alert.subtitle": "Enter a postcode to view key data at a local level. This postcode will only be stored on your phone in the app.",
-    "home.infoSection.newPostalCode.alert.placeholder": "Your postcode",
-    "home.infoSection.newPostalCode.alert.wrongPostalCode": "Please enter a 5-digit postcode",
-    "home.infoSection.updatePostalCode": "Change postcode",
-    "home.infoSection.updatePostalCode.alert.newPostalCode": "Enter a postcode",
-    "home.infoSection.updatePostalCode.alert.deletePostalCode": "Delete postcode",
+    "home.infoSection.newPostalCode.subtitle": "You can access key data at a local level by entering your zipcode.",
+    "home.infoSection.newPostalCode.button": "Enter a zipcode",
+    "home.infoSection.newPostalCode.alert.title": "Zipcode",
+    "home.infoSection.newPostalCode.alert.subtitle": "Enter a zipcode to get local level information. This zipcode will only be stored on your phone in the app.",
+    "home.infoSection.newPostalCode.alert.placeholder": "Your zipcode",
+    "home.infoSection.newPostalCode.alert.wrongPostalCode": "Please enter a 5-digit zipcode",
+    "home.infoSection.updatePostalCode": "Change zipcode",
+    "home.infoSection.updatePostalCode.alert.newPostalCode": "Enter a zipcode",
+    "home.infoSection.updatePostalCode.alert.deletePostalCode": "Delete zipcode",
     "onboarding.gesturesController.gesture8": "Limit your social contacts (no more than 6)",
     "onboarding.gesturesController.gesture9": "Air out rooms for ten minutes three times a day",
     "onboarding.gesturesController.gesture10": "Use digital tools (TousAntiCovid)",
-    "home.infoSection.newPostalCode.alert.unknownPostalCode": "Unknown postcode or no data",
+    "home.infoSection.newPostalCode.alert.unknownPostalCode": "Unknown zipcode or no data",
     "manageDataController.showInfoNotifications.title": "\"News\" notifications",
     "manageDataController.showInfoNotifications.subtitle": "Receive notifications for news and new data.",
     "manageDataController.showInfoNotifications.button": "Notify me",
@@ -432,7 +431,7 @@
     "attestation.form.address.placeholder": "999 Any Street",
     "attestation.form.city.label": "Town",
     "attestation.form.city.placeholder": "Anytown",
-    "attestation.form.zip.label": "Postcode",
+    "attestation.form.zip.label": "Zipcode",
     "attestation.form.zip.placeholder": "00000",
     "attestation.form.datetime.label": "Date and time of departure",
     "attestation.form.datetime.placeholder": "-",
@@ -495,7 +494,7 @@
     "accessibility.hint.keyFigure.valueDown": "This number has decreased",
     "accessibility.hint.keyFigure.valueSteady": "This number is unchanged",
     "accessibility.hint.info.share": "Share data",
-    "accessibility.hint.postalCode.button": "Change postcode",
+    "accessibility.hint.postalCode.button": "Change zipcode",
     "attestationsController.title": "Forms",
     "attestationsController.newAttestation": "New form",
     "attestationsController.termsOfUse": "Terms of use",
@@ -522,7 +521,7 @@
     "newAttestationController.generate.alert.validate": "I hereby certify",
     "newAttestationController.missingInfo.alert.title": "Please note",
     "newAttestationController.missingInfo.alert.message": "All fields must be completed in order to generate a form.",
-    "attestationController.footer":"Vous pouvez également utiliser l'attestation sur le site web du Ministère de l’Intérieur :",
+    "attestationController.footer":"You can also get the web version on the website of the Ministère de l’Intérieur :",
     "attestationsController.validAttestationsSection.title": "My forms",
     "attestationsController.validAttestationsSection.subtitle": "If you are stopped for an inspection, you can flash a QR code to display it in full-screen mode with details.",
     "attestationsController.expiredSection.title": "Expired",
@@ -545,8 +544,8 @@
     "home.healthSection.isSick.subtitle": "Find out more",
     "myHealthController.sick.title": "Health recommendations",
     "home.attestationSection.title": "Form",
-    "home.attestationSection.cell.title":"Vos attestations (nouveau !)",
-    "home.attestationSection.cell.subtitle.noAttestations": "Press here",
+    "home.attestationSection.cell.title":"Your forms",
+    "home.attestationSection.cell.subtitle.noAttestations": "Tap here",
     "home.attestationSection.cell.subtitle.oneAttestation": "1 form",
     "home.attestationSection.cell.subtitle.multipleAttestations": "%d forms",
     "home.healthSection.menu.covidAdvices": "My Covid advice",
@@ -571,7 +570,7 @@
     "sendHistoryController.successAlert.message": "Thank you for identifying yourself via the TousAntiCovid app and for informing those users you were in close contact with while you were contagious.\n\nThanks to you, these users will be able to take the necessary precautions in order to protect themselves and others. Let's keep up the fight against Covid.",
     "sendHistoryController.successAlert.button.learnMore": "Find out more",
     "keyFiguresExplanationsController.title": "Explanation of figures",
-    "keyFiguresController.section.health.subtitle": "⚠️ Suite à un incident sur le flux des données, environ 200 000 résultats de tests (non dédoublonnés, résultats positifs ou négatifs) n’ont pas pu être intégrés dans la base SI-DEP transmise à Santé publique France (remontée des tests de diagnostic).\n\nLe nombre total de cas confirmés enregistrés ce jour, 23 mars, serait donc sous-estimé. Cet incident n’a pas d’impact sur les indicateurs consolidés à J-3. La résolution de l’incident est en cours avec les acteurs concernés.\n\nAucun résultat de test n’a été perdu et cet incident n’a pas d’impact sur l’information du patient sur son résultat de test. Les résultats de tests de ce jour seront également réintégrés dans les chiffres consolidés dès résolution.\n\nPress \"read now\" to find out more about the source of the health data, how they are interpreted and updated.",
+    "keyFiguresController.section.health.subtitle": "⚠️ En raison des jours fériés, le taux d’incidence (calculé en date de prélèvement sur 7 jours glissants, J-9 à J-3) est à interpréter avec prudence par comparaison avec une semaine sans jour férié, compte tenu de la moindre activité des lieux de prélèvement les jours fériés.\n\nIl ne s’agit pas d’une baisse exceptionnelle dans une situation où le nombre quotidien de cas confirmés est élevé.\n\nTap \"read now\" to find out more about the source of the health data, how they are interpreted and updated.",
     "keyFiguresController.section.health.button": "Read now",
     "home.activation.sick.alert.title": "Information",
     "home.activation.sick.alert.message": "The alert for exposure to COVID-19 cannot be activated for 2 months after you declare yourself positive for COVID-19.\n\nFor 2 months after testing positive for COVID-19, you will not be considered as being \"at-risk of infection\".",
@@ -584,7 +583,7 @@
     "home.moreSection.venuesHistory": "Location history",
     "venuesRecording.onboardingController.title": "Locations",
     "venuesRecording.onboardingController.mainMessage.title": "We need to work together to be informed and to inform others of exposure to COVID-19 in a certain location",
-    "venuesRecording.onboardingController.mainMessage.message": "Simply scan the QR codes on display in each location and you will find out if there is someone who has identified themselves as having COVID-19 in the application.\n\nIf you identify yourself as positive in the application, this will anonymously inform everyone else who was in this same location at the same time as you.",
+    "venuesRecording.onboardingController.mainMessage.message": "TousAntiCovid Signal permet d’être alerté et d’alerter les autres en cas d’exposition à la COVID-19 dans un lieu que vous avez fréquenté.\n\nPour cela vous devez scanner le QR Code affiché à l’entrée des lieux qui ont mis en place ce dispositif. Si vous êtes testé positif à la COVID-19, n’oubliez pas de vous déclarer positif dans l’application pour informer les autres utilisateurs.\n\nCe dispositif est anonyme, aucune donnée nominative n’est collectée ni sur le lieu ni sur les personnes présentes. Le nom et l’adresse du lieu ne sont pas contenus dans le QR Code.\n\n👉 Cette nouvelle fonctionnalité est en phase d'expérimentation dans un nombre limité de lieux pour l’instant.",
     "venuesRecording.onboardingController.button.participate": "Sign up",
     "venuesRecording.confirmationController.title": "Location recorded",
     "erp.confirmationMessage.default.title": "Thank you!",
@@ -602,12 +601,12 @@
     "venuesHistoryController.title": "Location history",
     "venuesHistoryController.noVenuesEmptyView.title": "No locations have been recorded on your phone. Please note that all locations are deleted after 2 weeks.",
     "venuesHistoryController.entry": "%@ : %@",
-    
+   
     "venueType.default": "Location",
     "onboarding.venuesController.title": "Locations",
     "onboarding.venuesController.bottomButton": "Continue",
     "onboarding.venuesController.mainMessage.title": "Break the chain of transmission in public places",
-    "onboarding.venuesController.mainMessage.subtitle": "Scan the QR code in these locations and you will receive a notification if someone who has tested positive for COVID-19 was there at the same time as you.",
+    "onboarding.venuesController.mainMessage.subtitle": "TousAntiCovid Signal permet d’être alerté et d’alerter les autres en cas d’exposition à la COVID-19 dans un lieu que vous avez fréquenté.\n\nPour cela vous devez scanner le QR Code affiché à l’entrée des lieux qui ont mis en place ce dispositif. Si vous êtes testé positif à la COVID-19, n’oubliez pas de vous déclarer positif dans l’application pour informer les autres utilisateurs.\n\nCe dispositif est anonyme, aucune donnée nominative n’est collectée ni sur le lieu ni sur les personnes présentes. Le nom et l’adresse du lieu ne sont pas contenus dans le QR Code.\n\n👉 Cette nouvelle fonctionnalité est en phase d'expérimentation dans un nombre limité de lieux pour l’instant.",
     "home.healthSection.warningContact.cellTitle": "Possible at-risk exposure",
     "home.healthSection.warningContact.cellSubtitle": "See our recommendations",
     "myHealthController.state.warning.title": "You may have been exposed to at least one user who has tested positive for COVID-19 in the past few days",
@@ -661,8 +660,8 @@
     "isolation.recommendation.positiveCasePostIsolationPeriod.body": "For 7 days after you stop self-isolating, please strictly adhere to social distancing guidelines: wear a mask, wash your hands regularly and continue physical distancing. You should also avoid all contact with at-risk individuals.",
     "isolation.recommendation.positiveCaseSymptomsAfterIsolationStillHavingFever.title": "Self-isolation recommended",
     "isolation.recommendation.positiveCaseSymptomsAfterIsolationStillHavingFever.body": "Wait 48 hours after your fever has stopped before exiting self-isolation.",
-    "isolation.recommendation.indeterminate.title": "Finish the form",
-    "isolation.recommendation.indeterminate.body": "Press here to finish filling out the questionnaire and to get your self-isolation recommendations",
+    "isolation.recommendation.indeterminate.title": "Complete the form",
+    "isolation.recommendation.indeterminate.body": "Tap here to complete filling out the questionnaire and to get your self-isolation recommendations",
     "isolation.recommendation.initialCaseAtRiskOrSick.defineIsolationPeriod": "Determine my period of self-isolation",
     "isolation.recommendation.allGood.changeMyState": "My health status has changed",
     "isolation.recommendation.symptoms.testingSites": "Where can I get a test?",
@@ -721,23 +720,23 @@
     "confirmVenueQrCodeController.explanation.subtitle": "Do you want to add this location to your location history?",
     "confirmVenueQrCodeController.confirm": "Add this location",
     
-     "home.vaccinationSection.cellTitle": "Je me fais vacciner !",
-   "home.vaccinationSection.cellSubtitle": "Vérifiez votre éligibilité et trouvez un centre près de chez vous pour vous faire vacciner.",
+     "home.vaccinationSection.cellTitle": "I get vaccinated!",
+   "home.vaccinationSection.cellSubtitle": "Check your eligibility and find a center nearby to get vaccinated.",
    "vaccinationController.title": "Vaccination",
-   "vaccinationController.eligibility.title": "Suis-je prioritaire pour me faire vacciner ?",
-   "vaccinationController.eligibility.subtitle": "Aujourd’hui, les publics prioritaires définis par les autorités sanitaires sont :\n- Les personnes de 50 à 74 ans inclus, souffrant d’une ou plusieurs des comorbidités (appuyez sur \"En savoir plus\" pour plus de détails)\n- Les résidents de 60 ans et plus dans les foyers de travailleurs migrants (FTM)\n- Les professionnels du secteur de la santé et du secteur médico-social appartenant aux catégories prioritaires (appuyez sur \"En savoir plus\" pour plus de détails),\n- Les personnes âgées de plus de 75 ans,\n- Les personnes vulnérables ayant une pathologie qui les expose à un très haut risque face à la COVID-19,\n- Les personnes âgées résidant en établissements (par exemple EHPAD, USLD),\n- Les personnes en situation de handicap hébergées en établissement",
+   "vaccinationController.eligibility.title": "Am I eligible to get vaccinated?",
+   "vaccinationController.eligibility.subtitle": "Aujourd’hui, les publics prioritaires définis par les autorités sanitaires sont :\n- les personnes de 70 ans et plus quel que soit leur lieu de vie\n- les résidents en établissements (par exemple Ehpad, USLD)\n- les personnes vulnérables ayant une pathologie qui les expose à un très haut risque face à la Covid-19\n- les personnes en situation de handicap hébergées en établissements\n- les personnes de 50 à 69 ans inclus, souffrant d’une ou plusieurs des comorbidités\n- les résidents de 60 ans et plus dans les foyers de travailleurs migrants ;\n- les professionnels du secteur de la santé et du secteur médico-social appartenant aux catégories prioritaires.\n\nAppuyez sur \"En savoir plus\" pour plus de détails :",
    "vaccinationController.eligibility.buttonTitle": "En savoir plus",
-   "vaccinationController.eligibility.url": "https://solidarites-sante.gouv.fr/grands-dossiers/vaccin-covid-19/article/la-strategie-vaccinale-et-la-liste-des-publics-prioritaires",
-   "vaccinationController.vaccinationLocation.title": "Trouver un centre pour me faire vacciner",
-   "vaccinationController.vaccinationLocation.subtitle": "Rendez vous sur www.Santé.fr pour trouver les centres de vaccination.",
-   "vaccinationController.vaccinationLocation.buttonTitle": "Aller sur Santé.fr",
+   "vaccinationController.eligibility.url": "https://www.gouvernement.fr/info-coronavirus/vaccins#tac",
+   "vaccinationController.vaccinationLocation.title": "Find a center to get vaccinated",
+   "vaccinationController.vaccinationLocation.subtitle": "Go to www.Santé.fr to find vaccination centers.",
+   "vaccinationController.vaccinationLocation.buttonTitle": "Open Santé.fr",
    "vaccinationController.vaccinationLocation.url": "https://www.sante.fr/cf/centres-vaccination-covid.html?source=TousAntiCovid",
    "contactUs.url": "https://bonjour.tousanticovid.gouv.fr/contact.html",
    
    "keyfigure.nombrevaccinations.colorCode.light":"#34C859",
    "keyfigure.nombrevaccinations.colorCode.dark":"#31D158",
-   "keyfigure.nombrevaccinations.label":"Nombre total de personnes vaccinées",
-   "keyfigure.nombrevaccinations.shortLabel":"Total vaccinés",
+   "keyfigure.nombrevaccinations.label":"Total number of vaccinated people",
+   "keyfigure.nombrevaccinations.shortLabel":"Total vaccinated",
    "keyfigure.nombrevaccinations.description":"Cet indicateur représente le nombre total de personnes primo-vaccinées (personnes ayant reçu une première injection).\nLes données sont consolidées le lendemain de leur remontée pour tenir compte des dernières données de vaccination de la veille au soir.",
    "enterCodeController.alert.expiredCode.title":"Expiré",
    "enterCodeController.alert.expiredCode.message":"Votre présence dans ce lieu date de plus de 14 jours. Il n'est donc plus utile d'un point de vue sanitaire de l'ajouter à votre historique.",
@@ -752,44 +751,56 @@
    "keyfigure.qrcodes.shortLabel":"Cas déclarés",
    
       
-   "keyFigureDetailController.section.evolution.subtitle": "%@.\nDernière valeur du %@ : %@",
-   "keyFigureDetailController.section.evolution.subtitle2Charts": "%@.\nDernière valeur du %@ : %@ (France : %@)",
+   "keyFigureDetailController.section.evolution.subtitle": "%@.\nLast value of %@ : %@",
+   "keyFigureDetailController.section.evolution.subtitle2Charts": "%@.\nLast value of %@ : %@ (France : %@)",
    "home.activationExplanation.title": "Attention",
    "home.activationExplanation.message": "Votre téléphone ne supportant pas complètement le Bluetooth Low Energy (BLE), TousAntiCovid va  redémarrer le Bluetooth de votre téléphone assez fréquemment pour fonctionner correctement.",
-   "accessibility.hint.keyFigure.chart.share": "Partager le graphique du chiffre clé",
+   "accessibility.hint.keyFigure.chart.share": "Share key figure chart",
    
    "keyfigure.nombrevaccinations.learnMore":"Le nombre cumulé de personnes vaccinées en France est obtenu quotidiennement via l’outil \"Vaccin Covid\" dans lequel le nombre de personnes vaccinées est enregistré directement.\n\nLes données sont ensuite consolidées par Santé publique France puis publiées sur data.gouv.\n\nLes données sont disponibles au niveau régional et national de manière quotidienne.",
 
-   "vaccinationController.vaccinationLocation.newPostalCode": "Renseigner un code postal",
-   "vaccinationController.vaccinationLocation.updatePostalCode": "Changer de code postal",
-   "vaccinationController.vaccinationLocation.footer": "Si vous ne trouvez pas un centre de vaccination qui vous convient, retrouvez tous les centres sur Santé.fr",
-   "vaccinationCenterCell.openingDate.title": "Horaires",
-   "vaccinationCenterCell.openingDate.from": "À partir du",
-   "vaccinationController.vaccinationLocation.section.title": "Où me faire vacciner ?",
+   "vaccinationController.vaccinationLocation.newPostalCode": "Enter a zipcode",
+   "vaccinationController.vaccinationLocation.updatePostalCode": "Modify the zipcode",
+   "vaccinationController.vaccinationLocation.footer": "If you cannot find a vaccination center that suits you, find all the centers on Santé.fr",
+   "vaccinationCenterCell.openingDate.title": "Timetable",
+   "vaccinationCenterCell.openingDate.from": "From",
+   "vaccinationController.vaccinationLocation.section.title": "Where can I get vaccinated?",
 
-   "vaccinationController.vaccinationCenter.actionSheet.alert.sharing": "Partager les infos",
-   "vaccinationController.vaccinationCenter.actionSheet.alert.website": "Prendre rdv sur internet",
-   "vaccinationController.vaccinationCenter.actionSheet.alert.mapLocation": "Localiser sur une carte",
-   "vaccinationController.vaccinationCenter.actionSheet.alert.call": "Appeler (%@)",
-   "vaccinationController.vaccinationCenter.actionSheet.alert.sharing.text.tel": "Tél : %@",
-   "vaccinationController.vaccinationCenter.actionSheet.alert.sharing.text.url": "Prise de rendez-vous sur le web : %@",
-   "vaccinationController.vaccinationLocation.vaccinationCenterNotFound": "Aucun centre de vaccination n'a été trouvé",
-   "vaccinationController.vaccinationLocation.explanation": "Avec un code postal, l'application vous donnera une liste des %d centres de vaccination les plus proches de ce code postal.",
+   "vaccinationController.vaccinationCenter.actionSheet.alert.sharing": "Share information",
+   "vaccinationController.vaccinationCenter.actionSheet.alert.website": "Make an appointment",
+   "vaccinationController.vaccinationCenter.actionSheet.alert.mapLocation": "Locate on a map",
+   "vaccinationController.vaccinationCenter.actionSheet.alert.call": "Call (%@)",
+   "vaccinationController.vaccinationCenter.actionSheet.alert.sharing.text.tel": "Phone: %@",
+   "vaccinationController.vaccinationCenter.actionSheet.alert.sharing.text.url": "Appointment booking on the web: %@",
+   "vaccinationController.vaccinationLocation.vaccinationCenterNotFound": "No vaccination center was found",
+   "vaccinationController.vaccinationLocation.explanation": "With a zipcode, the application will give you a list of the %d vaccination centers closest to that zipcode.",
    
-   "keyFigureDetailController.section.evolutionAvg.subtitle": "%@.\nMoyenne glissante sur 7 jours.",
-   "keyFigureDetailController.section.evolutionAvg.legendWithLocation": "%@ (moyenne glissante)",
+   "keyFigureDetailController.section.evolutionAvg.subtitle": "%@.\n7-day moving average",
+   "keyFigureDetailController.section.evolutionAvg.legendWithLocation": "%@ (moving average)",
    "keyfigure.reffectif.limitLine": "R=1",
    "error.cryptoIssue.explanation.title": "Sécurité",
    "error.cryptoIssue.explanation.message": "Pour des raisons de sécurité, il est nécessaire de vous enregistrer à nouveau. Si vous n’êtes pas à jour, il est nécessaire d'installer la dernière version de TousAntiCovid maintenant.",
    "error.cryptoIssue.explanation.register": "M'enregistrer",
    "error.cryptoIssue.explanation.goToStore": "Aller sur le store",
    "proximityController.error.noAdvertising": "Votre téléphone ne possédant pas le Bluetooth advertising, il n'est pas compatible avec l’alerte des personnes contacts via Bluetooth malheureusement.",
-   "common.privacyPolicy": "https://bonjour.tousanticovid.gouv.fr/privacy-en.html#camera",
-   "common.updatePostalCode":"Code postal: %@",
-   "common.updatePostalCode.end":"Changer",
-
-   "myHealthStateHeaderCell.exposureDate.title": "Date de contact approximative :",
-   "myHealthStateHeaderCell.exposureDate.range": "Entre le %@ et %@",
+   "common.privacyPolicy": "https://bonjour.tousanticovid.gouv.fr/privacy.html#camera",
+   
+   "keyfigure.tauxincidence.learnMore" : "Le taux d’incidence est arrêté à J-3 et calculé sur la somme du nombre de nouvelles personnes testées positives des 7 derniers jours [J-9 ; J-3] afin de mieux prendre en compte la fluctuation de remontée des données.\n\nIl est exprimé pour 100 000 habitants et permet de comparer des zones géographiques entre elles.\n\nLe taux d’incidence est disponible au niveau national (France métropolitaine) et au niveau départemental (départements métropolitains et ultra-marins) et mis à jour quotidiennement, après consolidation par SpF et le Ministère des Solidarités et de la Santé.",
+   
+  "keyfigure.tauxpositivite.learnMore": "Le taux de positivité est arrêté à J-3 et calculé sur la moyenne des 7 derniers jours [J-9 ; J-3] afin de mieux prendre en compte la fluctuation de remontée des données.\n\nLe taux de positivité est disponible au niveau national (France métropolitaine) et au niveau départemental (départements métropolitains et ultra-marins) et mis à jour quotidiennement, après consolidation par SpF et le Ministère des Solidarités et de la Santé.",
+  
+     "keyfigure.tauxoccupation.learnMore":"Cet indicateur de tension des réanimations informe sur la situation de la veille.\n\nIl est disponible au niveau national (France métropolitaine) et au niveau régional (régions métropolitaines et ultra-marines) et mis à jour quotidiennement, après consolidation par SpF et le Ministère des Solidarités et de la Santé.\n\nCet indicateur est plus pertinent au niveau régional que départemental en raison des disparités de présence d’hôpitaux et de services de réanimation au sein des différents départements.",
+     
+     "keyfigure.nombrecasj3.learnMore": "L’indicateur informe sur la situation d’il y a trois jours (J-3).\n\nCet indicateur est similaire à \"Nouveaux cas rapportés J-1\" mais permet de bénéficier de suffisamment de temps pour que les données sur les tests remontent et qu’elles reflètent correctement la situation épidémiologique d'il y a trois jours.\n\nCet indicateur est disponible au niveau national (France métropolitaine) et au niveau départemental (départements métropolitains et ultra-marins), et mis à jour quotidiennement, après consolidation par SpF et le Ministère des Solidarités et de la Santé.\n\nLa courbe de la moyenne glissante des nouveaux cas sur 7 jours permet de présenter la tendance en \"lissant\" par exemple les effets du week-end où les données remontent moins.",
+     
+     "keyfigure.nouveauxpatientsrea.learnMore": "Cet indicateur informe sur la situation de la veille.\n\nIl est disponible au niveau national (France métropolitaine) et au niveau régional (régions métropolitaines et ultra-marines) et mis à jour quotidiennement, après consolidation par SpF et le Ministère des Solidarités et de la Santé.\n\nCet indicateur est plus pertinent au niveau régional que départemental en raison des disparités de présence d’hôpitaux et de services de réanimation au sein des différents départements.",
+     
+     "keyfigure.patientsrea.learnMore": "Cet indicateur informe sur la situation en réanimation de la veille.\n\nIl est disponible au niveau national (France métropolitaine) et au niveau régional (régions métropolitaines et ultra-marines) et mis à jour quotidiennement, après consolidation par SpF et le Ministère des Solidarités et de la Santé.\n\nCet indicateur est plus pertinent au niveau régional que départemental en raison des disparités de présence d’hôpitaux et de services de réanimation au sein des différents départements.",
+   "common.updatePostalCode":"Zipcode: %@",
+   "common.updatePostalCode.end":"Change",
+   
+   "myHealthStateHeaderCell.exposureDate.title": "Approximate contact date:",
+   "myHealthStateHeaderCell.exposureDate.range": "Between %@ and %@",
     
    "notification.lowRisk.title":"Info : restez vigilant",
    "notification.lowRisk.message":"Restez vigilant, vous croisez régulièrement des personnes positives et contagieuses. Continuez de bien respecter les mesures barrières !",
@@ -797,9 +808,9 @@
    "notification.atHighWarning.title": "Alerte : contact à risque dans un lieu",
    "notification.atHighWarning.message": "Vous avez fréquenté le même lieu ou événement qu’au moins un utilisateur testé positif à la COVID-19 et contagieux ces derniers jours. Si vous êtes un mineur, discutez-en avec vos parents ou vos responsables légaux.",
    
-   "manageDataController.hideStatus.title": "Mon statut de risque",
-   "manageDataController.hideStatus.subtitle": "Vous pouvez à tout moment masquer votre statut de risque sur l'écran d'accueil de l'application. Pour le voir, à nouveau, il faudra changer la configuration ci-dessous",
-   "manageDataController.hideStatus.button": "Masquer mon statut",
+   "manageDataController.hideStatus.title": "My risk status",
+   "manageDataController.hideStatus.subtitle": "You can hide your risk status on the home screen of the application. To unhide it, you will have to change the configuration below.",
+   "manageDataController.hideStatus.button": "Hide my status",
 	
 	"risk.section.measures.title" : "Respectez les mesures barrières",
 	"risk.section.measures.body" : "Veillez à respecter les mesures barrières pour freiner la propagation du virus.",
@@ -817,6 +828,9 @@
 	"risk.section.test.body" : "Vous bénéficiez d'un accès prioritaire au test. Il vous est recommandé de vous faire tester immédiatement et 7 jours après votre date de contact.\n\nPour savoir quel jour est le plus adéquat pour vous faire tester en fonction de votre situation, actualisez votre état dans le module \"Recommandation isolement\".\n\nContactez votre médecin traitant en cas de doute.\n\nSi vous n'avez pas de médecin, appelez le 0 800 130 000 afin d'être orienté vers un médecin (service gratuit + appel gratuit).",
 	"risk.section.test.button":"Trouver un centre",
 	"risk.section.test.url":"https://www.sante.fr/covid19/external/depistage?source=TousAntiCovid",
+	
+	"risk0.section.test.title" : "Où se faire dépister",
+	"risk0.section.test.body" : "Pour trouver où se faire dépister, rendez vous sur Santé.fr.",
 	
 	"risk.section.symptoms.title" : "Apparition de symptômes",
 	"risk.section.symptoms.body" : "En cas de doute, n'hésitez pas à effectuer le questionnaire d'orientation sur Mes Conseils Covid ou appeler votre médecin.\n\nSi vous avez des symptômes compatibles avec la COVID-19, vous pouvez également actualiser votre état dans le module \"Recommandation isolement\" afin de savoir si votre durée d'isolement doit être modifiée.",
@@ -862,97 +876,196 @@
 	"risk4.notif.title" : "Alerte : contact à risque",
 	"risk4.notif.sub" : "Vous avez été exposé à au moins un utilisateur testé positif et contagieux. Si vous êtes un mineur, discutez-en avec vos parents ou vos responsables légaux.",
 	"risk4.home.title" : "Alerte : exposition à risque élevée suite à un contact",
-	"risk4.home.sub" : "Consultez nos recommandations",
+	"risk4.home.sub" : "Date de contact, recommandations, arrêt de travail... 👉",
 	"risk4.details.title" : "Exposition à risque suite à un contact : vous êtes un contact à risque",
 	"risk4.details.sub" : "Isolez-vous et faites-vous tester !",
 	"risk4.section1.title" : "Votre risque",
 	"risk4.section1.body" : "Vous avez été exposé à au moins un utilisateur testé positif et contagieux, vous êtes un contact à risque.\n\nLa date de contact affichée est approximative à plus ou moins un jour, pour préserver l’anonymat des personnes s'étant déclarées positives.\n\nSi vous avez le moindre doute notamment sur votre exposition à risque, contactez votre médecin en l'informant que vous avez été à proximité d'au moins un utilisateur testé positif et contagieux.",
 
   "myHealthController.workStopping.title": "Arrêt de travail",
-  "myHealthController.workStopping.message": "Vous avez ici un lien unique qui vous permet de faire une demande d'arrêt de travail sur Ameli.fr, pendant 7 jours uniquement après la date de contact.\nVous pouvez réaliser cette demande à partir de votre smartphone, ou bien vous envoyer le lien pour faire la demande sur votre ordinateur.",
+  "myHealthController.workStopping.message": "Vous avez ici un lien unique qui vous permet de faire une demande d'arrêt de travail sur declare.ameli.fr, pendant 7 jours uniquement après la date de contact.\nVous pouvez réaliser cette demande à partir de votre smartphone, ou bien vous envoyer le lien pour faire la demande sur votre ordinateur.",
   "myHealthController.workStopping.link": "Demander un arrêt",
   "myHealthController.workStopping.share": "M'envoyer le lien unique",
   
   
   
-  
-   "attestation.form.reason_curfew.label":"Motif de couvre-feu (19h-6h)",
+  "attestation.form.reason_curfew.label":"Reason between 7pm & 6am",
    "attestation.form.reason_curfew.placeholder":"-",
    
-   "attestation.form.reason_curfew.travail.shortLabel":"1. Activité professionnelle enseignement et formation",
-   "attestation.form.reason_curfew.travail.longLabel":"Déplacements entre le domicile et le lieu d’exercice de l’activité professionnelle ou le lieu d’enseignement et de formation, déplacements professionnels ne pouvant être différés",
+   "attestation.form.reason_curfew.travail.shortLabel":"1. Professional occupation, education and training, general interest mission",
+   "attestation.form.reason_curfew.travail.longLabel":"- Travel between the home and the place of work, education or training.\n- Business travel that cannot be postponed, deliveries.\n- Travel to make purchases of supplies required for my professional occupation.\n- Travel to participate in missions of general interest at the request of the administrative authority.",
    
-    "attestation.form.reason_curfew.sante.shortLabel":"2. Consultations et soins",
-   "attestation.form.reason_curfew.sante.longLabel":"Déplacements pour des consultations, examens, actes de prévention (dont vaccination) et soins ne pouvant être assurés à distance ou pour l’achat de produits de santé",
+    "attestation.form.reason_curfew.sante.shortLabel":"2. Health (consultations and care/treatment)",
+   "attestation.form.reason_curfew.sante.longLabel":"Travel for consultations, examinations/check-ups, preventive procedures (including vaccination) and care/treatment that cannot be provided remotely, or to buy health products.",
    
-   "attestation.form.reason_curfew.famille.shortLabel":"3. Motif familial impérieux, personnes vulnérables ou précaires ou gardes d'enfants",
-   "attestation.form.reason_curfew.famille.longLabel":"Déplacements pour motif familial impérieux, pour l’assistance aux personnes vulnérables ou précaires ou pour la garde d’enfants",
+   "attestation.form.reason_curfew.famille.shortLabel":"3. Compelling family reason, assistance to vulnerable people, childcare, disability",
+   "attestation.form.reason_curfew.famille.longLabel":"- Travel for a compelling family reason, for assistance to vulnerable or needy people, or childcare.\n- Travel of people with disabilities and their carers.",
    
-   "attestation.form.reason_curfew.handicap.shortLabel":"4. Situation de handicap",
-   "attestation.form.reason_curfew.handicap.longLabel":"Déplacements des personnes en situation de handicap et de leur accompagnant",
+   "attestation.form.reason_curfew.convocation_demarches.shortLabel":"4. Judicial or administrative summons, procedures that cannot be carried out remotely",
+   "attestation.form.reason_curfew.convocation_demarches.longLabel":"Travel to respond to a judicial or administrative summons, travel to visit a public service or a legal professional for formalities or proceedings that cannot be carried out remotely.",
    
+   "attestation.form.reason_curfew.animaux.shortLabel":"5. Pet animals in the evening and at night",
+   "attestation.form.reason_curfew.animaux.longLabel":"Short outings for the needs of pet animals (within a radius of 1 kilometre around the home).",
+   
+   
+    "attestation.form.reason_curfew.handicap.shortLabel":"4. Situation de handicap",
+   "attestation.form.reason_curfew.handicap.longLabel":"🙂 Mise à jour en cours, merci de relancer l'app dans quelques instants",
    "attestation.form.reason_curfew.judiciaire.shortLabel":"5. Convocation judiciaire ou administrative",
-   "attestation.form.reason_curfew.judiciaire.longLabel":"Déplacements pour répondre à une convocation judiciaire ou administrative, déplacements pour se rendre chez un professionnel du droit, pour un acte ou une démarche qui ne peuvent être réalisés à distance",
-   
-   "attestation.form.reason_curfew.missions.shortLabel":"6. Missions d'intérêt général",
-   "attestation.form.reason_curfew.missions.longLabel":"Déplacements pour participer à des missions d’intérêt général sur demande de l’autorité administrative",
-   
+   "attestation.form.reason_curfew.judiciaire.longLabel":"🙂 Mise à jour en cours, merci de relancer l'app dans quelques instants",
+    "attestation.form.reason_curfew.missions.shortLabel":"6. Missions d'intérêt général",
+   "attestation.form.reason_curfew.missions.longLabel":"🙂 Mise à jour en cours, merci de relancer l'app dans quelques instants",
    "attestation.form.reason_curfew.transit.shortLabel":"7. Déplacements de transit et longue distance",
-   "attestation.form.reason_curfew.transit.longLabel":"Déplacements liés à des transits ferroviaires, aériens ou en bus pour des déplacements de longues distances",
+   "attestation.form.reason_curfew.transit.longLabel":"🙂 Mise à jour en cours, merci de relancer l'app dans quelques instants",
    
    
-   "attestation.form.reason_curfew.animaux.shortLabel":"8. Animaux de compagnie",
-   "attestation.form.reason_curfew.animaux.longLabel":"Déplacements brefs dans un rayon maximal d’un kilomètre autour du domicile pour les besoins des animaux de compagnie",
+   "attestation.form.reason_curfew.title":"Between 7pm & 6am",
    
-   "attestation.form.reason_curfew.title":"Motifs couvre-feu",
-   
-    "attestation.form.reason_curfew.header":"Choisissez le motif couvre-feu (19h-6h) :",
+    "attestation.form.reason_curfew.header":"I am travelling between 7pm & 6am for one of the following reasons:",
     
-   "attestation.form.reason_curfew.footer":"Les personnes souhaitant bénéficier de l'une de ces exceptions doivent se munir s'il y a lieu, lors de leurs déplacements hors de leur domicile, d'un document leur permettant de justifier que le déplacement considéré entre dans le champ de l'une de ces exceptions.",
+   "attestation.form.reason_curfew.footer":"People wishing to benefit from one of these exceptions must bring, if necessary, when traveling outside their home, a document allowing them to justify that the trip in question falls within the scope of one of these exceptions.",
    
    
-   "attestation.form.reason_lockdown.label":"Motif de journée (6h-19h)",
+   "attestation.form.reason_lockdown.label":"Reason between 6am & 7pm",
    "attestation.form.reason_lockdown.placeholder":"-",
    
-   "attestation.form.reason_lockdown.sport.shortLabel":"1. Activité physique et promenade",
-   "attestation.form.reason_lockdown.sport.longLabel":"Déplacements liés soit à la promenade, soit à l'activité physique individuelle des personnes\n\n👉 Attestation à remplir seulement à défaut de pouvoir présenter un justificatif de domicile.\nDéplacement dans la limite de 10 kilomètres de son domicile",
+   "attestation.form.reason_lockdown.travail.shortLabel":"1. Professional occupation, education and training, general interest mission",
+   "attestation.form.reason_lockdown.travail.longLabel":"- Travel between the home and the place of work, education or training.\n- Business travel that cannot be postponed, deliveries.\n- Travel to make purchases of supplies required for my professional occupation.\n- Travel to participate in missions of general interest at the request of the administrative authority.",
+   
+   "attestation.form.reason_lockdown.sante.shortLabel":"2. Health (consultations and care/treatment)",
+   "attestation.form.reason_lockdown.sante.longLabel":"Travel for consultations, examinations/check-ups, preventive procedures (including vaccination) and care/treatment that cannot be provided remotely, or to buy health products.",
+   
+   "attestation.form.reason_lockdown.famille.shortLabel":"3. Compelling family reason, assistance to vulnerable people, childcare, disability",
+   "attestation.form.reason_lockdown.famille.longLabel":"- Travel for a compelling family reason, for assistance to vulnerable or needy people, or childcare.\n- Travel of people with disabilities and their carers.",
+   
+   "attestation.form.reason_lockdown.convocation_demarches.shortLabel":"4. Judicial or administrative summons, procedures that cannot be carried out remotely",
+   "attestation.form.reason_lockdown.convocation_demarches.longLabel":"Travel to respond to a judicial or administrative summons, travel to visit a public service or a legal professional for formalities or proceedings that cannot be carried out remotely.",
+   
+   "attestation.form.reason_lockdown.demenagement.shortLabel":"5. Moving home",
+   "attestation.form.reason_lockdown.demenagement.longLabel":"- Travel connected to moving home resulting from a change of home address.\n- Travel which is essential for the purchase or rental of a main residence that cannot be postponed.",
+   
+   "attestation.form.reason_lockdown.achats_culte_culturel.shortLabel":"6. Purchases, cultural establishments or places of worship (within my department [1])",
+   "attestation.form.reason_lockdown.achats_culte_culturel.longLabel":"- Travel for purchases of basic necessities, to collect orders or to benefit from services.\n- Travel to visit a cultural establishment that is open or a place of worship.",
+   
+   "attestation.form.reason_lockdown.sport.shortLabel":"7. Physical and open-air activities, walking (within a radius of 10 kilometres around your home)",
+   "attestation.form.reason_lockdown.sport.longLabel":"- Travel connected to walking, individual physical activities, open-air activities and the needs of pet animals.\n👉 You should only complete the certificate for this reason if you are unable to present proof of address.",
    
    "attestation.form.reason_lockdown.achats.shortLabel":"2. Achats",
-   "attestation.form.reason_lockdown.achats.longLabel":"Déplacements pour effectuer des achats de première nécessité ou des retraits de commandes\n\n👉 Déplacement au sein du département de résidence [1]",
-   
+   "attestation.form.reason_lockdown.achats.longLabel":"🙂 Mise à jour en cours, merci de relancer l'app dans quelques instants",
    "attestation.form.reason_lockdown.enfants.shortLabel":"3. Accompagnement des enfants à l’école",
-   "attestation.form.reason_lockdown.enfants.longLabel":"Déplacements pour emmener et aller chercher les enfants à l’école et à l’occasion de leurs activités péri-scolaires\n\n👉 Déplacement au sein du département de résidence [1]",
-   
-   "attestation.form.reason_lockdown.culte_culturel.shortLabel":"4. Etablissement culturel ou lieu de culte",
-   "attestation.form.reason_lockdown.culte_culturel.longLabel":"Déplacements pour se rendre dans un établissement culturel (bibliothèques et médiathèques) ou un lieu de culte\n\n👉 Déplacement au sein du département de résidence [1]",
-   
+   "attestation.form.reason_lockdown.enfants.longLabel":"🙂 Mise à jour en cours, merci de relancer l'app dans quelques instants",
+    "attestation.form.reason_lockdown.culte_culturel.shortLabel":"4. Etablissement culturel ou lieu de culte",
+   "attestation.form.reason_lockdown.culte_culturel.longLabel":"🙂 Mise à jour en cours, merci de relancer l'app dans quelques instants",
    "attestation.form.reason_lockdown.demarche.shortLabel":"5. Démarches administratives ou juridiques",
-   "attestation.form.reason_lockdown.demarche.longLabel":"Déplacements pour se rendre dans un service public pour un acte ou une démarche qui ne peuvent être réalisés à distance\n\n👉 Déplacement au sein du département de résidence [1]",
-   
-   "attestation.form.reason_lockdown.travail.shortLabel":"6. Activité professionnelle, enseignement et formation, mission d’intérêt général",
-   "attestation.form.reason_lockdown.travail.longLabel":"Déplacements entre le domicile et le lieu d’exercice de l’activité professionnelle ou le lieu d’enseignement et de formation, déplacements professionnels ne pouvant être différés, livraisons à domicile, déplacements pour effectuer des achats de fournitures nécessaires à l'activité professionnelle, déplacements liés à des missions d’intérêt général sur demande de l’autorité administrative\n\n👉 Déplacement sans limitation de distance",
-   
-   "attestation.form.reason_lockdown.sante.shortLabel":"7. Santé (consultations et soins)",
-   "attestation.form.reason_lockdown.sante.longLabel":"Déplacements pour des consultations, examens, actes de prévention (dont vaccination) et soins ne pouvant être assurés à distance ou pour l’achat de produits de santé\n\n👉 Déplacement sans limitation de distance",
-   
-   "attestation.form.reason_lockdown.famille.shortLabel":"8. Motif familial impérieux, personnes vulnérables ou précaires ou gardes d’enfants",
-   "attestation.form.reason_lockdown.famille.longLabel":"Déplacements pour motif familial impérieux, pour l’assistance aux personnes vulnérables ou précaires ou pour la garde d’enfants\n\n👉 Déplacement sans limitation de distance",
-   
-   "attestation.form.reason_lockdown.handicap.shortLabel":"9. Situation de handicap",
-   "attestation.form.reason_lockdown.handicap.longLabel":"Déplacements des personnes en situation de handicap et de leur accompagnant\n\n👉 Déplacement sans limitation de distance",
-   
+   "attestation.form.reason_lockdown.demarche.longLabel":"🙂 Mise à jour en cours, merci de relancer l'app dans quelques instants",
+    "attestation.form.reason_lockdown.handicap.shortLabel":"9. Situation de handicap",
+   "attestation.form.reason_lockdown.handicap.longLabel":"🙂 Mise à jour en cours, merci de relancer l'app dans quelques instants",
    "attestation.form.reason_lockdown.judiciaire.shortLabel":"10. Convocation judiciaire ou administrative",
-   "attestation.form.reason_lockdown.judiciaire.longLabel":"Déplacements pour répondre à une convocation judiciaire ou administrative, déplacements pour se rendre chez un professionnel du droit, pour un acte ou une démarche qui ne peuvent être réalisés à distance\n\n👉 Déplacement sans limitation de distance",
-   
-   "attestation.form.reason_lockdown.demenagement.shortLabel":"11. Déménagement",
-   "attestation.form.reason_lockdown.demenagement.longLabel":"Déplacements liés à un déménagement résultant d'un changement de domicile et déplacements indispensables à l'acquisition ou à la location d’une résidence principale, insusceptibles d'être différés\n\n👉 Déplacement sans limitation de distance",
-   
+   "attestation.form.reason_lockdown.judiciaire.longLabel":"🙂 Mise à jour en cours, merci de relancer l'app dans quelques instants",
    "attestation.form.reason_lockdown.transit.shortLabel":"12. Déplacement de transit vers les gares et les aéroports",
-   "attestation.form.reason_lockdown.transit.longLabel":"👉 Déplacement sans limitation de distance",
-    
-   "attestation.form.reason_lockdown.title":"Motifs journée",
+   "attestation.form.reason_lockdown.transit.longLabel":"🙂 Mise à jour en cours, merci de relancer l'app dans quelques instants",
+
+
+   "attestation.form.reason_lockdown.title":"Between 6am & 7pm",
    
-    "attestation.form.reason_lockdown.header":"Pour les personnes résidant dans les départements soumis à des mesures renforcées, choisissez le motif journée (6h-19h) :",
+    "attestation.form.reason_lockdown.header":"I am travelling between 6am & 7pm for one of the following reasons:",
     
-   "attestation.form.reason_lockdown.footer":"Les déplacements sont autorisés sous réserve de justifier de l’un des motifs prévus dans la présente attestation.\n\nDans un rayon de 10 km autour du lieu de résidence, les déplacements correspondant peuvent se faire sans attestation sous réserve de pouvoir présenter un justificatif de domicile.\n\nPour les déplacements à l’extérieur des limites du département de résidence, ils ne sont possibles que pour les seuls motifs impérieux mentionnés aux 6 à 12 de la présente attestation.\n\nCes motifs autorisent également les personnes résidant hors des départements soumis à des mesures renforcées à se rendre dans les départements concernés par ces mesures.\n\n[1] Pour les personnes résidant aux frontières d’un département, une tolérance de 30 kms au-delà du département est acceptée"
+   "attestation.form.reason_lockdown.footer":"People wishing to benefit from one of these exceptions must bring, if necessary, when traveling outside their home, a document allowing them to justify that the trip in question falls within the scope of one of these exceptions.\n\n[1] For persons residing near the boundary of a department, a distance of 30 kilometres beyond the department boundary is accepted.",
+   
+   
+  
+   "walletController.title": "Carnet de tests",
+   "walletController.explanations.title": "Comment ça marche ?",
+   "walletController.explanations.subtitle": "Une fois le résultat de votre test disponible, vous recevrez un SMS avec un lien à suivre.\n\nSuivez les instructions, et vous pourrez ainsi ajouter le certificat de test (un document \"2D-DOC\") dans votre carnet.\n\nCe document 2D-DOC sera à montrer en cas de contrôle.",
+   "walletController.flashButton.title": "Scanner un QR Code",
+   "walletController.flashExplanation": "Sur votre document SIDEP de résultat de test négatif, vous avez un QR Code que vous pouvez flasher pour l'ajouter dans votre carnet ici.",
+   "walletController.recentCertificatesSection.title": "Mes tests récents",
+   "walletController.recentCertificatesSection.subtitle": "Ces certificats de test ont moins de 7 jours.",
+   "walletController.oldCertificatesSection.title": "Tests de plus d'une semaine",
+   "walletController.oldCertificatesSection.subtitle": "Ces certificats de test ont plus de 7 jours.",
+   "walletController.menu.share": "Partager le certificat",
+   "walletController.menu.share.text": "Voici mon certificat de test #TousAntiCovid",
+   "walletController.menu.delete": "Supprimer ce certificat",
+   "walletController.menu.delete.alert.title": "Confirmation",
+   "walletController.menu.delete.alert.message": "Êtes-vous sûr de vouloir supprimer ce certificat ?",
+   
+   "home.attestationSection.sanitaryCertificates.cell.title": "Votre carnet de tests",
+   "home.attestationSection.sanitaryCertificates.cell.subtitle": "Vos tests négatifs seront disponibles ici",
+   
+   "flashWalletCodeController.title": "Scannez",
+   "flashWalletCodeController.explanation": "Scanner le QR code du test sur votre document SIDEP.",
+   "flashWalletCodeController.alert.invalidCode.title": "Code invalide",
+   "flashWalletCodeController.alert.invalidCode.message": "Le code n'est pas valide. Veuillez essayer à nouveau.",
+   
+   "walletController.noCertificates.flashExplanation": "Sur votre document SIDEP de résultat de test négatif, vous avez un QR Code que vous pouvez flasher pour l'ajouter dans votre carnet ici.",
+   "confirmWalletQrCodeController.title":"Carnet de test",
+   "confirmWalletQrCodeController.explanation.title":"Vous venez d'appuyer sur un lien TousAntiCovid pour ajouter un certificat de test dans votre carnet.",
+   "confirmWalletQrCodeController.explanation.subtitle":"Confirmez-vous cet ajout dans votre carnet ?",
+   "confirmWalletQrCodeController.confirm":"Ajouter",
+   
+   "flashDataMatrixCodeController.title": "Scannez le code 2D-DOC",
+   "flashDataMatrixCodeController.explanation": "Vérifiez un certificat en scannant le 2D-DOC",
+   "flashDataMatrixCodeController.alert.invalidCode.title": "Code invalide",
+   "flashDataMatrixCodeController.alert.invalidCode.message": "Le code n'est pas valide. Veuillez essayer à nouveau.",
+   
+   "home.moreSection.verifySanitaryCertificate": "Vérifier un certificat 2D-DOC",
+   "wallet.proof.sanitaryCertificate.F5.P": "Positif",
+   "wallet.proof.sanitaryCertificate.F5.N": "Négatif",
+   "wallet.proof.sanitaryCertificate.F5.I": "Indéterminé",
+   "wallet.proof.sanitaryCertificate.F5.X": "Prélèvement non conforme",
+   "wallet.proof.sanitaryCertificate.F3.M": "Homme",
+   "wallet.proof.sanitaryCertificate.F3.F": "Femme",
+   "wallet.proof.sanitaryCertificate.F3.U": "Inconnu",
+   
+   "wallet.proof.sanitaryCertificate.loinc.94309" : "PCR COVID (%@)",
+   "wallet.proof.sanitaryCertificate.loinc.943092" : "PCR COVID (%@)",
+   "wallet.proof.sanitaryCertificate.loinc.945006" : "PCR COVID (%@)",
+   "wallet.proof.sanitaryCertificate.loinc.948455" : "PCR COVID (%@)",
+   
+   "wallet.proof.sanitaryCertificate.loinc.945584" : "Antigénique COVID (%@)",
+   "wallet.proof.sanitaryCertificate.loinc.945071" : "Sérologie COVID (%@)",
+   "wallet.proof.sanitaryCertificate.loinc.945089" : "Sérologie COVID (%@)",
+   
+    "wallet.proof.sanitaryCertificate.loinc.947622" : " Sérologie COVID (%@)",
+   "wallet.proof.sanitaryCertificate.loinc.945634" : " Sérologie COVID (%@)",
+   "wallet.proof.sanitaryCertificate.loinc.945642" : " Sérologie COVID (%@)",
+   
+   
+   "wallet.proof.sanitaryCertificate.description": "<F0>, <F1>\nné(e) le <F2>, <F3>\n<F4>\n<F5>, prélevé le <F6>",
+   "wallet.proof.sanitaryCertificate.pillTitle": "Certificat de test",
+   "walletCertificateVerifiedController.title": "Valide",
+   "walletCertificateVerifiedController.proofValidated": "Certificat validé",
+   "walletCertificateVerifiedController.validateAnotherProof": "Vérifier un autre certificat",
+   
+      "keyfigure.variantsuk.label":"Variant britannique",
+   "keyfigure.variantsuk.shortLabel":"Variant UK",
+   "keyfigure.variantsuk.description":"Cet indicateur reflète le pourcentage de variants britanniques (UK 20I/501Y.V1) parmi les tests criblés.",
+   
+   "keyfigure.variantsuk.colorCode.light":"#4C76EB",
+   "keyfigure.variantsuk.colorCode.dark":"#A6B6E3",
+   
+    "keyfigure.variantsuk.learnMore": "En cas de test (RT-PCR ou antigénique) de première intention positif, un second test RT-PCR dit de criblage est réalisé afin de détecter les variants d’intérêt connus à ce jour et d’évaluer leur diffusion sur l’ensemble du territoire.\n\nCet indicateur porte sur les données relatives aux résultats de criblage arrêtés à J-3 et mis à jour quotidiennement.\n\nIl exprime la part du variant 20I/501Y.V1 (UK) parmi tous les tests criblés. Les données sont collectées dans SIDEP depuis le 25 janvier 2021.",
+    
+    "keyfigure.variantssabr.label":"Variants sud-africains ou brésiliens",
+	"keyfigure.variantssabr.shortLabel":"Variants SA ou BR",
+	"keyfigure.variantssabr.description":"Cet indicateur reflète le pourcentage de variants sud-africains ou brésiliens (20H/501Y.V2 (SA) ou 20J/501Y.V3 (BR)) parmi les tests criblés.",
+	
+	"keyfigure.variantssabr.colorCode.light":"#D6774C",
+	"keyfigure.variantssabr.colorCode.dark":"#F6A37E",
+	
+	"keyfigure.variantssabr.learnMore": "En cas de test (RT-PCR ou antigénique) de première intention positif, un second test RT-PCR dit de criblage est réalisé afin de détecter les variants d’intérêt connus à ce jour et d’évaluer leur diffusion sur l’ensemble du territoire.\n\nCet indicateur porte sur les données relatives aux résultats de criblage arrêtés à J-3 et mises à jour quotidiennement.\n\nIl exprime la part des variants 20H/501Y.V2 (SA) ou 20J/501Y.V3 (BR) parmi tous les tests criblés. Les données sont collectées dans SIDEP depuis le 25 janvier 2021.",
+    
+    "manageDataController.walletData.confirmationDialog.title": "Confirmation",
+    "manageDataController.walletData.confirmationDialog.message": "Confirmez-vous vouloir supprimer tous les certificats de test ?",
+    "manageDataController.walletData.title": "Mes certificats",
+    "manageDataController.walletData.subtitle": "Cette opération effacera tous vos certificats de test de votre téléphone.",
+    "manageDataController.walletData.button": "Effacer sur mon téléphone",
+    
+    "wallet.proof.error.1.title": "Certificat erroné",
+    "wallet.proof.error.1.message": "Le certificat scanné n’a pas le bon format.",
+    "wallet.proof.error.2.title": "Certificat non authentique",
+    "wallet.proof.error.2.message": "L'authenticité du certificat scanné n'a pas pu être vérifiée.",
+    
+    "wallet.proof.moreThanSpecificHours": "⚠️ Plus de %dh",
+    "wallet.proof.lessThanSpecificHours": "Moins de %dh"
+
 }

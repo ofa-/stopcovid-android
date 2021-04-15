@@ -10,19 +10,25 @@
 
 package com.lunabeestudio.stopcovid.fastitem
 
+import android.content.res.ColorStateList
 import android.graphics.Bitmap
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.PopupMenu
+import androidx.core.view.isVisible
 import com.lunabeestudio.stopcovid.R
-import com.lunabeestudio.stopcovid.databinding.ItemAttestationQrCodeBinding
+import com.lunabeestudio.stopcovid.coreui.extension.fetchSystemColor
+import com.lunabeestudio.stopcovid.databinding.ItemQrCodeCardBinding
+import com.lunabeestudio.stopcovid.extension.setTextOrHide
 import com.mikepenz.fastadapter.binding.AbstractBindingItem
 
-class AttestationQrCodeItem : AbstractBindingItem<ItemAttestationQrCodeBinding>() {
+class QrCodeCardItem : AbstractBindingItem<ItemQrCodeCardBinding>() {
     var qrCodeBitmap: Bitmap? = null
     var text: String? = null
+    var tagText: String? = null
+    var formatText: String? = null
     var share: String? = null
     var delete: String? = null
     var allowShare: Boolean = false
@@ -33,11 +39,15 @@ class AttestationQrCodeItem : AbstractBindingItem<ItemAttestationQrCodeBinding>(
 
     override val type: Int = R.id.item_attestation_qr_code
 
-    override fun createBinding(inflater: LayoutInflater, parent: ViewGroup?): ItemAttestationQrCodeBinding {
-        return ItemAttestationQrCodeBinding.inflate(inflater, parent, false)
+    override fun createBinding(inflater: LayoutInflater, parent: ViewGroup?): ItemQrCodeCardBinding {
+        val binding = ItemQrCodeCardBinding.inflate(inflater, parent, false)
+        binding.tag.chip.chipBackgroundColor = ColorStateList.valueOf(
+            R.attr.colorPrimary.fetchSystemColor(binding.tag.chip.context)
+        )
+        return binding
     }
 
-    override fun bindView(binding: ItemAttestationQrCodeBinding, payloads: List<Any>) {
+    override fun bindView(binding: ItemQrCodeCardBinding, payloads: List<Any>) {
         super.bindView(binding, payloads)
         binding.textView.text = text
         binding.imageView.setImageBitmap(qrCodeBitmap)
@@ -47,6 +57,9 @@ class AttestationQrCodeItem : AbstractBindingItem<ItemAttestationQrCodeBinding>(
         binding.actionButton.setOnClickListener {
             showMenu(it)
         }
+        binding.formatTextView.setTextOrHide(formatText)
+        binding.tag.chip.text = tagText
+        binding.tagLayout.isVisible = tagText != null
         binding.actionButton.contentDescription = actionContentDescription
     }
 
@@ -79,5 +92,6 @@ class AttestationQrCodeItem : AbstractBindingItem<ItemAttestationQrCodeBinding>(
     }
 }
 
-fun attestationQrCodeItem(block: (AttestationQrCodeItem.() -> Unit)): AttestationQrCodeItem = AttestationQrCodeItem().apply(
-    block)
+fun qrCodeCardItem(block: (QrCodeCardItem.() -> Unit)): QrCodeCardItem = QrCodeCardItem().apply(
+    block
+)

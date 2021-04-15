@@ -81,15 +81,6 @@ class ManageDataFragment : MainFragment() {
         viewModel.covidException.observe(viewLifecycleOwner) { covidException ->
             showErrorSnackBar(covidException.getString(strings))
         }
-        viewModel.eraseAttestationsSuccess.observe(viewLifecycleOwner) {
-            showSnackBar(strings["manageDataController.eraseLocalHistory.success"] ?: "")
-        }
-        viewModel.eraseIsolationSuccess.observe(viewLifecycleOwner) {
-            showSnackBar(strings["manageDataController.eraseLocalHistory.success"] ?: "")
-        }
-        viewModel.eraseVenuesSuccess.observe(viewLifecycleOwner) {
-            showSnackBar(strings["manageDataController.eraseLocalHistory.success"] ?: "")
-        }
         viewModel.eraseLocalSuccess.observe(viewLifecycleOwner) {
             showSnackBar(strings["manageDataController.eraseLocalHistory.success"] ?: "")
         }
@@ -114,6 +105,8 @@ class ManageDataFragment : MainFragment() {
         hideRiskStatusItems(items)
         spaceDividerItems(items)
         eraseAttestationItems(items)
+        spaceDividerItems(items)
+        eraseCertificatesItems(items)
         spaceDividerItems(items)
         if (robertManager.configuration.displayIsolation) {
             eraseIsolationItems(items)
@@ -222,6 +215,34 @@ class ManageDataFragment : MainFragment() {
                     .setNegativeButton(strings["common.cancel"], null)
                     .setPositiveButton(strings["common.confirm"]) { _, _ ->
                         viewModel.eraseAttestations()
+                    }
+                    .show()
+            }
+            identifier = items.count().toLong()
+        }
+    }
+
+    private fun eraseCertificatesItems(items: MutableList<GenericItem>) {
+        items += titleItem {
+            text = strings["manageDataController.walletData.title"]
+            identifier = items.count().toLong()
+        }
+        items += spaceItem {
+            spaceRes = R.dimen.spacing_medium
+        }
+        items += captionItem {
+            text = strings["manageDataController.walletData.subtitle"]
+            identifier = items.count().toLong()
+        }
+        items += lightButtonItem {
+            text = strings["manageDataController.walletData.button"]
+            onClickListener = View.OnClickListener {
+                MaterialAlertDialogBuilder(requireContext())
+                    .setTitle(strings["manageDataController.walletData.confirmationDialog.title"])
+                    .setMessage(strings["manageDataController.walletData.confirmationDialog.message"])
+                    .setNegativeButton(strings["common.cancel"], null)
+                    .setPositiveButton(strings["common.confirm"]) { _, _ ->
+                        viewModel.eraseCertificates()
                     }
                     .show()
             }

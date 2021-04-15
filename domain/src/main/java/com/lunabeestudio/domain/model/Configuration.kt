@@ -56,4 +56,9 @@ class Configuration(
     val scanReportDelay: Int,
     val contagiousSpan: Int,
     val ameliUrl: String?,
+    var displaySanitaryCertificatesWallet: Boolean,
+    var walletOldCertificateThresholdInDays: Map<String, Float>,
+    val testCertificateValidityThresholdInHours: Int,
+    var walletPublicKeys: List<WalletPublicKey>,
+    var displaySanitaryCertificatesValidation: Boolean
 )

@@ -86,7 +86,7 @@ object ConfigManager {
         val configList = gson.fromJson(this, ConfigurationWrapper::class.java).config
         val jsonObject = JSONObject()
         configList.forEach {
-            jsonObject.put(it.name, if (it.value is List<*>) gson.toJson(it.value) else it.value)
+            jsonObject.put(it.name, if (it.value is List<*> || it.value is Map<*, *>) gson.toJson(it.value) else it.value)
         }
         return gson.fromJson(jsonObject.toString(), ApiConfiguration::class.java).toDomain(gson)
     }

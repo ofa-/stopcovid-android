@@ -21,6 +21,7 @@
         android:id="@+id/constraintLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/spacing_large"
         android:background="?selectableItemBackground">
 
         <ImageView
@@ -33,7 +34,25 @@
             app:layout_constraintBottom_toTopOf="@id/textView"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:layout_height="@dimen/qr_code_size"
+            tools:layout_width="@dimen/qr_code_size"
+            tools:src="@tools:sample/avatars" />
+
+        <TextView
+            android:id="@+id/formatTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/spacing_large"
+            android:layout_marginTop="@dimen/spacing_medium"
+            android:layout_marginBottom="@dimen/spacing_large"
+            android:gravity="center"
+            android:textAppearance="@style/TextAppearance.StopCovid.Title.Bold"
+            android:textIsSelectable="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/imageView"
+            tools:text="@tools:sample/lorem[3]" />
 
         <TextView
             android:id="@+id/textView"
@@ -43,13 +62,26 @@
             android:layout_marginTop="@dimen/spacing_medium"
             android:layout_marginBottom="@dimen/spacing_large"
             android:gravity="center"
-            android:textAppearance="@style/TextAppearance.StopCovid.Title"
+            android:textAppearance="@style/TextAppearance.StopCovid.Caption"
             android:textIsSelectable="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/formatTextView"
+            tools:text="@tools:sample/lorem[12]" />
+
+        <FrameLayout
+            android:id="@+id/tagLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/imageView"
-            tools:text="@tools:sample/lorem[12]" />
+            app:layout_constraintTop_toBottomOf="@id/textView">
+
+            <include
+                android:id="@+id/tag"
+                layout="@layout/item_tag" />
+        </FrameLayout>
 
         <ImageButton
             android:id="@+id/actionButton"

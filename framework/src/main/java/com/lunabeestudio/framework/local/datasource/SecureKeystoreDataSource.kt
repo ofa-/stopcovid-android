@@ -21,6 +21,7 @@ import com.lunabeestudio.domain.model.Attestation
 import com.lunabeestudio.domain.model.Calibration
 import com.lunabeestudio.domain.model.Configuration
 import com.lunabeestudio.domain.model.FormEntry
+import com.lunabeestudio.domain.model.RawWalletCertificate
 import com.lunabeestudio.domain.model.VenueQrCode
 import com.lunabeestudio.framework.local.LocalCryptoManager
 import com.lunabeestudio.robert.datasource.LocalKeystoreDataSource
@@ -127,6 +128,16 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
             setEncryptedValue(SHARED_PREF_KEY_ATTESTATIONS, value)
             _attestationsLiveData.postValue(value)
         }
+
+    override var rawWalletCertificates: List<RawWalletCertificate>?
+        get() = getEncryptedValue(SHARED_PREF_KEY_WALLET_CERTIFICATES, object : TypeToken<List<RawWalletCertificate>>() {}.type)
+        set(value) {
+            setEncryptedValue(SHARED_PREF_KEY_WALLET_CERTIFICATES, value)
+            _rawWalletCertificatesLiveData.postValue(value)
+        }
+    private var _rawWalletCertificatesLiveData: MutableLiveData<List<RawWalletCertificate>?> = MutableLiveData(rawWalletCertificates)
+    override val rawWalletCertificatesLiveData: LiveData<List<RawWalletCertificate>?>
+        get() = _rawWalletCertificatesLiveData
 
     override var deprecatedAttestations: List<Map<String, FormEntry>>?
         get() = getEncryptedValue(SHARED_PREF_KEY_DEPRECTATED_ATTESTATIONS, object : TypeToken<List<Map<String, FormEntry>>>() {}.type)
@@ -295,7 +306,7 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
             sharedPreferences.edit()
                 .putString(
                     key,
-                    cryptoManager.encryptToString(gson.toJson(value))
+                    gson.toJson(value)
                 )
                 .apply()
         } else {
@@ -345,6 +356,7 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
         private const val SHARED_PREF_KEY_REPORT_TO_SEND_START_TIME = "shared.pref.report_to_send_start_time"
         private const val SHARED_PREF_KEY_REPORT_TO_SEND_END_TIME = "shared.pref.report_to_send_end_time"
         private const val SHARED_PREF_KEY_DECLARATION_TOKEN = "shared.pref.declaration_token"
+        private const val SHARED_PREF_KEY_WALLET_CERTIFICATES = "shared.pref.wallet_certificates"
 
         // Add on to ROBERT for isolation
         private const val SHARED_PREF_KEY_REPORT_SYMPTOMS_DATE = "shared.pref.reportSymptomsDate"
