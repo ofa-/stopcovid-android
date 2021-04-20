@@ -28,7 +28,7 @@ object PrivacyManager : SectionManager() {
     }
 
     override val url: String = ConfigConstant.Privacy.URL
-    override val folderName: String = ConfigConstant.Privacy.ASSET_FOLDER_NAME
+    override val folderName: String = ConfigConstant.Privacy.FOLDER
     override val prefix: String = ConfigConstant.Privacy.FILE_PREFIX
     override val lastRefreshSharedPrefsKey: String = Constants.SharedPrefs.LAST_PRIVACY_REFRESH
 }

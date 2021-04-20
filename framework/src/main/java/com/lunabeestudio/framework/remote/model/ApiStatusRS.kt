@@ -19,6 +19,7 @@ internal class ApiStatusRS(
     val message: String?,
     val tuples: String,
     val declarationToken: String?,
+    val analyticsToken: String?,
 )
 
 internal fun ApiStatusRS.toDomain() = StatusReport(
@@ -28,4 +29,5 @@ internal fun ApiStatusRS.toDomain() = StatusReport(
     message = message,
     tuples = tuples,
     declarationToken = declarationToken,
+    analyticsToken = analyticsToken,
 )

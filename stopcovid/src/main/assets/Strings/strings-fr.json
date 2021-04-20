@@ -1,5 +1,5 @@
 {
-   "app.name":"TousAntiCovid", 
+      "app.name":"TousAntiCovid", 
    "onboarding.welcomeController.title":"Bienvenue",
    "onboarding.welcomeController.mainMessage.title":"Soyez alertés et alertez les autres en cas d’exposition à la COVID-19",
    "onboarding.welcomeController.mainMessage.subtitle":"Avec TousAntiCovid, participez à la lutte contre l’épidémie en réduisant les risques de transmission.\n\n\nCette application a été réalisée en collaboration avec le Ministère des Solidarités et de la Santé et Santé Publique France.",
@@ -338,7 +338,7 @@
    "keyfigure.tauxoccupation.description":"Cet indicateur reflète le niveau de tension des capacités hospitalières en réanimation. Il s’agit du nombre de patients atteints de la COVID-19 actuellement en réanimation, en soins intensifs, ou en unité de surveillance continue rapporté au total des lits de réanimation disponibles avant la crise.",
    "keyfigure.nombrecas.label":"Nouveaux cas rapportés J-1",
    "keyfigure.nombrecas.shortLabel":"Nouveaux cas",
-   "keyfigure.nombrecas.description":"⚠️ Suite à l’incident survenu hier sur le flux des données de la base SI-DEP, le nombre total de cas confirmés publié ce jour intègre un rattrapage des données non publiées la veille.\n\nIl n’est donc pas à interpréter comme une augmentation exceptionnelle du nombre de cas quotidien.\n\nLes 84 999 cas positifs sont des résultats de tests positifs en date de prélèvement du 05 avril (1 542 cas), du 06 avril (49 754 cas) et du 07 avril (30 785 cas) ou des jours précédents.\n\nNous remercions chacun de ceux qui utilisent quotidiennement ces indicateurs de leur compréhension 👍",
+   "keyfigure.nombrecas.description":"Cet indicateur, disponible seulement au niveau national, correspond au nombre de nouveaux cas confirmés par un test positif (RT-PCR et test antigénique), sur les dernières 24 heures.",
    "keyfigure.nombrecasj3.label":"Nouveaux cas prélevés J-3",
    "keyfigure.nombrecasj3.shortLabel":"Nouveaux cas J-3",
    "keyfigure.nombrecasj3.description":"Cet indicateur correspond au nombre de nouveaux cas testés positif (RT-PCR et test antigénique) à la COVID-19, enregistrés par date de prélèvement.\n\nL’indicateur informe sur la situation d’il y a trois jours (J-3). Cela permet d’avoir suffisamment de temps pour que les données sur les tests remontent et qu’elles reflètent correctement la situation épidémiologique d’il y a trois jours.",
@@ -429,58 +429,6 @@
    "attestation.form.datetime.placeholder":"-",
    "attestation.form.reason.label":"Motif de déplacement",
    "attestation.form.reason.placeholder":"-",
-   
-   "attestation.form.travail.shortLabel":"1. Activité professionnelle enseignement et formation",
-   "attestation.form.travail.longLabel":"Déplacements entre le domicile et le lieu d’exercice de l’activité professionnelle ou le lieu d’enseignement et de formation, déplacements professionnels ne pouvant être différés",
-   
-   "attestation.form.achats_culturel_cultuel.shortLabel":"2. Etablissement culturel, lieu de culte, achats",
-   "attestation.form.achats_culturel_cultuel.longLabel":"Déplacements pour se rendre dans un établissement culturel autorisé ou un lieu de culte ; déplacements pour effectuer des achats de biens, pour des services dont la fourniture est autorisée, pour les retraits de commandes et les livraisons à domicile",
-   
-   "attestation.form.sante.shortLabel":"2. Consultations et soins",
-   "attestation.form.sante.longLabel":"Déplacements pour des consultations, examens, actes de prévention (dont vaccination) et soins ne pouvant être assurés à distance ou pour l’achat de produits de santé",
-   
-   "attestation.form.famille.shortLabel":"3. Motif familial impérieux, personnes vulnérables ou précaires ou gardes d'enfants",
-   "attestation.form.famille.longLabel":"Déplacements pour motif familial impérieux, pour l’assistance aux personnes vulnérables ou précaires ou pour la garde d’enfants",
-   
-   "attestation.form.handicap.shortLabel":"4. Situation de handicap",
-   "attestation.form.handicap.longLabel":"Déplacements des personnes en situation de handicap et de leur accompagnant",
-   
-   "attestation.form.sport_animaux.shortLabel":"Déplacements 3h, 20km",
-   "attestation.form.sport_animaux.longLabel":"Déplacements en plein air ou vers un lieu de plein air, sans changement du lieu de résidence, dans la limite de trois heures quotidiennes et dans un rayon maximal de vingt kilomètres autour du domicile, liés soit à l’activité physique ou aux loisirs individuels, à l’exclusion de toute pratique sportive collective et de toute proximité avec d’autres personnes, soit à la promenade avec les seules personnes regroupées dans un même domicile, soit aux besoins des animaux de compagnie",
-   
-   "attestation.form.convocation.shortLabel":"5. Convocation judiciaire ou administrative",
-   "attestation.form.convocation.longLabel":"Déplacements pour répondre à une convocation judiciaire ou administrative, déplacements pour se rendre chez un professionnel du droit, pour un acte ou une démarche qui ne peuvent être réalisés à distance",
-   
-   "attestation.form.judiciaire.shortLabel":"5. Convocation judiciaire ou administrative",
-   "attestation.form.judiciaire.longLabel":"Déplacements pour répondre à une convocation judiciaire ou administrative, déplacements pour se rendre chez un professionnel du droit, pour un acte ou une démarche qui ne peuvent être réalisés à distance",
-   
-   "attestation.form.missions.shortLabel":"6. Missions d'intérêt général",
-   "attestation.form.missions.longLabel":"Déplacements pour participer à des missions d’intérêt général sur demande de l’autorité administrative",
-   
-   "attestation.form.transits.shortLabel":"7. Déplacements de transit et longue distance",
-   "attestation.form.transits.longLabel":"Déplacements liés à des transits ferroviaires, aériens ou en bus pour des déplacements de longues distances",
-   "attestation.form.transit.shortLabel":"7. Déplacements de transit et longue distance",
-   "attestation.form.transit.longLabel":"Déplacements liés à des transits ferroviaires, aériens ou en bus pour des déplacements de longues distances",
-   
-   
-   "attestation.form.animaux.shortLabel":"8. Animaux de compagnie",
-   "attestation.form.animaux.longLabel":"Déplacements brefs dans un rayon maximal d’un kilomètre autour du domicile pour les besoins des animaux de compagnie",
-   
-   "attestation.form.enfants.shortLabel":"Enfants à l’école",
-   "attestation.form.enfants.longLabel":"Déplacements pour chercher les enfants à l’école et à l’occasion de leurs activités périscolaires",
-  
-   "attestation.form.courses.shortLabel":"9. Achats",
-   "attestation.form.courses.longLabel":"Déplacements pour effectuer des achats de fournitures nécessaires à l'activité professionnelle, des achats de première nécessité, des retraits de commandes, des livraisons à domicile, ainsi que pour les déménagements\n👉 motif pour les territoires soumis à un confinement le week-end [1]",
-   
-   "attestation.form.sport.shortLabel":"10. Activités physiques",
-   "attestation.form.sport.longLabel":"Déplacements brefs, dans la limite d'une heure quotidienne et dans un rayon maximal de cinq kilomètres autour du domicile, liés soit à l'activité physique individuelle des personnes, à l'exclusion de toute pratique sportive collective et de toute proximité avec d'autres personnes, soit à la promenade avec les seules personnes regroupées dans un même domicile [3]\n👉 motif pour les territoires soumis à un confinement le week-end [1]",
-  
-   "attestation.form.rassemblement.shortLabel":"11. Participation à des rassemblements autorisés",
-   "attestation.form.rassemblement.longLabel":"Déplacements à destination ou en provenance d'un lieu de culte, participation à des rassemblements, réunions ou activités sur la voie publique ou dans un lieu ouvert au public qui ne sont pas interdits en application de l'article 3\n👉 motif pour les territoires soumis à un confinement le week-end [1]",
-   
-   "attestation.form.demarche.shortLabel":"12. Démarches administratives ou juridiques",
-   "attestation.form.demarche.longLabel":"Déplacements pour se rendre dans un service public.\n👉 motif pour les territoires soumis à un confinement le week-end [1]",
-  
      
    "accessibility.keyFigures.noValueAvailable":"Information non disponible",
    "accessibility.hint.keyFigure.share":"Partager le chiffre clé",
@@ -538,8 +486,8 @@
    "home.healthSection.isSick.title":"Prenez soin de vous",
    "home.healthSection.isSick.subtitle":"En savoir plus",
    "myHealthController.sick.title":"Recommandations sanitaires",
-   "home.attestationSection.title":"Attestation",
-   "home.attestationSection.cell.title":"Vos attestations",
+   "home.attestationSection.title":"Attestations & Carnet",
+   "home.attestationSection.cell.title":"Mes attestations",
    "home.attestationSection.cell.subtitle.noAttestations":"Appuyez ici",
    "home.attestationSection.cell.subtitle.oneAttestation":"1 attestation",
    "home.attestationSection.cell.subtitle.multipleAttestations":"%d attestations",
@@ -568,7 +516,7 @@
    "sendHistoryController.successAlert.button.learnMore": "En savoir plus",
    
    "keyFiguresExplanationsController.title": "Explication des chiffres",
-   "keyFiguresController.section.health.subtitle": "⚠️ En raison des jours fériés, le taux d’incidence (calculé en date de prélèvement sur 7 jours glissants, J-9 à J-3) est à interpréter avec prudence par comparaison avec une semaine sans jour férié, compte tenu de la moindre activité des lieux de prélèvement les jours fériés.\n\nIl ne s’agit pas d’une baisse exceptionnelle dans une situation où le nombre quotidien de cas confirmés est élevé.\n\nAppuyez sur \"en savoir plus\" pour découvrir la source des chiffres sanitaires, leur interprétation, ainsi que leur mise à jour.",
+   "keyFiguresController.section.health.subtitle": "⚠️ A partir d’aujourd’hui, la semaine glissante d’étude n’inclut pas le lundi de pâques, et sa comparaison avec les 7 jours précédents, qui inclut le lundi de pâques, est à faire avec prudence et n’est pas à considérer comme une hausse exceptionnelle du nombre de cas.\n\nAppuyez sur \"en savoir plus\" pour découvrir la source des chiffres sanitaires, leur interprétation, ainsi que leur mise à jour.",
    "keyFiguresController.section.health.button": "En savoir plus",
 
    "home.activation.sick.alert.title": "Informations",
@@ -583,6 +531,7 @@
    "home.moreSection.venuesHistory": "Journal des visites de lieux",
    "venuesRecording.onboardingController.title": "TousAntiCovid Signal",
    "venuesRecording.onboardingController.mainMessage.title": "Rompre les chaînes de transmission dans les lieux recevant du public et lors d’événements",
+   "venuesRecording.onboardingController.mainMessage.message": "TousAntiCovid Signal permet d’être alerté et d’alerter les autres en cas d’exposition à la COVID-19 dans un lieu que vous avez fréquenté.\n\nPour cela vous devez scanner le QR Code affiché à l’entrée des lieux qui ont mis en place ce dispositif. Si vous êtes testé positif à la COVID-19, n’oubliez pas de vous déclarer positif dans l’application pour informer les autres utilisateurs.\n\nCe dispositif est anonyme, aucune donnée nominative n’est collectée ni sur le lieu ni sur les personnes présentes. Le nom et l’adresse du lieu ne sont pas contenus dans le QR Code.\n\n👉 Cette nouvelle fonctionnalité est en phase d'expérimentation dans un nombre limité de lieux pour l’instant.",
    "venuesRecording.onboardingController.button.participate": "Je participe",
    "venuesRecording.confirmationController.title": "Ajouté",
    "erp.confirmationMessage.default.title": "Merci !",
@@ -609,7 +558,6 @@
    "onboarding.venuesController.bottomButton":"Continuer",
    "onboarding.venuesController.mainMessage.title":"Rompre les chaînes de transmission dans les lieux recevant du public et lors d’événements",
    "onboarding.venuesController.mainMessage.subtitle":"TousAntiCovid Signal permet d’être alerté et d’alerter les autres en cas d’exposition à la COVID-19 dans un lieu que vous avez fréquenté.\n\nPour cela vous devez scanner le QR Code affiché à l’entrée des lieux qui ont mis en place ce dispositif. Si vous êtes testé positif à la COVID-19, n’oubliez pas de vous déclarer positif dans l’application pour informer les autres utilisateurs.\n\nCe dispositif est anonyme, aucune donnée nominative n’est collectée ni sur le lieu ni sur les personnes présentes. Le nom et l’adresse du lieu ne sont pas contenus dans le QR Code.\n\n👉 Cette nouvelle fonctionnalité est en phase d'expérimentation dans un nombre limité de lieux pour l’instant.",
-   "venuesRecording.onboardingController.mainMessage.message": "TousAntiCovid Signal permet d’être alerté et d’alerter les autres en cas d’exposition à la COVID-19 dans un lieu que vous avez fréquenté.\n\nPour cela vous devez scanner le QR Code affiché à l’entrée des lieux qui ont mis en place ce dispositif. Si vous êtes testé positif à la COVID-19, n’oubliez pas de vous déclarer positif dans l’application pour informer les autres utilisateurs.\n\nCe dispositif est anonyme, aucune donnée nominative n’est collectée ni sur le lieu ni sur les personnes présentes. Le nom et l’adresse du lieu ne sont pas contenus dans le QR Code.\n\n👉 Cette nouvelle fonctionnalité est en phase d'expérimentation dans un nombre limité de lieux pour l’instant.",
    
    "home.healthSection.warningContact.cellTitle": "Info : possible exposition à risque",
    "home.healthSection.warningContact.cellSubtitle": "Consultez nos recommandations",
@@ -756,7 +704,7 @@
    "home.vaccinationSection.cellSubtitle": "Vérifiez votre éligibilité et trouvez un centre près de chez vous pour vous faire vacciner.",
    "vaccinationController.title": "Vaccination",
    "vaccinationController.eligibility.title": "Suis-je prioritaire pour me faire vacciner ?",
-   "vaccinationController.eligibility.subtitle": "Aujourd’hui, les publics prioritaires définis par les autorités sanitaires sont :\n- les personnes de 70 ans et plus quel que soit leur lieu de vie\n- les résidents en établissements (par exemple Ehpad, USLD)\n- les personnes vulnérables ayant une pathologie qui les expose à un très haut risque face à la Covid-19\n- les personnes en situation de handicap hébergées en établissements\n- les personnes de 50 à 69 ans inclus, souffrant d’une ou plusieurs des comorbidités\n- les résidents de 60 ans et plus dans les foyers de travailleurs migrants ;\n- les professionnels du secteur de la santé et du secteur médico-social appartenant aux catégories prioritaires.\n\nAppuyez sur \"En savoir plus\" pour plus de détails :",
+   "vaccinationController.eligibility.subtitle": "Aujourd’hui, les publics prioritaires définis par les autorités sanitaires sont :\n- les personnes de 55 ans et plus, quels que soient leur lieu de vie et leur état de santé (avec ou sans comorbidités)\n- les femmes enceintes à partir du deuxième trimestre de la grossesse ;\n- les résidents en établissements (par exemple Ehpad, USLD)\n- les personnes de plus de 18 ans ayant une pathologie qui les expose à un très haut risque face à la Covid-19 ;\n- les personnes de 50 à 54 ans inclus, souffrant d’une ou plusieurs comorbidités\n- les personnes en situation de handicap hébergées en établissements\n- les résidents de 60 ans et plus dans les foyers de travailleurs migrants\n- les professionnels du secteur de la santé et du secteur médico-social appartenant aux catégories prioritaires.\n\nAppuyez sur \"En savoir plus\" pour plus de détails.",
    "vaccinationController.eligibility.buttonTitle": "En savoir plus",
    "vaccinationController.eligibility.url": "https://www.gouvernement.fr/info-coronavirus/vaccins#tac",
    "vaccinationController.vaccinationLocation.title": "Trouver un centre pour me faire vacciner",
@@ -921,7 +869,8 @@
   
   
   
-  "attestation.form.reason_curfew.label":"Motif de couvre-feu (19h-6h)",
+  
+   "attestation.form.reason_curfew.label":"Motif de couvre-feu (19h-6h)",
    "attestation.form.reason_curfew.placeholder":"-",
    
    "attestation.form.reason_curfew.travail.shortLabel":"1. Activité professionnelle, enseignement et formation, mission d’intérêt général",
@@ -1002,48 +951,30 @@
     
    "attestation.form.reason_lockdown.footer":"Les déplacements sont autorisés sous réserve de justifier de l’un des motifs prévus dans la présente attestation.\n\n[1] Pour les personnes résidant aux frontières d’un département, une tolérance de 30 kilomètres au-delà du département est acceptée.",
    
-      "keyfigure.variantsuk.label":"Variant britannique",
-   "keyfigure.variantsuk.shortLabel":"Variant UK",
-   "keyfigure.variantsuk.description":"Cet indicateur reflète le pourcentage de variants britanniques (UK 20I/501Y.V1) parmi les tests criblés.",
-   
-   "keyfigure.variantsuk.colorCode.light":"#4C76EB",
-   "keyfigure.variantsuk.colorCode.dark":"#A6B6E3",
-   
-    "keyfigure.variantsuk.learnMore": "En cas de test (RT-PCR ou antigénique) de première intention positif, un second test RT-PCR dit de criblage est réalisé afin de détecter les variants d’intérêt connus à ce jour et d’évaluer leur diffusion sur l’ensemble du territoire.\n\nCet indicateur porte sur les données relatives aux résultats de criblage arrêtés à J-3 et mis à jour quotidiennement.\n\nIl exprime la part du variant 20I/501Y.V1 (UK) parmi tous les tests criblés. Les données sont collectées dans SIDEP depuis le 25 janvier 2021.",
-    
-    "keyfigure.variantssabr.label":"Variants sud-africains ou brésiliens",
-	"keyfigure.variantssabr.shortLabel":"Variants SA ou BR",
-	"keyfigure.variantssabr.description":"Cet indicateur reflète le pourcentage de variants sud-africains ou brésiliens (20H/501Y.V2 (SA) ou 20J/501Y.V3 (BR)) parmi les tests criblés.",
-	
-	"keyfigure.variantssabr.colorCode.light":"#D6774C",
-	"keyfigure.variantssabr.colorCode.dark":"#F6A37E",
-	
-	"keyfigure.variantssabr.learnMore": "En cas de test (RT-PCR ou antigénique) de première intention positif, un second test RT-PCR dit de criblage est réalisé afin de détecter les variants d’intérêt connus à ce jour et d’évaluer leur diffusion sur l’ensemble du territoire.\n\nCet indicateur porte sur les données relatives aux résultats de criblage arrêtés à J-3 et mises à jour quotidiennement.\n\nIl exprime la part des variants 20H/501Y.V2 (SA) ou 20J/501Y.V3 (BR) parmi tous les tests criblés. Les données sont collectées dans SIDEP depuis le 25 janvier 2021.",
-	
-	"walletController.title": "Carnet de tests",
+   "walletController.title": "Carnet de tests",
    "walletController.explanations.title": "Comment ça marche ?",
-   "walletController.explanations.subtitle": "Une fois le résultat de votre test disponible, vous recevrez un SMS avec un lien à suivre.\n\nSuivez les instructions, et vous pourrez ainsi ajouter le certificat de test (un document \"2D-DOC\") dans votre carnet.\n\nCe document 2D-DOC sera à montrer en cas de contrôle.",
-   "walletController.flashButton.title": "Scanner un QR Code",
-   "walletController.flashExplanation": "Sur votre document SIDEP de résultat de test négatif, vous avez un QR Code que vous pouvez flasher pour l'ajouter dans votre carnet ici.",
-   "walletController.recentCertificatesSection.title": "Mes tests récents",
-   "walletController.recentCertificatesSection.subtitle": "Ces certificats de test ont moins de 3 jours.",
-   "walletController.oldCertificatesSection.title": "Tests de plus de 3 jours",
-   "walletController.oldCertificatesSection.subtitle": "Ces certificats de test ont plus de 3 jours.",
+   "walletController.explanations.subtitle": "Pour numériser vos certificats de test et toujours les avoir à portée de main, c'est simple : une fois le résultat de votre test disponible, vous recevrez un SMS avec un lien et les instructions à suivre.\n\nCe certificat sera à montrer lors des contrôles pour vos voyages aériens 👉 expérimentation en cours, uniquement sur certains vols pour la Corse (Air France et Air Corsica informeront leurs clients éligibles).\n\nSi vous rencontrez un problème, vous pouvez appeler le 0 800 08 71 48.",
+   "walletController.flashButton.title": "Scanner le QR Code",
+   "walletController.flashExplanation": "Sur votre document SIDEP de résultat de test, vous avez un QR Code que vous pouvez scanner pour ajouter le certificat dans ce carnet.",
+   "walletController.recentCertificatesSection.title": "Certificats récents",
+   "walletController.recentCertificatesSection.subtitle": "Ces certificats ont moins de 3 jours.",
+   "walletController.oldCertificatesSection.title": "Certificats de plus de 3 jours",
+   "walletController.oldCertificatesSection.subtitle": "Ces certificats ont plus de 3 jours.",
    "walletController.menu.share": "Partager le certificat",
    "walletController.menu.share.text": "Voici mon certificat de test #TousAntiCovid",
    "walletController.menu.delete": "Supprimer ce certificat",
    "walletController.menu.delete.alert.title": "Confirmation",
    "walletController.menu.delete.alert.message": "Êtes-vous sûr de vouloir supprimer ce certificat ?",
    
-   "home.attestationSection.sanitaryCertificates.cell.title": "Votre carnet de tests",
-   "home.attestationSection.sanitaryCertificates.cell.subtitle": "Vos tests négatifs seront disponibles ici",
+   "home.attestationSection.sanitaryCertificates.cell.title": "Mon carnet de tests",
+   "home.attestationSection.sanitaryCertificates.cell.subtitle": "Vos certificats de test seront disponibles ici",
    
    "flashWalletCodeController.title": "Scannez",
-   "flashWalletCodeController.explanation": "Scanner le QR code du test sur votre document SIDEP.",
+   "flashWalletCodeController.explanation": "Scanner le QR Code sur votre document SIDEP.",
    "flashWalletCodeController.alert.invalidCode.title": "Code invalide",
    "flashWalletCodeController.alert.invalidCode.message": "Le code n'est pas valide. Veuillez essayer à nouveau.",
    
-   "walletController.noCertificates.flashExplanation": "Sur votre document SIDEP de résultat de test négatif, vous avez un QR Code que vous pouvez flasher pour l'ajouter dans votre carnet ici.",
+   "walletController.noCertificates.flashExplanation": "Sur votre document SIDEP de résultat de test, vous avez un QR Code que vous pouvez scanner pour ajouter le certificat dans ce carnet.",
    "confirmWalletQrCodeController.title":"Carnet de test",
    "confirmWalletQrCodeController.explanation.title":"Vous venez d'appuyer sur un lien TousAntiCovid pour ajouter un certificat de test dans votre carnet.",
    "confirmWalletQrCodeController.explanation.subtitle":"Confirmez-vous cet ajout dans votre carnet ?",
@@ -1089,10 +1020,29 @@
     "manageDataController.walletData.button": "Effacer sur mon téléphone",
     
     "wallet.proof.error.1.title": "Certificat erroné",
-    "wallet.proof.error.1.message": "Le certificat scanné n’a pas le bon format.",
+    "wallet.proof.error.1.message": "Le certificat scanné n’a pas le bon format. Si le problème persiste, veuillez appeler le 0 800 08 71 48",
     "wallet.proof.error.2.title": "Certificat non authentique",
-    "wallet.proof.error.2.message": "L'authenticité du certificat scanné n'a pas pu être vérifiée.",
+    "wallet.proof.error.2.message": "L'authenticité du certificat scanné n'a pas pu être vérifiée. Si le problème persiste, veuillez appeler le 0 800 08 71 48",
     
     "wallet.proof.moreThanSpecificHours": "⚠️ Plus de %dh",
-    "wallet.proof.lessThanSpecificHours": "Moins de %dh"
+    "wallet.proof.lessThanSpecificHours": "Moins de %dh",
+    
+   "keyfigure.variantsuk.label":"Variant britannique",
+   "keyfigure.variantsuk.shortLabel":"Variant UK",
+   "keyfigure.variantsuk.description":"Cet indicateur reflète le pourcentage de variants britanniques (UK 20I/501Y.V1) parmi les tests criblés.",
+   
+   "keyfigure.variantsuk.colorCode.light":"#4C76EB",
+   "keyfigure.variantsuk.colorCode.dark":"#A6B6E3",
+   
+    "keyfigure.variantsuk.learnMore": "En cas de test (RT-PCR ou antigénique) de première intention positif, un second test RT-PCR dit de criblage est réalisé afin de détecter les variants d’intérêt connus à ce jour et d’évaluer leur diffusion sur l’ensemble du territoire.\n\nCet indicateur porte sur les données relatives aux résultats de criblage arrêtés à J-3 et mis à jour quotidiennement.\n\nIl exprime la part du variant 20I/501Y.V1 (UK) parmi tous les tests criblés. Les données sont collectées dans SIDEP depuis le 25 janvier 2021.",
+    
+    "keyfigure.variantssabr.label":"Variants sud-africains ou brésiliens",
+	"keyfigure.variantssabr.shortLabel":"Variants SA ou BR",
+	"keyfigure.variantssabr.description":"Cet indicateur reflète le pourcentage de variants sud-africains ou brésiliens (20H/501Y.V2 (SA) ou 20J/501Y.V3 (BR)) parmi les tests criblés.",
+	
+	"keyfigure.variantssabr.colorCode.light":"#D6774C",
+	"keyfigure.variantssabr.colorCode.dark":"#F6A37E",
+	
+	"keyfigure.variantssabr.learnMore": "En cas de test (RT-PCR ou antigénique) de première intention positif, un second test RT-PCR dit de criblage est réalisé afin de détecter les variants d’intérêt connus à ce jour et d’évaluer leur diffusion sur l’ensemble du territoire.\n\nCet indicateur porte sur les données relatives aux résultats de criblage arrêtés à J-3 et mises à jour quotidiennement.\n\nIl exprime la part des variants 20H/501Y.V2 (SA) ou 20J/501Y.V3 (BR) parmi tous les tests criblés. Les données sont collectées dans SIDEP depuis le 25 janvier 2021."
+	
 }

@@ -96,7 +96,7 @@ object VenuesManager {
             saveVenue(secureKeystoreDataSource, venueQrCode)
             venueType
         } catch (e: Exception) {
-            Timber.e(e, "Fail to proces path $path")
+            Timber.e(e, "Fail to process path $path")
             null
         }
     }

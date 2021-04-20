@@ -18,6 +18,7 @@ buildscript {
 RefreshVersionsSetup.bootstrap(settings)
 
 rootProject.name = 'StopCovid'
+include ':analytics'
 include ':coreui'
 include ':stopcovid'
 include ':robert'

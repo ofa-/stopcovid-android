@@ -17,7 +17,7 @@ import com.lunabeestudio.domain.model.Configuration
 import com.lunabeestudio.domain.model.FormEntry
 import com.lunabeestudio.domain.model.RawWalletCertificate
 import com.lunabeestudio.domain.model.VenueQrCode
-import com.lunabeestudio.robert.model.AtRiskStatus
+import com.lunabeestudio.domain.model.AtRiskStatus
 
 interface LocalKeystoreDataSource {
     var configuration: Configuration?

@@ -13,14 +13,17 @@ package com.lunabeestudio.stopcovid.manager
 import android.content.Context
 import android.content.SharedPreferences
 import android.location.Location
+import androidx.core.content.edit
 import androidx.core.util.AtomicFile
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.preference.PreferenceManager
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.robert.utils.Event
 import com.lunabeestudio.stopcovid.coreui.ConfigConstant
+import com.lunabeestudio.stopcovid.coreui.extension.getETagSharedPrefs
 import com.lunabeestudio.stopcovid.coreui.extension.saveTo
 import com.lunabeestudio.stopcovid.extension.chosenPostalCode
 import com.lunabeestudio.stopcovid.extension.currentVaccinationReferenceDepartmentCode
@@ -93,7 +96,7 @@ object VaccinationCenterManager {
         if (postalCode == null) {
             // Clear all data
             Timber.d("Updating postal code to null")
-            clearAllData(sharedPreferences)
+            clearAllData(context)
         } else {
             // Postal code changed, update department and location
             Timber.d("Postal code did update")
@@ -175,13 +178,18 @@ object VaccinationCenterManager {
         }
     }
 
-    fun clearAllData(sharedPreferences: SharedPreferences) {
+    fun clearAllData(context: Context) {
         Timber.d("Clearing everything related to vaccination centers")
         _vaccinationCenters.postValue(Event(emptyList()))
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
         sharedPreferences.chosenPostalCode = null
         sharedPreferences.currentVaccinationReferenceDepartmentCode = null
         sharedPreferences.currentVaccinationReferenceLatitude = null
         sharedPreferences.currentVaccinationReferenceLongitude = null
+        context.getETagSharedPrefs().edit {
+            remove(lastUpdateFileName)
+            remove(centersFileName)
+        }
     }
 
     private suspend fun loadLocal(context: Context, sharedPreferences: SharedPreferences): List<VaccinationCenter>? {
@@ -216,25 +224,31 @@ object VaccinationCenterManager {
             }
             lastUpdateFileOutPutStream = "${url}${sharedPreferences.currentVaccinationReferenceDepartmentCode}/$lastUpdateFileName".saveTo(
                 context,
-                atomicLastUpdateFile
+                atomicLastUpdateFile,
+                lastUpdateFileName,
             )
-            val vaccinationCenterLastUpdate = gson.fromJson(
-                atomicLastUpdateFile.baseFile.readText(),
-                VaccinationCenterLastUpdate::class.java
-            )
+            if (lastUpdateFileOutPutStream != null) {
+                val vaccinationCenterLastUpdate = gson.fromJson(
+                    atomicLastUpdateFile.baseFile.readText(),
+                    VaccinationCenterLastUpdate::class.java
+                )
 
-            if (vaccinationCenterLastUpdate.sha1 != previousVaccinationCenterLastUpdate?.sha1) {
-                Timber.d("Downloaded Sha1 (${vaccinationCenterLastUpdate.sha1}) is different than our file Sha1 (${previousVaccinationCenterLastUpdate?.sha1}). Let's fetch the new file")
-                val fetched = fetchLastCenters(context, sharedPreferences)
-                if (!fetched) {
-                    atomicLastUpdateFile.failWrite(lastUpdateFileOutPutStream)
+                if (vaccinationCenterLastUpdate.sha1 != previousVaccinationCenterLastUpdate?.sha1) {
+                    Timber.d("Downloaded Sha1 (${vaccinationCenterLastUpdate.sha1}) is different than our file Sha1 (${previousVaccinationCenterLastUpdate?.sha1}). Let's fetch the new file")
+                    val fetched = fetchLastCenters(context, sharedPreferences)
+                    if (!fetched) {
+                        atomicLastUpdateFile.failWrite(lastUpdateFileOutPutStream)
+                    } else {
+                        atomicLastUpdateFile.finishWrite(lastUpdateFileOutPutStream)
+                    }
+                    fetched
                 } else {
-                    atomicLastUpdateFile.finishWrite(lastUpdateFileOutPutStream)
+                    Timber.d("Previous Sha1 is the same. No need to fetch new centers.")
+                    atomicLastUpdateFile.failWrite(lastUpdateFileOutPutStream)
+                    false
                 }
-                fetched
             } else {
-                Timber.d("Previous Sha1 is the same. No need to fetch new centers.")
-                atomicLastUpdateFile.failWrite(lastUpdateFileOutPutStream)
+                // No update etag is still valid
                 false
             }
         } catch (e: Exception) {
@@ -251,15 +265,21 @@ object VaccinationCenterManager {
         return try {
             centersFileOutPutStream = "${url}${sharedPreferences.currentVaccinationReferenceDepartmentCode}/$centersFileName".saveTo(
                 context,
-                atomicCentersFile
+                atomicCentersFile,
+                centersFileName,
             )
-            val list = gson.fromJson<List<VaccinationCenter?>>(atomicCentersFile.baseFile.readText(), vaccinationCentersType)
-            if (list.any { it == null }) {
-                atomicCentersFile.failWrite(centersFileOutPutStream)
-                false
+            if (centersFileOutPutStream != null) {
+                val list = gson.fromJson<List<VaccinationCenter?>>(atomicCentersFile.baseFile.readText(), vaccinationCentersType)
+                if (list.any { it == null }) {
+                    atomicCentersFile.failWrite(centersFileOutPutStream)
+                    false
+                } else {
+                    atomicCentersFile.finishWrite(centersFileOutPutStream)
+                    true
+                }
             } else {
-                atomicCentersFile.finishWrite(centersFileOutPutStream)
-                true
+                // No update etag is still valid
+                false
             }
         } catch (e: Exception) {
             Timber.e(e, "Fetching fail for $centersFileName")

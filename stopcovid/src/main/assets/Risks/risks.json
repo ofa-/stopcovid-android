@@ -9,7 +9,7 @@
             "detailTitle" : "risk0.details.title",
             "detailSubtitle" : "risk0.details.sub",
             "widgetShort" : "risk0.home.title",
-            "widgetLong" : "risk0.details.title"
+            "widgetLong" : "risk0.widget.longTitle"
         },
         "color" : {"from" : "#00AC8C", "to" : "#169B62"},
         "sections" : [
@@ -100,7 +100,7 @@
             "notifTitle" : "risk2.notif.title",
             "notifBody" : "risk2.notif.sub"
         },
-        "color" : {"from" : "#D07C75", "to" : "#A7645E"},
+        "color" : {"from" : "#FF6F4D", "to" : "#CC593E"},
         "contactDateFormat" : "range",
         "sections" : [
             {
@@ -151,7 +151,7 @@
             "notifTitle" : "risk3.notif.title",
             "notifBody" : "risk3.notif.sub"
         },
-        "color" : {"from" : "#FF6F4D", "to" : "#CD593E"},
+        "color" : {"from" : "#A47984", "to" : "#7E4F5B"},
         "contactDateFormat" : "range",
         "sections" : [
             {
@@ -209,7 +209,7 @@
             "notifTitle" : "risk4.notif.title",
             "notifBody" : "risk4.notif.sub"
         },
-        "color" : {"from" : "#E1000F", "to" : "#B4000C"},
+        "color" : {"from" : "#E1000F", "to" : "#901F27"},
         "contactDateFormat" : "date",
         "sections" : [
             {

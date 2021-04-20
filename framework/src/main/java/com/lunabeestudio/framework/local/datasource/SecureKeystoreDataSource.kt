@@ -25,7 +25,7 @@ import com.lunabeestudio.domain.model.RawWalletCertificate
 import com.lunabeestudio.domain.model.VenueQrCode
 import com.lunabeestudio.framework.local.LocalCryptoManager
 import com.lunabeestudio.robert.datasource.LocalKeystoreDataSource
-import com.lunabeestudio.robert.model.AtRiskStatus
+import com.lunabeestudio.domain.model.AtRiskStatus
 import java.lang.reflect.Type
 
 class SecureKeystoreDataSource(context: Context, private val cryptoManager: LocalCryptoManager) : LocalKeystoreDataSource {
@@ -139,6 +139,7 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
     override val rawWalletCertificatesLiveData: LiveData<List<RawWalletCertificate>?>
         get() = _rawWalletCertificatesLiveData
 
+    @Deprecated(message = "Old model", replaceWith = ReplaceWith("attestations"), level = DeprecationLevel.WARNING)
     override var deprecatedAttestations: List<Map<String, FormEntry>>?
         get() = getEncryptedValue(SHARED_PREF_KEY_DEPRECTATED_ATTESTATIONS, object : TypeToken<List<Map<String, FormEntry>>>() {}.type)
         set(value) {

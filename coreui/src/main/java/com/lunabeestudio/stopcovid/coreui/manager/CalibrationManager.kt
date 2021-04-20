@@ -11,10 +11,12 @@
 package com.lunabeestudio.stopcovid.coreui.manager
 
 import android.content.Context
+import androidx.core.content.edit
 import com.google.gson.Gson
 import com.lunabeestudio.domain.model.Calibration
 import com.lunabeestudio.stopcovid.coreui.ConfigConstant
 import com.lunabeestudio.stopcovid.coreui.EnvConstant
+import com.lunabeestudio.stopcovid.coreui.extension.getETagSharedPrefs
 import com.lunabeestudio.stopcovid.coreui.extension.saveTo
 import com.lunabeestudio.stopcovid.coreui.model.ApiCalibration
 import com.lunabeestudio.stopcovid.coreui.model.toDomain
@@ -32,7 +34,7 @@ object CalibrationManager {
         val file = File(context.filesDir, ConfigConstant.Calibration.LOCAL_FILENAME)
         Timber.v("Fetching remote calibration at ${getUrl()}")
         try {
-            getUrl().saveTo(context, file)
+            getUrl().saveTo(context, file, ConfigConstant.Calibration.LOCAL_FILENAME)
         } catch (e: Exception) {
             Timber.e(e)
         }
@@ -81,6 +83,9 @@ object CalibrationManager {
     }
 
     fun clearLocal(context: Context) {
+        context.getETagSharedPrefs().edit {
+            remove(ConfigConstant.Calibration.LOCAL_FILENAME)
+        }
         File(context.filesDir, ConfigConstant.Calibration.LOCAL_FILENAME).delete()
     }
 }

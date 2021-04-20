@@ -11,9 +11,10 @@
 package com.lunabeestudio.robert
 
 import android.content.Context
+import com.lunabeestudio.analytics.proxy.AnalyticsInfosProvider
 import com.lunabeestudio.domain.model.VenueQrCode
 
-interface RobertApplication {
+interface RobertApplication : AnalyticsInfosProvider {
     val robertManager: RobertManager
     fun getAppContext(): Context
     fun refreshProximityService()

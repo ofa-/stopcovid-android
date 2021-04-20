@@ -42,10 +42,10 @@
         "links": [
             {
                 "label": "À propos de TousAntiCovid",
-                "url": "https://bonjour.tousanticovid.gouv.fr/stopcovid.html"
+                "url": "https://bonjour.tousanticovid.gouv.fr/app.html"
             },
             {
-                "label": "Code source de l'application",
+                "label": "Code source de la plateforme",
                 "url": "https://gitlab.inria.fr/stopcovid19/accueil"
             },
             {

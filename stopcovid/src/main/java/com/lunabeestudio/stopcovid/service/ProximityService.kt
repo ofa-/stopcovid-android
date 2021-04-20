@@ -21,6 +21,7 @@ import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
+import com.lunabeestudio.analytics.manager.AnalyticsManager
 import com.lunabeestudio.framework.ble.service.RobertProximityService
 import com.lunabeestudio.robert.RobertApplication
 import com.lunabeestudio.robert.RobertManager
@@ -104,7 +105,13 @@ open class ProximityService : RobertProximityService() {
         return START_STICKY
     }
 
+    override fun onCreate() {
+        super.onCreate()
+        AnalyticsManager.proximityDidStart(this)
+    }
+
     override fun onDestroy() {
+        AnalyticsManager.proximityDidStop(this)
         robertManager.deactivateProximity(applicationContext as RobertApplication)
         super.onDestroy()
     }

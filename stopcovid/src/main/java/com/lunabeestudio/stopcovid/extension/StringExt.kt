@@ -13,6 +13,7 @@ package com.lunabeestudio.stopcovid.extension
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
+import android.graphics.Color
 import android.net.Uri
 import android.widget.Toast
 import androidx.core.text.isDigitsOnly
@@ -82,3 +83,5 @@ fun String.sha256(): String = MessageDigest
 
 // Dirty hack to fix strange display of quotes on some Android devices
 fun String.fixQuoteInString(): String = replace("'", "")
+
+fun String?.safeParseColor(): Int = Color.parseColor(this ?: "#0B0091")

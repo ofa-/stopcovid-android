@@ -17,6 +17,7 @@ import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import com.lunabeestudio.stopcovid.coreui.BuildConfig
 import com.lunabeestudio.stopcovid.coreui.UiConstants
+import com.lunabeestudio.stopcovid.coreui.extension.getETagSharedPrefs
 import com.lunabeestudio.stopcovid.coreui.extension.getFirstSupportedLanguage
 import com.lunabeestudio.stopcovid.coreui.extension.saveTo
 import kotlinx.coroutines.Dispatchers
@@ -38,15 +39,6 @@ abstract class ServerManager<T> {
     protected open fun transform(input: String): String = input
     private val extension: String = ".json"
 
-    protected suspend fun fetchLast(context: Context, forceRefresh: Boolean): Boolean {
-        return if (shouldRefresh(context) || forceRefresh) {
-            fetchLast(context, context.getFirstSupportedLanguage())
-        } else {
-            Timber.v("Only use local data")
-            false
-        }
-    }
-
     protected suspend fun loadLocal(context: Context): T? {
         val currentLanguage = context.getFirstSupportedLanguage()
 
@@ -54,11 +46,21 @@ abstract class ServerManager<T> {
             ?: loadFromAssets(context, currentLanguage)
     }
 
-    private suspend fun fetchLast(context: Context, languageCode: String): Boolean {
+    protected suspend fun fetchLast(context: Context, forceRefresh: Boolean): Boolean {
+        return if (shouldRefresh(context) || forceRefresh) {
+            fetchLast(context)
+        } else {
+            Timber.v("Only use local data")
+            false
+        }
+    }
+
+    private suspend fun fetchLast(context: Context): Boolean {
+        val languageCode = context.getFirstSupportedLanguage()
         val filename = "$prefix$languageCode$extension"
         val tmpFile = File(context.filesDir, "$filename.bck")
         return try {
-            "$url$filename".saveTo(context, tmpFile)
+            "$url$filename".saveTo(context, tmpFile, filename)
             if (fileNotCorrupted(tmpFile)) {
                 tmpFile.copyTo(File(context.filesDir, filename), overwrite = true, bufferSize = 4 * 1024)
                 saveLastRefresh(context)
@@ -106,18 +108,6 @@ abstract class ServerManager<T> {
         }
     }
 
-    private fun shouldRefresh(context: Context): Boolean {
-        val lastRefreshTimeMS = PreferenceManager.getDefaultSharedPreferences(context).getLong(lastRefreshSharedPrefsKey, 0L)
-        val timeDiffMs = System.currentTimeMillis() - lastRefreshTimeMS
-        return !BuildConfig.USE_LOCAL_DATA && abs(timeDiffMs) > BuildConfig.REFRESH_STRING_MIN_DURATION_MS
-    }
-
-    private fun saveLastRefresh(context: Context) {
-        PreferenceManager.getDefaultSharedPreferences(context).edit {
-            putLong(lastRefreshSharedPrefsKey, System.currentTimeMillis())
-        }
-    }
-
     private suspend fun fileNotCorrupted(file: File): Boolean {
         return withContext(Dispatchers.IO) {
             try {
@@ -130,10 +120,26 @@ abstract class ServerManager<T> {
         }
     }
 
+    private fun shouldRefresh(context: Context): Boolean {
+        val lastRefreshTimeMS = PreferenceManager.getDefaultSharedPreferences(context).getLong(lastRefreshSharedPrefsKey, 0L)
+        val timeDiffMs = System.currentTimeMillis() - lastRefreshTimeMS
+        return !BuildConfig.USE_LOCAL_DATA && abs(timeDiffMs) > BuildConfig.REFRESH_STRING_MIN_DURATION_MS
+    }
+
+    private fun saveLastRefresh(context: Context) {
+        PreferenceManager.getDefaultSharedPreferences(context).edit {
+            putLong(lastRefreshSharedPrefsKey, System.currentTimeMillis())
+        }
+    }
+
     fun clearLocal(context: Context) {
         val filename = "$prefix${context.getFirstSupportedLanguage()}$extension"
         File(context.filesDir, filename).delete()
         val defaultFilename = "$prefix${UiConstants.DEFAULT_LANGUAGE}$extension"
         File(context.filesDir, defaultFilename).delete()
+        context.getETagSharedPrefs().edit {
+            remove(filename)
+            remove(defaultFilename)
+        }
     }
 }

@@ -12,6 +12,8 @@ package com.lunabeestudio.stopcovid.fragment
 
 import android.view.View
 import androidx.lifecycle.lifecycleScope
+import com.lunabeestudio.analytics.manager.AnalyticsManager
+import com.lunabeestudio.analytics.model.AppEventName
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.extension.viewLifecycleOwnerOrNull
@@ -110,6 +112,7 @@ class KeyFiguresFragment : KeyFigureGenericFragment() {
                 }
             }
             onClickListener = View.OnClickListener {
+                AnalyticsManager.reportAppEvent(requireContext(), AppEventName.e9, null)
                 findNavControllerOrNull()?.safeNavigate(
                     KeyFiguresFragmentDirections.actionKeyFiguresFragmentToKeyFigureDetailsFragment(
                         figure.labelKey

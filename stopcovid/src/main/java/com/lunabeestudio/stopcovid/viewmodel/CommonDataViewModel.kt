@@ -23,6 +23,7 @@ import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.StopCovid
 import com.lunabeestudio.stopcovid.coreui.UiConstants
+import com.lunabeestudio.stopcovid.coreui.extension.getETagSharedPrefs
 import com.lunabeestudio.stopcovid.manager.IsolationManager
 import com.lunabeestudio.stopcovid.manager.VaccinationCenterManager
 import com.lunabeestudio.stopcovid.manager.VenuesManager
@@ -43,6 +44,7 @@ abstract class CommonDataViewModel(
         secureKeystoreDataSource.savedAttestationData = null
         secureKeystoreDataSource.saveAttestationData = null
         secureKeystoreDataSource.attestations = null
+        @Suppress("DEPRECATION")
         secureKeystoreDataSource.deprecatedAttestations = null
     }
 
@@ -61,11 +63,16 @@ abstract class CommonDataViewModel(
         (application.getAppContext() as StopCovid).cancelActivateReminder()
         eraseIsolation()
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(application.getAppContext())
-        VaccinationCenterManager.clearAllData(sharedPreferences)
+        VaccinationCenterManager.clearAllData(application.getAppContext())
         sharedPreferences.edit {
             remove(Constants.SharedPrefs.PRIVATE_EVENT_QR_CODE_GENERATION_DATE)
             remove(Constants.SharedPrefs.PRIVATE_EVENT_QR_CODE)
         }
+        application.getAppContext()
+            .getETagSharedPrefs()
+            .edit {
+                clear()
+            }
     }
 
     protected fun clearNotifications(application: RobertApplication) {

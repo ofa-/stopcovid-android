@@ -12,7 +12,7 @@ package com.lunabeestudio.stopcovid.coreui
 
 object ConfigConstant {
     private const val BASE_URL: String = "https://app.tousanticovid.gouv.fr/"
-    private const val VERSION_PATH: String = "json/version-29/"
+    private const val VERSION_PATH: String = "json/version-30/"
     private const val VERSIONED_SERVER_URL: String = BASE_URL + VERSION_PATH
     const val SERVER_CERTIFICATE_SHA256: String = "sha256/ckVocY6+T4RvpXWtbqOF45qEvNls4oFWi83BryOQgOk="
 
@@ -64,9 +64,9 @@ object ConfigConstant {
     }
 
     object Privacy {
-        const val URL: String = VERSIONED_SERVER_URL
+        const val FOLDER: String = "Privacy/"
+        const val URL: String = VERSIONED_SERVER_URL + FOLDER
         const val FILE_PREFIX: String = "privacy-"
-        const val ASSET_FOLDER_NAME: String = "Privacy/"
     }
 
     object Risks {
@@ -79,7 +79,6 @@ object ConfigConstant {
     object Labels {
         const val FOLDER: String = "Strings/"
         const val URL: String = VERSIONED_SERVER_URL + FOLDER
-
         const val FILE_PREFIX: String = "strings-"
     }
 

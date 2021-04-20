@@ -39,5 +39,6 @@ dependencies {
 
     implementation 'com.jakewharton.timber:timber:_'
 
+    implementation project(path: ':analytics')
     implementation project(path: ':domain')
 }

@@ -30,6 +30,11 @@
         android:orientation="vertical"
         tools:ignore="UseCompoundDrawables">
 
+        <Space
+            android:id="@+id/topSpace"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/spacing_large" />
+
         <ImageView
             android:id="@+id/imageView"
             android:layout_width="match_parent"

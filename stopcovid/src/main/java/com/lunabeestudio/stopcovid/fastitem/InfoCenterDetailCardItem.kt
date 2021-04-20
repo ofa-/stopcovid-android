@@ -10,6 +10,10 @@
 
 package com.lunabeestudio.stopcovid.fastitem
 
+import android.graphics.Typeface
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.style.StyleSpan
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.view.isVisible
@@ -62,7 +66,18 @@ class InfoCenterDetailCardItem : AbstractBindingItem<ItemInfoCenterDetailCardBin
     override fun bindView(binding: ItemInfoCenterDetailCardBinding, payloads: List<Any>) {
         binding.headerTextView.setTextOrHide(header)
         binding.titleTextView.setTextOrHide(title)
-        binding.bodyTextView.setTextOrHide(body)
+        val boldBody = body?.split("\n\n", limit = 2)?.let {
+            if (it.size == 2) {
+                it[0].length
+            } else {
+                null
+            }
+        }?.let { boldTextLength ->
+            SpannableString(body).apply {
+                setSpan(StyleSpan(Typeface.BOLD), 0, boldTextLength, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            }
+        } ?: body
+        binding.bodyTextView.setTextOrHide(boldBody)
         binding.includeLink.textView.setTextOrHide(link)
         binding.includeLink.leftIconImageView.isVisible = false
         binding.space.isVisible = link == null || url == null

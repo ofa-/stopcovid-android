@@ -16,7 +16,6 @@ import android.content.Intent
 import android.os.Build
 import android.view.Gravity
 import androidx.annotation.RequiresApi
-import androidx.navigation.fragment.findNavController
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.UiConstants
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull

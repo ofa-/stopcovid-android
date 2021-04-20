@@ -1,4 +1,4 @@
-﻿[
+[
    {
       "section":"I tuoi dati sono protetti",
       "description":"TousAntiCovid è conforme alla normativa che garantisce la protezione dei tuoi dati.",
@@ -42,7 +42,7 @@
       "links":[
          {
             "label":"A proposito di TousAntiCovid",
-            "url":"https://bonjour.tousanticovid.gouv.fr/stopcovid.html"
+            "url":"https://bonjour.tousanticovid.gouv.fr/app.html"
          },
          {
             "label":"Codice sorgente dell’applicazione",

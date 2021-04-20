@@ -12,9 +12,11 @@ package com.lunabeestudio.stopcovid.coreui.extension
 
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.res.Configuration
 import android.net.Uri
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.lunabeestudio.stopcovid.coreui.Constants
 import com.lunabeestudio.stopcovid.coreui.UiConstants
 import java.util.Locale
 
@@ -87,4 +89,8 @@ fun Context.getFirstSupportedLanguage(): String {
     } else {
         Locale.getDefault().language.takeIf { UiConstants.SUPPORTED_LANGUAGE.contains(it) } ?: UiConstants.DEFAULT_LANGUAGE
     }
+}
+
+fun Context.getETagSharedPrefs(): SharedPreferences {
+    return getSharedPreferences(Constants.SharedPrefs.SHARED_PREF_ETAG_FILE_NAME, Context.MODE_PRIVATE)
 }

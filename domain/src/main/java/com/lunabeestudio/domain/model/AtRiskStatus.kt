@@ -8,7 +8,7 @@
  * Created by Lunabee Studio / Date - 2020/10/29 - for the TOUS-ANTI-COVID project
  */
 
-package com.lunabeestudio.robert.model
+package com.lunabeestudio.domain.model
 
 data class AtRiskStatus(
     var riskLevel: Float,

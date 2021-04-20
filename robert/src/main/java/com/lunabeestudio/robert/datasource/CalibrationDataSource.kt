@@ -12,7 +12,6 @@ package com.lunabeestudio.robert.datasource
 
 import android.content.Context
 import com.lunabeestudio.domain.model.Calibration
-import com.lunabeestudio.domain.model.Configuration
 import com.lunabeestudio.robert.model.RobertResultData
 
 interface CalibrationDataSource {

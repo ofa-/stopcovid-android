@@ -2,11 +2,11 @@
   "config": [
 	{
       "name": "lastUpdate",
-      "value": "16 march 2021"
+      "value": "12 april 2021"
     },
     {
       "name": "version",
-      "value": 40
+      "value": 44
     },
     {
       "name": "versionCalibrationBle",
@@ -14,11 +14,23 @@
     },
     {
       "name": "app.apiVersion",
-      "value": "v5"
+      "value": "v6"
     },
     {
       "name": "app.warningApiVersion",
       "value": "v2"
+    },
+    {
+      "name": "app.clea.reportApiVersion",
+      "value": "v1"
+    },
+    {
+      "name": "app.clea.statusApiVersion",
+      "value": "v1"
+    },
+    {
+      "name": "app.analyticsApiVersion",
+      "value": "v1"
     },
     {
 	    "name" : "app.ameliUrl",
@@ -46,15 +58,19 @@
     },
     {
       "name": "app.vaccinationCentersCount",
-      "value": 10
+      "value": 14
     },
     {
       "name": "app.displaySanitaryCertificatesWallet",
-      "value": false
+      "value": true
     },
     {
       "name": "app.displaySanitaryCertificatesValidation",
       "value": false
+    },
+    {
+      "name": "app.isAnalyticsOn",
+      "value": true
     },
     {
       "name": "app.wallet.oldCertificateThresholdInDays",

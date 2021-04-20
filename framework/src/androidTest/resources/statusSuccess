@@ -4,5 +4,6 @@
     "lastRiskScoringDate": "3814601613",
     "message": "message",
     "tuples": "tuples",
-    "declarationToken": "declarationToken"
+    "declarationToken": "declarationToken",
+    "analyticsToken": "analyticsToken"
 }

@@ -2,8 +2,10 @@ package com.lunabeestudio.stopcovid.manager
 
 import android.content.Context
 import android.util.MalformedJsonException
+import androidx.core.content.edit
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
+import com.lunabeestudio.stopcovid.coreui.extension.getETagSharedPrefs
 import com.lunabeestudio.stopcovid.coreui.extension.saveTo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -22,21 +24,25 @@ abstract class RemoteFileManager<T> {
 
     protected suspend fun loadLocal(context: Context): T? {
         val localFile = File(context.filesDir, localFileName)
-        return if (localFile.exists()) {
-            withContext(Dispatchers.IO) {
-                try {
-                    Timber.v("Loading $localFile to object")
-                    gson.fromJson<T>(localFile.readText(), type)
-                } catch (e: Exception) {
-                    Timber.e(e)
-                    null
+        return when {
+            localFile.exists() -> {
+                withContext(Dispatchers.IO) {
+                    try {
+                        Timber.v("Loading $localFile to object")
+                        gson.fromJson<T>(localFile.readText(), type)
+                    } catch (e: Exception) {
+                        Timber.e(e)
+                        null
+                    }
                 }
             }
-        } else if (assetFilePath != null) {
-            getDefaultAssetFile(context)
-        } else {
-            Timber.v("Nothing to load")
-            null
+            assetFilePath != null -> {
+                getDefaultAssetFile(context)
+            }
+            else -> {
+                Timber.v("Nothing to load")
+                null
+            }
         }
     }
 
@@ -55,13 +61,16 @@ abstract class RemoteFileManager<T> {
 
         return try {
             Timber.v("Fetching remote data at $remoteFileUrl")
-            remoteFileUrl.saveTo(context, tmpFile)
-            if (fileNotCorrupted(tmpFile)) {
-                tmpFile.copyTo(File(context.filesDir, localFileName), overwrite = true, bufferSize = 4 * 1024)
+            if (remoteFileUrl.saveTo(context, tmpFile, localFileName)) {
+                if (fileNotCorrupted(tmpFile)) {
+                    tmpFile.copyTo(File(context.filesDir, localFileName), overwrite = true, bufferSize = 4 * 1024)
+                } else {
+                    throw MalformedJsonException("Failed to parse JSON")
+                }
+                true
             } else {
-                throw MalformedJsonException("Failed to parse JSON")
+                false
             }
-            true
         } catch (e: Exception) {
             Timber.e(e, "Fetching failed")
             false
@@ -82,6 +91,9 @@ abstract class RemoteFileManager<T> {
     }
 
     fun clearLocal(context: Context) {
+        context.getETagSharedPrefs().edit {
+            remove(localFileName)
+        }
         File(context.filesDir, localFileName).delete()
     }
 }

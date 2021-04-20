@@ -16,7 +16,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.WorkManager
+import com.lunabeestudio.analytics.manager.AnalyticsManager
+import com.lunabeestudio.analytics.model.HealthEventName
 import com.lunabeestudio.domain.extension.unixTimeMsToNtpTimeS
+import com.lunabeestudio.domain.model.AtRiskStatus
 import com.lunabeestudio.domain.model.Calibration
 import com.lunabeestudio.domain.model.Configuration
 import com.lunabeestudio.domain.model.HelloBuilder
@@ -37,7 +40,6 @@ import com.lunabeestudio.robert.datasource.SharedCryptoDataSource
 import com.lunabeestudio.robert.extension.safeEnumValueOf
 import com.lunabeestudio.robert.extension.use
 import com.lunabeestudio.robert.manager.LocalProximityFilter
-import com.lunabeestudio.robert.model.AtRiskStatus
 import com.lunabeestudio.robert.model.ForbiddenException
 import com.lunabeestudio.robert.model.NoEphemeralBluetoothIdentifierFound
 import com.lunabeestudio.robert.model.NoEphemeralBluetoothIdentifierFoundForEpoch
@@ -205,7 +207,7 @@ class RobertManagerImpl(
     }
 
     private suspend fun refreshCalibration(application: RobertApplication): RobertResult {
-        return if (configuration.versionCalibrationBle == calibration.version) {
+        return if (configuration.versionCalibrationBle > calibration.version) {
             val calibrationResult = remoteServiceRepository.fetchOrLoadCalibration(application.getAppContext())
             when (calibrationResult) {
                 is RobertResultData.Success -> {
@@ -267,6 +269,7 @@ class RobertManagerImpl(
         activateProximity: Boolean,
     ): RobertResult {
         return try {
+            AnalyticsManager.register(application.getAppContext())
             keystoreRepository.timeStart = registerReport.timeStart
             keystoreRepository.atRiskLastRefresh = System.currentTimeMillis()
             ephemeralBluetoothIdentifierRepository.save(Base64.decode(registerReport.tuples, Base64.NO_WRAP))
@@ -356,7 +359,7 @@ class RobertManagerImpl(
                 val shouldRefreshStatus = lastSuccessLongEnough || lastErrorLongEnough
                 if (shouldRefreshStatus) {
                     if (ssu is RobertResultData.Success) {
-                        val statusResult = status(ssu)
+                        val statusResult = status(robertApplication, ssu)
                         val wstatusResult = wstatus(robertApplication)
                         processStatusResults(robertApplication, statusResult, wstatusResult)
                     } else {
@@ -373,6 +376,7 @@ class RobertManagerImpl(
     }
 
     private suspend fun status(
+        robertApplication: RobertApplication,
         ssu: RobertResultData.Success<ServerStatusUpdate>,
     ): RobertResultData<AtRiskStatus> {
         val result = remoteServiceRepository.status(apiVersion, ssu.data)
@@ -383,6 +387,17 @@ class RobertManagerImpl(
                     keystoreRepository.declarationToken = result.data.declarationToken
                     ephemeralBluetoothIdentifierRepository.save(Base64.decode(result.data.tuples, Base64.NO_WRAP))
                     keystoreRepository.shouldReloadBleSettings = true
+                    AnalyticsManager.statusDidSucceed(robertApplication.getAppContext())
+                    if (result.data.analyticsToken != null) {
+                        AnalyticsManager.sendAnalytics(
+                            robertApplication.getAppContext(),
+                            this,
+                            robertApplication,
+                            result.data.analyticsToken!!
+                        )
+                    } else {
+                        AnalyticsManager.reset(robertApplication.getAppContext())
+                    }
                     RobertResultData.Success(
                         AtRiskStatus(
                             result.data.riskLevel,
@@ -538,6 +553,7 @@ class RobertManagerImpl(
         val result = remoteServiceRepository.report(apiVersion, token, filteredLocalProximityList)
         return when (result) {
             is RobertResultData.Success -> {
+                AnalyticsManager.reportHealthEvent(application.getAppContext(), HealthEventName.eh1, null)
                 keystoreRepository.isSick = true
                 val reportCalendar = Calendar.getInstance()
                 reportCalendar.add(Calendar.DAY_OF_YEAR, -originDayInPast.toInt())
@@ -697,6 +713,7 @@ class RobertManagerImpl(
         keystoreRepository.reportToSendStartTime = null
         keystoreRepository.reportToSendEndTime = null
         keystoreRepository.declarationToken = null
+        AnalyticsManager.unregister(application.getAppContext())
         keystoreRepository.atRiskModelVersion = AT_RISK_MODEL_VERSION
     }
 
@@ -715,6 +732,12 @@ class RobertManagerImpl(
             if (atRiskMutableLiveData.value == null || atRiskMutableLiveData.value?.peekContent() != atRisk) {
                 atRiskMutableLiveData.postValue(Event(atRisk))
             }
+        }
+    }
+
+    override suspend fun getLocalProximityCount(): Int {
+        return withContext(Dispatchers.IO) {
+            localProximityRepository.getBetweenTime(Long.MIN_VALUE, Long.MAX_VALUE).size
         }
     }
 

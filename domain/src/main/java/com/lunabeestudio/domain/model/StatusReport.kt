@@ -17,4 +17,5 @@ class StatusReport(
     val message: String?,
     val tuples: String?,
     val declarationToken: String?,
+    val analyticsToken: String?,
 )

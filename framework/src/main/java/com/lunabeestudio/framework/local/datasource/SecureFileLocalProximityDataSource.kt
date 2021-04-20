@@ -102,6 +102,7 @@ open class SecureFileLocalProximityDataSource(
 
     override fun removeAll() {
         dumpJob?.cancel(CancellationException("Remove all local data called"))
+        dumpDelayRunning.set(false)
         localProximityList.clear()
         storageDir.listFiles()?.forEach { file ->
             file.deleteRecursively()
@@ -148,17 +149,15 @@ open class SecureFileLocalProximityDataSource(
             Pair(lastDumpedIndex, dumpTime)
         }
 
+        dumpDelayRunning.set(true)
         while (dumpRequested.getAndSet(false)) {
-            dumpDelayRunning.set(true)
             val dumpResult = doDump()
             updateEncryptedFolderIfNeeded(dumpResult.first)
             val delayMillis = max(dumpResult.second * DUMP_DELAY_FACTOR, DUMP_MIN_DELAY_MS)
             Timber.v("Delaying dumps for ${delayMillis}ms")
             delay(delayMillis)
-            if (!dumpRequested.get()) {
-                dumpDelayRunning.set(false)
-            }
         }
+        dumpDelayRunning.set(false)
     }
 
     protected open suspend fun updateEncryptedFolderIfNeeded(lastDumpedIndex: Int) {

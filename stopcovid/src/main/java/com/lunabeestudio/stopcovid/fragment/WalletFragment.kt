@@ -18,9 +18,10 @@ import androidx.navigation.fragment.navArgs
 import androidx.preference.PreferenceManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.zxing.BarcodeFormat
+import com.lunabeestudio.analytics.manager.AnalyticsManager
+import com.lunabeestudio.analytics.model.AppEventName
 import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.R
-import com.lunabeestudio.stopcovid.coreui.BuildConfig
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.cardWithActionItem
@@ -40,12 +41,9 @@ import com.lunabeestudio.stopcovid.fastitem.qrCodeCardItem
 import com.lunabeestudio.stopcovid.manager.ShareManager
 import com.lunabeestudio.stopcovid.manager.WalletManager
 import com.lunabeestudio.stopcovid.model.WalletCertificate
-import com.lunabeestudio.stopcovid.model.WalletCertificateInvalidSignatureException
-import com.lunabeestudio.stopcovid.model.WalletCertificateMalformedException
 import com.lunabeestudio.stopcovid.viewmodel.WalletViewModel
 import com.lunabeestudio.stopcovid.viewmodel.WalletViewModelFactory
 import com.mikepenz.fastadapter.GenericItem
-import timber.log.Timber
 import kotlin.time.ExperimentalTime
 
 class WalletFragment : QRCodeListFragment() {
@@ -269,6 +267,7 @@ class WalletFragment : QRCodeListFragment() {
     private fun processCodeValue(certificateCode: String) {
         try {
             WalletManager.processCertificateCode(sharedPreferences, robertManager, keystoreDataSource, certificateCode)
+            context?.let { AnalyticsManager.reportAppEvent(it, AppEventName.e13, null) }
         } catch (e: Exception) {
             catchWalletException(e)
         }

@@ -35,4 +35,13 @@
             <certificates src="@raw/app_tousanticovid_gouv_fr" />
         </trust-anchors>
     </domain-config>
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="true">analytics-api.tousanticovid.gouv.fr</domain>
+        <pin-set tools:ignore="MissingBackupPin">
+            <pin digest="SHA-256">KhFx3fIev58nbXs9m2WqXDbqYrE/7r4J9cP1QqPHtVk=</pin>
+        </pin-set>
+        <trust-anchors>
+            <certificates src="@raw/analytics_api_tousanticovid_gouv_fr" />
+        </trust-anchors>
+    </domain-config>
 </network-security-config>

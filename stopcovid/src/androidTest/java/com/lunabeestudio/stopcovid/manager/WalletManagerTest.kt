@@ -94,7 +94,7 @@ class WalletManagerTest {
                 )
             }\u001FZCQ5EDEXRCRYMU4U5U4YQSF5GOE2PMFFC6PDWOMZK64434TUCJWQLIXCRYMA5TWVT7TEZSF2S3ZCJSYK3JYFOBVUHNOEXQMEKWQDG3A"
         )
-        assert((walletCertificate as SanitaryCertificate).firstName == "JEAN LOUIS,EDOUARD")
+        assert((walletCertificate as SanitaryCertificate).firstName == "JEAN LOUIS, EDOUARD")
         assert(walletCertificate.name == "DUPOND")
         assert(walletCertificate.birthDate?.time == 343954800000L)
         assert(walletCertificate.gender == "M")
@@ -127,7 +127,7 @@ class WalletManagerTest {
                 )
             }\u001FZCQ5EDEXRCRYMU4U5U4YQSF5GOE2PMFFC6PDWOMZK64434TUCJWQLIXCRYMA5TWVT7TEZSF2S3ZCJSYK3JYFOBVUHNOEXQMEKWQDG3A"
         )
-        assert((walletCertificate as SanitaryCertificate).firstName == "JEAN LOUIS,EDOUARD")
+        assert((walletCertificate as SanitaryCertificate).firstName == "JEAN LOUIS, EDOUARD")
         assert(walletCertificate.name == "DUPOND")
         assert(walletCertificate.birthDate?.time == 343954800000L)
         assert(walletCertificate.gender == "F")
