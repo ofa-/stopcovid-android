@@ -14,7 +14,7 @@
         "links": [
 	        {
                 "label": "Trouver où se faire dépister",
-                "url": "https://sante.fr/recherche/trouver/DepistageCovid?source=TousAntiCovid"
+                "url": "https://www.sante.fr/covid19/external/depistage?source=TousAntiCovid"
             }
         ]
     },
@@ -30,12 +30,8 @@
     },
     {
         "section": "l'Assurance Maladie",
-        "description": "Voici plusieurs informations utiles fournies par Ameli.fr, dont l’arrêt de travail dérogatoire si vous êtes personne contact ou si vous présentez des symptômes de la Covid-19.",
+        "description": "Voici plusieurs informations utiles fournies par Ameli.fr, au sujet du contact tracing et sur les personnes contact.",
         "links": [
-	        {
-                "label": "Arrêt de travail dérogatoire",
-                "url": "https://declare.ameli.fr/"
-            },
 	        {
                 "label": "Contact tracing",
                 "url": "https://www.ameli.fr/assure/covid-19/tester-alerter-proteger-comprendre-la-strategie-pour-stopper-lepidemie/contact-tracing-arreter-les-chaines-de-transmission"
@@ -65,10 +61,6 @@
 	        {
                 "label": "Les consignes d’isolement",
                 "url": "https://solidarites-sante.gouv.fr/soins-et-maladies/maladies/maladies-infectieuses/coronavirus/professionnels-de-sante/article/ressources-documentaires-a-destination-des-professionnels-de-sante"
-            },
-            {
-                "label": "Isolement, test : que faire ?",
-                "url": "https://solidarites-sante.gouv.fr/IMG/pdf/arbre_de_cisionnel_covid_2909.pdf"
             }
         ]
     }

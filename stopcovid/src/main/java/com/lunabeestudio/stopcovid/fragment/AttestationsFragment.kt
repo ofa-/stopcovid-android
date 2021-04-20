@@ -133,12 +133,12 @@ class AttestationsFragment : QRCodeListFragment() {
         }
 
         val validAttestations = viewModel.attestations.value?.filter { attestation ->
-            !attestation.isExpired(robertManager)
+            !attestation.isExpired(robertManager.configuration)
         }?.sortedByDescending { attestation ->
             attestation.timestamp
         }
         val expiredAttestations = viewModel.attestations.value?.filter { attestation ->
-            attestation.isExpired(robertManager)
+            attestation.isExpired(robertManager.configuration)
         }?.sortedByDescending { attestation ->
             attestation.timestamp
         }

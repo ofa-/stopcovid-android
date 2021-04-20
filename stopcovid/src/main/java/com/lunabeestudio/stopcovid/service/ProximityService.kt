@@ -21,6 +21,7 @@ import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
+import com.lunabeestudio.analytics.manager.AnalyticsManager
 import com.lunabeestudio.domain.model.EphemeralBluetoothIdentifier
 import com.lunabeestudio.framework.ble.extension.toLocalProximity
 import com.lunabeestudio.framework.ble.service.RobertProximityService
@@ -175,7 +176,13 @@ open class ProximityService : RobertProximityService() {
         return START_STICKY
     }
 
+    override fun onCreate() {
+        super.onCreate()
+        AnalyticsManager.proximityDidStart(this)
+    }
+
     override fun onDestroy() {
+        AnalyticsManager.proximityDidStop(this)
         robertManager.deactivateProximity(applicationContext as RobertApplication)
         super.onDestroy()
     }

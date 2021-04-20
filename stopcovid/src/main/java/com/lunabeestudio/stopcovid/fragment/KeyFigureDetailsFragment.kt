@@ -38,6 +38,7 @@ import com.lunabeestudio.stopcovid.extension.labelStringKey
 import com.lunabeestudio.stopcovid.extension.learnMoreStringKey
 import com.lunabeestudio.stopcovid.extension.limitLineStringKey
 import com.lunabeestudio.stopcovid.extension.safeNavigate
+import com.lunabeestudio.stopcovid.extension.safeParseColor
 import com.lunabeestudio.stopcovid.fastitem.bigTitleItem
 import com.lunabeestudio.stopcovid.fastitem.keyFigureCardChartItem
 import com.lunabeestudio.stopcovid.manager.KeyFiguresManager
@@ -259,7 +260,7 @@ class KeyFigureDetailsFragment : KeyFigureGenericFragment() {
                 entries = departmentKeyFigure.series
                     .sortedBy { it.date }
                     .map { Entry(it.date.toFloat(), it.value.toFloat()) },
-                color = Color.parseColor(strings[figure.colorStringKey(requireContext().isNightMode())])
+                color = strings[figure.colorStringKey(requireContext().isNightMode())].safeParseColor()
             )
         }
     }
@@ -271,9 +272,9 @@ class KeyFigureDetailsFragment : KeyFigureGenericFragment() {
             .sortedBy { it.date }
             .map { Entry(it.date.toFloat(), it.value.toFloat()) },
         color = if (isSecondary) {
-            Color.parseColor(strings[figure.colorStringKey(requireContext().isNightMode())]).brighterColor()
+            strings[figure.colorStringKey(requireContext().isNightMode())].safeParseColor().brighterColor()
         } else {
-            Color.parseColor(strings[figure.colorStringKey(requireContext().isNightMode())])
+            strings[figure.colorStringKey(requireContext().isNightMode())].safeParseColor()
         }
     )
 
@@ -284,7 +285,7 @@ class KeyFigureDetailsFragment : KeyFigureGenericFragment() {
             ?.sortedBy { it.date }
             ?.map { Entry(it.date.toFloat(), it.value.toFloat()) }
             ?: emptyList(),
-        color = Color.parseColor(strings[figure.colorStringKey(requireContext().isNightMode())])
+        color = strings[figure.colorStringKey(requireContext().isNightMode())].safeParseColor()
     )
 
     private fun limitLineData(figure: KeyFigure): LimitLineData? {
@@ -292,7 +293,7 @@ class KeyFigureDetailsFragment : KeyFigureGenericFragment() {
             LimitLineData(
                 it.toFloat(),
                 strings[figure.limitLineStringKey],
-                Color.parseColor(strings[figure.colorStringKey(requireContext().isNightMode())])
+                strings[figure.colorStringKey(requireContext().isNightMode())].safeParseColor()
             )
         }
     }

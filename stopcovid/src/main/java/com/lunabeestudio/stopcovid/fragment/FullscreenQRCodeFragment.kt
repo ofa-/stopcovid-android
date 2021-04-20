@@ -15,6 +15,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import androidx.core.view.isVisible
 import androidx.navigation.fragment.navArgs
 import com.google.zxing.BarcodeFormat
 import com.journeyapps.barcodescanner.BarcodeEncoder
@@ -72,6 +73,7 @@ class FullscreenQRCodeFragment : BaseFragment() {
                 qrCodeSize
             )
         )
+        binding?.topSpace?.isVisible = args.qrCodeFormat == BarcodeFormat.DATA_MATRIX
         binding?.formatTextView?.setTextOrHide(formatText())
         binding?.textView?.text = args.qrCodeValueDisplayed
     }

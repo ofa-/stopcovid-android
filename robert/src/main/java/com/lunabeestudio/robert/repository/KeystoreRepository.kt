@@ -14,7 +14,7 @@ import com.lunabeestudio.domain.model.Calibration
 import com.lunabeestudio.domain.model.Configuration
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.robert.datasource.LocalKeystoreDataSource
-import com.lunabeestudio.robert.model.AtRiskStatus
+import com.lunabeestudio.domain.model.AtRiskStatus
 
 internal class KeystoreRepository(
     private val keystoreDataSource: LocalKeystoreDataSource,

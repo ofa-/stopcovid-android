@@ -152,15 +152,17 @@ object InfoCenterManager {
         }
     }
 
-    private suspend fun fetchLastTimestamp(context: Context): Boolean {
-        return try {
+    private suspend fun fetchLastTimestamp(context: Context) {
+        try {
             val filename = "$lastUpdatePrefix.json"
             Timber.v("Fetching remote data at $url$filename")
-            "$url$filename".saveTo(context, File(context.filesDir, filename))
-            true
+            "$url$filename".saveTo(
+                context,
+                File(context.filesDir, filename),
+                lastUpdatePrefix,
+            )
         } catch (e: Exception) {
             Timber.v("Fetching fail for last timestamp")
-            false
         }
     }
 
@@ -174,8 +176,11 @@ object InfoCenterManager {
             if (shouldRefresh(context) || forceRefresh) {
                 val filename = "$prefix${languageCode ?: ""}.json"
                 Timber.v("Fetching remote data at $url$filename")
-                "$url$filename".saveTo(context, File(context.filesDir, filename))
-                true
+                "$url$filename".saveTo(
+                    context,
+                    File(context.filesDir, filename),
+                    prefix,
+                )
             } else {
                 Timber.v("Use local data")
                 false

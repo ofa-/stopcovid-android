@@ -3,24 +3,24 @@
         "section": "Info Coronavirus",
         "links": [
 	        {
-                "label": "Aller sur le site du gouvernement",
+                "label": "Go to gouvernement.fr",
                 "url": "https://www.gouvernement.fr/info-coronavirus"
             }
         ]
     },
     {
-        "section": "Où se faire dépister",
-        "description" : "Pour trouver où se faire dépister, rendez vous sur Santé.fr.",
+        "section": "Where to get tested",
+        "description" : "To find out where to get tested, go to Santé.fr.",
         "links": [
 	        {
-                "label": "Trouver où se faire dépister",
-                "url": "https://sante.fr/recherche/trouver/DepistageCovid?source=TousAntiCovid"
+                "label": "Find where to get tested",
+                "url": "https://www.sante.fr/covid19/external/depistage?source=TousAntiCovid"
             }
         ]
     },
     {
         "section": "Mes Conseils Covid",
-        "description" : "Retrouvez des conseils personnalisés de prévention et de prise en charge sur le site Mes Conseils Covid. Mes Conseils Covid est un service du ministère des Solidarités et de la Santé.",
+        "description" : "Find personalized advice on prevention and care on the Mes Conseils Covid website. Mes Conseils Covid is a service of the Ministère des Solidarités et de la Santé.",
         "links": [
 	        {
                 "label": "Mes Conseils Covid",
@@ -30,18 +30,14 @@
     },
     {
         "section": "l'Assurance Maladie",
-        "description": "Voici plusieurs informations utiles fournies par Ameli.fr, dont l’arrêt de travail dérogatoire si vous êtes personne contact ou si vous présentez des symptômes de la Covid-19.",
+        "description": "Here is several useful information provided by Ameli.fr, including contact tracing and at-risk contact person",
         "links": [
-	        {
-                "label": "Arrêt de travail dérogatoire",
-                "url": "https://declare.ameli.fr/"
-            },
 	        {
                 "label": "Contact tracing",
                 "url": "https://www.ameli.fr/assure/covid-19/tester-alerter-proteger-comprendre-la-strategie-pour-stopper-lepidemie/contact-tracing-arreter-les-chaines-de-transmission"
             },
             {
-				"label": "Vous êtes une personne contact ?",
+				"label": "Are you a at-risk contact person?",
                 "url": "https://www.ameli.fr/assure/covid-19/en-cas-de-contact-avec-une-personne-malade-du-covid-19/en-cas-de-contact-avec-une-personne-malade-de-la-covid-19"
 
             }
@@ -50,25 +46,21 @@
     },
     {
         "section": "Cnam.BriserLaChaine.org",
-        "description" : "En collaboration avec l'Assurance Maladie, le site internet Cnam.BriserLaChaine.org peut vous aider à vous souvenir de toutes les personnes que vous avez croisées.",
+        "description" : "In collaboration with Assurance Maladie, the Cnam.BriserLaChaine.org website can help you remember all the people you have met.",
         "links": [
 	        {
-                "label": "Aller sur Cnam.BriserLaChaine.org",
+                "label": "Go to Cnam.BriserLaChaine.org",
                 "url": "https://cnam.briserlachaine.org/accueil"
             }
         ]
     },
     {
-        "section": "Isolement",
-        "description" : "Le Ministère des Solidarités et de la Santé a mis à disposition des informations sur l'isolement.",
+        "section": "Isolation",
+        "description" : "The Ministère des Solidarités et de la Santé has made information on isolation available.",
         "links": [
 	        {
-                "label": "Les consignes d’isolement",
+                "label": "Isolation instructions",
                 "url": "https://solidarites-sante.gouv.fr/soins-et-maladies/maladies/maladies-infectieuses/coronavirus/professionnels-de-sante/article/ressources-documentaires-a-destination-des-professionnels-de-sante"
-            },
-            {
-                "label": "Isolement, test : que faire ?",
-                "url": "https://solidarites-sante.gouv.fr/IMG/pdf/arbre_de_cisionnel_covid_2909.pdf"
             }
         ]
     }

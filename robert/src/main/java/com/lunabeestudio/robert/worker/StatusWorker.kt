@@ -77,9 +77,11 @@ internal class StatusWorker(context: Context, workerParams: WorkerParameters) : 
             val statusWorkRequest = PeriodicWorkRequestBuilder<StatusWorker>(minDelaySec, TimeUnit.SECONDS)
                 .setConstraints(constraints)
                 .setInitialDelay(randomDelaySec, TimeUnit.SECONDS)
-                .setBackoffCriteria(BackoffPolicy.LINEAR,
+                .setBackoffCriteria(
+                    BackoffPolicy.LINEAR,
                     (robertManager.configuration.minStatusRetryDuration * 3600).roundToLong(),
-                    TimeUnit.SECONDS)
+                    TimeUnit.SECONDS
+                )
                 .build()
 
             WorkManager.getInstance(context)

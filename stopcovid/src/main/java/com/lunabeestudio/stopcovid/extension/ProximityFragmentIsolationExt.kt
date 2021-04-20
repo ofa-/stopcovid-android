@@ -12,6 +12,8 @@ package com.lunabeestudio.stopcovid.extension
 
 import android.util.LayoutDirection
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.lunabeestudio.analytics.manager.AnalyticsManager
+import com.lunabeestudio.analytics.model.AppEventName
 import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.StopCovid
@@ -47,7 +49,7 @@ internal fun ProximityFragment.addIsolationItems(items: ArrayList<GenericItem>) 
             mainLayoutDirection = LayoutDirection.RTL
             contentDescription = strings[state.getTitleStringKey()]
             onCardClick = {
-                findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToIsolationFormFragment())
+                openIsolationForm()
             }
             identifier = "isolationSafe".hashCode().toLong()
         }
@@ -58,7 +60,7 @@ internal fun ProximityFragment.addIsolationItems(items: ArrayList<GenericItem>) 
             val isolationEndDateString = isolationManager.currentIsolationEndDate?.let { dateFormat.format(Date(it)) }
             mainBody = strings[state.getBodyStringKey()]?.fixFormatter()?.formatWithSameValue(isolationEndDateString)
             onCardClick = {
-                findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToIsolationFormFragment())
+                openIsolationForm()
             }
             actions = actionsForIsolationState(state)
             identifier = "isolationNotSafe".hashCode().toLong()
@@ -126,6 +128,7 @@ private fun ProximityFragment.actionsForIsolationState(recommendationState: Isol
 }
 
 private fun ProximityFragment.openIsolationForm() {
+    AnalyticsManager.reportAppEvent(requireContext(), AppEventName.e6, null)
     findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToIsolationFormFragment())
 }
 

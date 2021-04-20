@@ -1,0 +1,68 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * Authors
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * Created by Lunabee Studio / Date - 2020/04/10 - for the TOUS-ANTI-COVID project
+ */
+
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
+apply plugin: 'com.google.protobuf'
+
+android {
+    compileSdkVersion 30
+    buildToolsVersion "30.0.3"
+
+    defaultConfig {
+        minSdkVersion 21
+        targetSdkVersion 30
+    }
+
+    def props = new Properties()
+    file("../versions.properties").withInputStream { props.load(it) }
+
+    protobuf {
+        protoc {
+            artifact = "com.google.protobuf:protoc:${props.getProperty("version.com.google.protobuf..protobuf-javalite")}"
+        }
+        generateProtoTasks {
+            all().each { task ->
+                task.builtins {
+                    java {
+                        option "lite"
+                    }
+                }
+            }
+        }
+    }
+
+    kotlinOptions.jvmTarget = JavaVersion.VERSION_1_8.toString()
+
+    lintOptions {
+        disable "GradleDependency"
+    }
+}
+
+dependencies {
+    implementation 'androidx.core:core-ktx:_'
+
+    implementation 'com.google.protobuf:protobuf-javalite:_'
+    implementation 'com.google.code.gson:gson:_'
+
+    implementation 'com.jakewharton.timber:timber:_'
+
+    implementation 'com.squareup.okhttp3:logging-interceptor:_'
+    implementation "com.squareup.okhttp3:okhttp-tls:_"
+    implementation "com.squareup.retrofit2:converter-gson:_"
+    implementation "com.squareup.retrofit2:retrofit:_"
+
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:_"
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:_'
+
+    implementation project(path: ':domain')
+}

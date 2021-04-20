@@ -19,6 +19,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Build
 import androidx.core.app.NotificationCompat
+import androidx.core.content.edit
 import androidx.emoji.bundled.BundledEmojiCompatConfig
 import androidx.emoji.text.EmojiCompat
 import androidx.lifecycle.Lifecycle
@@ -35,6 +36,10 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
+import com.lunabeestudio.analytics.manager.AnalyticsManager
+import com.lunabeestudio.analytics.model.AppEventName
+import com.lunabeestudio.analytics.model.HealthEventName
+import com.lunabeestudio.domain.extension.ntpTimeSToUnixTimeMs
 import com.lunabeestudio.domain.model.VenueQrCode
 import com.lunabeestudio.framework.crypto.BouncyCastleCryptoDataSource
 import com.lunabeestudio.framework.local.LocalCryptoManager
@@ -51,11 +56,14 @@ import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.ConfigConstant
 import com.lunabeestudio.stopcovid.coreui.EnvConstant
 import com.lunabeestudio.stopcovid.coreui.UiConstants
+import com.lunabeestudio.stopcovid.coreui.extension.getETagSharedPrefs
 import com.lunabeestudio.stopcovid.coreui.manager.CalibrationManager
 import com.lunabeestudio.stopcovid.coreui.manager.ConfigManager
 import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
 import com.lunabeestudio.stopcovid.extension.alertRiskLevelChanged
+import com.lunabeestudio.stopcovid.extension.hasChosenPostalCode
 import com.lunabeestudio.stopcovid.extension.hideRiskStatus
+import com.lunabeestudio.stopcovid.extension.isObsolete
 import com.lunabeestudio.stopcovid.extension.lastVersionCode
 import com.lunabeestudio.stopcovid.fragment.AboutFragment
 import com.lunabeestudio.stopcovid.manager.AppMaintenanceManager
@@ -91,8 +99,6 @@ import java.util.Calendar
 import java.util.Date
 import java.util.concurrent.TimeUnit
 import kotlin.random.Random
-import kotlin.time.Duration
-import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
 import kotlin.time.hours
 import kotlin.time.milliseconds
@@ -160,6 +166,9 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
             ConfigManager.clearLocal(this)
             CalibrationManager.clearLocal(this)
             FormManager.clearLocal(this)
+            this.getETagSharedPrefs().edit {
+                clear()
+            }
             secureKeystoreDataSource.configuration = secureKeystoreDataSource.configuration?.apply {
                 version = 0
             }
@@ -213,6 +222,7 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
         EmojiCompat.init(config)
 //      startAppMaintenanceWorker(false)
         AboutFragment.Downloader(applicationContext).autoDeleteFile()
+        AnalyticsManager.init(this)
 
         sharedPrefs.lastVersionCode = BuildConfig.VERSION_CODE
     }
@@ -260,6 +270,7 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
         appCoroutineScope.launch {
             robertManager.refreshConfig(this@StopCovid)
         }
+        AnalyticsManager.reportAppEvent(this, AppEventName.e3)
 
         refreshProximityService()
         refreshStatusIfNeeded()
@@ -295,6 +306,7 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
 
     override fun notifyAtRiskLevelChange() {
         RisksLevelManager.getCurrentLevel(robertManager.atRiskStatus?.riskLevel)?.let { riskLevel ->
+            AnalyticsManager.reportHealthEvent(this, HealthEventName.eh2, null)
             val inputData = Data.Builder()
                 .putString(AtRiskNotificationWorker.INPUT_DATA_TITLE_KEY, riskLevel.labels.notifTitle)
                 .putString(AtRiskNotificationWorker.INPUT_DATA_MESSAGE_KEY, riskLevel.labels.notifBody)
@@ -511,13 +523,8 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
 
     @OptIn(ExperimentalTime::class)
     private fun deleteOldAttestations() {
-        val expiredMilliSeconds = System.currentTimeMillis() - Duration.convert(
-            robertManager.configuration.qrCodeDeletionHours.toDouble(),
-            DurationUnit.HOURS,
-            DurationUnit.MILLISECONDS
-        )
-        secureKeystoreDataSource.deprecatedAttestations = secureKeystoreDataSource.deprecatedAttestations?.filter { attestation ->
-            (attestation["datetime"]?.value?.toLongOrNull() ?: 0L) > expiredMilliSeconds
+        secureKeystoreDataSource.attestations = secureKeystoreDataSource.attestations?.filter { attestation ->
+            !attestation.isObsolete(robertManager.configuration)
         }
     }
 
@@ -537,4 +544,34 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
     companion object {
         private const val LOCAL_PROXIMITY_DIR = "local_proximity"
     }
+
+    override fun getBaseUrl(): String {
+        return EnvConstant.Prod.analyticsBaseUrl
+    }
+
+    override fun getCertificateSha256(): String {
+        return EnvConstant.Prod.analyticsCertificateSha256
+    }
+
+    override fun getApiVersion(): String {
+        return robertManager.configuration.analyticsApiVersion
+    }
+
+    override fun getAppVersion(): String = BuildConfig.VERSION_NAME
+
+    override fun getAppBuild(): Int = BuildConfig.VERSION_CODE
+
+    override fun getPlacesCount(): Int = secureKeystoreDataSource.venuesQrCode?.size ?: 0
+
+    override fun getFormsCount(): Int = secureKeystoreDataSource.attestations?.size ?: 0
+
+    override fun getCertificatesCount(): Int = secureKeystoreDataSource.rawWalletCertificates?.size ?: 0
+
+    override fun userHaveAZipCode(): Boolean = sharedPrefs.hasChosenPostalCode
+
+    override fun getDateSample(): Long? = robertManager.reportPositiveTestDate
+
+    override fun getDateFirstSymptom(): Long? = robertManager.reportSymptomsStartDate
+
+    override fun getDateLastContactNotification(): Long? = robertManager.atRiskStatus?.ntpLastContactS?.ntpTimeSToUnixTimeMs()
 }

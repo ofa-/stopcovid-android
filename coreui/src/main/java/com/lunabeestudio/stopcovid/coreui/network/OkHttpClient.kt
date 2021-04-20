@@ -77,6 +77,9 @@ object OkHttpClient {
     }
 
     private fun getLogInterceptor(): HttpLoggingInterceptor = HttpLoggingInterceptor { message -> Timber.v(message) }.apply {
-        level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE
+        level = when {
+            BuildConfig.DEBUG -> HttpLoggingInterceptor.Level.BODY
+            else -> HttpLoggingInterceptor.Level.NONE
+        }
     }
 }

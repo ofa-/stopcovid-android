@@ -13,7 +13,7 @@ package com.lunabeestudio.stopcovid.robert
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import com.lunabeestudio.robert.RobertApplication
-import com.lunabeestudio.robert.model.AtRiskStatus
+import com.lunabeestudio.domain.model.AtRiskStatus
 import com.lunabeestudio.robert.model.RobertResultData
 import com.lunabeestudio.support.robert.SupportRobertManager
 import org.junit.After

@@ -111,6 +111,7 @@ object AttestationsManager {
         strings["qrCode.infoNotAvailable"] ?: ""
     )
 
+    @Suppress("DEPRECATION")
     fun migrateAttestationsIfNeeded(robertManager: RobertManager, keystoreDataSource: LocalKeystoreDataSource, strings: LocalizedStrings) {
         keystoreDataSource.deprecatedAttestations?.forEach { deprecatedAttestation ->
             addAttestation(robertManager, keystoreDataSource, strings, deprecatedAttestation)

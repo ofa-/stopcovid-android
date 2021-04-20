@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import com.lunabeestudio.domain.extension.unixTimeMsToNtpTimeS
 import com.lunabeestudio.framework.local.datasource.SecureKeystoreDataSource
-import com.lunabeestudio.robert.model.AtRiskStatus
+import com.lunabeestudio.domain.model.AtRiskStatus
 import com.lunabeestudio.stopcovid.StopCovid
 import com.lunabeestudio.stopcovid.model.IsolationRecommendationStateEnum
 import org.junit.After

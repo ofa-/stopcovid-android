@@ -56,16 +56,7 @@
                "code":"reason_curfew.famille"
             },
             {
-	            "code":"reason_curfew.handicap"
-            },
-            {
-               "code":"reason_curfew.judiciaire"
-            },
-            {
-               "code":"reason_curfew.missions"
-            },
-            {
-               "code":"reason_curfew.transit"
+               "code":"reason_curfew.convocation_demarches"
             },
             {
 	            "code":"reason_curfew.animaux"
@@ -78,40 +69,25 @@
          "type":"list",
          "items":[
             {
-               "code":"reason_lockdown.sport"
+               "code":"reason_lockdown.travail"
             },
             {
-               "code":"reason_lockdown.achats"
+               "code":"reason_lockdown.sante"
             },
             {
-               "code":"reason_lockdown.enfants"
+               "code":"reason_lockdown.famille"
             },
             {
-	            "code":"reason_lockdown.culte_culturel"
-            },
-            {
-	            "code":"reason_lockdown.demarche"
-            },
-            {
-	            "code":"reason_lockdown.travail"
-            },
-            {
-	            "code":"reason_lockdown.sante"
-            },
-            {
-	            "code":"reason_lockdown.famille"
-            },
-            {
-	            "code":"reason_lockdown.handicap"
-            },
-            {
-	            "code":"reason_lockdown.judiciaire"
+	            "code":"reason_lockdown.convocation_demarches"
             },
             {
 	            "code":"reason_lockdown.demenagement"
             },
             {
-	            "code":"reason_lockdown.transit"
+	            "code":"reason_lockdown.achats_culte_culturel"
+            },
+            {
+	            "code":"reason_lockdown.sport"
             }
          ]
       }

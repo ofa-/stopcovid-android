@@ -11,19 +11,20 @@
 package com.lunabeestudio.robert
 
 import androidx.lifecycle.LiveData
+import com.lunabeestudio.analytics.proxy.AnalyticsRobertManager
+import com.lunabeestudio.domain.model.AtRiskStatus
 import com.lunabeestudio.domain.model.Calibration
 import com.lunabeestudio.domain.model.Configuration
 import com.lunabeestudio.domain.model.HelloBuilder
 import com.lunabeestudio.domain.model.LocalProximity
 import com.lunabeestudio.domain.model.ServerStatusUpdate
 import com.lunabeestudio.robert.manager.LocalProximityFilter
-import com.lunabeestudio.robert.model.AtRiskStatus
 import com.lunabeestudio.robert.model.RobertResult
 import com.lunabeestudio.robert.model.RobertResultData
 import com.lunabeestudio.robert.utils.Event
 
-interface RobertManager {
-    val configuration: Configuration
+interface RobertManager : AnalyticsRobertManager {
+    override val configuration: Configuration
 
     val calibration: Calibration
 
@@ -37,7 +38,7 @@ interface RobertManager {
 
     val liveAtRiskStatus: LiveData<Event<AtRiskStatus>>
 
-    val atRiskStatus: AtRiskStatus?
+    override val atRiskStatus: AtRiskStatus?
 
     val atRiskLastRefresh: Long?
 

@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package model;
+
+option java_package = "com.lunabeestudio.analytics.proto";
+option java_outer_classname = "ProtoStorage";
+
+message TimestampedEventProto {
+    string name = 1;
+    string timestamp = 2;
+    string desc = 3;
+}
+
+message TimestampedEventProtoList {
+    repeated TimestampedEventProto timestampedEventProtoList = 1;
+}

@@ -100,6 +100,7 @@ class ServiceTest {
         assertThat(result.data.message).isEqualTo("message")
         assertThat(result.data.tuples).isEqualTo("tuples")
         assertThat(result.data.declarationToken).isEqualTo("declarationToken")
+        assertThat(result.data.analyticsToken).isEqualTo("analyticsToken")
 
         testDataErrors {
             dataSource.status("", ServerStatusUpdate("", 0L, "", ""))

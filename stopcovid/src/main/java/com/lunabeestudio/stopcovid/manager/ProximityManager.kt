@@ -65,10 +65,10 @@ object ProximityManager {
         return BluetoothAdapter.getDefaultAdapter()?.bluetoothLeAdvertiser == null && Build.VERSION.SDK_INT < Build.VERSION_CODES.N
     }
 
-    fun isNotificationOn(context: Context): Boolean =
+    private fun isNotificationOn(context: Context): Boolean =
         NotificationManagerCompat.from(context).areNotificationsEnabled()
 
-    fun isLocalisationGranted(context: Context): Boolean =
+    private fun isLocalisationGranted(context: Context): Boolean =
         ContextCompat.checkSelfPermission(context, getManifestLocationPermission()) == PackageManager.PERMISSION_GRANTED
 
     fun getManifestLocationPermission(): String = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
