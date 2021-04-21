@@ -35,6 +35,7 @@ import com.lunabeestudio.stopcovid.extension.isolationManager
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
+import com.lunabeestudio.stopcovid.extension.sendAnalytics
 import com.lunabeestudio.stopcovid.extension.venuesFeaturedWasActivatedAtLeastOneTime
 import com.lunabeestudio.stopcovid.fastitem.dangerButtonItem
 import com.lunabeestudio.stopcovid.manager.ProximityManager
@@ -328,6 +329,17 @@ class ManageDataFragment : MainFragment() {
                         viewModel.eraseRemoteExposureHistory(requireContext().applicationContext as RobertApplication)
                     }
                     .show()
+            }
+            identifier = items.count().toLong()
+        }
+        items += spaceItem {
+            spaceRes = R.dimen.spacing_medium
+        }
+        items += switchItem {
+            title = "Send analytics to server"
+            isChecked = sharedPreferences.sendAnalytics
+            onCheckChange = { isChecked ->
+                sharedPreferences.sendAnalytics = isChecked
             }
             identifier = items.count().toLong()
         }

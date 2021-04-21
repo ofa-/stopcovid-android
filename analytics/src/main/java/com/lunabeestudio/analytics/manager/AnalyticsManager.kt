@@ -124,6 +124,7 @@ object AnalyticsManager : LifecycleObserver {
         analyticsInfosProvider: AnalyticsInfosProvider,
         token: String
     ) {
+        robertManager.configuration.isAnalyticsOn = getSharedPrefs(context).getBoolean("sendAnalytics", false)
         if (robertManager.configuration.isAnalyticsOn) {
             val receivedHelloMessagesCount = robertManager.getLocalProximityCount()
             sendAppAnalytics(context, analyticsInfosProvider, token, receivedHelloMessagesCount)
