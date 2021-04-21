@@ -104,6 +104,8 @@ class ManageDataFragment : MainFragment() {
         spaceDividerItems(items)
         hideRiskStatusItems(items)
         spaceDividerItems(items)
+        additionalPrefsItems(items)
+        spaceDividerItems(items)
         eraseAttestationItems(items)
         spaceDividerItems(items)
         eraseCertificatesItems(items)
@@ -330,6 +332,13 @@ class ManageDataFragment : MainFragment() {
                     }
                     .show()
             }
+            identifier = items.count().toLong()
+        }
+    }
+
+    private fun additionalPrefsItems(items: MutableList<GenericItem>) {
+        items += titleItem {
+            text = "Additional Preferences"
             identifier = items.count().toLong()
         }
         items += spaceItem {
