@@ -91,6 +91,7 @@ import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
 import com.lunabeestudio.stopcovid.extension.showPostalCodeDialog
+import com.lunabeestudio.stopcovid.extension.showActivationReminderDialog
 import com.lunabeestudio.stopcovid.extension.toCovidException
 import com.lunabeestudio.stopcovid.fastitem.LogoItem
 import com.lunabeestudio.stopcovid.fastitem.NumbersCardItem
@@ -1022,7 +1023,7 @@ class ProximityFragment : TimeMainFragment() {
         currentServiceError = null
         robertManager.deactivateProximity(requireContext().applicationContext as RobertApplication)
         view?.rootView?.announceForAccessibility(strings["notification.proximityServiceNotRunning.title"])
-        if (showReminder) {
+        if (showReminder && sharedPrefs.showActivationReminderDialog) {
             findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToReminderDialogFragment())
         }
     }

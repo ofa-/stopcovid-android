@@ -37,6 +37,7 @@ object Constants {
         const val ALERT_RISK_LEVEL_CHANGED: String = "alertRiskLevelChanged"
         const val HIDE_RISK_STATUS: String = "hideRiskStatus"
         const val SEND_ANALYTICS: String = "sendAnalytics"
+        const val SHOW_ACTIVATION_REMINDER: String = "showActivationReminder"
     }
 
     object Notification {

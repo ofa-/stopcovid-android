@@ -36,6 +36,7 @@ import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
 import com.lunabeestudio.stopcovid.extension.sendAnalytics
+import com.lunabeestudio.stopcovid.extension.showActivationReminderDialog
 import com.lunabeestudio.stopcovid.extension.venuesFeaturedWasActivatedAtLeastOneTime
 import com.lunabeestudio.stopcovid.fastitem.dangerButtonItem
 import com.lunabeestudio.stopcovid.manager.ProximityManager
@@ -349,6 +350,17 @@ class ManageDataFragment : MainFragment() {
             isChecked = sharedPreferences.sendAnalytics
             onCheckChange = { isChecked ->
                 sharedPreferences.sendAnalytics = isChecked
+            }
+            identifier = items.count().toLong()
+        }
+        items += spaceItem {
+            spaceRes = R.dimen.spacing_medium
+        }
+        items += switchItem {
+            title = "Show activation reminder"
+            isChecked = sharedPreferences.showActivationReminderDialog
+            onCheckChange = { isChecked ->
+                sharedPreferences.showActivationReminderDialog = isChecked
             }
             identifier = items.count().toLong()
         }
