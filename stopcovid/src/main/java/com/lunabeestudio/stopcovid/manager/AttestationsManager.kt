@@ -93,7 +93,7 @@ object AttestationsManager {
                         )
                         .replace(
                             "<$key-shortlabel>",
-                            strings[attestation[key]?.value?.attestationShortLabelFromKey()] ?: strings["qrCode.infoNotAvailable"] ?: ""
+                            strings[attestation[key]?.value?.attestationShortLabelFromKey()] ?: "${attestation[key]?.value}"
                         )
                         .replace(
                             "<$key-longlabel>",
