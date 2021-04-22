@@ -1085,10 +1085,14 @@ class ProximityFragment : TimeMainFragment() {
     }
 
     private fun refreshTitleAndErrorLayout() {
+        (activity as AppCompatActivity).supportActionBar?.title = strings[getTitleKey()]
+        asyncUpdateNewVersionAvailableTitle()
+        //refreshErrorLayout()
+    }
+
+    private fun refreshErrorLayout() {
         context?.let { context ->
-            (activity as AppCompatActivity).supportActionBar?.title = strings[getTitleKey()]
             updateErrorLayout(getActivityBinding()?.errorLayout, ProximityManager.getDeviceSetup(context, robertManager))
-            asyncUpdateNewVersionAvailableTitle()
         }
     }
 
