@@ -5,9 +5,12 @@ _Extended_ StopCovid app, featuring:
 
 - proximity info screen
 - proximity notifications
-- proximity data availability
+- proximity data adb access
 - venues QR code screens
 - one-click attestations
+- parameters > send analytics
+- parameters > activation reminder
+- no "error banner" display
 - no "maintenance" mode
 
 This repo is a fork of [upstream gitlab][upstream]
