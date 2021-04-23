@@ -69,19 +69,24 @@
             app:layout_constraintTop_toBottomOf="@id/formatTextView"
             tools:text="@tools:sample/lorem[12]" />
 
-        <FrameLayout
+        <LinearLayout
             android:id="@+id/tagLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:gravity="center"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/textView">
 
             <include
-                android:id="@+id/tag"
+                android:id="@+id/tag1"
                 layout="@layout/item_tag" />
-        </FrameLayout>
+
+            <include
+                android:id="@+id/tag2"
+                layout="@layout/item_tag" />
+        </LinearLayout>
 
         <ImageButton
             android:id="@+id/actionButton"

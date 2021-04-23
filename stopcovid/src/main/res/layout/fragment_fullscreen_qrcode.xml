@@ -20,6 +20,7 @@
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:background="?colorSurface"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -33,12 +34,12 @@
         <Space
             android:id="@+id/topSpace"
             android:layout_width="0dp"
-            android:layout_height="@dimen/spacing_large" />
+            android:layout_height="@dimen/spacing_xlarge" />
 
         <ImageView
             android:id="@+id/imageView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="@dimen/qr_code_fullscreen_size"
+            android:layout_height="@dimen/qr_code_fullscreen_size"
             android:layout_marginHorizontal="@dimen/spacing_large"
             android:layout_marginBottom="@dimen/spacing_large"
             android:adjustViewBounds="true"
@@ -57,7 +58,8 @@
             android:layout_marginBottom="@dimen/spacing_large"
             android:gravity="center"
             android:textAppearance="@style/TextAppearance.StopCovid.Title.Bold"
-            tools:text="@tools:sample/lorem[2]" />
+            tools:text="@tools:sample/lorem[2]"
+            tools:ignore="SelectableText" />
 
         <TextView
             android:id="@+id/textView"
@@ -67,6 +69,7 @@
             android:layout_marginTop="@dimen/spacing_medium"
             android:gravity="center"
             android:textAppearance="@style/TextAppearance.StopCovid.Title"
-            tools:text="@tools:sample/lorem[12]" />
+            tools:text="@tools:sample/lorem[12]"
+            tools:ignore="SelectableText" />
     </LinearLayout>
 </ScrollView>

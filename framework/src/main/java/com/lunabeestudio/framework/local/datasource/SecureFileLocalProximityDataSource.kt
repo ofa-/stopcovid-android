@@ -10,6 +10,7 @@
 
 package com.lunabeestudio.framework.local.datasource
 
+import androidx.core.util.AtomicFile
 import com.lunabeestudio.domain.extension.unixTimeMsToNtpTimeS
 import com.lunabeestudio.domain.model.LocalProximity
 import com.lunabeestudio.framework.extension.toDomain
@@ -68,8 +69,13 @@ open class SecureFileLocalProximityDataSource(
         }?.flatMap {
             it.listFiles()?.asList() ?: emptyList()
         }?.flatMap {
-            cryptoManager.createCipherInputStream(it.inputStream()).use { cis ->
-                ProtoStorage.LocalProximityProtoList.parseFrom(cis).toDomain()
+            try {
+                cryptoManager.createCipherInputStream(it.inputStream()).use { cis ->
+                    ProtoStorage.LocalProximityProtoList.parseFrom(cis).toDomain()
+                }
+            } catch (e: Exception) {
+                Timber.e(e)
+                emptyList()
             }
         } ?: emptyList()
     }
@@ -132,8 +138,9 @@ open class SecureFileLocalProximityDataSource(
             var lastDumpedIndex: Int
             var dumpTime = System.currentTimeMillis()
 
-            val tmpFile = createTempFile(directory = encryptedFile.parentFile)
-            cryptoManager.createCipherOutputStream(tmpFile.outputStream()).use { cos ->
+            val atomicFile = AtomicFile(encryptedFile)
+            val fileOutputStream = atomicFile.startWrite()
+            cryptoManager.createCipherOutputStream(fileOutputStream).use { cos ->
                 val proto = cacheMtx.withLock {
                     Timber.v("Start dumping ${localProximityList.size} items to ${encryptedFile.absolutePath}")
                     lastDumpedIndex = (localProximityList.size - 1).coerceAtLeast(0)
@@ -141,7 +148,7 @@ open class SecureFileLocalProximityDataSource(
                 }
                 proto.writeTo(cos)
             }
-            tmpFile.renameTo(encryptedFile)
+            atomicFile.finishWrite(fileOutputStream)
 
             dumpTime = System.currentTimeMillis() - dumpTime
             Timber.v("Dumping cache to ${encryptedFile.absolutePath} done in ${dumpTime}ms")

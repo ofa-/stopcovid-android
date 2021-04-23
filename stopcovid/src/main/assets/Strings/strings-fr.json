@@ -207,7 +207,7 @@
    "onboarding.noBleController.mainMessage.subtitle":"Vous pouvez tout de même agir contre la COVID-19 en partageant cette application. Plus elle est utilisée largement, plus elle est efficace.\nInformez vos proches et vos connaissances !",
    "onboarding.noBleController.accept":"Partager l'application",
    "onboarding.noBleController.infos":"Smartphones compatibles",
-   "onboarding.noBleController.infosUrl":"https://app.tousanticovid.gouv.fr/json/version-29/devices.html",
+   "onboarding.noBleController.infosUrl":"https://bonjour.tousanticovid.gouv.fr/devices.html",
    "common.error.unauthorized":"Vous n'avez pas les permissions requises pour effectuer cette action.",
    "common.error.unknown":"Une erreur est survenue.",
    "common.error.proximityUnknown":"Une erreur Bluetooth est survenue.",
@@ -403,7 +403,7 @@
    "onboarding.runWithoutBleController.mainMessage.title":"TousAntiCovid ne pourra pas détecter vos \"contacts Bluetooth\"",
    "onboarding.runWithoutBleController.mainMessage.subtitle":"Malheureusement, votre téléphone ne supporte pas intégralement le Bluetooth Low Energy, utilisé pour détecter vos \"contacts Bluetooth\". Vous pouvez néanmoins accéder au reste de l'application.",
    "onboarding.runWithoutBleController.infos":"Smartphones compatibles",
-   "onboarding.runWithoutBleController.infosUrl":"https://app.tousanticovid.gouv.fr/json/version-29/devices.html",
+   "onboarding.runWithoutBleController.infosUrl":"https://bonjour.tousanticovid.gouv.fr/devices.html",
    "keyFigures.update":"Donnée du : %@",
    "declareController.codeNotReceived.buttonTitle":"J'ai besoin d'aide",
    "declareController.codeNotReceived.alert.title":"J'ai besoin d'aide",
@@ -516,7 +516,7 @@
    "sendHistoryController.successAlert.button.learnMore": "En savoir plus",
    
    "keyFiguresExplanationsController.title": "Explication des chiffres",
-   "keyFiguresController.section.health.subtitle": "⚠️ A partir d’aujourd’hui, la semaine glissante d’étude n’inclut pas le lundi de pâques, et sa comparaison avec les 7 jours précédents, qui inclut le lundi de pâques, est à faire avec prudence et n’est pas à considérer comme une hausse exceptionnelle du nombre de cas.\n\nAppuyez sur \"en savoir plus\" pour découvrir la source des chiffres sanitaires, leur interprétation, ainsi que leur mise à jour.",
+   "keyFiguresController.section.health.subtitle": "Appuyez sur \"en savoir plus\" pour découvrir la source des chiffres sanitaires, leur interprétation, ainsi que leur mise à jour.",
    "keyFiguresController.section.health.button": "En savoir plus",
 
    "home.activation.sick.alert.title": "Informations",
@@ -953,7 +953,7 @@
    
    "walletController.title": "Carnet de tests",
    "walletController.explanations.title": "Comment ça marche ?",
-   "walletController.explanations.subtitle": "Pour numériser vos certificats de test et toujours les avoir à portée de main, c'est simple : une fois le résultat de votre test disponible, vous recevrez un SMS avec un lien et les instructions à suivre.\n\nCe certificat sera à montrer lors des contrôles pour vos voyages aériens 👉 expérimentation en cours, uniquement sur certains vols pour la Corse (Air France et Air Corsica informeront leurs clients éligibles).\n\nSi vous rencontrez un problème, vous pouvez appeler le 0 800 08 71 48.",
+   "walletController.explanations.subtitle": "Pour numériser vos certificats de test et toujours les avoir à portée de main, c'est simple : une fois le résultat de votre test disponible, vous recevrez un SMS avec un lien (du portail patient SI-DEP) et les instructions à suivre.\n\nCe certificat sera à montrer lors des contrôles pour vos voyages aériens 👉 expérimentation en cours, uniquement sur certains vols pour la Corse (Air France et Air Corsica informeront leurs clients éligibles).\n\nSi vous rencontrez un problème, vous pouvez appeler le 0 800 08 71 48.",
    "walletController.flashButton.title": "Scanner le QR Code",
    "walletController.flashExplanation": "Sur votre document SIDEP de résultat de test, vous avez un QR Code que vous pouvez scanner pour ajouter le certificat dans ce carnet.",
    "walletController.recentCertificatesSection.title": "Certificats récents",
@@ -1043,6 +1043,12 @@
 	"keyfigure.variantssabr.colorCode.light":"#D6774C",
 	"keyfigure.variantssabr.colorCode.dark":"#F6A37E",
 	
-	"keyfigure.variantssabr.learnMore": "En cas de test (RT-PCR ou antigénique) de première intention positif, un second test RT-PCR dit de criblage est réalisé afin de détecter les variants d’intérêt connus à ce jour et d’évaluer leur diffusion sur l’ensemble du territoire.\n\nCet indicateur porte sur les données relatives aux résultats de criblage arrêtés à J-3 et mises à jour quotidiennement.\n\nIl exprime la part des variants 20H/501Y.V2 (SA) ou 20J/501Y.V3 (BR) parmi tous les tests criblés. Les données sont collectées dans SIDEP depuis le 25 janvier 2021."
+	"keyfigure.variantssabr.learnMore": "En cas de test (RT-PCR ou antigénique) de première intention positif, un second test RT-PCR dit de criblage est réalisé afin de détecter les variants d’intérêt connus à ce jour et d’évaluer leur diffusion sur l’ensemble du territoire.\n\nCet indicateur porte sur les données relatives aux résultats de criblage arrêtés à J-3 et mises à jour quotidiennement.\n\nIl exprime la part des variants 20H/501Y.V2 (SA) ou 20J/501Y.V3 (BR) parmi tous les tests criblés. Les données sont collectées dans SIDEP depuis le 25 janvier 2021.",
+     
+     "wallet.proof.vaccinationCertificate.LA.CO": "En cours",
+     "wallet.proof.vaccinationCertificate.LA.EC": "En cours",
+     "wallet.proof.vaccinationCertificate.LA.TE": "Terminé",
+     "wallet.proof.vaccinationCertificate.pillTitle": "Vaccin",
+     "wallet.proof.vaccinationCertificate.description": "<L1>, <L0>\nné(e) le <L2>\n<L5> (<L4>)\ninjection le <L9>\nDose : <L7>/<L8>"
 	
 }

@@ -15,6 +15,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.view.isVisible
 import androidx.navigation.fragment.navArgs
 import com.google.zxing.BarcodeFormat
@@ -43,7 +44,8 @@ class FullscreenQRCodeFragment : BaseFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentFullscreenQrcodeBinding.inflate(inflater, container, false)
+        val themedInflater = LayoutInflater.from(ContextThemeWrapper(context, R.style.Theme_Base_StopCovid_ForceLight))
+        binding = FragmentFullscreenQrcodeBinding.inflate(themedInflater, container, false)
         appCompatActivity?.supportActionBar?.title = null
         return binding?.root
     }

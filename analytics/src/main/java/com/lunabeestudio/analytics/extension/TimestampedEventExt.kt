@@ -11,6 +11,7 @@
 package com.lunabeestudio.analytics.extension
 
 import com.lunabeestudio.analytics.model.TimestampedEvent
+import com.lunabeestudio.analytics.network.model.TimestampedEventRQ
 import com.lunabeestudio.analytics.proto.ProtoStorage
 
 fun TimestampedEvent.toProto(): ProtoStorage.TimestampedEventProto {
@@ -29,6 +30,20 @@ fun List<TimestampedEvent>.toProto(): ProtoStorage.TimestampedEventProtoList {
         })
     }
     return builder.build()
+}
+
+private fun TimestampedEvent.toAPI(): TimestampedEventRQ {
+    return TimestampedEventRQ(
+        name = name,
+        timestamp = timestamp,
+        desc = desc.takeIf { it.isNotBlank() }
+    )
+}
+
+fun List<TimestampedEvent>.toAPI(): List<TimestampedEventRQ> {
+    return this.map { timestampedEvent ->
+        timestampedEvent.toAPI()
+    }
 }
 
 private fun ProtoStorage.TimestampedEventProto.toDomain(): TimestampedEvent =
