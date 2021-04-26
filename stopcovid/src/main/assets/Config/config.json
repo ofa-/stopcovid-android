@@ -2,11 +2,11 @@
   "config": [
 	{
       "name": "lastUpdate",
-      "value": "12 april 2021"
+      "value": "23 april 2021"
     },
     {
       "name": "version",
-      "value": 44
+      "value": 47
     },
     {
       "name": "versionCalibrationBle",
@@ -70,7 +70,7 @@
     },
     {
       "name": "app.isAnalyticsOn",
-      "value": true
+      "value": false
     },
     {
       "name": "app.wallet.oldCertificateThresholdInDays",
@@ -86,23 +86,13 @@
       "name": "app.walletPubKeys",
       "value": [
         {
-          "auth": "DHI0",
-          "pubKeys": {
-            "TST1": "-----BEGIN PUBLIC KEY-----MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE6lPsrLPPis5Wl9u8Y7THfNIIfeEyq3q72MpzUm3gvr6ctYk4d3OQhn76GKSjSYX/0ZRC/cYO9479K0SUzYZ9yg==-----END PUBLIC KEY-----"
-          }
-        },
-        {
-          "auth": "FR00",
-          "pubKeys": {
-            "0001": "-----BEGIN PUBLIC KEY-----MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEqY8NfM1igIiTvsTUNuedGDSh1uAB1w8cTNzNnZ4v4in3JAUU6N3AypjQx0QMnMSShJoPvac/w5L02grgf4TCPA==-----END PUBLIC KEY-----"
-          }
-        },
-        {
           "auth": "FR03",
           "pubKeys":
           	{
 	          	"AHP1": "-----BEGIN PUBLIC KEY-----MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEPnxJntwNwme9uHSasmGFFwdC0FWNEpucgzhjr+/AZ6UuTm3kL3ogEUAwKU0tShEVmZNK4/lM05h+0ZvtboJM/A==-----END PUBLIC KEY-----",
-	            "AHP2": "-----BEGIN PUBLIC KEY-----MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEOYUgmx8pKu0UbyqQ/kt4+PXSpUprkO2YLHmzzoN66XjDW0AnSzXorFPe556p73Vawqaoy3qQKDIDB62IBYWBuA==-----END PUBLIC KEY-----"
+	            "AHP2": "-----BEGIN PUBLIC KEY-----MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEOYUgmx8pKu0UbyqQ/kt4+PXSpUprkO2YLHmzzoN66XjDW0AnSzXorFPe556p73Vawqaoy3qQKDIDB62IBYWBuA==-----END PUBLIC KEY-----",
+	            "AV01": "-----BEGIN PUBLIC KEY-----MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE1T9uG2bEP7uWND6RT/lJs2y787BkEJoRMMLXvqPKFFC3ckqFAPnFjbiv/odlWH04a1P9CvaCRxG31FMEOFZyXA==-----END PUBLIC KEY-----",
+	            "AV02": "-----BEGIN PUBLIC KEY-----MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE3jL6zQ0aQj9eJHUw4VDHB9sMoviLVIlADnoBwC43Md8p9w655z2bDhYEEajQ2amQzt+eU7HdWrvqY23Do91Izg==-----END PUBLIC KEY-----"
             }
         }
       ]

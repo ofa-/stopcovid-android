@@ -27,7 +27,8 @@ import com.mikepenz.fastadapter.binding.AbstractBindingItem
 class QrCodeCardItem : AbstractBindingItem<ItemQrCodeCardBinding>() {
     var qrCodeBitmap: Bitmap? = null
     var text: String? = null
-    var tagText: String? = null
+    var tag1Text: String? = null
+    var tag2Text: String? = null
     var formatText: String? = null
     var share: String? = null
     var delete: String? = null
@@ -41,9 +42,12 @@ class QrCodeCardItem : AbstractBindingItem<ItemQrCodeCardBinding>() {
 
     override fun createBinding(inflater: LayoutInflater, parent: ViewGroup?): ItemQrCodeCardBinding {
         val binding = ItemQrCodeCardBinding.inflate(inflater, parent, false)
-        binding.tag.chip.chipBackgroundColor = ColorStateList.valueOf(
-            R.attr.colorPrimary.fetchSystemColor(binding.tag.chip.context)
-        )
+        val tagColor = ColorStateList.valueOf(
+            R.attr.colorPrimary.fetchSystemColor(binding.root.context))
+
+        binding.tag1.chip.chipBackgroundColor = tagColor
+        binding.tag2.chip.chipBackgroundColor = tagColor
+
         return binding
     }
 
@@ -58,8 +62,15 @@ class QrCodeCardItem : AbstractBindingItem<ItemQrCodeCardBinding>() {
             showMenu(it)
         }
         binding.formatTextView.setTextOrHide(formatText)
-        binding.tag.chip.text = tagText
-        binding.tagLayout.isVisible = tagText != null
+
+        binding.tag1.chip.text = tag1Text
+        binding.tag1.chip.isVisible = !tag1Text.isNullOrEmpty()
+
+        binding.tag2.chip.text = tag2Text
+        binding.tag2.chip.isVisible = !tag2Text.isNullOrEmpty()
+
+        binding.tagLayout.isVisible = !(tag1Text.isNullOrEmpty() && tag2Text.isNullOrEmpty())
+
         binding.actionButton.contentDescription = actionContentDescription
     }
 

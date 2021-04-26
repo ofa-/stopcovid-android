@@ -219,7 +219,7 @@
     "onboarding.noBleController.mainMessage.subtitle": "رغم ذلك، يمكنك مكافحة مرض كوفيد-19 من خلال مشاركة هذا التطبيق. فكلما توسع استعماله، ازدادت فعاليته.\nعرف أقرباءك وعلاقاتك بها!",
     "onboarding.noBleController.accept": "مشاركة التطبيق",
     "onboarding.noBleController.infos": "الهواتف الذكية المتوافقة",
-    "onboarding.noBleController.infosUrl": "https://app.tousanticovid.gouv.fr/json/version-29/devices.html",
+    "onboarding.noBleController.infosUrl": "https://bonjour.tousanticovid.gouv.fr/devices.html",
     "common.error.unauthorized": "ليست لديك الموافقات المطلوبة لتنفيذ هذا الإجراء.",
     "common.error.unknown": "حدث خطأ.",
     "common.error.proximityUnknown": "حدث خطأ في Bluetooth.",
@@ -412,7 +412,7 @@
     "onboarding.runWithoutBleController.mainMessage.title": "لن يتمكن TousAntiCovid من كشف \"قائمة الاتصال Bluetooth\" لديك",
     "onboarding.runWithoutBleController.mainMessage.subtitle": "لسوء الحظ، هاتفك غير  مزود بالكامل بتقنية Bluetooth Low Energy المستخدمة لكشف \"قائمة الاتصال Bluetooth\" لديك. لكن يسعك الوصول إلى ما تبقى في التطبيق.",
     "onboarding.runWithoutBleController.infos": "الهواتف الذكية المتوافقة",
-    "onboarding.runWithoutBleController.infosUrl": "https://app.tousanticovid.gouv.fr/json/version-29/devices.html",
+    "onboarding.runWithoutBleController.infosUrl": "https://bonjour.tousanticovid.gouv.fr/devices.html",
     "keyFigures.update": "المعلومة في: %@",
     "declareController.codeNotReceived.buttonTitle": "لم أتلقى الرمز",
     "declareController.codeNotReceived.alert.title": "رمزك",
@@ -544,8 +544,8 @@
     "home.healthSection.isSick.title": "اعتن بنفسك",
     "home.healthSection.isSick.subtitle": "للمزيد من المعلومات",
     "myHealthController.sick.title": "التوصيات الصحية",
-    "home.attestationSection.title": "انتبه",
-    "home.attestationSection.cell.title":"Vos attestations (nouveau !)",
+    "home.attestationSection.title": "Wallet & انتبه",
+    "home.attestationSection.cell.title":"انتبه",
     "home.attestationSection.cell.subtitle.noAttestations": "اضغط هنا",
     "home.attestationSection.cell.subtitle.oneAttestation": "الافادة 1",
     "home.attestationSection.cell.subtitle.multipleAttestations": "%d الافادات ",
@@ -571,7 +571,7 @@
     "sendHistoryController.successAlert.message": "شكرا على اعلانك عبر منصة TousAntiCovid واعلامك المستخدمين الذين تواجدوا على مقربة منك خلال الفترة التي كنت فيها مُعدياً.\n\nبفضلك سيتمكّن أولئك المستخدمون من اتخاذ التدابير الضرورية لحماية أنفسهم وغيرهم. شكرا لاسهامك في مكافحة جائحة الكوفيد.",
     "sendHistoryController.successAlert.button.learnMore": "لمزيد من المعلومات",
     "keyFiguresExplanationsController.title": "تفسير الأرقام",
-    "keyFiguresController.section.health.subtitle": "⚠️ A partir d’aujourd’hui, la semaine glissante d’étude n’inclut pas le lundi de pâques, et sa comparaison avec les 7 jours précédents, qui inclut le lundi de pâques, est à faire avec prudence et n’est pas à considérer comme une hausse exceptionnelle du nombre de cas.\n\nTap \"read now\" to find out more about the source of the health data, how they are interpreted and updated.",
+    "keyFiguresController.section.health.subtitle": "Tap \"read now\" to find out more about the source of the health data, how they are interpreted and updated.",
     "keyFiguresController.section.health.button": "القراءة الآن",
     "home.activation.sick.alert.title": "معلومات",
     "home.activation.sick.alert.message": "لا يمكنك تشغيل الانذار في حال تعرّضك الى الكوفيد-19 خلال الشهرين المواليين لاعلانك عن ايجابيتك للكوفيد19\n\nاذ أنّه لا يمكن اعتبارك \"من الحالات التي قد تتعرّض  للاصابة\" خلال الشهرين المواليين لتحليل ايجابي للكوفيد19\n\n",
@@ -975,9 +975,9 @@
 
    "walletController.title": "Test wallet",
    "walletController.explanations.title": "How does it work?",
-   "walletController.explanations.subtitle": "To digitalize your test certificates and always have them at hand, it's simple: once the result of your test is available, you will receive a text message with a link and instructions to follow.\n\nThis certificate will have to be presented during checks for your air travels 👉 experiment in progress, only on some flights to Corsica (Air France and Air Corsica will inform their eligible customers).\n\nIf you have a problem, you can call 0 800 08 71 48.",
+   "walletController.explanations.subtitle": "To digitalize your test certificates and always have them at hand, it's simple: once the result of your test is available, you will receive a text message with a link (from SI-DEP platform) and instructions to follow.\n\nThis certificate will have to be presented during checks for your air travels 👉 experiment in progress, only on some flights to Corsica (Air France and Air Corsica will inform their eligible customers).\n\nIf you have a problem, you can call 0 800 08 71 48.",
    "walletController.flashButton.title": "Scan QR Code",
-   "walletController.flashExplanation": "On your your SIDEP document with your test results, you have a QR Code that you can scan to add your certificate in this wallet.",
+   "walletController.flashExplanation": "On your SIDEP document with your test results, you have a QR Code that you can scan to add your certificate in this wallet.",
    "walletController.recentCertificatesSection.title": "Recent certificates",
    "walletController.recentCertificatesSection.subtitle": "These certificates are less than 3 days old.",
    "walletController.oldCertificatesSection.title": "Certificates older than 3 days",
@@ -1066,6 +1066,12 @@
     "wallet.proof.error.2.message": "The authenticity of the scanned certificate could not be verified. If the problem persists, please call 0 800 08 71 48",
     
     "wallet.proof.moreThanSpecificHours": "⚠️ More than %dh",
-    "wallet.proof.lessThanSpecificHours": "Less than %dh"
+    "wallet.proof.lessThanSpecificHours": "Less than %dh",
+     
+     "wallet.proof.vaccinationCertificate.LA.CO": "On-going",
+     "wallet.proof.vaccinationCertificate.LA.EC": "On-going",
+     "wallet.proof.vaccinationCertificate.LA.TE": "Completed",
+     "wallet.proof.vaccinationCertificate.pillTitle": "Vaccine",
+     "wallet.proof.vaccinationCertificate.description": "<L1>, <L0>\nDate of birth: <L2>\n<L5> (<L4>)\nInjection date <L9>\nDose: <L7>/<L8>"
 
 }

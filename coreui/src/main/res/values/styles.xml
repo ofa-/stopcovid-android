@@ -39,6 +39,8 @@
         <item name="dividerColor">@color/color_mercury</item>
     </style>
 
+    <style name="Theme.Base.StopCovid.ForceLight" parent="Theme.MaterialComponents.Light" />
+
     <!-- Base application theme. -->
     <style name="Theme.StopCovid" parent="Theme.Base.StopCovid" />
 

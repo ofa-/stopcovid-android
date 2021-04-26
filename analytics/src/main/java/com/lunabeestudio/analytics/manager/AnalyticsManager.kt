@@ -16,6 +16,7 @@ import android.os.Build
 import androidx.core.content.edit
 import androidx.core.util.AtomicFile
 import androidx.lifecycle.LifecycleObserver
+import com.lunabeestudio.analytics.extension.toAPI
 import com.lunabeestudio.analytics.extension.toDomain
 import com.lunabeestudio.analytics.extension.toProto
 import com.lunabeestudio.analytics.model.AnalyticsResult
@@ -146,8 +147,8 @@ object AnalyticsManager : LifecycleObserver {
         val sendAnalyticsRQ = SendAnalyticsRQ(
             installationUuid = sharedPreferences.getString(SHARED_PREFS_INSTALLATION_UUID, null) ?: UUID.randomUUID().toString(),
             infos = appInfos,
-            events = appEvents,
-            errors = appErrors
+            events = appEvents.toAPI(),
+            errors = appErrors.toAPI()
         )
         withContext(Dispatchers.IO) {
             val result = AnalyticsServerManager.sendAnalytics(
@@ -186,7 +187,7 @@ object AnalyticsManager : LifecycleObserver {
         val sendAnalyticsRQ = SendAnalyticsRQ(
             installationUuid = UUID.randomUUID().toString(),
             infos = healthInfos,
-            events = healthEvents,
+            events = healthEvents.toAPI(),
             errors = emptyList()
         )
         withContext(Dispatchers.IO) {

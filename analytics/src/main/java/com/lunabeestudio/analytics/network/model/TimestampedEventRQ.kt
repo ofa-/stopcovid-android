@@ -13,9 +13,8 @@ package com.lunabeestudio.analytics.network.model
 import com.lunabeestudio.analytics.model.Infos
 import com.lunabeestudio.analytics.model.TimestampedEvent
 
-class SendAnalyticsRQ(
-    val installationUuid: String,
-    val infos: Infos,
-    val events: List<TimestampedEventRQ>,
-    val errors: List<TimestampedEventRQ>
+class TimestampedEventRQ(
+    var name: String,
+    var timestamp: String,
+    var desc: String?,
 )

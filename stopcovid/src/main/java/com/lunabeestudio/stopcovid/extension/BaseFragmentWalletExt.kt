@@ -6,6 +6,7 @@ import com.lunabeestudio.stopcovid.coreui.BuildConfig
 import com.lunabeestudio.stopcovid.coreui.fragment.BaseFragment
 import com.lunabeestudio.stopcovid.model.WalletCertificateInvalidSignatureException
 import com.lunabeestudio.stopcovid.model.WalletCertificateMalformedException
+import com.lunabeestudio.stopcovid.model.WalletCertificateNoKeyError
 import timber.log.Timber
 
 fun BaseFragment.catchWalletException(e: Exception, listener: DialogInterface.OnClickListener? = null) {
@@ -13,6 +14,7 @@ fun BaseFragment.catchWalletException(e: Exception, listener: DialogInterface.On
     when (e) {
         is WalletCertificateInvalidSignatureException -> showInvalidCertificateSignatureAlert(listener)
         is WalletCertificateMalformedException -> showMalformedCertificateAlert(listener)
+        is WalletCertificateNoKeyError -> showInvalidCertificateSignatureAlert(listener)
         else -> showUnknownErrorAlert(e, listener)
     }
 }

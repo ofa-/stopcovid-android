@@ -219,7 +219,7 @@
     "onboarding.noBleController.mainMessage.subtitle": "Sie können allerdings trotzdem einen Beitrag zum Kampf gegen COVID-19 leisten, indem Sie diese App teilen. Diese App ist umso effizienter, je mehr Personen sie verwenden.\nInformieren Sie Ihre Angehörigen, Freunde und Bekannte!",
     "onboarding.noBleController.accept": "App teilen",
     "onboarding.noBleController.infos": "Kompatible Smartphones",
-    "onboarding.noBleController.infosUrl": "https://app.tousanticovid.gouv.fr/json/version-29/devices.html",
+    "onboarding.noBleController.infosUrl": "https://bonjour.tousanticovid.gouv.fr/devices.html",
     "common.error.unauthorized": "Sie verfügen nicht über die zur Ausführung dieser Aktion erforderlichen Rechte.",
     "common.error.unknown": "Ein Fehler ist aufgetreten.",
     "common.error.proximityUnknown": "Ein Bluetooth-Fehler ist aufgetreten.",
@@ -412,7 +412,7 @@
     "onboarding.runWithoutBleController.mainMessage.title": "TousAntiCovid kann Ihre Bluetooth-Kontakte nicht erkennen",
     "onboarding.runWithoutBleController.mainMessage.subtitle": "Die zum Erkennen Ihrer Bluetooth-Kontakte verwendete Bluetooth Low Energy-Funktion wird von Ihrem Telefon leider nicht unterstützt. Sie können allerdings auf alle übrigen Funktionen des Telefons zugreifen.",
     "onboarding.runWithoutBleController.infos": "Kompatible Smartphones",
-    "onboarding.runWithoutBleController.infosUrl": "https://app.tousanticovid.gouv.fr/json/version-29/devices.html",
+    "onboarding.runWithoutBleController.infosUrl": "https://bonjour.tousanticovid.gouv.fr/devices.html",
     "keyFigures.update": "Daten vom: %@",
     "declareController.codeNotReceived.buttonTitle": "Ich habe keinen Code erhalten",
     "declareController.codeNotReceived.alert.title": "Ihr Code",
@@ -544,8 +544,8 @@
     "home.healthSection.isSick.title": "Passen Sie auf sich auf!",
     "home.healthSection.isSick.subtitle": "Mehr erfahren",
     "myHealthController.sick.title": "Empfehlungen",
-    "home.attestationSection.title": "Bescheinigung",
-    "home.attestationSection.cell.title":"Vos attestations (nouveau !)",
+    "home.attestationSection.title": "Bescheinigung & Wallet",
+    "home.attestationSection.cell.title":"Bescheinigung",
     "home.attestationSection.cell.subtitle.noAttestations": "Hier drücken",
     "home.attestationSection.cell.subtitle.oneAttestation": "1 Bescheinigung",
     "home.attestationSection.cell.subtitle.multipleAttestations": "%d Bescheinigungen",
@@ -571,7 +571,7 @@
     "sendHistoryController.successAlert.message": "Vielen Dank, dass Sie sich über TousAntiCovid registriert haben und dass Sie die Benutzer, die während Ihrer Ansteckung in der Nähe waren, informiert haben.\n\nDank Ihnen können diese Benutzer die notwendigen Maßnahmen ergreifen, um sich und andere zu schützen. Vielen Dank, dass Sie sich am Kampf gegen Covid beteiligen.",
     "sendHistoryController.successAlert.button.learnMore": "Erfahren Sie mehr",
     "keyFiguresExplanationsController.title": "Erklärung der Zahlen",
-    "keyFiguresController.section.health.subtitle": "⚠️ A partir d’aujourd’hui, la semaine glissante d’étude n’inclut pas le lundi de pâques, et sa comparaison avec les 7 jours précédents, qui inclut le lundi de pâques, est à faire avec prudence et n’est pas à considérer comme une hausse exceptionnelle du nombre de cas.\n\nTap \"read now\" to find out more about the source of the health data, how they are interpreted and updated.",
+    "keyFiguresController.section.health.subtitle": "Tap \"read now\" to find out more about the source of the health data, how they are interpreted and updated.",
     "keyFiguresController.section.health.button": "Jetzt lesen",
     "home.activation.sick.alert.title": "Informationen",
     "home.activation.sick.alert.message": "Sie können den Alarm für die Exposition gegenüber COVID-19 erst 2 Monate, nachdem Sie einen positiven COVID-19-Test gemeldet haben, erneut aktivieren.\n\nDies liegt daran, dass Sie in den 2 Monaten nach einem positiven Test auf COVID-19 nicht als \"ansteckungsgefährdet\" gelten.",
@@ -667,7 +667,7 @@
     "isolation.recommendation.initialCaseAtRiskOrSick.defineIsolationPeriod": "Definition meiner Isolationsperiode",
     "isolation.recommendation.allGood.changeMyState": "Mein Gesundheitszustand hat sich geändert",
     "isolation.recommendation.symptoms.testingSites": "Wo kann ich mich testen lassen?",
-    "isolation.recommendation.symptoms.positiveTest": "Je suis testé positif",
+    "isolation.recommendation.symptoms.positiveTest": "Ich habe ein positives Testergebnisf",
     "isolation.recommendation.symptoms.negativeTest": "Ich habe ein negatives Testergebnisf",
     "isolation.recommendation.contactCaseUnknownIndex.testingSites": "Wo kann ich mich testen lassen?",
     "isolation.recommendation.contactCaseUnknownIndex.symptoms": "Ich zeige Symptome einer COVID-19-Erkrankung",
@@ -975,9 +975,9 @@
 
    "walletController.title": "Test wallet",
    "walletController.explanations.title": "How does it work?",
-   "walletController.explanations.subtitle": "To digitalize your test certificates and always have them at hand, it's simple: once the result of your test is available, you will receive a text message with a link and instructions to follow.\n\nThis certificate will have to be presented during checks for your air travels 👉 experiment in progress, only on some flights to Corsica (Air France and Air Corsica will inform their eligible customers).\n\nIf you have a problem, you can call 0 800 08 71 48.",
+   "walletController.explanations.subtitle": "To digitalize your test certificates and always have them at hand, it's simple: once the result of your test is available, you will receive a text message with a link (from SI-DEP platform) and instructions to follow.\n\nThis certificate will have to be presented during checks for your air travels 👉 experiment in progress, only on some flights to Corsica (Air France and Air Corsica will inform their eligible customers).\n\nIf you have a problem, you can call 0 800 08 71 48.",
    "walletController.flashButton.title": "Scan QR Code",
-   "walletController.flashExplanation": "On your your SIDEP document with your test results, you have a QR Code that you can scan to add your certificate in this wallet.",
+   "walletController.flashExplanation": "On your SIDEP document with your test results, you have a QR Code that you can scan to add your certificate in this wallet.",
    "walletController.recentCertificatesSection.title": "Recent certificates",
    "walletController.recentCertificatesSection.subtitle": "These certificates are less than 3 days old.",
    "walletController.oldCertificatesSection.title": "Certificates older than 3 days",
@@ -1066,6 +1066,12 @@
     "wallet.proof.error.2.message": "The authenticity of the scanned certificate could not be verified. If the problem persists, please call 0 800 08 71 48",
     
     "wallet.proof.moreThanSpecificHours": "⚠️ More than %dh",
-    "wallet.proof.lessThanSpecificHours": "Less than %dh"
+    "wallet.proof.lessThanSpecificHours": "Less than %dh",
+     
+     "wallet.proof.vaccinationCertificate.LA.CO": "On-going",
+     "wallet.proof.vaccinationCertificate.LA.EC": "On-going",
+     "wallet.proof.vaccinationCertificate.LA.TE": "Completed",
+     "wallet.proof.vaccinationCertificate.pillTitle": "Vaccine",
+     "wallet.proof.vaccinationCertificate.description": "<L1>, <L0>\nDate of birth: <L2>\n<L5> (<L4>)\nInjection date <L9>\nDose: <L7>/<L8>"
 
 }

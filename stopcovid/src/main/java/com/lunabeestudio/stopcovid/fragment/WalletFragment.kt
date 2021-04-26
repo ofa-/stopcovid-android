@@ -32,6 +32,7 @@ import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
 import com.lunabeestudio.stopcovid.extension.shortDescription
+import com.lunabeestudio.stopcovid.extension.statusStringKey
 import com.lunabeestudio.stopcovid.extension.tagStringKey
 import com.lunabeestudio.stopcovid.fastitem.QrCodeCardItem
 import com.lunabeestudio.stopcovid.fastitem.bigTitleItem
@@ -40,6 +41,7 @@ import com.lunabeestudio.stopcovid.fastitem.logoItem
 import com.lunabeestudio.stopcovid.fastitem.qrCodeCardItem
 import com.lunabeestudio.stopcovid.manager.ShareManager
 import com.lunabeestudio.stopcovid.manager.WalletManager
+import com.lunabeestudio.stopcovid.model.VaccinationCertificate
 import com.lunabeestudio.stopcovid.model.WalletCertificate
 import com.lunabeestudio.stopcovid.viewmodel.WalletViewModel
 import com.lunabeestudio.stopcovid.viewmodel.WalletViewModelFactory
@@ -213,7 +215,12 @@ class WalletFragment : QRCodeListFragment() {
             share = strings["walletController.menu.share"]
             delete = strings["walletController.menu.delete"]
             formatText = Constants.QrCode.FORMAT_2D_DOC
-            tagText = strings[certificate.tagStringKey()]
+            tag1Text = strings[certificate.tagStringKey()]
+
+            if (certificate is VaccinationCertificate) {
+                tag2Text = strings[certificate.statusStringKey()]
+            }
+
             this.allowShare = true
             onShare = {
                 val uri = ShareManager.getShareCaptureUriFromBitmap(requireContext(), bitmap, "qrCode")

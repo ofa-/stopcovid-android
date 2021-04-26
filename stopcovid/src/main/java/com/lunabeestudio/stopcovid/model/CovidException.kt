@@ -104,5 +104,5 @@ class WalletCertificateMalformedException(message: String = "Invalid certificate
 class WalletCertificateInvalidSignatureException(message: String = "Invalid certificate signature") :
     CovidException(ErrorCode.WALLET_CERTIFICATE_INVALID_SIGNATURE, message)
 
-class WalletCertificateUnknownError(message: String = "Unknown error for the certificate") :
+class WalletCertificateNoKeyError(message: String = "No key to verify the certificate authenticity") :
     CovidException(ErrorCode.WALLET_CERTIFICATE_UNKNOWN_ERROR, message)

@@ -15,8 +15,10 @@ import com.lunabeestudio.domain.model.WalletCertificateType
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 
-fun Configuration.walletOldCertificateThresholdInMs(type: WalletCertificateType): Long {
-    return TimeUnit.DAYS.toMillis((walletOldCertificateThresholdInDays[type.code.toLowerCase(Locale.getDefault())])?.toLong() ?: 0.toLong())
+fun Configuration.walletOldCertificateThresholdInMs(type: WalletCertificateType): Long? {
+    return walletOldCertificateThresholdInDays[type.code.toLowerCase(Locale.getDefault())]?.let {
+        TimeUnit.DAYS.toMillis(it.toLong())
+    }
 }
 
 fun Configuration.walletPublicKey(authority: String, certificateId: String): String? {

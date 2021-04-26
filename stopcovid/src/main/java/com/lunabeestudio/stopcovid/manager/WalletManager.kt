@@ -12,9 +12,10 @@ import com.lunabeestudio.domain.model.WalletCertificateType
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.robert.datasource.LocalKeystoreDataSource
 import com.lunabeestudio.stopcovid.model.SanitaryCertificate
+import com.lunabeestudio.stopcovid.model.VaccinationCertificate
 import com.lunabeestudio.stopcovid.model.WalletCertificate
 import com.lunabeestudio.stopcovid.model.WalletCertificateMalformedException
-import com.lunabeestudio.stopcovid.model.WalletCertificateUnknownError
+import com.lunabeestudio.stopcovid.model.WalletCertificateNoKeyError
 
 object WalletManager {
 
@@ -75,7 +76,7 @@ object WalletManager {
         if (key != null) {
             walletCertificate.verifyKey(key)
         } else {
-            throw WalletCertificateUnknownError()
+            throw WalletCertificateNoKeyError()
         }
 
         return walletCertificate
@@ -94,6 +95,7 @@ object WalletManager {
         val type: WalletCertificateType = extractCertificateType(value) ?: return null
         return when (type) {
             WalletCertificateType.SANITARY -> SanitaryCertificate(value)
+            WalletCertificateType.VACCINATION -> VaccinationCertificate(value)
         }
     }
 
