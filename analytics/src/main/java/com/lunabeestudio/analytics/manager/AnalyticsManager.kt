@@ -13,9 +13,13 @@ package com.lunabeestudio.analytics.manager
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Build
-import androidx.core.content.edit
 import androidx.core.util.AtomicFile
 import androidx.lifecycle.LifecycleObserver
+import com.lunabeestudio.analytics.extension.installationUUID
+import com.lunabeestudio.analytics.extension.isOptIn
+import com.lunabeestudio.analytics.extension.proximityActiveDuration
+import com.lunabeestudio.analytics.extension.proximityStartTime
+import com.lunabeestudio.analytics.extension.statusSuccessCount
 import com.lunabeestudio.analytics.extension.toAPI
 import com.lunabeestudio.analytics.extension.toDomain
 import com.lunabeestudio.analytics.extension.toProto
@@ -50,19 +54,20 @@ object AnalyticsManager : LifecycleObserver {
     private const val FILE_NAME_APP_ERRORS: String = "app_errors"
     private const val FILE_NAME_HEALTH_EVENTS: String = "heath_events"
     private const val SHARED_PREFS_NAME: String = "TacAnalytics"
-    private const val SHARED_PREFS_INSTALLATION_UUID: String = "Shared.Prefs.Installation.UUID"
-    private const val SHARED_PREFS_PROXIMITY_START_TIME: String = "Shared.Prefs.Proximity.Start.Time"
-    private const val SHARED_PREFS_PROXIMITY_ACTIVE_DURATION: String = "Shared.Prefs.Proximity.Active.Duration"
-    private const val SHARED_PREFS_STATUS_SUCCESS_COUNT: String = "Shared.Prefs.Status.Success.Count"
 
     private val dateFormat: DateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.FRANCE)
 
     private lateinit var sharedPreferences: SharedPreferences
 
+    fun isOptIn(context: Context): Boolean = getSharedPrefs(context).isOptIn
+    fun setIsOptIn(context: Context, isOptIn: Boolean) {
+        getSharedPrefs(context).isOptIn = isOptIn
+    }
+
     fun init(context: Context) {
-        if (!getSharedPrefs(context).contains(SHARED_PREFS_INSTALLATION_UUID)) {
-            getSharedPrefs(context).edit {
-                putString(SHARED_PREFS_INSTALLATION_UUID, UUID.randomUUID().toString())
+        getSharedPrefs(context).apply {
+            if (installationUUID == null) {
+                installationUUID = UUID.randomUUID().toString()
             }
         }
     }
@@ -75,47 +80,40 @@ object AnalyticsManager : LifecycleObserver {
     }
 
     fun register(context: Context) {
-        getSharedPrefs(context).edit {
-            putString(SHARED_PREFS_INSTALLATION_UUID, UUID.randomUUID().toString())
-        }
+        getSharedPrefs(context).installationUUID = UUID.randomUUID().toString()
     }
 
     fun unregister(context: Context) {
-        getSharedPrefs(context).edit {
-            remove(SHARED_PREFS_INSTALLATION_UUID)
-            remove(SHARED_PREFS_PROXIMITY_START_TIME)
-            remove(SHARED_PREFS_PROXIMITY_ACTIVE_DURATION)
-            remove(SHARED_PREFS_STATUS_SUCCESS_COUNT)
+        getSharedPrefs(context).apply {
+            installationUUID = null
+            proximityStartTime = null
+            proximityActiveDuration = 0L
+            statusSuccessCount = 0
         }
         reset(context)
     }
 
     fun proximityDidStart(context: Context) {
-        getSharedPrefs(context).edit {
-            putLong(SHARED_PREFS_PROXIMITY_START_TIME, System.currentTimeMillis())
-        }
+        getSharedPrefs(context).proximityStartTime = System.currentTimeMillis()
     }
 
     fun proximityDidStop(context: Context) {
-        getSharedPrefs(context).edit {
-            putLong(SHARED_PREFS_PROXIMITY_ACTIVE_DURATION, getProximityActiveDuration(context))
-            remove(SHARED_PREFS_PROXIMITY_START_TIME)
+        getSharedPrefs(context).apply {
+            proximityActiveDuration = getProximityActiveDuration(context)
+            proximityStartTime = null
         }
     }
 
     fun statusDidSucceed(context: Context) {
         reportAppEvent(context, AppEventName.e16)
-        getSharedPrefs(context).edit {
-            putInt(SHARED_PREFS_STATUS_SUCCESS_COUNT, getSharedPrefs(context).getInt(SHARED_PREFS_STATUS_SUCCESS_COUNT, 0) + 1)
+        getSharedPrefs(context).apply {
+            statusSuccessCount += 1
         }
     }
 
     private fun getProximityActiveDuration(context: Context): Long {
-        val oldDuration = getSharedPrefs(context).getLong(SHARED_PREFS_PROXIMITY_ACTIVE_DURATION, 0L)
-        val addedDuration = System.currentTimeMillis() - getSharedPrefs(context).getLong(
-            SHARED_PREFS_PROXIMITY_START_TIME,
-            System.currentTimeMillis()
-        )
+        val oldDuration = getSharedPrefs(context).proximityActiveDuration
+        val addedDuration = System.currentTimeMillis() - (getSharedPrefs(context).proximityStartTime ?: System.currentTimeMillis())
         return oldDuration + addedDuration
     }
 
@@ -125,7 +123,7 @@ object AnalyticsManager : LifecycleObserver {
         analyticsInfosProvider: AnalyticsInfosProvider,
         token: String
     ) {
-        if (robertManager.configuration.isAnalyticsOn) {
+        if (robertManager.configuration.isAnalyticsOn && getSharedPrefs(context).isOptIn) {
             val receivedHelloMessagesCount = robertManager.getLocalProximityCount()
             sendAppAnalytics(context, analyticsInfosProvider, token, receivedHelloMessagesCount)
             sendHealthAnalytics(context, robertManager, analyticsInfosProvider, token, receivedHelloMessagesCount)
@@ -144,7 +142,7 @@ object AnalyticsManager : LifecycleObserver {
         val appEvents = getAppEvents(context)
         val appErrors = getErrors(context.filesDir)
         val sendAnalyticsRQ = SendAnalyticsRQ(
-            installationUuid = sharedPreferences.getString(SHARED_PREFS_INSTALLATION_UUID, null) ?: UUID.randomUUID().toString(),
+            installationUuid = sharedPreferences.installationUUID ?: UUID.randomUUID().toString(),
             infos = appInfos,
             events = appEvents.toAPI(),
             errors = appErrors.toAPI()
@@ -223,35 +221,41 @@ object AnalyticsManager : LifecycleObserver {
     @Suppress("BlockingMethodInNonBlockingContext")
     @Synchronized
     fun reportAppEvent(context: Context, eventName: AppEventName, desc: String? = null) {
-        CoroutineScope(Dispatchers.IO).launch {
-            val timestampedEventList = getAppEvents(context).toMutableList()
-            timestampedEventList += TimestampedEvent(eventName.name, dateFormat.format(Date()), desc ?: "")
-            val file = File(File(context.filesDir, FOLDER_NAME), FILE_NAME_APP_EVENTS)
-            writeTimestampedEventProtoToFile(file, timestampedEventList.toProto())
+        if (getSharedPrefs(context).isOptIn) {
+            CoroutineScope(Dispatchers.IO).launch {
+                val timestampedEventList = getAppEvents(context).toMutableList()
+                timestampedEventList += TimestampedEvent(eventName.name, dateFormat.format(Date()), desc ?: "")
+                val file = File(File(context.filesDir, FOLDER_NAME), FILE_NAME_APP_EVENTS)
+                writeTimestampedEventProtoToFile(file, timestampedEventList.toProto())
+            }
         }
     }
 
     @Suppress("BlockingMethodInNonBlockingContext")
     @Synchronized
     fun reportHealthEvent(context: Context, eventName: HealthEventName, desc: String? = null) {
-        CoroutineScope(Dispatchers.IO).launch {
-            val timestampedEventList = getHealthEvents(context).toMutableList()
-            timestampedEventList += TimestampedEvent(eventName.name, dateFormat.format(Date()), desc ?: "")
-            val file = File(File(context.filesDir, FOLDER_NAME), FILE_NAME_HEALTH_EVENTS)
-            writeTimestampedEventProtoToFile(file, timestampedEventList.toProto())
+        if (getSharedPrefs(context).isOptIn) {
+            CoroutineScope(Dispatchers.IO).launch {
+                val timestampedEventList = getHealthEvents(context).toMutableList()
+                timestampedEventList += TimestampedEvent(eventName.name, dateFormat.format(Date()), desc ?: "")
+                val file = File(File(context.filesDir, FOLDER_NAME), FILE_NAME_HEALTH_EVENTS)
+                writeTimestampedEventProtoToFile(file, timestampedEventList.toProto())
+            }
         }
     }
 
     @Suppress("BlockingMethodInNonBlockingContext")
     @Synchronized
-    fun reportWSError(filesDir: File, wsName: String, wsVersion: String, errorCode: Int, desc: String? = null) {
-        if (desc?.contains("No address associated with hostname") != true) {
-            CoroutineScope(Dispatchers.IO).launch {
-                val name = "ERR-${wsName.toUpperCase(Locale.getDefault())}-${wsVersion.toUpperCase(Locale.getDefault())}-$errorCode"
-                val timestampedEventList = getErrors(filesDir).toMutableList()
-                timestampedEventList += TimestampedEvent(name, dateFormat.format(Date()), desc ?: "")
-                val file = File(File(filesDir, FOLDER_NAME), FILE_NAME_APP_ERRORS)
-                writeTimestampedEventProtoToFile(file, timestampedEventList.toProto())
+    fun reportWSError(context: Context, filesDir: File, wsName: String, wsVersion: String, errorCode: Int, desc: String? = null) {
+        if (getSharedPrefs(context).isOptIn) {
+            if (desc?.contains("No address associated with hostname") != true) {
+                CoroutineScope(Dispatchers.IO).launch {
+                    val name = "ERR-${wsName.toUpperCase(Locale.getDefault())}-${wsVersion.toUpperCase(Locale.getDefault())}-$errorCode"
+                    val timestampedEventList = getErrors(filesDir).toMutableList()
+                    timestampedEventList += TimestampedEvent(name, dateFormat.format(Date()), desc ?: "")
+                    val file = File(File(filesDir, FOLDER_NAME), FILE_NAME_APP_ERRORS)
+                    writeTimestampedEventProtoToFile(file, timestampedEventList.toProto())
+                }
             }
         }
     }
@@ -280,7 +284,7 @@ object AnalyticsManager : LifecycleObserver {
             placesCount = infosProvider.getPlacesCount(),
             formsCount = infosProvider.getFormsCount(),
             certificatesCount = infosProvider.getCertificatesCount(),
-            statusSuccessCount = sharedPreferences.getInt(SHARED_PREFS_STATUS_SUCCESS_COUNT, 0),
+            statusSuccessCount = sharedPreferences.statusSuccessCount ?: 0,
             userHasAZipcode = infosProvider.userHaveAZipCode(),
         )
     }
@@ -328,7 +332,12 @@ object AnalyticsManager : LifecycleObserver {
                 if (file.exists()) {
                     val atomicFile = AtomicFile(file)
                     atomicFile.openRead().use { inputStream ->
-                        ProtoStorage.TimestampedEventProtoList.parseFrom(inputStream).toDomain()
+                        try {
+                            ProtoStorage.TimestampedEventProtoList.parseFrom(inputStream).toDomain()
+                        } catch (e: Exception) {
+                            Timber.e(e)
+                            emptyList()
+                        }
                     }
                 } else {
                     emptyList()
