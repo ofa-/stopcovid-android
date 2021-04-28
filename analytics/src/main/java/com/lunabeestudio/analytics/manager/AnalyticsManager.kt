@@ -285,7 +285,7 @@ object AnalyticsManager : LifecycleObserver {
             placesCount = infosProvider.getPlacesCount(),
             formsCount = infosProvider.getFormsCount(),
             certificatesCount = infosProvider.getCertificatesCount(),
-            statusSuccessCount = sharedPreferences.statusSuccessCount ?: 0,
+            statusSuccessCount = sharedPreferences.statusSuccessCount,
             userHasAZipcode = infosProvider.userHaveAZipCode(),
         )
     }
