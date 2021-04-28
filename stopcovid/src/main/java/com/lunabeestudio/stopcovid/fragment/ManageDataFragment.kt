@@ -17,6 +17,7 @@ import androidx.core.content.edit
 import androidx.fragment.app.viewModels
 import androidx.preference.PreferenceManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.lunabeestudio.analytics.manager.AnalyticsManager
 import com.lunabeestudio.robert.RobertApplication
 import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.R
@@ -130,6 +131,11 @@ class ManageDataFragment : MainFragment() {
             eraseLocalHistoryItems(items)
             spaceDividerItems(items)
             eraseRemoteContactItems(items)
+            spaceDividerItems(items)
+        }
+
+        if (robertManager.configuration.isAnalyticsOn) {
+            optOutAnalyticsItems(items)
             spaceDividerItems(items)
         }
 
@@ -384,6 +390,36 @@ class ManageDataFragment : MainFragment() {
             onCheckChange = { isChecked ->
                 viewModel.eraseRemoteAlert(requireContext().applicationContext as RobertApplication)
                 sharedPreferences.hideRiskStatus = isChecked
+            }
+            identifier = items.count().toLong()
+        }
+    }
+
+    private fun optOutAnalyticsItems(items: MutableList<GenericItem>) {
+        items += titleItem {
+            text = strings["manageDataController.analytics.title"]
+            identifier = items.count().toLong()
+        }
+        items += spaceItem {
+            spaceRes = R.dimen.spacing_medium
+        }
+        items += captionItem {
+            text = strings["manageDataController.analytics.subtitle"]
+            identifier = items.count().toLong()
+        }
+        val isOptIn = context?.let(AnalyticsManager::isOptIn) ?: false
+        items += switchItem {
+            title = strings[if (isOptIn) {
+                "manageDataController.analytics.switch.on"
+            } else {
+                "manageDataController.analytics.switch.off"
+            }]
+            isChecked = isOptIn
+            onCheckChange = { isChecked ->
+                context?.let {
+                    AnalyticsManager.setIsOptIn(it, isChecked)
+                    refreshScreen()
+                }
             }
             identifier = items.count().toLong()
         }

@@ -43,7 +43,7 @@ import timber.log.Timber
 import java.io.File
 
 class ServiceDataSource(
-    context: Context,
+    private val context: Context,
     baseUrl: String,
     warningBaseUrl: String,
     certificateSha256: String,
@@ -190,7 +190,7 @@ class ServiceDataSource(
                 if (result.body()?.success == true) {
                     RobertResult.Success()
                 } else {
-                    AnalyticsManager.reportWSError(filesDir, serviceName, apiVersion, result.code())
+                    AnalyticsManager.reportWSError(context, filesDir, serviceName, apiVersion, result.code())
                     RobertResult.Failure(
                         BackendException(
                             result.body()?.message!!
@@ -198,12 +198,12 @@ class ServiceDataSource(
                     )
                 }
             } else {
-                AnalyticsManager.reportWSError(filesDir, serviceName, apiVersion, result.code())
+                AnalyticsManager.reportWSError(context, filesDir, serviceName, apiVersion, result.code())
                 RobertResult.Failure(HttpException(result).remoteToRobertException())
             }
         } catch (e: Exception) {
             Timber.e(ServiceDataSource::class.java.simpleName, e.message ?: "")
-            AnalyticsManager.reportWSError(filesDir, serviceName, apiVersion, (e as? HttpException)?.code() ?: 0, e.message)
+            AnalyticsManager.reportWSError(context, filesDir, serviceName, apiVersion, (e as? HttpException)?.code() ?: 0, e.message)
             RobertResult.Failure(error = e.remoteToRobertException())
         }
     }
@@ -219,12 +219,12 @@ class ServiceDataSource(
             if (result.isSuccessful) {
                 RobertResultData.Success(result.body()!!)
             } else {
-                AnalyticsManager.reportWSError(filesDir, serviceName, apiVersion, result.code())
+                AnalyticsManager.reportWSError(context, filesDir, serviceName, apiVersion, result.code())
                 RobertResultData.Failure(HttpException(result).remoteToRobertException())
             }
         } catch (e: Exception) {
             Timber.e(e)
-            AnalyticsManager.reportWSError(filesDir, serviceName, apiVersion, (e as? HttpException)?.code() ?: 0, e.message)
+            AnalyticsManager.reportWSError(context, filesDir, serviceName, apiVersion, (e as? HttpException)?.code() ?: 0, e.message)
             RobertResultData.Failure(error = e.remoteToRobertException())
         }
     }

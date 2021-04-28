@@ -1061,6 +1061,11 @@
      "wallet.proof.vaccinationCertificate.LA.EC": "En cours",
      "wallet.proof.vaccinationCertificate.LA.TE": "Terminé",
      "wallet.proof.vaccinationCertificate.pillTitle": "Vaccin",
-     "wallet.proof.vaccinationCertificate.description": "<L1>, <L0>\nné(e) le <L2>\n<L5> (<L4>)\ninjection le <L9>\nDose : <L7>/<L8>"
+     "wallet.proof.vaccinationCertificate.description": "<L1>, <L0>\nné(e) le <L2>\n<L5> (<L4>)\ninjection le <L9>\nDose : <L7>/<L8>",
+
+    "manageDataController.analytics.title": "Statistiques et mesure d’audience",
+    "manageDataController.analytics.subtitle": "En conformité avec le RGPD, nous vous informons de notre capacité à collecter des données sur l’usage que vous faites de TousAntiCovid, à des fins de diagnostics, d’amélioration de performance et de l’expérience utilisateur. Sachez enfin que ces données sont conservées sur le serveur pendant 3 mois.",
+    "manageDataController.analytics.switch.on": "Activé",
+    "manageDataController.analytics.switch.off": "Désactivé"
 	
 }
