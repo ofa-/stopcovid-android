@@ -345,14 +345,14 @@ class ManageDataFragment : MainFragment() {
 
     private fun additionalPrefsItems(items: MutableList<GenericItem>) {
         items += titleItem {
-            text = "Additional Preferences"
+            text = strings["manageDataController.preferences.section.title"]
             identifier = items.count().toLong()
         }
         items += spaceItem {
             spaceRes = R.dimen.spacing_medium
         }
         items += switchItem {
-            title = "Send analytics to server"
+            title = strings["manageDataController.preferences.switch.sendAnalyticsToServer"]
             isChecked = sharedPreferences.sendAnalytics
             onCheckChange = { isChecked ->
                 sharedPreferences.sendAnalytics = isChecked
@@ -363,7 +363,7 @@ class ManageDataFragment : MainFragment() {
             spaceRes = R.dimen.spacing_medium
         }
         items += switchItem {
-            title = "Show activation reminder"
+            title = strings["manageDataController.preferences.switch.showActivationReminder"]
             isChecked = sharedPreferences.showActivationReminderDialog
             onCheckChange = { isChecked ->
                 sharedPreferences.showActivationReminderDialog = isChecked
