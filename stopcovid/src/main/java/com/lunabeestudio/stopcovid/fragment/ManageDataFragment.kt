@@ -134,11 +134,6 @@ class ManageDataFragment : MainFragment() {
             spaceDividerItems(items)
         }
 
-        if (robertManager.configuration.isAnalyticsOn) {
-            optOutAnalyticsItems(items)
-            spaceDividerItems(items)
-        }
-
         if (deviceSetup != DeviceSetup.NO_BLE || robertManager.isRegistered) {
             quitStopCovidItems(items)
         }
