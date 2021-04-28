@@ -60,7 +60,7 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
-        def gitRev = "git rev-parse HEAD".execute().getText().substring(0, 6)
+        def gitRev = "git rev-parse HEAD".execute().getText().substring(0, 7)
 
         buildConfigField 'String', 'BUILD_ID', /"${gitRev}"/
     }
