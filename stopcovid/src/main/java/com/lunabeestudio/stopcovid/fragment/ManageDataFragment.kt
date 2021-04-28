@@ -17,6 +17,7 @@ import androidx.core.content.edit
 import androidx.fragment.app.viewModels
 import androidx.preference.PreferenceManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.lunabeestudio.analytics.extension.sendAnalytics
 import com.lunabeestudio.analytics.manager.AnalyticsManager
 import com.lunabeestudio.robert.RobertApplication
 import com.lunabeestudio.stopcovid.Constants
@@ -36,7 +37,6 @@ import com.lunabeestudio.stopcovid.extension.isolationManager
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
-import com.lunabeestudio.stopcovid.extension.sendAnalytics
 import com.lunabeestudio.stopcovid.extension.showActivationReminderDialog
 import com.lunabeestudio.stopcovid.extension.venuesFeaturedWasActivatedAtLeastOneTime
 import com.lunabeestudio.stopcovid.fastitem.dangerButtonItem

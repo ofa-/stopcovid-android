@@ -13,6 +13,7 @@ package com.lunabeestudio.analytics.extension
 import android.content.SharedPreferences
 import androidx.core.content.edit
 
+private const val SHARED_PREFS_SEND_ANALYTICS: String = "Shared.Prefs.Send.Analytics"
 private const val SHARED_PREFS_INSTALLATION_UUID: String = "Shared.Prefs.Installation.UUID"
 private const val SHARED_PREFS_PROXIMITY_START_TIME: String = "Shared.Prefs.Proximity.Start.Time"
 private const val SHARED_PREFS_PROXIMITY_ACTIVE_DURATION: String = "Shared.Prefs.Proximity.Active.Duration"
@@ -53,6 +54,12 @@ var SharedPreferences.statusSuccessCount: Int
     get() = getInt(SHARED_PREFS_STATUS_SUCCESS_COUNT, 0)
     set(value) = edit {
         putInt(SHARED_PREFS_STATUS_SUCCESS_COUNT, value)
+    }
+
+var SharedPreferences.sendAnalytics: Boolean
+    get() = getBoolean(SHARED_PREFS_SEND_ANALYTICS, false)
+    set(value) = edit {
+        putBoolean(SHARED_PREFS_SEND_ANALYTICS, value)
     }
 
 var SharedPreferences.isOptIn: Boolean

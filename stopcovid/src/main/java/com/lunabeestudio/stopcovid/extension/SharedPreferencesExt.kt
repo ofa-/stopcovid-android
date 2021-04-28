@@ -110,10 +110,6 @@ var SharedPreferences.hideRiskStatus: Boolean
     get() = getBoolean(Constants.SharedPrefs.HIDE_RISK_STATUS, false)
     set(value) = edit { putBoolean(Constants.SharedPrefs.HIDE_RISK_STATUS, value) }
 
-var SharedPreferences.sendAnalytics: Boolean
-    get() = getBoolean(Constants.SharedPrefs.SEND_ANALYTICS, false)
-    set(value) = edit { putBoolean(Constants.SharedPrefs.SEND_ANALYTICS, value) }
-
 var SharedPreferences.showActivationReminderDialog: Boolean
     get() = getBoolean(Constants.SharedPrefs.SHOW_ACTIVATION_REMINDER, false)
     set(value) = edit { putBoolean(Constants.SharedPrefs.SHOW_ACTIVATION_REMINDER, value) }

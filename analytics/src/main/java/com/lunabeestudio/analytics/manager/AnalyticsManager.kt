@@ -17,6 +17,7 @@ import androidx.core.util.AtomicFile
 import androidx.lifecycle.LifecycleObserver
 import com.lunabeestudio.analytics.extension.installationUUID
 import com.lunabeestudio.analytics.extension.isOptIn
+import com.lunabeestudio.analytics.extension.sendAnalytics
 import com.lunabeestudio.analytics.extension.proximityActiveDuration
 import com.lunabeestudio.analytics.extension.proximityStartTime
 import com.lunabeestudio.analytics.extension.statusSuccessCount
@@ -123,7 +124,7 @@ object AnalyticsManager : LifecycleObserver {
         analyticsInfosProvider: AnalyticsInfosProvider,
         token: String
     ) {
-        robertManager.configuration.isAnalyticsOn = getSharedPrefs(context).getBoolean("sendAnalytics", false)
+        robertManager.configuration.isAnalyticsOn = getSharedPrefs(context).sendAnalytics
         if (robertManager.configuration.isAnalyticsOn && getSharedPrefs(context).isOptIn) {
             val receivedHelloMessagesCount = robertManager.getLocalProximityCount()
             sendAppAnalytics(context, analyticsInfosProvider, token, receivedHelloMessagesCount)
