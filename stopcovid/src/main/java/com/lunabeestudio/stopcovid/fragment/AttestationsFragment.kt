@@ -71,21 +71,6 @@ class AttestationsFragment : QRCodeListFragment() {
             }
             identifier = label.hashCode().toLong()
         }
-        items += linkCardItem {
-            label = strings["attestationsController.termsOfUse"]
-            iconRes = R.drawable.ic_cgu
-            onClickListener = View.OnClickListener {
-                MaterialAlertDialogBuilder(requireContext())
-                    .setTitle(strings["attestationsController.termsOfUse.alert.title"])
-                    .setMessage(strings["attestationsController.termsOfUse.alert.message"])
-                    .setPositiveButton(strings["common.readMore"]) { _, _ ->
-                        strings["attestationsController.termsOfUse.url"]?.openInExternalBrowser(requireContext())
-                    }
-                    .setNegativeButton(strings["common.ok"], null)
-                    .show()
-            }
-            identifier = label.hashCode().toLong()
-        }
 
         items += spaceItem {
             spaceRes = R.dimen.spacing_large
@@ -139,6 +124,27 @@ class AttestationsFragment : QRCodeListFragment() {
                 spaceRes = R.dimen.spacing_large
                 identifier = items.count().toLong()
             }
+        }
+
+        items += linkItem {
+            text = strings["attestationsController.termsOfUse"]
+            forceShowArrow = true
+            onClickListener = View.OnClickListener {
+                MaterialAlertDialogBuilder(requireContext())
+                    .setTitle(strings["attestationsController.termsOfUse.alert.title"])
+                    .setMessage(strings["attestationsController.termsOfUse.alert.message"])
+                    .setPositiveButton(strings["common.readMore"]) { _, _ ->
+                        strings["attestationsController.termsOfUse.url"]?.openInExternalBrowser(requireContext())
+                    }
+                    .setNegativeButton(strings["common.ok"], null)
+                    .show()
+            }
+            identifier = "attestationsController.termsOfUse".hashCode().toLong()
+        }
+
+        items += spaceItem {
+            spaceRes = R.dimen.spacing_small
+            identifier = items.size.toLong()
         }
 
         items += captionItem {

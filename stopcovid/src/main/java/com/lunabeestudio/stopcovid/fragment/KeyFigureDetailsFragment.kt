@@ -10,7 +10,6 @@
 
 package com.lunabeestudio.stopcovid.fragment
 
-import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import androidx.lifecycle.lifecycleScope
@@ -22,6 +21,7 @@ import com.lunabeestudio.stopcovid.coreui.extension.appCompatActivity
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.extension.isNightMode
 import com.lunabeestudio.stopcovid.coreui.extension.viewLifecycleOwnerOrNull
+import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.cardWithActionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.databinding.ItemKeyFigureChartCardBinding
@@ -77,6 +77,9 @@ class KeyFigureDetailsFragment : KeyFigureGenericFragment() {
     override fun getItems(): List<GenericItem> {
         if (keyFigure == null) {
             return emptyList()
+        }
+        if (keyFigure?.series?.isEmpty() == true) {
+            return getNoDataItems()
         }
 
         val items = ArrayList<GenericItem>()
@@ -147,7 +150,8 @@ class KeyFigureDetailsFragment : KeyFigureGenericFragment() {
                         chartData = arrayOf(
                             localData(figure)
                         ).filterNotNull().toTypedArray()
-                        chartExplanationLabel = chartExplanationLabel(figure, chartData.plus(globalData(figure, true)))
+                        chartExplanationLabel = chartExplanationLabel(figure,
+                            chartData.plus(listOfNotNull(globalData(figure, true))))
                         shareContentDescription = strings["accessibility.hint.keyFigure.chart.share"]
                         onShareCard = { binding ->
                             shareChart(binding)
@@ -163,7 +167,7 @@ class KeyFigureDetailsFragment : KeyFigureGenericFragment() {
                 items += keyFigureCardChartItem {
                     chartData = arrayOf(
                         globalData(figure, false)
-                    )
+                    ).filterNotNull().toTypedArray()
                     chartExplanationLabel = chartExplanationLabel(figure, chartData)
                     shareContentDescription = strings["accessibility.hint.keyFigure.chart.share"]
                     onShareCard = { binding ->
@@ -219,6 +223,21 @@ class KeyFigureDetailsFragment : KeyFigureGenericFragment() {
         return items
     }
 
+    private fun getNoDataItems(): List<GenericItem> {
+        val items = ArrayList<GenericItem>()
+
+        items += spaceItem {
+            spaceRes = R.dimen.spacing_large
+            identifier = items.count().toLong()
+        }
+        items += captionItem {
+            text = stringsFormat("keyFigureDetailController.nodata", strings[keyFigure?.labelStringKey])
+            identifier = text.hashCode().toLong()
+        }
+
+        return items
+    }
+
     private fun shareChart(binding: ItemKeyFigureChartCardBinding) {
         viewLifecycleOwnerOrNull()?.lifecycleScope?.launch {
             val uri = getShareCaptureUri(binding, Constants.Chart.SHARE_CHART_FILENAME)
@@ -233,17 +252,20 @@ class KeyFigureDetailsFragment : KeyFigureGenericFragment() {
     @OptIn(ExperimentalTime::class)
     private fun chartExplanationLabel(figure: KeyFigure, chartData: Array<ChartData>): String? {
         return when {
+            chartData.isNotEmpty() && chartData[0].entries.isEmpty() -> stringsFormat(
+                "keyFigureDetailController.section.evolution.subtitle.nodata",
+                strings["${figure.labelKey}.label"])
             chartData.size > 1 -> stringsFormat(
                 "keyFigureDetailController.section.evolution.subtitle2Charts",
                 strings["${figure.labelKey}.label"],
-                chartData[0].entries.last().x.toLong().seconds.getRelativeDateShortString(requireContext()),
+                chartData[0].entries.lastOrNull()?.x?.toLong()?.seconds?.getRelativeDateShortString(requireContext()) ?: "",
                 chartData[0].currentValueToDisplay?.formatNumberIfNeeded(numberFormat),
                 chartData[1].currentValueToDisplay?.formatNumberIfNeeded(numberFormat)
             )
             chartData.isNotEmpty() -> stringsFormat(
                 "keyFigureDetailController.section.evolution.subtitle",
                 strings["${figure.labelKey}.label"],
-                chartData[0].entries.last().x.toLong().seconds.getRelativeDateShortString(requireContext()),
+                chartData[0].entries.lastOrNull()?.x?.toLong()?.seconds?.getRelativeDateShortString(requireContext()) ?: "",
                 chartData[0].currentValueToDisplay?.formatNumberIfNeeded(numberFormat)
             )
             else -> null
@@ -254,29 +276,33 @@ class KeyFigureDetailsFragment : KeyFigureGenericFragment() {
         val departmentKeyFigure = figure.getKeyFigureForPostalCode(sharedPrefs.chosenPostalCode)
 
         return departmentKeyFigure?.let {
-            ChartData(
-                description = figure.getKeyFigureForPostalCode(sharedPrefs.chosenPostalCode)?.dptLabel,
-                currentValueToDisplay = departmentKeyFigure.valueToDisplay,
-                entries = departmentKeyFigure.series
-                    .sortedBy { it.date }
-                    .map { Entry(it.date.toFloat(), it.value.toFloat()) },
-                color = strings[figure.colorStringKey(requireContext().isNightMode())].safeParseColor()
-            )
+            departmentKeyFigure.series?.let { series ->
+                ChartData(
+                    description = figure.getKeyFigureForPostalCode(sharedPrefs.chosenPostalCode)?.dptLabel,
+                    currentValueToDisplay = departmentKeyFigure.valueToDisplay,
+                    entries = series
+                        .sortedBy { it.date }
+                        .map { Entry(it.date.toFloat(), it.value.toFloat()) },
+                    color = strings[figure.colorStringKey(requireContext().isNightMode())].safeParseColor()
+                )
+            }
         }
     }
 
-    private fun globalData(figure: KeyFigure, isSecondary: Boolean) = ChartData(
-        description = strings["common.country.france"],
-        currentValueToDisplay = figure.valueGlobalToDisplay,
-        entries = figure.series
-            .sortedBy { it.date }
-            .map { Entry(it.date.toFloat(), it.value.toFloat()) },
-        color = if (isSecondary) {
-            strings[figure.colorStringKey(requireContext().isNightMode())].safeParseColor().brighterColor()
-        } else {
-            strings[figure.colorStringKey(requireContext().isNightMode())].safeParseColor()
-        }
-    )
+    private fun globalData(figure: KeyFigure, isSecondary: Boolean) = figure.series?.let { series ->
+        ChartData(
+            description = strings["common.country.france"],
+            currentValueToDisplay = figure.valueGlobalToDisplay,
+            entries = series
+                .sortedBy { it.date }
+                .map { Entry(it.date.toFloat(), it.value.toFloat()) },
+            color = if (isSecondary) {
+                strings[figure.colorStringKey(requireContext().isNightMode())].safeParseColor().brighterColor()
+            } else {
+                strings[figure.colorStringKey(requireContext().isNightMode())].safeParseColor()
+            }
+        )
+    }
 
     private fun avgGlobalData(figure: KeyFigure) = ChartData(
         description = stringsFormat("keyFigureDetailController.section.evolutionAvg.legendWithLocation", strings["common.country.france"]),

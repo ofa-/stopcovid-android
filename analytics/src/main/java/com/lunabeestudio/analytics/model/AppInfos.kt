@@ -10,18 +10,18 @@
 
 package com.lunabeestudio.analytics.model
 
+@Suppress("unused")
 class AppInfos(
     type: Int,
     os: String,
-    deviceModel: String,
-    osVersion: String,
-    appVersion: String,
-    appBuild: Int,
-    receivedHelloMessagesCount: Int,
-    secondsTracingActivated: Long,
-    placesCount: Int,
+    val deviceModel: String,
+    val osVersion: String,
+    val appVersion: String,
+    val appBuild: Int,
+    val receivedHelloMessagesCount: Int,
+    val placesCount: Int,
     val formsCount: Int,
     val certificatesCount: Int,
     val statusSuccessCount: Int,
     val userHasAZipcode: Boolean,
-) : Infos(type, os, deviceModel, osVersion, appVersion, appBuild, receivedHelloMessagesCount, secondsTracingActivated, placesCount)
+) : Infos(type, os)

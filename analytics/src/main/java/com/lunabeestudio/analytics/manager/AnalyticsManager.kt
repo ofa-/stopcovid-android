@@ -36,6 +36,7 @@ import com.lunabeestudio.analytics.proxy.AnalyticsInfosProvider
 import com.lunabeestudio.analytics.proxy.AnalyticsRobertManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
@@ -46,6 +47,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.UUID
+import kotlin.random.Random
 
 object AnalyticsManager : LifecycleObserver {
 
@@ -54,6 +56,8 @@ object AnalyticsManager : LifecycleObserver {
     private const val FILE_NAME_APP_ERRORS: String = "app_errors"
     private const val FILE_NAME_HEALTH_EVENTS: String = "heath_events"
     private const val SHARED_PREFS_NAME: String = "TacAnalytics"
+    private const val ANALYTICS_REPORT_MIN_DELAY: Long = 500L
+    private const val ANALYTICS_REPORT_MAX_DELAY: Long = 2000L
 
     private val dateFormat: DateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.FRANCE)
 
@@ -126,7 +130,8 @@ object AnalyticsManager : LifecycleObserver {
         if (robertManager.configuration.isAnalyticsOn && getSharedPrefs(context).isOptIn) {
             val receivedHelloMessagesCount = robertManager.getLocalProximityCount()
             sendAppAnalytics(context, analyticsInfosProvider, token, receivedHelloMessagesCount)
-            sendHealthAnalytics(context, robertManager, analyticsInfosProvider, token, receivedHelloMessagesCount)
+            delay(Random.nextLong(ANALYTICS_REPORT_MIN_DELAY, ANALYTICS_REPORT_MAX_DELAY))
+            sendHealthAnalytics(context, robertManager, analyticsInfosProvider, token)
         } else {
             reset(context)
         }
@@ -138,7 +143,7 @@ object AnalyticsManager : LifecycleObserver {
         token: String,
         receivedHelloMessagesCount: Int
     ) {
-        val appInfos = getAppInfos(context, analyticsInfosProvider, receivedHelloMessagesCount)
+        val appInfos = getAppInfos(analyticsInfosProvider, receivedHelloMessagesCount)
         val appEvents = getAppEvents(context)
         val appErrors = getErrors(context.filesDir)
         val sendAnalyticsRQ = SendAnalyticsRQ(
@@ -176,10 +181,9 @@ object AnalyticsManager : LifecycleObserver {
         context: Context,
         robertManager: AnalyticsRobertManager,
         analyticsInfosProvider: AnalyticsInfosProvider,
-        token: String,
-        receivedHelloMessagesCount: Int
+        token: String
     ) {
-        val healthInfos = getHealthInfos(context, robertManager, analyticsInfosProvider, receivedHelloMessagesCount)
+        val healthInfos = getHealthInfos(context, robertManager, analyticsInfosProvider)
         val healthEvents = getHealthEvents(context)
         val sendAnalyticsRQ = SendAnalyticsRQ(
             installationUuid = UUID.randomUUID().toString(),
@@ -269,9 +273,10 @@ object AnalyticsManager : LifecycleObserver {
         }
     }
 
-    private fun getAppInfos(context: Context,
+    private fun getAppInfos(
         infosProvider: AnalyticsInfosProvider,
-        receivedHelloMessagesCount: Int): AppInfos {
+        receivedHelloMessagesCount: Int
+    ): AppInfos {
         return AppInfos(
             type = 0,
             os = "Android",
@@ -280,29 +285,23 @@ object AnalyticsManager : LifecycleObserver {
             appVersion = infosProvider.getAppVersion(),
             appBuild = infosProvider.getAppBuild(),
             receivedHelloMessagesCount = receivedHelloMessagesCount,
-            secondsTracingActivated = getProximityActiveDuration(context) / 1000L,
             placesCount = infosProvider.getPlacesCount(),
             formsCount = infosProvider.getFormsCount(),
             certificatesCount = infosProvider.getCertificatesCount(),
-            statusSuccessCount = sharedPreferences.statusSuccessCount ?: 0,
+            statusSuccessCount = sharedPreferences.statusSuccessCount,
             userHasAZipcode = infosProvider.userHaveAZipCode(),
         )
     }
 
-    private fun getHealthInfos(context: Context,
+    private fun getHealthInfos(
+        context: Context,
         robertManager: AnalyticsRobertManager,
-        infosProvider: AnalyticsInfosProvider,
-        receivedHelloMessagesCount: Int): HealthInfos {
+        infosProvider: AnalyticsInfosProvider
+    ): HealthInfos {
         return HealthInfos(
             type = 1,
             os = "Android",
-            deviceModel = Build.MODEL,
-            osVersion = Build.VERSION.SDK_INT.toString(),
-            appVersion = infosProvider.getAppVersion(),
-            appBuild = infosProvider.getAppBuild(),
-            receivedHelloMessagesCount = receivedHelloMessagesCount,
             secondsTracingActivated = getProximityActiveDuration(context) / 1000L,
-            placesCount = infosProvider.getPlacesCount(),
             riskLevel = robertManager.atRiskStatus?.riskLevel,
             dateSample = infosProvider.getDateSample()?.let { dateFormat.format(Date(it)) },
             dateFirstSymptoms = infosProvider.getDateFirstSymptom()?.let { dateFormat.format(Date(it)) },

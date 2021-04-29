@@ -10,18 +10,13 @@
 
 package com.lunabeestudio.analytics.model
 
+@Suppress("unused")
 class HealthInfos(
     type: Int,
     os: String,
-    deviceModel: String,
-    osVersion: String,
-    appVersion: String,
-    appBuild: Int,
-    receivedHelloMessagesCount: Int,
-    secondsTracingActivated: Long,
-    placesCount: Int,
+    val secondsTracingActivated: Long,
     val riskLevel: Float?,
     val dateSample: String?,
     val dateFirstSymptoms: String?,
     val dateLastContactNotification: String?,
-) : Infos(type, os, deviceModel, osVersion, appVersion, appBuild, receivedHelloMessagesCount, secondsTracingActivated, placesCount)
+) : Infos(type, os)
