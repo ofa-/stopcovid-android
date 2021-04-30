@@ -28,7 +28,7 @@ data class KeyFigure(
     val displayOnSameChart: Boolean,
     val limitLine: Number?,
     val chartType: KeyFigureChartType = KeyFigureChartType.LINES,
-    val series: List<KeyFigureSeriesItem>,
+    val series: List<KeyFigureSeriesItem>?,
     val avgSeries: List<KeyFigureSeriesItem>?
 )
 
@@ -40,7 +40,7 @@ data class DepartmentKeyFigure(
     val valueToDisplay: String?,
     val color: String,
     val trend: Int?,
-    val series: List<KeyFigureSeriesItem>
+    val series: List<KeyFigureSeriesItem>?
 )
 
 data class KeyFigureSeriesItem(

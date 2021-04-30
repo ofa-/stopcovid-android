@@ -13,11 +13,4 @@ package com.lunabeestudio.analytics.model
 open class Infos(
     val type: Int,
     val os: String,
-    val deviceModel: String,
-    val osVersion: String,
-    val appVersion: String,
-    val appBuild: Int,
-    val receivedHelloMessagesCount: Int,
-    val secondsTracingActivated: Long,
-    val placesCount: Int,
 )

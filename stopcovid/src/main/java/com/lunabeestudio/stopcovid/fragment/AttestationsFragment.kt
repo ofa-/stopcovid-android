@@ -101,6 +101,7 @@ class AttestationsFragment : QRCodeListFragment() {
             }
             identifier = label.hashCode().toLong()
         }
+
         labelMap.forEach { key, labelText ->
         items += linkCardItem {
             label = "$key. $labelText"
@@ -110,21 +111,6 @@ class AttestationsFragment : QRCodeListFragment() {
             }
             identifier = label.hashCode().toLong()
         }
-        }
-        items += linkCardItem {
-            label = strings["attestationsController.termsOfUse"]
-            iconRes = R.drawable.ic_cgu
-            onClickListener = View.OnClickListener {
-                MaterialAlertDialogBuilder(requireContext())
-                    .setTitle(strings["attestationsController.termsOfUse.alert.title"])
-                    .setMessage(strings["attestationsController.termsOfUse.alert.message"])
-                    .setPositiveButton(strings["common.readMore"]) { _, _ ->
-                        strings["attestationsController.termsOfUse.url"]?.openInExternalBrowser(requireContext())
-                    }
-                    .setNegativeButton(strings["common.ok"], null)
-                    .show()
-            }
-            identifier = label.hashCode().toLong()
         }
 
         items += spaceItem {
