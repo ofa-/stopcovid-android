@@ -1173,6 +1173,21 @@ class ProximityFragment : TimeMainFragment() {
 
     private fun updateErrorLayout(errorLayout: FrameLayout?, deviceSetup: DeviceSetup?) {
         getActivityBinding()?.errorTextView?.text = ProximityManager.getErrorText(this, robertManager, currentServiceError, strings)
+        val clickListener = getErrorClickListener()
+        getActivityBinding()?.errorTextView?.setOnClickListener(clickListener)
+        if (clickListener != null) {
+            getActivityBinding()?.errorTextView?.addRipple()
+        } else {
+            getActivityBinding()?.errorTextView?.background = null
+        }
+        if (getActivityBinding()?.errorTextView?.text.isNullOrEmpty()) {
+            hideErrorLayout(errorLayout)
+        } else if (deviceSetup != DeviceSetup.NO_BLE) {
+            showErrorLayout(errorLayout)
+        }
+    }
+
+    private fun getErrorClickListener() : View.OnClickListener? {
         val clickListener = ProximityManager.getErrorClickListener(this, robertManager, currentServiceError, {
             if (SystemClock.elapsedRealtime() > proximityClickThreshold) {
                 proximityClickThreshold = SystemClock.elapsedRealtime() + PROXIMITY_BUTTON_DELAY
@@ -1186,17 +1201,7 @@ class ProximityFragment : TimeMainFragment() {
 
             }
         }
-        getActivityBinding()?.errorTextView?.setOnClickListener(clickListener)
-        if (clickListener != null) {
-            getActivityBinding()?.errorTextView?.addRipple()
-        } else {
-            getActivityBinding()?.errorTextView?.background = null
-        }
-        if (getActivityBinding()?.errorTextView?.text.isNullOrEmpty()) {
-            hideErrorLayout(errorLayout)
-        } else if (deviceSetup != DeviceSetup.NO_BLE) {
-            showErrorLayout(errorLayout)
-        }
+        return clickListener
     }
 
     private fun hideErrorLayout(errorLayout: FrameLayout?) {
