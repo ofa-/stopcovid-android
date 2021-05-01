@@ -1056,7 +1056,9 @@ class ProximityFragment : TimeMainFragment() {
             }
 
             proximityButtonItem?.showMainButton = !isProximityOn
-            proximityButtonItem?.isButtonEnabled = deviceSetup == DeviceSetup.BLE
+            if (deviceSetup != DeviceSetup.BLE) {
+                proximityButtonItem?.onClickListener = getErrorClickListener()
+            }
 
             if (isAdded && !isHidden) {
                 refreshTitleAndErrorLayout()
