@@ -20,9 +20,11 @@ import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import no.nordicsemi.android.support.v18.scanner.ScanRecord
 import no.nordicsemi.android.support.v18.scanner.ScanResult
+import org.junit.Ignore
 import org.junit.runner.RunWith
 import java.util.UUID
 
+@Ignore
 @RunWith(ZohhakRunner::class)
 class ScanResultExtKtTest {
 

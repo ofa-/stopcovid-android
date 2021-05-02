@@ -39,6 +39,7 @@ import com.orange.proximitynotification.tools.Result
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Assert
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -463,6 +464,7 @@ class BleProximityNotificationWithAdvertiserTest {
         verify(bleGattManager, atLeastOnce()).stop()
     }
 
+    @Ignore
     @Test
     fun notifyPayloadUpdated_should_restart_advertiser() = testCoroutineRule.runBlockingTest {
 
