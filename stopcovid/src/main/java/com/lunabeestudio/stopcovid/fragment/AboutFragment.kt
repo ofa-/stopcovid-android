@@ -59,11 +59,7 @@ class AboutFragment : MainFragment() {
     }
 
     private fun toast(text: String?) {
-        CoroutineScope(Dispatchers.Main).launch {
-            Toast.makeText(requireContext(), text, Toast.LENGTH_SHORT).also {
-                it.setGravity(Gravity.CENTER, 0, 0)
-            }.show()
-        }
+        toast(requireContext(), text)
     }
 
     private fun checkNewVersion() {
@@ -248,5 +244,13 @@ class AboutFragment : MainFragment() {
         fun autoDeleteFile(): Boolean {
             return file.let { it.exists() && it.delete() }
         }
+    }
+}
+
+fun toast(context: Context, text: String?) {
+    CoroutineScope(Dispatchers.Main).launch {
+        Toast.makeText(context, text, Toast.LENGTH_SHORT).also {
+            it.setGravity(Gravity.CENTER, 0, 0)
+        }.show()
     }
 }

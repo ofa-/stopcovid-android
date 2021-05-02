@@ -354,9 +354,7 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
     }
 
     private fun toast(text: String?) {
-        Toast.makeText(context, text, Toast.LENGTH_SHORT).also {
-            it.setGravity(Gravity.CENTER, 0, 0)
-        }.show()
+        toast(requireContext(), text)
     }
 
     override fun refreshScreen() {

@@ -1291,11 +1291,7 @@ class ProximityFragment : TimeMainFragment() {
     }
 
     private fun toast(text: String?) {
-        CoroutineScope(Dispatchers.Main).launch {
-            Toast.makeText(requireContext(), text, Toast.LENGTH_SHORT).also {
-                it.setGravity(Gravity.CENTER, 0, 0)
-            }.show()
-        }
+        toast(requireContext(), text)
     }
 
     private fun downloadLatest() {
