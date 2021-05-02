@@ -962,14 +962,14 @@ class ProximityFragment : TimeMainFragment() {
                         requireContext().secureKeystoreDataSource(),
                     ).isNullOrEmpty())
                 },
-                Action(R.drawable.ic_settings, strings["common.settings"]) {
-                    findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToManageDataFragment())
-                },
                 Action(R.drawable.ic_2d_doc, strings["home.moreSection.verifySanitaryCertificate"]) {
                     findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToVerifyWalletQRCodeFragment())
                 }.takeIf {
                     true ||
                     robertManager.configuration.displaySanitaryCertificatesValidation
+                },
+                Action(R.drawable.ic_settings, strings["common.settings"]) {
+                    findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToManageDataFragment())
                 },
                 Action(R.drawable.ic_about, strings["home.moreSection.aboutStopCovid"]) {
                     findNavControllerOrNull()?.safeNavigate(R.id.nav_about, null, navOptions {
