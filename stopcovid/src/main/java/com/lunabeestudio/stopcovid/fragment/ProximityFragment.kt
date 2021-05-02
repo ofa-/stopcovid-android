@@ -967,6 +967,7 @@ class ProximityFragment : TimeMainFragment() {
                 Action(R.drawable.ic_2d_doc, strings["home.moreSection.verifySanitaryCertificate"]) {
                     findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToVerifyWalletQRCodeFragment())
                 }.takeIf {
+                    true ||
                     robertManager.configuration.displaySanitaryCertificatesValidation
                 },
                 Action(R.drawable.ic_privacy, strings["home.moreSection.privacy"]) {
