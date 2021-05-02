@@ -970,9 +970,6 @@ class ProximityFragment : TimeMainFragment() {
                     true ||
                     robertManager.configuration.displaySanitaryCertificatesValidation
                 },
-                Action(R.drawable.ic_privacy, strings["home.moreSection.privacy"]) {
-                    findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToPrivacyFragment())
-                },
                 Action(R.drawable.ic_about, strings["home.moreSection.aboutStopCovid"]) {
                     findNavControllerOrNull()?.safeNavigate(R.id.nav_about, null, navOptions {
                         anim {
