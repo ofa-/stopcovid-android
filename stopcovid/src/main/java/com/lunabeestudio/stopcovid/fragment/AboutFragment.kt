@@ -19,11 +19,13 @@ import android.content.IntentFilter
 import android.net.Uri
 import android.os.Environment
 import android.view.Gravity
+import android.view.View
 import android.widget.Toast
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import com.lunabeestudio.stopcovid.BuildConfig
 import com.lunabeestudio.stopcovid.R
+import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.dividerItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
@@ -31,6 +33,7 @@ import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
 import com.lunabeestudio.stopcovid.fastitem.linkItem
 import com.lunabeestudio.stopcovid.fastitem.logoItem
 import com.lunabeestudio.stopcovid.extension.openInExternalBrowser
+import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.mikepenz.fastadapter.GenericItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -121,6 +124,14 @@ class AboutFragment : MainFragment() {
         }
         items += dividerItem {
             identifier = items.count().toLong()
+        }
+        items += linkItem {
+            iconRes = R.drawable.ic_privacy
+            text = strings["home.moreSection.privacy"]
+            onClickListener = View.OnClickListener {
+                    findNavControllerOrNull()?.safeNavigate(AboutFragmentDirections.actionAboutFragmentToPrivacyFragment())
+                }
+            identifier = items.size.toLong()
         }
         items += linkItem {
             iconRes = R.drawable.ic_email
