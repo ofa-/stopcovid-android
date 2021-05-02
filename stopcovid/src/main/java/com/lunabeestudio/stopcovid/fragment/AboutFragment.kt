@@ -110,18 +110,6 @@ class AboutFragment : MainFragment() {
             spaceRes = R.dimen.spacing_xlarge
             identifier = items.size.toLong()
         }
-        items += titleItem {
-            text = strings["aboutController.mainMessage.title"]
-            identifier = items.size.toLong()
-        }
-        items += captionItem {
-            text = strings["aboutController.mainMessage.subtitle"]
-            identifier = items.size.toLong()
-        }
-        items += spaceItem {
-            spaceRes = R.dimen.spacing_xlarge
-            identifier = items.size.toLong()
-        }
         items += dividerItem {
             identifier = items.count().toLong()
         }
