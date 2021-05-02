@@ -90,6 +90,7 @@ import com.lunabeestudio.stopcovid.extension.openInExternalBrowser
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
+import com.lunabeestudio.stopcovid.extension.showErrorPanel
 import com.lunabeestudio.stopcovid.extension.showPostalCodeDialog
 import com.lunabeestudio.stopcovid.extension.showActivationReminderDialog
 import com.lunabeestudio.stopcovid.extension.toCovidException
@@ -1087,7 +1088,9 @@ class ProximityFragment : TimeMainFragment() {
     private fun refreshTitleAndErrorLayout() {
         (activity as AppCompatActivity).supportActionBar?.title = strings[getTitleKey()]
         asyncUpdateNewVersionAvailableTitle()
-        //refreshErrorLayout()
+        if (sharedPrefs.showErrorPanel) {
+            refreshErrorLayout()
+        }
     }
 
     private fun refreshErrorLayout() {

@@ -73,6 +73,7 @@
     "manageDataController.preferences.section.title": "التفضيلات",
     "manageDataController.preferences.switch.sendAnalyticsToServer": "إرسال الإحصائيات إلى الخادم",
     "manageDataController.preferences.switch.showActivationReminder": "إظهار تذكير التنشيط",
+    "manageDataController.preferences.switch.showErrorPanel": "إظهار علامة التنشيط",
     "proximityController.title": "التقارب",
     "proximityController.tuneProximity": "القرب",
     "proximityController.toast.copied": "نسخ",
