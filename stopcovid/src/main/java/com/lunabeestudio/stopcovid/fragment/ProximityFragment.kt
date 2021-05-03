@@ -941,7 +941,7 @@ class ProximityFragment : TimeMainFragment() {
 
         items += cardWithActionItem {
             actions = listOfNotNull(
-                Action(R.drawable.ic_settings, strings["proximityController.tuneProximity"]) {
+                Action(R.drawable.ic_compass, strings["proximityController.tuneProximity"]) {
                     findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToTuneProximityFragment())
                 },
                 Action(R.drawable.ic_link, strings["home.moreSection.usefulLinks"]) {
