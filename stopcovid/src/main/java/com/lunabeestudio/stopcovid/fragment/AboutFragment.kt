@@ -121,6 +121,9 @@ class AboutFragment : MainFragment() {
                 }
             identifier = items.size.toLong()
         }
+        items += dividerItem {
+            identifier = items.count().toLong()
+        }
         items += linkItem {
             iconRes = R.drawable.ic_email
             text = strings["aboutController.contactUsByEmail"]
