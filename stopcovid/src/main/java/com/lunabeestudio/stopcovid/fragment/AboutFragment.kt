@@ -152,6 +152,15 @@ class AboutFragment : MainFragment() {
             identifier = items.count().toLong()
         }
         items += linkItem {
+            iconRes = R.drawable.ic_history
+            text = strings["aboutController.versionHistory"]
+            url = releasesUri
+            identifier = items.size.toLong()
+        }
+        items += dividerItem {
+            identifier = items.count().toLong()
+        }
+        items += linkItem {
             iconRes = R.drawable.ic_web
             text = strings["aboutController.webpage"]
             url = strings["aboutController.webpageUrl"]

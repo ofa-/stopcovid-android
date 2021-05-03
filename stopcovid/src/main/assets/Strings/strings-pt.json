@@ -67,6 +67,7 @@
     "aboutController.opinion": "Dar a minha opinião",
     "aboutController.opinionUrl": "https://voxusagers.numerique.gouv.fr/Demarches/2543?&view-mode=formulaire-avis&nd_mode=en-ligne-enti%C3%A8rement&nd_source=button&key=d209f7b2be0fca3de1df21eaeff49a97",
     "aboutController.appVersion": "Versão %@ #%@",
+    "aboutController.versionHistory": "Histórico de versão",
     "aboutController.toast.alreadyUpToDate": "💕  🐭   Já atualizado   🐱  💋",
     "aboutController.toast.downloadingLatest": "⏬ 🐱   baixando   🐭 ⏬",
     "aboutController.toast.errorFetchingUpdates": "🐰   erro de rede   🎃",
