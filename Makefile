@@ -42,7 +42,7 @@ strings-%:
 
 keystore = stopcovid/my-release-key.jks
 
-build: $(keystore) .
+build: $(keystore) local.properties .
 	./gradlew assembleRelease
 
 install:
@@ -52,3 +52,6 @@ $(keystore):
 	echo "password,password,,,,,,,yes" | tr , "\n" |\
 	keytool -genkey -v -keystore $(keystore) \
 		-keyalg RSA -keysize 2048 -validity 10000 -alias my-alias
+
+local.properties:
+	cp $@.sample $@
