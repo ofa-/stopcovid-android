@@ -47,6 +47,7 @@ import com.lunabeestudio.framework.local.datasource.SecureFileEphemeralBluetooth
 import com.lunabeestudio.framework.local.datasource.SecureFileLocalProximityDataSource
 import com.lunabeestudio.framework.local.datasource.SecureKeystoreDataSource
 import com.lunabeestudio.framework.manager.LocalProximityFilterImpl
+import com.lunabeestudio.framework.remote.datasource.CleaDataSource
 import com.lunabeestudio.framework.remote.datasource.ServiceDataSource
 import com.lunabeestudio.robert.RobertApplication
 import com.lunabeestudio.robert.RobertManager
@@ -112,11 +113,11 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
 
     private val appCoroutineScope = CoroutineScope(Dispatchers.Main + SupervisorJob() + coroutineExceptionHandler)
 
+    override var isAppInForeground: Boolean = false
+
     private val sharedPrefs: SharedPreferences by lazy {
         PreferenceManager.getDefaultSharedPreferences(this)
     }
-
-    var isAppInForeground: Boolean = false
 
     private val cryptoManager: LocalCryptoManager by lazy {
         LocalCryptoManager(this)
@@ -135,9 +136,14 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
             ServiceDataSource(
                 this,
                 EnvConstant.Prod.baseUrl,
-                EnvConstant.Prod.warningBaseUrl,
                 EnvConstant.Prod.certificateSha256,
-                EnvConstant.Prod.warningCertificateSha256,
+            ),
+            CleaDataSource(
+                this,
+                EnvConstant.Prod.cleaReportBaseUrl,
+                EnvConstant.Prod.cleaReportCertificateSha256,
+                EnvConstant.Prod.cleaStatusBaseUrl,
+                EnvConstant.Prod.cleaStatusCertificateSha256
             ),
             BouncyCastleCryptoDataSource(),
             ConfigDataSource,
@@ -271,7 +277,7 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
         deleteOldAttestations()
         VenuesManager.clearExpired(robertManager, secureKeystoreDataSource)
         appCoroutineScope.launch {
-            robertManager.wreportIfNeeded(this@StopCovid, false)
+            robertManager.cleaReportIfNeeded(this@StopCovid, false)
         }
     }
 

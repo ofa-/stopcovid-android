@@ -95,6 +95,12 @@ internal class KeystoreRepository(
             robertManager.refreshAtRisk()
         }
 
+    var cleaLastStatusIteration: Int?
+        get() = keystoreDataSource.cleaLastStatusIteration
+        set(value) {
+            keystoreDataSource.cleaLastStatusIteration = value
+        }
+
     var atRiskLastRefresh: Long?
         get() = keystoreDataSource.atRiskLastRefresh
         set(value) {

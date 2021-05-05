@@ -16,6 +16,7 @@ import com.lunabeestudio.domain.model.VenueQrCode
 
 interface RobertApplication : AnalyticsInfosProvider {
     val robertManager: RobertManager
+    var isAppInForeground: Boolean
     fun getAppContext(): Context
     fun refreshProximityService()
     fun notifyAtRiskLevelChange()

@@ -11,57 +11,40 @@
 package com.lunabeestudio.framework.remote.datasource
 
 import android.content.Context
-import com.lunabeestudio.analytics.manager.AnalyticsManager
 import com.lunabeestudio.domain.model.LocalProximity
 import com.lunabeestudio.domain.model.RegisterReport
 import com.lunabeestudio.domain.model.ReportResponse
 import com.lunabeestudio.domain.model.ServerStatusUpdate
 import com.lunabeestudio.domain.model.StatusReport
-import com.lunabeestudio.domain.model.VenueQrCode
-import com.lunabeestudio.domain.model.WStatusReport
 import com.lunabeestudio.framework.remote.RetrofitClient
 import com.lunabeestudio.framework.remote.extension.remoteToRobertException
-import com.lunabeestudio.framework.remote.model.ApiCommonRS
 import com.lunabeestudio.framework.remote.model.ApiDeleteExposureHistoryRQ
 import com.lunabeestudio.framework.remote.model.ApiRegisterV2RQ
 import com.lunabeestudio.framework.remote.model.ApiReportRQ
 import com.lunabeestudio.framework.remote.model.ApiStatusRQ
 import com.lunabeestudio.framework.remote.model.ApiUnregisterRQ
-import com.lunabeestudio.framework.remote.model.ApiWReportRQ
-import com.lunabeestudio.framework.remote.model.ApiWStatusRQ
 import com.lunabeestudio.framework.remote.model.CaptchaRQ
 import com.lunabeestudio.framework.remote.model.toDomain
 import com.lunabeestudio.framework.remote.server.StopCovidApi
-import com.lunabeestudio.framework.remote.server.StopCovidWarningApi
+import com.lunabeestudio.framework.utils.RequestHelper
 import com.lunabeestudio.robert.datasource.RemoteServiceDataSource
-import com.lunabeestudio.robert.model.BackendException
 import com.lunabeestudio.robert.model.RobertResult
 import com.lunabeestudio.robert.model.RobertResultData
-import retrofit2.HttpException
-import retrofit2.Response
-import timber.log.Timber
 import java.io.File
 
 class ServiceDataSource(
     private val context: Context,
     baseUrl: String,
-    warningBaseUrl: String,
-    certificateSha256: String,
-    warningCertificateSha256: String,
+    certificateSha256: String
 ) : RemoteServiceDataSource {
 
     private var filesDir = context.filesDir
     private var api: StopCovidApi = RetrofitClient.getService(context, baseUrl, certificateSha256, StopCovidApi::class.java)
-    private var warningApi: StopCovidWarningApi = RetrofitClient.getWarningService(
-        context,
-        warningBaseUrl,
-        warningCertificateSha256,
-        StopCovidWarningApi::class.java
-    )
     private var fileApi: StopCovidApi = RetrofitClient.getFileService(context, baseUrl, certificateSha256, StopCovidApi::class.java)
 
     override suspend fun generateCaptcha(apiVersion: String, type: String, language: String): RobertResultData<String> {
-        val result = tryCatchRequestData(apiVersion, "captcha-${type}") {
+
+        val result = RequestHelper.tryCatchRequestData(context, filesDir, apiVersion, "captcha-${type}") {
             api.captcha(apiVersion, CaptchaRQ(type = type, locale = language))
         }
         return when (result) {
@@ -71,7 +54,8 @@ class ServiceDataSource(
     }
 
     override suspend fun getCaptcha(apiVersion: String, captchaId: String, type: String, path: String): RobertResult {
-        val result = tryCatchRequestData(apiVersion, "captcha") {
+
+        val result = RequestHelper.tryCatchRequestData(context, filesDir, apiVersion, "captcha") {
             fileApi.getCaptcha(apiVersion, captchaId, type)
         }
         return when (result) {
@@ -97,7 +81,8 @@ class ServiceDataSource(
         captchaId: String,
         clientPublicECDHKey: String,
     ): RobertResultData<RegisterReport> {
-        val result = tryCatchRequestData(apiVersion, "register") {
+
+        val result = RequestHelper.tryCatchRequestData(context, filesDir, apiVersion, "register") {
             api.registerV2(apiVersion, ApiRegisterV2RQ(captcha = captcha, captchaId = captchaId, clientPublicECDHKey = clientPublicECDHKey))
         }
         return when (result) {
@@ -107,13 +92,13 @@ class ServiceDataSource(
     }
 
     override suspend fun unregister(apiVersion: String, ssu: ServerStatusUpdate): RobertResult {
-        return tryCatchRequest(apiVersion, "unregister") {
+        return RequestHelper.tryCatchRequest(context, filesDir, apiVersion, "unregister") {
             api.unregister(apiVersion, ApiUnregisterRQ(ebid = ssu.ebid, epochId = ssu.epochId, time = ssu.time, mac = ssu.mac))
         }
     }
 
     override suspend fun status(apiVersion: String, ssu: ServerStatusUpdate): RobertResultData<StatusReport> {
-        val result = tryCatchRequestData(apiVersion, "status") {
+        val result = RequestHelper.tryCatchRequestData(context, filesDir, apiVersion, "status") {
             api.status(
                 apiVersion, ApiStatusRQ(
                 ebid = ssu.ebid,
@@ -129,28 +114,13 @@ class ServiceDataSource(
         }
     }
 
-    override suspend fun wstatus(
-        warningApiVersion: String,
-        venueQrCodeList: List<VenueQrCode>,
-    ): RobertResultData<WStatusReport> {
-        val result = tryCatchRequestData(warningApiVersion, "wstatus") {
-            warningApi.wstatus(
-                warningApiVersion,
-                ApiWStatusRQ.fromVenueQrCodeList(venueQrCodeList)
-            )
-        }
-        return when (result) {
-            is RobertResultData.Success -> RobertResultData.Success(result.data.toDomain())
-            is RobertResultData.Failure -> RobertResultData.Failure(result.error)
-        }
-    }
-
     override suspend fun report(
         apiVersion: String,
         token: String,
         localProximityList: List<LocalProximity>,
     ): RobertResultData<ReportResponse> {
-        val result = tryCatchRequestData(apiVersion, "report") {
+
+        val result = RequestHelper.tryCatchRequestData(context, filesDir, apiVersion, "report") {
             api.report(apiVersion, ApiReportRQ.fromLocalProximityList(token, localProximityList))
         }
         return when (result) {
@@ -159,73 +129,12 @@ class ServiceDataSource(
         }
     }
 
-    override suspend fun wreport(
-        warningApiVersion: String,
-        token: String,
-        venueQrCodeList: List<VenueQrCode>,
-    ): RobertResult {
-        return tryCatchRequest(warningApiVersion, "wreport") {
-            warningApi.wreport(warningApiVersion, "Bearer $token", ApiWReportRQ.fromVenueQrCodeList(venueQrCodeList))
-        }
-    }
-
     override suspend fun deleteExposureHistory(apiVersion: String, ssu: ServerStatusUpdate): RobertResult {
-        return tryCatchRequest(apiVersion, "deleteExposureHistory") {
+        return RequestHelper.tryCatchRequest(context, filesDir, apiVersion, "deleteExposureHistory") {
             api.deleteExposureHistory(
                 apiVersion,
                 ApiDeleteExposureHistoryRQ(ebid = ssu.ebid, epochId = ssu.epochId, time = ssu.time, mac = ssu.mac)
             )
-        }
-    }
-
-    @Suppress("BlockingMethodInNonBlockingContext")
-    private suspend fun tryCatchRequest(
-        apiVersion: String,
-        serviceName: String,
-        doRequest: suspend () -> Response<ApiCommonRS>
-    ): RobertResult {
-        return try {
-            val result = doRequest()
-            if (result.isSuccessful) {
-                if (result.body()?.success == true) {
-                    RobertResult.Success()
-                } else {
-                    AnalyticsManager.reportWSError(context, filesDir, serviceName, apiVersion, result.code())
-                    RobertResult.Failure(
-                        BackendException(
-                            result.body()?.message!!
-                        )
-                    )
-                }
-            } else {
-                AnalyticsManager.reportWSError(context, filesDir, serviceName, apiVersion, result.code())
-                RobertResult.Failure(HttpException(result).remoteToRobertException())
-            }
-        } catch (e: Exception) {
-            Timber.e(ServiceDataSource::class.java.simpleName, e.message ?: "")
-            AnalyticsManager.reportWSError(context, filesDir, serviceName, apiVersion, (e as? HttpException)?.code() ?: 0, e.message)
-            RobertResult.Failure(error = e.remoteToRobertException())
-        }
-    }
-
-    @Suppress("BlockingMethodInNonBlockingContext")
-    private suspend fun <T> tryCatchRequestData(
-        apiVersion: String,
-        serviceName: String,
-        doRequest: suspend () -> Response<T>
-    ): RobertResultData<T> {
-        return try {
-            val result = doRequest()
-            if (result.isSuccessful) {
-                RobertResultData.Success(result.body()!!)
-            } else {
-                AnalyticsManager.reportWSError(context, filesDir, serviceName, apiVersion, result.code())
-                RobertResultData.Failure(HttpException(result).remoteToRobertException())
-            }
-        } catch (e: Exception) {
-            Timber.e(e)
-            AnalyticsManager.reportWSError(context, filesDir, serviceName, apiVersion, (e as? HttpException)?.code() ?: 0, e.message)
-            RobertResultData.Failure(error = e.remoteToRobertException())
         }
     }
 }

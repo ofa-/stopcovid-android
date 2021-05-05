@@ -17,6 +17,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.lunabeestudio.domain.extension.ntpTimeSToUnixTimeMs
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
+import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
 import com.lunabeestudio.stopcovid.extension.setImageResourceOrHide
 import com.lunabeestudio.stopcovid.fastitem.deleteCardItem
@@ -52,11 +53,11 @@ class VenuesHistoryFragment : MainFragment() {
         items.addAll(VenuesManager.getVenuesQrCode(requireContext().secureKeystoreDataSource())
             ?.reversed()
             ?.map { venueQrCode ->
-                val venueType = strings["venueType.${venueQrCode.venueType}"] ?: strings["venueType.default"] ?: ""
+                val venueType = strings["venueType.default"] ?: ""
                 val venueDate = dateTimeFormat.format(Date(venueQrCode.ntpTimestamp.ntpTimeSToUnixTimeMs()))
                 deleteCardItem {
                     title = stringsFormat("venuesHistoryController.entry", venueType, venueDate)
-                    caption = venueQrCode.uuid
+                    caption = venueQrCode.ltid
                     deleteContentDescription = strings["common.delete"]
                     onDelete = {
                         MaterialAlertDialogBuilder(requireContext())
@@ -75,6 +76,10 @@ class VenuesHistoryFragment : MainFragment() {
 
         val footer = strings["venuesHistoryController.footer"]
         if (items.isNotEmpty() && !footer.isNullOrBlank()) {
+            items += spaceItem {
+                spaceRes = R.dimen.spacing_large
+                identifier = items.count().toLong()
+            }
             items += captionItem {
                 text = footer
                 textAppearance = R.style.TextAppearance_StopCovid_Caption_Small_Grey

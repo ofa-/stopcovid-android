@@ -10,5 +10,7 @@
 
 package com.lunabeestudio.domain.extension
 
-fun Long.unixTimeMsToNtpTimeS(): Long = this / 1000L + 2208988800
-fun Long.ntpTimeSToUnixTimeMs(): Long = (this - 2208988800) * 1000L
+fun Long.unixTimeMsToNtpTimeS(): Long = (this / 1000L).unixTimeSToNtpTimeS()
+fun Long.unixTimeSToNtpTimeS(): Long = this + 2208988800
+fun Long.ntpTimeSToUnixTimeMs(): Long = ntpTimeSToUnixTimeS() * 1000L
+fun Long.ntpTimeSToUnixTimeS(): Long = (this - 2208988800)

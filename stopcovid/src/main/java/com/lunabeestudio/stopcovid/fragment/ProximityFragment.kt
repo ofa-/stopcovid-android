@@ -576,9 +576,8 @@ class ProximityFragment : TimeMainFragment() {
 
     private fun addVenueItems(items: ArrayList<GenericItem>, isSick: Boolean) {
         val displayRecordVenues = robertManager.configuration.displayRecordVenues
-        val displayPrivateEvent = robertManager.configuration.displayPrivateEvent
 
-        if (!isSick && (displayRecordVenues || displayPrivateEvent)) {
+        if (!isSick && displayRecordVenues) {
             items += bigTitleItem {
                 text = strings["home.venuesSection.title"]
                 identifier = "home.venuesSection.title".hashCode().toLong()
@@ -602,19 +601,6 @@ class ProximityFragment : TimeMainFragment() {
                 }
             }
 
-            if (displayPrivateEvent) {
-                items += cardWithActionItem {
-                    mainImage = R.drawable.parties_card
-                    onCardClick = {
-                        startPrivateEvent()
-                    }
-                    mainTitle = strings["home.venuesSection.privateCell.title"]
-                    mainBody = strings["home.venuesSection.privateCell.subtitle"]
-                    mainLayoutDirection = LayoutDirection.RTL
-                    identifier = R.drawable.parties_card.toLong()
-                }
-            }
-
             items += spaceItem {
                 spaceRes = R.dimen.spacing_large
                 identifier = items.count().toLong()
@@ -625,20 +611,6 @@ class ProximityFragment : TimeMainFragment() {
     private fun startRecordVenue() {
         AnalyticsManager.reportAppEvent(requireContext(), AppEventName.e12, null)
         findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToVenueQrCodeFragment())
-    }
-
-    private fun startPrivateEvent() {
-        when {
-            !robertManager.isRegistered -> {
-                findNavControllerOrNull()
-                    ?.safeNavigate(
-                        ProximityFragmentDirections.actionProximityFragmentToCaptchaFragment(CaptchaNextFragment.Private)
-                    )
-            }
-            else -> {
-                findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToVenuesPrivateEventFragment())
-            }
-        }
     }
 
     private fun addNewsItems(items: ArrayList<GenericItem>) {
@@ -980,7 +952,8 @@ class ProximityFragment : TimeMainFragment() {
                     if (viewModel.refreshConfig(requireContext().applicationContext as RobertApplication)) {
                         withContext(Dispatchers.Main) {
                             findNavControllerOrNull()
-                                ?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToCaptchaFragment(CaptchaNextFragment.Back))
+                                ?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToCaptchaFragment(CaptchaNextFragment.Back,
+                                    null))
                         }
                     }
                 }

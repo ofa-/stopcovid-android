@@ -23,8 +23,8 @@ import com.lunabeestudio.stopcovid.model.VaccinationCertificate
 import com.lunabeestudio.stopcovid.model.WalletCertificateMalformedException
 import com.lunabeestudio.support.extension.doNotCheckCertificatesKey
 import com.lunabeestudio.support.robert.SupportRobertManager
-import org.junit.Assert
 import org.junit.Test
+import org.junit.Assert
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.concurrent.TimeUnit

@@ -14,10 +14,12 @@ enum class EnvConstant {
     Prod {
         override val captchaApiKey: String = "6LettPsUAAAAAHYaFdRBOilHUgmTMSIPKNZN4D7l"
         override val baseUrl: String = "https://api.tousanticovid.gouv.fr"
-        override val warningBaseUrl: String = "https://tacw.tousanticovid.gouv.fr"
-        override val analyticsBaseUrl: String = "https://analytics-api.tousanticovid.gouv.fr"
         override val certificateSha256: String = "sha256/xrPKKhmYeHgk4v57GcqYPrFpnI3f1FTmEfol9WIicaI="
-        override val warningCertificateSha256: String = "sha256/b7w+uqyD+XILNIlRc3XVmEROwFCVTv5yOchb2i5FJbo="
+        override val cleaStatusBaseUrl: String = "https://s3.fr-par.scw.cloud/clea-batch/"
+        override val cleaStatusCertificateSha256: String = "sha256/LB5QyMD8qDE1y12jAq/yey1VpjsBbVfFNOblb7QyaR0="
+        override val cleaReportBaseUrl: String = "https://signal-api.tousanticovid.gouv.fr/"
+        override val cleaReportCertificateSha256: String = "sha256/tnjjbtuXZUSyK1uReQhvmtspPS7IUl95cs9G8RvfVUs="
+        override val analyticsBaseUrl: String = "https://analytics-api.tousanticovid.gouv.fr"
         override val analyticsCertificateSha256: String = "sha256/KhFx3fIev58nbXs9m2WqXDbqYrE/7r4J9cP1QqPHtVk="
         override val configFilename: String = "config.json"
         override val calibrationFilename: String = "calibrationBle.json"
@@ -26,10 +28,12 @@ enum class EnvConstant {
 
     abstract val captchaApiKey: String
     abstract val baseUrl: String
-    abstract val warningBaseUrl: String
-    abstract val analyticsBaseUrl: String
     abstract val certificateSha256: String
-    abstract val warningCertificateSha256: String
+    abstract val cleaStatusBaseUrl: String
+    abstract val cleaStatusCertificateSha256: String
+    abstract val cleaReportBaseUrl: String
+    abstract val cleaReportCertificateSha256: String
+    abstract val analyticsBaseUrl: String
     abstract val analyticsCertificateSha256: String
     abstract val configFilename: String
     abstract val calibrationFilename: String

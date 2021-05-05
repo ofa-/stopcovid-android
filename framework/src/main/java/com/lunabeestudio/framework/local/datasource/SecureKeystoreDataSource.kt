@@ -90,6 +90,10 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
         get() = getEncryptedValue(SHARED_PREF_KEY_CURRENT_WARNING_AT_RISK_STATUS, AtRiskStatus::class.java)
         set(value) = setEncryptedValue(SHARED_PREF_KEY_CURRENT_WARNING_AT_RISK_STATUS, value)
 
+    override var cleaLastStatusIteration: Int?
+        get() = getEncryptedValue(SHARED_PREF_KEY_CLEA_LAST_STATUS_ITERATION, Int::class.java)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_CLEA_LAST_STATUS_ITERATION, value)
+
     override var atRiskModelVersion: Int?
         get() = getEncryptedValue(SHARED_PREF_KEY_AT_RISK_MODEL_VERSION, Int::class.java)
         set(value) = setEncryptedValue(SHARED_PREF_KEY_AT_RISK_MODEL_VERSION, value)
@@ -358,6 +362,9 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
         private const val SHARED_PREF_KEY_REPORT_TO_SEND_END_TIME = "shared.pref.report_to_send_end_time"
         private const val SHARED_PREF_KEY_DECLARATION_TOKEN = "shared.pref.declaration_token"
         private const val SHARED_PREF_KEY_WALLET_CERTIFICATES = "shared.pref.wallet_certificates"
+
+        // Clea
+        private const val SHARED_PREF_KEY_CLEA_LAST_STATUS_ITERATION = "shared.pref.clea_last_status_iteration"
 
         // Add on to ROBERT for isolation
         private const val SHARED_PREF_KEY_REPORT_SYMPTOMS_DATE = "shared.pref.reportSymptomsDate"

@@ -1,134 +1,111 @@
 package com.lunabeestudio.stopcovid.manager
 
 import android.content.SharedPreferences
+import android.net.Uri
+import android.net.UrlQuerySanitizer
+import android.util.Base64
 import com.lunabeestudio.domain.extension.ntpTimeSToUnixTimeMs
+import com.lunabeestudio.domain.extension.unixTimeMsToNtpTimeS
 import com.lunabeestudio.domain.model.VenueQrCode
-import com.lunabeestudio.domain.model.VenueQrType
+import com.lunabeestudio.framework.extension.fromBase64URL
 import com.lunabeestudio.framework.local.datasource.SecureKeystoreDataSource
 import com.lunabeestudio.robert.RobertManager
-import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.extension.isValidUUID
 import com.lunabeestudio.stopcovid.extension.isVenueOnBoardingDone
-import com.lunabeestudio.stopcovid.extension.privateEventQrCode
-import com.lunabeestudio.stopcovid.extension.privateEventQrCodeGenerationDate
-import com.lunabeestudio.stopcovid.extension.roundedTimeIntervalSince1900
-import com.lunabeestudio.stopcovid.extension.sha256
 import com.lunabeestudio.stopcovid.extension.venuesFeaturedWasActivatedAtLeastOneTime
+import com.lunabeestudio.stopcovid.model.VenueExpiredException
+import com.lunabeestudio.stopcovid.model.VenueInvalidFormatException
 import timber.log.Timber
-import java.net.URL
-import java.util.Calendar
-import java.util.Date
-import java.util.Locale
+import java.nio.ByteBuffer
+import java.util.Arrays.copyOfRange
 import java.util.UUID
-import kotlin.random.Random
 import kotlin.time.ExperimentalTime
 import kotlin.time.days
-import kotlin.time.milliseconds
-import kotlin.time.seconds
 
 object VenuesManager {
+
+    fun cleanVenueUri(stringUri: String): Uri = Uri.parse(cleanVenueUriString(stringUri))
+
+    private fun cleanVenueUriString(stringUri: String): String = stringUri.replace("#", "&code=")
 
     fun processVenueUrl(
         robertManager: RobertManager,
         secureKeystoreDataSource: SecureKeystoreDataSource,
         stringUrl: String,
-    ): String? {
-        return try {
-            val url = URL(stringUrl)
-            val path: String = url.path.drop(1)
-            if ("${url.protocol}://${url.host}/" == Constants.Url.VENUE_ROOT_URL) {
-                processVenuePath(robertManager, secureKeystoreDataSource, path)
-            } else {
-                throw Exception("invalid rootUrl")
+    ) {
+        try {
+            val sanitizer = UrlQuerySanitizer()
+            sanitizer.registerParameters(arrayOf("code", "v", "t")) {
+                it // Do nothing since there are plenty of non legal characters in this value
             }
+            sanitizer.parseUrl(cleanVenueUriString(stringUrl))
+
+            val base64URLCode: String = sanitizer.getValue("code") ?: throw VenueInvalidFormatException()
+            val version: Int = sanitizer.getValue("v")?.toInt() ?: throw VenueInvalidFormatException()
+            val time: Long? = sanitizer.getValue("t")?.toLong() // Time is optional, if null, will be set to System.currentTime
+
+            processVenue(robertManager, secureKeystoreDataSource, base64URLCode, version, time)
+
         } catch (e: Exception) {
             Timber.e(e)
-            null
+            throw e
         }
     }
 
     @OptIn(ExperimentalTime::class)
-    fun processVenuePath(
+    fun processVenue(
         robertManager: RobertManager,
         secureKeystoreDataSource: SecureKeystoreDataSource,
-        path: String,
-    ): String? {
-        return try {
-            val info: List<String> = path.trimEnd('/').split("/")
+        base64URLCode: String,
+        version: Int,
+        unixTimeInSeconds: Long?
+    ) {
+        try {
 
-            if (info.count() < 3) throw Exception("not enough parameter")
+            val uuid = extractTlIdFromBase64(base64URLCode.fromBase64URL())
+            if (!uuid.isValidUUID()) {
+                throw VenueInvalidFormatException()
+            }
 
-            // Values
-            val qrType = VenueQrType.fromValue(info[0].toInt())
-            val uuid = info[1]
-            val venueType = info[2].toUpperCase(Locale.getDefault())
-            val venueCategory = info.getOrNull(3)?.toIntOrNull() ?: 0
-            val venueCapacity = info.getOrNull(4)?.toIntOrNull() ?: 0
-            val timestamp = info.getOrNull(5)?.toLongOrNull()?.seconds ?: System.currentTimeMillis().milliseconds
+            val timestamp = unixTimeInSeconds?.times(1000L) ?: System.currentTimeMillis()
 
-            // Conditions
-            if (!(uuid.isValidUUID()
-                    && qrType != null
-                    && (1..3).contains(venueType.count())
-                    && (0..5).contains(venueCategory)
-                    && venueCapacity >= 0
-                    && !isVenuePathExpired(robertManager, path))
-            ) throw Exception("invalid UUID, qrType, venueType, venueCategory or venueCapacity")
+            if (isExpired(robertManager, timestamp)) {
+                throw VenueExpiredException()
+            }
 
-            val nowRoundedNtpTimestamp: Long =
-                Date(timestamp.toLongMilliseconds())
-                    .roundedTimeIntervalSince1900(robertManager.configuration.venuesTimestampRoundingInterval.toLong())
-            val id = "$uuid$nowRoundedNtpTimestamp"
+            val ntpTimeStamp: Long = timestamp.unixTimeMsToNtpTimeS()
 
-            val salt: Int = Random.nextInt(1, robertManager.configuration.venuesSalt)
-            val payload: String = "$salt$uuid".sha256()
+            val id = "$uuid$ntpTimeStamp"
 
             val venueQrCode = VenueQrCode(
-                id,
-                uuid,
-                qrType,
-                venueType,
-                nowRoundedNtpTimestamp,
-                venueCategory,
-                venueCapacity,
-                payload
+                id = id,
+                ltid = uuid,
+                ntpTimestamp = ntpTimeStamp,
+                base64URL = base64URLCode,
+                version = version
             )
             saveVenue(secureKeystoreDataSource, venueQrCode)
-            venueType
         } catch (e: Exception) {
-            Timber.e(e, "Fail to process path $path")
-            null
+            Timber.e(e, "Fail to process venue with code: $base64URLCode")
+            throw e
         }
     }
 
-    fun isVenueUrlExpired(
-        robertManager: RobertManager,
-        stringUrl: String,
-    ): Boolean {
-        return try {
-            val url = URL(stringUrl)
-            val path: String = url.path.drop(1)
-            isVenuePathExpired(robertManager, path)
-        } catch (e: Exception) {
-            Timber.e(e)
-            false
-        }
+    private fun extractTlIdFromBase64(base64String: String): String {
+        val bs = copyOfRange(Base64.decode(base64String, Base64.NO_WRAP), 1, 17)
+        return extractTlIdFromBase64ByteArray(bs).toString()
+    }
+
+    private fun extractTlIdFromBase64ByteArray(bytes: ByteArray): UUID {
+        val byteBuffer = ByteBuffer.wrap(bytes)
+        val high = byteBuffer.long
+        val low = byteBuffer.long
+        return UUID(high, low)
     }
 
     @OptIn(ExperimentalTime::class)
-    fun isVenuePathExpired(robertManager: RobertManager, path: String): Boolean {
-        return try {
-            val info: List<String> = path.trimEnd('/').split("/")
-
-            if (info.count() < 3) throw Exception("not enough parameter")
-
-            val timestamp = info.getOrNull(5)?.toLongOrNull()?.seconds ?: System.currentTimeMillis().milliseconds
-
-            return timestamp.toLongMilliseconds() + gracePeriod(robertManager) < System.currentTimeMillis()
-        } catch (e: Exception) {
-            false
-        }
-    }
+    fun isExpired(robertManager: RobertManager,
+        unixTimeInMS: Long): Boolean = unixTimeInMS + gracePeriod(robertManager) <= System.currentTimeMillis()
 
     private fun saveVenue(keystoreDataSource: SecureKeystoreDataSource, venueQrCode: VenueQrCode) {
         val venuesQrCode = keystoreDataSource.venuesQrCode?.toMutableList() ?: mutableListOf()
@@ -136,8 +113,11 @@ object VenuesManager {
             venuesQrCode.none {
                 venueQrCode.id == it.id
             }
-        }?.let(venuesQrCode::add)
-        keystoreDataSource.venuesQrCode = venuesQrCode
+        }?.let {
+            venuesQrCode.add(it)
+            venueListHasChanged(keystoreDataSource)
+            keystoreDataSource.venuesQrCode = venuesQrCode
+        }
     }
 
     fun getVenuesQrCode(
@@ -157,10 +137,13 @@ object VenuesManager {
         robertManager: RobertManager,
         keystoreDataSource: SecureKeystoreDataSource,
     ) {
-        val gracePeriod = gracePeriod(robertManager)
-        keystoreDataSource.venuesQrCode = keystoreDataSource.venuesQrCode?.filter { venueQrCode ->
-            val recordTimestamp = venueQrCode.ntpTimestamp.ntpTimeSToUnixTimeMs()
-            recordTimestamp + gracePeriod >= System.currentTimeMillis()
+        if (!keystoreDataSource.venuesQrCode?.filter {
+                isExpired(robertManager, it.ntpTimestamp.ntpTimeSToUnixTimeMs())
+            }.isNullOrEmpty()) {
+            keystoreDataSource.venuesQrCode = keystoreDataSource.venuesQrCode?.filter { venueQrCode ->
+                !isExpired(robertManager, venueQrCode.ntpTimestamp.ntpTimeSToUnixTimeMs())
+            }
+            venueListHasChanged(keystoreDataSource)
         }
     }
 
@@ -169,8 +152,11 @@ object VenuesManager {
 
     fun removeVenue(keystoreDataSource: SecureKeystoreDataSource, venueId: String) {
         val venuesQrCode = keystoreDataSource.venuesQrCode?.toMutableList() ?: mutableListOf()
-        venuesQrCode.firstOrNull { it.id == venueId }?.let(venuesQrCode::remove)
-        keystoreDataSource.venuesQrCode = venuesQrCode
+        venuesQrCode.firstOrNull { it.id == venueId }?.let {
+            venuesQrCode.remove(it)
+            venueListHasChanged(keystoreDataSource)
+            keystoreDataSource.venuesQrCode = venuesQrCode
+        }
     }
 
     fun clearAllData(preferences: SharedPreferences, keystoreDataSource: SecureKeystoreDataSource) {
@@ -179,21 +165,8 @@ object VenuesManager {
         preferences.venuesFeaturedWasActivatedAtLeastOneTime = false
     }
 
-    fun generateNewQRCodeIfNeeded(
-        sharedPreferences: SharedPreferences,
-        robertManager: RobertManager,
-        keystoreDataSource: SecureKeystoreDataSource,
-    ) {
-        val nowCalendar = Calendar.getInstance()
-        val lastGenerationCalendar = Calendar.getInstance().apply {
-            timeInMillis = sharedPreferences.privateEventQrCodeGenerationDate
-        }
-        if (nowCalendar.get(Calendar.DAY_OF_YEAR) != lastGenerationCalendar.get(Calendar.DAY_OF_YEAR)
-            || nowCalendar.get(Calendar.YEAR) != lastGenerationCalendar.get(Calendar.YEAR)) {
-            val venueUrl = "${Constants.Url.VENUE_ROOT_URL}0/${UUID.randomUUID()}/${robertManager.configuration.privateEventVenueType}"
-            sharedPreferences.privateEventQrCode = venueUrl
-            processVenueUrl(robertManager, keystoreDataSource, venueUrl)
-            sharedPreferences.privateEventQrCodeGenerationDate = System.currentTimeMillis()
-        }
+    private fun venueListHasChanged(keystoreDataSource: SecureKeystoreDataSource) {
+        // We reset Clea scoring iteration because we changed the venues
+        keystoreDataSource.cleaLastStatusIteration = null
     }
 }

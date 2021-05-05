@@ -23,8 +23,6 @@ import java.util.Locale
 
 class VenueConfirmationFragment : BottomSheetMainFragment() {
 
-    private val args: VenueConfirmationFragmentArgs by navArgs()
-
     override fun getTitleKey(): String = "venuesRecording.confirmationController.title"
 
     override fun getBottomSheetButtonKey(): String = "common.ok"
@@ -40,14 +38,12 @@ class VenueConfirmationFragment : BottomSheetMainFragment() {
             identifier = R.raw.erp_waving.toLong()
         }
         items += bigTitleItem {
-            text = strings["erp.confirmationMessage.${args.venueType.toLowerCase(Locale.getDefault())}.title"]
-                ?: strings["erp.confirmationMessage.default.title"]
+            text = strings["erp.confirmationMessage.default.title"]
             gravity = Gravity.CENTER
             identifier = items.count().toLong()
         }
         items += captionItem {
-            text = strings["erp.confirmationMessage.${args.venueType.toLowerCase(Locale.getDefault())}.message"]
-                ?: strings["erp.confirmationMessage.default.message"]
+            text = strings["erp.confirmationMessage.default.message"]
             gravity = Gravity.CENTER
             identifier = items.count().toLong()
         }

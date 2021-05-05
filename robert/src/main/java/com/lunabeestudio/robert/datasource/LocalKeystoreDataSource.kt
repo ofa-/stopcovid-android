@@ -34,6 +34,7 @@ interface LocalKeystoreDataSource {
     var atRiskStatus: AtRiskStatus?
     var currentRobertAtRiskStatus: AtRiskStatus?
     var currentWarningAtRiskStatus: AtRiskStatus?
+    var cleaLastStatusIteration: Int?
     var atRiskModelVersion: Int?
     var deprecatedLastRiskReceivedDate: Long?
     var deprecatedLastExposureTimeframe: Int?
