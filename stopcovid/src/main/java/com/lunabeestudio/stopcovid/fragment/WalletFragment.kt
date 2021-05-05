@@ -131,12 +131,6 @@ class WalletFragment : QRCodeListFragment() {
                 imageRes = R.drawable.wallet
                 identifier = R.drawable.wallet.toLong()
             }
-
-            items += cardWithActionItem {
-                mainTitle = strings["walletController.explanations.title"]
-                mainBody = strings["walletController.explanations.subtitle"]
-                identifier = mainBody.hashCode().toLong()
-            }
         }
 
         items += spaceItem {
@@ -161,6 +155,14 @@ class WalletFragment : QRCodeListFragment() {
         items += spaceItem {
             spaceRes = R.dimen.spacing_large
             identifier = items.size.toLong()
+        }
+
+        if (viewModel.isEmpty()) {
+            items += cardWithActionItem {
+                mainTitle = strings["walletController.explanations.title"]
+                mainBody = strings["walletController.explanations.subtitle"]
+                identifier = mainBody.hashCode().toLong()
+            }
         }
 
         if (!viewModel.recentCertificates.isNullOrEmpty()) {
