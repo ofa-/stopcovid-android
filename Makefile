@@ -35,7 +35,7 @@ tar:
 strings: strings-fr
 strings-%: src.dir = stopcovid/src/main/assets/Strings
 strings-%:
-	curl -s https://app.stopcovid.gouv.fr/json/version-25/$@.json \
+	curl -s https://app.tousanticovid.gouv.fr/json/version-31/Strings/$@.json \
 		> $(src.dir)/$@.json
 	git diff $(src.dir)
 
