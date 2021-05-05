@@ -1,5 +1,5 @@
 {
-      "app.name":"TousAntiCovid", 
+   "app.name":"TousAntiCovid",
    "onboarding.welcomeController.title":"Bienvenue",
    "onboarding.welcomeController.mainMessage.title":"Soyez alertés et alertez les autres en cas d’exposition à la COVID-19",
    "onboarding.welcomeController.mainMessage.subtitle":"Avec TousAntiCovid, participez à la lutte contre l’épidémie en réduisant les risques de transmission.\n\n\nCette application a été réalisée en collaboration avec le Ministère des Solidarités et de la Santé et Santé Publique France.",
@@ -371,12 +371,12 @@
    "keyfigure.patientsrea.colorCode.dark":"#2682DF",
    "keyfigure.nombrecas.colorCode.light":"#8944AB",
    "keyfigure.nombrecas.colorCode.dark":"#DA8FFF",
-   "keyfigure.nombrecasj3.colorCode.light":"#8944AB",
-   "keyfigure.nombrecasj3.colorCode.dark":"#DA8FFF",
+   "keyfigure.nombrecasj3.colorCode.light":"#EA7777",
+   "keyfigure.nombrecasj3.colorCode.dark":"#DF8181",
    "keyfigure.reffectif.colorCode.light":"#0141DD",
    "keyfigure.reffectif.colorCode.dark":"#429DFF",
-   "keyfigure.tauxincidence.colorCode.light":"#A05A03",
-   "keyfigure.tauxincidence.colorCode.dark":"#B79E1C",
+   "keyfigure.tauxincidence.colorCode.light":"#FF2C55",
+   "keyfigure.tauxincidence.colorCode.dark":"#FED708",
    "keyfigure.tauxpositivite.colorCode.light":"#3734A3",
    "keyfigure.tauxpositivite.colorCode.dark":"#7D7BFF",
    "keyfigure.tauxoccupation.colorCode.light":"#0271A4",
@@ -721,7 +721,7 @@
    "home.vaccinationSection.cellSubtitle": "Vérifiez votre éligibilité et trouvez un centre près de chez vous pour vous faire vacciner.",
    "vaccinationController.title": "Vaccination",
    "vaccinationController.eligibility.title": "Suis-je prioritaire pour me faire vacciner ?",
-   "vaccinationController.eligibility.subtitle": "Aujourd’hui, les publics prioritaires définis par les autorités sanitaires sont :\n- les personnes de 55 ans et plus, quels que soient leur lieu de vie et leur état de santé (avec ou sans comorbidités)\n- les femmes enceintes à partir du deuxième trimestre de la grossesse\n- les résidents en établissements (par exemple Ehpad, USLD)\n- les personnes de plus de 18 ans ayant une pathologie qui les expose à un très haut risque face à la Covid-19\n- les personnes de 50 à 54 ans inclus, souffrant d’une ou plusieurs comorbidités\n- les personnes en situation de handicap hébergées en établissements\n- les résidents de 60 ans et plus dans les foyers de travailleurs migrants\n- les professionnels de santé et les professionnels du secteur médico-social (dont les ambulanciers), les aides à domicile intervenant auprès de personnes âgées et handicapées vulnérables, les sapeurs-pompiers et les vétérinaires.\n\nAppuyez sur \"En savoir plus\" pour plus de détails.",
+   "vaccinationController.eligibility.subtitle": "Aujourd’hui, les publics prioritaires définis par les autorités sanitaires sont :\n- les personnes de 55 ans et plus, quels que soient leur lieu de vie et leur état de santé (avec ou sans comorbidités)\n- les femmes enceintes à partir du deuxième trimestre de la grossesse\n- les résidents en établissements (par exemple Ehpad, USLD)\n- les personnes de plus de 18 ans souffrants d’une ou plusieurs comorbidités;\n- les personnes en situation de handicap hébergées en établissements\n- les résidents de 60 ans et plus dans les foyers de travailleurs migrants\n- les professionnels de santé et les professionnels du secteur médico-social (dont les ambulanciers), les aides à domicile intervenant auprès de personnes âgées et handicapées vulnérables, les sapeurs-pompiers et les vétérinaires.\n\nAppuyez sur \"En savoir plus\" pour plus de détails.",
    "vaccinationController.eligibility.buttonTitle": "En savoir plus",
    "vaccinationController.eligibility.url": "https://www.gouvernement.fr/info-coronavirus/vaccins#tac",
    "vaccinationController.vaccinationLocation.title": "Trouver un centre pour me faire vacciner",
@@ -887,7 +887,7 @@
   
   
   
-   "attestation.form.reason_curfew.label":"Motif de couvre-feu (19h-6h)",
+   "attestation.form.reason_curfew.label":"Motif 19h-6h (couvre-feu)",
    "attestation.form.reason_curfew.placeholder":"-",
    
    "attestation.form.reason_curfew.travail.shortLabel":"1. Activité professionnelle, enseignement et formation, mission d’intérêt général",
@@ -901,10 +901,13 @@
    
    "attestation.form.reason_curfew.convocation_demarches.shortLabel":"4. Convocation judiciaire ou administrative, démarches ne pouvant être menées à distance",
    "attestation.form.reason_curfew.convocation_demarches.longLabel":"Déplacements pour répondre à une convocation judiciaire ou administrative, pour se rendre dans un service public ou chez un professionnel du droit, pour un acte ou une démarche qui ne peut être réalisé à distance.",
+      
    
-   "attestation.form.reason_curfew.animaux.shortLabel":"5. Animaux de compagnie, le soir et la nuit.",
+   "attestation.form.reason_curfew.transit.shortLabel":"5. Déplacements de longue distance",
+   "attestation.form.reason_curfew.transit.longLabel":"Déplacements liés à des transferts ou transits depuis des gares ou aéroports dans le cadre de déplacements de longue distance.",
+   
+   "attestation.form.reason_curfew.animaux.shortLabel":"6. Animaux de compagnie, le soir et la nuit",
    "attestation.form.reason_curfew.animaux.longLabel":"Déplacements brefs pour les besoins des animaux de compagnie (dans un rayon de 1 kilomètre autour du domicile).",
-   
    
     "attestation.form.reason_curfew.handicap.shortLabel":"4. Situation de handicap",
    "attestation.form.reason_curfew.handicap.longLabel":"Déplacements des personnes en situation de handicap et de leur accompagnant",
@@ -912,8 +915,6 @@
    "attestation.form.reason_curfew.judiciaire.longLabel":"Déplacements pour répondre à une convocation judiciaire ou administrative, déplacements pour se rendre chez un professionnel du droit, pour un acte ou une démarche qui ne peuvent être réalisés à distance",
     "attestation.form.reason_curfew.missions.shortLabel":"6. Missions d'intérêt général",
    "attestation.form.reason_curfew.missions.longLabel":"Déplacements pour participer à des missions d’intérêt général sur demande de l’autorité administrative",
-   "attestation.form.reason_curfew.transit.shortLabel":"7. Déplacements de transit et longue distance",
-   "attestation.form.reason_curfew.transit.longLabel":"Déplacements liés à des transits ferroviaires, aériens ou en bus pour des déplacements de longues distances",
    
    "attestation.form.reason_curfew.title":"Motifs couvre-feu",
    
@@ -922,7 +923,7 @@
    "attestation.form.reason_curfew.footer":"Les personnes souhaitant bénéficier de l'une de ces exceptions doivent se munir s'il y a lieu, lors de leurs déplacements hors de leur domicile, d'un document leur permettant de justifier que le déplacement considéré entre dans le champ de l'une de ces exceptions.",
    
    
-   "attestation.form.reason_lockdown.label":"Motif de journée (6h-19h)",
+   "attestation.form.reason_lockdown.label":"Motif 6h-19h (journée)",
    "attestation.form.reason_lockdown.placeholder":"-",
    
    "attestation.form.reason_lockdown.travail.shortLabel":"1. Activité professionnelle, enseignement et formation, mission d’intérêt général",
@@ -968,32 +969,32 @@
     
    "attestation.form.reason_lockdown.footer":"Les déplacements sont autorisés sous réserve de justifier de l’un des motifs prévus dans la présente attestation.\n\n[1] Pour les personnes résidant aux frontières d’un département, une tolérance de 30 kilomètres au-delà du département est acceptée.",
    
-   "walletController.title": "Carnet de tests",
+   "walletController.title": "Carnet",
    "walletController.explanations.title": "Comment ça marche ?",
-   "walletController.explanations.subtitle": "Pour numériser vos certificats de test et toujours les avoir à portée de main, c'est simple : une fois le résultat de votre test disponible, vous recevrez un SMS avec un lien (du portail patient SI-DEP) et les instructions à suivre.\n\nCe certificat sera à montrer lors des contrôles pour vos voyages aériens 👉 expérimentation en cours, uniquement sur certains vols pour la Corse (Air France et Air Corsica informeront leurs clients éligibles).\n\nSi vous rencontrez un problème, vous pouvez appeler le 0 800 08 71 48.",
+   "walletController.explanations.subtitle": "Pour numériser vos certificats de test et de vaccination, et toujours les avoir à portée de main, c'est simple :\n- pour les tests, vous recevrez un SMS du portail SI-DEP avec les instructions à suivre.\n- pour la vaccination, il vous sera remis un certificat papier avec un QR Code à flasher. Dès seconde quinzaine de mai, vous pourrez récupérer vos anciens certificats de vaccination.\n\nCes certificats seront à montrer pour vos voyages aériens et maritimes 👉 expérimentation en cours, les compagnies aériennes et maritimes informeront leurs clients éligibles.\n\nSi vous rencontrez un problème, vous pouvez appeler le 0 800 08 71 48.",
    "walletController.flashButton.title": "Scanner le QR Code",
-   "walletController.flashExplanation": "Sur votre document SIDEP de résultat de test, vous avez un QR Code que vous pouvez scanner pour ajouter le certificat dans ce carnet.",
+   "walletController.flashExplanation": "Sur votre document SI-DEP de test (pas laboratoire), ou sur votre preuve de vaccination papier (depuis le 3 mai, 11h), vous avez un QR Code que vous pouvez scanner pour ajouter le certificat dans ce carnet.",
    "walletController.recentCertificatesSection.title": "Certificats récents",
-   "walletController.recentCertificatesSection.subtitle": "Ces certificats ont moins de 3 jours.",
-   "walletController.oldCertificatesSection.title": "Certificats de plus de 3 jours",
-   "walletController.oldCertificatesSection.subtitle": "Ces certificats ont plus de 3 jours.",
+   "walletController.recentCertificatesSection.subtitle": "Dans cette section, vous avez les certificats de vaccination et les certificats de test de moins de 3 jours.",
+   "walletController.oldCertificatesSection.title": "Certificats plus anciens",
+   "walletController.oldCertificatesSection.subtitle": "Ces certificats de test ont plus de 3 jours.",
    "walletController.menu.share": "Partager le certificat",
-   "walletController.menu.share.text": "Voici mon certificat de test #TousAntiCovid",
+   "walletController.menu.share.text": "Voici mon certificat #TousAntiCovid",
    "walletController.menu.delete": "Supprimer ce certificat",
    "walletController.menu.delete.alert.title": "Confirmation",
    "walletController.menu.delete.alert.message": "Êtes-vous sûr de vouloir supprimer ce certificat ?",
    
-   "home.attestationSection.sanitaryCertificates.cell.title": "Mon carnet de tests",
-   "home.attestationSection.sanitaryCertificates.cell.subtitle": "Vos certificats de test seront disponibles ici",
+   "home.attestationSection.sanitaryCertificates.cell.title": "Mon carnet",
+   "home.attestationSection.sanitaryCertificates.cell.subtitle": "Vos certificats de test et de vaccination",
    
    "flashWalletCodeController.title": "Scannez",
-   "flashWalletCodeController.explanation": "Scanner le QR Code sur votre document SIDEP.",
+   "flashWalletCodeController.explanation": "Scannez le QR Code sur votre document SI-DEP, ou sur votre certificat de vaccination papier.",
    "flashWalletCodeController.alert.invalidCode.title": "Code invalide",
    "flashWalletCodeController.alert.invalidCode.message": "Le code n'est pas valide. Veuillez essayer à nouveau.",
    
-   "walletController.noCertificates.flashExplanation": "Sur votre document SIDEP de résultat de test, vous avez un QR Code que vous pouvez scanner pour ajouter le certificat dans ce carnet.",
-   "confirmWalletQrCodeController.title":"Carnet de test",
-   "confirmWalletQrCodeController.explanation.title":"Vous venez d'appuyer sur un lien TousAntiCovid pour ajouter un certificat de test dans votre carnet.",
+   "walletController.noCertificates.flashExplanation": "Sur votre résultat de test SI-DEP ou preuve de vaccination papier (depuis le 3 mai, 11h), vous avez un QR Code que vous pouvez scanner pour l’ajouter dans ce carnet.",
+   "confirmWalletQrCodeController.title":"Carnet",
+   "confirmWalletQrCodeController.explanation.title":"Vous venez d'appuyer sur un lien TousAntiCovid pour ajouter un certificat dans votre carnet.",
    "confirmWalletQrCodeController.explanation.subtitle":"Confirmez-vous cet ajout dans votre carnet ?",
    "confirmWalletQrCodeController.confirm":"Ajouter",
    
@@ -1025,15 +1026,15 @@
    "wallet.proof.sanitaryCertificate.loinc.945642" : "Sérologie COVID (%@)",
    
    "wallet.proof.sanitaryCertificate.description": "<F0>, <F1>\nné(e) le <F2>, <F3>\n\n<F4>\n<F5>, prélevé le <F6>",
-   "wallet.proof.sanitaryCertificate.pillTitle": "Certificat de test",
+   "wallet.proof.sanitaryCertificate.pillTitle": "Test",
    "walletCertificateVerifiedController.title": "Certificat",
    "walletCertificateVerifiedController.proofValidated": "Certificat vérifié",
    "walletCertificateVerifiedController.validateAnotherProof": "Vérifier un autre certificat",
     
     "manageDataController.walletData.confirmationDialog.title": "Confirmation",
-    "manageDataController.walletData.confirmationDialog.message": "Confirmez-vous vouloir supprimer tous les certificats de test ?",
+    "manageDataController.walletData.confirmationDialog.message": "Confirmez-vous vouloir supprimer tous les certificats de test et de vaccination ?",
     "manageDataController.walletData.title": "Mes certificats",
-    "manageDataController.walletData.subtitle": "Cette opération effacera tous vos certificats de test de votre téléphone.",
+    "manageDataController.walletData.subtitle": "Cette opération effacera tous vos certificats de test et de vaccination de votre téléphone.",
     "manageDataController.walletData.button": "Effacer sur mon téléphone",
     
     "wallet.proof.error.1.title": "Certificat erroné",
@@ -1051,22 +1052,21 @@
    "keyfigure.variantsuk.colorCode.light":"#4C76EB",
    "keyfigure.variantsuk.colorCode.dark":"#A6B6E3",
    
-    "keyfigure.variantsuk.learnMore": "En cas de test (RT-PCR ou antigénique) de première intention positif, un second test RT-PCR dit de criblage est réalisé afin de détecter les variants d’intérêt connus à ce jour et d’évaluer leur diffusion sur l’ensemble du territoire.\n\nCet indicateur porte sur les données relatives aux résultats de criblage arrêtés à J-3 et mis à jour quotidiennement.\n\nIl exprime la part du variant 20I/501Y.V1 (UK) parmi tous les tests criblés. Les données sont collectées dans SIDEP depuis le 25 janvier 2021.",
+    "keyfigure.variantsuk.learnMore": "En cas de test (RT-PCR ou antigénique) de première intention positif, un second test RT-PCR dit de criblage est réalisé afin de détecter les variants d’intérêt connus à ce jour et d’évaluer leur diffusion sur l’ensemble du territoire.\n\nCet indicateur porte sur les données relatives aux résultats de criblage arrêtés à J-3 et mis à jour quotidiennement.\n\nIl exprime la part du variant 20I/501Y.V1 (UK) parmi tous les tests criblés. Les données sont collectées dans SI-DEP depuis le 25 janvier 2021.",
     
     "keyfigure.variantssabr.label":"Variants sud-africains ou brésiliens",
 	"keyfigure.variantssabr.shortLabel":"Variants SA ou BR",
 	"keyfigure.variantssabr.description":"Cet indicateur reflète le pourcentage de variants sud-africains ou brésiliens (20H/501Y.V2 (SA) ou 20J/501Y.V3 (BR)) parmi les tests criblés.",
 	
-	"keyfigure.variantssabr.colorCode.light":"#D6774C",
-	"keyfigure.variantssabr.colorCode.dark":"#F6A37E",
+	"keyfigure.variantssabr.colorCode.light":"#F49F54",
+	"keyfigure.variantssabr.colorCode.dark":"#F49F54",
 	
-	"keyfigure.variantssabr.learnMore": "En cas de test (RT-PCR ou antigénique) de première intention positif, un second test RT-PCR dit de criblage est réalisé afin de détecter les variants d’intérêt connus à ce jour et d’évaluer leur diffusion sur l’ensemble du territoire.\n\nCet indicateur porte sur les données relatives aux résultats de criblage arrêtés à J-3 et mises à jour quotidiennement.\n\nIl exprime la part des variants 20H/501Y.V2 (SA) ou 20J/501Y.V3 (BR) parmi tous les tests criblés. Les données sont collectées dans SIDEP depuis le 25 janvier 2021.",
-     
-     "wallet.proof.vaccinationCertificate.LA.CO": "En cours",
-     "wallet.proof.vaccinationCertificate.LA.EC": "En cours",
-     "wallet.proof.vaccinationCertificate.LA.TE": "Terminé",
-     "wallet.proof.vaccinationCertificate.pillTitle": "Vaccin",
-     "wallet.proof.vaccinationCertificate.description": "<L1>, <L0>\nné(e) le <L2>\n<L5> (<L4>)\ninjection le <L9>\nDose : <L7>/<L8>",
+	"keyfigure.variantssabr.learnMore": "En cas de test (RT-PCR ou antigénique) de première intention positif, un second test RT-PCR dit de criblage est réalisé afin de détecter les variants d’intérêt connus à ce jour et d’évaluer leur diffusion sur l’ensemble du territoire.\n\nCet indicateur porte sur les données relatives aux résultats de criblage arrêtés à J-3 et mises à jour quotidiennement.\n\nIl exprime la part des variants 20H/501Y.V2 (SA) ou 20J/501Y.V3 (BR) parmi tous les tests criblés. Les données sont collectées dans SI-DEP depuis le 25 janvier 2021.",
+    
+    "wallet.proof.vaccinationCertificate.LA.CO": "En cours",
+    "wallet.proof.vaccinationCertificate.LA.TE": "Terminé",
+    "wallet.proof.vaccinationCertificate.pillTitle": "Vaccin",
+    "wallet.proof.vaccinationCertificate.description": "<L1>, <L0>\nné(e) le <L2>\n<L5> (<L4>)\ninjection le <L9>\nDose : <L7>/<L8>",
 
     "manageDataController.analytics.title": "Statistiques et mesure d’audience",
     "manageDataController.analytics.subtitle": "En conformité avec le RGPD, nous vous informons de notre capacité à collecter des données sur l’usage que vous faites de TousAntiCovid, à des fins de diagnostics, d’amélioration de performance et de l’expérience utilisateur. Sachez enfin que ces données sont conservées sur le serveur pendant 3 mois.",
@@ -1074,5 +1074,4 @@
     "manageDataController.analytics.switch.off": "Désactivé",
     "keyFigureDetailController.section.evolution.subtitle.nodata": "%@.\nAucune donnée",
     "keyFigureDetailController.nodata": "Aucune donnée disponible pour l'indicateur \"%@\"."
-	
 }
