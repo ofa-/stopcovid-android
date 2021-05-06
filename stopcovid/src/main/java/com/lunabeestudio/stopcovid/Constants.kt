@@ -27,6 +27,8 @@ object Constants {
         const val ARE_INFO_NOTIFICATIONS_ENABLED: String = "Are.Info.Notifications.Enabled"
         const val LAST_VERSION_CODE: String = "Last.Version.Code"
         const val ZIP_GEOLOC_VERSION: String = "Zip.Geoloc.Version"
+        const val PRIVATE_EVENT_QR_CODE: String = "Private.Event.QR.Code"
+        const val PRIVATE_EVENT_QR_CODE_GENERATION_DATE: String = "Private.Event.QR.Code.Generation.Date"
         const val VENUES_ON_BOARDING_DONE: String = "isVenueOnBoardingDone"
         const val VENUES_FEATURED_ACTIVATED: String = "venuesFeaturedWasActivatedAtLeastOneTime"
         const val CURRENT_VACCINATION_REFERENCE_DEPARTMENT_CODE: String = "currentVaccinationReferenceDepartmentCode"

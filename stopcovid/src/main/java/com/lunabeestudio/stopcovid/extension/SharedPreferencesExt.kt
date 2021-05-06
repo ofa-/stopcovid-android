@@ -52,6 +52,14 @@ var SharedPreferences.isVenueOnBoardingDone: Boolean
     get() = getBoolean(Constants.SharedPrefs.VENUES_ON_BOARDING_DONE, false)
     set(value) = edit { putBoolean(Constants.SharedPrefs.VENUES_ON_BOARDING_DONE, value) }
 
+var SharedPreferences.privateEventQrCode: String?
+    get() = getString(Constants.SharedPrefs.PRIVATE_EVENT_QR_CODE, null)
+    set(value) = edit { putString(Constants.SharedPrefs.PRIVATE_EVENT_QR_CODE, value) }
+
+var SharedPreferences.privateEventQrCodeGenerationDate: Long
+    get() = getLong(Constants.SharedPrefs.PRIVATE_EVENT_QR_CODE_GENERATION_DATE, 0L)
+    set(value) = edit { putLong(Constants.SharedPrefs.PRIVATE_EVENT_QR_CODE_GENERATION_DATE, value) }
+
 var SharedPreferences.currentVaccinationReferenceDepartmentCode: String?
     get() = getString(Constants.SharedPrefs.CURRENT_VACCINATION_REFERENCE_DEPARTMENT_CODE, null)
     set(value) = edit { putString(Constants.SharedPrefs.CURRENT_VACCINATION_REFERENCE_DEPARTMENT_CODE, value) }
