@@ -135,6 +135,13 @@
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
         <action
+            android:id="@+id/action_proximityFragment_to_venuesPrivateEventFragment"
+            app:destination="@id/venuesPrivateEventFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
             android:id="@+id/action_proximityFragment_to_isolationFormFragment"
             app:destination="@id/isolationFormFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
@@ -481,6 +488,10 @@
     <fragment
         android:id="@+id/venueConfirmationFragment"
         android:name="com.lunabeestudio.stopcovid.fragment.VenueConfirmationFragment"
+        tools:layout="@layout/fragment_qr_code" />
+    <fragment
+        android:id="@+id/venuesPrivateEventFragment"
+        android:name="com.lunabeestudio.stopcovid.fragment.VenuesPrivateEventFragment"
         tools:layout="@layout/fragment_qr_code" />
     <fragment
         android:id="@+id/reportQrCodeFragment"

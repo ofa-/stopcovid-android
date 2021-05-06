@@ -651,6 +651,7 @@ class ProximityFragment : TimeMainFragment() {
     }
 
     private fun startPrivateEvent() {
+        findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToVenuesPrivateEventFragment())
     }
 
     private fun addNewsItems(items: ArrayList<GenericItem>) {
