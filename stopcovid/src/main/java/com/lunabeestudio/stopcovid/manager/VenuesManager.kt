@@ -13,11 +13,15 @@ import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.stopcovid.extension.isValidUUID
 import com.lunabeestudio.stopcovid.extension.isVenueOnBoardingDone
 import com.lunabeestudio.stopcovid.extension.venuesFeaturedWasActivatedAtLeastOneTime
+import com.lunabeestudio.stopcovid.Constants
+import com.lunabeestudio.stopcovid.extension.privateEventQrCode
+import com.lunabeestudio.stopcovid.extension.privateEventQrCodeGenerationDate
 import com.lunabeestudio.stopcovid.model.VenueExpiredException
 import com.lunabeestudio.stopcovid.model.VenueInvalidFormatException
 import timber.log.Timber
 import java.nio.ByteBuffer
 import java.util.Arrays.copyOfRange
+import java.util.Calendar
 import java.util.UUID
 import kotlin.time.ExperimentalTime
 import kotlin.time.days
@@ -168,5 +172,23 @@ object VenuesManager {
     private fun venueListHasChanged(keystoreDataSource: SecureKeystoreDataSource) {
         // We reset Clea scoring iteration because we changed the venues
         keystoreDataSource.cleaLastStatusIteration = null
+    }
+
+    fun generateNewQRCodeIfNeeded(
+        sharedPreferences: SharedPreferences,
+        robertManager: RobertManager,
+        keystoreDataSource: SecureKeystoreDataSource,
+    ) {
+        val nowCalendar = Calendar.getInstance()
+        val lastGenerationCalendar = Calendar.getInstance().apply {
+            timeInMillis = sharedPreferences.privateEventQrCodeGenerationDate
+        }
+        if (nowCalendar.get(Calendar.DAY_OF_YEAR) != lastGenerationCalendar.get(Calendar.DAY_OF_YEAR)
+            || nowCalendar.get(Calendar.YEAR) != lastGenerationCalendar.get(Calendar.YEAR)) {
+            val venueUrl = "${Constants.Url.VENUE_ROOT_URL}?code=${UUID.randomUUID()}&v=0"
+            sharedPreferences.privateEventQrCode = venueUrl
+            processVenueUrl(robertManager, keystoreDataSource, venueUrl)
+            sharedPreferences.privateEventQrCodeGenerationDate = System.currentTimeMillis()
+        }
     }
 }
