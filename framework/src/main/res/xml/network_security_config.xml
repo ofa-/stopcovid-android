@@ -44,4 +44,22 @@
             <certificates src="@raw/analytics_api_tousanticovid_gouv_fr" />
         </trust-anchors>
     </domain-config>
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="true">signal-api.tousanticovid.gouv.fr</domain>
+        <pin-set tools:ignore="MissingBackupPin">
+            <pin digest="SHA-256">tnjjbtuXZUSyK1uReQhvmtspPS7IUl95cs9G8RvfVUs=</pin>
+        </pin-set>
+        <trust-anchors>
+            <certificates src="@raw/signal_api_tousanticovid_gouv_fr" />
+        </trust-anchors>
+    </domain-config>
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="true">s3.fr-par.scw.cloud</domain>
+        <pin-set tools:ignore="MissingBackupPin">
+            <pin digest="SHA-256">LB5QyMD8qDE1y12jAq/yey1VpjsBbVfFNOblb7QyaR0=</pin>
+        </pin-set>
+        <trust-anchors>
+            <certificates src="@raw/s3_fr_par_scw_cloud" />
+        </trust-anchors>
+    </domain-config>
 </network-security-config>

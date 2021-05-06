@@ -87,7 +87,7 @@ interface RobertManager : AnalyticsRobertManager {
         application: RobertApplication,
     ): RobertResult
 
-    suspend fun wreportIfNeeded(application: RobertApplication, shouldRetry: Boolean)
+    suspend fun cleaReportIfNeeded(application: RobertApplication, shouldRetry: Boolean)
 
     suspend fun storeLocalProximity(vararg localProximity: LocalProximity)
 

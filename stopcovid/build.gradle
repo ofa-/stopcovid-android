@@ -55,8 +55,8 @@ android {
         applicationId "fr.gouv.android.stopcovid"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 222
-        versionName "2.6.2"
+        versionCode 228
+        versionName "3.0.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
@@ -107,4 +107,5 @@ dependencies {
 
     androidTestImplementation "androidx.test.ext:junit:_"
     androidTestImplementation "androidx.test:runner:_"
+    androidTestImplementation "com.squareup.okhttp3:mockwebserver:_"
 }

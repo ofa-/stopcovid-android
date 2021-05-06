@@ -11,36 +11,41 @@
 package com.lunabeestudio.stopcovid.model
 
 import android.content.SharedPreferences
+import androidx.navigation.NavArgs
 import androidx.navigation.NavController
+import androidx.navigation.navOptions
+import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.extension.isVenueOnBoardingDone
 import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.fragment.CaptchaFragmentDirections
+import com.lunabeestudio.stopcovid.fragment.VenueQRCodeFragmentArgs
 
 enum class CaptchaNextFragment {
     Back {
         override val activateProximity: Boolean = true
-        override fun registerPostAction(navController: NavController?, sharedPreferences: SharedPreferences, args: Any?) {
+        override fun registerPostAction(navController: NavController?, sharedPreferences: SharedPreferences, args: NavArgs?) {
             navController?.navigateUp()
         }
     },
     Venue {
         override val activateProximity: Boolean = false
-        override fun registerPostAction(navController: NavController?, sharedPreferences: SharedPreferences, args: Any?) {
-            val venueFullPath = args as? String
-            if (sharedPreferences.isVenueOnBoardingDone || venueFullPath != null) {
-                navController?.safeNavigate(CaptchaFragmentDirections.actionCaptchaFragmentToVenueQrCodeFragment(venueFullPath = venueFullPath))
+        override fun registerPostAction(navController: NavController?, sharedPreferences: SharedPreferences, args: NavArgs?) {
+            val arguments = args as? VenueQRCodeFragmentArgs
+            if (sharedPreferences.isVenueOnBoardingDone || arguments != null) {
+                navController?.safeNavigate(R.id.venueQrCodeFragment, arguments?.toBundle(), navOptions {
+                    anim {
+                        enter = R.anim.nav_default_enter_anim
+                        popEnter = R.anim.nav_default_pop_enter_anim
+                        popExit = R.anim.nav_default_pop_exit_anim
+                        exit = R.anim.nav_default_exit_anim
+                    }
+                })
             } else {
                 navController?.safeNavigate(CaptchaFragmentDirections.actionCaptchaFragmentToVenueOnBoardingFragment())
             }
         }
-    },
-    Private {
-        override val activateProximity: Boolean = false
-        override fun registerPostAction(navController: NavController?, sharedPreferences: SharedPreferences, args: Any?) {
-            navController?.safeNavigate(CaptchaFragmentDirections.actionCaptchaFragmentToVenuesPrivateEventFragment())
-        }
     };
 
     abstract val activateProximity: Boolean
-    abstract fun registerPostAction(navController: NavController?, sharedPreferences: SharedPreferences, args: Any? = null)
+    abstract fun registerPostAction(navController: NavController?, sharedPreferences: SharedPreferences, args: NavArgs? = null)
 }

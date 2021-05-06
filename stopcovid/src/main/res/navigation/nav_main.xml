@@ -135,13 +135,6 @@
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
         <action
-            android:id="@+id/action_proximityFragment_to_venuesPrivateEventFragment"
-            app:destination="@id/venuesPrivateEventFragment"
-            app:enterAnim="@anim/nav_default_enter_anim"
-            app:exitAnim="@anim/nav_default_exit_anim"
-            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
-            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
-        <action
             android:id="@+id/action_proximityFragment_to_isolationFormFragment"
             app:destination="@id/isolationFormFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
@@ -179,9 +172,9 @@
         android:name="com.lunabeestudio.stopcovid.fragment.VenueOnBoardingFragment"
         tools:layout="@layout/fragment_recycler_view">
         <argument
-            android:name="venueFullPath"
+            android:name="venueArgs"
             android:defaultValue="@null"
-            app:argType="string"
+            app:argType="android.os.Bundle"
             app:nullable="true" />
         <action
             android:id="@+id/action_venueOnBoardingFragment_to_venueQrCodeFragment"
@@ -279,9 +272,8 @@
             android:name="nextFragment"
             app:argType="com.lunabeestudio.stopcovid.model.CaptchaNextFragment" />
         <argument
-            android:name="venueFullPath"
-            android:defaultValue="@null"
-            app:argType="string"
+            android:name="nextFragmentArgs"
+            app:argType="android.os.Bundle"
             app:nullable="true" />
         <action
             android:id="@+id/action_captchaFragment_to_venueOnBoardingFragment"
@@ -301,14 +293,6 @@
             app:popExitAnim="@anim/nav_default_pop_exit_anim"
             app:popUpTo="@id/captchaFragment"
             app:popUpToInclusive="true" />
-        <action
-            android:id="@+id/action_captchaFragment_to_venuesPrivateEventFragment"
-            app:destination="@id/venuesPrivateEventFragment"
-            app:enterAnim="@anim/nav_default_enter_anim"
-            app:exitAnim="@anim/nav_default_exit_anim"
-            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
-            app:popExitAnim="@anim/nav_default_pop_exit_anim"
-            app:popUpTo="@id/proximityFragment" />
     </fragment>
     <fragment
         android:id="@+id/reportFragment"
@@ -418,25 +402,23 @@
         tools:layout="@layout/fragment_qr_code">
         <deepLink app:uri="tousanticovid://venueQRCode" />
         <deepLink
-            android:autoVerify="true"
-            app:uri="https://tac.gouv.fr/0/{venueStaticPath}"
+            app:uri="https://tac.gouv.fr?v={venueVersion}&amp;code={venueContent}"
             tools:targetApi="m" />
         <deepLink
-            android:autoVerify="true"
-            app:uri="https://tac.gouv.fr/1/{venueDynamicPath}"
+            app:uri="https://tac.gouv.fr?v={venueVersion}&amp;t={venueTime}&amp;code={venueContent}"
             tools:targetApi="m" />
         <argument
-            android:name="venueFullPath"
+            android:name="venueContent"
             android:defaultValue="@null"
             app:argType="string"
             app:nullable="true" />
         <argument
-            android:name="venueStaticPath"
+            android:name="venueVersion"
             android:defaultValue="@null"
             app:argType="string"
             app:nullable="true" />
         <argument
-            android:name="venueDynamicPath"
+            android:name="venueTime"
             android:defaultValue="@null"
             app:argType="string"
             app:nullable="true" />
@@ -478,7 +460,14 @@
         android:name="com.lunabeestudio.stopcovid.fragment.ConfirmVenueQrCodeFragment"
         tools:layout="@layout/fragment_qr_code">
         <argument
-            android:name="venueFullPath"
+            android:name="venueContent"
+            app:argType="string" />
+        <argument
+            android:name="venueVersion"
+            app:argType="integer" />
+        <argument
+            android:name="venueTime"
+            app:nullable="true"
             app:argType="string" />
         <action
             android:id="@+id/action_confirmVenueQrCodeFragment_to_venueConfirmationFragment"
@@ -492,14 +481,6 @@
     <fragment
         android:id="@+id/venueConfirmationFragment"
         android:name="com.lunabeestudio.stopcovid.fragment.VenueConfirmationFragment"
-        tools:layout="@layout/fragment_qr_code">
-        <argument
-            android:name="venueType"
-            app:argType="string" />
-    </fragment>
-    <fragment
-        android:id="@+id/venuesPrivateEventFragment"
-        android:name="com.lunabeestudio.stopcovid.fragment.VenuesPrivateEventFragment"
         tools:layout="@layout/fragment_qr_code" />
     <fragment
         android:id="@+id/reportQrCodeFragment"

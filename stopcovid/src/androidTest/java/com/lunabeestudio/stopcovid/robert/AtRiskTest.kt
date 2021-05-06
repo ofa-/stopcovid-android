@@ -362,4 +362,34 @@ class AtRiskTest {
         assert(context.robertManager().atRiskStatus?.ntpLastRiskScoringS == 1L)
         assert(context.robertManager().atRiskStatus?.ntpLastContactS == 2L)
     }
+
+    @Test
+    fun risk_update_if_error_but_higher_risk() {
+        assert(context.robertManager().atRiskStatus == null)
+
+        context.robertManager().processStatusResults(
+            RobertResultData.Failure(),
+            RobertResultData.Success(AtRiskStatus(2f, 0L, 1L)),
+        )
+        assert(context.robertManager().atRiskStatus?.riskLevel == 2f)
+
+        context.robertManager().processStatusResults(
+            RobertResultData.Success(AtRiskStatus(4f, 1L, 2L)),
+            RobertResultData.Failure(),
+        )
+        assert(context.robertManager().atRiskStatus?.riskLevel == 4f)
+
+        context.robertManager().processStatusResults(
+            RobertResultData.Success(AtRiskStatus(0f, 1L, 2L)),
+            RobertResultData.Failure(),
+        )
+        assert(context.robertManager().atRiskStatus?.riskLevel == 4f)
+
+        context.robertManager().processStatusResults(
+            RobertResultData.Success(AtRiskStatus(0f, 3L, null)),
+            RobertResultData.Success(AtRiskStatus(0f, 3L, null))
+        )
+        assert(context.robertManager().atRiskStatus?.riskLevel == 0f)
+
+    }
 }

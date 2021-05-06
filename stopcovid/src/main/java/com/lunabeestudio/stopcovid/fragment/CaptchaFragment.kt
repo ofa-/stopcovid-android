@@ -86,11 +86,13 @@ class CaptchaFragment : MainFragment() {
         }
         viewModel.codeSuccess.observe(viewLifecycleOwner) { captchaNextFragment ->
             val nextFragmentArgs = if (captchaNextFragment == CaptchaNextFragment.Venue) {
-                args.venueFullPath
+                args.nextFragmentArgs
             } else {
                 null
             }
-            captchaNextFragment.registerPostAction(findNavControllerOrNull(), sharedPreferences, nextFragmentArgs)
+            captchaNextFragment.registerPostAction(findNavControllerOrNull(),
+                sharedPreferences,
+                nextFragmentArgs?.let { VenueQRCodeFragmentArgs.fromBundle(nextFragmentArgs) })
         }
         viewModel.covidException.observe(viewLifecycleOwner) { error ->
             if (error is UnauthorizedException && viewModel.code.isNotBlank()) {

@@ -651,17 +651,6 @@ class ProximityFragment : TimeMainFragment() {
     }
 
     private fun startPrivateEvent() {
-        when {
-            !robertManager.isRegistered -> {
-                findNavControllerOrNull()
-                    ?.safeNavigate(
-                        ProximityFragmentDirections.actionProximityFragmentToCaptchaFragment(CaptchaNextFragment.Private)
-                    )
-            }
-            else -> {
-                findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToVenuesPrivateEventFragment())
-            }
-        }
     }
 
     private fun addNewsItems(items: ArrayList<GenericItem>) {
@@ -1006,7 +995,8 @@ class ProximityFragment : TimeMainFragment() {
                     if (viewModel.refreshConfig(requireContext().applicationContext as RobertApplication)) {
                         withContext(Dispatchers.Main) {
                             findNavControllerOrNull()
-                                ?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToCaptchaFragment(CaptchaNextFragment.Back))
+                                ?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToCaptchaFragment(CaptchaNextFragment.Back,
+                                    null))
                         }
                     }
                 }
@@ -1086,7 +1076,7 @@ class ProximityFragment : TimeMainFragment() {
     }
 
     private fun refreshTitleAndErrorLayout() {
-        (activity as AppCompatActivity).supportActionBar?.title = strings[getTitleKey()]
+        appCompatActivity?.supportActionBar?.title = strings[getTitleKey()]
         asyncUpdateNewVersionAvailableTitle()
         if (sharedPrefs.showErrorPanel) {
             refreshErrorLayout()

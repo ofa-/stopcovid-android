@@ -36,11 +36,7 @@ class VenueOnBoardingFragment : BottomSheetMainFragment() {
     override fun getBottomSheetButtonKey(): String = "venuesRecording.onboardingController.button.participate"
     override fun onBottomSheetButtonClicked() {
         sharedPreferences.isVenueOnBoardingDone = true
-        findNavControllerOrNull()?.safeNavigate(
-            VenueOnBoardingFragmentDirections.actionVenueOnBoardingFragmentToVenueQrCodeFragment(
-                venueFullPath = args.venueFullPath
-            )
-        )
+        findNavControllerOrNull()?.safeNavigate(R.id.venueQrCodeFragment, args.venueArgs)
     }
 
     override fun getItems(): List<GenericItem> {

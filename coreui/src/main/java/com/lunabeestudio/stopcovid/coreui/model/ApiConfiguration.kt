@@ -23,8 +23,10 @@ internal class ApiConfiguration(
     val versionCalibrationBle: Int,
     @SerializedName("app.apiVersion")
     val apiVersion: String,
-    @SerializedName("app.warningApiVersion")
-    val warningApiVersion: String,
+    @SerializedName("app.clea.statusApiVersion")
+    val cleaStatusApiVersion: String,
+    @SerializedName("app.clea.reportApiVersion")
+    val cleaReportApiVersion: String,
     @SerializedName("app.displayAttestation")
     val displayAttestation: Boolean,
     @SerializedName("app.displayVaccination")
@@ -127,7 +129,6 @@ internal fun ApiConfiguration.toDomain(gson: Gson) = Configuration(
     version = version,
     versionCalibrationBle = versionCalibrationBle,
     apiVersion = apiVersion,
-    warningApiVersion = warningApiVersion,
     displayAttestation = displayAttestation,
     displayVaccination = displayVaccination,
     dataRetentionPeriod = dataRetentionPeriod,
@@ -185,7 +186,9 @@ internal fun ApiConfiguration.toDomain(gson: Gson) = Configuration(
         object : TypeToken<List<WalletPublicKey>?>() {}.type
     ),
     testCertificateValidityThresholdInHours = testCertificateValidityThresholdInHours,
+    cleaReportApiVersion = cleaReportApiVersion,
+    cleaStatusApiVersion = cleaStatusApiVersion,
     displaySanitaryCertificatesValidation = displaySanitaryCertificatesValidation,
     isAnalyticsOn = isAnalyticsOn,
-    analyticsApiVersion = analyticsApiVersion,
+    analyticsApiVersion = analyticsApiVersion
 )

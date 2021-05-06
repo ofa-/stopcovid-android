@@ -62,12 +62,7 @@ abstract class CommonDataViewModel(
         eraseVenues(application)
         (application.getAppContext() as StopCovid).cancelActivateReminder()
         eraseIsolation()
-        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(application.getAppContext())
         VaccinationCenterManager.clearAllData(application.getAppContext())
-        sharedPreferences.edit {
-            remove(Constants.SharedPrefs.PRIVATE_EVENT_QR_CODE_GENERATION_DATE)
-            remove(Constants.SharedPrefs.PRIVATE_EVENT_QR_CODE)
-        }
         application.getAppContext()
             .getETagSharedPrefs()
             .edit {

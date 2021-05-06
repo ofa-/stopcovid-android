@@ -75,7 +75,7 @@ class NoEphemeralBluetoothIdentifierFound(message: String? = null) :
 class RobertUnknownException(message: String = "Unknown error occurred") :
     RobertException(ErrorCode.ROBERT_UNKNOWN, message)
 
-class BLEAdvertiserException(message: String = "An error occurs in BLE advertiser", val shouldRestartBle : Boolean = false) :
+class BLEAdvertiserException(message: String = "An error occurs in BLE advertiser", val shouldRestartBle: Boolean = false) :
     RobertException(ErrorCode.BLE_ADVERTISER, message)
 
 class BLEScannerException(message: String = "An error occurs in BLE scanner") :

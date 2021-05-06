@@ -15,7 +15,8 @@ import android.os.Bundle
 import android.view.View
 import androidx.navigation.fragment.navArgs
 import androidx.preference.PreferenceManager
-import com.lunabeestudio.domain.model.VenueQrType
+import com.lunabeestudio.analytics.manager.AnalyticsManager
+import com.lunabeestudio.analytics.model.AppEventName
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.extension.isVenueOnBoardingDone
 import com.lunabeestudio.stopcovid.extension.robertManager
@@ -23,8 +24,11 @@ import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
 import com.lunabeestudio.stopcovid.extension.showExpiredCodeAlert
 import com.lunabeestudio.stopcovid.extension.showInvalidCodeAlert
+import com.lunabeestudio.stopcovid.extension.showUnknownErrorAlert
 import com.lunabeestudio.stopcovid.manager.VenuesManager
 import com.lunabeestudio.stopcovid.model.CaptchaNextFragment
+import com.lunabeestudio.stopcovid.model.VenueExpiredException
+import com.lunabeestudio.stopcovid.model.VenueInvalidFormatException
 
 class VenueQRCodeFragment : QRCodeFragment() {
 
@@ -43,22 +47,25 @@ class VenueQRCodeFragment : QRCodeFragment() {
 
         isReadyToStartScanFlow = false
 
-        val venueFullPath = args.venueFullPath
-            ?: args.venueStaticPath?.let { "${VenueQrType.STATIC.value}/$it" }
-            ?: args.venueDynamicPath?.let { "${VenueQrType.DYNAMIC.value}/$it" }
+        val venueContent = args.venueContent
+        val venueVersion = args.venueVersion
 
         when {
             !robertManager.isRegistered -> findNavControllerOrNull()?.safeNavigate(
                 VenueQRCodeFragmentDirections.actionVenueQrCodeFragmentToCaptchaFragment(
                     CaptchaNextFragment.Venue,
-                    venueFullPath = venueFullPath
+                    args.toBundle()
                 )
             )
-            venueFullPath != null -> findNavControllerOrNull()?.safeNavigate(
-                VenueQRCodeFragmentDirections.actionVenueQrCodeFragmentToConfirmVenueQrCodeFragment(venueFullPath)
+            venueContent != null && venueVersion != null -> findNavControllerOrNull()?.safeNavigate(
+                VenueQRCodeFragmentDirections.actionVenueQrCodeFragmentToConfirmVenueQrCodeFragment(
+                    venueContent,
+                    venueVersion.toInt(),
+                    args.venueTime
+                )
             )
             !sharedPrefs.isVenueOnBoardingDone -> findNavControllerOrNull()?.safeNavigate(
-                VenueQRCodeFragmentDirections.actionVenueQrCodeFragmentToVenueOnBoardingFragment(venueFullPath = venueFullPath)
+                VenueQRCodeFragmentDirections.actionVenueQrCodeFragmentToVenueOnBoardingFragment(args.toBundle())
             )
             else -> isReadyToStartScanFlow = true
         }
@@ -68,25 +75,21 @@ class VenueQRCodeFragment : QRCodeFragment() {
     override fun getExplanationKey(): String = "venueFlashCodeController.explanation"
 
     override fun onCodeScanned(code: String) {
-        val venueType = VenuesManager.processVenueUrl(
-            robertManager = robertManager,
-            secureKeystoreDataSource = requireContext().secureKeystoreDataSource(),
-            code
-        )
-        handleVenueType(code, venueType)
-    }
-
-    private fun handleVenueType(code: String, venueType: String?) {
-        if (venueType == null) {
-            if (VenuesManager.isVenueUrlExpired(robertManager, code)) {
-                context?.showExpiredCodeAlert(strings)
-            } else {
-                context?.showInvalidCodeAlert(strings)
-            }
-            findNavControllerOrNull()?.navigateUp()
-        } else {
+        try {
+            VenuesManager.processVenueUrl(
+                robertManager = robertManager,
+                secureKeystoreDataSource = requireContext().secureKeystoreDataSource(),
+                code
+            )
+            AnalyticsManager.reportAppEvent(requireContext(), AppEventName.e14, null)
             findNavControllerOrNull()
-                ?.safeNavigate(VenueQRCodeFragmentDirections.actionVenueQrCodeFragmentToVenueConfirmationFragment(venueType))
+                ?.safeNavigate(VenueQRCodeFragmentDirections.actionVenueQrCodeFragmentToVenueConfirmationFragment())
+        } catch (e: VenueExpiredException) {
+            context?.showExpiredCodeAlert(strings)
+        } catch (e: VenueInvalidFormatException) {
+            context?.showInvalidCodeAlert(strings)
+        } catch (e: Exception) {
+            showUnknownErrorAlert(null)
         }
     }
 }

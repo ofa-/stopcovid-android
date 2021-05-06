@@ -14,6 +14,8 @@ import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.navArgs
+import com.lunabeestudio.analytics.manager.AnalyticsManager
+import com.lunabeestudio.analytics.model.AppEventName
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.fastitem.buttonItem
@@ -21,13 +23,15 @@ import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
 import com.lunabeestudio.stopcovid.extension.robertManager
-import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
 import com.lunabeestudio.stopcovid.extension.showExpiredCodeAlert
 import com.lunabeestudio.stopcovid.extension.showInvalidCodeAlert
+import com.lunabeestudio.stopcovid.extension.showUnknownErrorAlert
 import com.lunabeestudio.stopcovid.fastitem.dangerButtonItem
 import com.lunabeestudio.stopcovid.fastitem.logoItem
 import com.lunabeestudio.stopcovid.manager.VenuesManager
+import com.lunabeestudio.stopcovid.model.VenueExpiredException
+import com.lunabeestudio.stopcovid.model.VenueInvalidFormatException
 import com.mikepenz.fastadapter.GenericItem
 
 class ConfirmVenueQrCodeFragment : MainFragment() {
@@ -70,12 +74,23 @@ class ConfirmVenueQrCodeFragment : MainFragment() {
             gravity = Gravity.CENTER
             width = ViewGroup.LayoutParams.MATCH_PARENT
             onClickListener = View.OnClickListener {
-                val venueType = VenuesManager.processVenuePath(
-                    robertManager = robertManager,
-                    secureKeystoreDataSource = requireContext().secureKeystoreDataSource(),
-                    args.venueFullPath,
-                )
-                handleVenueType(args.venueFullPath, venueType)
+                try {
+                    VenuesManager.processVenue(
+                        robertManager = robertManager,
+                        secureKeystoreDataSource = requireContext().secureKeystoreDataSource(),
+                        args.venueContent,
+                        args.venueVersion,
+                        args.venueTime?.toLong()
+                    )
+                    AnalyticsManager.reportAppEvent(requireContext(), AppEventName.e14, null)
+                    findNavControllerOrNull()?.navigateUp()
+                } catch (e: VenueExpiredException) {
+                    context?.showExpiredCodeAlert(strings)
+                } catch (e: VenueInvalidFormatException) {
+                    context?.showInvalidCodeAlert(strings)
+                } catch (e: Exception) {
+                    showUnknownErrorAlert(null)
+                }
             }
             identifier = "confirmVenueQrCodeController.confirm".hashCode().toLong()
         }
@@ -96,17 +111,4 @@ class ConfirmVenueQrCodeFragment : MainFragment() {
         return items
     }
 
-    private fun handleVenueType(code: String, venueType: String?) {
-        if (venueType == null) {
-            if (VenuesManager.isVenuePathExpired(robertManager, code)) {
-                context?.showExpiredCodeAlert(strings)
-            } else {
-                context?.showInvalidCodeAlert(strings)
-            }
-            findNavControllerOrNull()?.navigateUp()
-        } else {
-            findNavControllerOrNull()
-                ?.safeNavigate(ConfirmVenueQrCodeFragmentDirections.actionConfirmVenueQrCodeFragmentToVenueConfirmationFragment(venueType))
-        }
-    }
 }

@@ -39,14 +39,6 @@ object RetrofitClient {
             .build().create(clazz)
     }
 
-    internal fun <T> getWarningService(context: Context, warningBaseUrl: String, warningCertificateSHA256: String, clazz: Class<T>): T {
-        return Retrofit.Builder()
-            .baseUrl(warningBaseUrl.toHttpUrl())
-            .addConverterFactory(GsonConverterFactory.create(GsonBuilder().create()))
-            .client(getDefaultOKHttpClient(context, warningBaseUrl, warningCertificateSHA256))
-            .build().create(clazz)
-    }
-
     internal fun <T> getFileService(context: Context, baseUrl: String, certificateSHA256: String, clazz: Class<T>): T {
         return Retrofit.Builder()
             .baseUrl(baseUrl.toHttpUrl())
@@ -72,6 +64,8 @@ object RetrofitClient {
                     .addTrustedCertificate(certificateFromString(context, "api_tousanticovid_gouv_fr"))
                     .addTrustedCertificate(certificateFromString(context, "tacw_tousanticovid_gouv_fr"))
                     .addTrustedCertificate(certificateFromString(context, "app_tousanticovid_gouv_fr"))
+                    .addTrustedCertificate(certificateFromString(context, "s3_fr_par_scw_cloud"))
+                    .addTrustedCertificate(certificateFromString(context, "signal_api_tousanticovid_gouv_fr"))
                     .build()
                 sslSocketFactory(certificates.sslSocketFactory(), certificates.trustManager)
             }

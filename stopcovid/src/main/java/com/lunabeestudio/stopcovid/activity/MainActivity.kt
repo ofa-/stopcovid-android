@@ -21,7 +21,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
 import androidx.navigation.ui.NavigationUI.setupActionBarWithNavController
 import androidx.preference.PreferenceManager
-import androidx.work.ExistingWorkPolicy
 import androidx.work.WorkManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
@@ -37,6 +36,7 @@ import com.lunabeestudio.stopcovid.extension.alertRiskLevelChanged
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.showAlertRiskLevelChanged
 import com.lunabeestudio.stopcovid.manager.RisksLevelManager
+import com.lunabeestudio.stopcovid.manager.VenuesManager
 
 class MainActivity : BaseActivity() {
 
@@ -115,7 +115,11 @@ class MainActivity : BaseActivity() {
     }
 
     private fun fixIntentData(intent: Intent) {
-        val uriBuilder = intent.data?.buildUpon()
+        // since we use '#' to separate the venue base64 code, we replace it to pass a clean URL to the nav_graph deeplink handle
+        val uri = intent.data?.let {
+            VenuesManager.cleanVenueUri(it.toString())
+        }
+        val uriBuilder = uri?.buildUpon()
             ?.path(intent.data?.path?.takeIf { it != "/" })
 
         intent.data = uriBuilder?.build()
