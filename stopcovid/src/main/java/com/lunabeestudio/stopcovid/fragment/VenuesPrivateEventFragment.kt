@@ -63,7 +63,6 @@ class VenuesPrivateEventFragment : MainFragment() {
 
         items += privateVenueQrCodeItem {
             qrCodeBitmap = bitmap
-            text = sharedPrefs.privateEventQrCode
             identifier = items.size.toLong()
         }
         items += spaceItem {
