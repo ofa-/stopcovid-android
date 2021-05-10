@@ -56,7 +56,6 @@ internal object AnalyticsServerManager {
                     )
                     val certificates: HandshakeCertificates = HandshakeCertificates.Builder()
                         .addTrustedCertificate(certificateFromString(context, "analytics_api_tousanticovid_gouv_fr"))
-                        .addTrustedCertificate(certificateFromString(context, "analytics_api_int_tousanticovid_gouv_fr"))
                         .build()
                     sslSocketFactory(certificates.sslSocketFactory(), certificates.trustManager)
                 }
