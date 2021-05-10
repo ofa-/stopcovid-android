@@ -497,6 +497,7 @@ class RobertManagerImpl(
 
     private fun matchingCleaPrefix(clusterIndex: ClusterIndex,
         venueQrCodeList: List<VenueQrCode>?): List<String> = clusterIndex.clusterPrefixList.filter { prefix ->
+        prefix != null &&
         venueQrCodeList?.any { it.ltid.startsWith(prefix, true) } == true
     }
 
