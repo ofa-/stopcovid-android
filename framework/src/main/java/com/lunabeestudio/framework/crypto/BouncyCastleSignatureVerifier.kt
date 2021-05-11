@@ -3,7 +3,11 @@ package com.lunabeestudio.framework.crypto
 import android.util.Base64
 import com.lunabeestudio.framework.extension.removePublicKeyDecoration
 import org.apache.commons.codec.binary.Base32
+import org.bouncycastle.asn1.ASN1EncodableVector
+import org.bouncycastle.asn1.ASN1Integer
+import org.bouncycastle.asn1.DERSequence
 import org.bouncycastle.jce.provider.BouncyCastleProvider
+import java.math.BigInteger
 import java.nio.charset.StandardCharsets
 import java.security.KeyFactory
 import java.security.PublicKey
@@ -40,25 +44,26 @@ object BouncyCastleSignatureVerifier {
         val ecdsaVerify: Signature = Signature.getInstance(signatureKeyAlgorithm)
 
         val rawMessage = message.toByteArray(StandardCharsets.US_ASCII)
+        val decodedSignature = Base32().decode(rawSignature)
 
+        val derSequence = getDERSequenceFromSignature(decodedSignature)
         ecdsaVerify.initVerify(publicKey)
         ecdsaVerify.update(rawMessage)
 
-        val decodedSignature = Base32().decode(rawSignature)
+        return ecdsaVerify.verify(derSequence.encoded)
+    }
 
-        var r = decodedSignature.take(decodedSignature.size / 2).toByteArray()
-        var s = decodedSignature.takeLast(decodedSignature.size / 2).toByteArray()
+    private fun getDERSequenceFromSignature(decodedSignature: ByteArray): DERSequence {
+        val length = decodedSignature.size / 2
+        val bytes = ByteArray(length)
+        val asn1EncodableVector = ASN1EncodableVector()
 
-        // DER encoding
-        if (r.first() < 0x00) {
-            r = byteArrayOf(0x00) + r
-        }
-        if (s.first() < 0x00) {
-            s = byteArrayOf(0x00) + s
-        }
-        val rs = byteArrayOf(0x02, r.size.toByte()) + r + byteArrayOf(0x02, s.size.toByte()) + s
-        val derSignature = byteArrayOf(0x30, (rs.size).toByte()) + rs
+        System.arraycopy(decodedSignature, 0, bytes, 0, length)
+        asn1EncodableVector.add(ASN1Integer(BigInteger(1, bytes)))
 
-        return ecdsaVerify.verify(derSignature)
+        System.arraycopy(decodedSignature, length, bytes, 0, length)
+        asn1EncodableVector.add(ASN1Integer(BigInteger(1, bytes)))
+
+        return DERSequence(asn1EncodableVector)
     }
 }
