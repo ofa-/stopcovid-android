@@ -59,10 +59,6 @@ android {
         versionName "3.0.2"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-
-        def gitRev = "git rev-parse HEAD".execute().getText().substring(0, 7)
-
-        buildConfigField 'String', 'BUILD_ID', /"${gitRev}"/
     }
 
     lintOptions {

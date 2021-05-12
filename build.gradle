@@ -55,6 +55,9 @@ subprojects{
             defaultConfig {
                 minSdkVersion 21
                 targetSdkVersion 30
+
+                def gitRev = "git rev-parse HEAD".execute().getText().substring(0, 7)
+                buildConfigField 'String', 'BUILD_ID', /"${gitRev}"/
             }
         }
     }
