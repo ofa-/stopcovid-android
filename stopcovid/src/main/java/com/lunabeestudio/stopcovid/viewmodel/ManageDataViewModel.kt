@@ -10,10 +10,12 @@
 
 package com.lunabeestudio.stopcovid.viewmodel
 
+import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.lunabeestudio.analytics.manager.AnalyticsManager
 import com.lunabeestudio.framework.local.datasource.SecureKeystoreDataSource
 import com.lunabeestudio.robert.RobertApplication
 import com.lunabeestudio.robert.RobertManager
@@ -35,6 +37,7 @@ class ManageDataViewModel(
 
     val eraseLocalSuccess: SingleLiveEvent<Unit> = SingleLiveEvent()
     val eraseRemoteSuccess: SingleLiveEvent<Unit> = SingleLiveEvent()
+    val deleteAnalyticsSuccess: SingleLiveEvent<Unit> = SingleLiveEvent()
     val quitStopCovidSuccess: SingleLiveEvent<Unit> = SingleLiveEvent()
     val covidException: SingleLiveEvent<CovidException> = SingleLiveEvent()
     val loadingInProgress: MutableLiveData<Boolean> = MutableLiveData(false)
@@ -44,8 +47,8 @@ class ManageDataViewModel(
         eraseLocalSuccess.postValue(null)
     }
 
-    override fun eraseAttestations() {
-        super.eraseAttestations()
+    override fun eraseAttestations(context: Context) {
+        super.eraseAttestations(context)
         eraseLocalSuccess.postValue(null)
     }
 
@@ -90,6 +93,22 @@ class ManageDataViewModel(
 
     fun eraseRemoteAlert(application: RobertApplication) {
         clearNotifications(application)
+    }
+
+    fun requestDeleteAnalytics(application: RobertApplication) {
+        if (robertManager.isRegistered) {
+            if (loadingInProgress.value == false) {
+                AnalyticsManager.requestDeleteAnalytics(application.getAppContext())
+                viewModelScope.launch(Dispatchers.IO) {
+                    loadingInProgress.postValue(true)
+                    robertManager.updateStatus(application)
+                    loadingInProgress.postValue(false)
+                    deleteAnalyticsSuccess.postValue(null)
+                }
+            }
+        } else {
+            covidException.postValue(NeedRegisterException())
+        }
     }
 
     fun quitStopCovid(application: RobertApplication) {

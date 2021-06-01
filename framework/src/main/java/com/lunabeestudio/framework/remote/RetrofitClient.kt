@@ -12,7 +12,6 @@ package com.lunabeestudio.framework.remote
 
 import android.content.Context
 import android.os.Build
-import com.google.gson.GsonBuilder
 import com.lunabeestudio.framework.BuildConfig
 import okhttp3.CertificatePinner
 import okhttp3.ConnectionSpec
@@ -23,7 +22,7 @@ import okhttp3.TlsVersion
 import okhttp3.logging.HttpLoggingInterceptor
 import okhttp3.tls.HandshakeCertificates
 import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.converter.moshi.MoshiConverterFactory
 import timber.log.Timber
 import java.security.cert.CertificateFactory
 import java.security.cert.X509Certificate
@@ -31,11 +30,17 @@ import java.util.concurrent.TimeUnit
 
 object RetrofitClient {
 
-    internal fun <T> getService(context: Context, baseUrl: String, certificateSHA256: String, clazz: Class<T>): T {
+    internal fun <T> getService(
+        context: Context,
+        baseUrl: String,
+        certificateSHA256: String,
+        clazz: Class<T>,
+        onProgressUpdate: ((Float) -> Unit)? = null,
+    ): T {
         return Retrofit.Builder()
             .baseUrl(baseUrl.toHttpUrl())
-            .addConverterFactory(GsonConverterFactory.create(GsonBuilder().create()))
-            .client(getDefaultOKHttpClient(context, baseUrl, certificateSHA256))
+            .addConverterFactory(MoshiConverterFactory.create())
+            .client(getDefaultOKHttpClient(context, baseUrl, certificateSHA256, onProgressUpdate))
             .build().create(clazz)
     }
 
@@ -46,7 +51,12 @@ object RetrofitClient {
             .build().create(clazz)
     }
 
-    fun getDefaultOKHttpClient(context: Context, url: String, certificateSHA256: String): OkHttpClient {
+    fun getDefaultOKHttpClient(
+        context: Context,
+        url: String,
+        certificateSHA256: String,
+        onProgressUpdate: ((Float) -> Unit)? = null,
+    ): OkHttpClient {
         val requireTls12 = ConnectionSpec.Builder(ConnectionSpec.RESTRICTED_TLS)
             .tlsVersions(TlsVersion.TLS_1_2)
             .build()
@@ -71,10 +81,11 @@ object RetrofitClient {
             }
             addInterceptor(getDefaultHeaderInterceptor())
             addInterceptor(getLogInterceptor())
-            callTimeout(30L, TimeUnit.SECONDS)
-            connectTimeout(30L, TimeUnit.SECONDS)
-            readTimeout(30L, TimeUnit.SECONDS)
-            writeTimeout(30L, TimeUnit.SECONDS)
+            addNetworkInterceptor(getProgressInterceptor(onProgressUpdate))
+            callTimeout(1L, TimeUnit.MINUTES)
+            connectTimeout(1L, TimeUnit.MINUTES)
+            readTimeout(1L, TimeUnit.MINUTES)
+            writeTimeout(1L, TimeUnit.MINUTES)
         }.build()
     }
 
@@ -135,5 +146,27 @@ object RetrofitClient {
 
     private fun getLogInterceptor(): HttpLoggingInterceptor = HttpLoggingInterceptor { message -> Timber.v(message) }.apply {
         level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE
+    }
+
+    private fun getProgressInterceptor(onProgressUpdate: ((Float) -> Unit)?): Interceptor = Interceptor { chain ->
+        val originalRequest = chain.request()
+
+        val requestBody = originalRequest.body
+        if (requestBody == null) {
+            chain.proceed(originalRequest)
+        } else {
+            val progressRequest = originalRequest.newBuilder()
+                .method(
+                    originalRequest.method,
+                    UploadProgressRequestBody(requestBody, object : UploadProgressRequestBody.ProgressListener {
+                        override fun update(bytesWritten: Long, contentLength: Long) {
+                            onProgressUpdate?.invoke(bytesWritten.toFloat() / contentLength.toFloat())
+                        }
+                    })
+                )
+                .build()
+
+            chain.proceed(progressRequest)
+        }
     }
 }

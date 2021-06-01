@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ This Source Code Form is subject to the terms of the Mozilla Public
+  ~ License, v. 2.0. If a copy of the MPL was not distributed with this
+  ~ file, You can obtain one at https://mozilla.org/MPL/2.0/.
+  ~
+  ~ Authors
+  ~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ Created by Lunabee Studio / Date - 2021/21/5 - for the TOUS-ANTI-COVID project
+  -->
+
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/walletNavHostFragment"
+        android:name="androidx.navigation.fragment.NavHostFragment"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:defaultNavHost="true"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        app:layout_constraintBottom_toTopOf="@id/walletBottomSheetCard"
+        app:layout_constraintTop_toTopOf="parent"
+        app:navGraph="@navigation/nav_wallet" />
+
+    <Space
+        android:id="@+id/walletBottomSheetTopSpace"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/wallet_bottom_sheet_top_space_shadow_height"
+        app:layout_constraintTop_toTopOf="@id/walletBottomSheetCard" />
+
+    <include
+        layout="@layout/top_shadow"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/wallet_bottom_sheet_top_shadow_height"
+        app:layout_constraintBottom_toBottomOf="@id/walletBottomSheetTopSpace" />
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/walletBottomSheetCard"
+        style="@style/Widget.MaterialComponents.CardView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardElevation="@dimen/bottom_sheet_card_elevation"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/walletBottomSheetButton"
+            style="@style/Widget.StopCovid.Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/spacing_xlarge"
+            android:layout_marginVertical="@dimen/spacing_large"
+            android:textAllCaps="false"
+            tools:text="@tools:sample/lorem[3]" />
+    </com.google.android.material.card.MaterialCardView>
+</androidx.constraintlayout.widget.ConstraintLayout>

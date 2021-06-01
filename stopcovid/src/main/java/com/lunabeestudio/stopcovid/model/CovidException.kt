@@ -91,6 +91,9 @@ class BLEScannerException(message: String = "An error occurs in BLE scanner") :
 class BLEGattException(message: String = "An error occurs in BLE GATT") :
     CovidException(ErrorCode.BLE_GATT, message)
 
+class BLEProximityNotificationException(message: String = "An error occurs in BLE Proximity Notification") :
+    CovidException(ErrorCode.BLE_PROXIMITY_NOTIFICATION, message)
+
 class TimeNotAlignedException(message: String = "Phone time not aligned with server time") :
     CovidException(ErrorCode.TIME_NOT_ALIGNED, message)
 

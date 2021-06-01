@@ -20,6 +20,7 @@ import com.orange.proximitynotification.ble.scanner.BleScannedDevice
 import java.util.Date
 
 internal fun proximityPayload() = ProximityPayload((1..16).map { it.toByte() }.toByteArray())
+internal fun proximityPayload(value : Byte) = ProximityPayload(ByteArray(ProximityPayload.SIZE, init = { value }))
 
 internal fun record(
     payload: BlePayload = payload(),

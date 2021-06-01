@@ -48,4 +48,8 @@
     <item name="item_selection" type="id" />
     <item name="item_tag" type="id" />
     <item name="item_vaccination_center_card" type="id" />
+    <item name="item_documents_card" type="id" />
+    <item name="item_phone_support" type="id" />
+    <item name="wallet_pager" type="id" />
+    <item name="item_add_certificate_card" type="id" />
 </resources>

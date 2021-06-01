@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ This Source Code Form is subject to the terms of the Mozilla Public
+  ~ License, v. 2.0. If a copy of the MPL was not distributed with this
+  ~ file, You can obtain one at https://mozilla.org/MPL/2.0/.
+  ~
+  ~ Authors
+  ~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ Created by Lunabee Studio / Date - 2021/25/5 - for the TOUS-ANTI-COVID project
+  -->
+
+<!--
+  ~ This Source Code Form is subject to the terms of the Mozilla Public
+  ~ License, v. 2.0. If a copy of the MPL was not distributed with this
+  ~ file, You can obtain one at https://mozilla.org/MPL/2.0/.
+  ~
+  ~ Authors
+  ~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ Created by Lunabee Studio / Date - 2021/25/5 - for the TOUS-ANTI-COVID project
+  -->
+
+<resources>
+    <dimen name="certificate_double_thumbnail_height">140dp</dimen>
+    <dimen name="certificate_single_thumbnail_height">250dp</dimen>
+    <dimen name="wallet_bottom_sheet_top_space_shadow_height">8dp</dimen>
+    <dimen name="wallet_bottom_sheet_top_shadow_height">16dp</dimen>
+</resources>

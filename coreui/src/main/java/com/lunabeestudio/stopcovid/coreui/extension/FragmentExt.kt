@@ -50,3 +50,11 @@ fun Fragment.viewLifecycleOwnerOrNull(): LifecycleOwner? =
 
 val Fragment.appCompatActivity: AppCompatActivity?
     get() = activity as? AppCompatActivity
+
+inline fun <reified T : Fragment> Fragment.findParentFragmentByType(): T? {
+    var parent = parentFragment
+    while (parent?.parentFragment != null && parent !is T) {
+        parent = parent.parentFragment
+    }
+    return parent as? T
+}

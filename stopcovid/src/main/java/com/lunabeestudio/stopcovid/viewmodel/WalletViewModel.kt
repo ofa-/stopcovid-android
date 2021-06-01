@@ -13,6 +13,7 @@ package com.lunabeestudio.stopcovid.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.map
 import com.lunabeestudio.framework.local.datasource.SecureKeystoreDataSource
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.robert.datasource.LocalKeystoreDataSource
@@ -21,10 +22,15 @@ import com.lunabeestudio.stopcovid.extension.isRecent
 import com.lunabeestudio.stopcovid.manager.WalletManager
 import com.lunabeestudio.stopcovid.model.WalletCertificate
 
-class WalletViewModel(private val robertManager: RobertManager, private val keystoreDataSource: LocalKeystoreDataSource) : ViewModel() {
+class WalletViewModel(
+    private val robertManager: RobertManager,
+    private val keystoreDataSource: LocalKeystoreDataSource
+) : ViewModel() {
 
     val certificates: LiveData<List<WalletCertificate>?>
         get() = WalletManager.walletCertificateLiveData
+
+    val certificatesCount: LiveData<Int> = certificates.map { it?.size ?: 0 }
 
     val recentCertificates: List<WalletCertificate>?
         get() = certificates.value?.filter {

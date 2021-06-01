@@ -225,7 +225,7 @@ class BleScannerImpl(
      * iOS service scan in background
      */
     private fun ScanRecord.isIOSInBackgroundServiceScan() =
-        serviceData == null && matchesManufacturerDataMask(
+        serviceUuids == null && matchesManufacturerDataMask(
             APPLE_MANUFACTURER_ID,
             settings.backgroundServiceManufacturerDataIOS
         )

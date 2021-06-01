@@ -28,7 +28,6 @@ import com.orange.proximitynotification.ble.gatt.BleGattManager.Callback.Payload
 import com.orange.proximitynotification.tools.Result
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
-import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 
@@ -148,15 +147,6 @@ internal class BleGattManagerImpl(
 
                 Result.Success(rssi)
 
-            } catch (e: TimeoutCancellationException) {
-
-                ProximityNotificationLogger.error(
-                    eventId = ProximityNotificationEventId.BLE_GATT_REQUEST_REMOTE_RSSI_TIMEOUT,
-                    message = "Failed to request remote RSSI. Connection timeout",
-                    cause = e
-                )
-
-                Result.Failure(e)
             } catch (t: Throwable) {
 
                 ProximityNotificationLogger.error(
@@ -187,39 +177,38 @@ internal class BleGattManagerImpl(
                 val remoteServices =
                     withTimeout(settings.discoverServicesTimeout) { client.discoverServices() }
 
-                remoteServices.firstOrNull { it.uuid == settings.serviceUuid }
+                val payloadCharacteristic = remoteServices
+                    .singleOrNull { it.uuid == settings.serviceUuid }
                     ?.getCharacteristic(payloadCharacteristic.uuid)
-                    ?.let { payloadCharacteristic ->
+                    ?: throw BleGattManagerException.IncorrectPayloadService("Bluetooth services does not contain expected UUID")
 
-                        val properties = payloadCharacteristic.properties
+                val properties = payloadCharacteristic.properties
 
-                        require(properties and BluetoothGattCharacteristic.PROPERTY_WRITE == BluetoothGattCharacteristic.PROPERTY_WRITE) {
-                            "payload characteristic is not writeable (properties=$properties)"
-                        }
+                if (properties and BluetoothGattCharacteristic.PROPERTY_WRITE != BluetoothGattCharacteristic.PROPERTY_WRITE) {
+                    throw BleGattManagerException.IncorrectPayloadService("payload characteristic is not writeable (properties=$properties)")
+                }
 
-                        payloadCharacteristic.value = value.copyOf()
-                        payloadCharacteristic.writeType =
-                            BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
-                        withTimeout(settings.writeRemotePayloadTimeout) {
-                            client.writeCharacteristic(payloadCharacteristic)
-                        }
+                payloadCharacteristic.value = value.copyOf()
+                payloadCharacteristic.writeType = BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
+                withTimeout(settings.writeRemotePayloadTimeout) {
+                    client.writeCharacteristic(payloadCharacteristic)
+                }
 
-                        if (shouldReadRemotePayload
-                            && (properties and BluetoothGattCharacteristic.PROPERTY_READ == BluetoothGattCharacteristic.PROPERTY_READ)
-                        ) {
+                if (shouldReadRemotePayload
+                    && (properties and BluetoothGattCharacteristic.PROPERTY_READ == BluetoothGattCharacteristic.PROPERTY_READ)
+                ) {
 
-                            val rssi =
-                                withTimeout(settings.readRemoteRssiTimeout) { client.readRemoteRssi() }
-                            val remotePayload = withTimeout(settings.readRemotePayloadTimeout) {
-                                client.readCharacteristic(payloadCharacteristic)
-                            }
-
-                            RemoteRssiAndPayload(rssi, remotePayload.value)
-                        } else {
-                            null
-                        }
+                    val rssi =
+                        withTimeout(settings.readRemoteRssiTimeout) { client.readRemoteRssi() }
+                    val remotePayload = withTimeout(settings.readRemotePayloadTimeout) {
+                        client.readCharacteristic(payloadCharacteristic).value?.copyOf()
                     }
 
+                    requireNotNull(remotePayload) { "remote payload could not be null" }
+                    RemoteRssiAndPayload(rssi, remotePayload)
+                } else {
+                    null
+                }
             }
             ProximityNotificationLogger.debug(
                 eventId = ProximityNotificationEventId.BLE_GATT_EXCHANGE_PAYLOAD_SUCCESS,
@@ -228,14 +217,6 @@ internal class BleGattManagerImpl(
 
             Result.Success(result)
 
-        } catch (e: TimeoutCancellationException) {
-            ProximityNotificationLogger.error(
-                eventId = ProximityNotificationEventId.BLE_GATT_EXCHANGE_PAYLOAD_TIMEOUT,
-                message = "Failed to exchange payload. Connection timeout",
-                cause = e
-            )
-
-            Result.Failure(e)
         } catch (t: Throwable) {
 
             ProximityNotificationLogger.error(
@@ -269,10 +250,16 @@ internal class BleGattManagerImpl(
                     cause = t
                 )
 
-                throw BleGattConnectionException(cause = t)
+                throw BleGattManagerException.ConnectionFailed(cause = t)
             }
 
-            action(client)
+            try {
+                action(client)
+            } catch (t: BleGattManagerException) {
+                throw t
+            } catch (t: Throwable) {
+                throw BleGattManagerException.OperationFailed(t)
+            }
 
         } finally {
             withContext(NonCancellable) {

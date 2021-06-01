@@ -12,13 +12,17 @@ package com.lunabeestudio.stopcovid.fastitem
 
 import android.graphics.drawable.GradientDrawable
 import android.view.View
-import android.widget.ImageButton
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.lunabeestudio.stopcovid.R
+import com.lunabeestudio.stopcovid.coreui.databinding.ItemActionBinding
 import com.lunabeestudio.stopcovid.coreui.extension.safeEmojiSpanify
+import com.lunabeestudio.stopcovid.coreui.extension.setOnClickListenerOrHideRipple
 import com.lunabeestudio.stopcovid.coreui.fastitem.BaseItem
+import com.lunabeestudio.stopcovid.coreui.model.Action
+import com.lunabeestudio.stopcovid.coreui.extension.setImageResourceOrHide
 import com.lunabeestudio.stopcovid.extension.setTextOrHide
 
 class HealthCardItem(layoutRes: Int) : BaseItem<HealthCardItem.ViewHolder>(
@@ -29,6 +33,8 @@ class HealthCardItem(layoutRes: Int) : BaseItem<HealthCardItem.ViewHolder>(
     var caption: String? = null
     var dateLabel: String? = null
     var dateValue: String? = null
+
+    var statusUpdateAction: Action? = null
 
     // Gradient background, override theme
     var gradientBackground: GradientDrawable? = null
@@ -41,6 +47,18 @@ class HealthCardItem(layoutRes: Int) : BaseItem<HealthCardItem.ViewHolder>(
         holder.dateLabelTextView.setTextOrHide(dateLabel.safeEmojiSpanify())
         holder.dateValueTextView.setTextOrHide(dateValue.safeEmojiSpanify())
         gradientBackground?.let { holder.rootLayout.background = it }
+
+        statusUpdateAction?.let { action ->
+            holder.actionBinding.actionDivider.isVisible = false
+            holder.actionBinding.textView.text = action.label.safeEmojiSpanify()
+            holder.actionBinding.leftIconImageView.setImageResourceOrHide(action.icon)
+            holder.actionBinding.badgeView.isVisible = action.showBadge
+            holder.actionBinding.actionRootLayout.setOnClickListenerOrHideRipple(action.onClickListener)
+            holder.actionBinding.arrowImageView.isVisible = action.onClickListener != null
+            holder.actionBinding.progressBar.isVisible = action.loading == true
+        } ?: run {
+            holder.actionBinding.actionRootLayout.visibility = View.GONE
+        }
     }
 
     override fun unbindView(holder: ViewHolder) {
@@ -54,6 +72,8 @@ class HealthCardItem(layoutRes: Int) : BaseItem<HealthCardItem.ViewHolder>(
         val captionTextView: TextView = v.findViewById(R.id.captionTextView)
         val dateLabelTextView: TextView = v.findViewById(R.id.dateLabelTextView)
         val dateValueTextView: TextView = v.findViewById(R.id.dateValueTextView)
+
+        val actionBinding: ItemActionBinding = ItemActionBinding.bind(v.findViewById(R.id.statusUpdateAction))
         val rootLayout: ConstraintLayout = v.findViewById(R.id.rootLayout)
     }
 }

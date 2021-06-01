@@ -367,14 +367,14 @@
     "keyfigure.nouveauxpatientsrea.colorCode.dark": "#C712CD",
     "keyfigure.patientsrea.colorCode.light": "#3393FD",
     "keyfigure.patientsrea.colorCode.dark": "#2682DF",
-    "keyfigure.nombrecas.colorCode.light": "#8944AB",
-    "keyfigure.nombrecas.colorCode.dark": "#DA8FFF",
+    "keyfigure.nombrecas.colorCode.light": "#EA7777",
+    "keyfigure.nombrecas.colorCode.dark": "#DF8181",
     "keyfigure.nombrecasj3.colorCode.light": "#8944AB",
     "keyfigure.nombrecasj3.colorCode.dark": "#DA8FFF",
     "keyfigure.reffectif.colorCode.light": "#0141DD",
     "keyfigure.reffectif.colorCode.dark": "#429DFF",
-    "keyfigure.tauxincidence.colorCode.light": "#A05A03",
-    "keyfigure.tauxincidence.colorCode.dark": "#B79E1C",
+    "keyfigure.tauxincidence.colorCode.light": "#FF2C55",
+    "keyfigure.tauxincidence.colorCode.dark": "#FED708",
     "keyfigure.tauxpositivite.colorCode.light": "#3734A3",
     "keyfigure.tauxpositivite.colorCode.dark": "#7D7BFF",
     "keyfigure.tauxoccupation.colorCode.light": "#0271A4",
@@ -731,7 +731,7 @@
    "home.vaccinationSection.cellSubtitle": "Check your eligibility and find a center nearby to get vaccinated.",
    "vaccinationController.title": "Vaccination",
    "vaccinationController.eligibility.title": "Am I eligible to get vaccinated?",
-   "vaccinationController.eligibility.subtitle": "Aujourd’hui, les publics prioritaires définis par les autorités sanitaires sont :\n- les personnes de 55 ans et plus, quels que soient leur lieu de vie et leur état de santé (avec ou sans comorbidités)\n- les femmes enceintes à partir du deuxième trimestre de la grossesse\n- les résidents en établissements (par exemple Ehpad, USLD)\n- les personnes de plus de 18 ans ayant une pathologie qui les expose à un très haut risque face à la Covid-19\n- les personnes de 50 à 54 ans inclus, souffrant d’une ou plusieurs comorbidités\n- les personnes en situation de handicap hébergées en établissements\n- les résidents de 60 ans et plus dans les foyers de travailleurs migrants\n- les professionnels de santé et les professionnels du secteur médico-social (dont les ambulanciers), les aides à domicile intervenant auprès de personnes âgées et handicapées vulnérables, les sapeurs-pompiers et les vétérinaires.\n\nAppuyez sur \"En savoir plus\" pour plus de détails.",
+   "vaccinationController.eligibility.subtitle": "Aujourd’hui, les publics prioritaires définis par les autorités sanitaires sont :\n- 24 mai 2021 : toutes les personnes exerçant une profession prioritaire, sans restriction d'âge\n- L’ensemble des personnes de 50 ans et plus\n- Les professionnels du secteur de la santé et du secteur médico-social\n- Les personnes de plus de 18 ans souffrant d’une ou plusieurs comorbidités ou hébergées en maisons d’accueil spécialisées, foyers d’accueil médicalisés, foyers pour personnes handicapées non médicalisés, ainsi qu’en établissements médico-sociaux spécifiques \n- Les personnes de plus de 16 ans souffrant d’une pathologie à très haut risque de forme grave de Covid-19\n- Les proches (de plus de 16 ans) d’une personne sévèrement immunodéprimée\n\n👍 Toutes les personnes de plus de 18 ans peuvent désormais prendre rendez-vous pour le jour même ou pour le lendemain pour se faire vacciner contre la Covid-19 si des doses de vaccin restent disponibles.",
    "vaccinationController.eligibility.buttonTitle": "En savoir plus",
    "vaccinationController.eligibility.url": "https://www.gouvernement.fr/info-coronavirus/vaccins#tac",
    "vaccinationController.vaccinationLocation.title": "Find a center to get vaccinated",
@@ -860,7 +860,7 @@
 	"risk1.details.title" : "No at-risk exposure detected, but stay alert",
 	"risk1.details.sub" : "Do not forget the preventive measures and health recommendations",
 	"risk1.section1.title" : "Your risk",
-	"risk1.section1.body" : "You have not been near a user who tested positive and contagious, but you regularly come across positive and contagious people.\n\nYou will be notified if you have been nearby (estimated distance to be less than two meters) or in the same at-risk location as a user declared as a case of COVID-19.\n\nYour status in the app is checked approximately every 24 hours.\n\nTousAntiCovid will then give you the recommendations of the Ministère des Solidarités et de la Santé.",
+	"risk1.section1.body" : "You have not been near a user who tested positive and contagious, but you regularly come across positive and contagious people.\n\nYou will be notified if you have been nearby (estimated distance to be less than two meters) or in the same at-risk vennue as a user declared as a case of COVID-19.\n\nYour status in the app is checked approximately every 24 hours.\n\nTousAntiCovid will then give you the recommendations of the Ministère des Solidarités et de la Santé.",
 
 	"risk2.notif.title" : "Info: place at risk",
 	"risk2.notif.sub" : "You have been exposed to a moderate risk of contamination following your presence in the same place as a contagious person. If you are a minor, discuss it with your parents or legal guardians",
@@ -896,7 +896,7 @@
   
   
   
-  "attestation.form.reason_curfew.label":"Reason between 7pm & 6am",
+  "attestation.form.reason_curfew.label":"Reason between 9pm & 6am",
    "attestation.form.reason_curfew.placeholder":"-",
    
    "attestation.form.reason_curfew.travail.shortLabel":"1. Professional occupation, education and training, general interest mission",
@@ -911,7 +911,7 @@
    "attestation.form.reason_curfew.convocation_demarches.shortLabel":"4. Judicial or administrative summons, procedures that cannot be carried out remotely",
    "attestation.form.reason_curfew.convocation_demarches.longLabel":"Travel to respond to a judicial or administrative summons, travel to visit a public service or a legal professional for formalities or proceedings that cannot be carried out remotely.",
    
-   "attestation.form.reason_curfew.animaux.shortLabel":"5. Pet animals in the evening and at night",
+   "attestation.form.reason_curfew.animaux.shortLabel":"6. Pet animals in the evening and at night",
    "attestation.form.reason_curfew.animaux.longLabel":"Short outings for the needs of pet animals (within a radius of 1 kilometre around the home).",
    
    
@@ -921,18 +921,18 @@
    "attestation.form.reason_curfew.judiciaire.longLabel":"Déplacements pour répondre à une convocation judiciaire ou administrative, déplacements pour se rendre chez un professionnel du droit, pour un acte ou une démarche qui ne peuvent être réalisés à distance",
     "attestation.form.reason_curfew.missions.shortLabel":"6. Missions d'intérêt général",
    "attestation.form.reason_curfew.missions.longLabel":"Déplacements pour participer à des missions d’intérêt général sur demande de l’autorité administrative",
-   "attestation.form.reason_curfew.transit.shortLabel":"7. Déplacements de transit et longue distance",
-   "attestation.form.reason_curfew.transit.longLabel":"Déplacements liés à des transits ferroviaires, aériens ou en bus pour des déplacements de longues distances",
+   "attestation.form.reason_curfew.transit.shortLabel":"5. Long distance trips",
+	"attestation.form.reason_curfew.transit.longLabel":"Travels related to transfers or transits from stations or airports as part of long-distance journeys.",
    
    
-   "attestation.form.reason_curfew.title":"Between 7pm & 6am",
+   "attestation.form.reason_curfew.title":"Between 9pm & 6am",
    
-    "attestation.form.reason_curfew.header":"I am travelling between 7pm & 6am for one of the following reasons:",
+    "attestation.form.reason_curfew.header":"I am travelling between 9pm & 6am for one of the following reasons:",
     
    "attestation.form.reason_curfew.footer":"People wishing to benefit from one of these exceptions must bring, if necessary, when traveling outside their home, a document allowing them to justify that the trip in question falls within the scope of one of these exceptions.",
    
    
-   "attestation.form.reason_lockdown.label":"Reason between 6am & 7pm",
+   "attestation.form.reason_lockdown.label":"Between 6am & 7pm (Guadeloupe, Wallis-et-Futuna, Martinique)",
    "attestation.form.reason_lockdown.placeholder":"-",
    
    "attestation.form.reason_lockdown.travail.shortLabel":"1. Professional occupation, education and training, general interest mission",
@@ -974,19 +974,19 @@
 
    "attestation.form.reason_lockdown.title":"Between 6am & 7pm",
    
-    "attestation.form.reason_lockdown.header":"I am travelling between 6am & 7pm for one of the following reasons:",
+    "attestation.form.reason_lockdown.header":"Guadeloupe, Wallis-et-Futuna, Martinique -  I am travelling between 6am & 7pm for one of the following reasons:",
     
    "attestation.form.reason_lockdown.footer":"People wishing to benefit from one of these exceptions must bring, if necessary, when traveling outside their home, a document allowing them to justify that the trip in question falls within the scope of one of these exceptions.\n\n[1] For persons residing near the boundary of a department, a distance of 30 kilometres beyond the department boundary is accepted.",
 
-   "walletController.title": "Test wallet",
+   "walletController.title": "Wallet",
    "walletController.explanations.title": "How does it work?",
-   "walletController.explanations.subtitle": "To digitalize your test certificates and always have them at hand, it's simple: once the result of your test is available, you will receive a text message with a link (from SI-DEP platform) and instructions to follow.\n\nThis certificate will have to be presented during checks for your air travels 👉 experiment in progress, only on some flights to Corsica (Air France and Air Corsica will inform their eligible customers).\n\nIf you have a problem, you can call 0 800 08 71 48.",
+   "walletController.explanations.subtitle": "To digitalize your test and vaccination certificates and always have them at hand, it's simple:\n- for your tests, you will receive a text message from SI-DEP platform with instructions.\n- for your vaccination, you will have a QR Code to scan on your paper certificate. From the second half of May, you will be able to collect your old vaccination certificates.\n\nThese certificates will have to be presented during checks for your travels 👉 experimentation in progress, airlines and shipping companies will inform their eligible customers.\n\nIf you have a problem, you can call 0 800 08 71 48.",
    "walletController.flashButton.title": "Scan QR Code",
-   "walletController.flashExplanation": "On your SIDEP document with your test results, you have a QR Code that you can scan to add your certificate in this wallet.",
+   "walletController.flashExplanation": "On your SI-DEP document (test) or vaccination certificate paper (since May 3rd, 11AM), you have a QR Code that you can scan to add your certificate in this wallet.",
    "walletController.recentCertificatesSection.title": "Recent certificates",
-   "walletController.recentCertificatesSection.subtitle": "These certificates are less than 3 days old.",
-   "walletController.oldCertificatesSection.title": "Certificates older than 3 days",
-   "walletController.oldCertificatesSection.subtitle": "These certificates are more than 3 days old.",
+   "walletController.recentCertificatesSection.subtitle": "In this section, you have all your vaccination certificates and test certificates less than 3 days old. 👉 Tap a certificate to switch it to full screen.",
+   "walletController.oldCertificatesSection.title": "Older certificates",
+   "walletController.oldCertificatesSection.subtitle": "These test certificates are more than 3 days old.",
    "walletController.menu.share": "Share the certificate",
    "walletController.menu.share.text": "Here is my #TousAntiCovid certificate",
    "walletController.menu.delete": "Delete this certificate",
@@ -994,16 +994,16 @@
    "walletController.menu.delete.alert.message": "Are you sure you want to delete this certificate?",
    
    "home.attestationSection.sanitaryCertificates.cell.title": "My wallet",
-   "home.attestationSection.sanitaryCertificates.cell.subtitle": "Your test certificates will be available here",
+   "home.attestationSection.sanitaryCertificates.cell.subtitle": "Your test and vaccination certificates",
    
    "flashWalletCodeController.title": "Scan",
-   "flashWalletCodeController.explanation": "Scan the QR Code on your SIDEP document.",
+   "flashWalletCodeController.explanation": "Scan the QR Code on your SI-DEP document (test) or paper certificate (vaccination).",
    "flashWalletCodeController.alert.invalidCode.title": "Invalid code",
    "flashWalletCodeController.alert.invalidCode.message": "The code is not valid. Please try again.",
    
-   "walletController.noCertificates.flashExplanation": "On your SIDEP test result document, you have a QR Code that you can scan to add the certificate to this wallet.",
+   "walletController.noCertificates.flashExplanation": "On your SI-DEP document (test) or vaccination certificate paper (since May 3rd, 11AM), you have a QR Code that you can scan to add your certificate in this wallet.",
    "confirmWalletQrCodeController.title":"Test wallet",
-   "confirmWalletQrCodeController.explanation.title":"You have just hit a TousAntiCovid link to add a test certificate to your wallet.",
+   "confirmWalletQrCodeController.explanation.title":"You have just hit a TousAntiCovid link to add a certificate to your wallet.",
    "confirmWalletQrCodeController.explanation.subtitle":"Do you want to add this certificate to your wallet?",
    "confirmWalletQrCodeController.confirm":"Add",
    
@@ -1034,9 +1034,8 @@
    "wallet.proof.sanitaryCertificate.loinc.945634" : "COVID serologic test (%@)",
    "wallet.proof.sanitaryCertificate.loinc.945642" : "COVID serologic test (%@)",
    
-   
    "wallet.proof.sanitaryCertificate.description": "<F0>, <F1>\nDate of birth <F2>, <F3>\n\n<F4>\n<F5>, tested on <F6>",
-   "wallet.proof.sanitaryCertificate.pillTitle": "Test certificate",
+   "wallet.proof.sanitaryCertificate.pillTitle": "Test",
    "walletCertificateVerifiedController.title": "Certificate",
    "walletCertificateVerifiedController.proofValidated": "Verified certificate",
    "walletCertificateVerifiedController.validateAnotherProof": "Verify another certificate",
@@ -1048,16 +1047,16 @@
    "keyfigure.variantsuk.colorCode.light":"#4C76EB",
    "keyfigure.variantsuk.colorCode.dark":"#A6B6E3",
    
-    "keyfigure.variantsuk.learnMore": "En cas de test (RT-PCR ou antigénique) de première intention positif, un second test RT-PCR dit de criblage est réalisé afin de détecter les variants d’intérêt connus à ce jour et d’évaluer leur diffusion sur l’ensemble du territoire.\n\nCet indicateur porte sur les données relatives aux résultats de criblage arrêtés à J-3 et mis à jour quotidiennement.\n\nIl exprime la part du variant 20I/501Y.V1 (UK) parmi tous les tests criblés. Les données sont collectées dans SIDEP depuis le 25 janvier 2021.",
+    "keyfigure.variantsuk.learnMore": "En cas de test (RT-PCR ou antigénique) de première intention positif, un second test RT-PCR dit de criblage est réalisé afin de détecter les variants d’intérêt connus à ce jour et d’évaluer leur diffusion sur l’ensemble du territoire.\n\nCet indicateur porte sur les données relatives aux résultats de criblage arrêtés à J-3 et mis à jour quotidiennement.\n\nIl exprime la part du variant 20I/501Y.V1 (UK) parmi tous les tests criblés. Les données sont collectées dans SI-DEP depuis le 25 janvier 2021.",
     
     "keyfigure.variantssabr.label":"Variants sud-africains ou brésiliens",
 	"keyfigure.variantssabr.shortLabel":"Variants SA ou BR",
 	"keyfigure.variantssabr.description":"Cet indicateur reflète le pourcentage de variants sud-africains ou brésiliens (20H/501Y.V2 (SA) ou 20J/501Y.V3 (BR)) parmi les tests criblés.",
 	
-	"keyfigure.variantssabr.colorCode.light":"#D6774C",
-	"keyfigure.variantssabr.colorCode.dark":"#F6A37E",
+	"keyfigure.variantssabr.colorCode.light":"#F49F54",
+	"keyfigure.variantssabr.colorCode.dark":"#F49F54",
 	
-	"keyfigure.variantssabr.learnMore": "En cas de test (RT-PCR ou antigénique) de première intention positif, un second test RT-PCR dit de criblage est réalisé afin de détecter les variants d’intérêt connus à ce jour et d’évaluer leur diffusion sur l’ensemble du territoire.\n\nCet indicateur porte sur les données relatives aux résultats de criblage arrêtés à J-3 et mises à jour quotidiennement.\n\nIl exprime la part des variants 20H/501Y.V2 (SA) ou 20J/501Y.V3 (BR) parmi tous les tests criblés. Les données sont collectées dans SIDEP depuis le 25 janvier 2021.",
+	"keyfigure.variantssabr.learnMore": "En cas de test (RT-PCR ou antigénique) de première intention positif, un second test RT-PCR dit de criblage est réalisé afin de détecter les variants d’intérêt connus à ce jour et d’évaluer leur diffusion sur l’ensemble du territoire.\n\nCet indicateur porte sur les données relatives aux résultats de criblage arrêtés à J-3 et mises à jour quotidiennement.\n\nIl exprime la part des variants 20H/501Y.V2 (SA) ou 20J/501Y.V3 (BR) parmi tous les tests criblés. Les données sont collectées dans SI-DEP depuis le 25 janvier 2021.",
     
     "manageDataController.walletData.confirmationDialog.title": "Confirmation",
     "manageDataController.walletData.confirmationDialog.message": "Are you sure you want to delete all your certificates?",
@@ -1065,25 +1064,90 @@
     "manageDataController.walletData.subtitle": "This will erase all of your certificates from your phone.",
     "manageDataController.walletData.button": "Delete on my phone",
     
-    "wallet.proof.error.1.title": "Wrong certificate",
-    "wallet.proof.error.1.message": "The scanned certificate is in the wrong format. If the problem persists, please call 0 800 08 71 48",
-    "wallet.proof.error.2.title": "Non-authentic certificate",
-    "wallet.proof.error.2.message": "The authenticity of the scanned certificate could not be verified. If the problem persists, please call 0 800 08 71 48",
+    "wallet.proof.error.1.title": "Wrong format",
+    "wallet.proof.error.1.message": "This certificate's format is incorrect.\n👉 For the tests, it's the QR Code on the left of the SI-DEP document.\n👉 For the vaccination, this is the QR Code on the right of the \"Assurance Maladie\" document.\n\nIf the problem persists, please call 0 800 08 71 48",
+    "wallet.proof.error.2.title": "Non-authentic",
+    "wallet.proof.error.2.message": "This certificate is not authentic.\n👉 For the tests, it's the QR Code on the left of the SI-DEP document.\n👉 For the vaccination, this is the QR Code on the right of the \"Assurance Maladie\" document.\n\nIf the problem persists, please call 0 800 08 71 48",
     
     "wallet.proof.moreThanSpecificHours": "⚠️ More than %dh",
     "wallet.proof.lessThanSpecificHours": "Less than %dh",
-     
-     "wallet.proof.vaccinationCertificate.LA.CO": "On-going",
+    
+    "wallet.proof.vaccinationCertificate.LA.CO": "On-going",
      "wallet.proof.vaccinationCertificate.LA.EC": "On-going",
      "wallet.proof.vaccinationCertificate.LA.TE": "Completed",
      "wallet.proof.vaccinationCertificate.pillTitle": "Vaccine",
-     "wallet.proof.vaccinationCertificate.description": "<L1>, <L0>\nDate of birth: <L2>\n<L5> (<L4>)\nInjection date <L9>\nDose: <L7>/<L8>",
+     "wallet.proof.vaccinationCertificate.description": "<L1>, <L0>\nDate of birth: <L2>\n<L5> (<L4>)\nInjection date <L9>\nDose(s): <L7>",
 
-    "manageDataController.analytics.title": "Statistiques et mesure d’audience",
-    "manageDataController.analytics.subtitle": "En conformité avec le RGPD, nous vous informons de notre capacité à collecter des données sur l’usage que vous faites de TousAntiCovid, à des fins de diagnostics, d’amélioration de performance et de l’expérience utilisateur. Sachez enfin que ces données sont conservées sur le serveur pendant 3 mois.",
-    "manageDataController.analytics.switch.on": "Activé",
-    "manageDataController.analytics.switch.off": "Désactivé",
-    "keyFigureDetailController.section.evolution.subtitle.nodata": "%@.\nAucune donnée",
-    "keyFigureDetailController.nodata": "Aucune donnée disponible pour l'indicateur \"%@\"."
+    "manageDataController.analytics.title": "Statistics and audience measurement",
+    "manageDataController.analytics.subtitle": "In compliance with the GDPR, we inform you of our ability to collect data on your use of TousAntiCovid, for diagnostic purposes, performance improvement and user experience. Finally, note that this data is kept on the server for 3 months.",
+    "manageDataController.analytics.switch.on": "Activated",
+    "manageDataController.analytics.switch.off": "Deactivated",
+    "keyFigureDetailController.section.evolution.subtitle.nodata": "%@.\nNo data",
+    "keyFigureDetailController.nodata": "No data is available for this figure \"%@\".",
+    
+    "home.healthSection.statusState": "Checking your status...",
+    "home.appUpdate.cell.title": "Update available",
+    "home.appUpdate.cell.subtitle": "A new version of TousAntiCovid is available.\nTap to install it now.",
+
+    "venuesHistoryController.noVenuesEmptyView.isSick.title": "Thanks for updating your status after having tested positive for COVID-19. Your venues history has been deleted, and the people alerted thanks to you.",
+
+   "sendHistoryController.progress.title": "Sending...",
+   "sendHistoryController.progress.message": "Thanks for your help, it can take several minutes.",
+   
+   "walletController.howDoesItWork.title": "The wallet: how does it work?",
+   "walletController.howDoesItWork.subtitle": "To digitalize your test and vaccination certificates and always have them at hand, it's simple:\n\n👉 for your tests, you will receive a text message from SI-DEP platform with instructions.\n\n👉 for your vaccination, you will have a QR Code to scan on your paper certificate. End of May, you will be able to collect your old vaccination certificates.",
+   "walletController.documents.title": "The documents",
+   "walletController.documents.subtitle": "From these two documents, you can digitalize your test and vaccination certficates, and add them here in TousAntiCovid Wallet.\nTap to have them full screen.",
+   "walletController.documents.vaccin": "Vaccination certificate",
+   "walletController.documents.test": "Test result",
+   "walletController.whenToUse.title": "When to use it?",
+   "walletController.whenToUse.subtitle": "These certificates will have to be presented for your travels.\n\n👉 experimentation in progress, airlines and shipping companies will inform their eligible customers.",
+   "walletController.whenToUse.button": "Learn more",
+   "walletController.whenToUse.url": "https://www.gouvernement.fr/pass-sanitaire-toutes-les-reponses-a-vos-questions",
+   "walletController.phone.title": "Need help?",
+   "walletController.phone.subtitle": "Call us 0 800 08 71 48.",
+   "walletController.phone.number": "0800087148",
+   "walletController.addCertificate": "Add a certificate",
+   "walletController.addCertificateExplanation": "Tap this button to add a test or vaccination certificate",
+   "walletController.mode.myCertificates": "My certificates (%d)",
+   "walletController.mode.info": "Information",
+   "walletController.addCertificate.explanation": "Tap the image of the document to have it full-screen and make sure you have the right document.",
+   "documentExplanationController.vaccinCertificate.title": "Vaccination certificate",
+   "documentExplanationController.testCertificate.title": "Test certificate",
+   "documentExplanationController.vaccinCertificate.explanation": "Here is an example of the document from the Assurance Maladie with the vaccination certificate. The QR Code to scan with TousAntiCovid is on the right, highlighted with the orange square.",
+   "documentExplanationController.testCertificate.explanation": "Here is an example of the SIDEP document for the test certificate. The QR Code to scan with TousAntiCovid is on the left, highlighted with the orange square.",
+   "walletAddCertificateController.testCertificate.title": "Add a test certificate",
+   "walletAddCertificateController.testCertificate.subtitle": "Tap here to add a test certificate",
+   "walletAddCertificateController.vaccinCertificate.title": "Add a vaccination certificate",
+   "walletAddCertificateController.vaccinCertificate.subtitle": "Tap here to add a vaccination certificate",
+   "walletCertificateErrorController.title": "Certificate error",
+   "walletCertificateErrorController.explanations.invalidSignature.testCertificate.title": "⚠️ Not authentic",
+   "walletCertificateErrorController.explanations.invalidSignature.testCertificate.subtitle": "This certificate is not authentic.\n\nMake sure you scan the QR Code of the right document 👇",
+   "walletCertificateErrorController.explanations.invalidSignature.vaccinCertificate.title": "⚠️ Not authentic",
+   "walletCertificateErrorController.explanations.invalidSignature.vaccinCertificate.subtitle": "This certificate is not authentic.\n\nMake sure you scan the QR Code of the right document 👇",
+   "walletCertificateErrorController.explanations.invalidFormat.testCertificate.title": "⚠️ Wrong format",
+   "walletCertificateErrorController.explanations.invalidFormat.testCertificate.subtitle": "This certificate's format is not correct.\n\nPlease try to scan it with more light. And make sure you scan the QR Code of the right document 👇",
+   "walletCertificateErrorController.explanations.invalidFormat.vaccinCertificate.title": "⚠️ Wrong format",
+   "walletCertificateErrorController.explanations.invalidFormat.vaccinCertificate.subtitle": "This certificate's format is not correct.\n\nPlease try to scan it with more light. And make sure you scan the QR Code of the right document 👇",
+   "walletCertificateErrorController.checkDocument.testCertificate.title": "Check your document",
+   "walletCertificateErrorController.checkDocument.testCertificate.subtitle": "Here is an example the document you should have for your test result. This document is the only one allowing you to add a test certificate in TousAntiCovid.",
+   "walletCertificateErrorController.checkDocument.vaccinCertificate.title": "Check your document",
+   "walletCertificateErrorController.checkDocument.vaccinCertificate.subtitle": "Here is an example the document you should have for your vaccination certificate. This document is the only one allowing you to add a vaccination certificate in TousAntiCovid.",
+   
+    "attestation.form.country.label":"Country",
+    "attestation.form.country.placeholder":"France",
+    
+    "common.moreInfo": "More info",
+   "venuesRecording.whenToUse.title": "The QR Codes",
+   "venuesRecording.whenToUse.subtitle": "The venues with these QR Codes have it either at the entrance, or in more approriate places to scan a QR Code.\n\nIf you don't find the QR Code, you can ask the staff to help you.",
+   "venuesRecording.alert.title": "The alerts",
+   "venuesRecording.alert.subtitle": "If a person later tests positive, all people will be informed that they may have been exposed to the virus and will be invited to be tested.\n\nIf three people or more have been in the same place and then test positive, all the other people present in this place will be considered as contacts (because co-exposed) and invited to isolate themselves, to be tested.",
+   
+   "manageDataController.analytics.button": "Delete my data",
+    "manageDataController.analytics.confirmationDialog.title": "Confirmation",
+    "manageDataController.analytics.confirmationDialog.message": "Do you really want to delete your usage data?",
+
+   "manageDataController.analytics.successDialog.title": "Confirmation",
+   "manageDataController.analytics.successDialog.message": "Your delete request has been taken into account."
 
 }

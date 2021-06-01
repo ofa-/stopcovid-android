@@ -59,9 +59,9 @@ class Configuration(
     val ameliUrl: String?,
     var displaySanitaryCertificatesWallet: Boolean,
     var walletOldCertificateThresholdInDays: Map<String, Float>,
-    val testCertificateValidityThresholdInHours: Int,
     var walletPublicKeys: List<WalletPublicKey>,
     var displaySanitaryCertificatesValidation: Boolean,
     var isAnalyticsOn: Boolean,
     var analyticsApiVersion: String,
+    var testCertificateValidityThresholds: List<Int>,
 )

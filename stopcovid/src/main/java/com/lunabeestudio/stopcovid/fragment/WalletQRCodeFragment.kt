@@ -14,16 +14,13 @@ import android.os.Bundle
 import android.view.View
 import androidx.core.os.bundleOf
 import androidx.fragment.app.setFragmentResult
-import androidx.preference.PreferenceManager
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import androidx.navigation.fragment.navArgs
+import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
-import com.lunabeestudio.stopcovid.extension.robertManager
-import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
-import com.lunabeestudio.stopcovid.manager.WalletManager
-import com.lunabeestudio.stopcovid.model.WalletCertificateInvalidSignatureException
-import timber.log.Timber
 
 class WalletQRCodeFragment : QRCodeFragment() {
+
+    private val args: WalletQRCodeFragmentArgs by navArgs()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -35,7 +32,13 @@ class WalletQRCodeFragment : QRCodeFragment() {
     override fun getExplanationKey(): String = "flashWalletCodeController.explanation"
 
     override fun onCodeScanned(code: String) {
-        setFragmentResult(WalletFragment.SCANNED_CODE_RESULT_KEY, bundleOf(WalletFragment.SCANNED_CODE_BUNDLE_KEY to code))
-        findNavControllerOrNull()?.navigateUp()
+        setFragmentResult(
+            WalletContainerFragment.SCANNED_CODE_RESULT_KEY,
+            bundleOf(
+                WalletContainerFragment.SCANNED_CODE_BUNDLE_KEY to code,
+                WalletContainerFragment.SCANNED_CERTIFICATE_TYPE_REQUESTED_BUNDLE_KEY to args.certificateType.name,
+            )
+        )
+        findNavControllerOrNull()?.popBackStack(R.id.walletAddCertificateFragment, true)
     }
 }

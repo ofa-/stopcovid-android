@@ -7,7 +7,7 @@
   ~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   ~ Created by Lunabee Studio / Date - 2020/04/05 - for the TOUS-ANTI-COVID project
   -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <style name="Widget.StopCovid.Toolbar.Surface" parent="Widget.MaterialComponents.Toolbar">
         <item name="android:theme">@style/ThemeOverlay.StopCovid.Toolbar.Surface</item>
@@ -85,6 +85,37 @@
 
     <style name="Widget.App.CardView" parent="Widget.MaterialComponents.CardView">
         <item name="cardElevation">@dimen/cardElevation</item>
+    </style>
+
+    <style name="Widget.StopCovid.Widget.Attestation.TextView.Date" parent="Widget.MaterialComponents.TextView">
+        <item name="android:textColor">@color/color_indigo</item>
+        <item name="android:autoSizeTextType" tools:targetApi="o">uniform</item>
+        <item name="android:autoSizeMaxTextSize" tools:targetApi="o">@dimen/date_widget_attestation_max_font_size</item>
+        <item name="android:autoSizeMinTextSize" tools:targetApi="o">@dimen/date_widget_attestation_min_font_size</item>
+    </style>
+
+    <style name="Widget.StopCovid.Widget.Attestation.TextView.Reason" parent="Widget.MaterialComponents.TextView">
+        <item name="android:textSize">@dimen/reason_widget_attestation_font_size</item>
+    </style>
+
+    <style name="Widget.StopCovid.Widget.TextView.Title" parent="Widget.MaterialComponents.TextView">
+        <item name="android:autoSizeTextType" tools:targetApi="o">uniform</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:textSize">@dimen/title_widget_font_size</item>
+        <item name="android:autoSizeMinTextSize" tools:targetApi="o">@dimen/title_widget_min_font_size</item>
+    </style>
+
+    <style name="Widget.StopCovid.Widget.Proximity.TextView.Risk" parent="Widget.MaterialComponents.TextView">
+        <item name="android:textSize">@dimen/caption_font_size</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+
+    <style name="Widget.StopCovid.Widget.Proximity.TextView.Info" parent="Widget.MaterialComponents.TextView">
+        <item name="android:textSize">@dimen/small_caption_font_size</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:ellipsize">end</item>
     </style>
 
 </resources>

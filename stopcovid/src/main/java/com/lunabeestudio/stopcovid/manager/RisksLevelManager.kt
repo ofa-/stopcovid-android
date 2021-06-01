@@ -11,41 +11,36 @@
 package com.lunabeestudio.stopcovid.manager
 
 import android.content.Context
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.google.gson.reflect.TypeToken
-import com.lunabeestudio.robert.utils.Event
+import com.lunabeestudio.robert.RobertConstant
 import com.lunabeestudio.stopcovid.coreui.ConfigConstant
 import com.lunabeestudio.stopcovid.model.ContactDateFormat
 import com.lunabeestudio.stopcovid.model.RisksUILevel
 import java.lang.reflect.Type
 import java.util.concurrent.TimeUnit
 
-object RisksLevelManager : RemoteFileManager<List<RisksUILevel>>() {
+object RisksLevelManager : RemoteJsonManager<List<RisksUILevel>>() {
 
     override val type: Type = object : TypeToken<List<RisksUILevel>>() {}.type
     override val localFileName: String = ConfigConstant.Risks.FILENAME
     override val remoteFileUrl: String = ConfigConstant.Risks.URL
     override val assetFilePath: String = ConfigConstant.Risks.ASSET_FILE_PATH
 
-    private val _risksLevels: MutableLiveData<Event<List<RisksUILevel>>> = MutableLiveData()
+    var risksLevels: List<RisksUILevel>? = null
 
     fun getLastContactDateFrom(riskLevel: Float?, lastContactDate: Long): Long? = when (getCurrentLevel(riskLevel)?.contactDateFormat) {
         ContactDateFormat.DATE -> lastContactDate
-        ContactDateFormat.RANGE -> lastContactDate - TimeUnit.DAYS.toMillis(1)
+        ContactDateFormat.RANGE -> lastContactDate - TimeUnit.SECONDS.toMillis(RobertConstant.LAST_CONTACT_DELTA_S)
         else -> null
     }
 
     fun getLastContactDateTo(riskLevel: Float?, lastContactDate: Long): Long? = when (getCurrentLevel(riskLevel)?.contactDateFormat) {
-        ContactDateFormat.RANGE -> lastContactDate + TimeUnit.DAYS.toMillis(1)
+        ContactDateFormat.RANGE -> lastContactDate + TimeUnit.SECONDS.toMillis(RobertConstant.LAST_CONTACT_DELTA_S)
         else -> null
     }
 
-    val risksLevels: LiveData<Event<List<RisksUILevel>>>
-        get() = _risksLevels
-
     fun getCurrentLevel(riskLevel: Float?): RisksUILevel? {
-        return _risksLevels.value?.peekContent()?.let {
+        return risksLevels?.let {
             it.firstOrNull { risksUILevel ->
                 risksUILevel.riskLevel == riskLevel
             }
@@ -53,18 +48,18 @@ object RisksLevelManager : RemoteFileManager<List<RisksUILevel>>() {
     }
 
     suspend fun initialize(context: Context) {
-        loadLocal(context)?.let { risksLevels ->
-            if (_risksLevels.value?.peekContent() != risksLevels) {
-                _risksLevels.postValue(Event(risksLevels))
+        loadLocal(context)?.let { localRisksLevels ->
+            if (risksLevels != localRisksLevels) {
+                risksLevels = localRisksLevels
             }
         }
     }
 
     suspend fun onAppForeground(context: Context) {
         if (fetchLast(context)) {
-            loadLocal(context)?.let { risksLevels ->
-                if (_risksLevels.value?.peekContent() != risksLevels) {
-                    _risksLevels.postValue(Event(risksLevels))
+            loadLocal(context)?.let { localRisksLevels ->
+                if (this.risksLevels != localRisksLevels) {
+                    this.risksLevels = localRisksLevels
                 }
             }
         }

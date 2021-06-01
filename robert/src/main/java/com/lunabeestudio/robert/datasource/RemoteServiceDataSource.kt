@@ -10,15 +10,11 @@
 
 package com.lunabeestudio.robert.datasource
 
-import com.lunabeestudio.domain.model.Cluster
-import com.lunabeestudio.domain.model.ClusterIndex
 import com.lunabeestudio.domain.model.LocalProximity
 import com.lunabeestudio.domain.model.RegisterReport
 import com.lunabeestudio.domain.model.ReportResponse
 import com.lunabeestudio.domain.model.ServerStatusUpdate
 import com.lunabeestudio.domain.model.StatusReport
-import com.lunabeestudio.domain.model.VenueQrCode
-import com.lunabeestudio.domain.model.WStatusReport
 import com.lunabeestudio.robert.model.RobertResult
 import com.lunabeestudio.robert.model.RobertResultData
 
@@ -34,6 +30,12 @@ interface RemoteServiceDataSource {
 
     suspend fun unregister(apiVersion: String, ssu: ServerStatusUpdate): RobertResult
     suspend fun status(apiVersion: String, ssu: ServerStatusUpdate): RobertResultData<StatusReport>
-    suspend fun report(apiVersion: String, token: String, localProximityList: List<LocalProximity>): RobertResultData<ReportResponse>
+    suspend fun report(
+        apiVersion: String,
+        token: String,
+        localProximityList: List<LocalProximity>,
+        onProgressUpdate: ((Float) -> Unit)? = null
+    ): RobertResultData<ReportResponse>
+
     suspend fun deleteExposureHistory(apiVersion: String, ssu: ServerStatusUpdate): RobertResult
 }

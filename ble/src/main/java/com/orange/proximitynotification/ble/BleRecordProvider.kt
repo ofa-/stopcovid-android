@@ -11,13 +11,27 @@
 package com.orange.proximitynotification.ble
 
 import com.orange.proximitynotification.ble.scanner.BleScannedDevice
+import java.util.Date
 
-internal abstract class BleRecordProvider {
+internal open class BleRecordProvider {
 
-    protected fun buildRecord(payload: BlePayload, scannedDevice: BleScannedDevice) = BleRecord(
+    fun buildRecord(payload: BlePayload, scannedDevice: BleScannedDevice) = buildRecord(
         payload = payload,
         rssi = scannedDevice.rssi,
         timestamp = scannedDevice.timestamp,
         isRssiCalibrated = false
     )
+
+    fun buildRecord(
+        payload: BlePayload,
+        rssi: Int,
+        timestamp: Date,
+        isRssiCalibrated: Boolean
+    ) =
+        BleRecord(
+            payload = payload,
+            rssi = rssi,
+            timestamp = timestamp,
+            isRssiCalibrated = isRssiCalibrated
+        )
 }

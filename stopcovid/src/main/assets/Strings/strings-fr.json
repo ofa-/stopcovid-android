@@ -407,9 +407,9 @@
    "home.infoSection.updatePostalCode":"Changer de code postal",
    "home.infoSection.updatePostalCode.alert.newPostalCode":"Entrer un code postal",
    "home.infoSection.updatePostalCode.alert.deletePostalCode":"Supprimer le code postal",
-   "onboarding.gesturesController.gesture8":"Limiter au maximum ses contacts sociaux (6 maximum)",
-   "onboarding.gesturesController.gesture9":"Aérer les pièces 10 minutes, 3 fois par jour",
-   "onboarding.gesturesController.gesture10":"Utiliser les outils numériques (TousAntiCovid)",
+   "onboarding.gesturesController.gesture8":"Limitez au maximum ses contacts sociaux (6 maximum)",
+   "onboarding.gesturesController.gesture9":"Aérez les pièces 10 minutes, 3 fois par jour",
+   "onboarding.gesturesController.gesture10":"Utilisez les outils numériques (TousAntiCovid)",
    "home.infoSection.newPostalCode.alert.unknownPostalCode":"Ce code postal est inconnu ou n'a pas de données",
    "manageDataController.showInfoNotifications.title":"Notifications \"actualités\"",
    "manageDataController.showInfoNotifications.subtitle":"Recevez une notification quand de nouvelles actualités et chiffres sont disponibles.",
@@ -455,7 +455,7 @@
    "accessibility.hint.info.share":"Partager l'information",
    "accessibility.hint.postalCode.button":"Changer de code postal",
    "attestationsController.title":"Attestations",
-   "attestationsController.newAttestation":"Nouvelle attestation",
+   "attestationsController.newAttestation":"Ajouter une attestation",
    "attestationsController.termsOfUse":"Conditions d'utilisation",
    "attestationsController.attestationWebSite":"Site web attestation",
    "attestationsController.termsOfUse.alert.title":"Conditions d'utilisation",
@@ -540,16 +540,16 @@
    "home.activation.sick.alert.message": "Vous ne pouvez pas activer l’alerte en cas d’exposition à la COVID-19 pendant 2 mois après votre déclaration de positivité au COVID-19.\n\nEn effet, pendant les 2 mois suivant un test positif à la COVID-19, vous ne serez pas considéré comme \"à risque de contamination\".",
    "common.error.secretKey": "Échec de décryption de la base. Essayez à nouveau ou redémarrez votre téléphone.",
    
-   "home.venuesSection.title": "TousAntiCovid Signal",
+   "home.venuesSection.title": "Cahier de rappel",
    "home.venuesSection.recordCell.title": "Scanner un QR Code lieu",
    "home.venuesSection.recordCell.subtitle": "Soyez alerté en cas d'exposition dans un lieu (en cours d'expérimentation)",
    "home.venuesSection.privateCell.title": "Vous organisez un événement privé ?",
    "home.venuesSection.privateCell.subtitle": "Créez votre propre code, permettant de protéger vos invités",
-   "home.moreSection.venuesHistory": "Journal des visites de lieux",
+   "home.moreSection.venuesHistory": "Journal du cahier de rappel",
    "venuesRecording.onboardingController.title": "TousAntiCovid Signal",
-   "venuesRecording.onboardingController.mainMessage.title": "Rompre les chaînes de transmission dans les lieux recevant du public et lors d’événements",
-   "venuesRecording.onboardingController.mainMessage.message": "TousAntiCovid Signal permet d’être alerté et d’alerter les autres en cas d’exposition à la COVID-19 dans un lieu que vous avez fréquenté.\n\nPour cela vous devez scanner le QR Code affiché à l’entrée des lieux qui ont mis en place ce dispositif. Si vous êtes testé positif à la COVID-19, n’oubliez pas de vous déclarer positif dans l’application pour informer les autres utilisateurs.\n\nCe dispositif est anonyme, aucune donnée nominative n’est collectée ni sur le lieu ni sur les personnes présentes. Le nom et l’adresse du lieu ne sont pas contenus dans le QR Code.\n\n👉 Cette nouvelle fonctionnalité est en phase d'expérimentation dans un nombre limité de lieux pour l’instant.",
-   "venuesRecording.onboardingController.button.participate": "Je participe",
+   "venuesRecording.onboardingController.mainMessage.title": "Le cahier de rappel numérique.\nPlus simple et anonyme.",
+   "venuesRecording.onboardingController.mainMessage.message": "TousAntiCovid Signal est l'alternative simple et anonyme aux cahiers de rappel.\n\n👉 Pourquoi : pour être alerté et alerter les autres en cas d’exposition à la COVID-19 dans un lieu que vous avez fréquenté.\n\n🔒 C'est anonyme : aucune donnée nominative n’est collectée ni sur le lieu ni sur les personnes.\n\n🙂 C'est simple : scannez le QR Code dans les lieux qui ont mis en place Signal. Si vous êtes positif, n’oubliez pas de vous déclarer dans TousAntiCovid pour informer anonymement les autres utilisateurs.\n\nEn phase d'expérimentation dans un nombre limité de lieux.",
+   "venuesRecording.onboardingController.button.participate": "Je scanne",
    "venuesRecording.confirmationController.title": "Ajouté",
    "erp.confirmationMessage.default.title": "Merci !",
    "erp.confirmationMessage.default.message": "Vous avez bien ajouté ce lieu dans votre journal.\n\nVous serez alerté et pourrez alerter les autres de manière anonyme en cas d’exposition possible à la COVID-19 lors de votre visite dans ce lieu.",
@@ -562,10 +562,10 @@
    "venueFlashCodeController.title": "Scannez le QR Code",
    "venueFlashCodeController.explanation": "Scanner le QR Code pour enregistrer votre visite dans ce lieu.",
    "venueFlashCodeController.alert.invalidCode.title": "Code invalide",
-   "venueFlashCodeController.alert.invalidCode.message": "Le code n'est pas valide. Veuillez essayer à nouveau.",
+   "venueFlashCodeController.alert.invalidCode.message": "Ce QR Code \"cahier de rappel numérique\" n'est pas valide. Veuillez essayer à nouveau.\n👉 Si le problème persiste, veuillez en informer le gérant de l'établissement.\n\n⚠️ Si vous tentez d'importer un QR Code \"certificat\" (vaccin ou test), il faut vous rendre dans la section \"Carnet\" de l'écran d'accueil.",
    "home.moreSection.appSharing": "Je partage TousAntiCovid",
    
-   "venuesHistoryController.title": "Journal des visites",
+   "venuesHistoryController.title": "Journal du cahier de rappel",
    "venuesHistoryController.noVenuesEmptyView.title": "Vous n’avez enregistré aucune visite de lieu dans votre journal.\nLes visites de plus de 14 jours sont automatiquement effacées.",
    "venuesHistoryController.entry": "%@ : %@",
   
@@ -573,12 +573,12 @@
    
    "onboarding.venuesController.title":"TousAntiCovid Signal",
    "onboarding.venuesController.bottomButton":"Continuer",
-   "onboarding.venuesController.mainMessage.title":"Rompre les chaînes de transmission dans les lieux recevant du public et lors d’événements",
-   "onboarding.venuesController.mainMessage.subtitle":"TousAntiCovid Signal permet d’être alerté et d’alerter les autres en cas d’exposition à la COVID-19 dans un lieu que vous avez fréquenté.\n\nPour cela vous devez scanner le QR Code affiché à l’entrée des lieux qui ont mis en place ce dispositif. Si vous êtes testé positif à la COVID-19, n’oubliez pas de vous déclarer positif dans l’application pour informer les autres utilisateurs.\n\nCe dispositif est anonyme, aucune donnée nominative n’est collectée ni sur le lieu ni sur les personnes présentes. Le nom et l’adresse du lieu ne sont pas contenus dans le QR Code.\n\n👉 Cette nouvelle fonctionnalité est en phase d'expérimentation dans un nombre limité de lieux pour l’instant.",
+   "onboarding.venuesController.mainMessage.title":"Le cahier de rappel numérique.\nPlus simple et anonyme.",
+   "onboarding.venuesController.mainMessage.subtitle":"TousAntiCovid Signal est l'alternative simple et anonyme aux cahiers de rappel.\n\n👉 Pourquoi : pour être alerté et alerter les autres en cas d’exposition à la COVID-19 dans un lieu que vous avez fréquenté.\n\n🔒 C'est anonyme : aucune donnée nominative n’est collectée ni sur le lieu ni sur les personnes.\n\n🙂 C'est simple : scannez le QR Code dans les lieux qui ont mis en place Signal. Si vous êtes positif, n’oubliez pas de vous déclarer dans TousAntiCovid pour informer anonymement les autres utilisateurs.\n\nEn phase d'expérimentation dans un nombre limité de lieux.",
    
    "home.healthSection.warningContact.cellTitle": "Info : possible exposition à risque",
    "home.healthSection.warningContact.cellSubtitle": "Consultez nos recommandations",
-   "myHealthController.state.warning.title": "Vous avez fréquenté le même lieu ou événement qu’au moins un utilisateur testé positif à la COVID-19 et contagieux ces derniers jours",
+   "myHealthController.state.warning.title": "Vous avez fréquenté le même lieu qu’au moins un utilisateur testé positif à la COVID-19 et contagieux ces derniers jours",
    "myHealthController.state.warning.subtitle": "Faites-vous tester, surveillez vos symptômes, et contactez votre médecin si vous avez un doute.\n\nPour savoir quel jour serait le plus adéquat pour vous faire tester en fonction de votre situation, actualisez votre état dans le module \"Recommandation isolement\". Vous bénéficiez d’un accès prioritaire au test.",
    "appShortcut.venues": "Scanner un lieu",
    
@@ -593,7 +593,7 @@
    "myHealthController.step.beCareful.warning.title": "Restez attentif à l'apparition de symptômes",
    "myHealthController.step.beCareful.warning.subtitle":"En cas de doute, n'hésitez pas à effectuer le questionnaire d'orientation sur Mes Conseils Covid ou appeler votre médecin.",
    "notification.atWarning.title": "Info : possible exposition à risque",
-   "notification.atWarning.message": "Vous avez fréquenté le même lieu ou événement qu’au moins un utilisateur testé positif à la COVID-19 et contagieux ces derniers jours. Si vous êtes un mineur, discutez-en avec vos parents ou vos responsables légaux. Appuyez ici pour la marche à suivre.",
+   "notification.atWarning.message": "Vous avez fréquenté le même lieu qu’au moins un utilisateur testé positif à la COVID-19 et contagieux ces derniers jours. Si vous êtes un mineur, discutez-en avec vos parents ou vos responsables légaux. Appuyez ici pour la marche à suivre.",
    "home.infoSection.otherKeyFigures": "Autres chiffres clés",
    "home.infoSection.newCases": "Nouveaux cas",
    
@@ -704,7 +704,7 @@
    "isolationFormController.footer.title": "Veuillez bien répondre aux questions du formulaire pour qu'on puisse vous faire des recommandations sur votre durée d’isolement.",
    
    "declareController.codeNotReceived.alert.contactUs": "Nous contacter",
-   "venuesHistoryController.footer": "Ce journal des visites de lieux permettra d'être averti si vous avez fréquenté le même lieu ou événement qu’un utilisateur contagieux qui se déclare positif dans l’appli.\n\nToutes les visites de lieux de plus de 14 jours sont effacées automatiquement à chaque ouverture de l'application.",
+   "venuesHistoryController.footer": "Ce journal des visites de lieux permettra d'être averti si vous avez fréquenté le même lieu qu’un utilisateur contagieux qui se déclare positif dans l’appli.\n\nToutes les visites de lieux de plus de 14 jours sont effacées automatiquement à chaque ouverture de l'application.",
    "venuesHistoryController.delete.alert.title": "Souhaitez-vous supprimer cette visite de lieu ?",
    "venuesHistoryController.delete.alert.message": "Une fois supprimé, si une personne qui a fréquenté ce lieu en même temps que vous se déclare positif, alors vous ne serez pas notifié.",
    "manageDataController.isolationData.title":"Mes données \"isolement\"",
@@ -721,7 +721,7 @@
    "home.vaccinationSection.cellSubtitle": "Vérifiez votre éligibilité et trouvez un centre près de chez vous pour vous faire vacciner.",
    "vaccinationController.title": "Vaccination",
    "vaccinationController.eligibility.title": "Suis-je prioritaire pour me faire vacciner ?",
-   "vaccinationController.eligibility.subtitle": "Aujourd’hui, les publics prioritaires définis par les autorités sanitaires sont :\n- les personnes de 55 ans et plus, quels que soient leur lieu de vie et leur état de santé (avec ou sans comorbidités)\n- les femmes enceintes à partir du deuxième trimestre de la grossesse\n- les résidents en établissements (par exemple Ehpad, USLD)\n- les personnes de plus de 18 ans souffrants d’une ou plusieurs comorbidités;\n- les personnes en situation de handicap hébergées en établissements\n- les résidents de 60 ans et plus dans les foyers de travailleurs migrants\n- les professionnels de santé et les professionnels du secteur médico-social (dont les ambulanciers), les aides à domicile intervenant auprès de personnes âgées et handicapées vulnérables, les sapeurs-pompiers et les vétérinaires.\n\nAppuyez sur \"En savoir plus\" pour plus de détails.",
+   "vaccinationController.eligibility.subtitle": "Aujourd’hui, les publics prioritaires définis par les autorités sanitaires sont :\n- 24 mai 2021 : toutes les personnes exerçant une profession prioritaire, sans restriction d'âge\n- L’ensemble des personnes de 50 ans et plus\n- Les professionnels du secteur de la santé et du secteur médico-social\n- Les personnes de plus de 18 ans souffrant d’une ou plusieurs comorbidités ou hébergées en maisons d’accueil spécialisées, foyers d’accueil médicalisés, foyers pour personnes handicapées non médicalisés, ainsi qu’en établissements médico-sociaux spécifiques \n- Les personnes de plus de 16 ans souffrant d’une pathologie à très haut risque de forme grave de Covid-19\n- Les proches (de plus de 16 ans) d’une personne sévèrement immunodéprimée\n\n👍 Toutes les personnes de plus de 18 ans peuvent désormais prendre rendez-vous pour le jour même ou pour le lendemain pour se faire vacciner contre la Covid-19 si des doses de vaccin restent disponibles.",
    "vaccinationController.eligibility.buttonTitle": "En savoir plus",
    "vaccinationController.eligibility.url": "https://www.gouvernement.fr/info-coronavirus/vaccins#tac",
    "vaccinationController.vaccinationLocation.title": "Trouver un centre pour me faire vacciner",
@@ -802,7 +802,7 @@
    "notification.lowRisk.message":"Restez vigilant, vous croisez régulièrement des personnes positives et contagieuses. Continuez de bien respecter les mesures barrières !",
    
    "notification.atHighWarning.title": "Alerte : contact à risque dans un lieu",
-   "notification.atHighWarning.message": "Vous avez fréquenté le même lieu ou événement qu’au moins un utilisateur testé positif à la COVID-19 et contagieux ces derniers jours. Si vous êtes un mineur, discutez-en avec vos parents ou vos responsables légaux.",
+   "notification.atHighWarning.message": "Vous avez fréquenté le même lieu qu’au moins un utilisateur testé positif à la COVID-19 et contagieux ces derniers jours. Si vous êtes un mineur, discutez-en avec vos parents ou vos responsables légaux.",
    
    "manageDataController.hideStatus.title": "Mon statut de risque",
    "manageDataController.hideStatus.subtitle": "Vous pouvez à tout moment masquer votre statut de risque sur l'écran d'accueil de l'application. Pour le voir, à nouveau, il faudra changer la configuration ci-dessous",
@@ -862,7 +862,7 @@
 	"risk2.section1.body" : "Vous avez été exposé à un risque de contamination modéré suite à la fréquentation d’un même lieu qu’une personne contagieuse et qui s'est déclarée positive dans l'application.\n\nLa date de contact affichée est approximative à plus ou moins un jour, pour préserver l’anonymat des personnes s'étant déclarées positives.\n\nSi vous avez le moindre doute notamment sur votre exposition à risque, contactez votre médecin en l'informant que vous avez été dans un lieu avec un risque de contamination modéré.",
 	
 	"risk3.notif.title" : "Alerte : lieu à risque",
-	"risk3.notif.sub" : "Vous avez été exposé à un risque de contamination élevé suite à la fréquentation d’un même lieu qu' une personne contagieuse. Si vous êtes un mineur, discutez-en avec vos parents ou vos responsables légaux.",
+	"risk3.notif.sub" : "Vous avez été exposé à un risque de contamination élevé suite à la fréquentation d’un même lieu qu'une personne contagieuse. Si vous êtes un mineur, discutez-en avec vos parents ou vos responsables légaux.",
 	"risk3.home.title" : "Alerte : contact à risque élevé dans un lieu",
 	"risk3.home.sub" : "Consultez nos recommandations",
 	"risk3.details.title" : "Vous avez fréquenté un lieu avec un risque de contamination élevé : vous êtes un contact à risque",
@@ -887,7 +887,7 @@
   
   
   
-   "attestation.form.reason_curfew.label":"Motif 19h-6h (couvre-feu)",
+   "attestation.form.reason_curfew.label":"Motif couvre-feu (21h-6h)",
    "attestation.form.reason_curfew.placeholder":"-",
    
    "attestation.form.reason_curfew.travail.shortLabel":"1. Activité professionnelle, enseignement et formation, mission d’intérêt général",
@@ -918,12 +918,12 @@
    
    "attestation.form.reason_curfew.title":"Motifs couvre-feu",
    
-    "attestation.form.reason_curfew.header":"Je me déplace entre 19h et 6h pour l'une des raisons suivantes :",
+    "attestation.form.reason_curfew.header":"Je me déplace entre 21h et 6h pour l'une des raisons suivantes :",
     
    "attestation.form.reason_curfew.footer":"Les personnes souhaitant bénéficier de l'une de ces exceptions doivent se munir s'il y a lieu, lors de leurs déplacements hors de leur domicile, d'un document leur permettant de justifier que le déplacement considéré entre dans le champ de l'une de ces exceptions.",
    
    
-   "attestation.form.reason_lockdown.label":"Motif 6h-19h (journée)",
+   "attestation.form.reason_lockdown.label":"Motif journée (Guadeloupe, Wallis-et-Futuna, Martinique)",
    "attestation.form.reason_lockdown.placeholder":"-",
    
    "attestation.form.reason_lockdown.travail.shortLabel":"1. Activité professionnelle, enseignement et formation, mission d’intérêt général",
@@ -965,17 +965,17 @@
 
    "attestation.form.reason_lockdown.title":"Motifs journée",
    
-    "attestation.form.reason_lockdown.header":"Je me déplace entre 6h et 19h pour l'une des raisons suivantes :",
+    "attestation.form.reason_lockdown.header":"Guadeloupe, Wallis-et-Futuna, Martinique - je me déplace entre 6h et 19h pour l'une des raisons suivantes :",
     
    "attestation.form.reason_lockdown.footer":"Les déplacements sont autorisés sous réserve de justifier de l’un des motifs prévus dans la présente attestation.\n\n[1] Pour les personnes résidant aux frontières d’un département, une tolérance de 30 kilomètres au-delà du département est acceptée.",
    
    "walletController.title": "Carnet",
    "walletController.explanations.title": "Comment ça marche ?",
-   "walletController.explanations.subtitle": "Pour numériser vos certificats de test et de vaccination, et toujours les avoir à portée de main, c'est simple :\n- pour les tests, vous recevrez un SMS du portail SI-DEP avec les instructions à suivre.\n- pour la vaccination, il vous sera remis un certificat papier avec un QR Code à flasher. Dès seconde quinzaine de mai, vous pourrez récupérer vos anciens certificats de vaccination.\n\nCes certificats seront à montrer pour vos voyages aériens et maritimes 👉 expérimentation en cours, les compagnies aériennes et maritimes informeront leurs clients éligibles.\n\nSi vous rencontrez un problème, vous pouvez appeler le 0 800 08 71 48.",
+   "walletController.explanations.subtitle": "Pour numériser vos certificats de test et de vaccination, et toujours les avoir à portée de main, c'est simple :\n- pour les tests, vous recevrez un SMS du portail SI-DEP avec les instructions à suivre.\n- pour la vaccination, il vous sera remis un certificat papier avec un QR Code à flasher. D'ici à fin mai, vous pourrez récupérer vos anciens certificats de vaccination.\n\nCes certificats seront à montrer pour vos voyages aériens et maritimes 👉 expérimentation en cours, les compagnies aériennes et maritimes informeront leurs clients éligibles.\n\nSi vous rencontrez un problème, vous pouvez appeler le 0 800 08 71 48.",
    "walletController.flashButton.title": "Scanner le QR Code",
    "walletController.flashExplanation": "Sur votre document SI-DEP de test (pas laboratoire), ou sur votre preuve de vaccination papier (depuis le 3 mai, 11h), vous avez un QR Code que vous pouvez scanner pour ajouter le certificat dans ce carnet.",
    "walletController.recentCertificatesSection.title": "Certificats récents",
-   "walletController.recentCertificatesSection.subtitle": "Dans cette section, vous avez les certificats de vaccination et les certificats de test de moins de 3 jours.",
+   "walletController.recentCertificatesSection.subtitle": "Dans cette section, vous avez les certificats de vaccination et les certificats de test de moins de 3 jours. 👉 Appuyez sur un certificat pour le passer en plein écran.",
    "walletController.oldCertificatesSection.title": "Certificats plus anciens",
    "walletController.oldCertificatesSection.subtitle": "Ces certificats de test ont plus de 3 jours.",
    "walletController.menu.share": "Partager le certificat",
@@ -990,7 +990,7 @@
    "flashWalletCodeController.title": "Scannez",
    "flashWalletCodeController.explanation": "Scannez le QR Code sur votre document SI-DEP, ou sur votre certificat de vaccination papier.",
    "flashWalletCodeController.alert.invalidCode.title": "Code invalide",
-   "flashWalletCodeController.alert.invalidCode.message": "Le code n'est pas valide. Veuillez essayer à nouveau.",
+   "flashWalletCodeController.alert.invalidCode.message": "Le code n'est pas valide.\n\n👉Assurez-vous svp que l'application est bien à jour sur le Store, merci !",
    
    "walletController.noCertificates.flashExplanation": "Sur votre résultat de test SI-DEP ou preuve de vaccination papier (depuis le 3 mai, 11h), vous avez un QR Code que vous pouvez scanner pour l’ajouter dans ce carnet.",
    "confirmWalletQrCodeController.title":"Carnet",
@@ -1037,10 +1037,10 @@
     "manageDataController.walletData.subtitle": "Cette opération effacera tous vos certificats de test et de vaccination de votre téléphone.",
     "manageDataController.walletData.button": "Effacer sur mon téléphone",
     
-    "wallet.proof.error.1.title": "Certificat erroné",
-    "wallet.proof.error.1.message": "Le certificat scanné n’a pas le bon format. Si le problème persiste, veuillez appeler le 0 800 08 71 48",
-    "wallet.proof.error.2.title": "Certificat non authentique",
-    "wallet.proof.error.2.message": "L'authenticité du certificat scanné n'a pas pu être vérifiée. Si le problème persiste, veuillez appeler le 0 800 08 71 48",
+    "wallet.proof.error.1.title": "Mauvais format",
+    "wallet.proof.error.1.message": "Le certificat scanné n’a pas le format attendu.\n⚠️ Veuillez ré-essayer de le flasher avec plus de lumière. Et assurez-vous que vous avez le bon document.\n👉 Pour les tests, c'est le QR Code à gauche sur le document SI-DEP.\n👉 Pour les vaccins, c'est le QR Code à droite sur le document de l'Assurance Maladie.\n\nSi le problème persiste, veuillez appeler le 0 800 08 71 48",
+    "wallet.proof.error.2.title": "Non authentique",
+    "wallet.proof.error.2.message": "Ce certificat n'est pas authentique.\n⚠️ Assurez-vous que l'appli est bien à jour sur le Store !\n👉 Pour les tests, c'est le QR Code à gauche sur le document SI-DEP.\n👉 Pour les vaccins, c'est le QR Code à droite sur le document de l'Assurance Maladie.\n\nSi le problème persiste, veuillez appeler le 0 800 08 71 48",
     
     "wallet.proof.moreThanSpecificHours": "⚠️ Plus de %dh",
     "wallet.proof.lessThanSpecificHours": "Moins de %dh",
@@ -1066,12 +1066,77 @@
     "wallet.proof.vaccinationCertificate.LA.CO": "En cours",
     "wallet.proof.vaccinationCertificate.LA.TE": "Terminé",
     "wallet.proof.vaccinationCertificate.pillTitle": "Vaccin",
-    "wallet.proof.vaccinationCertificate.description": "<L1>, <L0>\nné(e) le <L2>\n<L5> (<L4>)\ninjection le <L9>\nDose : <L7>/<L8>",
+    "wallet.proof.vaccinationCertificate.description": "<L1>, <L0>\nné(e) le <L2>\n<L5> (<L4>)\ninjection le <L9>\nDose(s) : <L7>",
 
     "manageDataController.analytics.title": "Statistiques et mesure d’audience",
     "manageDataController.analytics.subtitle": "En conformité avec le RGPD, nous vous informons de notre capacité à collecter des données sur l’usage que vous faites de TousAntiCovid, à des fins de diagnostics, d’amélioration de performance et de l’expérience utilisateur. Sachez enfin que ces données sont conservées sur le serveur pendant 3 mois.",
     "manageDataController.analytics.switch.on": "Activé",
     "manageDataController.analytics.switch.off": "Désactivé",
     "keyFigureDetailController.section.evolution.subtitle.nodata": "%@.\nAucune donnée",
-    "keyFigureDetailController.nodata": "Aucune donnée disponible pour l'indicateur \"%@\"."
+    "keyFigureDetailController.nodata": "Aucune donnée disponible pour l'indicateur \"%@\".",
+    
+    "home.healthSection.statusState": "Vérification de votre statut...",
+    "home.appUpdate.cell.title": "Mise à jour disponible",
+    "home.appUpdate.cell.subtitle": "Une nouvelle version de TousAntiCovid est disponible.\nAppuyez pour l'installer maintenant.",
+
+    "venuesHistoryController.noVenuesEmptyView.isSick.title": "Merci de vous être déclaré positif dans TousAntiCovid, votre historique de lieux a été effacé, et les personnes ont été alertées.",
+
+   "sendHistoryController.progress.title": "Envoi en cours",
+   "sendHistoryController.progress.message": "Merci pour votre aide, l'envoi peut prendre quelques minutes",
+   
+   "walletController.howDoesItWork.title": "Le carnet : comment ça marche ?",
+   "walletController.howDoesItWork.subtitle": "Pour numériser vos certificats de test et de vaccination, et toujours les avoir à portée de main, c'est simple :\n\n👉 pour les tests, vous recevrez un SMS du portail SI-DEP avec les instructions à suivre.\n\n👉 pour la vaccination, il vous sera remis un certificat papier avec un QR Code à flasher. D'ici à fin mai, vous pourrez récupérer vos anciens certificats de vaccination.",
+   "walletController.documents.title": "Les documents",
+   "walletController.documents.subtitle": "À partir de ces deux documents, vous pouvez numériser les certificats de test et de vaccination, et les ajouter ici dans TousAntiCovid Carnet.\nAppuyez pour les voir en plein écran.",
+   "walletController.documents.vaccin": "Attestation de vaccin",
+   "walletController.documents.test": "Résultat de test virologique",
+   "walletController.whenToUse.title": "Quand les utiliser ?",
+   "walletController.whenToUse.subtitle": "Ces certificats seront à montrer pour vos voyages aériens et maritimes.\n\n👉 expérimentation en cours, les compagnies aériennes et maritimes informeront leurs clients éligibles.",
+   "walletController.whenToUse.button": "En savoir plus",
+   "walletController.whenToUse.url": "https://www.gouvernement.fr/pass-sanitaire-toutes-les-reponses-a-vos-questions",
+   "walletController.phone.title": "Besoin d'aide ?",
+   "walletController.phone.subtitle": "Appelez-nous au 0 800 08 71 48.",
+   "walletController.phone.number": "0800087148",
+   "walletController.addCertificate": "Ajouter un certificat",
+   "walletController.addCertificateExplanation": "Appuyez pour ajouter un certificat de vaccination ou de test.",
+   "walletController.mode.myCertificates": "Mes certificats (%d)",
+   "walletController.mode.info": "Informations",
+   "walletController.addCertificate.explanation": "Appuyez sur l’image du document pour le voir en plein écran et vérifier que vous avez le bon document.",
+   "documentExplanationController.vaccinCertificate.title": "Attestation de vaccin",
+   "documentExplanationController.testCertificate.title": "Certificat de test",
+   "documentExplanationController.vaccinCertificate.explanation": "Voici un exemple de document de l'Assurance Maladie avec la certification de la vaccination. Le QR Code à flasher avec TousAntiCovid est à droite, indiqué par le carré orange.",
+   "documentExplanationController.testCertificate.explanation": "Voici un exemple de document SIDEP avec la certification du test COVID. Le QR Code à flasher avec TousAntiCovid est à gauche, indiqué par le carré orange.",
+   "walletAddCertificateController.testCertificate.title": "Ajouter un certificat de test",
+   "walletAddCertificateController.testCertificate.subtitle": "Appuyez ici pour ajouter un certificat de test",
+   "walletAddCertificateController.vaccinCertificate.title": "Ajouter un certificat de vaccination",
+   "walletAddCertificateController.vaccinCertificate.subtitle": "Appuyez ici pour ajouter un certificat de vaccination",
+   "walletCertificateErrorController.title": "Erreur de certificat",
+   "walletCertificateErrorController.explanations.invalidSignature.testCertificate.title": "⚠️ Non authentique",
+   "walletCertificateErrorController.explanations.invalidSignature.testCertificate.subtitle": "Ce certificat n'est pas authentique.\n\nAssurez-vous que vous tentez de scanner le QR Code sur le bon document 👇",
+   "walletCertificateErrorController.explanations.invalidSignature.vaccinCertificate.title": "⚠️ Non authentique",
+   "walletCertificateErrorController.explanations.invalidSignature.vaccinCertificate.subtitle": "Ce certificat n'est pas authentique.\n\nAssurez-vous que vous tentez de scanner le QR Code sur le bon document 👇",
+   "walletCertificateErrorController.explanations.invalidFormat.testCertificate.title": "⚠️ Format invalide",
+   "walletCertificateErrorController.explanations.invalidFormat.testCertificate.subtitle": "Ce certificat a un format invalide.\n\nVeuillez ré-essayer de le flasher avec plus de lumière. Et assurez-vous que vous tentez de scanner le QR Code sur le bon document 👇",
+   "walletCertificateErrorController.explanations.invalidFormat.vaccinCertificate.title": "⚠️ Format invalide",
+   "walletCertificateErrorController.explanations.invalidFormat.vaccinCertificate.subtitle": "Ce certificat a un format invalide.\n\nVeuillez ré-essayer de le flasher avec plus de lumière. Et assurez-vous que vous tentez de scanner le QR Code sur le bon document 👇",
+   "walletCertificateErrorController.checkDocument.testCertificate.title": "Vérifiez votre document",
+   "walletCertificateErrorController.checkDocument.testCertificate.subtitle": "Voici un exemple de document de résultat de test. Ce document est le seul vous permettant d’ajouter un certificat de test dans TousAntiCovid.",
+   "walletCertificateErrorController.checkDocument.vaccinCertificate.title": "Vérifiez votre document",
+   "walletCertificateErrorController.checkDocument.vaccinCertificate.subtitle": "Voici un exemple de document de résultat de vaccination. Ce document est le seul vous permettant d’ajouter un certificat de vaccination dans TousAntiCovid.",
+   
+    "attestation.form.country.label":"Pays",
+    "attestation.form.country.placeholder":"France",
+    
+    "common.moreInfo": "Plus d'infos",
+   "venuesRecording.whenToUse.title": "Les QR Codes",
+   "venuesRecording.whenToUse.subtitle": "Les lieux ayant ce dispositif affichent un QR Code soit à l’entrée, soit dans d’autres endroits de l’établissement propices au scan du QR Code.\n\nSi vous ne trouvez pas le QR Code, vous pouvez demander au personnel de l’établissement de vous aider.",
+   "venuesRecording.alert.title": "Les alertes",
+   "venuesRecording.alert.subtitle": "Si une personne se déclare positive par la suite, toutes les personnes seront informées qu’elles ont pu être exposées au virus et seront invitées à se faire tester.\n\nSi au moins trois personnes testées positives ont fréquenté un lieu en commun avant de tomber malade, il est possible qu'une personne super-contaminante ait exposé plus de personnes dans ce lieu. Ainsi toutes les autres personnes seront considérées comme co-exposées et seront invitées à s'isoler et se faire tester.",
+   
+   "manageDataController.analytics.button": "Supprimer mes données",
+    "manageDataController.analytics.confirmationDialog.title": "Confirmation",
+    "manageDataController.analytics.confirmationDialog.message": "Confirmez-vous vouloir supprimer vos données d’usage ?",
+   "manageDataController.analytics.successDialog.title": "Confirmation",
+   "manageDataController.analytics.successDialog.message": "Nous avons bien pris en compte votre demande de suppression."
+
 }

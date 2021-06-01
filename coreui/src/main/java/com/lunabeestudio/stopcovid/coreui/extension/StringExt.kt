@@ -52,7 +52,7 @@ suspend fun String.saveTo(context: Context, file: File, sharedPrefKey: String): 
                     }
                 }
             }
-            response.body!!.string().byteInputStream().use { input ->
+            response.body!!.byteStream().use { input ->
                 file.outputStream().use { output ->
                     input.copyTo(output, 4 * 1024)
                 }

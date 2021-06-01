@@ -115,14 +115,14 @@ internal class ApiConfiguration(
     val walletOldCertificateThresholdInDays: String,
     @SerializedName("app.walletPubKeys")
     val walletPublicKeys: String,
-    @SerializedName("app.wallet.testCertificateValidityThresholdInHours")
-    val testCertificateValidityThresholdInHours: Int,
     @SerializedName("app.displaySanitaryCertificatesValidation")
     val displaySanitaryCertificatesValidation: Boolean,
     @SerializedName("app.isAnalyticsOn")
     val isAnalyticsOn: Boolean,
     @SerializedName("app.analyticsApiVersion")
     val analyticsApiVersion: String,
+    @SerializedName("app.wallet.testCertificateValidityThresholds")
+    val testCertificateValidityThresholds: String,
 )
 
 internal fun ApiConfiguration.toDomain(gson: Gson) = Configuration(
@@ -185,10 +185,10 @@ internal fun ApiConfiguration.toDomain(gson: Gson) = Configuration(
         walletPublicKeys,
         object : TypeToken<List<WalletPublicKey>?>() {}.type
     ),
-    testCertificateValidityThresholdInHours = testCertificateValidityThresholdInHours,
     cleaReportApiVersion = cleaReportApiVersion,
     cleaStatusApiVersion = cleaStatusApiVersion,
     displaySanitaryCertificatesValidation = displaySanitaryCertificatesValidation,
     isAnalyticsOn = isAnalyticsOn,
-    analyticsApiVersion = analyticsApiVersion
+    analyticsApiVersion = analyticsApiVersion,
+    testCertificateValidityThresholds = gson.fromJson(testCertificateValidityThresholds, object : TypeToken<List<Int>>() {}.type),
 )

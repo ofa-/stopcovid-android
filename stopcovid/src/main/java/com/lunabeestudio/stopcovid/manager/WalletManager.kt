@@ -88,11 +88,14 @@ object WalletManager {
         localKeystoreDataSource.rawWalletCertificates = walletCertificates
     }
 
-    private fun extractCertificateType(value: String): WalletCertificateType? = WalletCertificateType.values()
+    private fun validateAndExtractCertificateType(value: String): WalletCertificateType? = WalletCertificateType.values()
         .firstOrNull { it.validationRegexp.matches(value) }
 
+    fun extractCertificateType(value: String): WalletCertificateType? = WalletCertificateType.values()
+        .firstOrNull { it.headerDetectionRegex.containsMatchIn(value) }
+
     private fun certificateFromValue(value: String): WalletCertificate? {
-        val type: WalletCertificateType = extractCertificateType(value) ?: return null
+        val type: WalletCertificateType = validateAndExtractCertificateType(value) ?: return null
         return when (type) {
             WalletCertificateType.SANITARY -> SanitaryCertificate(value)
             WalletCertificateType.VACCINATION -> VaccinationCertificate(value)

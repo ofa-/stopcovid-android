@@ -12,6 +12,8 @@ package com.lunabeestudio.stopcovid.fragment
 
 import android.os.Bundle
 import android.view.View
+import androidx.core.view.doOnNextLayout
+import androidx.core.view.isVisible
 import com.google.android.material.appbar.AppBarLayout
 import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.extension.appCompatActivity
@@ -29,6 +31,13 @@ abstract class MainFragment : FastAdapterFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        if ((activity as? MainActivity)?.binding?.tabLayout?.isVisible == true) {
+            postponeEnterTransition()
+            (activity as? MainActivity)?.binding?.appBarLayout?.doOnNextLayout {
+                startPostponedEnterTransition()
+            }
+            (activity as? MainActivity)?.binding?.tabLayout?.isVisible = false
+        }
         getActivityBinding()?.appBarLayout?.let { appBarLayout ->
             binding?.recyclerView?.registerToAppBarLayoutForLiftOnScroll(appBarLayout)
         }

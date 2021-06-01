@@ -19,7 +19,7 @@ import com.lunabeestudio.stopcovid.coreui.databinding.LayoutButtonBottomSheetBin
 
 abstract class BottomSheetMainFragment : MainFragment() {
 
-    private var bottomSheetBinding: LayoutButtonBottomSheetBinding? = null
+    protected var bottomSheetBinding: LayoutButtonBottomSheetBinding? = null
     abstract fun onBottomSheetButtonClicked()
     abstract fun getBottomSheetButtonKey(): String
 

@@ -20,7 +20,8 @@ import com.lunabeestudio.stopcovid.extension.attestationShortLabelFromKey
 import com.lunabeestudio.stopcovid.model.AttestationMap
 import java.text.DateFormat
 import java.text.SimpleDateFormat
-import java.util.Date
+import java.util.Calendar
+import java.util.TimeZone
 
 object AttestationsManager {
     private val dateFormat: DateFormat = SimpleDateFormat.getDateInstance(DateFormat.SHORT)
@@ -39,7 +40,9 @@ object AttestationsManager {
                 footer = attestationToFooterString(robertManager, strings, attestation),
                 qrCodeString = attestationToFormattedStringDisplayed(robertManager, strings, attestation),
                 timestamp = attestation[Constants.Attestation.KEY_DATE_TIME]?.value?.toLongOrNull() ?: 0L,
-                reason = attestation[Constants.Attestation.DATA_KEY_REASON]?.value ?: ""
+                reason = attestation[Constants.Attestation.DATA_KEY_REASON]?.value ?: "",
+                widgetString = strings[attestation[Constants.Attestation.DATA_KEY_REASON]?.value?.attestationShortLabelFromKey()]
+                    ?: strings["qrCode.infoNotAvailable"] ?: ""
             )
         )
         keystoreDataSource.attestations = attestations
@@ -51,9 +54,11 @@ object AttestationsManager {
             .attestationReplaceUnknownValues(strings)
     }
 
-    private fun attestationToFormattedStringDisplayed(robertManager: RobertManager,
+    private fun attestationToFormattedStringDisplayed(
+        robertManager: RobertManager,
         strings: LocalizedStrings,
-        attestation: AttestationMap): String {
+        attestation: AttestationMap
+    ): String {
         return robertManager.configuration.qrCodeFormattedStringDisplayed
             .attestationReplaceKnownValue(strings, attestation)
             .attestationReplaceUnknownValues(strings)
@@ -67,17 +72,24 @@ object AttestationsManager {
 
     private fun String.attestationReplaceKnownValue(strings: LocalizedStrings, attestation: AttestationMap): String {
         var result = this
+        timeFormat.apply {
+            timeZone = TimeZone.getDefault()
+        }
         attestation.keys.forEach { key ->
             when (attestation[key]?.type) {
                 "date" -> {
                     attestation[key]?.value?.toLongOrNull()?.let { timestamp ->
-                        val date = Date(timestamp)
+                        val date = Calendar.getInstance().apply {
+                            timeInMillis = timestamp
+                        }.time
                         result = result.replace("<$key>", dateFormat.format(date))
                     }
                 }
                 "datetime" -> {
                     attestation[key]?.value?.toLongOrNull()?.let { timestamp ->
-                        val date = Date(timestamp)
+                        val date = Calendar.getInstance().apply {
+                            timeInMillis = timestamp
+                        }.time
                         result = result.replace("<$key>", "${dateFormat.format(date)}, ${timeFormat.format(date)}")
                             .replace("<$key-day>", dateFormat.format(date))
                             .replace("<$key-hour>", timeFormat.format(date))

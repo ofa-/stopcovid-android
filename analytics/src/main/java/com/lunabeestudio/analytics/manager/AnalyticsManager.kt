@@ -15,6 +15,7 @@ import android.content.SharedPreferences
 import android.os.Build
 import androidx.core.util.AtomicFile
 import androidx.lifecycle.LifecycleObserver
+import com.lunabeestudio.analytics.extension.deleteAnalyticsAfterNextStatus
 import com.lunabeestudio.analytics.extension.installationUUID
 import com.lunabeestudio.analytics.extension.isOptIn
 import com.lunabeestudio.analytics.extension.sendAnalytics
@@ -67,6 +68,11 @@ object AnalyticsManager : LifecycleObserver {
     fun isOptIn(context: Context): Boolean = getSharedPrefs(context).isOptIn
     fun setIsOptIn(context: Context, isOptIn: Boolean) {
         getSharedPrefs(context).isOptIn = isOptIn
+    }
+
+    fun requestDeleteAnalytics(context: Context) {
+        reportAppEvent(context, AppEventName.e17)
+        getSharedPrefs(context).deleteAnalyticsAfterNextStatus = true
     }
 
     fun init(context: Context) {
@@ -137,6 +143,9 @@ object AnalyticsManager : LifecycleObserver {
         } else {
             reset(context)
         }
+        if (getSharedPrefs(context).deleteAnalyticsAfterNextStatus) {
+            sendDeleteAnalytics(context, analyticsInfosProvider, token)
+        }
     }
 
     private suspend fun sendAppAnalytics(
@@ -145,11 +154,11 @@ object AnalyticsManager : LifecycleObserver {
         token: String,
         receivedHelloMessagesCount: Int
     ) {
-        val appInfos = getAppInfos(analyticsInfosProvider, receivedHelloMessagesCount)
+        val appInfos = getAppInfos(context, analyticsInfosProvider, receivedHelloMessagesCount)
         val appEvents = getAppEvents(context)
         val appErrors = getErrors(context.filesDir)
         val sendAnalyticsRQ = SendAnalyticsRQ(
-            installationUuid = sharedPreferences.installationUUID ?: UUID.randomUUID().toString(),
+            installationUuid = getSharedPrefs(context).installationUUID ?: UUID.randomUUID().toString(),
             infos = appInfos,
             events = appEvents.toAPI(),
             errors = appErrors.toAPI()
@@ -218,6 +227,35 @@ object AnalyticsManager : LifecycleObserver {
         }
     }
 
+    private suspend fun sendDeleteAnalytics(
+        context: Context,
+        analyticsInfosProvider: AnalyticsInfosProvider,
+        token: String
+    ) {
+        withContext(Dispatchers.IO) {
+            getSharedPrefs(context).installationUUID?.let { installationUUID ->
+                val result = AnalyticsServerManager.deleteAnalytics(
+                    context,
+                    analyticsInfosProvider.getBaseUrl(),
+                    analyticsInfosProvider.getCertificateSha256(),
+                    analyticsInfosProvider.getApiVersion(),
+                    token,
+                    installationUUID,
+                )
+                when (result) {
+                    is AnalyticsResult.Success -> {
+                        withContext(Dispatchers.Main) {
+                            getSharedPrefs(context).deleteAnalyticsAfterNextStatus = false
+                        }
+                    }
+                    is AnalyticsResult.Failure -> {
+                        Timber.e(result.error)
+                    }
+                }
+            }
+        }
+    }
+
     fun reset(context: Context) {
         resetAppEvents(context)
         resetHealthEvents(context)
@@ -276,6 +314,7 @@ object AnalyticsManager : LifecycleObserver {
     }
 
     private fun getAppInfos(
+        context: Context,
         infosProvider: AnalyticsInfosProvider,
         receivedHelloMessagesCount: Int
     ): AppInfos {
@@ -290,7 +329,7 @@ object AnalyticsManager : LifecycleObserver {
             placesCount = infosProvider.getPlacesCount(),
             formsCount = infosProvider.getFormsCount(),
             certificatesCount = infosProvider.getCertificatesCount(),
-            statusSuccessCount = sharedPreferences.statusSuccessCount,
+            statusSuccessCount = getSharedPrefs(context).statusSuccessCount,
             userHasAZipcode = infosProvider.userHaveAZipCode(),
         )
     }

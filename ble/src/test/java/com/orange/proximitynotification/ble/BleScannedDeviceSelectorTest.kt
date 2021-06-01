@@ -11,7 +11,6 @@
 package com.orange.proximitynotification.ble
 
 import android.bluetooth.BluetoothDevice
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.orange.proximitynotification.ProximityPayload
 import com.orange.proximitynotification.ProximityPayloadId
@@ -19,15 +18,9 @@ import com.orange.proximitynotification.ProximityPayloadIdProvider
 import com.orange.proximitynotification.ble.scanner.BleScannedDevice
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Test
-import org.junit.runner.RunWith
 import java.util.Date
 
-@RunWith(AndroidJUnit4::class)
 class BleScannedDeviceSelectorTest {
-
-    private val cacheTimeout = 3L
-    private val minConfidenceScore = -1
-    private val minStatsCount = 3
 
     @Test
     fun select_given_no_scans_should_return_empty() = runBlockingTest {
@@ -220,6 +213,36 @@ class BleScannedDeviceSelectorTest {
 
 
     @Test
+    fun select_given_multiple_devices_without_stats_should_select_ones_with_rssi_timestammp() =
+        runBlockingTest {
+
+            // Given
+            val now = Date()
+            val rssi = -30
+
+            val deviceStatsProvider = givenDeviceStatsProvider(emptyMap())
+
+            val scannedDeviceSelector = givenScannedDeviceSelector(
+                maxDelayBetweenSuccess = 0L,
+                deviceStatsProvider = deviceStatsProvider
+            ).withScans(
+                bleScannedDevice(device(1), rssi, byteArrayOf(1), now.plus(1)),
+                bleScannedDevice(device(2), rssi, null, now.plus(2)),
+                bleScannedDevice(device(3), rssi, byteArrayOf(3), now.plus(3))
+            )
+
+            // When
+            val result = scannedDeviceSelector.select()
+
+            // Then
+            assertThat(result).containsExactly(
+                bleScannedDevice(device(3), rssi, byteArrayOf(3), now.plus(3)),
+                bleScannedDevice(device(2), rssi, null, now.plus(2)),
+                bleScannedDevice(device(1), rssi, byteArrayOf(1), now.plus(1))
+            ).inOrder()
+        }
+
+    @Test
     fun select_given_multiple_devices_should_select_ones_with_best_confidence_score() =
         runBlockingTest {
 
@@ -227,32 +250,98 @@ class BleScannedDeviceSelectorTest {
             val now = Date()
             val rssi = -30
 
-            val scannedDeviceSelector = givenScannedDeviceSelector().withScans(
+            val deviceStatsProvider = givenDeviceStatsProvider(
+                mapOf(
+                    byteArrayOf(1).deviceId() to BleDeviceStats(successCount = 1),
+                    byteArrayOf(3).deviceId() to BleDeviceStats(failureCount = 1)
+                )
+            )
+
+            val scannedDeviceSelector = givenScannedDeviceSelector(
+                maxDelayBetweenSuccess = 0L,
+                deviceStatsProvider = deviceStatsProvider
+            ).withScans(
                 bleScannedDevice(device(1), rssi, byteArrayOf(1), now.plus(1)),
                 bleScannedDevice(device(2), rssi, null, now.plus(2)),
                 bleScannedDevice(device(3), rssi, byteArrayOf(3), now.plus(3))
             )
-            assertThat(scannedDeviceSelector.select()).containsExactly(
-                bleScannedDevice(device(3), rssi, byteArrayOf(3), now.plus(3)),
+
+            // When
+            val result = scannedDeviceSelector.select()
+
+            // Then
+            assertThat(result).containsExactly(
+                bleScannedDevice(device(1), rssi, byteArrayOf(1), now.plus(1)),
                 bleScannedDevice(device(2), rssi, null, now.plus(2)),
-                bleScannedDevice(device(1), rssi, byteArrayOf(1), now.plus(1))
+                bleScannedDevice(device(3), rssi, byteArrayOf(3), now.plus(3))
+            ).inOrder()
+        }
+
+    @Test
+    fun select_given_mutliple_devices_should_remove_ones_which_just_succeed_and_select_ones_with_best_confidence_score() =
+        runBlockingTest {
+
+            // Given
+            val now = Date()
+            val rssi = -30
+
+            val deviceStatsProvider = givenDeviceStatsProvider(
+                mapOf(
+                    byteArrayOf(1).deviceId() to BleDeviceStats(lastSuccessTime = now.minus(1000).time)
+                )
+            )
+
+            val scannedDeviceSelector = givenScannedDeviceSelector(
+                maxDelayBetweenSuccess = 30 * 1000L,
+                deviceStatsProvider = deviceStatsProvider
+            ).withScans(
+                bleScannedDevice(device(1), rssi, byteArrayOf(1), now.plus(1)),
+                bleScannedDevice(device(2), rssi, null, now.plus(2)),
+                bleScannedDevice(device(3), rssi, byteArrayOf(3), now.plus(3))
+            )
+
+
+            // When
+            val result = scannedDeviceSelector.select()
+
+            // Then
+            assertThat(result).containsExactly(
+                bleScannedDevice(device(3), rssi, byteArrayOf(3), now.plus(3)),
+                bleScannedDevice(device(2), rssi, null, now.plus(2))
             ).inOrder()
             assertThat(scannedDeviceSelector.isEmpty()).isTrue()
 
-            // When
-            scannedDeviceSelector.succeed(
-                bleScannedDevice(device(1), rssi, byteArrayOf(1), now.plus(1))
+        }
+
+
+    @Test
+    fun select_given_multiple_devices_should_remove_ones_with_too_many_failures_and_select_others_with_best_confidence_score() =
+        runBlockingTest {
+
+            // Given
+            val now = Date()
+            val rssi = -30
+
+            val deviceStatsProvider = givenDeviceStatsProvider(
+                mapOf(
+                    byteArrayOf(1).deviceId() to BleDeviceStats(successiveFailureCount = 11)
+                )
             )
 
-            scannedDeviceSelector.withScans(
+            val scannedDeviceSelector = givenScannedDeviceSelector(
+                maxDelayBetweenSuccess = 0L,
+                deviceStatsProvider = deviceStatsProvider
+            ).withScans(
                 bleScannedDevice(device(1), rssi, byteArrayOf(1), now.plus(1)),
                 bleScannedDevice(device(2), rssi, null, now.plus(2)),
                 bleScannedDevice(device(3), rssi, byteArrayOf(3), now.plus(3))
             )
 
+            // When
+            val result = scannedDeviceSelector.select()
+
             // Then
-            assertThat(scannedDeviceSelector.select()).containsExactly(
-                bleScannedDevice(device(1), rssi, byteArrayOf(1), now.plus(1)),
+            assertThat(result).containsExactly(
                 bleScannedDevice(device(3), rssi, byteArrayOf(3), now.plus(3)),
                 bleScannedDevice(device(2), rssi, null, now.plus(2))
             ).inOrder()
@@ -261,145 +350,58 @@ class BleScannedDeviceSelectorTest {
         }
 
     @Test
-    fun select_given_multiple_devices_should_evict_scans_with_bad_confidence_score() =
-        runBlockingTest {
+    fun select_given_blacklisted_device_should_not_select_it() = runBlockingTest {
 
-            // Given
-            val now = Date()
-            val rssi = -30
+        // Given
+        val now = Date()
+        val rssi = -30
 
-            val scannedDeviceSelector = givenScannedDeviceSelector().withScans(
-                bleScannedDevice(device(1), rssi, byteArrayOf(1), now.plus(1)),
-                bleScannedDevice(device(2), rssi, null, now.plus(2)),
-                bleScannedDevice(device(3), rssi, byteArrayOf(3), now.plus(3))
+        val deviceStatsProvider = givenDeviceStatsProvider(
+            mapOf(
+                byteArrayOf(1).deviceId() to BleDeviceStats(shouldIgnore = true)
             )
-            assertThat(scannedDeviceSelector.select()).containsExactly(
-                bleScannedDevice(device(3), rssi, byteArrayOf(3), now.plus(3)),
-                bleScannedDevice(device(2), rssi, null, now.plus(2)),
-                bleScannedDevice(device(1), rssi, byteArrayOf(1), now.plus(1))
-            ).inOrder()
-            assertThat(scannedDeviceSelector.isEmpty()).isTrue()
-
-            // When
-            scannedDeviceSelector.failed(
-                bleScannedDevice(device(1), rssi, byteArrayOf(1), now.plus(1))
-            )
-
-            scannedDeviceSelector.withScans(
-                bleScannedDevice(device(1), rssi, byteArrayOf(1), now.plus(1)),
-                bleScannedDevice(device(2), rssi, null, now.plus(2)),
-                bleScannedDevice(device(3), rssi, byteArrayOf(3), now.plus(3))
-            )
-
-            // Then
-            assertThat(scannedDeviceSelector.select()).containsExactly(
-                bleScannedDevice(device(3), rssi, byteArrayOf(3), now.plus(3)),
-                bleScannedDevice(device(2), rssi, null, now.plus(2))
-            ).inOrder()
-            assertThat(scannedDeviceSelector.isEmpty()).isTrue()
-
-        }
-
-    @Test
-    fun select_given_multiple_devices_should_unprioritize_scans_if_failed_to_scan() =
-        runBlockingTest {
-
-            // Given
-            val now = Date()
-            val rssi = -30
-
-            val scannedDeviceSelector = givenScannedDeviceSelector().withScans(
-                bleScannedDevice(device(1), rssi, byteArrayOf(1), now.plus(1)),
-                bleScannedDevice(device(2), rssi, null, now.plus(2))
-            )
-            assertThat(scannedDeviceSelector.select()).containsExactly(
-                bleScannedDevice(device(2), rssi, null, now.plus(2)),
-                bleScannedDevice(device(1), rssi, byteArrayOf(1), now.plus(1))
-            ).inOrder()
-
-            // When
-            scannedDeviceSelector.failedToScan(
-                bleScannedDevice(device(2), rssi, null, now.plus(2)),
-            )
-
-            scannedDeviceSelector.withScans(
-                bleScannedDevice(device(1), rssi, byteArrayOf(1), now.plus(1)),
-                bleScannedDevice(device(2), rssi, null, now.plus(2))
-            )
-
-            // Then
-            assertThat(scannedDeviceSelector.select()).containsExactly(
-                bleScannedDevice(device(1), rssi, byteArrayOf(1), now.plus(1)),
-                bleScannedDevice(device(2), rssi, null, now.plus(2))
-            ).inOrder()
-
-        }
-
-    @Test
-    fun select_given_multiple_devices_should_not_prioritize_scans_if_stats_count_is_high_enough() =
-        runBlockingTest {
-
-            // Given
-            val now = Date()
-            val rssi = -30
-
-            val scannedDeviceSelector = givenScannedDeviceSelector().withScans(
-                bleScannedDevice(device(1), rssi, byteArrayOf(1), now.plus(1)),
-                bleScannedDevice(device(2), rssi, null, now.plus(2)),
-                bleScannedDevice(device(3), rssi, byteArrayOf(3), now.plus(3))
-            )
-            assertThat(scannedDeviceSelector.select()).containsExactly(
-                bleScannedDevice(device(3), rssi, byteArrayOf(3), now.plus(3)),
-                bleScannedDevice(device(2), rssi, null, now.plus(2)),
-                bleScannedDevice(device(1), rssi, byteArrayOf(1), now.plus(1))
-            ).inOrder()
-            assertThat(scannedDeviceSelector.isEmpty()).isTrue()
-
-            // When
-            bleScannedDevice(device(1), rssi, byteArrayOf(1), now.plus(1))
-                .also { scan ->
-                    repeat(minStatsCount + 1) {
-                        scannedDeviceSelector.succeed(scan)
-                    }
-                }
-
-            scannedDeviceSelector.withScans(
-                bleScannedDevice(device(1), rssi, byteArrayOf(1), now.plus(1)),
-                bleScannedDevice(device(2), rssi, null, now.plus(2)),
-                bleScannedDevice(device(3), rssi, byteArrayOf(3), now.plus(3))
-            )
-
-            // Then
-            assertThat(scannedDeviceSelector.select()).containsExactly(
-                bleScannedDevice(device(3), rssi, byteArrayOf(3), now.plus(3)),
-                bleScannedDevice(device(2), rssi, null, now.plus(2)),
-                bleScannedDevice(device(1), rssi, byteArrayOf(1), now.plus(1))
-            ).inOrder()
-            assertThat(scannedDeviceSelector.isEmpty()).isTrue()
-
-        }
-
-
-
-
-    private fun givenScannedDeviceSelector(timestampIsImportant: Boolean = true) =
-        BleScannedDeviceSelector(
-            cacheTimeout = cacheTimeout,
-            minConfidenceScore = minConfidenceScore,
-            minStatsCount = minStatsCount,
-            timestampIsImportantInSelection = timestampIsImportant,
-            payloadIdProvider = object : ProximityPayloadIdProvider {
-                override suspend fun fromProximityPayload(proximityPayload: ProximityPayload): ProximityPayloadId {
-                    return proximityPayload.data
-                }
-            }
         )
+
+        val scannedDeviceSelector = givenScannedDeviceSelector(
+            deviceStatsProvider = deviceStatsProvider
+        ).withScans(
+            bleScannedDevice(device(1), rssi, byteArrayOf(1), now.plus(1)),
+        )
+
+        // When
+        val result = scannedDeviceSelector.select()
+
+        // Then
+        assertThat(result).isEmpty()
+        assertThat(scannedDeviceSelector.isEmpty()).isTrue()
+    }
+
+    private fun givenScannedDeviceSelector(
+        maxDelayBetweenSuccess: Long = 0L,
+        maxSuccessiveFailureCount: Int = 10,
+        timestampIsImportant: Boolean = true,
+        deviceStatsProvider: BleDeviceStatsProvider = givenDeviceStatsProvider()
+    ) = BleScannedDeviceSelector(
+        maxDelayBetweenSuccess = maxDelayBetweenSuccess,
+        maxSuccessiveFailureCount = maxSuccessiveFailureCount,
+        timestampIsImportantInSelection = timestampIsImportant,
+        payloadIdProvider = object : ProximityPayloadIdProvider {
+            override suspend fun fromProximityPayload(proximityPayload: ProximityPayload): ProximityPayloadId {
+                return proximityPayload.data
+            }
+        },
+        deviceStatsProvider = deviceStatsProvider
+    )
+
+    private fun givenDeviceStatsProvider(stats: Map<BleDeviceId, BleDeviceStats> = emptyMap()): BleDeviceStatsProvider =
+        { stats[it] }
 
     private fun BleScannedDeviceSelector.withoutScans() = this
     private fun BleScannedDeviceSelector.withScans(vararg scans: BleScannedDevice) = apply {
         add(scans.toList())
     }
 
+    private fun ByteArray.deviceId() = contentHashCode()
 
     private val bluetoothDevices by lazy {
         (1..9).map { it to bluetoothDevice(it.toString()) }.toMap()

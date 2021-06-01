@@ -142,10 +142,10 @@ object VenuesManager {
         keystoreDataSource: SecureKeystoreDataSource,
     ) {
         if (!keystoreDataSource.venuesQrCode?.filter {
-                isExpired(robertManager, it.ntpTimestamp.ntpTimeSToUnixTimeMs())
+                isExpired(robertManager, it.ntpTimestamp.ntpTimeSToUnixTimeMs()) || it.ltid == null // This test is added to handle "old" venues that may have null here due to JSON parsing handling
             }.isNullOrEmpty()) {
             keystoreDataSource.venuesQrCode = keystoreDataSource.venuesQrCode?.filter { venueQrCode ->
-                !isExpired(robertManager, venueQrCode.ntpTimestamp.ntpTimeSToUnixTimeMs())
+                !isExpired(robertManager, venueQrCode.ntpTimestamp.ntpTimeSToUnixTimeMs()) && venueQrCode.ltid != null // This test is added to handle "old" venues that may have null here due to JSON parsing handling
             }
             venueListHasChanged(keystoreDataSource)
         }

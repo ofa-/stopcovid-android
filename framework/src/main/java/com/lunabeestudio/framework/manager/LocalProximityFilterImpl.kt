@@ -17,10 +17,14 @@ import com.lunabeestudio.robert.RobertConstant
 import com.lunabeestudio.robert.manager.LocalProximityFilter
 import com.orange.proximitynotification.filter.ProximityFilter
 import com.orange.proximitynotification.filter.TimestampedRssi
+import timber.log.Timber
 import java.util.Date
+import kotlin.time.ExperimentalTime
+import kotlin.time.milliseconds
 
 class LocalProximityFilterImpl : LocalProximityFilter {
 
+    @OptIn(ExperimentalTime::class)
     override fun filter(localProximityList: List<LocalProximity>,
         mode: LocalProximityFilter.Mode,
         configJson: String): List<LocalProximity> {
@@ -48,12 +52,12 @@ class LocalProximityFilterImpl : LocalProximityFilter {
                 epochDuration = RobertConstant.EPOCH_DURATION_S.toLong(),
                 mode = mode.toBleMode()
             )
-
             if (filterOutput is ProximityFilter.Output.Rejected) {
                 mutableLocalProximityList.removeAll(list)
             } else if (filterOutput is ProximityFilter.Output.Accepted && filterOutput.areTimestampedRssisUpdated) {
+                val localProximityByHashValue: Map<Int, List<LocalProximity>> = list.groupBy { it.hashCode() }
                 filterOutput.timestampedRssis.forEach { (id, _, rssi) ->
-                    localProximityList.find { it.hashCode() == id }?.calibratedRssi = rssi
+                    localProximityByHashValue[id]?.firstOrNull()?.calibratedRssi = rssi
                 }
             }
         }

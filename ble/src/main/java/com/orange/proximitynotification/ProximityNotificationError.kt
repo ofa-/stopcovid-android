@@ -16,14 +16,6 @@ data class ProximityNotificationError(
     val cause: String? = null
 ) {
 
-    companion object {
-        /**
-         * Root error code when too much BLE operation fail which may indicate that Bluetooth Stack
-         * is unhealthy.
-         */
-        const val UNHEALTHY_BLUETOOTH_ERROR_CODE = 1000
-    }
-
     enum class Type {
         /**
          * BLE advertising error
@@ -39,5 +31,10 @@ data class ProximityNotificationError(
          * BLE gatt error
          */
         BLE_GATT,
+
+        /**
+         * BLE proximity notification component error
+         */
+        BLE_PROXIMITY_NOTIFICATION
     }
 }

@@ -13,8 +13,6 @@ package com.orange.proximitynotification.ble
 import android.bluetooth.BluetoothDevice
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.nhaarman.mockitokotlin2.doReturn
-import com.nhaarman.mockitokotlin2.mock
 import com.orange.proximitynotification.ble.scanner.BleScannedDevice
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -29,9 +27,11 @@ class BleRecordProviderForScanWithoutPayloadTest {
         private const val MAX_CACHE_SIZE = 4
     }
 
-    private val bleRecordProvider = BleRecordProviderForScanWithoutPayload(mock {
-        on { cacheTimeout } doReturn CACHE_TIMEOUT
-    }, maxCacheSize = MAX_CACHE_SIZE)
+    private val bleRecordProvider = BleRecordProviderForScanWithoutPayload(
+        maxCacheSize = MAX_CACHE_SIZE,
+        scanCacheTimeout = CACHE_TIMEOUT,
+        payloadCacheTimeout = CACHE_TIMEOUT
+    )
 
     @Test
     fun fromScan_without_payload_should_return_null() {
@@ -132,7 +132,7 @@ class BleRecordProviderForScanWithoutPayloadTest {
 
         // Then
         assertThat(result).isNull()
-        assertThat(bleRecordProvider.lastScanByDeviceId[device1.address]).isNull()
+        assertThat(bleRecordProvider.lastScanByDeviceAddress[device1.address]).isNull()
     }
 
     @Test
@@ -149,13 +149,13 @@ class BleRecordProviderForScanWithoutPayloadTest {
         givenScanAndNoPayload(device4Scan1)
         advanceCacheBy(100)
 
-        assertThat(bleRecordProvider.lastScanByDeviceId.size()).isEqualTo(4)
+        assertThat(bleRecordProvider.lastScanByDeviceAddress.size()).isEqualTo(4)
         val result = bleRecordProvider.fromPayload(device4Scan1.device, payload = payload)
 
         // Then
         val expected = record(payload, device4Scan1)
         assertThat(result).isEqualTo(expected)
-        assertThat(bleRecordProvider.lastScanByDeviceId.size()).isEqualTo(1)
+        assertThat(bleRecordProvider.lastScanByDeviceAddress.size()).isEqualTo(1)
     }
 
     @Test
@@ -170,13 +170,13 @@ class BleRecordProviderForScanWithoutPayloadTest {
         givenScanAndNoPayload(device2Scan1)
         advanceCacheBy(100)
 
-        assertThat(bleRecordProvider.lastScanByDeviceId.size()).isEqualTo(2)
+        assertThat(bleRecordProvider.lastScanByDeviceAddress.size()).isEqualTo(2)
         val result = bleRecordProvider.fromPayload(device2Scan1.device, payload = payload)
 
         // Then
         val expected = record(payload, device2Scan1)
         assertThat(result).isEqualTo(expected)
-        assertThat(bleRecordProvider.lastScanByDeviceId.size()).isEqualTo(2)
+        assertThat(bleRecordProvider.lastScanByDeviceAddress.size()).isEqualTo(2)
     }
 
     @Test
@@ -193,14 +193,14 @@ class BleRecordProviderForScanWithoutPayloadTest {
         givenPayload(device4, payload)
         advanceCacheBy(100)
 
-        assertThat(bleRecordProvider.lastPayloadByDeviceId.size()).isEqualTo(4)
+        assertThat(bleRecordProvider.lastPayloadByDeviceAddress.size()).isEqualTo(4)
         val device4Scan1 = bleScannedDevice(device4, serviceData = null)
         val result = bleRecordProvider.fromScan(device4Scan1)
 
         // Then
         val expected = record(payload, device4Scan1)
         assertThat(result).isEqualTo(expected)
-        assertThat(bleRecordProvider.lastPayloadByDeviceId.size()).isEqualTo(1)
+        assertThat(bleRecordProvider.lastPayloadByDeviceAddress.size()).isEqualTo(1)
     }
 
     @Test
@@ -215,16 +215,33 @@ class BleRecordProviderForScanWithoutPayloadTest {
         givenPayload(device2, payload)
         advanceCacheBy(100)
 
-        assertThat(bleRecordProvider.lastPayloadByDeviceId.size()).isEqualTo(2)
+        assertThat(bleRecordProvider.lastPayloadByDeviceAddress.size()).isEqualTo(2)
         val device2Scan1 = bleScannedDevice(device2, serviceData = null)
         val result = bleRecordProvider.fromScan(device2Scan1)
 
         // Then
         val expected = record(payload, device2Scan1)
         assertThat(result).isEqualTo(expected)
-        assertThat(bleRecordProvider.lastPayloadByDeviceId.size()).isEqualTo(2)
+        assertThat(bleRecordProvider.lastPayloadByDeviceAddress.size()).isEqualTo(2)
     }
 
+    @Test
+    fun fromScanAndPayload_should_store_scan_and_payload() {
+        // Given
+        val device = bluetoothDevice("device1")
+        val payload = payload()
+        val deviceScan = bleScannedDevice(device = device, rssi = 1, serviceData = null)
+
+        // When
+        val result = bleRecordProvider.fromScanAndPayload(deviceScan, payload)
+
+        // Then
+        val expected = record(payload, deviceScan)
+        assertThat(result).isEqualTo(expected)
+
+        assertThat(bleRecordProvider.fromPayload(device, payload)).isEqualTo(expected)
+        assertThat(bleRecordProvider.fromScan(deviceScan)).isEqualTo(expected)
+    }
 
     private fun givenScanAndNoPayload(scannedDevice: BleScannedDevice) {
         bleRecordProvider.fromScan(scannedDevice)
@@ -236,7 +253,7 @@ class BleRecordProviderForScanWithoutPayloadTest {
 
     private fun givenCachedScannedDevices(vararg scannedDevices: BleScannedDevice) {
         scannedDevices.forEach {
-            bleRecordProvider.lastScanByDeviceId.put(it.device.address, it)
+            bleRecordProvider.lastScanByDeviceAddress.put(it.device.address, it)
         }
     }
 

@@ -59,6 +59,9 @@
                "code":"reason_curfew.convocation_demarches"
             },
             {
+               "code":"reason_curfew.transit"
+            },
+            {
 	            "code":"reason_curfew.animaux"
             }
          ]

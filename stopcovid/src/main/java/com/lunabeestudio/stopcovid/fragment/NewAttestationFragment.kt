@@ -45,6 +45,7 @@ import com.lunabeestudio.stopcovid.model.AttestationMap
 import com.lunabeestudio.stopcovid.model.FormField
 import com.lunabeestudio.stopcovid.viewmodel.NewAttestationViewModel
 import com.lunabeestudio.stopcovid.viewmodel.NewAttestationViewModelFactory
+import com.lunabeestudio.stopcovid.widgetshomescreen.AttestationWidget
 import com.mikepenz.fastadapter.GenericItem
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -57,7 +58,7 @@ class NewAttestationFragment : MainFragment() {
     private val gson: Gson = Gson()
     private val viewModel: NewAttestationViewModel by activityViewModels { NewAttestationViewModelFactory(requireContext().secureKeystoreDataSource()) }
     private val dateFormat: DateFormat = SimpleDateFormat.getDateInstance(DateFormat.LONG)
-    private val dateTimeFormat: DateFormat = SimpleDateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.SHORT, Locale.getDefault())
+    private val dateTimeFormat: DateFormat = SimpleDateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.SHORT)
 
     private val robertManager: RobertManager by lazy {
         requireContext().robertManager()
@@ -201,13 +202,21 @@ class NewAttestationFragment : MainFragment() {
                     placeholder = strings[formField.attestationPlaceholder()]
                     hint = strings[formField.attestationLabel()]
                     text = viewModel.infos[formField.dataKeyValue]?.value?.toLongOrNull()?.let { timestamp ->
-                        dateTimeFormat.format(Date(timestamp))
+                        dateTimeFormat.format(
+                            Calendar.getInstance().apply {
+                                timeInMillis = timestamp
+                            }.time
+                        )
                     }
                     onClick = {
                         val initialTimestamp = viewModel.infos[formField.dataKeyValue]?.value?.toLongOrNull()
-                            ?: System.currentTimeMillis()
+                            ?: Calendar.getInstance().timeInMillis
                         showDateTimePicker(initialTimestamp) { newDate ->
-                            text = dateTimeFormat.format(Date(newDate))
+                            text = dateTimeFormat.format(
+                                Calendar.getInstance().apply {
+                                    timeInMillis = newDate
+                                }.time
+                            )
                             viewModel.infos[formField.dataKeyValue] = FormEntry(newDate.toString(), formField.type, formField.key)
                             binding?.recyclerView?.adapter?.notifyDataSetChanged()
                         }
@@ -229,13 +238,19 @@ class NewAttestationFragment : MainFragment() {
                 }
             }
             else -> editTextItem {
+                val currentValue = viewModel.infos[formField.dataKeyValue]
                 placeholder = strings[formField.attestationPlaceholder()]
                 hint = strings[formField.attestationLabel()]
-                text = viewModel.infos[formField.dataKeyValue]?.value
+                text = if (currentValue != null) {
+                    viewModel.infos[formField.dataKeyValue]?.value
+                } else {
+                    viewModel.infos[formField.dataKeyValue] = FormEntry(formField.defaultValue, formField.type, formField.key)
+                    formField.defaultValue
+                }
                 textInputType = when (formField.type) {
                     "text" -> when (formField.contentType) {
                         "firstName", "lastName" -> EditorInfo.TYPE_CLASS_TEXT or EditorInfo.TYPE_TEXT_VARIATION_PERSON_NAME
-                        "addressLine1", "addressCity" -> EditorInfo.TYPE_CLASS_TEXT or EditorInfo.TYPE_TEXT_VARIATION_POSTAL_ADDRESS
+                        "addressLine1", "addressCity", "addressCountry" -> EditorInfo.TYPE_CLASS_TEXT or EditorInfo.TYPE_TEXT_VARIATION_POSTAL_ADDRESS
                         else -> EditorInfo.TYPE_CLASS_TEXT
                     }
                     "number" -> EditorInfo.TYPE_CLASS_NUMBER or EditorInfo.TYPE_NUMBER_VARIATION_NORMAL

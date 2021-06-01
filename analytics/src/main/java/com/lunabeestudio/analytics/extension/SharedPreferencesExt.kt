@@ -19,14 +19,18 @@ private const val SHARED_PREFS_PROXIMITY_START_TIME: String = "Shared.Prefs.Prox
 private const val SHARED_PREFS_PROXIMITY_ACTIVE_DURATION: String = "Shared.Prefs.Proximity.Active.Duration"
 private const val SHARED_PREFS_STATUS_SUCCESS_COUNT: String = "Shared.Prefs.Status.Success.Count"
 private const val SHARED_PREFS_IS_OPT_IN: String = "Shared.Prefs.Is.Opt.In"
+private const val SHARED_PREFS_DELETE_ANALYTICS_AFTER_NEXT_STATUS: String = "Shared.Prefs.Delete.Analytics.After.Next.Status"
 
 var SharedPreferences.installationUUID: String?
     get() = getString(SHARED_PREFS_INSTALLATION_UUID, null)
     set(value) = edit {
-        if (value.isNullOrBlank()) {
-            remove(SHARED_PREFS_INSTALLATION_UUID)
-        } else {
-            putString(SHARED_PREFS_INSTALLATION_UUID, value)
+        if (value != getString(SHARED_PREFS_INSTALLATION_UUID, null)) {
+            deleteAnalyticsAfterNextStatus = false
+            if (value.isNullOrBlank()) {
+                remove(SHARED_PREFS_INSTALLATION_UUID)
+            } else {
+                putString(SHARED_PREFS_INSTALLATION_UUID, value)
+            }
         }
     }
 
@@ -66,4 +70,10 @@ var SharedPreferences.isOptIn: Boolean
     get() = getBoolean(SHARED_PREFS_IS_OPT_IN, true)
     set(value) = edit {
         putBoolean(SHARED_PREFS_IS_OPT_IN, value)
+    }
+
+var SharedPreferences.deleteAnalyticsAfterNextStatus: Boolean
+    get() = getBoolean(SHARED_PREFS_DELETE_ANALYTICS_AFTER_NEXT_STATUS, true)
+    set(value) = edit {
+        putBoolean(SHARED_PREFS_DELETE_ANALYTICS_AFTER_NEXT_STATUS, value)
     }

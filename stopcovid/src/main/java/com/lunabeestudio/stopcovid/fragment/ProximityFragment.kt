@@ -61,6 +61,7 @@ import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.StopCovid
 import com.lunabeestudio.stopcovid.activity.MainActivity
+import com.lunabeestudio.stopcovid.coreui.ConfigConstant
 import com.lunabeestudio.stopcovid.coreui.UiConstants
 import com.lunabeestudio.stopcovid.coreui.extension.addRipple
 import com.lunabeestudio.stopcovid.coreui.extension.appCompatActivity
@@ -108,6 +109,7 @@ import com.lunabeestudio.stopcovid.fastitem.logoItem
 import com.lunabeestudio.stopcovid.fastitem.numbersCardItem
 import com.lunabeestudio.stopcovid.fastitem.onOffLottieItem
 import com.lunabeestudio.stopcovid.fastitem.proximityButtonItem
+import com.lunabeestudio.stopcovid.manager.AppMaintenanceManager
 import com.lunabeestudio.stopcovid.manager.InfoCenterManager
 import com.lunabeestudio.stopcovid.manager.KeyFiguresManager
 import com.lunabeestudio.stopcovid.manager.ProximityManager
@@ -133,7 +135,6 @@ import java.text.NumberFormat
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 import kotlin.time.ExperimentalTime
-import kotlin.time.milliseconds
 import kotlin.time.seconds
 
 class ProximityFragment : TimeMainFragment() {
@@ -382,6 +383,9 @@ class ProximityFragment : TimeMainFragment() {
         robertManager.liveAtRiskStatus.observeEventAndConsume(viewLifecycleOwner) {
             refreshScreen()
         }
+        robertManager.liveUpdatingRiskStatus.observeEventAndConsume(viewLifecycleOwner) {
+            refreshScreen()
+        }
         InfoCenterManager.infos.observeEventAndConsume(viewLifecycleOwner) {
             refreshScreen()
         }
@@ -424,36 +428,67 @@ class ProximityFragment : TimeMainFragment() {
             ProximityManager.getDeviceSetup(it, robertManager)
         }
 
-        addTopImageItems(items, deviceSetup)
+        addTopImageItems(items)
         addSubTitleItem(items)
         addActivateButtonItems(items, deviceSetup)
+
+        addSectionSeparator(items)
 
         // Health items
         addHealthItems(items, isSick)
         if (robertManager.configuration.displayIsolation) {
             addIsolationItems(items)
         }
-        addDeclareItems(items, isSick, deviceSetup)
+        if ((deviceSetup != DeviceSetup.NO_BLE || robertManager.configuration.displayRecordVenues) && !isSick) {
+            addDeclareItems(items)
+        }
         if (robertManager.configuration.displayVaccination) {
             addVaccinationItems(items)
         }
+        addSectionSeparator(items)
+
         // News items
         addNewsItems(items)
+        addSectionSeparator(items)
 
         // Attestation
         if (robertManager.configuration.displayAttestation) {
             addAttestationItems(items)
+            addSectionSeparator(items)
         }
 
         // Venue items
-        addVenueItems(items, isSick)
+            addVenueItems(items)
+            addSectionSeparator(items)
 
         // More items
         addMoreItems(items)
+        addSectionSeparator(items)
 
         refreshItems(deviceSetup)
 
         return items
+    }
+
+    private fun addSectionSeparator(items: ArrayList<GenericItem>) {
+        items += spaceItem {
+            spaceRes = R.dimen.spacing_large
+            identifier = items.count().toLong()
+        }
+    }
+
+    private fun addTopImageItems(items: ArrayList<GenericItem>) {
+        onOffLottieItem = onOffLottieItem {
+            identifier = items.count().toLong()
+        }
+        logoItem = logoItem {
+            identifier = items.count().toLong()
+        }
+        if (isAnimationEnabled()) {
+            onOffLottieItem?.let { items += it }
+        } else {
+            logoItem?.let { items += it }
+        }
     }
 
     fun addSubTitleItem(items: ArrayList<GenericItem>) {
@@ -467,63 +502,45 @@ class ProximityFragment : TimeMainFragment() {
         items += subTitleItem
     }
 
-    private fun addTopImageItems(items: ArrayList<GenericItem>, deviceSetup: DeviceSetup?) {
-        if (deviceSetup != DeviceSetup.NO_BLE) {
-            onOffLottieItem = onOffLottieItem {
-                identifier = items.count().toLong()
-            }
-            logoItem = logoItem {
-                identifier = items.count().toLong()
-            }
-            if (isAnimationEnabled()) {
-                onOffLottieItem?.let { items += it }
-            } else {
-                logoItem?.let { items += it }
-            }
-        }
-    }
-
     private fun addActivateButtonItems(items: ArrayList<GenericItem>, deviceSetup: DeviceSetup?) {
-        if (deviceSetup != DeviceSetup.NO_BLE) {
-            proximityButtonItem = proximityButtonItem {
-                mainText = strings["home.mainButton.activate"]
-                lightText = strings["home.mainButton.deactivate"]
-                onClickListener = View.OnClickListener {
-                    onProximityButtonClick(deviceSetup)
-                }
-                identifier = items.count().toLong()
+        proximityButtonItem = proximityButtonItem {
+            mainText = strings["home.mainButton.activate"]
+            lightText = strings["home.mainButton.deactivate"]
+            onClickListener = View.OnClickListener {
+                onProximityButtonClick(deviceSetup)
             }
+            identifier = items.count().toLong()
+        }
 
-            when {
-                robertManager.isRegistered -> {
-                    proximityButtonItem?.let { items += it }
+        when {
+            robertManager.isRegistered -> {
+                proximityButtonItem?.let { items += it }
+            }
+            !ProximityManager.isAdvertisingValid(robertManager) -> {
+                items += cardWithActionItem(CardTheme.Primary) {
+                    mainBody = strings["proximityController.error.noAdvertising"]
+                    identifier = items.count().toLong()
                 }
-                !ProximityManager.isAdvertisingValid(robertManager) -> {
-                    items += cardWithActionItem(CardTheme.Primary) {
-                        mainBody = strings["proximityController.error.noAdvertising"]
-                        identifier = items.count().toLong()
+            }
+            else -> {
+                items += cardWithActionItem(CardTheme.Primary) {
+                    mainBody = strings["home.activationExplanation"]
+                    onCardClick = {
+                        onProximityButtonClick(deviceSetup)
                     }
-                }
-                else -> {
-                    items += cardWithActionItem(CardTheme.Primary) {
-                        mainBody = strings["home.activationExplanation"]
-                        onCardClick = {
+                    identifier = items.count().toLong()
+                    actions = listOf(
+                        Action(label = strings["home.mainButton.activate"]) {
                             onProximityButtonClick(deviceSetup)
                         }
-                        identifier = items.count().toLong()
-                        actions = listOf(
-                            Action(label = strings["home.mainButton.activate"]) {
-                                onProximityButtonClick(deviceSetup)
-                            }
-                        )
-                    }
+                    )
                 }
             }
+        }
 
-            items += spaceItem {
-                spaceRes = R.dimen.spacing_large
-                identifier = items.count().toLong()
-            }
+        items += spaceItem {
+            spaceRes = R.dimen.spacing_medium
+            identifier = items.count().toLong()
         }
     }
 
@@ -582,6 +599,8 @@ class ProximityFragment : TimeMainFragment() {
                             findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToHealthFragment())
                         }
                         identifier = R.drawable.health_card.toLong()
+
+                        actions = refreshStatusActions(robertManager.liveUpdatingRiskStatus.value?.peekContent())?.let { listOf(it) }
                     }
                 }
 
@@ -597,51 +616,41 @@ class ProximityFragment : TimeMainFragment() {
         }
     }
 
-    private fun addVenueItems(items: ArrayList<GenericItem>, isSick: Boolean) {
-        val displayRecordVenues = true
-        val displayPrivateEvent = true
+    private fun addVenueItems(items: ArrayList<GenericItem>) {
+        items += bigTitleItem {
+            text = strings["home.venuesSection.title"]
+            identifier = "home.venuesSection.title".hashCode().toLong()
+            importantForAccessibility = ViewCompat.IMPORTANT_FOR_ACCESSIBILITY_NO
+        }
 
-        if (true) {
-            items += bigTitleItem {
-                text = strings["home.venuesSection.title"]
-                identifier = "home.venuesSection.title".hashCode().toLong()
-                importantForAccessibility = ViewCompat.IMPORTANT_FOR_ACCESSIBILITY_NO
+        items += cardWithActionItem(CardTheme.Primary) {
+            mainImage = R.drawable.signal_card
+            onCardClick = {
+                startRecordVenue()
             }
+            mainTitle = strings["home.venuesSection.recordCell.title"]
+            mainBody = strings["home.venuesSection.recordCell.subtitle"]
+            identifier = R.drawable.signal_card.toLong()
+        }
 
-            if (displayRecordVenues) {
-                items += cardWithActionItem(CardTheme.Primary) {
-                    mainImage = R.drawable.signal_card
-                    onCardClick = {
-                        startRecordVenue()
-                    }
-                    mainTitle = strings["home.venuesSection.recordCell.title"]
-                    mainBody = strings["home.venuesSection.recordCell.subtitle"]
-                    identifier = R.drawable.signal_card.toLong()
-                }
+        items += spaceItem {
+            spaceRes = R.dimen.spacing_medium
+            identifier = items.count().toLong()
+        }
 
-                items += spaceItem {
-                    spaceRes = R.dimen.spacing_medium
-                    identifier = items.count().toLong()
-                }
+        items += cardWithActionItem {
+            mainImage = R.drawable.parties_card
+            onCardClick = {
+                startPrivateEvent()
             }
+            mainTitle = strings["home.venuesSection.privateCell.title"]
+            mainBody = strings["home.venuesSection.privateCell.subtitle"]
+            identifier = R.drawable.parties_card.toLong()
+        }
 
-            if (displayPrivateEvent) {
-                items += cardWithActionItem {
-                    mainImage = R.drawable.parties_card
-                    onCardClick = {
-                        startPrivateEvent()
-                    }
-                    mainTitle = strings["home.venuesSection.privateCell.title"]
-                    mainBody = strings["home.venuesSection.privateCell.subtitle"]
-                    mainLayoutDirection = LayoutDirection.RTL
-                    identifier = R.drawable.parties_card.toLong()
-                }
-            }
-
-            items += spaceItem {
-                spaceRes = R.dimen.spacing_large
-                identifier = items.count().toLong()
-            }
+        items += spaceItem {
+            spaceRes = R.dimen.spacing_medium
+            identifier = items.count().toLong()
         }
     }
 
@@ -689,7 +698,7 @@ class ProximityFragment : TimeMainFragment() {
         items += infoCenterCardItem
 
         items += spaceItem {
-            spaceRes = R.dimen.spacing_large
+            spaceRes = R.dimen.spacing_medium
             identifier = items.count().toLong()
         }
     }
@@ -853,7 +862,7 @@ class ProximityFragment : TimeMainFragment() {
                 mainImage = R.drawable.wallet_card
                 mainLayoutDirection = LayoutDirection.RTL
                 onCardClick = {
-                    findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToWalletFragment())
+                    findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToWalletContainerFragment())
                 }
                 mainTitle = strings["home.attestationSection.sanitaryCertificates.cell.title"]
                 mainBody = strings["home.attestationSection.sanitaryCertificates.cell.subtitle"]
@@ -862,7 +871,7 @@ class ProximityFragment : TimeMainFragment() {
         }
 
         items += spaceItem {
-            spaceRes = R.dimen.spacing_large
+            spaceRes = R.dimen.spacing_medium
             identifier = items.count().toLong()
         }
     }
@@ -882,23 +891,21 @@ class ProximityFragment : TimeMainFragment() {
         }
     }
 
-    private fun addDeclareItems(items: ArrayList<GenericItem>, isSick: Boolean, deviceSetup: DeviceSetup?) {
-        if ((deviceSetup != DeviceSetup.NO_BLE || robertManager.configuration.displayRecordVenues) && !isSick) {
-            items += cardWithActionItem {
-                mainTitle = strings["home.declareSection.cellTitle"]
-                mainBody = strings["home.declareSection.cellSubtitle"]
-                mainImage = R.drawable.declare_card
-                contentDescription = strings["home.declareSection.title"]
-                onCardClick = {
-                    findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToReportFragment())
-                }
-                identifier = mainTitle.hashCode().toLong()
+    private fun addDeclareItems(items: ArrayList<GenericItem>) {
+        items += cardWithActionItem {
+            mainTitle = strings["home.declareSection.cellTitle"]
+            mainBody = strings["home.declareSection.cellSubtitle"]
+            mainImage = R.drawable.declare_card
+            contentDescription = strings["home.declareSection.title"]
+            onCardClick = {
+                findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToReportFragment())
             }
+            identifier = mainTitle.hashCode().toLong()
+        }
 
-            items += spaceItem {
-                spaceRes = R.dimen.spacing_medium
-                identifier = items.count().toLong()
-            }
+        items += spaceItem {
+            spaceRes = R.dimen.spacing_medium
+            identifier = items.count().toLong()
         }
     }
 
@@ -948,9 +955,9 @@ class ProximityFragment : TimeMainFragment() {
                     findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToVenuesHistoryFragment())
                 }.takeIf {
                     true ||
-                    !robertManager.isSick && (robertManager.configuration.displayRecordVenues || !VenuesManager.getVenuesQrCode(
+                    robertManager.configuration.displayRecordVenues || !VenuesManager.getVenuesQrCode(
                         requireContext().secureKeystoreDataSource(),
-                    ).isNullOrEmpty())
+                    ).isNullOrEmpty()
                 },
                 Action(R.drawable.ic_2d_doc, strings["home.moreSection.verifySanitaryCertificate"]) {
                     findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToVerifyWalletQRCodeFragment())
@@ -976,7 +983,7 @@ class ProximityFragment : TimeMainFragment() {
         }
 
         items += spaceItem {
-            spaceRes = R.dimen.spacing_large
+            spaceRes = R.dimen.spacing_medium
             identifier = items.count().toLong()
         }
     }
@@ -996,8 +1003,12 @@ class ProximityFragment : TimeMainFragment() {
                     if (viewModel.refreshConfig(requireContext().applicationContext as RobertApplication)) {
                         withContext(Dispatchers.Main) {
                             findNavControllerOrNull()
-                                ?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToCaptchaFragment(CaptchaNextFragment.Back,
-                                    null))
+                                ?.safeNavigate(
+                                    ProximityFragmentDirections.actionProximityFragmentToCaptchaFragment(
+                                        CaptchaNextFragment.Back,
+                                        null
+                                    )
+                                )
                         }
                     }
                 }
@@ -1118,15 +1129,14 @@ class ProximityFragment : TimeMainFragment() {
     @OptIn(ExperimentalTime::class)
     private fun refreshHealthItem(context: Context) {
         healthItem?.apply {
-            mainHeader = stringsFormat(
-                "myHealthController.notification.update",
-                robertManager.atRiskLastRefresh?.milliseconds?.getRelativeDateTimeString(context, strings["common.justNow"]) ?: ""
-            )
-
             RisksLevelManager.getCurrentLevel(robertManager.atRiskStatus?.riskLevel)?.let {
                 mainTitle = strings[it.labels.homeTitle]
                 mainBody = strings[it.labels.homeSub]
+
+                mainHeader = getStatusLastUpdateToDisplay(context, robertManager.atRiskLastRefresh, it.riskLevel)
             }
+
+            actions = refreshStatusActions(robertManager.liveUpdatingRiskStatus.value?.peekContent())?.let { listOf(it) }
         }
     }
 
@@ -1136,12 +1146,10 @@ class ProximityFragment : TimeMainFragment() {
         if (notifyCalledMoreThanHalfAMinuteAgo) {
             viewLifecycleOwnerOrNull()?.lifecycleScope?.launch(Dispatchers.Default) {
                 healthItem?.apply {
-                    mainHeader = stringsFormat(
-                        "myHealthController.notification.update",
-                        robertManager.atRiskLastRefresh?.milliseconds?.getRelativeDateTimeString(
-                            requireContext(),
-                            strings["common.justNow"]
-                        )
+                    mainHeader = getStatusLastUpdateToDisplay(
+                        requireContext(),
+                        robertManager.atRiskLastRefresh,
+                        robertManager.atRiskStatus?.riskLevel ?: 0f
                     )
                 }
                 InfoCenterManager.infos.value?.peekContent()?.firstOrNull()?.let { info ->

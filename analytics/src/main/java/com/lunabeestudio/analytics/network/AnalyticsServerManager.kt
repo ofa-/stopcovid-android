@@ -12,8 +12,8 @@ package com.lunabeestudio.analytics.network
 
 import android.content.Context
 import android.os.Build
-import com.google.gson.GsonBuilder
 import com.lunabeestudio.analytics.BuildConfig
+import com.lunabeestudio.analytics.manager.AnalyticsManager
 import com.lunabeestudio.analytics.model.AnalyticsResult
 import com.lunabeestudio.analytics.network.model.SendAnalyticsRQ
 import okhttp3.CertificatePinner
@@ -26,7 +26,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import okhttp3.tls.HandshakeCertificates
 import retrofit2.HttpException
 import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.converter.moshi.MoshiConverterFactory
 import timber.log.Timber
 import java.security.cert.CertificateFactory
 import java.security.cert.X509Certificate
@@ -37,7 +37,7 @@ internal object AnalyticsServerManager {
     private fun getRetrofit(context: Context, baseUrl: String, certificateSha256: String, token: String): AnalyticsApi {
         return Retrofit.Builder()
             .baseUrl(baseUrl)
-            .addConverterFactory(GsonConverterFactory.create(GsonBuilder().create()))
+            .addConverterFactory(MoshiConverterFactory.create())
             .client(OkHttpClient.Builder().apply {
                 if (!BuildConfig.DEBUG) {
                     val requireTls12 = ConnectionSpec.Builder(ConnectionSpec.RESTRICTED_TLS)
@@ -87,6 +87,36 @@ internal object AnalyticsServerManager {
                 AnalyticsResult.Failure(HttpException(result))
             }
         } catch (e: Exception) {
+            AnalyticsResult.Failure(e)
+        }
+    }
+
+    @Suppress("BlockingMethodInNonBlockingContext")
+    suspend fun deleteAnalytics(
+        context: Context,
+        baseUrl: String,
+        certificateSha256: String,
+        apiVersion: String,
+        token: String,
+        installationUuid: String,
+    ): AnalyticsResult {
+        return try {
+            val result = getRetrofit(context, baseUrl, certificateSha256, token).deleteAnalytics(apiVersion, installationUuid)
+            if (result.isSuccessful) {
+                AnalyticsResult.Success()
+            } else {
+                AnalyticsManager.reportWSError(context, context.filesDir, "analytics", apiVersion, result.code(), result.message())
+                AnalyticsResult.Failure(HttpException(result))
+            }
+        } catch (e: Exception) {
+            AnalyticsManager.reportWSError(
+                context,
+                context.filesDir,
+                "analytics",
+                apiVersion,
+                (e as? HttpException)?.code() ?: 0,
+                e.message
+            )
             AnalyticsResult.Failure(e)
         }
     }

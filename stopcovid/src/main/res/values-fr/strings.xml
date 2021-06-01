@@ -13,4 +13,5 @@
     <string name="splashScreenErrorDialog.message">Une connexion internet est requise. Êtes-vous bien connecté à internet ?</string>
     <string name="splashScreenErrorDialog.positiveButton">Réessayer</string>
     <string name="splashScreenErrorDialog.negativeButton">Quitter</string>
+    <string name="attestation_widget_create_attestation">Nouvelle attestation</string>
 </resources>

@@ -35,6 +35,7 @@ import com.lunabeestudio.stopcovid.fastitem.qrCodeCardItem
 import com.lunabeestudio.stopcovid.manager.ShareManager
 import com.lunabeestudio.stopcovid.viewmodel.AttestationsViewModel
 import com.lunabeestudio.stopcovid.viewmodel.AttestationsViewModelFactory
+import com.lunabeestudio.stopcovid.widgetshomescreen.AttestationWidget
 import com.mikepenz.fastadapter.GenericItem
 import kotlin.time.ExperimentalTime
 
@@ -215,6 +216,7 @@ class AttestationsFragment : QRCodeListFragment() {
                     .setNegativeButton(strings["common.cancel"], null)
                     .setPositiveButton(strings["common.confirm"]) { _, _ ->
                         viewModel.removeAttestation(attestation)
+                        context?.let { AttestationWidget.updateWidget(it, false) }
                         refreshScreen()
                     }
                     .show()

@@ -40,6 +40,15 @@ class ServiceDataSource(
 
     private var filesDir = context.filesDir
     private var api: StopCovidApi = RetrofitClient.getService(context, baseUrl, certificateSha256, StopCovidApi::class.java)
+    private var reportProgressUpdate: ((Float) -> Unit)? = null
+    private var reportApi: StopCovidApi = RetrofitClient.getService(
+        context,
+        baseUrl,
+        certificateSha256,
+        StopCovidApi::class.java,
+    ) {
+        reportProgressUpdate?.invoke(it)
+    }
     private var fileApi: StopCovidApi = RetrofitClient.getFileService(context, baseUrl, certificateSha256, StopCovidApi::class.java)
 
     override suspend fun generateCaptcha(apiVersion: String, type: String, language: String): RobertResultData<String> {
@@ -118,11 +127,14 @@ class ServiceDataSource(
         apiVersion: String,
         token: String,
         localProximityList: List<LocalProximity>,
+        onProgressUpdate: ((Float) -> Unit)?,
     ): RobertResultData<ReportResponse> {
 
         val result = RequestHelper.tryCatchRequestData(context, filesDir, apiVersion, "report") {
-            api.report(apiVersion, ApiReportRQ.fromLocalProximityList(token, localProximityList))
+            reportProgressUpdate = onProgressUpdate
+            reportApi.report(apiVersion, ApiReportRQ.fromLocalProximityList(token, localProximityList))
         }
+        reportProgressUpdate = null
         return when (result) {
             is RobertResultData.Success -> RobertResultData.Success(result.data.toDomain())
             is RobertResultData.Failure -> RobertResultData.Failure(result.error)

@@ -26,7 +26,3 @@ fun Configuration.walletPublicKey(authority: String, certificateId: String): Str
         it.auth == authority
     }?.pubKeys?.get(certificateId)
 }
-
-fun Configuration.certificateValidityThresholdInMs(): Long {
-    return TimeUnit.HOURS.toMillis(testCertificateValidityThresholdInHours.toLong())
-}

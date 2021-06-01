@@ -15,46 +15,55 @@ import com.orange.proximitynotification.ble.scanner.BleScannedDevice
 import com.orange.proximitynotification.tools.ExpiringCache
 
 internal class BleRecordProviderForScanWithoutPayload(
-    settings: BleSettings,
-    private val maxCacheSize: Int = 1000
+    private val maxCacheSize: Int,
+    scanCacheTimeout: Long,
+    payloadCacheTimeout : Long
 ) : BleRecordProvider() {
 
-    internal val lastPayloadByDeviceId =
-        ExpiringCache<DeviceId, BlePayload>(
-            maxCacheSize,
-            settings.cacheTimeout
-        )
-    internal val lastScanByDeviceId =
-        ExpiringCache<DeviceId, BleScannedDevice>(
-            maxCacheSize,
-            settings.cacheTimeout
-        )
+    internal val lastPayloadByDeviceAddress =
+        ExpiringCache<BleDeviceAddress, BlePayload>(maxCacheSize, payloadCacheTimeout)
+    internal val lastScanByDeviceAddress =
+        ExpiringCache<BleDeviceAddress, BleScannedDevice>(maxCacheSize, scanCacheTimeout)
 
     @Synchronized
     fun fromPayload(device: BluetoothDevice, payload: BlePayload): BleRecord? {
         cleanCacheIfNeeded()
 
-        val deviceId = device.deviceId()
-        lastPayloadByDeviceId.put(deviceId, payload)
+        val deviceAddress = device.deviceAddress()
+        lastPayloadByDeviceAddress.put(deviceAddress, payload)
 
-        return lastScanByDeviceId[deviceId]?.let { buildRecord(payload, it) }
+        return lastScanByDeviceAddress[deviceAddress]?.let { buildRecord(payload, it) }
     }
 
     @Synchronized
     fun fromScan(scannedDevice: BleScannedDevice): BleRecord? {
         cleanCacheIfNeeded()
 
-        val deviceId = scannedDevice.deviceId()
-        lastScanByDeviceId.put(deviceId, scannedDevice)
+        val deviceAddress = scannedDevice.deviceAddress()
+        lastScanByDeviceAddress.put(deviceAddress, scannedDevice)
 
-        return lastPayloadByDeviceId[deviceId]?.let { buildRecord(it, scannedDevice) }
+        return lastPayloadByDeviceAddress[deviceAddress]?.let { buildRecord(it, scannedDevice) }
+    }
+
+    @Synchronized
+    fun fromScanAndPayload(
+        scannedDevice: BleScannedDevice,
+        payload: BlePayload
+    ): BleRecord {
+        cleanCacheIfNeeded()
+
+        val deviceAddress = scannedDevice.deviceAddress()
+        lastPayloadByDeviceAddress.put(deviceAddress, payload)
+        lastScanByDeviceAddress.put(deviceAddress, scannedDevice)
+
+        return buildRecord(payload, scannedDevice)
     }
 
     private fun cleanCacheIfNeeded() {
         val cleanUpPredicate: (ExpiringCache<*, *>) -> Boolean =
             { it.size() >= (maxCacheSize * 0.75) }
-        lastPayloadByDeviceId.takeIf(cleanUpPredicate)?.cleanUp()
-        lastScanByDeviceId.takeIf(cleanUpPredicate)?.cleanUp()
+        lastPayloadByDeviceAddress.takeIf(cleanUpPredicate)?.cleanUp()
+        lastScanByDeviceAddress.takeIf(cleanUpPredicate)?.cleanUp()
     }
 
 }

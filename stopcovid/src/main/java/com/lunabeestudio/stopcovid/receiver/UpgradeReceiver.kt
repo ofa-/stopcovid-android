@@ -16,6 +16,8 @@ import android.content.Intent
 import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.service.ProximityService
+import com.lunabeestudio.stopcovid.widgetshomescreen.AttestationWidget
+import com.lunabeestudio.stopcovid.widgetshomescreen.ProximityWidget
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -30,6 +32,10 @@ class UpgradeReceiver : BroadcastReceiver() {
                     StringsManager.initialize(context)
                     ProximityService.start(context)
                 }
+            }
+            if (intent.action == Intent.ACTION_MY_PACKAGE_REPLACED) {
+                ProximityWidget.updateWidget(context)
+                AttestationWidget.updateWidget(context)
             }
         } catch (t: Throwable) {
             // Keychain may not be fully initialized

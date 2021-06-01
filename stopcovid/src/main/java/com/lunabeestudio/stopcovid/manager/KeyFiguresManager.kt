@@ -19,7 +19,7 @@ import com.lunabeestudio.stopcovid.coreui.ConfigConstant
 import com.lunabeestudio.stopcovid.model.KeyFigure
 import java.lang.reflect.Type
 
-object KeyFiguresManager : RemoteFileManager<List<KeyFigure>>() {
+object KeyFiguresManager : RemoteJsonManager<List<KeyFigure>>() {
 
     override val type: Type = object : TypeToken<List<KeyFigure>>() {}.type
     override val localFileName: String = ConfigConstant.KeyFigures.MASTER_LOCAL_FILENAME

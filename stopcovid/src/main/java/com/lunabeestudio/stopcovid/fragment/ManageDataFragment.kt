@@ -90,6 +90,9 @@ class ManageDataFragment : MainFragment() {
         viewModel.eraseRemoteSuccess.observe(viewLifecycleOwner) {
             showSnackBar(strings["manageDataController.eraseRemoteContact.success"] ?: "")
         }
+        viewModel.deleteAnalyticsSuccess.observe(viewLifecycleOwner) {
+            showSnackBar(strings["manageDataController.analytics.successDialog.message"] ?: "")
+        }
         viewModel.quitStopCovidSuccess.observe(viewLifecycleOwner) {
             showSnackBar(strings["manageDataController.quitStopCovid.success"] ?: "")
             sharedPreferences.edit {
@@ -219,7 +222,7 @@ class ManageDataFragment : MainFragment() {
                     .setMessage(strings["manageDataController.attestationsData.confirmationDialog.message"])
                     .setNegativeButton(strings["common.cancel"], null)
                     .setPositiveButton(strings["common.confirm"]) { _, _ ->
-                        viewModel.eraseAttestations()
+                        viewModel.eraseAttestations(requireContext())
                     }
                     .show()
             }
@@ -429,6 +432,22 @@ class ManageDataFragment : MainFragment() {
                 }
             }
             identifier = items.count().toLong()
+        }
+        items += lightButtonItem {
+            text = strings["manageDataController.analytics.button"]
+            onClickListener = View.OnClickListener {
+                MaterialAlertDialogBuilder(requireContext())
+                    .setTitle(strings["manageDataController.analytics.confirmationDialog.title"])
+                    .setMessage(strings["manageDataController.analytics.confirmationDialog.message"])
+                    .setNegativeButton(strings["common.cancel"], null)
+                    .setPositiveButton(strings["common.confirm"]) { _, _ ->
+                        context?.let {
+                            viewModel.requestDeleteAnalytics(requireContext().applicationContext as RobertApplication)
+                        }
+                    }
+                    .show()
+            }
+            identifier = "manageDataController.analytics.button".hashCode().toLong()
         }
     }
 

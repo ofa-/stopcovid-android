@@ -16,6 +16,8 @@ import android.view.Gravity
 import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.preference.PreferenceManager
+import com.lunabeestudio.analytics.manager.AnalyticsManager
+import com.lunabeestudio.analytics.model.AppEventName
 import com.lunabeestudio.domain.extension.ntpTimeSToUnixTimeMs
 import com.lunabeestudio.robert.extension.observeEventAndConsume
 import com.lunabeestudio.stopcovid.R
@@ -90,6 +92,9 @@ class HealthFragment : TimeMainFragment() {
         robertManager.liveAtRiskStatus.observeEventAndConsume(viewLifecycleOwner) {
             refreshScreen()
         }
+        robertManager.liveUpdatingRiskStatus.observeEventAndConsume(viewLifecycleOwner) {
+            refreshScreen()
+        }
     }
 
     override fun getItems(): List<GenericItem> {
@@ -132,13 +137,8 @@ class HealthFragment : TimeMainFragment() {
         RisksLevelManager.getCurrentLevel(robertManager.atRiskStatus?.riskLevel)?.let {
             if (!sharedPreferences.hideRiskStatus) {
                 items += healthCardItem(R.layout.item_health_card) {
-                    header = stringsFormat(
-                        "myHealthController.notification.update",
-                        robertManager.atRiskLastRefresh?.milliseconds?.getRelativeDateTimeString(
-                            requireContext(),
-                            strings["common.justNow"]
-                        ) ?: ""
-                    )
+                    header = getStatusLastUpdateToDisplay(requireContext(), robertManager.atRiskLastRefresh, it.riskLevel)
+
                     title = strings[it.labels.detailTitle]
                     caption = strings[it.labels.detailSubtitle]
                     gradientBackground = it.getGradientBackground()
@@ -148,8 +148,9 @@ class HealthFragment : TimeMainFragment() {
                         dateLabel = strings["myHealthStateHeaderCell.exposureDate.title"]
                         dateValue = date
                     }
+                    
+                    statusUpdateAction = refreshStatusActions(robertManager.liveUpdatingRiskStatus.value?.peekContent())
                 }
-
                 items += spaceItem {
                     spaceRes = R.dimen.spacing_medium
                     identifier = items.count().toLong()

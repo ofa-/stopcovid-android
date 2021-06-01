@@ -1,0 +1,39 @@
+<!--
+  ~ This Source Code Form is subject to the terms of the Mozilla Public
+  ~ License, v. 2.0. If a copy of the MPL was not distributed with this
+  ~ file, You can obtain one at https://mozilla.org/MPL/2.0/.
+  ~
+  ~ Authors
+  ~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ Created by Lunabee Studio / Date - 2021/19/5 - for the TOUS-ANTI-COVID project
+  -->
+
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:theme="@style/Theme.StopCovid.Widget"
+    android:background="@drawable/bg_widget"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:clickable="true"
+    android:focusable="true"
+    android:id="@+id/certificateWidgetLayout"
+    android:paddingEnd="@dimen/spacing_large">
+
+    <ImageView
+        android:id="@+id/mainImageView"
+        android:layout_width="@dimen/image_attestation_widget_size"
+        android:layout_height="@dimen/image_attestation_widget_size"
+        android:layout_marginTop="@dimen/spacing_medium"
+        android:src="@drawable/attestation_card" />
+
+    <TextView
+        android:id="@+id/mainTextView"
+        style="TextAppearance.StopCovid.Title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginStart="@dimen/spacing_large"
+        android:layout_toEndOf="@+id/mainImageView"
+        tools:text="@string/attestation_widget_create_attestation"/>
+</RelativeLayout>

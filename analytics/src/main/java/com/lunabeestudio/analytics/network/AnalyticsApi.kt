@@ -14,8 +14,10 @@ import com.lunabeestudio.analytics.network.model.SendAnalyticsRQ
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.POST
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 internal interface AnalyticsApi {
 
@@ -23,5 +25,11 @@ internal interface AnalyticsApi {
     suspend fun sendAnalytics(
         @Path("apiVersion") apiVersion: String,
         @Body body: SendAnalyticsRQ,
+    ): Response<ResponseBody>
+
+    @DELETE("api/{apiVersion}/analytics")
+    suspend fun deleteAnalytics(
+        @Path("apiVersion") apiVersion: String,
+        @Query("installationUuid") installationUuid: String,
     ): Response<ResponseBody>
 }

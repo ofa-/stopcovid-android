@@ -22,6 +22,7 @@
     <dimen name="double_item_image_width">70dp</dimen>
     <dimen name="icon_size">24dp</dimen>
     <dimen name="icon_small_size">12dp</dimen>
+    <dimen name="icon_large_size">36dp</dimen>
     <dimen name="link_icon_size">16dp</dimen>
     <dimen name="logo_body_size">80dp</dimen>
     <dimen name="logo_height">150dp</dimen>
@@ -42,6 +43,7 @@
     <dimen name="button_letter_spacing">0</dimen>
     <dimen name="badge_size">8dp</dimen>
     <dimen name="qr_code_size">200dp</dimen>
+    <dimen name="qr_code_widget_size">80dp</dimen>
     <dimen name="qr_code_fullscreen_size">240dp</dimen>
 
     <dimen name="loading_elevation">40dp</dimen>
@@ -50,4 +52,24 @@
     <dimen name="card_image_height">110dp</dimen>
 
     <dimen name="key_figure_chart_height">220dp</dimen>
+
+    <dimen name="widget_4_column_width">250dp</dimen>
+    <dimen name="widget_1_row_height">40dp</dimen>
+    <dimen name="image_attestation_widget_size">100dp</dimen>
+    <dimen name="qr_widget_corner_radius">5dp</dimen>
+    <dimen name="logo_proximity_widget_size">28dp</dimen>
+    <dimen name="image_risk_widget_size">100dp</dimen>
+    <dimen name="widget_corner_radius">10dp</dimen>
+    <dimen name="widget_3_column_width">180dp</dimen>
+    <dimen name="widget_2_row_height">110dp</dimen>
+    <dimen name="date_widget_attestation_max_font_size">25sp</dimen>
+    <dimen name="date_widget_attestation_min_font_size">5sp</dimen>
+    <dimen name="reason_widget_attestation_font_size">12sp</dimen>
+    <dimen name="title_widget_font_size">16sp</dimen>
+    <dimen name="title_widget_min_font_size">5sp</dimen>
+
+    <dimen name="widget_2_row_min_height">35dp</dimen>
+    <dimen name="widget_4_column_min_width">100dp</dimen>
+
+
 </resources>

@@ -202,10 +202,6 @@ open class ProximityService : RobertProximityService() {
         if (System.currentTimeMillis() - creationDate < STOP_SERVICE_ERROR_DELAY_MS
             || error.isCritical()) {
             robertManager.deactivateProximity(applicationContext as RobertApplication)
-        } else if ((error as? BLEAdvertiserException)?.shouldRestartBle == true) {
-            launch(Dispatchers.IO) {
-                restartBluetooth()
-            }
         } else if (ProximityManager.isBluetoothOn(this, robertManager) && shouldShowError()) {
             sendErrorNotification()
             Timber.e(error)

@@ -15,5 +15,6 @@ class Attestation(
     val footer: String,
     val qrCodeString: String,
     val timestamp: Long,
-    val reason: String
+    val reason: String,
+    val widgetString: String
 )

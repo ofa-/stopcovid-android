@@ -27,6 +27,7 @@ import com.lunabeestudio.stopcovid.coreui.extension.getETagSharedPrefs
 import com.lunabeestudio.stopcovid.manager.IsolationManager
 import com.lunabeestudio.stopcovid.manager.VaccinationCenterManager
 import com.lunabeestudio.stopcovid.manager.VenuesManager
+import com.lunabeestudio.stopcovid.widgetshomescreen.AttestationWidget
 
 abstract class CommonDataViewModel(
     private val secureKeystoreDataSource: SecureKeystoreDataSource,
@@ -40,12 +41,13 @@ abstract class CommonDataViewModel(
     }
 
     @CallSuper
-    open fun eraseAttestations() {
+    open fun eraseAttestations(context: Context) {
         secureKeystoreDataSource.savedAttestationData = null
         secureKeystoreDataSource.saveAttestationData = null
         secureKeystoreDataSource.attestations = null
         @Suppress("DEPRECATION")
         secureKeystoreDataSource.deprecatedAttestations = null
+        AttestationWidget.updateWidget(context)
     }
 
     @CallSuper
@@ -58,7 +60,7 @@ abstract class CommonDataViewModel(
         WorkManager.getInstance(application.getAppContext())
             .cancelUniqueWork(Constants.WorkerNames.AT_RISK_NOTIFICATION)
         clearNotifications(application)
-        eraseAttestations()
+        eraseAttestations(application.getAppContext())
         eraseVenues(application)
         (application.getAppContext() as StopCovid).cancelActivateReminder()
         eraseIsolation()

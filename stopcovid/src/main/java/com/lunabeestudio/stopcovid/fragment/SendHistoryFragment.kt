@@ -12,83 +12,110 @@ package com.lunabeestudio.stopcovid.fragment
 
 import android.os.Bundle
 import android.view.Gravity
+import android.view.LayoutInflater
 import android.view.View
-import androidx.core.content.ContextCompat
+import android.view.WindowManager
+import androidx.activity.OnBackPressedCallback
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
-import com.github.razir.progressbutton.DrawableButton
-import com.github.razir.progressbutton.hideProgress
-import com.github.razir.progressbutton.showProgress
-import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.lunabeestudio.robert.RobertApplication
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.StopCovid
-import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
+import com.lunabeestudio.stopcovid.coreui.fastitem.buttonItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
+import com.lunabeestudio.stopcovid.databinding.DialogProgressBarBinding
 import com.lunabeestudio.stopcovid.extension.getString
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.fastitem.logoItem
-import com.lunabeestudio.stopcovid.fastitem.progressButtonItem
 import com.lunabeestudio.stopcovid.model.UnauthorizedException
 import com.lunabeestudio.stopcovid.viewmodel.CodeViewModel
 import com.lunabeestudio.stopcovid.viewmodel.CodeViewModelFactory
 import com.mikepenz.fastadapter.GenericItem
-import java.lang.ref.WeakReference
 
 class SendHistoryFragment : MainFragment() {
 
     private val args: SendHistoryFragmentArgs by navArgs()
+    private var dialogProgressBarBinding: DialogProgressBarBinding? = null
+    private var progressDialog: AlertDialog? = null
 
     private val robertManager by lazy {
         requireContext().robertManager()
     }
-    private var progressButton: WeakReference<MaterialButton>? = null
 
     private val viewModel: CodeViewModel by viewModels { CodeViewModelFactory(robertManager) }
+
+    private val onBackPressedCallback: OnBackPressedCallback = object : OnBackPressedCallback(false) {
+        override fun handleOnBackPressed() {
+            // prevent back navigation
+        }
+    }
 
     override fun getTitleKey(): String = "sendHistoryController.title"
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initViewModelObserver()
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, onBackPressedCallback)
     }
 
     private fun initViewModelObserver() {
         viewModel.loadingInProgress.observe(viewLifecycleOwner) { inProgress ->
-            if (inProgress) {
-                progressButton?.get()?.showProgress {
-                    progressColor = ContextCompat.getColor(requireContext(), R.color.color_on_primary)
-                    gravity = DrawableButton.GRAVITY_CENTER
-                }
+            if (inProgress == null) {
+                progressDialog?.dismiss()
+                progressDialog = null
+                onBackPressedCallback.isEnabled = true
+                activity?.window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
             } else {
-                progressButton?.get()?.hideProgress(strings["common.send"])
+                if (progressDialog == null) {
+                    context?.let { context ->
+                        dialogProgressBarBinding = DialogProgressBarBinding.inflate(LayoutInflater.from(context))
+                        progressDialog = MaterialAlertDialogBuilder(context).apply {
+                            setTitle(strings["sendHistoryController.progress.title"])
+                            setMessage(strings["sendHistoryController.progress.message"])
+                            setCancelable(false)
+                            setView(dialogProgressBarBinding?.root)
+                        }.show()
+                    }
+                }
+                activity?.window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                dialogProgressBarBinding?.dialogProgressBar?.progress = (inProgress * 100f).toInt()
+                dialogProgressBarBinding?.dialogPercentTextView?.text = String.format("%d%%", (inProgress * 100f).toInt())
             }
         }
         viewModel.codeSuccess.observe(viewLifecycleOwner) {
-            (requireContext().applicationContext as StopCovid).cancelActivateReminder()
-            MaterialAlertDialogBuilder(requireContext())
-                .setTitle(strings["sendHistoryController.successAlert.title"])
-                .setMessage(strings["sendHistoryController.successAlert.message"])
-                .setPositiveButton(strings["sendHistoryController.successAlert.button.learnMore"]) { _, _ ->
-                    findNavControllerOrNull()?.safeNavigate(SendHistoryFragmentDirections.actionSendHistoryFragmentToIsSickFragment())
-                }
-                .setCancelable(false)
-                .show()
+            context?.let { context ->
+                (context.applicationContext as StopCovid).cancelActivateReminder()
+                MaterialAlertDialogBuilder(context)
+                    .setTitle(strings["sendHistoryController.successAlert.title"])
+                    .setMessage(strings["sendHistoryController.successAlert.message"])
+                    .setPositiveButton(strings["sendHistoryController.successAlert.button.learnMore"]) { _, _ ->
+                        findNavControllerOrNull()?.safeNavigate(SendHistoryFragmentDirections.actionSendHistoryFragmentToIsSickFragment())
+                    }
+                    .setCancelable(false)
+                    .show()
+            }
         }
         viewModel.covidException.observe(viewLifecycleOwner) { error ->
-            if (error is UnauthorizedException) {
-                MaterialAlertDialogBuilder(requireContext())
-                    .setTitle(strings["sendHistoryController.alert.invalidCode.title"])
-                    .setMessage(strings["sendHistoryController.alert.invalidCode.message"])
-                    .setPositiveButton(strings["common.ok"], null)
-                    .show()
-            } else {
-                (activity as? MainActivity)?.showErrorSnackBar(error.getString(strings))
+            context?.let { context ->
+                if (error is UnauthorizedException) {
+                    MaterialAlertDialogBuilder(context)
+                        .setTitle(strings["sendHistoryController.alert.invalidCode.title"])
+                        .setMessage(strings["sendHistoryController.alert.invalidCode.message"])
+                        .setPositiveButton(strings["common.ok"], null)
+                        .show()
+                } else {
+                    MaterialAlertDialogBuilder(context)
+                        .setTitle(strings["common.error.unknown"])
+                        .setMessage(error.getString(strings))
+                        .setPositiveButton(strings["common.ok"], null)
+                        .show()
+                }
             }
         }
     }
@@ -114,7 +141,7 @@ class SendHistoryFragment : MainFragment() {
             spaceRes = R.dimen.spacing_large
             identifier = items.count().toLong()
         }
-        items += progressButtonItem(viewLifecycleOwner) {
+        items += buttonItem {
             text = strings["common.send"]
             gravity = Gravity.CENTER
             onClickListener = View.OnClickListener {
@@ -125,11 +152,7 @@ class SendHistoryFragment : MainFragment() {
                     requireContext().applicationContext as RobertApplication
                 )
             }
-            startInProgress = viewModel.loadingInProgress.value == true
-            getProgressButton = { button ->
-                progressButton = WeakReference(button)
-            }
-            identifier = items.count().toLong()
+            identifier = "common.send".hashCode().toLong()
         }
 
         return items

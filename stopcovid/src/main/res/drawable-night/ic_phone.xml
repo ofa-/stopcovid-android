@@ -1,0 +1,28 @@
+<!--
+  ~ This Source Code Form is subject to the terms of the Mozilla Public
+  ~ License, v. 2.0. If a copy of the MPL was not distributed with this
+  ~ file, You can obtain one at https://mozilla.org/MPL/2.0/.
+  ~
+  ~ Authors
+  ~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ Created by Lunabee Studio / Date - 2021/20/5 - for the TOUS-ANTI-COVID project
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="41"
+    android:viewportHeight="41">
+    <path
+        android:fillColor="#85BBFF"
+        android:fillType="evenOdd"
+        android:pathData="M20.5,20.5m-20.5,0a20.5,20.5 0,1 1,41 0a20.5,20.5 0,1 1,-41 0"
+        android:strokeWidth="1"
+        android:strokeColor="#00000000" />
+    <path
+        android:fillColor="#00285A"
+        android:fillType="nonZero"
+        android:pathData="M26.8949,32.0586C28.43,32.0586 29.7777,31.5195 30.8558,30.3242C31.4886,29.6211 31.8753,28.8125 31.8753,28.0039C31.8753,27.3828 31.6293,26.7734 31.0316,26.3516L27.4339,23.7969C26.8597,23.3984 26.391,23.2109 25.9691,23.2109C25.4183,23.2109 24.9261,23.5156 24.3871,24.0547L23.5433,24.8984C23.4027,25.0273 23.2386,25.0859 23.0863,25.0859C22.8988,25.0859 22.723,25.0156 22.6058,24.9453C21.8675,24.5469 20.6019,23.4688 19.43,22.2969C18.2582,21.125 17.1683,19.8711 16.7816,19.1211C16.7113,18.9922 16.6527,18.8281 16.6527,18.6406C16.6527,18.5 16.6996,18.3359 16.8285,18.1953L17.6722,17.3398C18.1996,16.7891 18.516,16.3086 18.516,15.7578C18.516,15.3242 18.3285,14.8555 17.93,14.293L15.3871,10.7305C14.9535,10.1211 14.3441,9.8633 13.6761,9.8633C12.8793,9.8633 12.0824,10.2148 11.391,10.8828C10.2191,11.9844 9.7035,13.3555 9.7035,14.8672C9.7035,18.3008 12.3402,22.4609 15.7972,25.918C19.2543,29.3867 23.4613,32.0586 26.8949,32.0586Z"
+        android:strokeWidth="1"
+        android:strokeColor="#00000000" />
+</vector>

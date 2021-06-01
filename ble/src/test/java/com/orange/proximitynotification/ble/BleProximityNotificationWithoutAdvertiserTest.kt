@@ -16,12 +16,17 @@ import org.junit.Test
 class BleProximityNotificationWithoutAdvertiserTest {
 
 
-    class StatsTest {
+    class BleStatsTest {
 
-        private val stats = BleProximityNotificationWithoutAdvertiser.Stats(
+        companion object {
+            const val MAX_TIME_SINCE_LAST_STATUS = 100L
+        }
+
+        private val stats = BleStats(
             minStatCount = 5,
             errorRateThreshold = 0.5F,
-            minScanErrorCount = 1
+            minScanErrorCount = 1,
+            maxTimeSinceLastStatus = MAX_TIME_SINCE_LAST_STATUS
         )
 
         @Test
@@ -153,6 +158,35 @@ class BleProximityNotificationWithoutAdvertiserTest {
             // Given 3 success / Z error Then result should be false
             stats.succeed()
             Truth.assertThat(stats.isUnHealthy()).isFalse()
+        }
+
+        @Test
+        fun `isUnHealthy given no status for a time should return true`()  {
+
+            // Given
+            Truth.assertThat(stats.isUnHealthy()).isFalse()
+            Thread.sleep(MAX_TIME_SINCE_LAST_STATUS + 1)
+
+            // When
+            val result = stats.isUnHealthy()
+
+            // Then
+            Truth.assertThat(result).isTrue()
+        }
+
+        @Test
+        fun `isUnHealthy given succeed but no status for a time should return true`()  {
+
+            // Given
+            stats.succeed()
+            Truth.assertThat(stats.isUnHealthy()).isFalse()
+            Thread.sleep(MAX_TIME_SINCE_LAST_STATUS + 1)
+
+            // When
+            val result = stats.isUnHealthy()
+
+            // Then
+            Truth.assertThat(result).isTrue()
         }
 
     }

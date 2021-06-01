@@ -23,6 +23,7 @@ import com.lunabeestudio.stopcovid.model.FormField
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.TimeZone
 
 class NewAttestationViewModel(private val secureKeystoreDataSource: SecureKeystoreDataSource) : ViewModel() {
 
@@ -42,6 +43,9 @@ class NewAttestationViewModel(private val secureKeystoreDataSource: SecureKeysto
         }
         val infosCopy = infos.toMutableMap()
         val now = Date(infosCopy[Constants.Attestation.KEY_DATE_TIME]?.value?.toLongOrNull() ?: 0L)
+        timeFormat.apply {
+            timeZone = TimeZone.getDefault()
+        }
         infosCopy[Constants.Attestation.KEY_CREATION_DATE] = FormEntry(
             dateFormat.format(now),
             "text",
