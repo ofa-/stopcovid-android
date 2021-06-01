@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ This Source Code Form is subject to the terms of the Mozilla Public
+  ~ License, v. 2.0. If a copy of the MPL was not distributed with this
+  ~ file, You can obtain one at https://mozilla.org/MPL/2.0/.
+  ~
+  ~ Authors
+  ~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ Created by Lunabee Studio / Date - 2021/21/5 - for the TOUS-ANTI-COVID project
+  -->
+
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_wallet"
+    app:startDestination="@id/walletInfoFragment">
+
+    <fragment
+        android:id="@+id/walletInfoFragment"
+        android:name="com.lunabeestudio.stopcovid.fragment.WalletInfoFragment">
+        <action
+            android:id="@+id/action_walletInfoFragment_to_walletPagerFragment"
+            app:destination="@id/walletPagerFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim"
+            app:popUpTo="@id/nav_wallet"
+            app:popUpToInclusive="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/walletPagerFragment"
+        android:name="com.lunabeestudio.stopcovid.fragment.WalletPagerFragment">
+        <action
+            android:id="@+id/action_walletPagerFragment_to_walletInfoFragment"
+            app:destination="@id/walletInfoFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim"
+            app:popUpTo="@id/nav_wallet"
+            app:popUpToInclusive="true" />
+    </fragment>
+</navigation>

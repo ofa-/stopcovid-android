@@ -32,11 +32,14 @@ import com.lunabeestudio.stopcovid.coreui.UiConstants
 import com.lunabeestudio.stopcovid.coreui.extension.openAppSettings
 import com.lunabeestudio.stopcovid.model.CovidException
 import com.lunabeestudio.stopcovid.model.DeviceSetup
+import com.lunabeestudio.stopcovid.widgetshomescreen.ProximityWidget
 
 object ProximityManager {
 
-    fun isProximityOn(context: Context, robertManager: RobertManager): Boolean =
-        robertManager.isProximityActive && getDeviceSetup(context, robertManager) == DeviceSetup.BLE
+    fun isProximityOn(context: Context, robertManager: RobertManager): Boolean {
+        ProximityWidget.updateWidget(context)
+        return robertManager.isProximityActive && getDeviceSetup(context, robertManager) == DeviceSetup.BLE
+    }
 
     fun getDeviceSetup(context: Context, robertManager: RobertManager): DeviceSetup = when {
         isNotificationOn(context)

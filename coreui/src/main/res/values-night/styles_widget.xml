@@ -7,7 +7,7 @@
   ~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   ~ Created by Lunabee Studio / Date - 2020/13/05 - for the TOUS-ANTI-COVID project
   -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <style name="Widget.StopCovid.Button.Light">
         <item name="backgroundTint">@color/color_primary_light</item>
@@ -21,4 +21,10 @@
         <item name="android:textColor">@color/color_error</item>
     </style>
 
+    <style name="Widget.StopCovid.Widget.Attestation.TextView.Date" parent="Widget.MaterialComponents.TextView">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:autoSizeTextType" tools:targetApi="o">uniform</item>
+        <item name="android:autoSizeMaxTextSize" tools:targetApi="o">@dimen/date_widget_attestation_max_font_size</item>
+        <item name="android:autoSizeMinTextSize" tools:targetApi="o">@dimen/date_widget_attestation_min_font_size</item>
+    </style>
 </resources>

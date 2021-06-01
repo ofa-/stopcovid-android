@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ This Source Code Form is subject to the terms of the Mozilla Public
+  ~ License, v. 2.0. If a copy of the MPL was not distributed with this
+  ~ file, You can obtain one at https://mozilla.org/MPL/2.0/.
+  ~
+  ~ Authors
+  ~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ Created by Lunabee Studio / Date - 2021/20/5 - for the TOUS-ANTI-COVID project
+  -->
+
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:minWidth="@dimen/widget_3_column_width"
+    android:minHeight="@dimen/widget_2_row_height"
+    android:minResizeHeight="@dimen/widget_1_row_height"
+    android:previewImage="@drawable/proximity_widget_preview"
+    android:initialLayout="@layout/init_layout_proximity_widget"
+    android:resizeMode="horizontal|vertical" 
+    android:widgetCategory="home_screen">
+</appwidget-provider>

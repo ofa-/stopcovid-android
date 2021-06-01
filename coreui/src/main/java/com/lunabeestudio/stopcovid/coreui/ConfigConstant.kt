@@ -82,6 +82,27 @@ object ConfigConstant {
         const val FILE_PREFIX: String = "strings-"
     }
 
+    object Wallet {
+        private const val FOLDER: String = "Wallet/"
+        private const val URL: String = VERSIONED_SERVER_URL + FOLDER
+
+        const val TEST_CERTIFICATE_THUMBNAIL_FILE: String = "test-certificate.png"
+        private const val TEST_CERTIFICATE_THUMBNAIL_TEMPLATE_FILE: String = "test-certificate-%s.png"
+        const val TEST_CERTIFICATE_THUMBNAIL_TEMPLATE_URL: String = URL + TEST_CERTIFICATE_THUMBNAIL_TEMPLATE_FILE
+
+        const val TEST_CERTIFICATE_FULL_FILE: String = "test-certificate-full.png"
+        private const val TEST_CERTIFICATE_FULL_TEMPLATE_FILE: String = "test-certificate-full-%s.png"
+        const val TEST_CERTIFICATE_FULL_TEMPLATE_URL: String = URL + TEST_CERTIFICATE_FULL_TEMPLATE_FILE
+
+        const val VACCIN_CERTIFICATE_THUMBNAIL_FILE: String = "vaccin-certificate.png"
+        private const val VACCIN_CERTIFICATE_THUMBNAIL_TEMPLATE_FILE: String = "vaccin-certificate-%s.png"
+        const val VACCIN_CERTIFICATE_THUMBNAIL_TEMPLATE_URL: String = URL + VACCIN_CERTIFICATE_THUMBNAIL_TEMPLATE_FILE
+
+        const val VACCIN_CERTIFICATE_FULL_FILE: String = "vaccin-certificate-full.png"
+        private const val VACCIN_CERTIFICATE_FULL_TEMPLATE_FILE: String = "vaccin-certificate-full-%s.png"
+        const val VACCIN_CERTIFICATE_FULL_TEMPLATE_URL: String = URL + VACCIN_CERTIFICATE_FULL_TEMPLATE_FILE
+    }
+
     object Config {
         const val FOLDER: String = "Config/"
         const val URL: String = VERSIONED_SERVER_URL + FOLDER

@@ -35,7 +35,7 @@ object UiConstants {
         ISOLATION_REMINDER("reminder", 9)
     }
 
-    val SUPPORTED_LANGUAGE: Array<String> = arrayOf("ar", "de", "en", "es", "fr", "it", "pt")
+    val SUPPORTED_LANGUAGE: Array<String> = arrayOf("en", "fr")
 
     const val DEFAULT_LANGUAGE: String = "en"
 }

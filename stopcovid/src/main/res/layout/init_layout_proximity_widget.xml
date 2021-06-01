@@ -1,0 +1,107 @@
+<!--
+  ~ This Source Code Form is subject to the terms of the Mozilla Public
+  ~ License, v. 2.0. If a copy of the MPL was not distributed with this
+  ~ file, You can obtain one at https://mozilla.org/MPL/2.0/.
+  ~
+  ~ Authors
+  ~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ Created by Lunabee Studio / Date - 2021/20/5 - for the TOUS-ANTI-COVID project
+  -->
+
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:theme="@style/Theme.StopCovid.Widget"
+    android:id="@+id/proximityWidgetLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerVertical="true"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_proximity_widget_top"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="@dimen/spacing_medium">
+
+            <ImageView
+                android:id="@+id/logoImageView"
+                android:layout_width="@dimen/logo_proximity_widget_size"
+                android:layout_height="@dimen/logo_proximity_widget_size"
+                android:layout_marginRight="@dimen/spacing_medium"
+                android:src="@mipmap/ic_launcher" />
+
+            <TextView
+                android:id="@+id/titleWidgetTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/Widget.StopCovid.Widget.TextView.Title"
+                tools:text="@string/app_name" />
+        </LinearLayout>
+
+        <RelativeLayout
+            android:id="@+id/riskLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/bg_widget_risk_0"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingLeft="@dimen/spacing_medium"
+            android:paddingTop="@dimen/spacing_medium"
+            android:paddingRight="@dimen/spacing_medium">
+
+            <ImageView
+                android:id="@+id/riskImageView"
+                android:layout_width="@dimen/image_risk_widget_size"
+                android:layout_height="@dimen/image_risk_widget_size"
+                android:layout_alignParentBottom="true"
+                android:src="@drawable/health_card"
+                android:visibility="gone" />
+
+            <LinearLayout
+                android:id="@+id/textLayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginStart="@dimen/spacing_medium"
+                android:layout_marginEnd="@dimen/spacing_medium"
+                android:layout_toEndOf="@+id/riskImageView"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/riskTextView"
+                    style="@style/Widget.StopCovid.Widget.Proximity.TextView.Risk"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/spacing_medium"
+                    tools:text="Pas de risque"/>
+
+                <TextView
+                    android:id="@+id/infoTextView"
+                    style="@style/Widget.StopCovid.Widget.Proximity.TextView.Info"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/spacing_small"
+                    tools:text="Appuyez pour avoir des infos" />
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/clickableWidgetLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/ripple_widget_proximity"
+        android:clickable="true"
+        android:focusable="true"
+        android:orientation="vertical"/>
+
+</RelativeLayout>

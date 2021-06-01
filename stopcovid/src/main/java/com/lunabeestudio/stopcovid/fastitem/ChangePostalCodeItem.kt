@@ -16,7 +16,7 @@ import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.databinding.ItemChangePostalCodeBinding
-import com.lunabeestudio.stopcovid.extension.setImageResourceOrHide
+import com.lunabeestudio.stopcovid.coreui.extension.setImageResourceOrHide
 import com.lunabeestudio.stopcovid.extension.setTextOrHide
 import com.mikepenz.fastadapter.binding.AbstractBindingItem
 

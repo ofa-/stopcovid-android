@@ -13,7 +13,6 @@ package com.lunabeestudio.stopcovid.viewmodel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
 import com.lunabeestudio.robert.RobertApplication
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.robert.model.RobertResult
@@ -21,21 +20,30 @@ import com.lunabeestudio.stopcovid.coreui.utils.SingleLiveEvent
 import com.lunabeestudio.stopcovid.extension.toCovidException
 import com.lunabeestudio.stopcovid.model.CovidException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import timber.log.Timber
+import kotlin.time.ExperimentalTime
+import kotlin.time.milliseconds
 
 class CodeViewModel(private val robertManager: RobertManager) : ViewModel() {
 
     val codeSuccess: SingleLiveEvent<Unit> = SingleLiveEvent()
     val covidException: SingleLiveEvent<CovidException> = SingleLiveEvent()
-    val loadingInProgress: MutableLiveData<Boolean> = MutableLiveData(false)
+    val loadingInProgress: MutableLiveData<Float?> = MutableLiveData(null)
     val code: MutableLiveData<String> = MutableLiveData("")
 
+    @OptIn(ExperimentalTime::class)
     fun verifyCode(code: String, firstSymptoms: Int?, positiveTest: Int?, application: RobertApplication) {
-        if (loadingInProgress.value == false) {
-            viewModelScope.launch(Dispatchers.IO) {
-                loadingInProgress.postValue(true)
-                val result = robertManager.report(code, firstSymptoms, positiveTest, application)
-                loadingInProgress.postValue(false)
+        if (loadingInProgress.value == null) {
+            GlobalScope.launch(Dispatchers.IO) {
+                loadingInProgress.postValue(0f)
+                val startTime = System.currentTimeMillis()
+                val result = robertManager.report(code, firstSymptoms, positiveTest, application) {
+                    loadingInProgress.postValue(it)
+                }
+                Timber.d("report total duration = ${(System.currentTimeMillis() - startTime).milliseconds}")
+                loadingInProgress.postValue(null)
                 when (result) {
                     is RobertResult.Success -> codeSuccess.postValue(null)
                     is RobertResult.Failure -> covidException.postValue(result.error.toCovidException())

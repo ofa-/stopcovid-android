@@ -56,8 +56,8 @@ open class SecureFileLocalProximityDataSource(
 
     private var dumpJob: Job? = null
 
-    override fun getBetweenTime(ntpStartTimeS: Long, ntpEndTimeS: Long): List<LocalProximity> {
-        return storageDir.listFiles { file ->
+    override fun getBetweenTime(ntpStartTimeS: Long, ntpEndTimeS: Long, onProgressUpdate: ((Float) -> Unit)?): List<LocalProximity> {
+        val filesList = storageDir.listFiles { file ->
             file.isDirectory && file.name.toIntOrNull() != null
         }?.mapNotNull { file ->
             val dirDay = file.name.toInt()
@@ -68,15 +68,19 @@ open class SecureFileLocalProximityDataSource(
             }
         }?.flatMap {
             it.listFiles()?.asList() ?: emptyList()
-        }?.flatMap {
-            try {
-                cryptoManager.createCipherInputStream(it.inputStream()).use { cis ->
+        }
+        onProgressUpdate?.invoke(0f)
+        return filesList?.flatMapIndexed { index, file ->
+            val result = try {
+                cryptoManager.createCipherInputStream(file.inputStream()).use { cis ->
                     ProtoStorage.LocalProximityProtoList.parseFrom(cis).toDomain()
                 }
             } catch (e: Exception) {
                 Timber.e(e)
                 emptyList()
             }
+            onProgressUpdate?.invoke((index + 1).toFloat() / filesList.size.toFloat())
+            result
         } ?: emptyList()
     }
 

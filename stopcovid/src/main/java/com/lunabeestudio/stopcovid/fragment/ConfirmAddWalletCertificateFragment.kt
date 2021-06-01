@@ -52,9 +52,13 @@ class ConfirmAddWalletCertificateFragment : MainFragment() {
             gravity = Gravity.CENTER
             width = ViewGroup.LayoutParams.MATCH_PARENT
             onClickListener = View.OnClickListener {
-                setFragmentResult(WalletFragment.CONFIRM_ADD_CODE_RESULT_KEY,
-                    bundleOf(WalletFragment.CONFIRM_ADD_CODE_BUNDLE_KEY_CONFIRM to true,
-                        WalletFragment.CONFIRM_ADD_CODE_BUNDLE_KEY_CODE to args.certificateCode))
+                setFragmentResult(
+                    WalletContainerFragment.CONFIRM_ADD_CODE_RESULT_KEY,
+                    bundleOf(
+                        WalletContainerFragment.CONFIRM_ADD_CODE_BUNDLE_KEY_CONFIRM to true,
+                        WalletContainerFragment.CONFIRM_ADD_CODE_BUNDLE_KEY_CODE to args.certificateCode
+                    )
+                )
                 findNavControllerOrNull()?.navigateUp()
             }
             identifier = "confirmWalletQrCodeController.confirm".hashCode().toLong()

@@ -9,5 +9,6 @@ data class Action(
 
     val label: String? = null,
     val showBadge: Boolean = false,
-    val onClickListener: View.OnClickListener,
+    val loading: Boolean = false,
+    val onClickListener: View.OnClickListener?
 )

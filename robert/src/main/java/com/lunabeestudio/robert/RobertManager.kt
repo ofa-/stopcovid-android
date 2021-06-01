@@ -37,6 +37,7 @@ interface RobertManager : AnalyticsRobertManager {
     val isProximityActive: Boolean
 
     val liveAtRiskStatus: LiveData<Event<AtRiskStatus>>
+    val liveUpdatingRiskStatus: LiveData<Event<Boolean>>
 
     override val atRiskStatus: AtRiskStatus?
 
@@ -85,6 +86,7 @@ interface RobertManager : AnalyticsRobertManager {
         firstSymptoms: Int?,
         positiveTest: Int?,
         application: RobertApplication,
+        onProgressUpdate: (Float) -> Unit,
     ): RobertResult
 
     suspend fun cleaReportIfNeeded(application: RobertApplication, shouldRetry: Boolean)

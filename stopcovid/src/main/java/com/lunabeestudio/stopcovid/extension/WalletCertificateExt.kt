@@ -1,7 +1,6 @@
 package com.lunabeestudio.stopcovid.extension
 
 import android.annotation.SuppressLint
-import com.lunabeestudio.domain.extension.certificateValidityThresholdInMs
 import com.lunabeestudio.domain.extension.walletOldCertificateThresholdInMs
 import com.lunabeestudio.domain.model.Configuration
 import com.lunabeestudio.stopcovid.coreui.extension.stringsFormat
@@ -10,6 +9,7 @@ import com.lunabeestudio.stopcovid.model.SanitaryCertificate
 import com.lunabeestudio.stopcovid.model.VaccinationCertificate
 import com.lunabeestudio.stopcovid.model.WalletCertificate
 import java.text.SimpleDateFormat
+import java.util.concurrent.TimeUnit
 
 fun WalletCertificate.shortDescription(): String {
     return when (this) {
@@ -44,11 +44,7 @@ fun WalletCertificate.fullDescription(strings: LocalizedStrings, configuration: 
             text = text?.replace("<${SanitaryCertificate.SanitaryCertificateFields.TEST_RESULT.code}>", resultString ?: "N/A")
 
             if (testResult == "N") {
-                val timeIndicator = if (isValid(configuration)) {
-                    strings.stringsFormat("wallet.proof.lessThanSpecificHours", configuration.testCertificateValidityThresholdInHours)
-                } else {
-                    strings.stringsFormat("wallet.proof.moreThanSpecificHours", configuration.testCertificateValidityThresholdInHours)
-                }
+                val timeIndicator = validityString(configuration, strings)
                 text = text?.plus("\n$timeIndicator")
             }
 
@@ -95,6 +91,16 @@ fun WalletCertificate.isOld(configuration: Configuration): Boolean {
     return configuration.walletOldCertificateThresholdInMs(type)?.let { System.currentTimeMillis() - timestamp > it } ?: false
 }
 
-fun SanitaryCertificate.isValid(configuration: Configuration): Boolean {
-    return System.currentTimeMillis() - timestamp < configuration.certificateValidityThresholdInMs()
+fun SanitaryCertificate.validityString(configuration: Configuration, strings: LocalizedStrings): String? {
+    val testCertificateValidityThresholds = configuration.testCertificateValidityThresholds
+    val maxValidityInHours = testCertificateValidityThresholds.maxOrNull() ?: 0
+    val timeSinceCreation = System.currentTimeMillis() - timestamp
+    val validityThresholdInHours = testCertificateValidityThresholds
+        .filter { TimeUnit.HOURS.toMillis(it.toLong()) > timeSinceCreation }
+        .minOrNull()
+    return if (validityThresholdInHours != null) {
+        strings.stringsFormat("wallet.proof.lessThanSpecificHours", validityThresholdInHours)
+    } else {
+        strings.stringsFormat("wallet.proof.moreThanSpecificHours", maxValidityInHours)
+    }
 }

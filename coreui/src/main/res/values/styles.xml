@@ -7,7 +7,7 @@
   ~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   ~ Created by Lunabee Studio / Date - 2020/13/05 - for the TOUS-ANTI-COVID project
   -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <style name="Theme.Base.StopCovid" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="android:windowBackground">?colorSurface</item>
@@ -37,6 +37,7 @@
         <item name="bottomSheetDialogTheme">@style/ThemeOverlay.StopCovid.BottomSheetDialog</item>
 
         <item name="dividerColor">@color/color_mercury</item>
+
     </style>
 
     <style name="Theme.Base.StopCovid.ForceLight" parent="Theme.MaterialComponents.Light" />
@@ -51,5 +52,20 @@
         <item name="colorSurface">@color/color_black_33</item>
         <item name="android:textColor">@android:color/white</item>
     </style>
+
+    <style name="Theme.StopCovid.Base.Widget" parent="">
+        <item name="android:fontFamily">@font/marianne</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+
+    <style name="Theme.StopCovid.Widget" parent="Theme.StopCovid.Base.Widget">
+        <item name="widgetBackgroundColor">@android:color/white</item>
+        <item name="android:textColor">@android:color/black</item>
+    </style>
+
+    <style name="Theme.StopCovid.Widget.Attestation">
+        <item name="widgetBackgroundColor">@android:color/white</item>
+    </style>
+
 
 </resources>

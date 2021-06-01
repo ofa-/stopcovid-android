@@ -79,6 +79,7 @@ class NumbersCardItem : AbstractBindingItem<ItemNumbersCardBinding>() {
 
         binding.action.textView.setTextOrHide(link)
         binding.action.leftIconImageView.visibility = View.GONE
+        binding.action.progressBar.visibility = View.GONE
         binding.action.actionRootLayout.setOnClickListener(onClickListener)
 
         binding.root.setOnClickListener(onClickListener)

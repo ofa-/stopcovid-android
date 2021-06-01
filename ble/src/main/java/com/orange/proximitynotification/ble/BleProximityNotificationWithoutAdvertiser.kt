@@ -15,17 +15,20 @@ import android.bluetooth.BluetoothAdapter
 import android.content.Context
 import android.os.Build
 import android.os.PowerManager
+import com.orange.proximitynotification.ProximityNotificationCallback
 import com.orange.proximitynotification.ProximityNotificationError
-import com.orange.proximitynotification.ProximityNotificationEventId
-import com.orange.proximitynotification.ProximityNotificationLogger
 import com.orange.proximitynotification.ProximityPayload
+import com.orange.proximitynotification.ProximityPayloadIdProvider
+import com.orange.proximitynotification.ProximityPayloadProvider
 import com.orange.proximitynotification.ble.advertiser.BleAdvertiser
 import com.orange.proximitynotification.ble.calibration.BleRssiCalibration
 import com.orange.proximitynotification.ble.gatt.BleGattManager
+import com.orange.proximitynotification.ble.gatt.BleGattManagerException
 import com.orange.proximitynotification.ble.gatt.RemoteRssiAndPayload
 import com.orange.proximitynotification.ble.scanner.BleScannedDevice
 import com.orange.proximitynotification.ble.scanner.BleScanner
 import com.orange.proximitynotification.tools.CoroutineContextProvider
+import com.orange.proximitynotification.tools.ExpiringCache
 import com.orange.proximitynotification.tools.Result
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
@@ -47,7 +50,6 @@ import kotlin.coroutines.resumeWithException
 import kotlin.math.roundToInt
 
 
-private class BluetoothStackUnhealthyException : Exception()
 private data class BleScannerException(
     val errorCode: Int? = null,
     override val cause: Throwable? = null
@@ -81,60 +83,82 @@ internal class BleProximityNotificationWithoutAdvertiser(
 
         private val timeSinceLastScannerStart: Long
             get() = System.currentTimeMillis() - lastScannerStart.get()
-    }
 
+        private var deviceStatsRepository: BleDeviceStatsRepository? = null
+    }
 
     private enum class Timeouts(
         val serviceScan: Long = 2_000L,
         val deviceScan: Long = 2_000L,
-        val afterStoppingScanner: Long,
+        val afterStoppingScanner: Long = 100L,
         val advertiseProcess: Long,
-        val betweenDeviceAdvertisement: Long,
-        val scannerRestart: Long = 30_000L
+        val betweenDeviceAdvertisement: Long = 100L,
+        val scannerRestart: Long = 30_000L,
+        private val betweenScannerRestart: Long
     ) {
         ANDROID_LT_7(
-            advertiseProcess = 15_000L,
-            afterStoppingScanner = 100L,
-            betweenDeviceAdvertisement = 500L,
-        ) {
-            override val beforeStartingScanner = 3_000L
-        },
+            betweenScannerRestart = 5_000L,
+            advertiseProcess = 30_000L
+        ),
+
+        // Since Android 7 we should not start and stop scans more than 5 times
+        // in a window of 30 seconds (scannerRestart).
         ANDROID_GE_7(
-            advertiseProcess = 10_000L,
-            afterStoppingScanner = 100L,
-            betweenDeviceAdvertisement = 100L
-        ) {
-            // Since Android 7 we should not start and stop scans more than 5 times
-            // in a window of 30 seconds (scannerRestart).
-            override val beforeStartingScanner: Long
-                get() = maxOf(500, 8_000L - timeSinceLastScannerStart)
-        };
+            betweenScannerRestart = 8_000L,
+            advertiseProcess = 20_000L
+        );
 
-        abstract val beforeStartingScanner: Long
+        val beforeStartingScanner: Long
+            get() = maxOf(1_000L, betweenScannerRestart - timeSinceLastScannerStart)
     }
 
-    override val shouldRestartBluetooth = hasUnstableBluetoothStack()
+    override val shouldRestartBluetooth: Boolean
+        get() = hasUnstableBluetoothStack() && bleStats.isUnHealthy()
 
-    private val scannedDeviceSelector: BleScannedDeviceSelector by lazy {
-        BleScannedDeviceSelector(
-            cacheTimeout = settings.deviceSelectorCacheTimeout,
-            minConfidenceScore = settings.deviceSelectorMinConfidenceScore,
-            minStatsCount = settings.deviceSelectorMinStatsCount,
-            // On Android7+ we don't scan device again so best scans are the most recent ones
-            timestampIsImportantInSelection = isAndroidGreaterOrEqual7(),
-            payloadIdProvider = proximityPayloadIdProvider
-        )
-    }
+    override val couldRestartFrequently = false
+    override val bleRecordProvider = BleRecordProvider()
 
     private var wakeLock: PowerManager.WakeLock? = null
     private var advertiseJob: Job? = null
     private val proximityPayload = AtomicReference<ProximityPayload?>(null)
-    private val stats =
-        Stats(minStatCount = 20, errorRateThreshold = 0.55F, minScanErrorCount = 2)
+    private val bleStats =
+        BleStats(
+            minStatCount = 40,
+            errorRateThreshold = 0.55F,
+            minScanErrorCount = 2,
+            maxTimeSinceLastStatus = 15 * 60 * 1000
+        )
 
     private val timeouts: Timeouts = when {
         isAndroidGreaterOrEqual7() -> Timeouts.ANDROID_GE_7
         else -> Timeouts.ANDROID_LT_7
+    }
+
+    private lateinit var scannedDeviceSelector: BleScannedDeviceSelector
+
+    override fun setUp(
+        proximityPayloadProvider: ProximityPayloadProvider,
+        proximityPayloadIdProvider: ProximityPayloadIdProvider,
+        callback: ProximityNotificationCallback
+    ) {
+        super.setUp(proximityPayloadProvider, proximityPayloadIdProvider, callback)
+
+        if (deviceStatsRepository == null) {
+            deviceStatsRepository = BleDeviceStatsRepository(
+                maxCacheSize = settings.maxCacheSize,
+                cacheTimeout = settings.identityCacheTimeout
+            )
+        }
+
+        scannedDeviceSelector = BleScannedDeviceSelector(
+            maxDelayBetweenSuccess = settings.maxDelayBetweenExchange,
+            maxSuccessiveFailureCount = settings.maxSuccessiveFailure,
+            // On Android7+ we don't scan device again so best scans are the most recent ones
+            timestampIsImportantInSelection = isAndroidGreaterOrEqual7(),
+            deviceStatsProvider = { deviceStatsRepository?.get(it) },
+            payloadIdProvider = proximityPayloadIdProvider
+        )
+
     }
 
     override suspend fun start() {
@@ -165,15 +189,22 @@ internal class BleProximityNotificationWithoutAdvertiser(
     }
 
     override suspend fun handleScanResults(results: List<BleScannedDevice>) {
-        super.handleScanResults(results)
         scannedDeviceSelector.add(results)
+
+        withContext(coroutineContextProvider.default) {
+            // Android case
+            results.forEach { scannedDevice ->
+                scannedDevice.serviceData?.let { decodePayload(it) }
+                    ?.let { payload -> notifyProximity(scannedDevice, payload) }
+            }
+        }
     }
 
     private fun advertiseJob() = coroutineScope.launch(coroutineContextProvider.io) {
 
         try {
 
-            wakeLock?.release()
+            wakeLock?.takeIf { it.isHeld }?.release()
             @SuppressLint("WakelockTimeout")
             wakeLock = (context.getSystemService(Context.POWER_SERVICE) as? PowerManager)
                 ?.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "BleProximityNotification:WakeLock")
@@ -183,14 +214,6 @@ internal class BleProximityNotificationWithoutAdvertiser(
             advertiseLoop(this)
         } catch (_: CancellationException) {
             // no-op
-        } catch (_: BluetoothStackUnhealthyException) {
-            notifyErrorAsync(
-                ProximityNotificationError(
-                    ProximityNotificationError.Type.BLE_ADVERTISER,
-                    rootErrorCode = ProximityNotificationError.UNHEALTHY_BLUETOOTH_ERROR_CODE,
-                    cause = "Advertise job failed (Bluetooth stack seems unhealthy)"
-                )
-            )
         } catch (t: Throwable) {
             notifyErrorAsync(
                 ProximityNotificationError(
@@ -202,7 +225,7 @@ internal class BleProximityNotificationWithoutAdvertiser(
         } finally {
 
             withContext(NonCancellable) {
-                wakeLock?.release()
+                wakeLock?.takeIf { it.isHeld }?.release()
                 wakeLock = null
             }
         }
@@ -211,17 +234,6 @@ internal class BleProximityNotificationWithoutAdvertiser(
     private suspend fun advertiseLoop(coroutineScope: CoroutineScope) {
 
         while (coroutineScope.isActive) {
-
-            if (stats.isUnHealthy()) {
-                ProximityNotificationLogger.info(
-                    ProximityNotificationEventId.BLE_PROXIMITY_NOTIFICATION_WITHOUT_ADVERTISER,
-                    "Bluetooth seems to be unhealthy"
-                )
-
-                if (hasUnstableBluetoothStack()) {
-                    throw BluetoothStackUnhealthyException()
-                }
-            }
 
             delay(timeouts.beforeStartingScanner)
             if (!coroutineScope.isActive) return
@@ -271,7 +283,7 @@ internal class BleProximityNotificationWithoutAdvertiser(
             val refreshedDeviceScan = refreshDeviceScanIfNeeded(deviceScan)
 
             if (refreshedDeviceScan == null) {
-                scannedDeviceSelector.failedToScan(deviceScan)
+                deviceStatsRepository?.failed(deviceScan.deviceId(proximityPayloadIdProvider))
             } else if (coroutineScope.isActive) {
                 proximityPayload.get()?.let { currentProximityPayload ->
                     val result = advertiseDevice(currentProximityPayload, refreshedDeviceScan)
@@ -302,13 +314,26 @@ internal class BleProximityNotificationWithoutAdvertiser(
                     }
                 }
 
-                stats.succeed()
-                scannedDeviceSelector.succeed(scannedDevice)
+                bleStats.succeed()
+                deviceStatsRepository?.succeed(scannedDevice.deviceId(proximityPayloadIdProvider))
             }
 
             is Result.Failure -> {
-                stats.failed()
-                scannedDeviceSelector.failed(scannedDevice)
+
+                val deviceId = scannedDevice.deviceId(proximityPayloadIdProvider)
+                when (result.throwable) {
+
+                    // Consider BLE is working but blacklist device
+                    is BleGattManagerException.IncorrectPayloadService -> {
+                        bleStats.succeed()
+                        deviceStatsRepository?.blacklist(deviceId)
+                    }
+
+                    else -> {
+                        bleStats.failed()
+                        deviceStatsRepository?.failed(deviceId)
+                    }
+                }
             }
         }
     }
@@ -323,7 +348,7 @@ internal class BleProximityNotificationWithoutAdvertiser(
         }
 
         val updatedDeviceScan = runCatching {
-            withTimeout(timeouts.deviceScan) { scanForDevice(deviceScan.deviceId()) }
+            withTimeout(timeouts.deviceScan) { scanForDevice(deviceScan.deviceAddress()) }
         }.getOrNull()
 
         delay(timeouts.afterStoppingScanner)
@@ -348,7 +373,7 @@ internal class BleProximityNotificationWithoutAdvertiser(
 
         return bleGattManager.exchangePayload(
             scannedDevice.device,
-            payload,
+            payload.toByteArray(),
             shouldReadRemotePayload
         )
     }
@@ -405,7 +430,7 @@ internal class BleProximityNotificationWithoutAdvertiser(
                             checkAndHandleScanResults(results)
 
                             if (results.isNotEmpty()) {
-                                stats.scanSucceed()
+                                bleStats.scanSucceed()
                             }
 
                             continuation.takeIf { it.isActive }?.resume(results)
@@ -427,7 +452,7 @@ internal class BleProximityNotificationWithoutAdvertiser(
         } catch (_: CancellationException) {
             null
         } catch (t: Throwable) {
-            stats.scanFailed()
+            bleStats.scanFailed()
 
             throw when (t) {
                 is BleScannerException -> t
@@ -449,57 +474,110 @@ internal class BleProximityNotificationWithoutAdvertiser(
         }
     }
 
+}
 
-    internal class Stats(
-        private val minStatCount: Int,
-        private val errorRateThreshold: Float,
-        private val minScanErrorCount: Int
-    ) {
-        private val lastStatusHistory = mutableListOf<Boolean>()
-        private val scanErrorCount = AtomicInteger(0)
+/**
+ * Overall BLE statistics
+ */
+internal class BleStats(
+    private val minStatCount: Int,
+    private val errorRateThreshold: Float,
+    private val minScanErrorCount: Int,
+    private val maxTimeSinceLastStatus: Long
+) {
+    private val lastStatusHistory = mutableListOf<Boolean>()
+    private var lastStatusTime: Long = System.currentTimeMillis()
+    private val scanErrorCount = AtomicInteger(0)
 
-        fun scanSucceed() {
-            scanErrorCount.set(0)
+    fun scanSucceed() {
+        scanErrorCount.set(0)
+    }
+
+    fun scanFailed() {
+        scanErrorCount.incrementAndGet()
+    }
+
+    fun succeed() = add(true)
+    fun failed() = add(false)
+
+    @Synchronized
+    fun isUnHealthy(): Boolean {
+        return isErrorRateExceeded() || hasTooManyScanInError() || isLastStatusTooOld()
+    }
+
+    @Synchronized
+    private fun add(result: Boolean) {
+        lastStatusHistory.add(result)
+        lastStatusTime = System.currentTimeMillis()
+    }
+
+    private fun isLastStatusTooOld() =
+        (System.currentTimeMillis() - maxTimeSinceLastStatus) > lastStatusTime
+
+    private fun hasTooManyScanInError() = scanErrorCount.get() >= minScanErrorCount
+
+    private fun isErrorRateExceeded(): Boolean {
+
+        if (lastStatusHistory.size < minStatCount) {
+            return false
         }
 
-        fun scanFailed() {
-            scanErrorCount.incrementAndGet()
-        }
+        val lastStatuses = lastStatusHistory.takeLast(minStatCount)
+        lastStatusHistory.clear()
+        lastStatusHistory.addAll(lastStatuses)
 
-        fun succeed() = add(true)
-        fun failed() = add(false)
+        val errorCount = lastStatuses.count { !it }
+        val errorRate = errorCount.toFloat() / lastStatuses.size
 
-        @Synchronized
-        fun add(result: Boolean) {
-            lastStatusHistory.add(result)
-        }
+        return errorRate >= errorRateThreshold
+    }
+}
 
-        @Synchronized
-        fun isUnHealthy(): Boolean {
-            return isErrorRateExceeded() || hasTooManyScannerStartInError()
-        }
+/**
+ * [BleDeviceStats] internal repository using [ExpiringCache]
+ */
+internal class BleDeviceStatsRepository(maxCacheSize: Int, cacheTimeout: Long) {
 
-        private fun hasTooManyScannerStartInError() =
-            scanErrorCount.get() >= minScanErrorCount
+    private val deviceStatsCache =
+        ExpiringCache<BleDeviceId, BleDeviceStats>(maxCacheSize, cacheTimeout)
 
-        private fun isErrorRateExceeded(): Boolean {
+    @Synchronized
+    fun get(deviceId: BleDeviceId): BleDeviceStats? = deviceStatsCache[deviceId]
 
-            if (lastStatusHistory.size < minStatCount) {
-                return false
-            }
-
-            val lastStatuses = lastStatusHistory.takeLast(minStatCount)
-            lastStatusHistory.clear()
-            lastStatusHistory.addAll(lastStatuses)
-
-            val errorCount = lastStatuses.count { !it }
-            val errorRate = errorCount.toFloat() / lastStatuses.size
-
-            return errorRate >= errorRateThreshold
+    @Synchronized
+    fun succeed(deviceId: BleDeviceId) {
+        updateOrCreateDeviceStats(deviceId) {
+            it.copy(
+                successCount = it.successCount + 1,
+                successiveFailureCount = 0,
+                lastSuccessTime = System.currentTimeMillis()
+            )
         }
     }
 
+    @Synchronized
+    fun failed(deviceId: BleDeviceId) {
+        updateOrCreateDeviceStats(deviceId) {
+            it.copy(
+                failureCount = it.failureCount + 1,
+                successiveFailureCount = it.successiveFailureCount + 1
+            )
+        }
+    }
+
+    @Synchronized
+    fun blacklist(deviceId: BleDeviceId) {
+        updateOrCreateDeviceStats(deviceId) {
+            it.copy(shouldIgnore = true)
+        }
+    }
+
+    private inline fun updateOrCreateDeviceStats(
+        deviceId: BleDeviceId,
+        crossinline updater: (BleDeviceStats) -> BleDeviceStats
+    ) {
+        val deviceStats = deviceStatsCache[deviceId] ?: BleDeviceStats()
+        deviceStatsCache.put(deviceId, updater(deviceStats))
+    }
+
 }
-
-
-

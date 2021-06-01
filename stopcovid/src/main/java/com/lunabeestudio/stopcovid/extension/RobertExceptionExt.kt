@@ -14,6 +14,7 @@ import com.lunabeestudio.robert.model.ErrorCode
 import com.lunabeestudio.robert.model.RobertException
 import com.lunabeestudio.stopcovid.model.BLEAdvertiserException
 import com.lunabeestudio.stopcovid.model.BLEGattException
+import com.lunabeestudio.stopcovid.model.BLEProximityNotificationException
 import com.lunabeestudio.stopcovid.model.BLEScannerException
 import com.lunabeestudio.stopcovid.model.BackendException
 import com.lunabeestudio.stopcovid.model.CovidException
@@ -49,6 +50,7 @@ fun RobertException?.toCovidException(): CovidException = if (this != null) {
         ErrorCode.BLE_ADVERTISER -> BLEAdvertiserException(message)
         ErrorCode.BLE_SCANNER -> BLEScannerException(message)
         ErrorCode.BLE_GATT -> BLEGattException(message)
+        ErrorCode.BLE_PROXIMITY_NOTIFICATION -> BLEProximityNotificationException(message)
         ErrorCode.TIME_NOT_ALIGNED -> TimeNotAlignedException(message)
         ErrorCode.REPORT_DELAY -> ReportDelayException(message)
         ErrorCode.SECRET_KEY_ALREADY_GENERATED -> SecretKeyAlreadyGeneratedException(message)

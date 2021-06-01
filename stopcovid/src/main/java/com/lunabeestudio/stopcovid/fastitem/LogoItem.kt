@@ -10,25 +10,32 @@
 
 package com.lunabeestudio.stopcovid.fastitem
 
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageSwitcher
 import androidx.annotation.DrawableRes
 import androidx.core.view.isInvisible
 import androidx.recyclerview.widget.RecyclerView
 import com.lunabeestudio.stopcovid.R
-import com.lunabeestudio.stopcovid.coreui.fastitem.BaseItem
+import com.lunabeestudio.stopcovid.databinding.ItemLogoBinding
+import com.mikepenz.fastadapter.binding.AbstractBindingItem
 
-class LogoItem : BaseItem<LogoItem.ViewHolder>(
-    R.layout.item_logo, ::ViewHolder, R.id.item_logo
-) {
+class LogoItem : AbstractBindingItem<ItemLogoBinding>() {
+    override val type: Int = R.id.item_logo
+
     @DrawableRes
     var imageRes: Int? = null
     var isInvisible: Boolean = false
 
-    override fun bindView(holder: ViewHolder, payloads: List<Any>) {
-        super.bindView(holder, payloads)
-        imageRes?.let(holder.imageSwitcher::setImageResource)
-        holder.imageSwitcher.isInvisible = isInvisible
+    override fun createBinding(inflater: LayoutInflater, parent: ViewGroup?): ItemLogoBinding {
+        return ItemLogoBinding.inflate(inflater, parent, false)
+    }
+
+    override fun bindView(binding: ItemLogoBinding, payloads: List<Any>) {
+        super.bindView(binding, payloads)
+        imageRes?.let(binding.imageSwitcher::setImageResource)
+        binding.imageSwitcher.isInvisible = isInvisible
     }
 
     class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {

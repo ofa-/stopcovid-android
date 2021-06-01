@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ This Source Code Form is subject to the terms of the Mozilla Public
+  ~ License, v. 2.0. If a copy of the MPL was not distributed with this
+  ~ file, You can obtain one at https://mozilla.org/MPL/2.0/.
+  ~
+  ~ Authors
+  ~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ Created by Lunabee Studio / Date - 2021/19/5 - for the TOUS-ANTI-COVID project
+  -->
+
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="@dimen/spacing_large"
+    android:layout_marginVertical="@dimen/spacing_small">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/rootLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/spacing_large">
+
+        <TextView
+            android:id="@+id/mainTitleTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingVertical="@dimen/spacing_medium"
+            android:textAppearance="@style/TextAppearance.StopCovid.Title"
+            android:textIsSelectable="false"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="@tools:sample/lorem[1]" />
+
+        <TextView
+            android:id="@+id/mainBodyTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_small"
+            android:textAppearance="@style/TextAppearance.StopCovid.Caption"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/mainTitleTextView"
+            tools:text="@tools:sample/lorem[20]" />
+
+        <ImageView
+            android:id="@+id/vaccinCertificateImageView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_large"
+            android:layout_marginEnd="@dimen/spacing_large"
+            android:adjustViewBounds="true"
+            android:background="@drawable/shape_document_stroke"
+            android:src="@drawable/vaccin_certificate"
+            app:layout_constraintEnd_toStartOf="@id/testCertificateImageView"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/mainBodyTextView" />
+
+        <TextView
+            android:id="@+id/vaccinCertificateTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_small"
+            android:textAlignment="center"
+            android:textIsSelectable="false"
+            app:layout_constraintEnd_toEndOf="@id/vaccinCertificateImageView"
+            app:layout_constraintStart_toStartOf="@id/vaccinCertificateImageView"
+            app:layout_constraintTop_toBottomOf="@id/vaccinCertificateImageView"
+            tools:text="@tools:sample/lorem[2]" />
+
+        <View
+            android:id="@+id/vaccinCertificateClickableView"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="?selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            app:layout_constraintBottom_toBottomOf="@id/captionBarrier"
+            app:layout_constraintEnd_toEndOf="@id/vaccinCertificateImageView"
+            app:layout_constraintStart_toStartOf="@id/vaccinCertificateImageView"
+            app:layout_constraintTop_toTopOf="@id/vaccinCertificateImageView" />
+
+        <ImageView
+            android:id="@+id/testCertificateImageView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_large"
+            android:adjustViewBounds="true"
+            android:background="@drawable/shape_document_stroke"
+            android:src="@drawable/test_certificate"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/vaccinCertificateImageView"
+            app:layout_constraintTop_toBottomOf="@id/mainBodyTextView" />
+
+        <TextView
+            android:id="@+id/testCertificateTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_small"
+            android:textAlignment="center"
+            android:textIsSelectable="false"
+            app:layout_constraintEnd_toEndOf="@id/testCertificateImageView"
+            app:layout_constraintStart_toStartOf="@id/testCertificateImageView"
+            app:layout_constraintTop_toBottomOf="@id/testCertificateImageView"
+            tools:text="@tools:sample/lorem[4]" />
+
+        <View
+            android:id="@+id/testCertificateClickableView"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="?selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            app:layout_constraintBottom_toBottomOf="@id/captionBarrier"
+            app:layout_constraintEnd_toEndOf="@id/testCertificateImageView"
+            app:layout_constraintStart_toStartOf="@id/testCertificateImageView"
+            app:layout_constraintTop_toTopOf="@id/testCertificateImageView" />
+
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/captionBarrier"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:barrierDirection="bottom"
+            app:constraint_referenced_ids="vaccinCertificateTextView, testCertificateTextView" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>

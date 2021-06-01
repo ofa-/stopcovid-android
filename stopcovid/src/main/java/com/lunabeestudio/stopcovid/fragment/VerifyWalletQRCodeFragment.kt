@@ -14,11 +14,16 @@ import android.content.DialogInterface
 import android.os.Bundle
 import android.view.View
 import androidx.preference.PreferenceManager
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
-import com.lunabeestudio.stopcovid.extension.catchWalletException
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
+import com.lunabeestudio.stopcovid.extension.showUnknownErrorAlert
 import com.lunabeestudio.stopcovid.manager.WalletManager
+import com.lunabeestudio.stopcovid.model.WalletCertificateInvalidSignatureException
+import com.lunabeestudio.stopcovid.model.WalletCertificateMalformedException
+import com.lunabeestudio.stopcovid.model.WalletCertificateNoKeyError
+import timber.log.Timber
 
 class VerifyWalletQRCodeFragment : QRCodeFragment() {
 
@@ -42,12 +47,41 @@ class VerifyWalletQRCodeFragment : QRCodeFragment() {
     override fun onCodeScanned(code: String) {
         try {
             WalletManager.verifyCertificateCodeValue(sharedPreferences, robertManager.configuration, code)
-            findNavControllerOrNull()?.safeNavigate(VerifyWalletQRCodeFragmentDirections.actionVerifyWalletQRCodeFragmentToVerifyWalletResultFragment(
-                code))
+            findNavControllerOrNull()?.safeNavigate(
+                VerifyWalletQRCodeFragmentDirections.actionVerifyWalletQRCodeFragmentToVerifyWalletResultFragment(
+                    code
+                )
+            )
         } catch (e: Exception) {
             catchWalletException(e) { _, _ ->
                 resumeQrCodeReader()
             }
         }
+    }
+
+    private fun catchWalletException(e: Exception, listener: DialogInterface.OnClickListener? = null) {
+        Timber.e(e)
+        when (e) {
+            is WalletCertificateInvalidSignatureException -> showInvalidCertificateSignatureAlert(listener)
+            is WalletCertificateMalformedException -> showMalformedCertificateAlert(listener)
+            is WalletCertificateNoKeyError -> showInvalidCertificateSignatureAlert(listener)
+            else -> showUnknownErrorAlert(listener)
+        }
+    }
+
+    private fun showMalformedCertificateAlert(listener: DialogInterface.OnClickListener?) {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(strings["wallet.proof.error.1.title"])
+            .setMessage(strings["wallet.proof.error.1.message"])
+            .setPositiveButton(strings["common.ok"], listener)
+            .show()
+    }
+
+    private fun showInvalidCertificateSignatureAlert(listener: DialogInterface.OnClickListener?) {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(strings["wallet.proof.error.2.title"])
+            .setMessage(strings["wallet.proof.error.2.message"])
+            .setPositiveButton(strings["common.ok"], listener)
+            .show()
     }
 }

@@ -42,12 +42,12 @@ class SymptomsOriginFragment : MainFragment() {
         items += titleItem {
             text = strings["symptomsOriginController.explanation.title"]
             gravity = Gravity.CENTER
-            identifier = items.count().toLong()
+            identifier = "symptomsOriginController.explanation.title".hashCode().toLong()
         }
         items += captionItem {
             text = strings["symptomsOriginController.explanation.subtitle"]
             gravity = Gravity.CENTER
-            identifier = items.count().toLong()
+            identifier = "symptomsOriginController.explanation.subtitle".hashCode().toLong()
         }
         items += spaceItem {
             spaceRes = R.dimen.spacing_medium
@@ -62,6 +62,7 @@ class SymptomsOriginFragment : MainFragment() {
                             .actionSymptomsOriginFragmentToPositiveTestFragment(args.code)
                     )
             }
+            identifier = "symptomsOriginController.noSymptoms".hashCode().toLong()
         }
         items += dividerItem { }
         val calendar = Calendar.getInstance()
@@ -82,6 +83,7 @@ class SymptomsOriginFragment : MainFragment() {
                                 .actionSymptomsOriginFragmentToSendHistoryFragment(args.code, Integer(index))
                         )
                 }
+                identifier = title.hashCode().toLong()
             }
             items += dividerItem { }
             calendar.add(Calendar.DAY_OF_YEAR, -1)
@@ -95,6 +97,7 @@ class SymptomsOriginFragment : MainFragment() {
                             .actionSymptomsOriginFragmentToPositiveTestFragment(args.code)
                     )
             }
+            identifier = "common.iDontKnow".hashCode().toLong()
         }
         return items
     }

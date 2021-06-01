@@ -42,12 +42,12 @@ class PositiveTestFragment : MainFragment() {
         items += titleItem {
             text = strings["positiveTestController.explanation.title"]
             gravity = Gravity.CENTER
-            identifier = items.count().toLong()
+            identifier = "positiveTestController.explanation.title".hashCode().toLong()
         }
         items += captionItem {
             text = strings["positiveTestController.explanation.subtitle"]
             gravity = Gravity.CENTER
-            identifier = items.count().toLong()
+            identifier = "positiveTestController.explanation.subtitle".hashCode().toLong()
         }
         items += spaceItem {
             spaceRes = R.dimen.spacing_medium
@@ -62,6 +62,7 @@ class PositiveTestFragment : MainFragment() {
                             .actionPositiveTestFragmentToSendHistoryFragment(args.code, args.firstSymptoms)
                     )
             }
+            identifier = "positiveTestController.noDate".hashCode().toLong()
         }
         items += dividerItem { }
         val calendar = Calendar.getInstance()
@@ -82,6 +83,7 @@ class PositiveTestFragment : MainFragment() {
                                 .actionPositiveTestFragmentToSendHistoryFragment(args.code, args.firstSymptoms, Integer(index))
                         )
                 }
+                identifier = title.hashCode().toLong()
             }
             if (index != 14) {
                 items += dividerItem { }

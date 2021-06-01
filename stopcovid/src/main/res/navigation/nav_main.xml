@@ -22,6 +22,7 @@
         android:id="@+id/proximityFragment"
         android:name="com.lunabeestudio.stopcovid.fragment.ProximityFragment"
         tools:layout="@layout/fragment_recycler_view">
+        <deepLink app:uri="tousanticovid://proximity" />
         <action
             android:id="@+id/action_proximityFragment_to_manageDataFragment"
             app:destination="@id/manageDataFragment"
@@ -142,8 +143,8 @@
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
         <action
-            android:id="@+id/action_proximityFragment_to_walletFragment"
-            app:destination="@id/walletFragment"
+            android:id="@+id/action_proximityFragment_to_walletContainerFragment"
+            app:destination="@id/walletContainerFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
@@ -215,6 +216,7 @@
         android:id="@+id/newAttestationFragment"
         android:name="com.lunabeestudio.stopcovid.fragment.NewAttestationFragment"
         tools:layout="@layout/fragment_recycler_view">
+        <deepLink app:uri="tousanticovid://attestations//new_attestation" />
         <action
             android:id="@+id/action_newAttestationFragment_to_newAttestationPickerFragment"
             app:destination="@id/newAttestationPickerFragment"
@@ -460,8 +462,8 @@
             app:argType="integer" />
         <argument
             android:name="venueTime"
-            app:nullable="true"
-            app:argType="string" />
+            app:argType="string"
+            app:nullable="true" />
         <action
             android:id="@+id/action_confirmVenueQrCodeFragment_to_venueConfirmationFragment"
             app:destination="@id/venueConfirmationFragment"
@@ -642,44 +644,13 @@
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
     </fragment>
     <fragment
-        android:id="@+id/walletFragment"
-        android:name="com.lunabeestudio.stopcovid.fragment.WalletFragment"
-        tools:layout="@layout/fragment_recycler_view">
-        <deepLink
-            android:autoVerify="true"
-            app:uri="https://bonjour.tousanticovid.gouv.fr/app/wallet?v={certificateCode}"
-            tools:targetApi="m" />
-        <argument
-            android:name="certificateCode"
-            android:defaultValue="@null"
-            app:argType="string"
-            app:nullable="true" />
-        <action
-            android:id="@+id/action_walletFragment_to_walletQRFragment"
-            app:destination="@id/walletQRCodeFragment"
-            app:enterAnim="@anim/nav_default_enter_anim"
-            app:exitAnim="@anim/nav_default_exit_anim"
-            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
-            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
-        <action
-            android:id="@+id/action_walletFragment_to_fullscreenQRCodeFragment"
-            app:destination="@id/fullscreenQRCodeFragment"
-            app:enterAnim="@anim/nav_default_enter_anim"
-            app:exitAnim="@anim/nav_default_exit_anim"
-            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
-            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
-        <action
-            android:id="@+id/action_walletFragment_to_confirmAddWalletCertificateFragment"
-            app:destination="@id/confirmAddWalletCertificateFragment"
-            app:enterAnim="@anim/nav_default_enter_anim"
-            app:exitAnim="@anim/nav_default_exit_anim"
-            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
-            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
-    </fragment>
-    <fragment
         android:id="@+id/walletQRCodeFragment"
         android:name="com.lunabeestudio.stopcovid.fragment.WalletQRCodeFragment"
-        tools:layout="@layout/fragment_qr_code" />
+        tools:layout="@layout/fragment_qr_code">
+        <argument
+            android:name="certificateType"
+            app:argType="com.lunabeestudio.domain.model.WalletCertificateType" />
+    </fragment>
     <fragment
         android:id="@+id/confirmAddWalletCertificateFragment"
         android:name="com.lunabeestudio.stopcovid.fragment.ConfirmAddWalletCertificateFragment">
@@ -699,6 +670,13 @@
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim"
             app:popUpTo="@id/proximityFragment" />
+        <action
+            android:id="@+id/action_verifyWalletQRCodeFragment_to_walletCertificateErrorFragment"
+            app:destination="@id/walletCertificateErrorFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
     </fragment>
     <fragment
         android:id="@+id/verifyWalletResultFragment"
@@ -725,4 +703,114 @@
             app:argType="com.lunabeestudio.stopcovid.model.VaccinationCenter"
             app:nullable="false" />
     </dialog>
+    <fragment
+        android:id="@+id/walletContainerFragment"
+        android:name="com.lunabeestudio.stopcovid.fragment.WalletContainerFragment">
+        <deepLink
+            android:autoVerify="true"
+            app:uri="https://bonjour.tousanticovid.gouv.fr/app/wallet?v={certificateCode}"
+            tools:targetApi="m" />
+        <argument
+            android:name="certificateCode"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
+        <action
+            android:id="@+id/action_walletContainerFragment_to_walletAddCertificateFragment"
+            app:destination="@id/walletAddCertificateFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_walletContainerFragment_to_confirmAddWalletCertificateFragment"
+            app:destination="@id/confirmAddWalletCertificateFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_walletContainerFragment_to_testDocumentExplanationFragment"
+            app:destination="@id/testDocumentExplanationFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_walletContainerFragment_to_vaccinDocumentExplanationFragment"
+            app:destination="@id/vaccinDocumentExplanationFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_walletContainerFragment_to_fullscreenQRCodeFragment"
+            app:destination="@id/fullscreenQRCodeFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_walletQRCodeFragment_to_walletCertificateErrorFragment"
+            app:destination="@id/walletCertificateErrorFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+    </fragment>
+    <fragment
+        android:id="@+id/vaccinDocumentExplanationFragment"
+        android:name="com.lunabeestudio.stopcovid.fragment.VaccinDocumentExplanationFragment" />
+    <fragment
+        android:id="@+id/testDocumentExplanationFragment"
+        android:name="com.lunabeestudio.stopcovid.fragment.TestDocumentExplanationFragment" />
+    <fragment
+        android:id="@+id/walletAddCertificateFragment"
+        android:name="com.lunabeestudio.stopcovid.fragment.WalletAddCertificateFragment">
+        <action
+            android:id="@+id/action_walletAddCertificateFragment_to_walletQRFragment"
+            app:destination="@id/walletQRCodeFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_walletAddCertificateFragment_to_testDocumentExplanationFragment"
+            app:destination="@id/testDocumentExplanationFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_walletAddCertificateFragment_to_vaccinDocumentExplanationFragment"
+            app:destination="@id/vaccinDocumentExplanationFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+    </fragment>
+    <fragment
+        android:id="@+id/walletCertificateErrorFragment"
+        android:name="com.lunabeestudio.stopcovid.fragment.WalletCertificateErrorFragment">
+        <argument
+            android:name="certificateType"
+            app:argType="com.lunabeestudio.domain.model.WalletCertificateType" />
+        <argument
+            android:name="certificateError"
+            app:argType="com.lunabeestudio.domain.model.WalletCertificateError" />
+        <action
+            android:id="@+id/action_walletAddCertificateFragment_to_testDocumentExplanationFragment"
+            app:destination="@id/testDocumentExplanationFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_walletAddCertificateFragment_to_vaccinDocumentExplanationFragment"
+            app:destination="@id/vaccinDocumentExplanationFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+    </fragment>
 </navigation>

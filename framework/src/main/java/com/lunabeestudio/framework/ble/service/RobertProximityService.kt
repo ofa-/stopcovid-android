@@ -20,6 +20,7 @@ import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.robert.extension.splitToByteArray
 import com.lunabeestudio.robert.model.BLEAdvertiserException
 import com.lunabeestudio.robert.model.BLEGattException
+import com.lunabeestudio.robert.model.BLEProximityNotificationException
 import com.lunabeestudio.robert.model.BLEScannerException
 import com.lunabeestudio.robert.model.InvalidEphemeralBluetoothIdentifierForEpoch
 import com.lunabeestudio.robert.model.NoEphemeralBluetoothIdentifierFoundForEpoch
@@ -182,7 +183,6 @@ abstract class RobertProximityService : ProximityNotificationService() {
         if (!isBluetoothRestartInProgress) {
             launchRefreshBle()
         }
-
     }
 
     override fun doStop() {
@@ -211,8 +211,9 @@ abstract class RobertProximityService : ProximityNotificationService() {
                             delay(nextPayloadUpdateDelay)
                             try {
                                 val shouldRestartProximityService: Boolean =
-                                    robertManager.shouldReloadBleSettings
-                                        || (RESTART_SERVICE_ON_EBID_CHANGE && validUntilTimeMs - System.currentTimeMillis() < 0L)
+                                    shouldRestart
+                                        || robertManager.shouldReloadBleSettings
+                                        || (couldRestartFrequently && RESTART_SERVICE_ON_EBID_CHANGE && validUntilTimeMs - System.currentTimeMillis() < 0L)
                                         || nonCriticalErrorInARow.get() > 0
                                 Timber.v("shouldRestartProximityService = $shouldRestartProximityService; nonCriticalErrorInARow = $nonCriticalErrorInARow")
                                 startWaitForErrorOrClear()
@@ -265,12 +266,10 @@ abstract class RobertProximityService : ProximityNotificationService() {
         withContext(Dispatchers.Main) {
             onError(
                 when (error.type) {
-                    ProximityNotificationError.Type.BLE_ADVERTISER -> BLEAdvertiserException(
-                        "(${error.cause} [${error.rootErrorCode}])",
-                        shouldRestartBle = error.rootErrorCode == ProximityNotificationError.UNHEALTHY_BLUETOOTH_ERROR_CODE
-                    )
+                    ProximityNotificationError.Type.BLE_ADVERTISER -> BLEAdvertiserException("(${error.cause} [${error.rootErrorCode}])")
                     ProximityNotificationError.Type.BLE_SCANNER -> BLEScannerException("(${error.cause} [${error.rootErrorCode}])")
                     ProximityNotificationError.Type.BLE_GATT -> BLEGattException("(${error.cause} [${error.rootErrorCode}])")
+                    ProximityNotificationError.Type.BLE_PROXIMITY_NOTIFICATION -> BLEProximityNotificationException("(${error.cause} [${error.rootErrorCode}])")
                 }
             )
         }

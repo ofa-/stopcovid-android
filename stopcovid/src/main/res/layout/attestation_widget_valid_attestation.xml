@@ -1,0 +1,68 @@
+<!--
+  ~ This Source Code Form is subject to the terms of the Mozilla Public
+  ~ License, v. 2.0. If a copy of the MPL was not distributed with this
+  ~ file, You can obtain one at https://mozilla.org/MPL/2.0/.
+  ~
+  ~ Authors
+  ~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ Created by Lunabee Studio / Date - 2021/19/5 - for the TOUS-ANTI-COVID project
+  -->
+
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:theme="@style/Theme.StopCovid.Widget.Attestation"
+    android:background="@drawable/bg_widget"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:clickable="true"
+    android:focusable="true"
+    android:id="@+id/certificateWidgetLayout">
+
+    <ImageView
+        android:id="@+id/attestationImageView"
+        android:layout_width="@dimen/qr_code_widget_size"
+        android:layout_height="@dimen/qr_code_widget_size"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="@dimen/spacing_medium"
+        android:layout_marginTop="@dimen/spacing_large"
+        android:src="@drawable/attestation_card_reverse" />
+
+    <ImageView
+        android:id="@+id/qrCodeImageView"
+        android:layout_width="@dimen/qr_code_widget_size"
+        android:layout_height="@dimen/qr_code_widget_size"
+        android:layout_marginStart="@dimen/spacing_medium"
+        android:layout_marginEnd="@dimen/spacing_medium"
+        android:layout_centerVertical="true"
+        android:src="@drawable/ic_qr_code_scanner" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toStartOf="@+id/attestationImageView"
+        android:layout_toEndOf="@+id/qrCodeImageView"
+        android:layout_centerVertical="true"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/dateTextView"
+            android:layout_width="match_parent"
+            android:layout_height="25dp"
+            android:maxLines="1"
+            style="@style/Widget.StopCovid.Widget.Attestation.TextView.Date"
+            tools:text="15/03/2021, 15:35"
+            android:textAlignment="textEnd"/>
+
+        <TextView
+            android:id="@+id/reasonTextView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            style="@style/Widget.StopCovid.Widget.Attestation.TextView.Reason"
+            tools:text="Activité professionnelle, enseignement"
+            android:maxLines="2"
+            android:ellipsize="end"
+            android:textAlignment="textEnd" />
+    </LinearLayout>
+
+</RelativeLayout>

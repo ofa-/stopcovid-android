@@ -18,8 +18,9 @@ import com.lunabeestudio.domain.extension.ntpTimeSToUnixTimeMs
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
+import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
-import com.lunabeestudio.stopcovid.extension.setImageResourceOrHide
+import com.lunabeestudio.stopcovid.coreui.extension.setImageResourceOrHide
 import com.lunabeestudio.stopcovid.fastitem.deleteCardItem
 import com.lunabeestudio.stopcovid.manager.VenuesManager
 import com.mikepenz.fastadapter.GenericItem
@@ -29,6 +30,10 @@ import java.util.Date
 import java.util.Locale
 
 class VenuesHistoryFragment : MainFragment() {
+
+    private val robertManager by lazy {
+        requireContext().robertManager()
+    }
 
     override fun getTitleKey(): String = "venuesHistoryController.title"
 
@@ -92,6 +97,10 @@ class VenuesHistoryFragment : MainFragment() {
 
     override fun refreshScreen() {
         super.refreshScreen()
-        binding?.emptyDescriptionTextView?.text = strings["venuesHistoryController.noVenuesEmptyView.title"]
+        if (robertManager.isSick) {
+            binding?.emptyDescriptionTextView?.text = strings["venuesHistoryController.noVenuesEmptyView.isSick.title"]
+        } else {
+            binding?.emptyDescriptionTextView?.text = strings["venuesHistoryController.noVenuesEmptyView.title"]
+        }
     }
 }

@@ -18,7 +18,9 @@ import java.util.UUID
  * @param backgroundServiceManufacturerDataIOS Byte array of manufacturer data advertised by iOS in background
  * @param txCompensationGain Tx Compensation Gain (in dBm)
  * @param rxCompensationGain Tx Compensation Gain (in dBm)
- * @param cacheTimeout Timeout (in ms) for internal cache expiration
+ * @param scanCacheTimeout Timeout (in ms) for scan cache expiration
+ * @param identityCacheTimeout Timeout (in ms) for identity cache expiration
+ * @param maxCacheSize Maximum cache capacity
  * @param scanReportDelay Delay (in ms) between each ble scan report
  * @param connectionTimeout Timeout (in ms) for establishing a GATT connection
  * @param readRemoteRssiTimeout Timeout (in ms) for reading remote RSSI
@@ -26,9 +28,8 @@ import java.util.UUID
  * @param readRemotePayloadTimeout Timeout (in ms) for reading remote payload on connected GATT
  * @param writeRemotePayloadTimeout Timeout (in ms) for writing remote payload on connected GATT
  * @param useScannerHardwareBatching True to use scanner hardware batching if supported
- * @param deviceSelectorCacheTimeout Timeout (in ms) for device selection cache expiration
- * @param deviceSelectorMinConfidenceScore Minimum confidence score in order to keep device
- * @param deviceSelectorMinStatsCount Minimum stats count in order to define the priority of a device
+ * @param maxDelayBetweenExchange Maximum delay (in s) between successful exchanges for a same device
+ * @param maxSuccessiveFailure Maximum successive failure for a same device
  * */
 @Suppress("ArrayInDataClass")
 data class BleSettings(
@@ -37,7 +38,9 @@ data class BleSettings(
     val backgroundServiceManufacturerDataIOS: ByteArray,
     val txCompensationGain: Int,
     val rxCompensationGain: Int,
-    val cacheTimeout: Long = 30 * 1000,
+    val scanCacheTimeout: Long = 30 * 1000,
+    val identityCacheTimeout: Long = 150 * 1000,
+    val maxCacheSize: Int = 1000,
     val scanReportDelay: Long = 1 * 1000,
     val connectionTimeout: Long = 4 * 1000,
     val readRemoteRssiTimeout: Long = 1 * 1000,
@@ -45,9 +48,8 @@ data class BleSettings(
     val readRemotePayloadTimeout: Long = 1 * 1000,
     val writeRemotePayloadTimeout: Long = 1 * 1000,
     val useScannerHardwareBatching: Boolean = true,
-    val deviceSelectorCacheTimeout: Long = 60 * 1000,
-    val deviceSelectorMinConfidenceScore : Int = -3,
-    val deviceSelectorMinStatsCount : Int = 20,
+    val maxDelayBetweenExchange: Long = 45 * 1000,
+    val maxSuccessiveFailure: Int = 10,
 
-    val _devDebugForceNoAdvertiser: Boolean = false
+    val _devDebugForceNoAdvertiser: Boolean = false,
 )

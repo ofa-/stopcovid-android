@@ -31,6 +31,7 @@ enum class ErrorCode {
     BLE_ADVERTISER,
     BLE_SCANNER,
     BLE_GATT,
+    BLE_PROXIMITY_NOTIFICATION,
     TIME_NOT_ALIGNED,
     REPORT_DELAY,
     SECRET_KEY_ALREADY_GENERATED
@@ -75,7 +76,7 @@ class NoEphemeralBluetoothIdentifierFound(message: String? = null) :
 class RobertUnknownException(message: String = "Unknown error occurred") :
     RobertException(ErrorCode.ROBERT_UNKNOWN, message)
 
-class BLEAdvertiserException(message: String = "An error occurs in BLE advertiser", val shouldRestartBle: Boolean = false) :
+class BLEAdvertiserException(message: String = "An error occurs in BLE advertiser") :
     RobertException(ErrorCode.BLE_ADVERTISER, message)
 
 class BLEScannerException(message: String = "An error occurs in BLE scanner") :
@@ -83,6 +84,9 @@ class BLEScannerException(message: String = "An error occurs in BLE scanner") :
 
 class BLEGattException(message: String = "An error occurs in BLE gatt") :
     RobertException(ErrorCode.BLE_GATT, message)
+
+class BLEProximityNotificationException(message: String = "An error occurs in BLE Proximity Notification") :
+    RobertException(ErrorCode.BLE_PROXIMITY_NOTIFICATION, message)
 
 class TimeNotAlignedException(message: String = "Phone time not aligned with server time") :
     RobertException(ErrorCode.TIME_NOT_ALIGNED, message)

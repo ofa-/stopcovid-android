@@ -20,7 +20,7 @@ import com.lunabeestudio.stopcovid.coreui.extension.setOnClickListenerOrHideRipp
 import com.lunabeestudio.stopcovid.coreui.extension.setTextOrHide
 import com.lunabeestudio.stopcovid.coreui.model.Action
 import com.lunabeestudio.stopcovid.coreui.model.CardTheme
-import com.lunabeestudio.stopcovid.extension.setImageResourceOrHide
+import com.lunabeestudio.stopcovid.coreui.extension.setImageResourceOrHide
 import com.mikepenz.fastadapter.binding.AbstractBindingItem
 
 class CardWithActionsItem(private val cardTheme: CardTheme) : AbstractBindingItem<ItemCardWithActionsBinding>() {
@@ -55,14 +55,13 @@ class CardWithActionsItem(private val cardTheme: CardTheme) : AbstractBindingIte
     override fun createBinding(inflater: LayoutInflater, parent: ViewGroup?): ItemCardWithActionsBinding {
         val context = inflater.context
         val themedInflater = LayoutInflater.from(ContextThemeWrapper(context, cardTheme.themeId))
-        val itemCardWithActionsBinding = ItemCardWithActionsBinding.inflate(themedInflater, parent, false)
-        return itemCardWithActionsBinding
+        return ItemCardWithActionsBinding.inflate(themedInflater, parent, false)
     }
 
     override fun bindView(binding: ItemCardWithActionsBinding, payloads: List<Any>) {
         binding.cardTitleTextView.setTextOrHide(cardTitle) {
             cardTitleColorInt?.let {
-                val color = getColor(context, it);
+                val color = getColor(context, it)
                 setTextColor(color)
                 TextViewCompat.setCompoundDrawableTintList(this, ColorStateList.valueOf(color))
             }
@@ -112,13 +111,15 @@ class CardWithActionsItem(private val cardTheme: CardTheme) : AbstractBindingIte
                 }
             }
 
-            actions?.forEachIndexed { index, (icon, label, showBadge, onClickListener) ->
+            actions?.forEachIndexed { index, (icon, label, showBadge, loading, onClickListener) ->
                 val actionBinding = ItemActionBinding.bind(binding.actionsLinearLayout.getChildAt(index))
                 actionBinding.actionDivider.isVisible = (index == 0 && mainLayoutVisible) || (index > 0)
                 actionBinding.textView.text = label.safeEmojiSpanify()
                 actionBinding.leftIconImageView.setImageResourceOrHide(icon)
                 actionBinding.badgeView.isVisible = showBadge
-                actionBinding.actionRootLayout.setOnClickListener(onClickListener)
+                actionBinding.actionRootLayout.setOnClickListenerOrHideRipple(onClickListener)
+                actionBinding.arrowImageView.isVisible = onClickListener != null
+                actionBinding.progressBar.isVisible = loading == true
             }
             if (!binding.actionsLinearLayout.isVisible) {
                 binding.actionsLinearLayout.visibility = View.VISIBLE

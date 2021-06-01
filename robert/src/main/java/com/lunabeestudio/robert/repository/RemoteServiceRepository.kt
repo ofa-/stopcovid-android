@@ -20,9 +20,6 @@ import com.lunabeestudio.domain.model.RegisterReport
 import com.lunabeestudio.domain.model.ReportResponse
 import com.lunabeestudio.domain.model.ServerStatusUpdate
 import com.lunabeestudio.domain.model.StatusReport
-import com.lunabeestudio.domain.model.VenueQrCode
-import com.lunabeestudio.domain.model.WStatusReport
-import com.lunabeestudio.robert.BuildConfig
 import com.lunabeestudio.robert.RobertConstant
 import com.lunabeestudio.robert.datasource.CalibrationDataSource
 import com.lunabeestudio.robert.datasource.ConfigurationDataSource
@@ -79,8 +76,13 @@ internal class RemoteServiceRepository(
     suspend fun status(apiVersion: String, serverStatusUpdate: ServerStatusUpdate): RobertResultData<StatusReport> =
         remoteServiceDataSource.status(apiVersion, serverStatusUpdate)
 
-    suspend fun report(apiVersion: String, token: String, localProximityList: List<LocalProximity>): RobertResultData<ReportResponse> =
-        remoteServiceDataSource.report(apiVersion, token, localProximityList)
+    suspend fun report(
+        apiVersion: String,
+        token: String,
+        localProximityList: List<LocalProximity>,
+        onProgressUpdate: (Float) -> Unit,
+    ): RobertResultData<ReportResponse> =
+        remoteServiceDataSource.report(apiVersion, token, localProximityList, onProgressUpdate)
 
     suspend fun deleteExposureHistory(apiVersion: String, serverStatusUpdate: ServerStatusUpdate): RobertResult =
         remoteServiceDataSource.deleteExposureHistory(apiVersion, serverStatusUpdate)

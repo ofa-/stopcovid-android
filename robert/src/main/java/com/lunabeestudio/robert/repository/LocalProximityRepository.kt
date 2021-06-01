@@ -19,8 +19,8 @@ internal class LocalProximityRepository(private val localLocalProximityDataSourc
         localLocalProximityDataSource.saveAll(*localProximity)
     }
 
-    fun getBetweenTime(startNtpTimeS: Long, endNtpTimeS: Long): List<LocalProximity> {
-        return localLocalProximityDataSource.getBetweenTime(startNtpTimeS, endNtpTimeS)
+    fun getBetweenTime(startNtpTimeS: Long, endNtpTimeS: Long, onProgressUpdate: ((Float) -> Unit)? = null): List<LocalProximity> {
+        return localLocalProximityDataSource.getBetweenTime(startNtpTimeS, endNtpTimeS, onProgressUpdate)
     }
 
     fun removeUntilTime(ntpTimeS: Long) {

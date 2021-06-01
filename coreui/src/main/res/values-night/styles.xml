@@ -16,4 +16,14 @@
 
         <item name="dividerColor">@color/color_mine_shaft</item>
     </style>
+
+    <style name="Theme.StopCovid.Widget" parent="Theme.StopCovid.Base.Widget">
+        <item name="widgetBackgroundColor">@android:color/black</item>
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
+    <style name="Theme.StopCovid.Widget.Attestation">
+        <item name="widgetBackgroundColor">@color/color_indigo</item>
+    </style>
+
 </resources>

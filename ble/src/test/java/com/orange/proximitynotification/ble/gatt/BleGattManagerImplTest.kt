@@ -10,7 +10,9 @@
 
 package com.orange.proximitynotification.ble.gatt
 
+import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattServer
+import android.bluetooth.BluetoothGattService
 import android.bluetooth.BluetoothManager
 import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -26,17 +28,20 @@ import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import com.orange.proximitynotification.ble.BleSettings
 import com.orange.proximitynotification.ble.bluetoothDevice
+import com.orange.proximitynotification.ble.payload
+import com.orange.proximitynotification.ble.proximityPayload
 import com.orange.proximitynotification.tools.Result
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.util.UUID
 
 @RunWith(AndroidJUnit4::class)
 class BleGattManagerImplTest {
 
     private val settings: BleSettings = BleSettings(
-        serviceUuid = mock(),
-        servicePayloadCharacteristicUuid = mock(),
+        serviceUuid = UUID.randomUUID(),
+        servicePayloadCharacteristicUuid = UUID.randomUUID(),
         backgroundServiceManufacturerDataIOS = byteArrayOf(),
         txCompensationGain = 0,
         rxCompensationGain = 5
@@ -109,94 +114,57 @@ class BleGattManagerImplTest {
     }
 
     @Test
-    fun requestRemoteRssi_multiple_times_for_a_same_device_should_request_a_new_one_every_time() {
-        runBlocking {
-
-            // Given
-            val device = bluetoothDevice()
-            doReturn(mock<BleGattClient>()).whenever(bleGattClientProvider).fromDevice(eq(device))
-
-            // When
-            onLifecycle(mock()) {
-                it.requestRemoteRssi(device)
-                it.requestRemoteRssi(device)
-                it.requestRemoteRssi(device)
-            }
-
-            // Then
-            verify(bleGattClientProvider, times(3)).fromDevice(eq(device))
-        }
-    }
-
-    @Test
-    fun requestRemoteRssi_multiple_times_for_a_different_devices_should_request_a_new_one_every_time() {
-        runBlocking {
-
-            // Given
-            doReturn(mock<BleGattClient>()).whenever(bleGattClientProvider).fromDevice(any())
-
-            // When
-            onLifecycle(mock()) {
-                it.requestRemoteRssi(mock())
-                it.requestRemoteRssi(mock())
-                it.requestRemoteRssi(mock())
-            }
-
-            // Then
-            verify(bleGattClientProvider, times(3)).fromDevice(any())
-        }
-    }
-
-
-    @Test
-    fun requestRemoteRssi_given_gattClient_in_success_should_return_remote_rssi() {
+    fun requestRemoteRssi_given_gattClient_in_success_should_return_success() {
         runBlocking {
 
             // Given
             val device = bluetoothDevice()
             val client: BleGattClient = mock()
-            val rssi = 5
+            val rssi = -20
             doReturn(client).whenever(bleGattClientProvider).fromDevice(eq(device))
             doReturn(rssi).whenever(client).readRemoteRssi()
 
             // When
-            val result = onLifecycle(mock()) { it.requestRemoteRssi(device) }
+            val result = onLifecycle(mock()) {
+                it.requestRemoteRssi(device)
+            }
 
             // Then
             verify(bleGattClientProvider).fromDevice(eq(device))
-            verify(client, times(1)).readRemoteRssi()
             verify(client, times(1)).open()
+            verify(client, times(1)).readRemoteRssi()
             verify(client, times(1)).close()
             assertThat(result).isEqualTo(Result.Success(rssi))
         }
     }
 
     @Test
-    fun requestRemoteRssi_with_close_given_gattClient_in_success_should_return_remote_rssi_and_close_client() {
+    fun requestRemoteRssi_given_gattClient_connection_error_should_return_failure() {
         runBlocking {
 
             // Given
             val device = bluetoothDevice()
             val client: BleGattClient = mock()
-            val rssi = 5
             doReturn(client).whenever(bleGattClientProvider).fromDevice(eq(device))
-            doReturn(rssi).whenever(client).readRemoteRssi()
+            doAnswer { throw BleGattClientException() }.whenever(client).open()
 
             // When
-            val result = onLifecycle(mock()) { it.requestRemoteRssi(device) }
+            val result = onLifecycle(mock()) {
+                it.requestRemoteRssi(device)
+            }
 
             // Then
             verify(bleGattClientProvider).fromDevice(eq(device))
-            verify(client, times(1)).readRemoteRssi()
             verify(client, times(1)).open()
+            verify(client, times(0)).readRemoteRssi()
             verify(client, times(1)).close()
-            assertThat(result).isEqualTo(Result.Success(rssi))
+            assertThat(result).isInstanceOf(Result.Failure::class.java)
+            assertThat((result as Result.Failure).throwable).isInstanceOf(BleGattManagerException.ConnectionFailed::class.java)
         }
     }
 
-
     @Test
-    fun requestRemoteRssi_given_gattClient_with_error_should_return_null() {
+    fun requestRemoteRssi_given_gattClient_in_error_should_return_failure() {
         runBlocking {
 
             // Given
@@ -206,41 +174,261 @@ class BleGattManagerImplTest {
             doAnswer { throw BleGattClientException() }.whenever(client).readRemoteRssi()
 
             // When
-            val result = onLifecycle(mock()) { it.requestRemoteRssi(device) }
+            val result = onLifecycle(mock()) {
+                it.requestRemoteRssi(device)
+            }
 
             // Then
             verify(bleGattClientProvider).fromDevice(eq(device))
-            verify(client, times(1)).readRemoteRssi()
             verify(client, times(1)).open()
+            verify(client, times(1)).readRemoteRssi()
             verify(client, times(1)).close()
             assertThat(result).isInstanceOf(Result.Failure::class.java)
-            assertThat((result as Result.Failure).throwable).isInstanceOf(BleGattClientException::class.java)
+            assertThat((result as Result.Failure).throwable).isInstanceOf(BleGattManagerException.OperationFailed::class.java)
         }
     }
 
     @Test
-    fun requestRemoteRssi_with_close_given_gattClient_with_error_should_close_client_and_return_null() {
+    fun exchangePayload_without_requesting_remote_payload_given_gattClient_in_success_should_return_success() {
         runBlocking {
 
             // Given
             val device = bluetoothDevice()
             val client: BleGattClient = mock()
+            val payload = payload()
+            val services = givenBluetoothService()
             doReturn(client).whenever(bleGattClientProvider).fromDevice(eq(device))
-            doAnswer { throw BleGattClientException() }.whenever(client).readRemoteRssi()
+            doReturn(services).whenever(client).discoverServices()
 
             // When
-            val result = onLifecycle(mock()) { it.requestRemoteRssi(device) }
+            val result = onLifecycle(mock()) {
+                it.exchangePayload(
+                    device,
+                    value = payload.toByteArray(),
+                    shouldReadRemotePayload = false
+                )
+            }
 
             // Then
             verify(bleGattClientProvider).fromDevice(eq(device))
-            verify(client, times(1)).readRemoteRssi()
             verify(client, times(1)).open()
+            verify(client, times(1)).discoverServices()
+            verify(client, times(1)).writeCharacteristic(any())
+            verify(client, times(0)).readRemoteRssi()
+            verify(client, times(0)).readCharacteristic(any())
             verify(client, times(1)).close()
-            assertThat(result).isInstanceOf(Result.Failure::class.java)
-            assertThat((result as Result.Failure).throwable).isInstanceOf(BleGattClientException::class.java)
+            assertThat(result).isEqualTo(Result.Success(null))
         }
     }
 
+    @Test
+    fun exchangePayload_without_requesting_remote_payload_given_gattClient_having_different_services_should_return_failure() {
+        runBlocking {
+
+            // Given
+            val device = bluetoothDevice()
+            val client: BleGattClient = mock()
+            val payload = payload()
+            val services = givenBluetoothService(serviceUuid = UUID.randomUUID())
+            doReturn(client).whenever(bleGattClientProvider).fromDevice(eq(device))
+            doReturn(services).whenever(client).discoverServices()
+
+            // When
+            val result = onLifecycle(mock()) {
+                it.exchangePayload(
+                    device,
+                    value = payload.toByteArray(),
+                    shouldReadRemotePayload = false
+                )
+            }
+
+            // Then
+            verify(bleGattClientProvider).fromDevice(eq(device))
+            verify(client, times(1)).open()
+            verify(client, times(1)).discoverServices()
+            verify(client, times(0)).writeCharacteristic(any())
+            verify(client, times(0)).readRemoteRssi()
+            verify(client, times(0)).readCharacteristic(any())
+            verify(client, times(1)).close()
+            assertThat(result).isInstanceOf(Result.Failure::class.java)
+            assertThat((result as Result.Failure).throwable).isInstanceOf(BleGattManagerException.IncorrectPayloadService::class.java)
+        }
+    }
+
+    @Test
+    fun exchangePayload_without_requesting_remote_payload_given_gattClient_having_different_characteristic_should_return_failure() {
+        runBlocking {
+
+            // Given
+            val device = bluetoothDevice()
+            val client: BleGattClient = mock()
+            val payload = payload()
+            val services =
+                givenBluetoothService(
+                    writeCharacteristic = givenBluetoothGattCharacteristic(
+                        servicePayloadCharacteristicUuid = UUID.randomUUID()
+                    )
+                )
+            doReturn(client).whenever(bleGattClientProvider).fromDevice(eq(device))
+            doReturn(services).whenever(client).discoverServices()
+
+            // When
+            val result = onLifecycle(mock()) {
+                it.exchangePayload(
+                    device,
+                    value = payload.toByteArray(),
+                    shouldReadRemotePayload = false
+                )
+            }
+
+            // Then
+            verify(bleGattClientProvider).fromDevice(eq(device))
+            verify(client, times(1)).open()
+            verify(client, times(1)).discoverServices()
+            verify(client, times(0)).writeCharacteristic(any())
+            verify(client, times(0)).readRemoteRssi()
+            verify(client, times(0)).readCharacteristic(any())
+            verify(client, times(1)).close()
+            assertThat(result).isInstanceOf(Result.Failure::class.java)
+            assertThat((result as Result.Failure).throwable).isInstanceOf(BleGattManagerException.IncorrectPayloadService::class.java)
+        }
+    }
+
+    @Test
+    fun exchangePayload_requesting_remote_payload_given_gattClient_in_success_should_return_success() {
+        runBlocking {
+
+            // Given
+            val device = bluetoothDevice()
+            val client: BleGattClient = mock()
+            val payload = payload()
+            val remotePayload = payload(proximityPayload(1))
+            val remoteRssi = 5
+            val readCharacteristic =
+                givenBluetoothGattCharacteristic(value = remotePayload.toByteArray())
+            val services = givenBluetoothService(readCharacteristic = readCharacteristic)
+            doReturn(client).whenever(bleGattClientProvider).fromDevice(eq(device))
+            doReturn(services).whenever(client).discoverServices()
+            doReturn(remoteRssi).whenever(client).readRemoteRssi()
+            doReturn(readCharacteristic).whenever(client).readCharacteristic(any())
+
+            // When
+            val result = onLifecycle(mock()) {
+                it.exchangePayload(
+                    device,
+                    value = payload.toByteArray(),
+                    shouldReadRemotePayload = true
+                )
+            }
+
+            // Then
+            verify(bleGattClientProvider).fromDevice(eq(device))
+            verify(client, times(1)).open()
+            verify(client, times(1)).discoverServices()
+            verify(client, times(1)).writeCharacteristic(any())
+            verify(client, times(1)).readRemoteRssi()
+            verify(client, times(1)).readCharacteristic(any())
+            verify(client, times(1)).close()
+
+            assertThat(result).isEqualTo(
+                Result.Success(
+                    RemoteRssiAndPayload(
+                        rssi = remoteRssi,
+                        payload = remotePayload.toByteArray()
+                    )
+                )
+            )
+
+        }
+    }
+
+    @Test
+    fun exchangePayload_given_gattClient_connection_error_should_return_failure() {
+        runBlocking {
+
+            // Given
+            val device = bluetoothDevice()
+            val client: BleGattClient = mock()
+            val payload = payload()
+            doReturn(client).whenever(bleGattClientProvider).fromDevice(eq(device))
+            doAnswer { throw BleGattClientException() }.whenever(client).open()
+
+            // When
+            val result = onLifecycle(mock()) {
+                it.exchangePayload(
+                    device,
+                    value = payload.toByteArray(),
+                    shouldReadRemotePayload = false
+                )
+            }
+
+            // Then
+            verify(bleGattClientProvider).fromDevice(eq(device))
+            verify(client, times(1)).open()
+            verify(client, times(0)).discoverServices()
+            verify(client, times(0)).writeCharacteristic(any())
+            verify(client, times(0)).readRemoteRssi()
+            verify(client, times(0)).readCharacteristic(any())
+            verify(client, times(1)).close()
+            assertThat(result).isInstanceOf(Result.Failure::class.java)
+            assertThat((result as Result.Failure).throwable).isInstanceOf(BleGattManagerException.ConnectionFailed::class.java)
+        }
+    }
+
+    @Test
+    fun exchangePayload_given_gattClient_throwing_error_should_return_failure() {
+        runBlocking {
+
+            // Given
+            val device = bluetoothDevice()
+            val client: BleGattClient = mock()
+            val payload = payload()
+            doReturn(client).whenever(bleGattClientProvider).fromDevice(eq(device))
+            doAnswer { throw BleGattClientException() }.whenever(client).discoverServices()
+
+            // When
+            val result = onLifecycle(mock()) {
+                it.exchangePayload(
+                    device,
+                    value = payload.toByteArray(),
+                    shouldReadRemotePayload = false
+                )
+            }
+
+            // Then
+            verify(bleGattClientProvider).fromDevice(eq(device))
+            verify(client, times(1)).open()
+            verify(client, times(1)).discoverServices()
+            verify(client, times(0)).writeCharacteristic(any())
+            verify(client, times(0)).readRemoteRssi()
+            verify(client, times(0)).readCharacteristic(any())
+            verify(client, times(1)).close()
+            assertThat(result).isInstanceOf(Result.Failure::class.java)
+            assertThat((result as Result.Failure).throwable).isInstanceOf(BleGattManagerException.OperationFailed::class.java)
+        }
+    }
+
+    private fun givenBluetoothService(
+        serviceUuid: UUID = settings.serviceUuid,
+        writeCharacteristic: BluetoothGattCharacteristic? = givenBluetoothGattCharacteristic(),
+        readCharacteristic: BluetoothGattCharacteristic? = null
+    ): List<BluetoothGattService> {
+
+        val service = BluetoothGattService(serviceUuid, BluetoothGattService.SERVICE_TYPE_PRIMARY)
+        service.addCharacteristic(writeCharacteristic)
+        readCharacteristic?.let { service.addCharacteristic(readCharacteristic) }
+
+        return listOf(service)
+    }
+
+    private fun givenBluetoothGattCharacteristic(
+        servicePayloadCharacteristicUuid: UUID = settings.servicePayloadCharacteristicUuid,
+        value: ByteArray = byteArrayOf()
+    ) = BluetoothGattCharacteristic(
+        servicePayloadCharacteristicUuid,
+        BluetoothGattCharacteristic.PROPERTY_READ or BluetoothGattCharacteristic.PROPERTY_WRITE,
+        BluetoothGattCharacteristic.PERMISSION_READ or BluetoothGattCharacteristic.PERMISSION_WRITE
+    ).apply { setValue(value) }
 
     private suspend fun <T> onLifecycle(
         callback: BleGattManager.Callback,

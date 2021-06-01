@@ -42,6 +42,12 @@ object AppMaintenanceManager {
     var infoFreeCompletion: (() -> Unit)? = null
     var infoBlockedCompletion: ((info: Info) -> Unit)? = null
 
+    val shouldDisplayUpdateAvailable: Boolean
+        get() {
+            val info = getMaintenanceJson()?.let { Info(JSONObject(it)) }
+            return info?.minInfoBuildNumber?.let { buildNumber < it } ?: false
+        }
+
     /**
      * Should always be called first !
      * Prefer call this in the onCreate of your App class
@@ -206,6 +212,10 @@ object AppMaintenanceManager {
         sharedPrefs.edit()
             .putString(JSON_STRING_SHARED_PREFS_KEY, jsonString)
             .apply()
+    }
+
+    private fun getMaintenanceJson(): String? {
+        return sharedPrefs.getString(JSON_STRING_SHARED_PREFS_KEY, null)
     }
 
     /**

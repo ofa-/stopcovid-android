@@ -14,14 +14,43 @@ import android.bluetooth.BluetoothDevice
 import com.orange.proximitynotification.ble.BleSettings
 import com.orange.proximitynotification.tools.Result
 
-internal class RemoteRssiAndPayload(
+internal data class RemoteRssiAndPayload(
     val rssi: Int,
     val payload: ByteArray
-)
+) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
 
-internal data class BleGattConnectionException(
+        other as RemoteRssiAndPayload
+
+        if (rssi != other.rssi) return false
+        if (!payload.contentEquals(other.payload)) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = rssi
+        result = 31 * result + payload.contentHashCode()
+        return result
+    }
+}
+
+internal sealed class BleGattManagerException(
+    override val message: String? = null,
     override val cause: Throwable? = null
-) : Exception(cause)
+) : Exception(message, cause) {
+
+    data class ConnectionFailed(override val cause: Throwable? = null) :
+        BleGattManagerException(cause = cause)
+
+    data class OperationFailed(override val cause: Throwable? = null) :
+        BleGattManagerException(cause = cause)
+
+    class IncorrectPayloadService(override val message: String) :
+        BleGattManagerException(message = message)
+}
 
 internal interface BleGattManager {
     val settings: BleSettings

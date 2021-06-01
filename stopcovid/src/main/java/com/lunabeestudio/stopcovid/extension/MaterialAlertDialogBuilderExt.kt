@@ -21,8 +21,8 @@ import androidx.core.widget.doOnTextChanged
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.databinding.DialogPostalCodeEditTextBinding
-import com.lunabeestudio.stopcovid.model.RisksUILevel
 import com.lunabeestudio.stopcovid.manager.KeyFiguresManager
+import com.lunabeestudio.stopcovid.model.RisksUILevel
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -190,17 +190,14 @@ fun MaterialAlertDialogBuilder.showAlertRiskLevelChanged(
     sharedPreferences: SharedPreferences,
     risksUILevel: RisksUILevel?,
 ) {
+    sharedPreferences.alertRiskLevelChanged = false
     if (risksUILevel != null
         && risksUILevel.labels.notifTitle != null
         && risksUILevel.labels.notifBody != null) {
         setTitle(strings[risksUILevel.labels.notifTitle])
         setMessage(strings[risksUILevel.labels.notifBody])
-        setPositiveButton(strings["common.ok"]) { _, _ ->
-            sharedPreferences.alertRiskLevelChanged = false
-        }
+        setPositiveButton(strings["common.ok"], null)
         setCancelable(false)
         show()
-    } else {
-        sharedPreferences.alertRiskLevelChanged = false
     }
 }

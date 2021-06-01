@@ -78,12 +78,14 @@ import com.lunabeestudio.stopcovid.manager.LinksManager
 import com.lunabeestudio.stopcovid.manager.MoreKeyFiguresManager
 import com.lunabeestudio.stopcovid.manager.PrivacyManager
 import com.lunabeestudio.stopcovid.manager.ProximityManager
+import com.lunabeestudio.stopcovid.manager.CertificatesDocumentsManager
 import com.lunabeestudio.stopcovid.manager.RisksLevelManager
 import com.lunabeestudio.stopcovid.manager.VaccinationCenterManager
 import com.lunabeestudio.stopcovid.manager.VenuesManager
 import com.lunabeestudio.stopcovid.manager.WalletManager
 import com.lunabeestudio.stopcovid.model.DeviceSetup
 import com.lunabeestudio.stopcovid.service.ProximityService
+import com.lunabeestudio.stopcovid.widgetshomescreen.ProximityWidget
 import com.lunabeestudio.stopcovid.worker.ActivateReminderNotificationWorker
 import com.lunabeestudio.stopcovid.worker.AtRiskNotificationWorker
 import com.lunabeestudio.stopcovid.worker.IsolationReminderNotificationWorker
@@ -152,6 +154,8 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
             LocalProximityFilterImpl()
         )
     }
+
+    private val certificatesDocumentsManager: CertificatesDocumentsManager = CertificatesDocumentsManager(this)
 
     init {
         System.setProperty("kotlinx.coroutines.debug", if (BuildConfig.DEBUG) "on" else "off")
@@ -268,6 +272,9 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
             VaccinationCenterManager.onAppForeground(this@StopCovid, sharedPrefs)
         }
         appCoroutineScope.launch {
+            certificatesDocumentsManager.onAppForeground(this@StopCovid)
+        }
+        appCoroutineScope.launch {
             robertManager.refreshConfig(this@StopCovid)
         }
         AnalyticsManager.reportAppEvent(this, AppEventName.e3)
@@ -310,6 +317,7 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
     override fun alertAtRiskLevelChange() {
         sharedPrefs.alertRiskLevelChanged = true
         sharedPrefs.hideRiskStatus = false
+        ProximityWidget.updateWidget(applicationContext)
     }
 
     private fun sendAtRiskNotification(oneTimeWorkRequestBuilder: OneTimeWorkRequest.Builder) {

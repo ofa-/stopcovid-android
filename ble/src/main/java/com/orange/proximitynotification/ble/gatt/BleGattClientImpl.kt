@@ -104,13 +104,17 @@ internal class BleGattClientImpl(
         disconnectAndCloseGatt()
 
         // Close channels
+        closeGattOperationChannels(closeCause)
+        connectionStateChannel.close(closeCause)
+
+        job.cancel()
+    }
+
+    private fun closeGattOperationChannels(closeCause: Throwable?) {
         remoteRssiChannel.close(closeCause)
         discoveredServicesChannel.close(closeCause)
         writeCharacteristicChannel.close(closeCause)
         readCharacteristicChannel.close(closeCause)
-        connectionStateChannel.close(closeCause)
-
-        job.cancel()
     }
 
     private suspend fun disconnectAndCloseGatt() = withContext(NonCancellable) {
@@ -176,9 +180,13 @@ internal class BleGattClientImpl(
                 gatt.runCatching { refreshAndClose() }
             }
 
-            connectionState.set(newState)
+            val previousConnectionState = connectionState.getAndSet(newState)
             connectionStateChannel.sendValueWithStatus(status, newState)
 
+            if (previousConnectionState == BluetoothProfile.STATE_CONNECTED
+                && newState == BluetoothProfile.STATE_DISCONNECTED) {
+                closeGattOperationChannels(BleGattClientException("client is no more connected"))
+            }
         }
 
         override fun onReadRemoteRssi(gatt: BluetoothGatt, rssi: Int, status: Int) {

@@ -21,6 +21,10 @@ Component: Barcode scanning library for Android, using ZXing for decoding
 License Text URL: http://www.apache.org/licenses/LICENSE-2.0
 Source Code: https://github.com/journeyapps/zxing-android-embedded
 
+Component: PhotoView
+License Text URL: http://www.apache.org/licenses/LICENSE-2.0
+Source Code: https://github.com/Baseflow/PhotoView
+
 ================================================================================
 BSD 3-Clause
 ================================================================================

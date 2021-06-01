@@ -21,7 +21,7 @@ import java.lang.reflect.Type
 
 typealias AttestationForm = List<List<FormField>>
 
-object FormManager : RemoteFileManager<AttestationForm>() {
+object FormManager : RemoteJsonManager<AttestationForm>() {
 
     override val type: Type = object : TypeToken<AttestationForm>() {}.type
     override val localFileName: String = ConfigConstant.Attestations.FILENAME

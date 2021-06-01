@@ -13,7 +13,7 @@ package com.lunabeestudio.robert.datasource
 import com.lunabeestudio.domain.model.LocalProximity
 
 interface LocalLocalProximityDataSource {
-    fun getBetweenTime(ntpStartTimeS: Long, ntpEndTimeS: Long): List<LocalProximity>
+    fun getBetweenTime(ntpStartTimeS: Long, ntpEndTimeS: Long, onProgressUpdate: ((Float) -> Unit)? = null): List<LocalProximity>
     suspend fun saveAll(vararg localProximity: LocalProximity)
     fun removeUntilTime(ntpTimeS: Long)
     fun removeAll()

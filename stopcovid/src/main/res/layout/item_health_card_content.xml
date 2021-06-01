@@ -18,7 +18,7 @@
         android:id="@+id/headerTextView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:paddingVertical="@dimen/spacing_large"
+        android:paddingBottom="@dimen/spacing_large"
         android:layout_marginHorizontal="@dimen/spacing_large"
         android:textAppearance="@style/TextAppearance.StopCovid.Caption"
         android:textColor="@color/color_on_status_notification"
@@ -52,6 +52,7 @@
         android:textAppearance="@style/TextAppearance.StopCovid.Caption"
         android:textColor="@color/color_on_status_notification"
         android:textIsSelectable="false"
+        android:paddingBottom="@dimen/spacing_large"
         app:layout_constraintBottom_toTopOf="@id/dateLabelTextView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -63,7 +64,6 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/spacing_large"
-        android:layout_marginTop="@dimen/spacing_large"
         android:textAppearance="@style/TextAppearance.StopCovid.Caption"
         android:textColor="@color/color_on_status_notification"
         android:textIsSelectable="false"
@@ -81,10 +81,19 @@
         android:textAppearance="@style/TextAppearance.StopCovid.Caption.Bold"
         android:textColor="@color/color_on_status_notification"
         android:textIsSelectable="false"
-        app:layout_constraintBottom_toTopOf="parent"
+        android:paddingBottom="@dimen/spacing_large"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/dateLabelTextView"
         tools:text="@tools:sample/lorem[1]" />
+
+    <include layout="@layout/item_action"
+        android:id="@+id/statusUpdateAction"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/dateValueTextView" />
 
 </merge>

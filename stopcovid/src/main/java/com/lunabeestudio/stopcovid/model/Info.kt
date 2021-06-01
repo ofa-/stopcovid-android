@@ -23,6 +23,7 @@ class Info(jsonObject: JSONObject) {
     var isActive: Boolean? = null
     private var _mode: String
     var minRequiredBuildNumber: Int? = null
+    var minInfoBuildNumber: Int? = null
     private var messageMap: HashMap<String, String> = hashMapOf()
     val message: String?
         get() {
@@ -60,6 +61,7 @@ class Info(jsonObject: JSONObject) {
         isActive = androidInfoJSONObject.optBoolean("isActive")
         _mode = androidInfoJSONObject.optString("mode")
         minRequiredBuildNumber = androidInfoJSONObject.optInt("minRequiredBuildNumber")
+        minInfoBuildNumber = androidInfoJSONObject.optInt("minInfoBuild")
         mapStrings(androidInfoJSONObject.optJSONObject("message"), messageMap)
         mapStrings(androidInfoJSONObject.optJSONObject("buttonTitle"), buttonTitleMap)
         mapStrings(androidInfoJSONObject.optJSONObject("buttonURL"), buttonUrlMap)

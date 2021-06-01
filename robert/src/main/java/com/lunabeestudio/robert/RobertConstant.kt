@@ -20,6 +20,7 @@ object RobertConstant {
     const val DEFAULT_CALIBRATION_KEY: String = "DEFAULT"
     const val REGISTER_DELAY_MONTH: Int = 2
     val BLE_FILTER_MODE: LocalProximityFilter.Mode = LocalProximityFilter.Mode.RISKS
+    const val LAST_CONTACT_DELTA_S: Long = 24 * 60 * 60
 
     object PREFIX {
         const val C1: Byte = 0b00000001

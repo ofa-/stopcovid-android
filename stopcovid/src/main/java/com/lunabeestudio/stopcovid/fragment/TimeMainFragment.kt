@@ -14,6 +14,10 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import com.lunabeestudio.stopcovid.coreui.model.Action
+import com.lunabeestudio.stopcovid.extension.getRelativeDateTimeString
+import kotlin.time.ExperimentalTime
+import kotlin.time.milliseconds
 
 abstract class TimeMainFragment : MainFragment() {
 
@@ -33,5 +37,23 @@ abstract class TimeMainFragment : MainFragment() {
     override fun onPause() {
         super.onPause()
         context?.unregisterReceiver(timeUpdateReceiver)
+    }
+
+    @ExperimentalTime
+    protected fun getStatusLastUpdateToDisplay(context: Context, lastRefresh: Long?, riskLevel: Float): String? = if (riskLevel > 0f) {
+        null
+    } else {
+        stringsFormat(
+            "myHealthController.notification.update",
+            lastRefresh?.milliseconds?.getRelativeDateTimeString(context, strings["common.justNow"]) ?: ""
+        )
+    }
+
+    protected fun refreshStatusActions(isUpdatingStatus: Boolean?): Action? {
+        return if (isUpdatingStatus == true) {
+            Action(label = strings["home.healthSection.statusState"], loading = true, onClickListener = null)
+        } else {
+            null
+        }
     }
 }
