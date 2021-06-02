@@ -35,8 +35,8 @@ import com.lunabeestudio.stopcovid.databinding.ActivityMainBinding
 import com.lunabeestudio.stopcovid.extension.alertRiskLevelChanged
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.showAlertRiskLevelChanged
+import com.lunabeestudio.stopcovid.manager.DeeplinkManager
 import com.lunabeestudio.stopcovid.manager.RisksLevelManager
-import com.lunabeestudio.stopcovid.manager.VenuesManager
 
 class MainActivity : BaseActivity() {
 
@@ -115,9 +115,9 @@ class MainActivity : BaseActivity() {
     }
 
     private fun fixIntentData(intent: Intent) {
-        // since we use '#' to separate the venue base64 code, we replace it to pass a clean URL to the nav_graph deeplink handle
+        // since we use '#' to separate the code, we replace it to pass a clean URL to the nav_graph deeplink handle
         val uri = intent.data?.let {
-            VenuesManager.cleanVenueUri(it.toString())
+            DeeplinkManager.transformAnchorParam(it)
         }
         val uriBuilder = uri?.buildUpon()
             ?.path(intent.data?.path?.takeIf { it != "/" })

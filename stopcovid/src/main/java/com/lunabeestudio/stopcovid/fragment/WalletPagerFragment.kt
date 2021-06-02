@@ -29,6 +29,7 @@ import com.lunabeestudio.stopcovid.coreui.extension.findParentFragmentByType
 import com.lunabeestudio.stopcovid.coreui.extension.refreshLift
 import com.lunabeestudio.stopcovid.coreui.fragment.BaseFragment
 import com.lunabeestudio.stopcovid.extension.robertManager
+import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
 import com.lunabeestudio.stopcovid.model.UnknownException
 import com.lunabeestudio.stopcovid.viewmodel.WalletViewModel
@@ -69,7 +70,7 @@ class WalletPagerFragment : BaseFragment() {
         setupViewPager()
         viewModel.certificatesCount.observe(viewLifecycleOwner) { certificateCount ->
             if (certificateCount == 0) {
-                findNavControllerOrNull()?.navigate(WalletPagerFragmentDirections.actionWalletPagerFragmentToWalletInfoFragment())
+                findNavControllerOrNull()?.safeNavigate(WalletPagerFragmentDirections.actionWalletPagerFragmentToWalletInfoFragment())
             } else {
                 (activity as? MainActivity)?.binding?.tabLayout?.getTabAt(WALLET_CERTIFICATE_FRAGMENT_POSITION)?.text =
                     stringsFormat("walletController.mode.myCertificates", certificateCount)

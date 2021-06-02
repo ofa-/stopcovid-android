@@ -17,6 +17,7 @@ import com.lunabeestudio.stopcovid.coreui.extension.callPhone
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
+import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.fastitem.addCertificateCardItem
 import com.lunabeestudio.stopcovid.fastitem.phoneSupportItem
 import com.mikepenz.fastadapter.GenericItem
@@ -37,7 +38,7 @@ class WalletAddCertificateFragment : MainFragment() {
             fallbackRes = R.drawable.test_certificate
             mainAction = {
                 findNavControllerOrNull()
-                    ?.navigate(
+                    ?.safeNavigate(
                         WalletAddCertificateFragmentDirections.actionWalletAddCertificateFragmentToWalletQRFragment(
                             WalletCertificateType.SANITARY
                         )
@@ -45,7 +46,7 @@ class WalletAddCertificateFragment : MainFragment() {
             }
             thumbnailAction = {
                 findNavControllerOrNull()
-                    ?.navigate(WalletAddCertificateFragmentDirections.actionWalletAddCertificateFragmentToTestDocumentExplanationFragment())
+                    ?.safeNavigate(WalletAddCertificateFragmentDirections.actionWalletAddCertificateFragmentToTestDocumentExplanationFragment())
             }
             identifier = title.hashCode().toLong()
         }
@@ -57,7 +58,7 @@ class WalletAddCertificateFragment : MainFragment() {
             fallbackRes = R.drawable.vaccin_certificate
             mainAction = {
                 findNavControllerOrNull()
-                    ?.navigate(
+                    ?.safeNavigate(
                         WalletAddCertificateFragmentDirections.actionWalletAddCertificateFragmentToWalletQRFragment(
                             WalletCertificateType.VACCINATION
                         )
@@ -65,7 +66,7 @@ class WalletAddCertificateFragment : MainFragment() {
             }
             thumbnailAction = {
                 findNavControllerOrNull()
-                    ?.navigate(WalletAddCertificateFragmentDirections.actionWalletAddCertificateFragmentToVaccinDocumentExplanationFragment())
+                    ?.safeNavigate(WalletAddCertificateFragmentDirections.actionWalletAddCertificateFragmentToVaccinDocumentExplanationFragment())
             }
             identifier = title.hashCode().toLong()
         }

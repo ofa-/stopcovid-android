@@ -708,10 +708,14 @@
         android:name="com.lunabeestudio.stopcovid.fragment.WalletContainerFragment">
         <deepLink
             android:autoVerify="true"
-            app:uri="https://bonjour.tousanticovid.gouv.fr/app/wallet?v={certificateCode}"
+            app:uri="https://bonjour.tousanticovid.gouv.fr/app/wallet?v={code}"
+            tools:targetApi="m" />
+        <deepLink
+            android:autoVerify="true"
+            app:uri="https://bonjour.tousanticovid.gouv.fr/app/wallet2d?code={code}"
             tools:targetApi="m" />
         <argument
-            android:name="certificateCode"
+            android:name="code"
             android:defaultValue="@null"
             app:argType="string"
             app:nullable="true" />

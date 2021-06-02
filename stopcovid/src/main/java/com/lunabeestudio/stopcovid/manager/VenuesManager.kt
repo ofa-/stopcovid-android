@@ -1,7 +1,6 @@
 package com.lunabeestudio.stopcovid.manager
 
 import android.content.SharedPreferences
-import android.net.Uri
 import android.net.UrlQuerySanitizer
 import android.util.Base64
 import com.lunabeestudio.domain.extension.ntpTimeSToUnixTimeMs
@@ -24,10 +23,6 @@ import kotlin.time.days
 
 object VenuesManager {
 
-    fun cleanVenueUri(stringUri: String): Uri = Uri.parse(cleanVenueUriString(stringUri))
-
-    private fun cleanVenueUriString(stringUri: String): String = stringUri.replace("#", "&code=")
-
     fun processVenueUrl(
         robertManager: RobertManager,
         secureKeystoreDataSource: SecureKeystoreDataSource,
@@ -38,7 +33,7 @@ object VenuesManager {
             sanitizer.registerParameters(arrayOf("code", "v", "t")) {
                 it // Do nothing since there are plenty of non legal characters in this value
             }
-            sanitizer.parseUrl(cleanVenueUriString(stringUrl))
+            sanitizer.parseUrl(DeeplinkManager.transformAnchorParam(stringUrl))
 
             val base64URLCode: String = sanitizer.getValue("code") ?: throw VenueInvalidFormatException()
             val version: Int = sanitizer.getValue("v")?.toInt() ?: throw VenueInvalidFormatException()
