@@ -754,17 +754,17 @@ class ProximityFragment : TimeMainFragment() {
             KeyFiguresManager.featuredFigures?.let { keyFigures ->
                 franceData = NumbersCardItem.Data(
                     strings["common.country.france"],
-                    generateFromKeyFigure(keyFigures[0]),
-                    generateFromKeyFigure(keyFigures[1]),
-                    generateFromKeyFigure(keyFigures[2])
+                    generateFromKeyFigure(keyFigures.getOrNull(0)),
+                    generateFromKeyFigure(keyFigures.getOrNull(1)),
+                    generateFromKeyFigure(keyFigures.getOrNull(2))
                 )
 
                 localData = if (sharedPrefs.hasChosenPostalCode) {
                     NumbersCardItem.Data(
                         keyFigures.getDepartmentLabel(sharedPrefs.chosenPostalCode),
-                        generateFromKeyFigure(keyFigures[0], true),
-                        generateFromKeyFigure(keyFigures[1], true),
-                        generateFromKeyFigure(keyFigures[2], true)
+                        generateFromKeyFigure(keyFigures.getOrNull(0), true),
+                        generateFromKeyFigure(keyFigures.getOrNull(1), true),
+                        generateFromKeyFigure(keyFigures.getOrNull(2), true)
                     )
                 } else {
                     null
@@ -814,18 +814,20 @@ class ProximityFragment : TimeMainFragment() {
         return items
     }
 
-    private fun generateFromKeyFigure(keyFigure: KeyFigure, fromDepartment: Boolean = false): NumbersCardItem.DataFigure {
-        return NumbersCardItem.DataFigure(
-            strings[keyFigure.labelShortStringKey],
-            if (fromDepartment) {
-                keyFigure.getKeyFigureForPostalCode(sharedPrefs.chosenPostalCode)?.valueToDisplay?.formatNumberIfNeeded(numberFormat)
-            } else {
-                keyFigure.valueGlobalToDisplay.formatNumberIfNeeded(numberFormat)
-            },
-            strings[keyFigure.colorStringKey(requireContext().isNightMode())]?.let {
-                Color.parseColor(it)
-            }
-        )
+    private fun generateFromKeyFigure(keyFigure: KeyFigure?, fromDepartment: Boolean = false): NumbersCardItem.DataFigure? {
+        return keyFigure?.let {
+            NumbersCardItem.DataFigure(
+                strings[keyFigure.labelShortStringKey],
+                if (fromDepartment) {
+                    keyFigure.getKeyFigureForPostalCode(sharedPrefs.chosenPostalCode)?.valueToDisplay?.formatNumberIfNeeded(numberFormat)
+                } else {
+                    keyFigure.valueGlobalToDisplay.formatNumberIfNeeded(numberFormat)
+                },
+                strings[keyFigure.colorStringKey(requireContext().isNightMode())]?.let {
+                    Color.parseColor(it)
+                }
+            )
+        }
     }
 
     private fun addAttestationItems(items: ArrayList<GenericItem>) {

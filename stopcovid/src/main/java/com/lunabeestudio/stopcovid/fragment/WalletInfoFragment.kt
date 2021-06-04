@@ -62,7 +62,7 @@ class WalletInfoFragment : MainFragment() {
             if (it.isNullOrEmpty() || parentFragment is WalletPagerFragment) {
                 refreshScreen()
             } else {
-                findNavControllerOrNull()?.navigate(WalletInfoFragmentDirections.actionWalletInfoFragmentToWalletPagerFragment())
+                findNavControllerOrNull()?.safeNavigate(WalletInfoFragmentDirections.actionWalletInfoFragmentToWalletPagerFragment())
             }
         }
     }

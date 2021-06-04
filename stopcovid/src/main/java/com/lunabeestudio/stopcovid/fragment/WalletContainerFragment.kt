@@ -60,7 +60,7 @@ class WalletContainerFragment : BaseFragment() {
 
         confirmationAsked = savedInstanceState?.getBoolean(CONFIRMATION_ASKED_KEY) == true
 
-        val certificateCode = args.certificateCode
+        val certificateCode = args.code
         if (certificateCode != null && !confirmationAsked) {
             if (checkCodeValue(certificateCode)) {
                 findNavControllerOrNull()?.safeNavigate(
@@ -92,7 +92,7 @@ class WalletContainerFragment : BaseFragment() {
         binding = FragmentWalletContainerBinding.inflate(inflater, container, false)
         binding.walletBottomSheetButton.setOnClickListener {
             findNavControllerOrNull()
-                ?.navigate(WalletContainerFragmentDirections.actionWalletContainerFragmentToWalletAddCertificateFragment())
+                ?.safeNavigate(WalletContainerFragmentDirections.actionWalletContainerFragmentToWalletAddCertificateFragment())
         }
         return binding.root
     }
@@ -147,7 +147,7 @@ class WalletContainerFragment : BaseFragment() {
     private fun handleCertificateError(error: Exception, certificateType: WalletCertificateType): Boolean {
         val certificateError = error.walletCertificateError()
         if (certificateError != null) {
-            findNavControllerOrNull()?.navigate(
+            findNavControllerOrNull()?.safeNavigate(
                 WalletContainerFragmentDirections.actionWalletQRCodeFragmentToWalletCertificateErrorFragment(
                     certificateType,
                     certificateError,
