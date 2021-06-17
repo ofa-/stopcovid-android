@@ -44,6 +44,19 @@ object RetrofitClient {
             .build().create(clazz)
     }
 
+    internal fun <T> getService(
+        context: Context,
+        baseUrl: String,
+        clazz: Class<T>,
+        onProgressUpdate: ((Float) -> Unit)? = null,
+    ): T {
+        return Retrofit.Builder()
+            .baseUrl(baseUrl.toHttpUrl())
+            .addConverterFactory(MoshiConverterFactory.create())
+            .client(getDefaultOKHttpClient(context, baseUrl, null, onProgressUpdate))
+            .build().create(clazz)
+    }
+
     internal fun <T> getFileService(context: Context, baseUrl: String, certificateSHA256: String, clazz: Class<T>): T {
         return Retrofit.Builder()
             .baseUrl(baseUrl.toHttpUrl())
@@ -54,7 +67,7 @@ object RetrofitClient {
     fun getDefaultOKHttpClient(
         context: Context,
         url: String,
-        certificateSHA256: String,
+        certificateSHA256: String?,
         onProgressUpdate: ((Float) -> Unit)? = null,
     ): OkHttpClient {
         val requireTls12 = ConnectionSpec.Builder(ConnectionSpec.RESTRICTED_TLS)
@@ -64,7 +77,7 @@ object RetrofitClient {
             if (!BuildConfig.DEBUG) {
                 connectionSpecs(listOf(requireTls12))
             }
-            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N) {
+            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N && certificateSHA256 != null) {
                 certificatePinner(
                     CertificatePinner.Builder()
                         .add(url.toHttpUrl().host, certificateSHA256)

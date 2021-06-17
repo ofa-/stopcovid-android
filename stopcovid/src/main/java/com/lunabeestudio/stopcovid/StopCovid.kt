@@ -145,7 +145,6 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
                 EnvConstant.Prod.cleaReportBaseUrl,
                 EnvConstant.Prod.cleaReportCertificateSha256,
                 EnvConstant.Prod.cleaStatusBaseUrl,
-                EnvConstant.Prod.cleaStatusCertificateSha256
             ),
             BouncyCastleCryptoDataSource(),
             ConfigDataSource,

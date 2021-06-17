@@ -123,6 +123,8 @@ internal class ApiConfiguration(
     val analyticsApiVersion: String,
     @SerializedName("app.wallet.testCertificateValidityThresholds")
     val testCertificateValidityThresholds: String,
+    @SerializedName("app.cleaUrls")
+    val cleaUrls: String?,
 )
 
 internal fun ApiConfiguration.toDomain(gson: Gson) = Configuration(
@@ -191,4 +193,8 @@ internal fun ApiConfiguration.toDomain(gson: Gson) = Configuration(
     isAnalyticsOn = isAnalyticsOn,
     analyticsApiVersion = analyticsApiVersion,
     testCertificateValidityThresholds = gson.fromJson(testCertificateValidityThresholds, object : TypeToken<List<Int>>() {}.type),
+    cleaUrls = gson.fromJson(
+        cleaUrls,
+        object : TypeToken<List<String>?>() {}.type
+    ),
 )

@@ -64,4 +64,5 @@ class Configuration(
     var isAnalyticsOn: Boolean,
     var analyticsApiVersion: String,
     var testCertificateValidityThresholds: List<Int>,
+    val cleaUrls: List<String>,
 )

@@ -18,17 +18,15 @@ class CleaDataSource(
     val context: Context,
     cleaReportBaseUrl: String,
     cleaReportCertificateSha256: String,
-    cleaStatusBaseUrl: String,
-    cleaStatusCertificateSha256: String,
+    private val cleaStatusFallbackBaseUrl: String,
 ) : RemoteCleaDataSource {
 
     private var filesDir = context.filesDir
 
-    private var cleaStatusApi: CleaStatusApi = RetrofitClient.getService(
-        context,
-        cleaStatusBaseUrl,
-        cleaStatusCertificateSha256,
-        CleaStatusApi::class.java
+    private fun getCleaStatusApi(cleaStatusBaseUrl: String): CleaStatusApi = RetrofitClient.getService(
+        context = context,
+        baseUrl = cleaStatusBaseUrl,
+        clazz = CleaStatusApi::class.java,
     )
 
     private var cleaReportApi: CleaReportApi = RetrofitClient.getService(
@@ -49,9 +47,9 @@ class CleaDataSource(
         }
     }
 
-    override suspend fun cleaClusterIndex(apiVersion: String): RobertResultData<ClusterIndex> {
+    override suspend fun cleaClusterIndex(apiVersion: String, cleaStatusBaseUrl: String?): RobertResultData<ClusterIndex> {
         val result = RequestHelper.tryCatchRequestData(context, filesDir, apiVersion, null) {
-            cleaStatusApi.getClusterIndex(apiVersion)
+            getCleaStatusApi(cleaStatusBaseUrl ?: cleaStatusFallbackBaseUrl).getClusterIndex(apiVersion)
         }
         return when (result) {
             is RobertResultData.Success -> RobertResultData.Success(result.data.toDomain())
@@ -59,9 +57,14 @@ class CleaDataSource(
         }
     }
 
-    override suspend fun cleaClusterList(apiVersion: String, iteration: String, clusterPrefix: String): RobertResultData<List<Cluster>> {
+    override suspend fun cleaClusterList(
+        apiVersion: String,
+        iteration: String,
+        clusterPrefix: String,
+        cleaStatusBaseUrl: String?
+    ): RobertResultData<List<Cluster>> {
         val result = RequestHelper.tryCatchRequestData(context, filesDir, apiVersion, null) {
-            cleaStatusApi.getClusterList(apiVersion, iteration, clusterPrefix)
+            getCleaStatusApi(cleaStatusBaseUrl ?: cleaStatusFallbackBaseUrl).getClusterList(apiVersion, iteration, clusterPrefix)
         }
         return when (result) {
             is RobertResultData.Success -> RobertResultData.Success(result.data.mapNotNull { it.toDomain() })

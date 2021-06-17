@@ -1,6 +1,7 @@
 package com.lunabeestudio.stopcovid.manager
 
 import android.content.SharedPreferences
+import android.net.Uri
 import android.net.UrlQuerySanitizer
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
@@ -54,12 +55,18 @@ object WalletManager {
     }
 
     fun extractCertificateCodeFromUrl(urlValue: String): String {
-        val sanitizer = UrlQuerySanitizer()
-        sanitizer.registerParameter("v") {
-            it // Do nothing since there are plenty of non legal characters in this value
+        var code = Uri.parse(urlValue).fragment
+
+        if (code == null) { // Try the old way
+            val sanitizer = UrlQuerySanitizer()
+            sanitizer.registerParameter("v") {
+                it // Do nothing since there are plenty of non legal characters in this value
+            }
+            sanitizer.parseUrl(sanitizer.unescape(urlValue))
+            code = sanitizer.getValue("v")
         }
-        sanitizer.parseUrl(sanitizer.unescape(urlValue))
-        return sanitizer.getValue("v") ?: throw WalletCertificateMalformedException()
+
+        return code ?: throw WalletCertificateMalformedException()
     }
 
     fun verifyCertificateCodeValue(

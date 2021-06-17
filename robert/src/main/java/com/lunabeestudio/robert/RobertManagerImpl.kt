@@ -106,7 +106,7 @@ class RobertManagerImpl(
             calibrationDataSource,
             serverPublicKey
         )
-    private val cleaRepository = CleaRepository(cleaDataSource)
+    private val cleaRepository = CleaRepository(cleaDataSource, localKeystoreDataSource)
 
     private var _configuration: Configuration = remoteServiceRepository.loadConfig(application.getAppContext())
     override val configuration: Configuration

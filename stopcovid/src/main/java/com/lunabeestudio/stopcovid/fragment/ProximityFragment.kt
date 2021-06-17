@@ -459,8 +459,7 @@ class ProximityFragment : TimeMainFragment() {
         }
 
         // Venue items
-
-        if (!isSick && robertManager.configuration.displayRecordVenues) {
+        if (robertManager.configuration.displayRecordVenues) {
             addVenueItems(items)
             addSectionSeparator(items)
         }

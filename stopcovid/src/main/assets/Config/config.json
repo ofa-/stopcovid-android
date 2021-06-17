@@ -2,11 +2,11 @@
   "config": [
 	{
       "name": "lastUpdate",
-      "value": "29 april 2021"
+      "value": "5 June 2021"
     },
     {
       "name": "version",
-      "value": 49
+      "value": 57
     },
     {
       "name": "versionCalibrationBle",
@@ -31,6 +31,10 @@
     {
       "name": "app.analyticsApiVersion",
       "value": "v1"
+    },
+    {
+	    "name" : "app.cleaUrls",
+	    "value" : ["https://s3.fr-par.scw.cloud/clea-batch/"]
     },
     {
 	    "name" : "app.ameliUrl",
@@ -115,7 +119,7 @@
     },
     {
       "name": "app.displayRecordVenues",
-      "value": false
+      "value": true
     },
     {
       "name": "app.displayPrivateEvent",
@@ -175,11 +179,19 @@
     },
     {
       "name": "app.venuesRetentionPeriod",
-      "value": 14
+      "value": 15
     },
     {
       "name": "app.dataRetentionPeriod",
       "value": 14
+    },
+    {
+      "name": "app.covidPlusWarning",
+      "value": 14
+    },
+    {
+      "name": "app.covidPlusNoTracing",
+      "value": 60
     },
     {
       "name": "app.preSymptomsSpan",
@@ -203,11 +215,11 @@
     },
     {
       "name": "app.checkStatusFrequency",
-      "value": 6.0
+      "value": 12.0
     },
     {
       "name": "app.minStatusRetryDuration",
-      "value": 0.6
+      "value": 3.0
     },
     {
       "name": "app.appAvailability",

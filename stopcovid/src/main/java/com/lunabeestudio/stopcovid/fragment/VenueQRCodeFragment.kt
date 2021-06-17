@@ -51,7 +51,6 @@ class VenueQRCodeFragment : QRCodeFragment() {
         val venueVersion = args.venueVersion
 
         when {
-            robertManager.isSick -> findNavControllerOrNull()?.navigateUp()
             !robertManager.isRegistered -> findNavControllerOrNull()?.safeNavigate(
                 VenueQRCodeFragmentDirections.actionVenueQrCodeFragmentToCaptchaFragment(
                     CaptchaNextFragment.Venue,
