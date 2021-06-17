@@ -1,6 +1,7 @@
 package com.lunabeestudio.stopcovid.manager
 
 import android.content.SharedPreferences
+import android.net.Uri
 import android.net.UrlQuerySanitizer
 import android.util.Base64
 import com.lunabeestudio.domain.extension.ntpTimeSToUnixTimeMs
@@ -30,12 +31,12 @@ object VenuesManager {
     ) {
         try {
             val sanitizer = UrlQuerySanitizer()
-            sanitizer.registerParameters(arrayOf("code", "v", "t")) {
+            sanitizer.registerParameters(arrayOf(DeeplinkManager.DEEPLINK_CODE_PARAMETER, "v", "t")) {
                 it // Do nothing since there are plenty of non legal characters in this value
             }
-            sanitizer.parseUrl(DeeplinkManager.transformAnchorParam(stringUrl))
+            sanitizer.parseUrl(DeeplinkManager.transformFragmentToCodeParam(Uri.parse(stringUrl)).toString())
 
-            val base64URLCode: String = sanitizer.getValue("code") ?: throw VenueInvalidFormatException()
+            val base64URLCode: String = sanitizer.getValue(DeeplinkManager.DEEPLINK_CODE_PARAMETER) ?: throw VenueInvalidFormatException()
             val version: Int = sanitizer.getValue("v")?.toInt() ?: throw VenueInvalidFormatException()
             val time: Long? = sanitizer.getValue("t")?.toLong() // Time is optional, if null, will be set to System.currentTime
 
@@ -134,12 +135,12 @@ object VenuesManager {
         keystoreDataSource: SecureKeystoreDataSource,
     ) {
         if (!keystoreDataSource.venuesQrCode?.filter {
-            @Suppress("SENSELESS_COMPARISON")
-            isExpired(
+                @Suppress("SENSELESS_COMPARISON")
+                isExpired(
                     robertManager,
                     it.ntpTimestamp.ntpTimeSToUnixTimeMs()
                 ) || it.ltid == null // This test is added to handle "old" venues that may have null here due to JSON parsing handling
-        }.isNullOrEmpty()
+            }.isNullOrEmpty()
         ) {
             keystoreDataSource.venuesQrCode = keystoreDataSource.venuesQrCode?.filter { venueQrCode ->
                 @Suppress("SENSELESS_COMPARISON")

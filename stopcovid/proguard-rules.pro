@@ -22,6 +22,7 @@
 
 -dontobfuscate
 -keep public class com.lunabeestudio.** { *; }
+-keep public class dgca.verifier.app.decoder.model.** { *; }
 
 # Bouncy Castle -- Keep ECDH
 -keep class org.bouncycastle.jcajce.provider.asymmetric.EC$* { *; }
@@ -29,4 +30,6 @@
 -keep class org.bouncycastle.jcajce.provider.asymmetric.ec.KeyFactorySpi$ECDH { *; }
 -keep class org.bouncycastle.jcajce.provider.asymmetric.ec.KeyFactorySpi$ECDSA { *; }
 
-
+# json-schema-validator
+-keep class com.github.fge.jsonschema.** { *; }
+-keep class org.mozilla.javascript.** { *; }

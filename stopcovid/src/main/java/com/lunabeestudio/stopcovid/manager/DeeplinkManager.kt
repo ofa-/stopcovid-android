@@ -13,10 +13,14 @@ package com.lunabeestudio.stopcovid.manager
 import android.net.Uri
 
 object DeeplinkManager {
-    fun transformAnchorParam(uri: Uri): Uri = Uri.parse(transformAnchorParam(uri.toString()))
-    fun transformAnchorParam(uri: String): String = if (uri.contains('?')) {
-        uri.replace("#", "&code=")
-    } else {
-        uri.replace("#", "?code=")
+    const val DEEPLINK_CODE_PARAMETER: String = "code"
+    const val DEEPLINK_CERTIFICATE_FORMAT_PARAMETER: String = "certificateFormat"
+
+    fun transformFragmentToCodeParam(uri: Uri): Uri {
+        return uri.buildUpon()
+            .fragment(null)
+            .appendQueryParameter(DEEPLINK_CODE_PARAMETER, uri.encodedFragment)
+            .appendQueryParameter(DEEPLINK_CERTIFICATE_FORMAT_PARAMETER, uri.lastPathSegment)
+            .build()
     }
 }

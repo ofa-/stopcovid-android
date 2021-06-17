@@ -99,9 +99,9 @@ class ConfirmVenueQrCodeFragment : MainFragment() {
                     AnalyticsManager.reportAppEvent(requireContext(), AppEventName.e14, null)
                     findNavControllerOrNull()?.navigateUp()
                 } catch (e: VenueExpiredException) {
-                    context?.showExpiredCodeAlert(strings)
+                    context?.showExpiredCodeAlert(strings, null)
                 } catch (e: VenueInvalidFormatException) {
-                    context?.showInvalidCodeAlert(strings)
+                    context?.showInvalidCodeAlert(strings, null)
                 } catch (e: Exception) {
                     showUnknownErrorAlert(null)
                 }

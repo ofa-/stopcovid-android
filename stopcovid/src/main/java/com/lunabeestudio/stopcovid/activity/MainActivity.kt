@@ -120,7 +120,7 @@ class MainActivity : BaseActivity() {
     private fun fixIntentData(intent: Intent) {
         // since we use '#' to separate the code, we replace it to pass a clean URL to the nav_graph deeplink handle
         val uri = intent.data?.let {
-            DeeplinkManager.transformAnchorParam(it)
+            DeeplinkManager.transformFragmentToCodeParam(it)
         }
         val uriBuilder = uri?.buildUpon()
             ?.path(intent.data?.path?.takeIf { it != "/" })

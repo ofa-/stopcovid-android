@@ -69,6 +69,7 @@ import com.lunabeestudio.stopcovid.manager.AttestationsManager
 import com.lunabeestudio.stopcovid.manager.CalibDataSource
 import com.lunabeestudio.stopcovid.manager.CertificatesDocumentsManager
 import com.lunabeestudio.stopcovid.manager.ConfigDataSource
+import com.lunabeestudio.stopcovid.manager.DccCertificatesManager
 import com.lunabeestudio.stopcovid.manager.FormManager
 import com.lunabeestudio.stopcovid.manager.InfoCenterManager
 import com.lunabeestudio.stopcovid.manager.IsolationManager
@@ -155,6 +156,7 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
     }
 
     private val certificatesDocumentsManager: CertificatesDocumentsManager = CertificatesDocumentsManager(this)
+    val dccCertificatesManager: DccCertificatesManager by lazy { DccCertificatesManager() }
 
     init {
         System.setProperty("kotlinx.coroutines.debug", if (BuildConfig.DEBUG) "on" else "off")
@@ -277,6 +279,9 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
         }
         appCoroutineScope.launch {
             certificatesDocumentsManager.onAppForeground(this@StopCovid)
+        }
+        appCoroutineScope.launch {
+            dccCertificatesManager.onAppForeground(this@StopCovid)
         }
         appCoroutineScope.launch {
             robertManager.refreshConfig(this@StopCovid)

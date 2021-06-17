@@ -1,21 +1,36 @@
 package com.lunabeestudio.stopcovid.model
 
+import android.util.Base64
 import com.lunabeestudio.domain.model.WalletCertificateType
 import com.lunabeestudio.framework.crypto.BouncyCastleSignatureVerifier
+import com.lunabeestudio.stopcovid.extension.certificateType
+import com.lunabeestudio.stopcovid.extension.recoveryValidFrom
+import com.lunabeestudio.stopcovid.extension.testDateTimeOfCollection
+import com.lunabeestudio.stopcovid.extension.vaccineDate
+import dgca.verifier.app.decoder.base45.DefaultBase45Service
+import dgca.verifier.app.decoder.base64ToX509Certificate
+import dgca.verifier.app.decoder.cbor.DefaultCborService
+import dgca.verifier.app.decoder.compression.DefaultCompressorService
+import dgca.verifier.app.decoder.cose.DefaultCoseService
+import dgca.verifier.app.decoder.cose.VerificationCryptoService
+import dgca.verifier.app.decoder.model.GreenCertificate
+import dgca.verifier.app.decoder.model.VerificationResult
+import dgca.verifier.app.decoder.prefixvalidation.DefaultPrefixValidationService
+import dgca.verifier.app.decoder.schema.DefaultSchemaValidator
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import timber.log.Timber
 import java.security.SignatureException
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
 sealed class WalletCertificate(
-    val type: WalletCertificateType,
     open val value: String,
 ) {
+    abstract val type: WalletCertificateType
 
     var keyCertificateId: String = ""
-    var keyAuthority: String = ""
-    var keySignature: String = ""
-
     var firstName: String? = null
     var name: String? = null
 
@@ -23,14 +38,41 @@ sealed class WalletCertificate(
 
     abstract fun parse()
 
+    @Throws(IllegalArgumentException::class, WalletCertificateInvalidSignatureException::class, IllegalStateException::class)
+    abstract fun verifyKey(publicKey: String)
+
+    companion object {
+        suspend fun fromValue(value: String): WalletCertificate? {
+            return withContext(Dispatchers.Default) {
+                SanitaryCertificate.fromValue(value) ?: VaccinationCertificate.fromValue(value) ?: EuropeanCertificate.fromValue(value)
+            }
+        }
+
+        suspend fun getTypeFromValue(value: String): WalletCertificateType? {
+            return withContext(Dispatchers.Default) {
+                SanitaryCertificate.getTypeFromValue(value)
+                    ?: VaccinationCertificate.getTypeFromValue(value)
+                    ?: EuropeanCertificate.getTypeFromValue(value)
+            }
+        }
+    }
+}
+
+sealed class FrenchCertificate(value: String) : WalletCertificate(value) {
+    var keyAuthority: String = ""
+    var keySignature: String = ""
+
     enum class Separator(
         val ascii: String,
     ) {
         UNIT("\u001F"),
     }
 
-    @Throws(IllegalArgumentException::class, WalletCertificateInvalidSignatureException::class)
-    fun verifyKey(publicKey: String) {
+    protected fun parseBirthDate(dateString: String): String {
+        return "${dateString.substring(0, 2)}-${dateString.substring(2, 4)}-${dateString.substring(4)}"
+    }
+
+    override fun verifyKey(publicKey: String) {
         val split = value.split(Separator.UNIT.ascii)
         val message = split.getOrNull(0)
         val signature = split.getOrNull(1)
@@ -53,13 +95,10 @@ sealed class WalletCertificate(
             throw WalletCertificateInvalidSignatureException()
         }
     }
-
-    protected fun parseBirthDate(dateString: String): String {
-        return "${dateString.substring(0, 2)}-${dateString.substring(2, 4)}-${dateString.substring(4)}"
-    }
 }
 
-class SanitaryCertificate(override val value: String) : WalletCertificate(WalletCertificateType.SANITARY, value) {
+class SanitaryCertificate private constructor(override val value: String) : FrenchCertificate(value) {
+    override val type: WalletCertificateType = WalletCertificateType.SANITARY
 
     var birthDate: String? = null
     var gender: String? = null
@@ -71,8 +110,7 @@ class SanitaryCertificate(override val value: String) : WalletCertificate(Wallet
         get() = analysisDate ?: System.currentTimeMillis()
 
     override fun parse() {
-        val regex = type.validationRegexp
-        val matchResult = regex.find(value)
+        val matchResult = validationRegex.find(value)
 
         if (matchResult != null && matchResult.groups.size == SanitaryCertificateFields.values().size) {
             keyAuthority = matchResult.groups[SanitaryCertificateFields.KEY_AUTHORITY.ordinal]?.value ?: ""
@@ -113,9 +151,47 @@ class SanitaryCertificate(override val value: String) : WalletCertificate(Wallet
         ANALYSIS_DATE("F6"),
         SIGNATURE(null)
     }
+
+    companion object {
+        private val validationRegex: Regex = "^[A-Z\\d]{4}" // Characters 0 to 3 are ignored. They represent the document format version.
+            .plus("([A-Z\\d]{4})") // 1 - Characters 4 to 7 represent the document signing authority.
+            .plus("([A-Z\\d]{4})") // 2 - Characters 8 to 11 represent the id of the certificate used to sign the document.
+            .plus("[A-Z\\d]{8}") // Characters 12 to 19 are ignored.
+            .plus("B2") // Characters 20 and 21 represent the wallet certificate type (sanitary, ...)
+            .plus("[A-Z\\d]{4}") // Characters 22 to 25 are ignored.
+            .plus("F0([^\\x1D\\x1E]+)[\\x1D\\x1E]") // 3 - We capture the field F0. It must have at least one character.
+            .plus("F1([^\\x1D\\x1E]+)[\\x1D\\x1E]") // 4 - We capture the field F1. It must have at least one character.
+            .plus("F2(\\d{8})") // 5 - We capture the field F2. It can only contain digits.
+            .plus("F3([FMU]{1})") // 6 - We capture the field F3. It can only contain "F", "M" or "U".
+            .plus("F4([A-Z\\d]{3,7})\\x1D?") // 7 - We capture the field F4. It can contain 3 to 7 uppercase letters and/or digits. It can also be ended by the GS ASCII char (29) if the field reaches its max length.
+            .plus("F5([PNIX]{1})") // 8 - We capture the field F5. It can only contain "P", "N", "I" or "X".
+            .plus("F6(\\d{12})") // 9 - We capture the field F6. It can only contain digits.
+            .plus("\\x1F{1}") // This character is separating the message from its signature.
+            .plus("([A-Z\\d\\=]+)$").toRegex() // 10 - This is the message signature.
+
+        private val headerDetectionRegex: Regex = "^[A-Z\\d]{4}" // Characters 0 to 3 are ignored. They represent the document format version.
+            .plus("([A-Z\\d]{4})") // 1 - Characters 4 to 7 represent the document signing authority.
+            .plus("([A-Z\\d]{4})") // 2 - Characters 8 to 11 represent the id of the certificate used to sign the document.
+            .plus("[A-Z\\d]{8}") // Characters 12 to 19 are ignored.
+            .plus("B2") // Characters 20 and 21 represent the wallet certificate type (sanitary, ...)
+            .toRegex()
+
+        fun fromValue(value: String): SanitaryCertificate? = if (validationRegex.matches(value)) {
+            SanitaryCertificate(value)
+        } else {
+            null
+        }
+
+        fun getTypeFromValue(value: String): WalletCertificateType? = if (headerDetectionRegex.matches(value)) {
+            WalletCertificateType.SANITARY
+        } else {
+            null
+        }
+    }
 }
 
-class VaccinationCertificate(override val value: String) : WalletCertificate(WalletCertificateType.VACCINATION, value) {
+class VaccinationCertificate private constructor(override val value: String) : FrenchCertificate(value) {
+    override val type: WalletCertificateType = WalletCertificateType.VACCINATION
 
     var birthDate: String? = null
     var diseaseName: String? = null
@@ -131,8 +207,7 @@ class VaccinationCertificate(override val value: String) : WalletCertificate(Wal
         get() = lastVaccinationDate?.time ?: 0L
 
     override fun parse() {
-        val regex = type.validationRegexp
-        val matchResult = regex.find(value)
+        val matchResult = validationRegex.find(value)
 
         if (matchResult != null && matchResult.groups.size == VaccinationCertificateFields.values().size) {
             keyAuthority = matchResult.groups[VaccinationCertificateFields.KEY_AUTHORITY.ordinal]?.value ?: ""
@@ -184,5 +259,120 @@ class VaccinationCertificate(override val value: String) : WalletCertificate(Wal
         LAST_VACCINATION_DATE("L9"),
         VACCINATION_CYCLE_STATE("LA"),
         SIGNATURE(null)
+    }
+
+    companion object {
+        private val validationRegex: Regex = "^[A-Z\\d]{4}" // Characters 0 to 3 are ignored. They represent the document format version.
+            .plus("([A-Z\\d]{4})") // 1 - Characters 4 to 7 represent the document signing authority.
+            .plus("([A-Z\\d]{4})") // 2 - Characters 8 to 11 represent the id of the certificate used to sign the document.
+            .plus("[A-Z\\d]{8}") // Characters 12 to 19 are ignored.
+            .plus("L1") // Characters 20 and 21 represent the wallet certificate type (sanitary, ...)
+            .plus("[A-Z\\d]{4}") // Characters 22 to 25 are ignored.
+            .plus("L0([^\\x1D\\x1E]+)[\\x1D\\x1E]") // 3 - We capture the field L0. It can contain uppercased letters and spaces. It can also be ended by the GS ASCII char (29) if the field reaches its max length.
+            .plus("L1([^\\x1D\\x1E]+)[\\x1D\\x1E]") // 4 - We capture the field L1. It must have at least one character.
+            .plus("L2(\\d{8})\\x1D?") // 5 - We capture the field L2. It can only contain 8 digits.
+            .plus("L3([^\\x1D\\x1E]*)[\\x1D\\x1E]") // // 6 - We capture the field L3. It can contain any characters.
+            .plus("L4([^\\x1D\\x1E]+)[\\x1D\\x1E]") // 7 - We capture the field L4. It must have at least one character
+            .plus("L5([^\\x1D\\x1E]+)[\\x1D\\x1E]") // 8 - We capture the field L5. It must have at least one character
+            .plus("L6([^\\x1D\\x1E]+)[\\x1D\\x1E]") // 9 - We capture the field L6. It must have at least one character
+            .plus("L7(\\d{1})") // 10 - We capture the field L7. It can contain only one digit.
+            .plus("L8(\\d{1})") // 11 - We capture the field L8. It can contain only one digit.
+            .plus("L9(\\d{8})") // 12 - We capture the field L9. It can only contain 8 digits.
+            .plus("LA([A-Z\\d]{2})") // 13 - We capture the field LA. 2 characters letters or digits
+            .plus("\\x1F{1}") // This character is separating the message from its signature.
+            .plus("([A-Z\\d\\=]+)$").toRegex() // 14 - This is the message signature.
+
+        private val headerDetectionRegex: Regex = "^[A-Z\\d]{4}" // Characters 0 to 3 are ignored. They represent the document format version.
+            .plus("([A-Z\\d]{4})") // 1 - Characters 4 to 7 represent the document signing authority.
+            .plus("([A-Z\\d]{4})") // 2 - Characters 8 to 11 represent the id of the certificate used to sign the document.
+            .plus("[A-Z\\d]{8}") // Characters 12 to 19 are ignored.
+            .plus("L1") // Characters 20 and 21 represent the wallet certificate type (sanitary, ...)
+            .toRegex()
+
+        fun fromValue(value: String): VaccinationCertificate? = if (validationRegex.matches(value)) {
+            VaccinationCertificate(value)
+        } else {
+            null
+        }
+
+        fun getTypeFromValue(value: String): WalletCertificateType? = if (headerDetectionRegex.matches(value)) {
+            WalletCertificateType.VACCINATION
+        } else {
+            null
+        }
+    }
+}
+
+@OptIn(ExperimentalUnsignedTypes::class)
+class EuropeanCertificate private constructor(value: String) : WalletCertificate(value) {
+    override val timestamp: Long
+    override val type: WalletCertificateType
+    private val kid: ByteArray
+    private val cose: ByteArray
+    val greenCertificate: GreenCertificate
+
+    init {
+        val verificationResult = VerificationResult()
+        val plainInput = DefaultPrefixValidationService().decode(value, verificationResult)
+        val compressedCose = DefaultBase45Service().decode(plainInput, verificationResult)
+        cose = DefaultCompressorService().decode(compressedCose, verificationResult)
+        val coseData = checkNotNull(DefaultCoseService().decode(cose, verificationResult))
+        DefaultSchemaValidator().validate(coseData.cbor, verificationResult)
+        if (!verificationResult.isSchemaValid) {
+            throw WalletCertificateMalformedException()
+        }
+        kid = checkNotNull(coseData.kid)
+        greenCertificate = checkNotNull(DefaultCborService().decode(coseData.cbor, verificationResult))
+        type = checkNotNull(greenCertificate.certificateType)
+        timestamp = when (type) {
+            WalletCertificateType.SANITARY,
+            WalletCertificateType.VACCINATION -> null
+            WalletCertificateType.SANITARY_EUROPE -> greenCertificate.testDateTimeOfCollection?.time
+            WalletCertificateType.VACCINATION_EUROPE -> greenCertificate.vaccineDate?.time
+            WalletCertificateType.RECOVERY_EUROPE -> greenCertificate.recoveryValidFrom?.time
+        } ?: -1
+    }
+
+    override fun parse() {
+        keyCertificateId = Base64.encodeToString(kid, Base64.NO_WRAP)
+        firstName = greenCertificate.person.givenName
+        name = greenCertificate.person.familyName
+    }
+
+    override fun verifyKey(publicKey: String) {
+        val verificationResult = VerificationResult()
+        val certificate = publicKey.base64ToX509Certificate()
+        checkNotNull(certificate) { "Fail to get X509 certificate from public key $publicKey" }
+        VerificationCryptoService().validate(cose, certificate, verificationResult)
+        if (!verificationResult.coseVerified) {
+            throw WalletCertificateInvalidSignatureException()
+        }
+    }
+
+    companion object {
+        fun fromValue(value: String): EuropeanCertificate? {
+            return try {
+                EuropeanCertificate(value)
+            } catch (e: IllegalStateException) {
+                Timber.e(e)
+                null
+            }
+        }
+
+        fun getTypeFromValue(value: String): WalletCertificateType? {
+            return try {
+                val verificationResult = VerificationResult()
+                val plainInput = DefaultPrefixValidationService().decode(value, verificationResult)
+                val compressedCose = DefaultBase45Service().decode(plainInput, verificationResult)
+                val cose = DefaultCompressorService().decode(compressedCose, verificationResult)
+                val coseData = DefaultCoseService().decode(cose, verificationResult)
+                val greenCertificate = coseData?.let { DefaultCborService().decode(it.cbor, verificationResult) }
+
+                greenCertificate?.certificateType
+            } catch (e: IllegalStateException) {
+                Timber.e(e)
+                null
+            }
+        }
     }
 }

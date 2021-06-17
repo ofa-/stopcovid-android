@@ -465,7 +465,7 @@ class ProximityFragment : TimeMainFragment() {
         addSectionSeparator(items)
 
         // Attestation
-        if (robertManager.configuration.displayAttestation) {
+        if (robertManager.configuration.displayAttestation || robertManager.configuration.displaySanitaryCertificatesWallet) {
             addAttestationItems(items)
             addSectionSeparator(items)
         }
@@ -847,28 +847,32 @@ class ProximityFragment : TimeMainFragment() {
             importantForAccessibility = ViewCompat.IMPORTANT_FOR_ACCESSIBILITY_NO
         }
 
-        items += cardWithActionItem {
-            mainImage = R.drawable.attestation_card
-            onCardClick = {
-                AnalyticsManager.reportAppEvent(requireContext(), AppEventName.e11, null)
-                findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToAttestationsFragment())
+        if (robertManager.configuration.displayAttestation) {
+            items += cardWithActionItem {
+                mainImage = R.drawable.attestation_card
+                onCardClick = {
+                    AnalyticsManager.reportAppEvent(requireContext(), AppEventName.e11, null)
+                    findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToAttestationsFragment())
+                }
+                mainTitle = strings["home.attestationSection.cell.title"]
+                val attestationCount = viewModel.activeAttestationCount.value
+                mainBody = when (val count = attestationCount?.peekContent()) {
+                    0, null -> strings["home.attestationSection.cell.subtitle.noAttestations"]
+                    1 -> strings["home.attestationSection.cell.subtitle.oneAttestation"]
+                    else -> stringsFormat("home.attestationSection.cell.subtitle.multipleAttestations", count)
+                }
+                identifier = R.drawable.attestation_card.toLong()
             }
-            mainTitle = strings["home.attestationSection.cell.title"]
-            val attestationCount = viewModel.activeAttestationCount.value
-            mainBody = when (val count = attestationCount?.peekContent()) {
-                0, null -> strings["home.attestationSection.cell.subtitle.noAttestations"]
-                1 -> strings["home.attestationSection.cell.subtitle.oneAttestation"]
-                else -> stringsFormat("home.attestationSection.cell.subtitle.multipleAttestations", count)
+
+            if (robertManager.configuration.displaySanitaryCertificatesWallet) {
+                items += spaceItem {
+                    spaceRes = R.dimen.spacing_medium
+                    identifier = items.count().toLong()
+                }
             }
-            identifier = R.drawable.attestation_card.toLong()
         }
 
         if (robertManager.configuration.displaySanitaryCertificatesWallet) {
-            items += spaceItem {
-                spaceRes = R.dimen.spacing_medium
-                identifier = items.count().toLong()
-            }
-
             items += cardWithActionItem(CardTheme.Primary) {
                 mainImage = R.drawable.wallet_card
                 mainLayoutDirection = LayoutDirection.RTL

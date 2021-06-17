@@ -1,22 +1,26 @@
 package com.lunabeestudio.stopcovid.manager
 
-import android.content.SharedPreferences
 import android.net.Uri
 import android.net.UrlQuerySanitizer
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.lifecycleScope
 import com.lunabeestudio.domain.extension.walletPublicKey
 import com.lunabeestudio.domain.model.Configuration
 import com.lunabeestudio.domain.model.RawWalletCertificate
 import com.lunabeestudio.domain.model.WalletCertificateType
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.robert.datasource.LocalKeystoreDataSource
-import com.lunabeestudio.stopcovid.model.SanitaryCertificate
-import com.lunabeestudio.stopcovid.model.VaccinationCertificate
+import com.lunabeestudio.stopcovid.model.DccCertificates
+import com.lunabeestudio.stopcovid.model.EuropeanCertificate
+import com.lunabeestudio.stopcovid.model.FrenchCertificate
 import com.lunabeestudio.stopcovid.model.WalletCertificate
 import com.lunabeestudio.stopcovid.model.WalletCertificateMalformedException
 import com.lunabeestudio.stopcovid.model.WalletCertificateNoKeyError
+import com.lunabeestudio.stopcovid.model.getForKeyId
+import kotlinx.coroutines.launch
+import timber.log.Timber
 
 object WalletManager {
 
@@ -29,28 +33,41 @@ object WalletManager {
         localKeystoreDataSource: LocalKeystoreDataSource,
     ) {
         localKeystoreDataSource.rawWalletCertificatesLiveData.observe(lifecycleOwner) { rawWalletList ->
-            loadFromLocalKeystoreDataSource(rawWalletList)
+            lifecycleOwner.lifecycleScope.launch {
+                loadFromLocalKeystoreDataSource(rawWalletList)
+            }
         }
     }
 
-    private fun loadFromLocalKeystoreDataSource(
+    private suspend fun loadFromLocalKeystoreDataSource(
         rawWalletList: List<RawWalletCertificate>?
     ) {
         val walletCertificates = rawWalletList?.mapNotNull { rawWallet ->
-            val certificate = certificateFromValue(rawWallet.value)
-            certificate?.parse()
-            certificate
+            try {
+                val certificate = certificateFromValue(rawWallet.value)
+                certificate?.parse()
+                certificate
+            } catch (e: Exception) {
+                Timber.e(e)
+                null
+            }
         }
         _walletCertificateLiveData.postValue(walletCertificates)
     }
 
-    fun processCertificateCode(
-        sharedPreferences: SharedPreferences,
+    suspend fun processCertificateCode(
         robertManager: RobertManager,
         localKeystoreDataSource: LocalKeystoreDataSource,
         certificateCode: String,
+        dccCertificates: DccCertificates,
+        certificateFormat: WalletCertificateType.Format?,
     ) {
-        val walletCertificate = verifyCertificateCodeValue(sharedPreferences, robertManager.configuration, certificateCode)
+        val walletCertificate = verifyCertificateCodeValue(
+            robertManager.configuration,
+            certificateCode,
+            dccCertificates,
+            certificateFormat,
+        )
         saveCertificate(localKeystoreDataSource, walletCertificate)
     }
 
@@ -69,17 +86,26 @@ object WalletManager {
         return code ?: throw WalletCertificateMalformedException()
     }
 
-    fun verifyCertificateCodeValue(
-        sharedPreferences: SharedPreferences,
+    suspend fun verifyCertificateCodeValue(
         configuration: Configuration,
-        codeValue: String
+        codeValue: String,
+        dccCertificates: DccCertificates,
+        certificateFormat: WalletCertificateType.Format?,
     ): WalletCertificate {
         val walletCertificate = certificateFromValue(codeValue)
-            ?: throw WalletCertificateMalformedException()
+
+        if (walletCertificate == null ||
+            (certificateFormat != null && walletCertificate.type.format != certificateFormat)) {
+            throw WalletCertificateMalformedException()
+        }
 
         walletCertificate.parse()
 
-        val key = configuration.walletPublicKey(walletCertificate.keyAuthority, walletCertificate.keyCertificateId)
+        val key: String? = when (walletCertificate) {
+            is EuropeanCertificate -> dccCertificates.getForKeyId(walletCertificate.keyCertificateId)
+            is FrenchCertificate -> configuration.walletPublicKey(walletCertificate.keyAuthority, walletCertificate.keyCertificateId)
+        }
+
         if (key != null) {
             walletCertificate.verifyKey(key)
         } else {
@@ -95,18 +121,8 @@ object WalletManager {
         localKeystoreDataSource.rawWalletCertificates = walletCertificates
     }
 
-    private fun validateAndExtractCertificateType(value: String): WalletCertificateType? = WalletCertificateType.values()
-        .firstOrNull { it.validationRegexp.matches(value) }
-
-    fun extractCertificateType(value: String): WalletCertificateType? = WalletCertificateType.values()
-        .firstOrNull { it.headerDetectionRegex.containsMatchIn(value) }
-
-    private fun certificateFromValue(value: String): WalletCertificate? {
-        val type: WalletCertificateType = validateAndExtractCertificateType(value) ?: return null
-        return when (type) {
-            WalletCertificateType.SANITARY -> SanitaryCertificate(value)
-            WalletCertificateType.VACCINATION -> VaccinationCertificate(value)
-        }
+    private suspend fun certificateFromValue(value: String): WalletCertificate? {
+        return WalletCertificate.fromValue(value)
     }
 
     fun deleteCertificate(localKeystoreDataSource: LocalKeystoreDataSource, walletCertificate: WalletCertificate) {

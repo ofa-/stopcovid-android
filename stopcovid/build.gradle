@@ -26,20 +26,27 @@ android {
 
             packagingOptions {
                 exclude 'DebugProbesKt.bin'
-                exclude 'META-INF/AL2.0'
-                exclude 'META-INF/LGPL2.1'
+                pickFirst 'META-INF/AL2.0'
+                pickFirst 'META-INF/LGPL2.1'
+                pickFirst 'META-INF/ASL-2.0.txt'
+                pickFirst 'META-INF/LGPL-3.0.txt'
+                pickFirst 'draftv3/schema'
+                pickFirst 'draftv4/schema'
             }
         }
     }
 
     kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
+    compileOptions {
+        coreLibraryDesugaringEnabled = true
+    }
 
     defaultConfig {
         applicationId "fr.gouv.android.stopcovid"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 262
-        versionName "3.1.8"
+        versionCode 274
+        versionName "3.2.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -63,6 +70,7 @@ android {
 }
 
 dependencies {
+    coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:_"
 
     implementation "com.github.PhilJay:MPAndroidChart:_"
 
@@ -85,6 +93,7 @@ dependencies {
     implementation project(path: ':framework')
     implementation project(path: ':robert')
     implementation project(path: ':domain')
+    implementation project(path: ':dgca-decoder')
 
     androidTestImplementation "androidx.test.ext:junit:_"
     androidTestImplementation "androidx.test:runner:_"

@@ -54,6 +54,7 @@ detekt {
 
 tasks.withType(io.gitlab.arturbosch.detekt.Detekt) {
     exclude("**/build/**")
+    exclude("**/dgca-app-core-android/**")
 }
 
 allprojects {

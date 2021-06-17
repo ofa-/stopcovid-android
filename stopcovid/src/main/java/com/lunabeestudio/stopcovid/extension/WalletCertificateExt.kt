@@ -3,18 +3,25 @@ package com.lunabeestudio.stopcovid.extension
 import android.annotation.SuppressLint
 import com.lunabeestudio.domain.extension.walletOldCertificateThresholdInMs
 import com.lunabeestudio.domain.model.Configuration
+import com.lunabeestudio.domain.model.WalletCertificateType
 import com.lunabeestudio.stopcovid.coreui.extension.stringsFormat
 import com.lunabeestudio.stopcovid.coreui.manager.LocalizedStrings
+import com.lunabeestudio.stopcovid.model.EuropeanCertificate
+import com.lunabeestudio.stopcovid.model.FrenchCertificate
 import com.lunabeestudio.stopcovid.model.SanitaryCertificate
 import com.lunabeestudio.stopcovid.model.VaccinationCertificate
 import com.lunabeestudio.stopcovid.model.WalletCertificate
+import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.concurrent.TimeUnit
 
+fun WalletCertificate.fullName(): String =
+    "${firstName.orEmpty()} ${name.orEmpty()}".trim().uppercase()
+
 fun WalletCertificate.shortDescription(): String {
     return when (this) {
-        is SanitaryCertificate,
-        is VaccinationCertificate -> "$firstName $name"
+        is FrenchCertificate,
+        is EuropeanCertificate -> fullName()
     }
 }
 
@@ -24,16 +31,16 @@ fun WalletCertificate.fullDescription(strings: LocalizedStrings, configuration: 
     val dateFormat = SimpleDateFormat("d MMM yyyy")
     return when (this) {
         is SanitaryCertificate -> {
-            text = text?.replace("<${SanitaryCertificate.SanitaryCertificateFields.FIRST_NAME.code}>", firstName ?: "N/A")
-            text = text?.replace("<${SanitaryCertificate.SanitaryCertificateFields.NAME.code}>", name ?: "N/A")
+            text = text?.replace("<${SanitaryCertificate.SanitaryCertificateFields.FIRST_NAME.code}>", firstName.orNA())
+            text = text?.replace("<${SanitaryCertificate.SanitaryCertificateFields.NAME.code}>", name.orNA())
             text = text?.replace(
                 "<${SanitaryCertificate.SanitaryCertificateFields.BIRTH_DATE.code}>",
-                birthDate ?: "N/A"
+                birthDate.orNA()
             )
 
             val genderString =
                 strings["wallet.proof.${type.stringKey}.${SanitaryCertificate.SanitaryCertificateFields.GENDER.code}.$gender"]
-            text = text?.replace("<${SanitaryCertificate.SanitaryCertificateFields.GENDER.code}>", genderString ?: "N/A")
+            text = text?.replace("<${SanitaryCertificate.SanitaryCertificateFields.GENDER.code}>", genderString.orNA())
 
             val analysisCodeString = strings.stringsFormat("wallet.proof.${type.stringKey}.loinc.$analysisCode", analysisCode)
             text = text?.replace(
@@ -42,14 +49,14 @@ fun WalletCertificate.fullDescription(strings: LocalizedStrings, configuration: 
             )
 
             val analysisDateFormat = SimpleDateFormat("d MMM yyyy, HH:mm")
-            val dateString = analysisDate?.let { analysisDateFormat.format(it) } ?: "N/A"
+            val dateString = analysisDate?.let { analysisDateFormat.format(it) }.orNA()
             text = text?.replace("<${SanitaryCertificate.SanitaryCertificateFields.ANALYSIS_DATE.code}>", dateString)
 
             val resultString =
                 strings["wallet.proof.${type.stringKey}.${SanitaryCertificate.SanitaryCertificateFields.TEST_RESULT.code}.$testResult"]
             text = text?.replace(
                 oldValue = "<${SanitaryCertificate.SanitaryCertificateFields.TEST_RESULT.code}>",
-                newValue = resultString ?: "N/A"
+                newValue = resultString.orNA()
             )
 
             if (testResult == "N") {
@@ -60,37 +67,72 @@ fun WalletCertificate.fullDescription(strings: LocalizedStrings, configuration: 
             text ?: ""
         }
         is VaccinationCertificate -> {
-            text = text?.replace("<${VaccinationCertificate.VaccinationCertificateFields.FIRST_NAME.code}>", firstName ?: "N/A")
-            text = text?.replace("<${VaccinationCertificate.VaccinationCertificateFields.NAME.code}>", name ?: "N/A")
+            text = text?.replace("<${VaccinationCertificate.VaccinationCertificateFields.FIRST_NAME.code}>", firstName.orNA())
+            text = text?.replace("<${VaccinationCertificate.VaccinationCertificateFields.NAME.code}>", name.orNA())
             text = text?.replace(
                 "<${VaccinationCertificate.VaccinationCertificateFields.BIRTH_DATE.code}>",
-                birthDate ?: "N/A"
+                birthDate.orNA()
             )
-            text = text?.replace("<${VaccinationCertificate.VaccinationCertificateFields.DISEASE_NAME.code}>", diseaseName ?: "N/A")
+            text = text?.replace("<${VaccinationCertificate.VaccinationCertificateFields.DISEASE_NAME.code}>", diseaseName.orNA())
             text = text?.replace(
                 "<${VaccinationCertificate.VaccinationCertificateFields.PROPHYLACTIC_AGENT.code}>",
-                prophylacticAgent ?: "N/A"
+                prophylacticAgent.orNA()
             )
-            text = text?.replace("<${VaccinationCertificate.VaccinationCertificateFields.VACCINE_NAME.code}>", vaccineName ?: "N/A")
-            text = text?.replace("<${VaccinationCertificate.VaccinationCertificateFields.VACCINE_MAKER.code}>", vaccineMaker ?: "N/A")
+            text = text?.replace("<${VaccinationCertificate.VaccinationCertificateFields.VACCINE_NAME.code}>", vaccineName.orNA())
+            text = text?.replace("<${VaccinationCertificate.VaccinationCertificateFields.VACCINE_MAKER.code}>", vaccineMaker.orNA())
             text = text?.replace(
                 "<${VaccinationCertificate.VaccinationCertificateFields.LAST_VACCINATION_STATE_RANK.code}>",
-                lastVaccinationStateRank ?: "N/A"
+                lastVaccinationStateRank.orNA()
             )
             text = text?.replace(
                 "<${VaccinationCertificate.VaccinationCertificateFields.COMPLETE_CYCLE_DOSE_COUNT.code}>",
-                completeCycleDosesCount ?: "N/A"
+                completeCycleDosesCount.orNA()
             )
 
             text = text?.replace(
                 "<${VaccinationCertificate.VaccinationCertificateFields.LAST_VACCINATION_DATE.code}>",
-                lastVaccinationDate?.let { dateFormat.format(it) } ?: "N/A"
+                lastVaccinationDate?.let { dateFormat.format(it) }.orNA()
             )
 
             val vaxCode = VaccinationCertificate.VaccinationCertificateFields.VACCINATION_CYCLE_STATE.code
             val vaccinationState = strings["wallet.proof.${type.stringKey}.$vaxCode.$vaccinationCycleState"]
-            text = text?.replace("<$vaxCode>", vaccinationState ?: "N/A")
+            text = text?.replace("<$vaxCode>", vaccinationState.orNA())
             text ?: ""
+        }
+        is EuropeanCertificate -> when (this.type) {
+            WalletCertificateType.SANITARY,
+            WalletCertificateType.VACCINATION -> {
+                Timber.e("Unexpected type ${this.type} with ${this.javaClass.simpleName}")
+                ""
+            }
+            WalletCertificateType.VACCINATION_EUROPE -> {
+                text = strings["wallet.proof.europe.vaccine.description"]
+                text = text?.replace("<FULL_NAME>", fullName())
+                text = text?.replace("<BIRTHDATE>", this.greenCertificate.formattedDateOfBirthDate(dateFormat))
+                val vacName = this.greenCertificate.vaccineMedicinalProduct?.let { strings["vac.product.$it"] }
+                text = text?.replace("<VACCINE_NAME>", vacName.orNA())
+                text = text?.replace("<DATE>", this.greenCertificate.vaccineDate?.let(dateFormat::format).orNA())
+                text ?: ""
+            }
+            WalletCertificateType.RECOVERY_EUROPE -> {
+                text = strings["wallet.proof.europe.recovery.description"]
+                text = text?.replace("<FULL_NAME>", fullName())
+                text = text?.replace("<BIRTHDATE>", this.greenCertificate.formattedDateOfBirthDate(dateFormat))
+                text = text?.replace("<FROM_DATE>", this.greenCertificate.recoveryValidFrom?.let(dateFormat::format).orNA())
+                text = text?.replace("<TO_DATE>", this.greenCertificate.recoveryValidUntil?.let(dateFormat::format).orNA())
+                text ?: ""
+            }
+            WalletCertificateType.SANITARY_EUROPE -> {
+                text = strings["wallet.proof.europe.test.description"]
+                text = text?.replace("<FULL_NAME>", fullName())
+                text = text?.replace("<BIRTHDATE>", this.greenCertificate.formattedDateOfBirthDate(dateFormat))
+                val testName = this.greenCertificate.testType?.let { strings["test.man.$it"] }
+                text = text?.replace("<ANALYSIS_CODE>", testName.orNA())
+                val testResult = this.greenCertificate.testResultCode?.let { strings["wallet.proof.europe.test.$it"] }
+                text = text?.replace("<ANALYSIS_RESULT>", testResult.orNA())
+                text = text?.replace("<FROM_DATE>", this.greenCertificate.testDateTimeOfCollection?.let(dateFormat::format).orNA())
+                text ?: ""
+            }
         }
     }
 }
