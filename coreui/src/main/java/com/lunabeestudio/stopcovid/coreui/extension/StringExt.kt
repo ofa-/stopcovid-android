@@ -24,7 +24,6 @@ import okhttp3.Request
 import retrofit2.HttpException
 import retrofit2.Response
 import java.io.File
-import java.io.FileOutputStream
 import java.net.HttpURLConnection
 
 @Suppress("BlockingMethodInNonBlockingContext")
@@ -37,8 +36,9 @@ suspend fun String.saveTo(context: Context, file: File): Boolean {
         }.build()
 
         val response = okHttpClient.newCall(request).execute()
-        if (response.isSuccessful && response.body != null && response.networkResponse?.code != HttpURLConnection.HTTP_NOT_MODIFIED) {
-            response.body!!.byteStream().use { input ->
+        val body = response.body
+        if (response.isSuccessful && body != null && response.networkResponse?.code != HttpURLConnection.HTTP_NOT_MODIFIED) {
+            body.byteStream().use { input ->
                 file.outputStream().use { output ->
                     input.copyTo(output, 4 * 1024)
                 }
@@ -47,13 +47,13 @@ suspend fun String.saveTo(context: Context, file: File): Boolean {
         } else if (response.networkResponse?.code == HttpURLConnection.HTTP_NOT_MODIFIED) {
             true
         } else {
-            throw HttpException(Response.error<Any>(response.body!!, response))
+            throw HttpException(Response.error<Any>(body!!, response))
         }
     }
 }
 
 @Suppress("BlockingMethodInNonBlockingContext")
-suspend fun String.saveTo(context: Context, atomicFile: AtomicFile): FileOutputStream? {
+suspend fun String.saveTo(context: Context, atomicFile: AtomicFile, validData: suspend (data: ByteArray) -> Boolean): Boolean {
     return withContext(Dispatchers.IO) {
         val cacheConfig = CacheConfig(File(context.cacheDir, "http_cache"), 30 * 1024 * 1024)
         val okHttpClient = OkHttpClient.getDefaultOKHttpClient(context, this@saveTo, ConfigConstant.SERVER_CERTIFICATE_SHA256, cacheConfig)
@@ -62,16 +62,29 @@ suspend fun String.saveTo(context: Context, atomicFile: AtomicFile): FileOutputS
         }.build()
 
         val response = okHttpClient.newCall(request).execute()
-        if (response.isSuccessful && response.body != null && response.networkResponse?.code != HttpURLConnection.HTTP_NOT_MODIFIED) {
-            val fileOutputStream = atomicFile.startWrite()
-            response.body!!.byteStream().use { input ->
-                input.copyTo(fileOutputStream, 4 * 1024)
+        val body = response.body
+        if (response.isSuccessful && body != null && response.networkResponse?.code != HttpURLConnection.HTTP_NOT_MODIFIED) {
+            body.use {
+                val bodyBytes = body.bytes()
+                val isValid = validData(bodyBytes)
+                if (isValid) {
+                    val fileOutputStream = atomicFile.startWrite()
+                    try {
+                        bodyBytes.inputStream().use { input ->
+                            input.copyTo(fileOutputStream, 4 * 1024)
+                        }
+                        atomicFile.finishWrite(fileOutputStream)
+                    } catch (e: Exception) {
+                        atomicFile.failWrite(fileOutputStream)
+                        throw e
+                    }
+                }
             }
-            fileOutputStream
+            true
         } else if (response.networkResponse?.code == HttpURLConnection.HTTP_NOT_MODIFIED) {
-            null
+            false
         } else {
-            throw HttpException(Response.error<Any>(response.body!!, response))
+            throw HttpException(Response.error<Any>(body!!, response))
         }
     }
 }

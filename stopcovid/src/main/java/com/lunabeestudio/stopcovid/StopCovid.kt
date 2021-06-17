@@ -99,6 +99,7 @@ import java.io.File
 import java.util.Calendar
 import java.util.Date
 import java.util.concurrent.TimeUnit
+import kotlin.math.roundToInt
 import kotlin.random.Random
 import kotlin.time.ExperimentalTime
 import kotlin.time.hours
@@ -306,7 +307,8 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
 
     override fun notifyAtRiskLevelChange() {
         RisksLevelManager.getCurrentLevel(robertManager.atRiskStatus?.riskLevel)?.let { riskLevel ->
-            AnalyticsManager.reportHealthEvent(this, HealthEventName.eh2, null)
+            AnalyticsManager.reportHealthEvent(this, HealthEventName.eh2, riskLevel.riskLevel.roundToInt().toString())
+            AnalyticsManager.reportAppEvent(this, AppEventName.e2)
             val inputData = Data.Builder()
                 .putString(AtRiskNotificationWorker.INPUT_DATA_TITLE_KEY, riskLevel.labels.notifTitle)
                 .putString(AtRiskNotificationWorker.INPUT_DATA_MESSAGE_KEY, riskLevel.labels.notifBody)
