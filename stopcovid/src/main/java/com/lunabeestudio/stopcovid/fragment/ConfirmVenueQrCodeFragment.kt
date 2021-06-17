@@ -10,10 +10,12 @@
 
 package com.lunabeestudio.stopcovid.fragment
 
+import android.os.Bundle
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.navArgs
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.lunabeestudio.analytics.manager.AnalyticsManager
 import com.lunabeestudio.analytics.model.AppEventName
 import com.lunabeestudio.stopcovid.R
@@ -24,6 +26,7 @@ import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
+import com.lunabeestudio.stopcovid.extension.showAlertSickVenue
 import com.lunabeestudio.stopcovid.extension.showExpiredCodeAlert
 import com.lunabeestudio.stopcovid.extension.showInvalidCodeAlert
 import com.lunabeestudio.stopcovid.extension.showUnknownErrorAlert
@@ -40,6 +43,17 @@ class ConfirmVenueQrCodeFragment : MainFragment() {
 
     private val robertManager by lazy {
         requireContext().robertManager()
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        if (robertManager.isImmune) {
+            MaterialAlertDialogBuilder(requireContext()).showAlertSickVenue(
+                strings = strings,
+                onIgnore = null,
+                onCancel = { findNavControllerOrNull()?.navigateUp() }
+            )
+        }
     }
 
     override fun getTitleKey(): String = "confirmVenueQrCodeController.title"
@@ -110,5 +124,4 @@ class ConfirmVenueQrCodeFragment : MainFragment() {
 
         return items
     }
-
 }

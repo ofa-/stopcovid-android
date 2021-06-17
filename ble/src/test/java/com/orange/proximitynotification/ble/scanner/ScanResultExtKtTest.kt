@@ -29,7 +29,8 @@ class ScanResultExtKtTest {
     @TestWith(
         value = [
             "data",
-            "null"]
+            "null"
+        ]
     )
     fun toBleScannedDevice_should_create_BLEScannedDevice(data: String?) {
         // Given
@@ -57,7 +58,6 @@ class ScanResultExtKtTest {
         assertThat(result).isEqualTo(expected.copy(timestamp = result.timestamp))
     }
 
-
     private fun givenScanResult(
         device: BluetoothDevice = mock(),
         rssi: Int = 0,
@@ -73,7 +73,6 @@ class ScanResultExtKtTest {
         return scanResult
     }
 
-
     private fun givenScanRecord(data: ByteArray? = null): ScanRecord {
         val scanRecord = mock<ScanRecord>()
         val serviceData = mock<Map<ParcelUuid, ByteArray>>()
@@ -81,5 +80,4 @@ class ScanResultExtKtTest {
         whenever(serviceData[any()]).thenReturn(data)
         return scanRecord
     }
-
 }

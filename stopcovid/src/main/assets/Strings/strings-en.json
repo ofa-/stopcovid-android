@@ -122,9 +122,8 @@
     "common.dontSend": "Don’t send",
     "common.warning": "Please note",
     "common.error.internet": "Check your internet connection and try again",
-    "common.error": "Too many people right now!",
-    "common.error.server": "A lot of you have joined TousAntiCovid. Thank you! We're doing everything we can to get back online very soon.",
-    "common.error.needRegister": "You need to register to do this",
+    "common.error": "On-going maintenance",
+    "common.error.server": "Due to maintenance on our secure servers, this feature is not available at this time. Please try again later.",    "common.error.needRegister": "You need to register to do this",
     "accessibility.back.label": "Back",
     "accessibility.onboarding.explanations.step1": "First",
     "accessibility.onboarding.explanations.step2": "Second",
@@ -710,11 +709,11 @@
     "confirmVenueQrCodeController.explanation.subtitle": "Do you want to add this venue to your history?",
     "confirmVenueQrCodeController.confirm": "Add this venue",
     
-     "home.vaccinationSection.cellTitle": "I get vaccinated!",
+     "home.vaccinationSection.cellTitle": "I'm getting vaccinated!",
    "home.vaccinationSection.cellSubtitle": "Check your eligibility and find a center nearby to get vaccinated.",
    "vaccinationController.title": "Vaccination",
    "vaccinationController.eligibility.title": "Am I eligible to get vaccinated?",
-   "vaccinationController.eligibility.subtitle": "Aujourd’hui, les publics prioritaires définis par les autorités sanitaires sont :\n- 24 mai 2021 : toutes les personnes exerçant une profession prioritaire, sans restriction d'âge\n- L’ensemble des personnes de 50 ans et plus\n- Les professionnels du secteur de la santé et du secteur médico-social\n- Les personnes de plus de 18 ans souffrant d’une ou plusieurs comorbidités ou hébergées en maisons d’accueil spécialisées, foyers d’accueil médicalisés, foyers pour personnes handicapées non médicalisés, ainsi qu’en établissements médico-sociaux spécifiques \n- Les personnes de plus de 16 ans souffrant d’une pathologie à très haut risque de forme grave de Covid-19\n- Les proches (de plus de 16 ans) d’une personne sévèrement immunodéprimée\n\n👍 Toutes les personnes de plus de 18 ans peuvent désormais prendre rendez-vous pour le jour même ou pour le lendemain pour se faire vacciner contre la Covid-19 si des doses de vaccin restent disponibles.",
+   "vaccinationController.eligibility.subtitle": "Aujourd’hui, les publics prioritaires définis par les autorités sanitaires sont :\n- Toutes les personnes de 18 ans et plus\n- Les personnes de 16 ans et plus vulnérables à très haut risque de forme grave de Covid-19 telles que définies par le Conseil d’orientation de la stratégie vaccinale\n- Les proches (à savoir les personnes vivant sous le même toit ou apportant une aide dans la vie quotidienne) de 16 ans et plus de personnes sévèrement immunodéprimées",
    "vaccinationController.eligibility.buttonTitle": "En savoir plus",
    "vaccinationController.eligibility.url": "https://www.gouvernement.fr/info-coronavirus/vaccins#tac",
    "vaccinationController.vaccinationLocation.title": "Find a center to get vaccinated",
@@ -963,9 +962,9 @@
 
    "walletController.title": "Wallet",
    "walletController.explanations.title": "How does it work?",
-   "walletController.explanations.subtitle": "To digitalize your test and vaccination certificates and always have them at hand, it's simple:\n- for your tests, you will receive a text message from SI-DEP platform with instructions.\n- for your vaccination, you will have a QR Code to scan on your paper certificate. From the second half of May, you will be able to collect your old vaccination certificates.\n\nThese certificates will have to be presented during checks for your travels 👉 experimentation in progress, airlines and shipping companies will inform their eligible customers.\n\nIf you have a problem, you can call 0 800 08 71 48.",
+   "walletController.explanations.subtitle": "To digitalize your test and vaccination certificates and always have them at hand, it's simple:\n- for your tests, you will receive a text message or an e-mail from SI-DEP platform with instructions.\n- for your vaccination, you will have a QR Code to scan on your certificate. Since May 27th, you can get your vaccination certificates (including old ones) on https://attestation-vaccin.ameli.fr/\n\nThese certificates will have to be presented during checks for your travels 👉 experimentation in progress.\n\nIf you have a problem, you can call 0 800 08 71 48.",
    "walletController.flashButton.title": "Scan QR Code",
-   "walletController.flashExplanation": "On your SI-DEP document (test) or vaccination certificate paper (since May 3rd, 11AM), you have a QR Code that you can scan to add your certificate in this wallet.",
+   "walletController.flashExplanation": "On your SI-DEP document (test) or vaccination certificate, you have a QR Code that you can scan to add your certificate in this wallet.",
    "walletController.recentCertificatesSection.title": "Recent certificates",
    "walletController.recentCertificatesSection.subtitle": "In this section, you have all your vaccination certificates and test certificates less than 3 days old. 👉 Tap a certificate to switch it to full screen.",
    "walletController.oldCertificatesSection.title": "Older certificates",
@@ -980,11 +979,11 @@
    "home.attestationSection.sanitaryCertificates.cell.subtitle": "Your test and vaccination certificates",
    
    "flashWalletCodeController.title": "Scan",
-   "flashWalletCodeController.explanation": "Scan the QR Code on your SI-DEP document (test) or paper certificate (vaccination).",
+   "flashWalletCodeController.explanation": "Scan the QR Code on your SI-DEP document (test) or certificate (vaccination).",
    "flashWalletCodeController.alert.invalidCode.title": "Invalid code",
    "flashWalletCodeController.alert.invalidCode.message": "The code is not valid. Please try again.",
    
-   "walletController.noCertificates.flashExplanation": "On your SI-DEP document (test) or vaccination certificate paper (since May 3rd, 11AM), you have a QR Code that you can scan to add your certificate in this wallet.",
+   "walletController.noCertificates.flashExplanation": "On your SI-DEP document (test) or vaccination certificate, you have a QR Code that you can scan to add your certificate in this wallet.",
    "confirmWalletQrCodeController.title":"Test wallet",
    "confirmWalletQrCodeController.explanation.title":"You have just hit a TousAntiCovid link to add a certificate to your wallet.",
    "confirmWalletQrCodeController.explanation.subtitle":"Do you want to add this certificate to your wallet?",
@@ -1023,23 +1022,23 @@
    "walletCertificateVerifiedController.proofValidated": "Verified certificate",
    "walletCertificateVerifiedController.validateAnotherProof": "Verify another certificate",
    
-      "keyfigure.variantsuk.label":"Variant britannique",
-   "keyfigure.variantsuk.shortLabel":"Variant UK",
-   "keyfigure.variantsuk.description":"Cet indicateur reflète le pourcentage de variants britanniques (UK 20I/501Y.V1) parmi les tests criblés.",
+      "keyfigure.variantsuk.label":"UK variant",
+   "keyfigure.variantsuk.shortLabel":"UK variant",
+   "keyfigure.variantsuk.description":"This indicator reflects the percentage of British variants (UK 20I/501Y.V1) among the screened tests.",
    
    "keyfigure.variantsuk.colorCode.light":"#4C76EB",
    "keyfigure.variantsuk.colorCode.dark":"#A6B6E3",
    
-    "keyfigure.variantsuk.learnMore": "En cas de test (RT-PCR ou antigénique) de première intention positif, un second test RT-PCR dit de criblage est réalisé afin de détecter les variants d’intérêt connus à ce jour et d’évaluer leur diffusion sur l’ensemble du territoire.\n\nCet indicateur porte sur les données relatives aux résultats de criblage arrêtés à J-3 et mis à jour quotidiennement.\n\nIl exprime la part du variant 20I/501Y.V1 (UK) parmi tous les tests criblés. Les données sont collectées dans SI-DEP depuis le 25 janvier 2021.",
+    "keyfigure.variantsuk.learnMore": "In case of a positive test (RT-PCR or antigen), a second so-called screening RT-PCR test is carried out in order to detect the variants of interest known to date and to assess their geographical spread.\n\nThis indicator relies on data related to screening results stopped on D-3 and updated daily.\n\nIt represents the share of the UK variant among all the screened tests. Data has been collected in SI-DEP since January 25, 2021.",
     
-    "keyfigure.variantssabr.label":"Variants sud-africains ou brésiliens",
-	"keyfigure.variantssabr.shortLabel":"Variants SA ou BR",
-	"keyfigure.variantssabr.description":"Cet indicateur reflète le pourcentage de variants sud-africains ou brésiliens (20H/501Y.V2 (SA) ou 20J/501Y.V3 (BR)) parmi les tests criblés.",
+    "keyfigure.variantssabr.label":"South African or Brazilian variants",
+	"keyfigure.variantssabr.shortLabel":"SA or BR variants",
+	"keyfigure.variantssabr.description":"This indicator reflects the percentage of South African or Brazilian variants (20H/501Y.V2 (SA) ou 20J/501Y.V3 (BR)) among the screened tests.",
 	
 	"keyfigure.variantssabr.colorCode.light":"#F49F54",
 	"keyfigure.variantssabr.colorCode.dark":"#F49F54",
 	
-	"keyfigure.variantssabr.learnMore": "En cas de test (RT-PCR ou antigénique) de première intention positif, un second test RT-PCR dit de criblage est réalisé afin de détecter les variants d’intérêt connus à ce jour et d’évaluer leur diffusion sur l’ensemble du territoire.\n\nCet indicateur porte sur les données relatives aux résultats de criblage arrêtés à J-3 et mises à jour quotidiennement.\n\nIl exprime la part des variants 20H/501Y.V2 (SA) ou 20J/501Y.V3 (BR) parmi tous les tests criblés. Les données sont collectées dans SI-DEP depuis le 25 janvier 2021.",
+	"keyfigure.variantssabr.learnMore": "In case of a positive test (RT-PCR or antigen), a second so-called screening RT-PCR test is carried out in order to detect the variants of interest known to date and to assess their geographical spread.\n\nThis indicator relies on data related to screening results stopped on D-3 and updated daily.\n\nIt represents the share of the South African or Brazilian variants among all the screened tests. Data has been collected in SI-DEP since January 25, 2021.",
     
     "manageDataController.walletData.confirmationDialog.title": "Confirmation",
     "manageDataController.walletData.confirmationDialog.message": "Are you sure you want to delete all your certificates?",
@@ -1078,13 +1077,13 @@
    "sendHistoryController.progress.message": "Thanks for your help, it can take several minutes.",
    
    "walletController.howDoesItWork.title": "The wallet: how does it work?",
-   "walletController.howDoesItWork.subtitle": "To digitalize your test and vaccination certificates and always have them at hand, it's simple:\n\n👉 for your tests, you will receive a text message from SI-DEP platform with instructions.\n\n👉 for your vaccination, you will have a QR Code to scan on your paper certificate. End of May, you will be able to collect your old vaccination certificates.",
+   "walletController.howDoesItWork.subtitle": "To digitalize your test and vaccination certificates and always have them at hand, it's simple:\n\n👉 for your tests, you will receive a text message or an e-mail from SI-DEP platform with instructions.\n\n👉 for your vaccination, you will have a QR Code to scan on your certificate. Since May 27th, you can get your vaccination certificates (including old ones) on https://attestation-vaccin.ameli.fr/",
    "walletController.documents.title": "The documents",
    "walletController.documents.subtitle": "From these two documents, you can digitalize your test and vaccination certficates, and add them here in TousAntiCovid Wallet.\nTap to have them full screen.",
    "walletController.documents.vaccin": "Vaccination certificate",
    "walletController.documents.test": "Test result",
    "walletController.whenToUse.title": "When to use it?",
-   "walletController.whenToUse.subtitle": "These certificates will have to be presented for your travels.\n\n👉 experimentation in progress, airlines and shipping companies will inform their eligible customers.",
+   "walletController.whenToUse.subtitle": "According to the law of May 31 (on the health crisis), the test or vaccination certificates must be presented at the entrance of an event of more than 1,000 people or to travel (including in Corsica and France Overseas).",
    "walletController.whenToUse.button": "Learn more",
    "walletController.whenToUse.url": "https://www.gouvernement.fr/pass-sanitaire-toutes-les-reponses-a-vos-questions",
    "walletController.phone.title": "Need help?",
@@ -1120,17 +1119,21 @@
     "attestation.form.country.label":"Country",
     "attestation.form.country.placeholder":"France",
     
+    "manageDataController.analytics.button": "Delete my data",
+    "manageDataController.analytics.confirmationDialog.title": "Confirm",
+    "manageDataController.analytics.confirmationDialog.message": "Are you sure you want to delete your data?",
+    
     "common.moreInfo": "More info",
    "venuesRecording.whenToUse.title": "The QR Codes",
    "venuesRecording.whenToUse.subtitle": "The venues with these QR Codes have it either at the entrance, or in more approriate places to scan a QR Code.\n\nIf you don't find the QR Code, you can ask the staff to help you.",
    "venuesRecording.alert.title": "The alerts",
    "venuesRecording.alert.subtitle": "If a person later tests positive, all people will be informed that they may have been exposed to the virus and will be invited to be tested.\n\nIf three people or more have been in the same place and then test positive, all the other people present in this place will be considered as contacts (because co-exposed) and invited to isolate themselves, to be tested.",
-   
-   "manageDataController.analytics.button": "Delete my data",
-    "manageDataController.analytics.confirmationDialog.title": "Confirmation",
-    "manageDataController.analytics.confirmationDialog.message": "Do you really want to delete your usage data?",
-
    "manageDataController.analytics.successDialog.title": "Confirmation",
-   "manageDataController.analytics.successDialog.message": "Your delete request has been taken into account."
+   "manageDataController.analytics.successDialog.message": "Your delete request has been taken into account.",
+   
+   "home.venuesSection.sickAlert.title": "Attention",
+   "home.venuesSection.sickAlert.message": "You are tested positive for Covid. It is not recommended to go to an indoor restaurant, gym or pub. Please follow the recommendations of the isolation module.",
+   "home.venuesSection.sickAlert.positiveButton": "Ignore",
+   "home.venuesSection.sickAlert.negativeButton": "Cancel"
 
 }

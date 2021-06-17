@@ -18,8 +18,8 @@ import timber.log.Timber
 import java.nio.ByteBuffer
 import java.util.Arrays.copyOfRange
 import java.util.UUID
+import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
-import kotlin.time.days
 
 object VenuesManager {
 
@@ -40,7 +40,6 @@ object VenuesManager {
             val time: Long? = sanitizer.getValue("t")?.toLong() // Time is optional, if null, will be set to System.currentTime
 
             processVenue(robertManager, secureKeystoreDataSource, base64URLCode, version, time)
-
         } catch (e: Exception) {
             Timber.e(e)
             throw e
@@ -99,8 +98,10 @@ object VenuesManager {
     }
 
     @OptIn(ExperimentalTime::class)
-    fun isExpired(robertManager: RobertManager,
-        unixTimeInMS: Long): Boolean = unixTimeInMS + gracePeriod(robertManager) <= System.currentTimeMillis()
+    fun isExpired(
+        robertManager: RobertManager,
+        unixTimeInMS: Long
+    ): Boolean = unixTimeInMS + gracePeriod(robertManager) <= System.currentTimeMillis()
 
     private fun saveVenue(keystoreDataSource: SecureKeystoreDataSource, venueQrCode: VenueQrCode) {
         val venuesQrCode = keystoreDataSource.venuesQrCode?.toMutableList() ?: mutableListOf()
@@ -133,17 +134,27 @@ object VenuesManager {
         keystoreDataSource: SecureKeystoreDataSource,
     ) {
         if (!keystoreDataSource.venuesQrCode?.filter {
-                isExpired(robertManager, it.ntpTimestamp.ntpTimeSToUnixTimeMs()) || it.ltid == null // This test is added to handle "old" venues that may have null here due to JSON parsing handling
-            }.isNullOrEmpty()) {
+            @Suppress("SENSELESS_COMPARISON")
+            isExpired(
+                    robertManager,
+                    it.ntpTimestamp.ntpTimeSToUnixTimeMs()
+                ) || it.ltid == null // This test is added to handle "old" venues that may have null here due to JSON parsing handling
+        }.isNullOrEmpty()
+        ) {
             keystoreDataSource.venuesQrCode = keystoreDataSource.venuesQrCode?.filter { venueQrCode ->
-                !isExpired(robertManager, venueQrCode.ntpTimestamp.ntpTimeSToUnixTimeMs()) && venueQrCode.ltid != null // This test is added to handle "old" venues that may have null here due to JSON parsing handling
+                @Suppress("SENSELESS_COMPARISON")
+                !isExpired(
+                    robertManager,
+                    venueQrCode.ntpTimestamp.ntpTimeSToUnixTimeMs()
+                ) && venueQrCode.ltid != null // This test is added to handle "old" venues that may have null here due to JSON parsing handling
             }
             venueListHasChanged(keystoreDataSource)
         }
     }
 
     @OptIn(ExperimentalTime::class)
-    private fun gracePeriod(robertManager: RobertManager) = robertManager.configuration.venuesRetentionPeriod.days.toLongMilliseconds()
+    private fun gracePeriod(robertManager: RobertManager) =
+        Duration.days(robertManager.configuration.venuesRetentionPeriod).inWholeMilliseconds
 
     fun removeVenue(keystoreDataSource: SecureKeystoreDataSource, venueId: String) {
         val venuesQrCode = keystoreDataSource.venuesQrCode?.toMutableList() ?: mutableListOf()

@@ -43,4 +43,3 @@ internal class RssiClipper(private val rssiThreshold: Int) {
         return Output(clippedTimestampRssis, peaks)
     }
 }
-

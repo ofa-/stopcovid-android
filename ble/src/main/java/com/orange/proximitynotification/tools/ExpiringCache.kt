@@ -58,5 +58,4 @@ internal class ExpiringCache<K, V>(maxSize: Int, private val expireTime: Long) {
     internal fun elapsedRealtime(): Long {
         return SystemClock.elapsedRealtime()
     }
-
 }

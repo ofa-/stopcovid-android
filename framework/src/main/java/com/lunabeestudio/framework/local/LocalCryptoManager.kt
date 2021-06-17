@@ -183,7 +183,7 @@ class LocalCryptoManager(private val appContext: Context) {
             } else {
                 Timber.e(
                     "Secret key couldn't be found in the KeyStore but data are already encrypted with it\nkeystore aliases = ${
-                        keyStore.aliases().toList()
+                    keyStore.aliases().toList()
                     }"
                 )
                 throw SecretKeyAlreadyGeneratedException()

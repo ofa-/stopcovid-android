@@ -10,12 +10,28 @@
 
 package com.lunabeestudio.analytics.network.model
 
+import com.lunabeestudio.analytics.model.AppInfos
+import com.lunabeestudio.analytics.model.HealthInfos
 import com.lunabeestudio.analytics.model.Infos
-import com.lunabeestudio.analytics.model.TimestampedEvent
 
-class SendAnalyticsRQ(
+sealed class SendAnalyticsRQ(
     val installationUuid: String,
-    val infos: Infos,
     val events: List<TimestampedEventRQ>,
-    val errors: List<TimestampedEventRQ>
-)
+    val errors: List<TimestampedEventRQ>,
+) {
+    abstract val infos: Infos
+}
+
+class SendAppAnalyticsRQ(
+    installationUuid: String,
+    override val infos: AppInfos,
+    events: List<TimestampedEventRQ>,
+    errors: List<TimestampedEventRQ>
+) : SendAnalyticsRQ(installationUuid, events, errors)
+
+class SendHealthAnalyticsRQ(
+    installationUuid: String,
+    override val infos: HealthInfos,
+    events: List<TimestampedEventRQ>,
+    errors: List<TimestampedEventRQ>
+) : SendAnalyticsRQ(installationUuid, events, errors)

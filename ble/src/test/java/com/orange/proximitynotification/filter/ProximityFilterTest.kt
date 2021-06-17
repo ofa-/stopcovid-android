@@ -52,5 +52,4 @@ class ProximityFilterTest {
         // Then
         assertThat(output).isEqualTo(ProximityFilter.Output.Rejected)
     }
-
 }

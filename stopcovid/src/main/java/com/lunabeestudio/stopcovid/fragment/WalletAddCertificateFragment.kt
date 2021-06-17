@@ -45,8 +45,9 @@ class WalletAddCertificateFragment : MainFragment() {
                     )
             }
             thumbnailAction = {
-                findNavControllerOrNull()
-                    ?.safeNavigate(WalletAddCertificateFragmentDirections.actionWalletAddCertificateFragmentToTestDocumentExplanationFragment())
+                findNavControllerOrNull()?.safeNavigate(
+                    WalletAddCertificateFragmentDirections.actionWalletAddCertificateFragmentToTestDocumentExplanationFragment()
+                )
             }
             identifier = title.hashCode().toLong()
         }
@@ -65,8 +66,9 @@ class WalletAddCertificateFragment : MainFragment() {
                     )
             }
             thumbnailAction = {
-                findNavControllerOrNull()
-                    ?.safeNavigate(WalletAddCertificateFragmentDirections.actionWalletAddCertificateFragmentToVaccinDocumentExplanationFragment())
+                findNavControllerOrNull()?.safeNavigate(
+                    WalletAddCertificateFragmentDirections.actionWalletAddCertificateFragmentToVaccinDocumentExplanationFragment()
+                )
             }
             identifier = title.hashCode().toLong()
         }

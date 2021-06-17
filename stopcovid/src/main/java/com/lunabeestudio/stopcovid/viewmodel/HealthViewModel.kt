@@ -46,7 +46,6 @@ class HealthViewModel(private val robertManager: RobertManager) : ViewModel() {
             covidException.postValue(NeedRegisterException())
         }
     }
-
 }
 
 class HealthViewModelFactory(private val robertManager: RobertManager) :

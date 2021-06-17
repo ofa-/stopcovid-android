@@ -202,7 +202,6 @@ class ScanRecordExtKtTest {
     private fun ScanRecord.matchesExpectedManufacturerData() =
         matchesManufacturerDataMask(MANUFACTURER_ID, MANUFACTURER_DATA_MASK)
 
-
     private fun givenScanRecord(
         serviceUuids: List<ParcelUuid>? = null,
         serviceData: Map<ParcelUuid, ByteArray>? = null,

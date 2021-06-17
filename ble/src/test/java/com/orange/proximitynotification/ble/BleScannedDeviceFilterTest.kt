@@ -91,7 +91,6 @@ class BleScannedDeviceFilterTest {
         val device3 = bluetoothDevice("Device3")
         val device4 = bluetoothDevice("Device4")
 
-
         val scans: List<BleScannedDevice> = listOf(
             bleScannedDevice(device1, timestamp = now, serviceData = null),
             bleScannedDevice(device2, timestamp = now, serviceData = null),
@@ -156,7 +155,6 @@ class BleScannedDeviceFilterTest {
         )
         filter.filter(scansBefore)
 
-
         val scans: List<BleScannedDevice> = listOf(
             bleScannedDevice(device1, timestamp = now.plus(1_000), serviceData = null),
             bleScannedDevice(device2, timestamp = now.plus(1_001), serviceData = null),
@@ -171,5 +169,4 @@ class BleScannedDeviceFilterTest {
             bleScannedDevice(device3, timestamp = now.plus(1_002), serviceData = null)
         )
     }
-
 }

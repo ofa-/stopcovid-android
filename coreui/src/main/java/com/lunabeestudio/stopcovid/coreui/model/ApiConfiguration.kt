@@ -125,6 +125,10 @@ internal class ApiConfiguration(
     val testCertificateValidityThresholds: String,
     @SerializedName("app.cleaUrls")
     val cleaUrls: String?,
+    @SerializedName("app.covidPlusWarning")
+    val covidPlusWarning: Int,
+    @SerializedName("app.covidPlusNoTracing")
+    val covidPlusNoTracing: Int,
 )
 
 internal fun ApiConfiguration.toDomain(gson: Gson) = Configuration(
@@ -197,4 +201,6 @@ internal fun ApiConfiguration.toDomain(gson: Gson) = Configuration(
         cleaUrls,
         object : TypeToken<List<String>?>() {}.type
     ),
+    covidPlusWarning = covidPlusWarning,
+    covidPlusNoTracing = covidPlusNoTracing,
 )

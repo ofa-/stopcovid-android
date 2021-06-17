@@ -112,26 +112,28 @@ object AppMaintenanceManager {
         appIsFreeCompletion: (() -> Unit)?,
         appIsBlockedCompletion: ((info: Info) -> Unit)?
     ) {
-        LBMaintenanceHttpClient.get(context, jsonUrl!!, { result ->
-            try {
-                val info = Info(JSONObject(result))
-                saveMaintenanceJson(result)
-                showAppMaintenanceActivityIfNeeded(
-                    context,
-                    info,
-                    appIsFreeCompletion,
-                    appIsBlockedCompletion
-                )
-                saveLastRefresh(context)
-            } catch (e: Exception) {
-                // In case of a malformed JSON we don't safe it and use the last one instead
-                useLastResult(
-                    context,
-                    appIsFreeCompletion,
-                    appIsBlockedCompletion
-                )
-            }
-        },
+        LBMaintenanceHttpClient.get(
+            context, jsonUrl!!,
+            { result ->
+                try {
+                    val info = Info(JSONObject(result))
+                    saveMaintenanceJson(result)
+                    showAppMaintenanceActivityIfNeeded(
+                        context,
+                        info,
+                        appIsFreeCompletion,
+                        appIsBlockedCompletion
+                    )
+                    saveLastRefresh(context)
+                } catch (e: Exception) {
+                    // In case of a malformed JSON we don't safe it and use the last one instead
+                    useLastResult(
+                        context,
+                        appIsFreeCompletion,
+                        appIsBlockedCompletion
+                    )
+                }
+            },
             { e ->
                 useLastResult(
                     context,
@@ -139,7 +141,8 @@ object AppMaintenanceManager {
                     appIsBlockedCompletion
                 )
                 Timber.e(e)
-            })
+            }
+        )
     }
 
     private suspend fun useLastResult(

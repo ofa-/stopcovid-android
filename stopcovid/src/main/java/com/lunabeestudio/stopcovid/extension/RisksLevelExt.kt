@@ -10,5 +10,3 @@ fun RisksUILevel.getGradientBackground(): GradientDrawable? {
     colors[1] = parseColor(color.to)
     return GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, colors)
 }
-
-

@@ -26,5 +26,4 @@ class CSVReader(
                     .forEach { valuesAction(it) }
             }
     }
-
 }

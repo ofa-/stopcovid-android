@@ -134,4 +134,3 @@ private data class DeviceScansById(
     val timestamp: Long by lazy { mostRecentScan.timestamp.time }
     val timestampBracket: Long by lazy { timestamp / 200 }
 }
-

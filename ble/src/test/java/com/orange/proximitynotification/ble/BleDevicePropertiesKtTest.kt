@@ -43,7 +43,6 @@ class BleDevicePropertiesKtTest {
         assertThat(deviceId1).isEqualTo(deviceId2)
     }
 
-
     @Test
     fun `deviceId given scan without serviceData and different address should not be equal`() = runBlockingTest {
         // Given
@@ -99,7 +98,4 @@ class BleDevicePropertiesKtTest {
         // Then
         assertThat(deviceId).isEqualTo(scan.serviceData.contentHashCode())
     }
-
-
-
 }

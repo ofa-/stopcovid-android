@@ -118,4 +118,29 @@
         <item name="android:ellipsize">end</item>
     </style>
 
+    <style name="Widget.StopCovid.Widget.Figures.TextView.MainFigure.Value" parent="Widget.MaterialComponents.TextView">
+        <item name="android:textSize">@dimen/widget_main_figure_font_size</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="Widget.StopCovid.Widget.Figures.TextView.SecondFigures.Value" parent="Widget.MaterialComponents.TextView">
+        <item name="android:textSize">@dimen/widget_second_figure_font_size</item>
+        <item name="android:autoSizeMinTextSize" tools:targetApi="o">@dimen/widget_second_figure_min_font_size</item>
+        <item name="android:autoSizeTextType" tools:targetApi="o">uniform</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+
+    <style name="Widget.StopCovid.Widget.Figures.TextView.Label" parent="Widget.MaterialComponents.TextView">
+        <item name="android:textSize">@dimen/small_caption_font_size</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+
+    <style name="Widget.StopCovid.Widget.Divider" parent="">
+        <item name="android:layout_height">@dimen/divider_height</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:background">@color/color_black_15</item>
+    </style>
+
 </resources>

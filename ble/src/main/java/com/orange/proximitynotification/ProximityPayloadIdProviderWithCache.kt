@@ -39,7 +39,4 @@ internal class ProximityPayloadIdProviderWithCache(
 
         return proximityPayloadId
     }
-
 }
-
-

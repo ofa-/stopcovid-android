@@ -235,5 +235,4 @@ class VaccinationFragment : MainFragment() {
             }
         }
     }
-
 }

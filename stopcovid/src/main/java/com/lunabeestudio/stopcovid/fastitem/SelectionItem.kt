@@ -38,7 +38,6 @@ class SelectionItem : AbstractBindingItem<ItemSelectionBinding>() {
             onClick?.invoke()
         }
         binding.selectionImageView.isInvisible = !showSelection
-
     }
 }
 

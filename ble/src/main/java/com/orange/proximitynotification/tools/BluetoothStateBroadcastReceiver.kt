@@ -31,8 +31,9 @@ class BluetoothStateBroadcastReceiver(
         when (state) {
             STATE_ON -> onBluetoothEnabled()
             STATE_TURNING_OFF,
-            STATE_OFF -> if (previousState != STATE_TURNING_OFF && previousState != STATE_OFF)
+            STATE_OFF -> if (previousState != STATE_TURNING_OFF && previousState != STATE_OFF) {
                 onBluetoothDisabled()
+            }
         }
     }
 }

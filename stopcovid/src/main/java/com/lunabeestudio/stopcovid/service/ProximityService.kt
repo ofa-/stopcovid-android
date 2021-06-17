@@ -129,7 +129,8 @@ open class ProximityService : RobertProximityService() {
         }
         onError?.invoke(error)
         if (System.currentTimeMillis() - creationDate < STOP_SERVICE_ERROR_DELAY_MS
-            || error.isCritical()) {
+            || error.isCritical()
+        ) {
             robertManager.deactivateProximity(applicationContext as RobertApplication)
         } else if (ProximityManager.isBluetoothOn(this, robertManager) && shouldShowError()) {
             sendErrorNotification()

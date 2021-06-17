@@ -122,14 +122,23 @@ class RobertManagerImpl(
             keystoreRepository.shouldReloadBleSettings = value
         }
 
-    override val canActivateProximity: Boolean
+    override val isImmune: Boolean
         get() = keystoreRepository.reportDate?.let { reportDate ->
-            val reportCalendar = Calendar.getInstance().apply {
+            val endOfSickCal = Calendar.getInstance().apply {
                 timeInMillis = reportDate
-                add(Calendar.MONTH, RobertConstant.REGISTER_DELAY_MONTH)
+                add(Calendar.DAY_OF_YEAR, configuration.covidPlusNoTracing)
             }
-            System.currentTimeMillis() > reportCalendar.timeInMillis
-        } ?: true
+            System.currentTimeMillis() <= endOfSickCal.timeInMillis
+        } ?: false
+
+    override val isSick: Boolean
+        get() = keystoreRepository.reportDate?.let { reportDate ->
+            val endOfVenueWarningCal = Calendar.getInstance().apply {
+                timeInMillis = reportDate
+                add(Calendar.DAY_OF_YEAR, configuration.covidPlusWarning)
+            }
+            System.currentTimeMillis() <= endOfVenueWarningCal.timeInMillis
+        } ?: false
 
     override val isRegistered: Boolean
         get() = keystoreRepository.isRegistered
@@ -148,9 +157,6 @@ class RobertManagerImpl(
 
     override val atRiskLastRefresh: Long?
         get() = keystoreRepository.atRiskLastRefresh
-
-    override val isSick: Boolean
-        get() = keystoreRepository.isSick ?: false
 
     override val filteringMode: LocalProximityFilter.Mode
         get() = safeEnumValueOf<LocalProximityFilter.Mode>(configuration.filterMode) ?: RobertConstant.BLE_FILTER_MODE
@@ -315,7 +321,7 @@ class RobertManagerImpl(
     }
 
     override suspend fun activateProximity(application: RobertApplication, statusTried: Boolean): RobertResult {
-        return if (!canActivateProximity) {
+        return if (isImmune) {
             RobertResult.Failure(ReportDelayException())
         } else {
             val isHelloAvailable = ephemeralBluetoothIdentifierRepository.getForTime() != null
@@ -402,7 +408,7 @@ class RobertManagerImpl(
         if (!venueQrCodeList.isNullOrEmpty()) {
             val cleaStatusStart = System.currentTimeMillis()
 
-            //Fetch the latest index file
+            // Fetch the latest index file
             val clusterIndexResult: RobertResultData<ClusterIndex> = cleaRepository.cleaClusterIndex(configuration.cleaStatusApiVersion)
             val currentRiskStatus = currentCleaRiskStatus()
 
@@ -455,7 +461,7 @@ class RobertManagerImpl(
     }
 
     private fun newRiskStatus(clusterList: List<Cluster>?): AtRiskStatus {
-        //Calculate the max risk level
+        // Calculate the max risk level
         var currentRiskLevel = 0f
         var currentDate: Long = 0
         clusterList?.forEach { cluster ->
@@ -488,7 +494,6 @@ class RobertManagerImpl(
                     }
                 }
             }
-
         }
         return clusterListWithTimeMatch
     }
@@ -559,15 +564,21 @@ class RobertManagerImpl(
 
         if (statusResult is RobertResultData.Success) {
             if (statusResult.data.ntpLastRiskScoringS == null
-                || (statusResult.data.ntpLastRiskScoringS ?: 0) > (keystoreRepository.currentRobertAtRiskStatus?.ntpLastRiskScoringS
-                    ?: -1)) {
+                || (statusResult.data.ntpLastRiskScoringS ?: 0) > (
+                    keystoreRepository.currentRobertAtRiskStatus?.ntpLastRiskScoringS
+                        ?: -1
+                    )
+            ) {
                 keystoreRepository.currentRobertAtRiskStatus = statusResult.data
             }
         }
         if (wStatusResult is RobertResultData.Success) {
             if (wStatusResult.data.ntpLastRiskScoringS == null
-                || (wStatusResult.data.ntpLastRiskScoringS ?: 0) > (keystoreRepository.currentWarningAtRiskStatus?.ntpLastRiskScoringS
-                    ?: -1)) {
+                || (wStatusResult.data.ntpLastRiskScoringS ?: 0) > (
+                    keystoreRepository.currentWarningAtRiskStatus?.ntpLastRiskScoringS
+                        ?: -1
+                    )
+            ) {
                 keystoreRepository.currentWarningAtRiskStatus = wStatusResult.data
             }
         }
@@ -581,17 +592,25 @@ class RobertManagerImpl(
                 .coerceAtMost(System.currentTimeMillis().unixTimeMsToNtpTimeS() - RobertConstant.LAST_CONTACT_DELTA_S)
         }
 
-        return if (statusResult is RobertResultData.Success && wStatusResult is RobertResultData.Success || newAtRiskStatus.riskLevel > prevAtRiskStatus?.riskLevel ?: 0f) {
+        return if (statusResult is RobertResultData.Success &&
+            wStatusResult is RobertResultData.Success ||
+            newAtRiskStatus.riskLevel > prevAtRiskStatus?.riskLevel ?: 0f
+        ) {
             keystoreRepository.atRiskLastRefresh = System.currentTimeMillis()
             keystoreRepository.atRiskStatus = newAtRiskStatus
-            if (!isSick) {
+            if (!isImmune) {
                 if (prevAtRiskStatus?.ntpLastRiskScoringS != newAtRiskStatus.ntpLastRiskScoringS) {
                     robertApplication.alertAtRiskLevelChange()
                 }
                 if (newAtRiskStatus.riskLevel > 0f
-                    && ((prevAtRiskStatus?.riskLevel ?: 0f) < newAtRiskStatus.riskLevel
-                        || (prevAtRiskStatus?.riskLevel == newAtRiskStatus.riskLevel
-                        && prevAtRiskStatus.ntpLastRiskScoringS ?: 0L < newAtRiskStatus.ntpLastRiskScoringS ?: 0L))) {
+                    && (
+                        (prevAtRiskStatus?.riskLevel ?: 0f) < newAtRiskStatus.riskLevel
+                            || (
+                                prevAtRiskStatus?.riskLevel == newAtRiskStatus.riskLevel
+                                    && prevAtRiskStatus.ntpLastRiskScoringS ?: 0L < newAtRiskStatus.ntpLastRiskScoringS ?: 0L
+                                )
+                        )
+                ) {
                     robertApplication.notifyAtRiskLevelChange()
                 }
             }
@@ -614,9 +633,11 @@ class RobertManagerImpl(
         val ephemeralBluetoothIdentifierExpiredTime = System.currentTimeMillis().unixTimeMsToNtpTimeS()
         ephemeralBluetoothIdentifierRepository.removeUntilTimeKeepLast(ephemeralBluetoothIdentifierExpiredTime)
         val localProximityExpiredTime: Long =
-            (System.currentTimeMillis() - TimeUnit.DAYS.toMillis(
-                configuration.dataRetentionPeriod.toLong()
-            )).unixTimeMsToNtpTimeS()
+            (
+                System.currentTimeMillis() - TimeUnit.DAYS.toMillis(
+                    configuration.dataRetentionPeriod.toLong()
+                )
+                ).unixTimeMsToNtpTimeS()
         localProximityRepository.removeUntilTime(localProximityExpiredTime)
     }
 
@@ -669,13 +690,14 @@ class RobertManagerImpl(
         return when (result) {
             is RobertResultData.Success -> {
                 AnalyticsManager.reportHealthEvent(application.getAppContext(), HealthEventName.eh1, null)
-                keystoreRepository.isSick = true
                 val reportCalendar = Calendar.getInstance()
                 reportCalendar.add(Calendar.DAY_OF_YEAR, -originDayInPast.toInt())
                 keystoreRepository.reportDate = reportCalendar.timeInMillis
                 deactivateProximity(application)
-                keystoreRepository.reportSymptomsStartDate = firstSymptoms?.let { System.currentTimeMillis() - TimeUnit.DAYS.toMillis(it.toLong()) }
-                keystoreRepository.reportPositiveTestDate = positiveTest?.let { System.currentTimeMillis() - TimeUnit.DAYS.toMillis(it.toLong()) }
+                keystoreRepository.reportSymptomsStartDate =
+                    firstSymptoms?.let { System.currentTimeMillis() - TimeUnit.DAYS.toMillis(it.toLong()) }
+                keystoreRepository.reportPositiveTestDate =
+                    positiveTest?.let { System.currentTimeMillis() - TimeUnit.DAYS.toMillis(it.toLong()) }
                 keystoreRepository.reportValidationToken = result.data.reportValidationToken
                 keystoreRepository.reportToSendStartTime = firstProximityToSendTime
                 keystoreRepository.reportToSendEndTime = lastProximityToSendTime
@@ -831,7 +853,6 @@ class RobertManagerImpl(
         keystoreRepository.deprecatedLastRiskReceivedDate = null
         keystoreRepository.deprecatedLastExposureTimeframe = null
         keystoreRepository.proximityActive = null
-        keystoreRepository.isSick = null
         keystoreRepository.reportDate = null
         keystoreRepository.configuration = configuration.apply { version = 0 }
         keystoreRepository.calibration = calibration.apply { version = 0 }

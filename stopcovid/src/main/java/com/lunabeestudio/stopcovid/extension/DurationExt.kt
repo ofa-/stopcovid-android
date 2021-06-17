@@ -14,9 +14,9 @@ fun Duration.getRelativeDateTimeString(context: Context, nowString: String?): St
 
     return when {
         now - this <= 1.minutes -> nowString
-        now - this <= 1.days -> DateUtils.getRelativeTimeSpanString(
-            this.coerceAtMost(now - 1.minutes).toLongMilliseconds(),
-            now.toLongMilliseconds(),
+        now - this <= Duration.days(1) -> DateUtils.getRelativeTimeSpanString(
+            this.coerceAtMost(now - 1.minutes).inWholeMilliseconds,
+            now.inWholeMilliseconds,
             DateUtils.MINUTE_IN_MILLIS,
             DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_SHOW_YEAR or DateUtils.FORMAT_ABBREV_MONTH,
         )
@@ -24,7 +24,7 @@ fun Duration.getRelativeDateTimeString(context: Context, nowString: String?): St
             .fixQuoteInString()
         else -> DateUtils.getRelativeDateTimeString(
             context,
-            this.toLongMilliseconds(),
+            this.inWholeMilliseconds,
             DateUtils.DAY_IN_MILLIS,
             DateUtils.WEEK_IN_MILLIS,
             DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_SHOW_YEAR or DateUtils.FORMAT_ABBREV_MONTH,
@@ -37,10 +37,11 @@ fun Duration.getRelativeDateTimeString(context: Context, nowString: String?): St
 @OptIn(ExperimentalTime::class)
 fun Duration.getRelativeDateString(): String? {
     return DateUtils.getRelativeTimeSpanString(
-        this.toLongMilliseconds(),
+        this.inWholeMilliseconds,
         System.currentTimeMillis(),
         DateUtils.DAY_IN_MILLIS,
-        DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_SHOW_YEAR or DateUtils.FORMAT_ABBREV_MONTH)
+        DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_SHOW_YEAR or DateUtils.FORMAT_ABBREV_MONTH
+    )
         .toString()
 }
 
@@ -48,6 +49,7 @@ fun Duration.getRelativeDateString(): String? {
 fun Duration.getRelativeDateShortString(context: Context): String? {
     return DateUtils.formatDateTime(
         context,
-        this.toLongMilliseconds(),
-        DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_NO_YEAR or DateUtils.FORMAT_ABBREV_MONTH)
+        this.inWholeMilliseconds,
+        DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_NO_YEAR or DateUtils.FORMAT_ABBREV_MONTH
+    )
 }

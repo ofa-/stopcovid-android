@@ -44,11 +44,13 @@ class ClickableRowItem : BaseItem<ClickableRowItem.ViewHolder>(
         holder.captionTextView.text = caption
         holder.captionTextView.isVisible = caption != null
 
-        holder.itemView.setOnClickListener(onClick?.let {
-            View.OnClickListener {
-                it()
+        holder.itemView.setOnClickListener(
+            onClick?.let {
+                View.OnClickListener {
+                    it()
+                }
             }
-        })
+        )
     }
 
     class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {

@@ -65,5 +65,4 @@ internal class BleRecordProviderForScanWithoutPayload(
         lastPayloadByDeviceAddress.takeIf(cleanUpPredicate)?.cleanUp()
         lastScanByDeviceAddress.takeIf(cleanUpPredicate)?.cleanUp()
     }
-
 }

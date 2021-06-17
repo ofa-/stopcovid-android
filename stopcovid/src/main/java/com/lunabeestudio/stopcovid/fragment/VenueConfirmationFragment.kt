@@ -11,7 +11,6 @@
 package com.lunabeestudio.stopcovid.fragment
 
 import android.view.Gravity
-import androidx.navigation.fragment.navArgs
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
@@ -19,7 +18,6 @@ import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.fastitem.bigTitleItem
 import com.lunabeestudio.stopcovid.fastitem.lottieItem
 import com.mikepenz.fastadapter.GenericItem
-import java.util.Locale
 
 class VenueConfirmationFragment : BottomSheetMainFragment() {
 

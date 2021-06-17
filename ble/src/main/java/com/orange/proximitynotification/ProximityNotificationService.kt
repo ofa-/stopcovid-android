@@ -37,8 +37,11 @@ import kotlin.coroutines.CoroutineContext
 /**
  * ProximityNotification foreground service.
  */
-abstract class ProximityNotificationService : Service(),
-    ProximityNotificationCallback, ProximityPayloadProvider, ProximityPayloadIdProvider,
+abstract class ProximityNotificationService :
+    Service(),
+    ProximityNotificationCallback,
+    ProximityPayloadProvider,
+    ProximityPayloadIdProvider,
     ProximityNotificationLogger.Listener,
     CoroutineScope {
 
@@ -212,7 +215,6 @@ abstract class ProximityNotificationService : Service(),
                 ProximityNotificationEventId.PROXIMITY_NOTIFICATION_RESTART,
                 "Restart Proximity Notification - success"
             )
-
         } catch (t: Throwable) {
             ProximityNotificationLogger.error(
                 ProximityNotificationEventId.PROXIMITY_NOTIFICATION_RESTART,
@@ -226,18 +228,17 @@ abstract class ProximityNotificationService : Service(),
                     cause = "Restart failed (throwable = $t)"
                 )
             )
-
         } finally {
             restartInProgress.set(false)
         }
     }
 
-
     private fun registerBluetoothBroadcastReceiver() {
         bluetoothRestartInProgress.set(false)
         bluetoothStateBroadcastReceiver = BluetoothStateBroadcastReceiver(
             onBluetoothDisabled = { onBluetoothDisabled() },
-            onBluetoothEnabled = { onBluetoothEnabled() })
+            onBluetoothEnabled = { onBluetoothEnabled() }
+        )
             .also {
                 applicationContext.registerReceiver(
                     it,
@@ -343,7 +344,6 @@ abstract class ProximityNotificationService : Service(),
             )
 
             return true
-
         } catch (t: Throwable) {
             ProximityNotificationLogger.error(
                 ProximityNotificationEventId.PROXIMITY_NOTIFICATION_RESTART_BLUETOOTH,
@@ -352,7 +352,6 @@ abstract class ProximityNotificationService : Service(),
             )
 
             return false
-
         } finally {
 
             withContext(NonCancellable) {
@@ -363,7 +362,6 @@ abstract class ProximityNotificationService : Service(),
                 registerBluetoothBroadcastReceiver()
                 bluetoothRestartInProgress.set(false)
             }
-
         }
     }
 
@@ -406,7 +404,4 @@ abstract class ProximityNotificationService : Service(),
      * @return Notification used to display foreground service
      */
     abstract fun buildForegroundServiceNotification(): Notification
-
 }
-
-

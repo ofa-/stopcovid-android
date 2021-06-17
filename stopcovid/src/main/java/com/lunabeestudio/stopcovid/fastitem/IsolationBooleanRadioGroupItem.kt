@@ -62,5 +62,5 @@ class IsolationBooleanRadioGroupItem : AbstractBindingItem<ItemIsolationBooleanR
     }
 }
 
-fun isolationBooleanRadioGroupItem(block: (IsolationBooleanRadioGroupItem.() -> Unit)): IsolationBooleanRadioGroupItem = IsolationBooleanRadioGroupItem().apply(
-    block)
+fun isolationBooleanRadioGroupItem(block: (IsolationBooleanRadioGroupItem.() -> Unit)): IsolationBooleanRadioGroupItem =
+    IsolationBooleanRadioGroupItem().apply(block)

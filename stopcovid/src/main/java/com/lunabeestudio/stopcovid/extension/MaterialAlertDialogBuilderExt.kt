@@ -20,6 +20,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.widget.doOnTextChanged
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.lunabeestudio.stopcovid.R
+import com.lunabeestudio.stopcovid.coreui.manager.LocalizedStrings
 import com.lunabeestudio.stopcovid.databinding.DialogPostalCodeEditTextBinding
 import com.lunabeestudio.stopcovid.manager.KeyFiguresManager
 import com.lunabeestudio.stopcovid.model.RisksUILevel
@@ -30,7 +31,7 @@ import java.util.Date
 
 fun MaterialAlertDialogBuilder.showPostalCodeDialog(
     layoutInflater: LayoutInflater,
-    strings: Map<String, String>,
+    strings: LocalizedStrings,
     onPositiveButton: (String) -> Unit,
 ) {
     val postalCodeEditTextBinding = DialogPostalCodeEditTextBinding.inflate(layoutInflater)
@@ -65,7 +66,8 @@ fun MaterialAlertDialogBuilder.showPostalCodeDialog(
         val result = postalCodeEditTextBinding.textInputEditText.text.toString()
 
         if (result.isPostalCode() && KeyFiguresManager.figures.value?.peekContent()
-                .postalCodeExists(result)) {
+            .postalCodeExists(result)
+        ) {
             onPositiveButton(postalCodeEditTextBinding.textInputEditText.text.toString())
             dialog.dismiss()
         } else {
@@ -76,7 +78,7 @@ fun MaterialAlertDialogBuilder.showPostalCodeDialog(
 
 @SuppressLint("InflateParams")
 fun MaterialAlertDialogBuilder.showSpinnerDayPicker(
-    strings: Map<String, String>,
+    strings: LocalizedStrings,
     initialTimestamp: Long,
     dayInThePast: Int,
     onDatePicked: (Long) -> Unit,
@@ -130,7 +132,7 @@ fun MaterialAlertDialogBuilder.showSpinnerDayPicker(
 
 @SuppressLint("InflateParams")
 fun MaterialAlertDialogBuilder.showSpinnerDatePicker(
-    strings: Map<String, String>,
+    strings: LocalizedStrings,
     initialTimestamp: Long,
     onDatePicked: (Long) -> Unit,
 ) {
@@ -168,7 +170,7 @@ fun MaterialAlertDialogBuilder.showSpinnerDatePicker(
 }
 
 fun MaterialAlertDialogBuilder.showSymptomConfirmationDialog(
-    strings: Map<String, String>,
+    strings: LocalizedStrings,
     onConfirmation: (Boolean) -> Unit,
 ) {
     setTitle(strings["isolation.symptoms.alert.title"])
@@ -186,18 +188,32 @@ fun MaterialAlertDialogBuilder.showSymptomConfirmationDialog(
 }
 
 fun MaterialAlertDialogBuilder.showAlertRiskLevelChanged(
-    strings: Map<String, String>,
+    strings: LocalizedStrings,
     sharedPreferences: SharedPreferences,
     risksUILevel: RisksUILevel?,
 ) {
     sharedPreferences.alertRiskLevelChanged = false
     if (risksUILevel != null
         && risksUILevel.labels.notifTitle != null
-        && risksUILevel.labels.notifBody != null) {
+        && risksUILevel.labels.notifBody != null
+    ) {
         setTitle(strings[risksUILevel.labels.notifTitle])
         setMessage(strings[risksUILevel.labels.notifBody])
         setPositiveButton(strings["common.ok"], null)
         setCancelable(false)
         show()
     }
+}
+
+fun MaterialAlertDialogBuilder.showAlertSickVenue(
+    strings: LocalizedStrings,
+    onIgnore: (() -> Unit)?,
+    onCancel: (() -> Unit)?,
+) {
+    setTitle(strings["home.venuesSection.sickAlert.title"])
+    setMessage(strings["home.venuesSection.sickAlert.message"])
+    setPositiveButton(strings["home.venuesSection.sickAlert.positiveButton"], onIgnore?.let { { _, _ -> it() } })
+    setNegativeButton(strings["home.venuesSection.sickAlert.negativeButton"], onCancel?.let { { _, _ -> it() } })
+    setCancelable(false)
+    show()
 }

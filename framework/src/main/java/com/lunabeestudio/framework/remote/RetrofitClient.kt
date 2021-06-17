@@ -12,7 +12,9 @@ package com.lunabeestudio.framework.remote
 
 import android.content.Context
 import android.os.Build
+import com.lunabeestudio.domain.model.CacheConfig
 import com.lunabeestudio.framework.BuildConfig
+import okhttp3.Cache
 import okhttp3.CertificatePinner
 import okhttp3.ConnectionSpec
 import okhttp3.HttpUrl.Companion.toHttpUrl
@@ -35,12 +37,13 @@ object RetrofitClient {
         baseUrl: String,
         certificateSHA256: String,
         clazz: Class<T>,
+        cacheConfig: CacheConfig?,
         onProgressUpdate: ((Float) -> Unit)? = null,
     ): T {
         return Retrofit.Builder()
             .baseUrl(baseUrl.toHttpUrl())
             .addConverterFactory(MoshiConverterFactory.create())
-            .client(getDefaultOKHttpClient(context, baseUrl, certificateSHA256, onProgressUpdate))
+            .client(getDefaultOKHttpClient(context, baseUrl, certificateSHA256, cacheConfig, onProgressUpdate))
             .build().create(clazz)
     }
 
@@ -48,12 +51,13 @@ object RetrofitClient {
         context: Context,
         baseUrl: String,
         clazz: Class<T>,
+        cacheConfig: CacheConfig?,
         onProgressUpdate: ((Float) -> Unit)? = null,
     ): T {
         return Retrofit.Builder()
             .baseUrl(baseUrl.toHttpUrl())
             .addConverterFactory(MoshiConverterFactory.create())
-            .client(getDefaultOKHttpClient(context, baseUrl, null, onProgressUpdate))
+            .client(getDefaultOKHttpClient(context, baseUrl, null, cacheConfig, onProgressUpdate))
             .build().create(clazz)
     }
 
@@ -68,6 +72,7 @@ object RetrofitClient {
         context: Context,
         url: String,
         certificateSHA256: String?,
+        cacheConfig: CacheConfig?,
         onProgressUpdate: ((Float) -> Unit)? = null,
     ): OkHttpClient {
         val requireTls12 = ConnectionSpec.Builder(ConnectionSpec.RESTRICTED_TLS)
@@ -99,6 +104,9 @@ object RetrofitClient {
             connectTimeout(1L, TimeUnit.MINUTES)
             readTimeout(1L, TimeUnit.MINUTES)
             writeTimeout(1L, TimeUnit.MINUTES)
+            if (cacheConfig != null) {
+                cache(Cache(cacheConfig.cacheDir, cacheConfig.cacheSize))
+            }
         }.build()
     }
 
@@ -171,11 +179,14 @@ object RetrofitClient {
             val progressRequest = originalRequest.newBuilder()
                 .method(
                     originalRequest.method,
-                    UploadProgressRequestBody(requestBody, object : UploadProgressRequestBody.ProgressListener {
-                        override fun update(bytesWritten: Long, contentLength: Long) {
-                            onProgressUpdate?.invoke(bytesWritten.toFloat() / contentLength.toFloat())
+                    UploadProgressRequestBody(
+                        requestBody,
+                        object : UploadProgressRequestBody.ProgressListener {
+                            override fun update(bytesWritten: Long, contentLength: Long) {
+                                onProgressUpdate?.invoke(bytesWritten.toFloat() / contentLength.toFloat())
+                            }
                         }
-                    })
+                    )
                 )
                 .build()
 

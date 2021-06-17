@@ -95,7 +95,6 @@ internal class BleGattManagerImpl(
                 eventId = ProximityNotificationEventId.BLE_GATT_START_SUCCESS,
                 message = "Succeed to start GATT server"
             )
-
         }.onFailure {
             ProximityNotificationLogger.error(
                 eventId = ProximityNotificationEventId.BLE_GATT_START_ERROR,
@@ -146,7 +145,6 @@ internal class BleGattManagerImpl(
                 )
 
                 Result.Success(rssi)
-
             } catch (t: Throwable) {
 
                 ProximityNotificationLogger.error(
@@ -185,7 +183,9 @@ internal class BleGattManagerImpl(
                 val properties = payloadCharacteristic.properties
 
                 if (properties and BluetoothGattCharacteristic.PROPERTY_WRITE != BluetoothGattCharacteristic.PROPERTY_WRITE) {
-                    throw BleGattManagerException.IncorrectPayloadService("payload characteristic is not writeable (properties=$properties)")
+                    throw BleGattManagerException.IncorrectPayloadService(
+                        "payload characteristic is not writeable (properties=$properties)"
+                    )
                 }
 
                 payloadCharacteristic.value = value.copyOf()
@@ -216,7 +216,6 @@ internal class BleGattManagerImpl(
             )
 
             Result.Success(result)
-
         } catch (t: Throwable) {
 
             ProximityNotificationLogger.error(
@@ -260,7 +259,6 @@ internal class BleGattManagerImpl(
             } catch (t: Throwable) {
                 throw BleGattManagerException.OperationFailed(t)
             }
-
         } finally {
             withContext(NonCancellable) {
                 client.close()
@@ -364,9 +362,6 @@ internal class BleGattManagerImpl(
                     message = "onCharacteristicWriteRequest succeed (without response)"
                 )
             }
-
         }
     }
-
-
 }

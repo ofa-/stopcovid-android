@@ -32,14 +32,17 @@ enum class CaptchaNextFragment {
         override fun registerPostAction(navController: NavController?, sharedPreferences: SharedPreferences, args: NavArgs?) {
             val arguments = args as? VenueQRCodeFragmentArgs
             if (sharedPreferences.isVenueOnBoardingDone || arguments != null) {
-                navController?.safeNavigate(R.id.venueQrCodeFragment, arguments?.toBundle(), navOptions {
-                    anim {
-                        enter = R.anim.nav_default_enter_anim
-                        popEnter = R.anim.nav_default_pop_enter_anim
-                        popExit = R.anim.nav_default_pop_exit_anim
-                        exit = R.anim.nav_default_exit_anim
+                navController?.safeNavigate(
+                    R.id.venueQrCodeFragment, arguments?.toBundle(),
+                    navOptions {
+                        anim {
+                            enter = R.anim.nav_default_enter_anim
+                            popEnter = R.anim.nav_default_pop_enter_anim
+                            popExit = R.anim.nav_default_pop_exit_anim
+                            exit = R.anim.nav_default_exit_anim
+                        }
                     }
-                })
+                )
             } else {
                 navController?.safeNavigate(CaptchaFragmentDirections.actionCaptchaFragmentToVenueOnBoardingFragment())
             }

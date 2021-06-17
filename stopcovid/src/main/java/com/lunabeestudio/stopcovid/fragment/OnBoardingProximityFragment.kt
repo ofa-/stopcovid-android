@@ -42,7 +42,8 @@ class OnBoardingProximityFragment : OnBoardingFragment() {
     override fun getButtonTitleKey(): String = "onboarding.proximityController.allowProximity"
     override fun getOnButtonClick(): () -> Unit = {
         if (ContextCompat.checkSelfPermission(requireContext(), ProximityManager.getManifestLocationPermission())
-            != PackageManager.PERMISSION_GRANTED) {
+            != PackageManager.PERMISSION_GRANTED
+        ) {
             MaterialAlertDialogBuilder(requireContext())
                 .setTitle(strings["common.permissionsNeeded"])
                 .setMessage(strings["onboarding.proximityController.allowProximity.warning"])
@@ -56,7 +57,8 @@ class OnBoardingProximityFragment : OnBoardingFragment() {
         } else if (ProximityManager.hasFeatureBLE(requireContext(), robertManager) && !ProximityManager.isBluetoothOn(
                 requireContext(),
                 robertManager
-            )) {
+            )
+        ) {
             val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
             startActivityForResult(enableBtIntent, UiConstants.Activity.BLUETOOTH.ordinal)
         } else {
@@ -95,7 +97,8 @@ class OnBoardingProximityFragment : OnBoardingFragment() {
                 if (ProximityManager.hasFeatureBLE(requireContext(), robertManager) && !ProximityManager.isBluetoothOn(
                         requireContext(),
                         robertManager
-                    )) {
+                    )
+                ) {
                     val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
                     startActivityForResult(enableBtIntent, UiConstants.Activity.BLUETOOTH.ordinal)
                 } else {
@@ -136,11 +139,13 @@ class OnBoardingProximityFragment : OnBoardingFragment() {
         context?.let { context ->
             if (ProximityManager.hasFeatureBLE(context, robertManager)) {
                 if (!ProximityManager.isBatteryOptimizationOff(requireContext())) {
-                    findNavControllerOrNull()
-                        ?.safeNavigate(OnBoardingProximityFragmentDirections.actionOnBoardingProximityFragmentToOnBoardingBatteryFragment())
+                    findNavControllerOrNull()?.safeNavigate(
+                        OnBoardingProximityFragmentDirections.actionOnBoardingProximityFragmentToOnBoardingBatteryFragment()
+                    )
                 } else {
-                    findNavControllerOrNull()
-                        ?.safeNavigate(OnBoardingProximityFragmentDirections.actionOnBoardingProximityFragmentToOnBoardingNotificationFragment())
+                    findNavControllerOrNull()?.safeNavigate(
+                        OnBoardingProximityFragmentDirections.actionOnBoardingProximityFragmentToOnBoardingNotificationFragment()
+                    )
                 }
             } else {
                 findNavControllerOrNull()

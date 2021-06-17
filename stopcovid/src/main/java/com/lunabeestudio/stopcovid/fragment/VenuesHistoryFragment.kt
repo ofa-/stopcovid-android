@@ -16,11 +16,11 @@ import androidx.core.view.isVisible
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.lunabeestudio.domain.extension.ntpTimeSToUnixTimeMs
 import com.lunabeestudio.stopcovid.R
+import com.lunabeestudio.stopcovid.coreui.extension.setImageResourceOrHide
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
-import com.lunabeestudio.stopcovid.coreui.extension.setImageResourceOrHide
 import com.lunabeestudio.stopcovid.fastitem.deleteCardItem
 import com.lunabeestudio.stopcovid.manager.VenuesManager
 import com.mikepenz.fastadapter.GenericItem
@@ -49,35 +49,36 @@ class VenuesHistoryFragment : MainFragment() {
         binding?.emptyImageView?.setImageResourceOrHide(R.drawable.signal)
         binding?.emptyTitleTextView?.isVisible = false
         binding?.emptyButton?.isVisible = false
-
     }
 
     override fun getItems(): List<GenericItem> {
         val items = arrayListOf<GenericItem>()
 
-        items.addAll(VenuesManager.getVenuesQrCode(requireContext().secureKeystoreDataSource())
-            ?.reversed()
-            ?.map { venueQrCode ->
-                val venueType = strings["venueType.default"] ?: ""
-                val venueDate = dateTimeFormat.format(Date(venueQrCode.ntpTimestamp.ntpTimeSToUnixTimeMs()))
-                deleteCardItem {
-                    title = stringsFormat("venuesHistoryController.entry", venueType, venueDate)
-                    caption = venueQrCode.ltid
-                    deleteContentDescription = strings["common.delete"]
-                    onDelete = {
-                        MaterialAlertDialogBuilder(requireContext())
-                            .setTitle(strings["venuesHistoryController.delete.alert.title"])
-                            .setMessage(strings["venuesHistoryController.delete.alert.message"])
-                            .setPositiveButton(strings["common.delete"]) { _, _ ->
-                                VenuesManager.removeVenue(requireContext().secureKeystoreDataSource(), venueQrCode.id)
-                                refreshScreen()
-                            }
-                            .setNegativeButton(strings["common.cancel"], null)
-                            .show()
+        items.addAll(
+            VenuesManager.getVenuesQrCode(requireContext().secureKeystoreDataSource())
+                ?.reversed()
+                ?.map { venueQrCode ->
+                    val venueType = strings["venueType.default"] ?: ""
+                    val venueDate = dateTimeFormat.format(Date(venueQrCode.ntpTimestamp.ntpTimeSToUnixTimeMs()))
+                    deleteCardItem {
+                        title = stringsFormat("venuesHistoryController.entry", venueType, venueDate)
+                        caption = venueQrCode.ltid
+                        deleteContentDescription = strings["common.delete"]
+                        onDelete = {
+                            MaterialAlertDialogBuilder(requireContext())
+                                .setTitle(strings["venuesHistoryController.delete.alert.title"])
+                                .setMessage(strings["venuesHistoryController.delete.alert.message"])
+                                .setPositiveButton(strings["common.delete"]) { _, _ ->
+                                    VenuesManager.removeVenue(requireContext().secureKeystoreDataSource(), venueQrCode.id)
+                                    refreshScreen()
+                                }
+                                .setNegativeButton(strings["common.cancel"], null)
+                                .show()
+                        }
+                        identifier = venueQrCode.id.hashCode().toLong()
                     }
-                    identifier = venueQrCode.id.hashCode().toLong()
-                }
-            } ?: emptyList())
+                } ?: emptyList()
+        )
 
         val footer = strings["venuesHistoryController.footer"]
         if (items.isNotEmpty() && !footer.isNullOrBlank()) {
@@ -97,7 +98,7 @@ class VenuesHistoryFragment : MainFragment() {
 
     override fun refreshScreen() {
         super.refreshScreen()
-        if (robertManager.isSick) {
+        if (robertManager.isImmune) {
             binding?.emptyDescriptionTextView?.text = strings["venuesHistoryController.noVenuesEmptyView.isSick.title"]
         } else {
             binding?.emptyDescriptionTextView?.text = strings["venuesHistoryController.noVenuesEmptyView.title"]

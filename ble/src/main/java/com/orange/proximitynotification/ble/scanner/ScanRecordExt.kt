@@ -14,7 +14,6 @@ import android.os.ParcelUuid
 import no.nordicsemi.android.support.v18.scanner.ScanRecord
 import kotlin.experimental.and
 
-
 internal fun ScanRecord.hasServiceUuid(serviceUuid: ParcelUuid): Boolean =
     serviceUuids?.contains(serviceUuid) == true || serviceData?.get(serviceUuid) != null
 
@@ -33,5 +32,3 @@ internal fun ScanRecord.matchesManufacturerDataMask(manufacturerId: Int, mask: B
 
     return true
 }
-
-

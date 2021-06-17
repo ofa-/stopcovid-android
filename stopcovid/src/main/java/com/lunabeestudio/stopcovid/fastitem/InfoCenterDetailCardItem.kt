@@ -111,8 +111,9 @@ class InfoCenterDetailCardItem : AbstractBindingItem<ItemInfoCenterDetailCardBin
     }
 }
 
-class InfoCenterDetailCardItemViewHolder(binding: ItemInfoCenterDetailCardBinding)
-    : BindingViewHolder<ItemInfoCenterDetailCardBinding>(binding) {
+class InfoCenterDetailCardItemViewHolder(binding: ItemInfoCenterDetailCardBinding) : BindingViewHolder<ItemInfoCenterDetailCardBinding>(
+    binding
+) {
     val tagAdapter: FastItemAdapter<TagItem> = FastItemAdapter()
 
     init {

@@ -59,4 +59,5 @@ class WalletDoubleDocumentCardItem : AbstractBindingItem<ItemWalletDoubleDocumen
     }
 }
 
-fun walletDoubleDocumentCardItem(block: (WalletDoubleDocumentCardItem.() -> Unit)): WalletDoubleDocumentCardItem = WalletDoubleDocumentCardItem().apply(block)
+fun walletDoubleDocumentCardItem(block: (WalletDoubleDocumentCardItem.() -> Unit)): WalletDoubleDocumentCardItem =
+    WalletDoubleDocumentCardItem().apply(block)

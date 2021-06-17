@@ -13,7 +13,6 @@ import com.lunabeestudio.stopcovid.databinding.FragmentVerifyWalletResultBinding
 import com.lunabeestudio.stopcovid.extension.fullDescription
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
-import com.lunabeestudio.stopcovid.extension.shortDescription
 import com.lunabeestudio.stopcovid.manager.WalletManager
 import com.lunabeestudio.stopcovid.model.WalletCertificate
 
@@ -53,7 +52,9 @@ class VerifyWalletResultFragment : BaseFragment() {
         binding?.textView?.text = certificate?.fullDescription(strings, robertManager.configuration)
         binding?.button?.text = strings["walletCertificateVerifiedController.validateAnotherProof"]
         binding?.button?.setOnClickListener {
-            findNavControllerOrNull()?.safeNavigate(VerifyWalletResultFragmentDirections.actionVerifyWalletResultFragmentToVerifyWalletQRCodeFragment())
+            findNavControllerOrNull()?.safeNavigate(
+                VerifyWalletResultFragmentDirections.actionVerifyWalletResultFragmentToVerifyWalletQRCodeFragment()
+            )
         }
     }
 }

@@ -69,8 +69,8 @@ class VaccinationActionsBottomSheetFragment : BottomSheetDialogFragment() {
             text = strings["vaccinationController.vaccinationCenter.actionSheet.alert.mapLocation"]
             setOnClickListener {
                 context?.let {
-                    val geoUri = "http://maps.google.com/maps?q=loc:${args.vaccinationCenter.latitude},${args.vaccinationCenter.longitude} (${args.vaccinationCenter.name})";
-                    val mapIntent = Intent(Intent.ACTION_VIEW, Uri.parse(geoUri));
+                    val geoUri = "http://maps.google.com/maps?q=loc:${args.vaccinationCenter.latitude},${args.vaccinationCenter.longitude} (${args.vaccinationCenter.name})"
+                    val mapIntent = Intent(Intent.ACTION_VIEW, Uri.parse(geoUri))
                     if (mapIntent.resolveActivity(it.packageManager) != null) {
                         it.startActivity(mapIntent)
                     }

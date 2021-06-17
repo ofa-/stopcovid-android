@@ -117,4 +117,3 @@ class VenueExpiredException(message: String = "Venue expired") :
 
 class WalletCertificateNoKeyError(message: String = "No key to verify the certificate authenticity") :
     CovidException(ErrorCode.WALLET_CERTIFICATE_UNKNOWN_ERROR, message)
-

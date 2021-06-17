@@ -10,16 +10,21 @@
 
 package com.lunabeestudio.stopcovid.widgetshomescreen
 
-import android.graphics.*
-
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffXfermode
+import android.graphics.Rect
+import android.graphics.RectF
 
 class BitmapHelper {
 
     fun getRoundedBitmap(srcBitmap: Bitmap, cornerRadius: Float): Bitmap? {
         // Initialize a new instance of Bitmap
         val dstBitmap = Bitmap.createBitmap(
-            srcBitmap.width,  // Width
-            srcBitmap.height,  // Height
+            srcBitmap.width, // Width
+            srcBitmap.height, // Height
             Bitmap.Config.ARGB_8888 // Config
         )
 

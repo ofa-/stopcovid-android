@@ -1,0 +1,173 @@
+<!--
+  ~ This Source Code Form is subject to the terms of the Mozilla Public
+  ~ License, v. 2.0. If a copy of the MPL was not distributed with this
+  ~ file, You can obtain one at https://mozilla.org/MPL/2.0/.
+  ~
+  ~ Authors
+  ~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ Created by Lunabee Studio / Date - 2021/24/5 - for the TOUS-ANTI-COVID project
+  -->
+
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/figuresWidgetLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_widget"
+    android:clickable="true"
+    android:focusable="true"
+    android:theme="@style/Theme.StopCovid.Widget">
+
+    <LinearLayout
+        android:id="@+id/titleLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:layout_margin="@dimen/spacing_medium"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/logoImageView"
+            android:layout_width="@dimen/logo_proximity_widget_size"
+            android:layout_height="@dimen/logo_proximity_widget_size"
+            android:src="@mipmap/ic_launcher" />
+
+        <TextView
+            android:id="@+id/titleWidgetTextView"
+            style="@style/Widget.StopCovid.Widget.TextView.Title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/spacing_medium"
+            android:maxLines="1"
+            tools:text="TousAntiCovid: Chiffres clés" />
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/actionDividerTitleMainLayout"
+        style="@style/Widget.StopCovid.Widget.Divider"
+        android:layout_below="@id/titleLayout"
+        android:layout_marginBottom="@dimen/spacing_medium"/>
+
+    <LinearLayout
+        android:id="@+id/mainFigureLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/spacing_medium"
+        android:layout_marginEnd="@dimen/spacing_medium"
+        android:layout_marginStart="@dimen/spacing_medium"
+        android:layout_below="@+id/actionDividerTitleMainLayout"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/graphImageView"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginStart="@dimen/spacing_medium"
+            android:layout_marginEnd="@dimen/spacing_large"
+            tools:src="@drawable/ic_qr_code_scanner" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/labelMainFigureTextView"
+                style="@style/Widget.StopCovid.Widget.Figures.TextView.Label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/spacing_small"
+                tools:text="Nouveaux cas (France)" />
+
+            <TextView
+                android:id="@+id/valueMainFigureTextView"
+                style="@style/Widget.StopCovid.Widget.Figures.TextView.MainFigure.Value"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                tools:text="20 150" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/secondFiguresLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/spacing_medium"
+        android:layout_marginStart="@dimen/spacing_medium"
+        android:layout_marginEnd="@dimen/spacing_medium"
+        android:layout_below="@+id/mainFigureLayout"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:id="@+id/figure1Layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/spacing_medium"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/labelFigure1TextView"
+                style="@style/Widget.StopCovid.Widget.Figures.TextView.Label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:text="Total vaccinés" />
+
+            <TextView
+                android:id="@+id/valueFigure1TextView"
+                style="@style/Widget.StopCovid.Widget.Figures.TextView.SecondFigures.Value"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:text="20M" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/figure2Layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginEnd="@dimen/spacing_medium">
+
+            <TextView
+                android:id="@+id/labelFigure2TextView"
+                style="@style/Widget.StopCovid.Widget.Figures.TextView.Label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:text="Tension réa" />
+
+            <TextView
+                android:id="@+id/valueFigure2TextView"
+                style="@style/Widget.StopCovid.Widget.Figures.TextView.SecondFigures.Value"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:text="63,6%" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/figure3Layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginEnd="@dimen/spacing_medium">
+
+            <TextView
+                android:id="@+id/labelFigure3TextView"
+                style="@style/Widget.StopCovid.Widget.Figures.TextView.Label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:text="Nouveaux réa" />
+
+            <TextView
+                android:id="@+id/valueFigure3TextView"
+                style="@style/Widget.StopCovid.Widget.Figures.TextView.SecondFigures.Value"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:text="160" />
+        </LinearLayout>
+    </LinearLayout>
+</RelativeLayout>

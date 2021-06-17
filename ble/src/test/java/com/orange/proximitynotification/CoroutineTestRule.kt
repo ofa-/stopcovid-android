@@ -21,7 +21,8 @@ import org.junit.runner.Description
 import kotlin.coroutines.CoroutineContext
 
 class CoroutineTestRule(val testDispatcher: TestCoroutineDispatcher = TestCoroutineDispatcher()) :
-    TestWatcher(), TestCoroutineScope by TestCoroutineScope(testDispatcher),
+    TestWatcher(),
+    TestCoroutineScope by TestCoroutineScope(testDispatcher),
     CoroutineContextProvider {
 
     override val io: CoroutineContext = testDispatcher

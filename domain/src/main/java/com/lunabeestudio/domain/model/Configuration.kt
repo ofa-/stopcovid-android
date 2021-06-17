@@ -65,4 +65,6 @@ class Configuration(
     var analyticsApiVersion: String,
     var testCertificateValidityThresholds: List<Int>,
     val cleaUrls: List<String>,
+    val covidPlusWarning: Int,
+    val covidPlusNoTracing: Int,
 )

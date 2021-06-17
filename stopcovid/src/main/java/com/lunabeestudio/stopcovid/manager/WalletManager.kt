@@ -118,6 +118,4 @@ object WalletManager {
     fun deleteAllCertificates(localKeystoreDataSource: LocalKeystoreDataSource) {
         localKeystoreDataSource.rawWalletCertificates = emptyList()
     }
-
 }
-

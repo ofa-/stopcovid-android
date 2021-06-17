@@ -48,16 +48,18 @@ class IsolationStateRadioGroupItem : AbstractBindingItem<ItemIsolationStateRadio
         binding.stateSymptomsRadioButton.text = symptomsLabel.safeEmojiSpanify()
         binding.stateContactRadioButton.text = contactLabel.safeEmojiSpanify()
         binding.statePositiveRadioButton.text = positiveLabel.safeEmojiSpanify()
-        binding.stateSymptomsRadioButton.setOnTouchListener(onStateSymptomsClick?.let { onStateSymptomsClick ->
-            View.OnTouchListener { _, event ->
-                if (event.action == MotionEvent.ACTION_UP && !binding.stateSymptomsRadioButton.isChecked) {
-                    onStateSymptomsClick.invoke(binding.stateRadioGroup)
-                    true
-                } else {
-                    false
+        binding.stateSymptomsRadioButton.setOnTouchListener(
+            onStateSymptomsClick?.let { onStateSymptomsClick ->
+                View.OnTouchListener { _, event ->
+                    if (event.action == MotionEvent.ACTION_UP && !binding.stateSymptomsRadioButton.isChecked) {
+                        onStateSymptomsClick.invoke(binding.stateRadioGroup)
+                        true
+                    } else {
+                        false
+                    }
                 }
             }
-        })
+        )
 
         selectedState?.let {
             when (it) {
@@ -72,5 +74,5 @@ class IsolationStateRadioGroupItem : AbstractBindingItem<ItemIsolationStateRadio
     }
 }
 
-fun isolationStateRadioGroupItem(block: (IsolationStateRadioGroupItem.() -> Unit)): IsolationStateRadioGroupItem = IsolationStateRadioGroupItem().apply(
-    block)
+fun isolationStateRadioGroupItem(block: (IsolationStateRadioGroupItem.() -> Unit)): IsolationStateRadioGroupItem =
+    IsolationStateRadioGroupItem().apply(block)

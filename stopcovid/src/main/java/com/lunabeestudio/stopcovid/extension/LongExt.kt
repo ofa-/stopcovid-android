@@ -13,5 +13,3 @@ fun Long?.roundTimestampToStartOfDay(): Long? {
         calendar.timeInMillis
     }
 }
-
-

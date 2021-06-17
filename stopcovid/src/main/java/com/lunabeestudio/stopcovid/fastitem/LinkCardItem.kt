@@ -44,4 +44,5 @@ class LinkCardItem : AbstractBindingItem<ItemLinkCardBinding>() {
 }
 
 fun linkCardItem(block: (LinkCardItem.() -> Unit)): LinkCardItem = LinkCardItem().apply(
-    block)
+    block
+)

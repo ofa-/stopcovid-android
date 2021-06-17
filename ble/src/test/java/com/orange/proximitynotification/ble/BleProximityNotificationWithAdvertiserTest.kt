@@ -114,7 +114,6 @@ class BleProximityNotificationWithAdvertiserTest {
             assertThat(callbackSucceed).isTrue()
         }
 
-
     @Test
     fun scanner_with_bad_result_should_never_call_onProximity() =
         testCoroutineRule.runBlockingTest {
@@ -323,7 +322,6 @@ class BleProximityNotificationWithAdvertiserTest {
             assertThat(callbackSucceed).isTrue()
         }
 
-
     @Test
     fun scanner_and_gatt_with_good_result_should_call_onProximity_like_ios() =
         testCoroutineRule.runBlockingTest {
@@ -486,7 +484,7 @@ class BleProximityNotificationWithAdvertiserTest {
         verify(bleScanner, never()).stop()
         verify(bleScanner, times(1)).start(any()) // onStart
         verify(bleGattManager, never()).stop()
-        verify(bleGattManager, times(1)).start(any())  // onStart
+        verify(bleGattManager, times(1)).start(any()) // onStart
     }
 
     private fun onStart(callback: ProximityNotificationCallback) {
@@ -548,5 +546,4 @@ class BleProximityNotificationWithAdvertiserTest {
             true
         }
     }
-
 }

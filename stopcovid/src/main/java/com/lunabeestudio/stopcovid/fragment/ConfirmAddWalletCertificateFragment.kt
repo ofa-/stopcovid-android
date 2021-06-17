@@ -79,5 +79,4 @@ class ConfirmAddWalletCertificateFragment : MainFragment() {
 
         return items
     }
-
 }

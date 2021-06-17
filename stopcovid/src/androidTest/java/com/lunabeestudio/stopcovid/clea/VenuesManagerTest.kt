@@ -13,17 +13,16 @@ import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
 import com.lunabeestudio.stopcovid.manager.VenuesManager
 import com.lunabeestudio.stopcovid.model.VenueExpiredException
 import com.lunabeestudio.stopcovid.model.VenueInvalidFormatException
-import junit.framework.Assert.assertNotNull
 import org.junit.After
 import org.junit.Assert
+import org.junit.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Test
 import timber.log.Timber
 import java.security.KeyStore
+import kotlin.time.Duration
 import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
-import kotlin.time.days
-import kotlin.time.seconds
 
 class VenuesManagerTest {
 
@@ -138,19 +137,19 @@ class VenuesManagerTest {
     @OptIn(ExperimentalTime::class)
     @Test
     fun clear_expired() {
-        val gracePeriod = context.robertManager().configuration.venuesRetentionPeriod.days.toLongMilliseconds()
+        val gracePeriod = Duration.days(context.robertManager().configuration.venuesRetentionPeriod).inWholeMilliseconds
         val venue1 = VenueQrCode(
             id = "idtest1",
             ltid = "uuid",
             base64URL = "GA",
-            ntpTimestamp = (System.currentTimeMillis() - gracePeriod - 10.seconds.toLongMilliseconds()).unixTimeMsToNtpTimeS(),
+            ntpTimestamp = (System.currentTimeMillis() - gracePeriod - Duration.seconds(10).inWholeMilliseconds).unixTimeMsToNtpTimeS(),
             version = 0
         )
         val venue2 = VenueQrCode(
             id = "idtest2",
             ltid = "uuid",
             base64URL = "GA",
-            ntpTimestamp = (System.currentTimeMillis() - gracePeriod + 10.seconds.toLongMilliseconds()).unixTimeMsToNtpTimeS(),
+            ntpTimestamp = (System.currentTimeMillis() - gracePeriod + Duration.seconds(10).inWholeMilliseconds).unixTimeMsToNtpTimeS(),
             version = 0
         )
         VenuesManager.clearAllData(sharedPrefs, keystoreDataSource)
@@ -232,7 +231,7 @@ class VenuesManagerTest {
     @ExperimentalTime
     @Test
     fun venue_expired_test() {
-        val gracePeriod = context.robertManager().configuration.venuesRetentionPeriod.days.toLong(DurationUnit.SECONDS)
+        val gracePeriod = Duration.days(context.robertManager().configuration.venuesRetentionPeriod).toLong(DurationUnit.SECONDS)
 
         assertThrows<VenueExpiredException> {
             VenuesManager.processVenue(
@@ -269,14 +268,15 @@ class VenuesManagerTest {
         populateWithData()
 
         val venueQrCodes = VenuesManager.getVenuesQrCode(keystoreDataSource)
-        assert(venueQrCodes?.size == succesfullQrCodes.size) { "Only ${venueQrCodes?.size} venues created, expecting ${succesfullQrCodes.size}" }
+        assert(venueQrCodes?.size == succesfullQrCodes.size) {
+            "Only ${venueQrCodes?.size} venues created, expecting ${succesfullQrCodes.size}"
+        }
         venueQrCodes?.forEachIndexed { index, venueQrCode ->
             assertNotNull("venue QR code should exist", venueQrCode)
             assert(venueQrCode.ltid == ltid[index]) { "UUID is wrong" }
             assert(venueQrCode.base64URL == base64URLs[index])
             assert(venueQrCode.ntpTimestamp == timeStampsNTP[index])
         }
-
     }
 
     @Test
@@ -286,11 +286,13 @@ class VenuesManagerTest {
 
         assert(VenuesManager.getVenuesQrCode(keystoreDataSource)?.size == succesfullQrCodes.size) {
             "Only ${
-                VenuesManager.getVenuesQrCode(keystoreDataSource)?.size
+            VenuesManager.getVenuesQrCode(keystoreDataSource)?.size
             } venues created, excpecting ${succesfullQrCodes.size}"
         }
         VenuesManager.removeVenue(keystoreDataSource, VenuesManager.getVenuesQrCode(keystoreDataSource)?.get(1)?.id ?: "")
-        assert(VenuesManager.getVenuesQrCode(keystoreDataSource)?.size == succesfullQrCodes.size - 1) { "Should have ${succesfullQrCodes.size - 1} element" }
+        assert(VenuesManager.getVenuesQrCode(keystoreDataSource)?.size == succesfullQrCodes.size - 1) {
+            "Should have ${succesfullQrCodes.size - 1} element"
+        }
         assert(
             VenuesManager.getVenuesQrCode(keystoreDataSource)
                 ?.get(0)?.ltid == ltid[0]
@@ -300,7 +302,9 @@ class VenuesManagerTest {
                 ?.get(1)?.ltid == ltid[2]
         ) { "Third element shouldn't be removed" }
         VenuesManager.removeVenue(keystoreDataSource, VenuesManager.getVenuesQrCode(keystoreDataSource)?.get(0)?.id ?: "")
-        assert(VenuesManager.getVenuesQrCode(keystoreDataSource)?.size == succesfullQrCodes.size - 2) { "Should have ${succesfullQrCodes.size - 2} element" }
+        assert(VenuesManager.getVenuesQrCode(keystoreDataSource)?.size == succesfullQrCodes.size - 2) {
+            "Should have ${succesfullQrCodes.size - 2} element"
+        }
         assert(
             VenuesManager.getVenuesQrCode(keystoreDataSource)
                 ?.get(0)?.ltid == ltid[2]

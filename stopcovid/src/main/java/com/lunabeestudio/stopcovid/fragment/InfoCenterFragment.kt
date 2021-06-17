@@ -29,8 +29,8 @@ import com.mikepenz.fastadapter.GenericItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
-import kotlin.time.seconds
 
 class InfoCenterFragment : TimeMainFragment() {
 
@@ -97,7 +97,7 @@ class InfoCenterFragment : TimeMainFragment() {
                     }
 
                     items += infoCenterDetailCardItem {
-                        header = info.timestamp.seconds.getRelativeDateTimeString(requireContext(), strings["common.justNow"])
+                        header = Duration.seconds(info.timestamp).getRelativeDateTimeString(requireContext(), strings["common.justNow"])
                         title = infoTitle
                         body = infoDescription
                         link = infoCenterStrings[info.buttonLabelKey]

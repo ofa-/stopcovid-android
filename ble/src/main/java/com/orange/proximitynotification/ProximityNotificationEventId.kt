@@ -63,7 +63,6 @@ enum class ProximityNotificationEventId(val category: Category) {
 
     BLE_PROXIMITY_NOTIFICATION_FACTORY(PROXIMITY_NOTIFICATION);
 
-
     enum class Category {
         /**
          * BLE advertising error
@@ -85,6 +84,4 @@ enum class ProximityNotificationEventId(val category: Category) {
          */
         PROXIMITY_NOTIFICATION
     }
-
-
 }

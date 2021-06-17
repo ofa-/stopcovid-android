@@ -32,6 +32,30 @@ buildscript {
     }
 }
 
+plugins {
+    id 'io.gitlab.arturbosch.detekt'
+}
+
+dependencies {
+    detektPlugins "io.gitlab.arturbosch.detekt:detekt-formatting:_"
+}
+
+detekt {
+    input = files(rootProject.rootDir)
+    config = files("$projectDir/detekt-config.yml")
+    baseline = file("$projectDir/detekt-baseline.xml")
+    failFast = false
+    parallel = true
+    disableDefaultRuleSets = true
+    buildUponDefaultConfig = true
+    autoCorrect = true
+    ignoreFailures = true
+}
+
+tasks.withType(io.gitlab.arturbosch.detekt.Detekt) {
+    exclude("**/build/**")
+}
+
 allprojects {
     repositories {
         google()

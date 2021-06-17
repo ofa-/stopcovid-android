@@ -10,7 +10,8 @@
 
 package com.lunabeestudio.analytics.network
 
-import com.lunabeestudio.analytics.network.model.SendAnalyticsRQ
+import com.lunabeestudio.analytics.network.model.SendAppAnalyticsRQ
+import com.lunabeestudio.analytics.network.model.SendHealthAnalyticsRQ
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
@@ -22,9 +23,15 @@ import retrofit2.http.Query
 internal interface AnalyticsApi {
 
     @POST("api/{apiVersion}/analytics")
-    suspend fun sendAnalytics(
+    suspend fun sendAppAnalytics(
         @Path("apiVersion") apiVersion: String,
-        @Body body: SendAnalyticsRQ,
+        @Body body: SendAppAnalyticsRQ,
+    ): Response<ResponseBody>
+
+    @POST("api/{apiVersion}/analytics")
+    suspend fun sendHealthAnalytics(
+        @Path("apiVersion") apiVersion: String,
+        @Body body: SendHealthAnalyticsRQ,
     ): Response<ResponseBody>
 
     @DELETE("api/{apiVersion}/analytics")

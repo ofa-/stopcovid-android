@@ -196,5 +196,4 @@ class BlePayloadTest {
         // Then
         assertThat(payload1).isNotEqualTo(payload2)
     }
-
 }

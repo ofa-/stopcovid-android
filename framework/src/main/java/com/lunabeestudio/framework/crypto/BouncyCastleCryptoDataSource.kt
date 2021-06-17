@@ -37,10 +37,12 @@ class BouncyCastleCryptoDataSource : SharedCryptoDataSource {
         return keyPairGenerator.generateKeyPair()
     }
 
-    override fun getEncryptionKeys(rawServerPublicKey: ByteArray,
+    override fun getEncryptionKeys(
+        rawServerPublicKey: ByteArray,
         rawLocalPrivateKey: ByteArray,
         kADerivation: ByteArray,
-        kEADerivation: ByteArray): Pair<ByteArray, ByteArray> {
+        kEADerivation: ByteArray
+    ): Pair<ByteArray, ByteArray> {
         val bouncyCastleProvider = BouncyCastleProvider()
         val keyFactory = KeyFactory.getInstance(ALGORITHM_ECDH, bouncyCastleProvider)
         val serverPublicKey = keyFactory.generatePublic(X509EncodedKeySpec(rawServerPublicKey))

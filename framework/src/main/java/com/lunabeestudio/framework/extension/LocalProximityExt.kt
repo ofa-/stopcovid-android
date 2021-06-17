@@ -28,9 +28,11 @@ fun LocalProximity.toProto(): ProtoStorage.LocalProximityProto {
 
 fun List<LocalProximity>.toProto(): ProtoStorage.LocalProximityProtoList {
     val builder = ProtoStorage.LocalProximityProtoList.newBuilder().apply {
-        this.addAllLocalProximityProtoList(map {
-            it.toProto()
-        })
+        this.addAllLocalProximityProtoList(
+            map {
+                it.toProto()
+            }
+        )
     }
     return builder.build()
 }

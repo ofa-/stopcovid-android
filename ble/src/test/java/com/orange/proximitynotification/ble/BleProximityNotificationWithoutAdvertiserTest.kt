@@ -15,7 +15,6 @@ import org.junit.Test
 
 class BleProximityNotificationWithoutAdvertiserTest {
 
-
     class BleStatsTest {
 
         companion object {
@@ -133,7 +132,6 @@ class BleProximityNotificationWithoutAdvertiserTest {
             Truth.assertThat(result).isTrue()
         }
 
-
         @Test
         fun `isUnHealthy should use last results from history to compute final result`() {
 
@@ -161,7 +159,7 @@ class BleProximityNotificationWithoutAdvertiserTest {
         }
 
         @Test
-        fun `isUnHealthy given no status for a time should return true`()  {
+        fun `isUnHealthy given no status for a time should return true`() {
 
             // Given
             Truth.assertThat(stats.isUnHealthy()).isFalse()
@@ -175,7 +173,7 @@ class BleProximityNotificationWithoutAdvertiserTest {
         }
 
         @Test
-        fun `isUnHealthy given succeed but no status for a time should return true`()  {
+        fun `isUnHealthy given succeed but no status for a time should return true`() {
 
             // Given
             stats.succeed()
@@ -188,6 +186,5 @@ class BleProximityNotificationWithoutAdvertiserTest {
             // Then
             Truth.assertThat(result).isTrue()
         }
-
     }
 }

@@ -19,10 +19,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.databinding.ItemActionBinding
 import com.lunabeestudio.stopcovid.coreui.extension.safeEmojiSpanify
+import com.lunabeestudio.stopcovid.coreui.extension.setImageResourceOrHide
 import com.lunabeestudio.stopcovid.coreui.extension.setOnClickListenerOrHideRipple
 import com.lunabeestudio.stopcovid.coreui.fastitem.BaseItem
 import com.lunabeestudio.stopcovid.coreui.model.Action
-import com.lunabeestudio.stopcovid.coreui.extension.setImageResourceOrHide
 import com.lunabeestudio.stopcovid.extension.setTextOrHide
 
 class HealthCardItem(layoutRes: Int) : BaseItem<HealthCardItem.ViewHolder>(

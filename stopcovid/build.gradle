@@ -10,7 +10,7 @@
 
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-parcelize'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'androidx.navigation.safeargs.kotlin'
 
@@ -32,19 +32,14 @@ android {
         }
     }
 
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-    kotlinOptions.jvmTarget = JavaVersion.VERSION_1_8.toString()
     kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
 
     defaultConfig {
         applicationId "fr.gouv.android.stopcovid"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 252
-        versionName "3.1.5"
+        versionCode 260
+        versionName "3.1.7"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -79,7 +74,7 @@ dependencies {
     implementation "com.airbnb.android:lottie:_"
 
     implementation("com.journeyapps:zxing-android-embedded:_") { transitive = false }
-    implementation "com.google.zxing:core:_" // 3.4 require minSdk 24
+    implementation "com.google.zxing:core:3.3.3" // 3.4 require minSdk 24
 
     implementation "com.github.razir.progressbutton:progressbutton:_"
 

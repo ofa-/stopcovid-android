@@ -56,16 +56,17 @@ internal class RiskComputer(
                 0.0
             } else {
                 val averageRssi = rssis.softmax(a)
-                val gamma = (averageRssi - p0) / deltas[min(
-                    rssis.size - 1,
-                    deltas.lastIndex
-                )]
+                val gamma = (averageRssi - p0) / deltas[
+                    min(
+                        rssis.size - 1,
+                        deltas.lastIndex
+                    )
+                ]
                 gamma.coerceIn(0.0, 1.0)
             }
         }
     }
 }
-
 
 private fun List<TimestampedRssi>.sampleByTimeInterval(
     timeInterval: Int,

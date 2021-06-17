@@ -55,9 +55,9 @@ class CertificatesDocumentsManager(context: Context) {
     }
 
     suspend fun fetchLastImages(context: Context): Boolean {
-        return certificateDocumentRemoteFileManager.fetchLastImage(context) &&
-            fullCertificateDocumentRemoteFileManager.fetchLastImage(context) &&
-            vaccinDocumentRemoteFileManager.fetchLastImage(context) &&
-            fullVaccinDocumentRemoteFileManager.fetchLastImage(context)
+        return certificateDocumentRemoteFileManager.fetchLastImage(context)
+            .and(fullCertificateDocumentRemoteFileManager.fetchLastImage(context))
+            .and(vaccinDocumentRemoteFileManager.fetchLastImage(context))
+            .and(fullVaccinDocumentRemoteFileManager.fetchLastImage(context))
     }
 }

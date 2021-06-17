@@ -17,7 +17,6 @@ import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import com.lunabeestudio.stopcovid.coreui.BuildConfig
 import com.lunabeestudio.stopcovid.coreui.UiConstants
-import com.lunabeestudio.stopcovid.coreui.extension.getETagSharedPrefs
 import com.lunabeestudio.stopcovid.coreui.extension.getFirstSupportedLanguage
 import com.lunabeestudio.stopcovid.coreui.extension.saveTo
 import kotlinx.coroutines.Dispatchers
@@ -60,7 +59,7 @@ abstract class ServerManager<T> {
         val filename = "$prefix$languageCode$extension"
         val tmpFile = File(context.filesDir, "$filename.bck")
         return try {
-            "$url$filename".saveTo(context, tmpFile, filename)
+            "$url$filename".saveTo(context, tmpFile)
             if (fileNotCorrupted(tmpFile)) {
                 tmpFile.copyTo(File(context.filesDir, filename), overwrite = true, bufferSize = 4 * 1024)
                 saveLastRefresh(context)
@@ -101,9 +100,12 @@ abstract class ServerManager<T> {
             if (context.assets.list(folderName.removeSuffix("/"))?.contains(fileName) != true) {
                 null
             } else {
-                gson.fromJson<T>(context.assets.open("$folderName$fileName").use {
-                    transform(it.readBytes().toString(Charsets.UTF_8))
-                }, type)
+                gson.fromJson<T>(
+                    context.assets.open("$folderName$fileName").use {
+                        transform(it.readBytes().toString(Charsets.UTF_8))
+                    },
+                    type
+                )
             }
         }
     }
@@ -137,9 +139,5 @@ abstract class ServerManager<T> {
         File(context.filesDir, filename).delete()
         val defaultFilename = "$prefix${UiConstants.DEFAULT_LANGUAGE}$extension"
         File(context.filesDir, defaultFilename).delete()
-        context.getETagSharedPrefs().edit {
-            remove(filename)
-            remove(defaultFilename)
-        }
     }
 }

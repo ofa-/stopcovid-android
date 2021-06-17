@@ -19,7 +19,6 @@ import androidx.lifecycle.viewModelScope
 import com.lunabeestudio.framework.local.datasource.SecureKeystoreDataSource
 import com.lunabeestudio.robert.RobertApplication
 import com.lunabeestudio.robert.RobertManager
-import com.lunabeestudio.robert.datasource.LocalKeystoreDataSource
 import com.lunabeestudio.robert.model.RobertResult
 import com.lunabeestudio.robert.utils.Event
 import com.lunabeestudio.stopcovid.coreui.utils.SingleLiveEvent
@@ -47,9 +46,11 @@ class ProximityViewModel(
 
     @OptIn(ExperimentalTime::class)
     val activeAttestationCount: LiveData<Event<Int>> = keystoreDataSource.attestationsLiveData.map {
-        Event(it?.filter { attestation ->
-            !attestation.isExpired(robertManager.configuration)
-        }?.count() ?: 0)
+        Event(
+            it?.filter { attestation ->
+                !attestation.isExpired(robertManager.configuration)
+            }?.count() ?: 0
+        )
     }
 
     suspend fun refreshConfig(application: RobertApplication): Boolean {

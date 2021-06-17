@@ -16,11 +16,11 @@ import androidx.core.widget.TextViewCompat
 import com.lunabeestudio.stopcovid.coreui.databinding.ItemActionBinding
 import com.lunabeestudio.stopcovid.coreui.databinding.ItemCardWithActionsBinding
 import com.lunabeestudio.stopcovid.coreui.extension.safeEmojiSpanify
+import com.lunabeestudio.stopcovid.coreui.extension.setImageResourceOrHide
 import com.lunabeestudio.stopcovid.coreui.extension.setOnClickListenerOrHideRipple
 import com.lunabeestudio.stopcovid.coreui.extension.setTextOrHide
 import com.lunabeestudio.stopcovid.coreui.model.Action
 import com.lunabeestudio.stopcovid.coreui.model.CardTheme
-import com.lunabeestudio.stopcovid.coreui.extension.setImageResourceOrHide
 import com.mikepenz.fastadapter.binding.AbstractBindingItem
 
 class CardWithActionsItem(private val cardTheme: CardTheme) : AbstractBindingItem<ItemCardWithActionsBinding>() {
@@ -80,11 +80,13 @@ class CardWithActionsItem(private val cardTheme: CardTheme) : AbstractBindingIte
         if (mainLayoutVisible) {
             binding.mainLayout.visibility = View.VISIBLE
             binding.mainLayout.layoutDirection = mainLayoutDirection
-            binding.contentLayout.setOnClickListenerOrHideRipple(onCardClick?.let {
-                View.OnClickListener {
-                    it()
+            binding.contentLayout.setOnClickListenerOrHideRipple(
+                onCardClick?.let {
+                    View.OnClickListener {
+                        it()
+                    }
                 }
-            })
+            )
         } else {
             binding.mainLayout.visibility = View.GONE
         }

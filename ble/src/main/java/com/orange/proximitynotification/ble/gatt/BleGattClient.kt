@@ -28,4 +28,3 @@ internal interface BleGattClient {
     suspend fun writeCharacteristic(characteristic: BluetoothGattCharacteristic): BluetoothGattCharacteristic
     suspend fun readCharacteristic(characteristic: BluetoothGattCharacteristic): BluetoothGattCharacteristic
 }
-

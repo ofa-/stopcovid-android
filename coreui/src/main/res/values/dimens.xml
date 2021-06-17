@@ -65,11 +65,15 @@
     <dimen name="date_widget_attestation_max_font_size">25sp</dimen>
     <dimen name="date_widget_attestation_min_font_size">5sp</dimen>
     <dimen name="reason_widget_attestation_font_size">12sp</dimen>
-    <dimen name="title_widget_font_size">16sp</dimen>
+    <dimen name="title_widget_font_size">14sp</dimen>
     <dimen name="title_widget_min_font_size">5sp</dimen>
 
     <dimen name="widget_2_row_min_height">35dp</dimen>
     <dimen name="widget_4_column_min_width">100dp</dimen>
+    <dimen name="widget_main_figure_font_size">25sp</dimen>
+    <dimen name="widget_second_figure_font_size">20sp</dimen>
+    <dimen name="widget_second_figure_min_font_size">5sp</dimen>
+    <dimen name="widget_figures_graph_size">100dp</dimen>
 
 
 </resources>

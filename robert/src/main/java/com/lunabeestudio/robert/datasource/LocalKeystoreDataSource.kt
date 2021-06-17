@@ -11,13 +11,13 @@
 package com.lunabeestudio.robert.datasource
 
 import androidx.lifecycle.LiveData
+import com.lunabeestudio.domain.model.AtRiskStatus
 import com.lunabeestudio.domain.model.Attestation
 import com.lunabeestudio.domain.model.Calibration
 import com.lunabeestudio.domain.model.Configuration
 import com.lunabeestudio.domain.model.FormEntry
 import com.lunabeestudio.domain.model.RawWalletCertificate
 import com.lunabeestudio.domain.model.VenueQrCode
-import com.lunabeestudio.domain.model.AtRiskStatus
 
 interface LocalKeystoreDataSource {
     var configuration: Configuration?
@@ -30,7 +30,6 @@ interface LocalKeystoreDataSource {
     var atRiskLastRefresh: Long?
     var atRiskLastError: Long?
     var proximityActive: Boolean?
-    var isSick: Boolean?
     var atRiskStatus: AtRiskStatus?
     var currentRobertAtRiskStatus: AtRiskStatus?
     var currentWarningAtRiskStatus: AtRiskStatus?

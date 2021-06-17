@@ -338,7 +338,6 @@ class BleGattManagerImplTest {
                     )
                 )
             )
-
         }
     }
 
@@ -440,5 +439,4 @@ class BleGattManagerImplTest {
 
         return result
     }
-
 }

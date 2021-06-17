@@ -97,7 +97,8 @@ object InfoCenterManager {
         fetchLastTimestamp(context)
         if (fetchLast(context, infosPrefix, null, forceRefresh)
             && fetchLast(context, tagsPrefix, null, forceRefresh)
-            && fetchLast(context, stringPrefix, newLanguage, forceRefresh)) {
+            && fetchLast(context, stringPrefix, newLanguage, forceRefresh)
+        ) {
             prevLanguage = newLanguage
             saveLastRefresh(context)
         }
@@ -159,7 +160,6 @@ object InfoCenterManager {
             "$url$filename".saveTo(
                 context,
                 File(context.filesDir, filename),
-                lastUpdatePrefix,
             )
         } catch (e: Exception) {
             Timber.v("Fetching fail for last timestamp")
@@ -179,7 +179,6 @@ object InfoCenterManager {
                 "$url$filename".saveTo(
                     context,
                     File(context.filesDir, filename),
-                    prefix,
                 )
             } else {
                 Timber.v("Use local data")
@@ -229,8 +228,10 @@ object InfoCenterManager {
         }
     }
 
-    private fun isLastUpdatedAtDifferent(context: Context): Boolean = (lastUpdatedAt?.lastUpdatedAt
-        ?: 0) > PreferenceManager.getDefaultSharedPreferences(context).lastInfoCenterRefresh
+    private fun isLastUpdatedAtDifferent(context: Context): Boolean = (
+        lastUpdatedAt?.lastUpdatedAt
+            ?: 0
+        ) > PreferenceManager.getDefaultSharedPreferences(context).lastInfoCenterRefresh
 
     @OptIn(ExperimentalTime::class)
     private fun shouldRefresh(context: Context): Boolean {
@@ -251,7 +252,8 @@ object InfoCenterManager {
         if (sharedPreferences.areInfoNotificationsEnabled
             && lastUpdatedAt != null
             && isLastUpdatedAtDifferent(context)
-            && isAppInBackground) {
+            && isAppInBackground
+        ) {
             sendUpdateNotification(context)
         }
         lastUpdatedAt?.lastUpdatedAt?.let { lastUpdatedAt ->

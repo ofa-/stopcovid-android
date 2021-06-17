@@ -25,6 +25,8 @@ import com.google.zxing.BarcodeFormat
 import com.journeyapps.barcodescanner.BarcodeEncoder
 import com.lunabeestudio.domain.model.FormEntry
 import com.lunabeestudio.stopcovid.Constants
+import com.lunabeestudio.stopcovid.Constants.Url.CERTIFICATE_SHORTCUT_URI
+import com.lunabeestudio.stopcovid.Constants.Url.NEW_CERTIFICATE_SHORTCUT_URI
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.toDimensSize
 import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
@@ -55,18 +57,26 @@ class AttestationWidget : AppWidgetProvider() {
         val uriIntent: String
         val views: RemoteViews?
 
-        //get the valid attestations list
+        // get the valid attestations list
         val attestations = context.secureKeystoreDataSource().attestations
         val validAttestations =
             attestations?.filter { !it.isExpired(context.robertManager().configuration) }
                 ?.sortedBy { attestation -> attestation.timestamp }
-
-        if (validAttestations.isNullOrEmpty()) {
+        if (!context.robertManager().configuration.displayAttestation) {
+            views = RemoteViews(context.packageName, R.layout.attestation_widget_no_attestation)
+            uriIntent = Constants.Url.PROXIMITY_FRAGMENT_URI
+            views.setTextViewText(
+                R.id.mainTextView,
+                StringsManager.strings["attestationsController.endAttestation"] ?: "Attestations plus nécessaires"
+            )
+        } else if (validAttestations.isNullOrEmpty()) {
             // No certificate valid yet
             views = RemoteViews(context.packageName, R.layout.attestation_widget_no_attestation)
             uriIntent = NEW_CERTIFICATE_SHORTCUT_URI
-            views.setTextViewText(R.id.mainTextView,
-                StringsManager.strings["attestationsController.newAttestation"] ?: "Nouvelle attestation")
+            views.setTextViewText(
+                R.id.mainTextView,
+                StringsManager.strings["attestationsController.newAttestation"] ?: "Nouvelle attestation"
+            )
         }
         // already created a certif
         else {
@@ -74,7 +84,7 @@ class AttestationWidget : AppWidgetProvider() {
             views = RemoteViews(context.packageName, R.layout.attestation_widget_valid_attestation)
             uriIntent = CERTIFICATE_SHORTCUT_URI
 
-            //create QRCode from attestation
+            // create QRCode from attestation
             val qrSize = R.dimen.qr_code_widget_size.toDimensSize(context).toInt()
             val qrcodeBitmap = barcodeEncoder.encodeBitmap(
                 mainAttestation.qrCode,
@@ -87,14 +97,13 @@ class AttestationWidget : AppWidgetProvider() {
                 .format(mainAttestation.timestamp)
             val reason = mainAttestation.widgetString
 
-            //roundCorner on bitmap
+            // roundCorner on bitmap
             val imageWidget = bitmapHelper.getRoundedBitmap(qrcodeBitmap, R.dimen.qr_widget_corner_radius.toDimensSize(context))
             views.setTextViewText(R.id.dateTextView, dateHour)
             views.setTextViewText(R.id.reasonTextView, reason)
             views.setImageViewBitmap(R.id.qrCodeImageView, imageWidget)
-
         }
-        //setup intent of the widget click
+        // setup intent of the widget click
         setIntent(context, views, uriIntent)
 
         // Instruct the widget manager to update the widget
@@ -116,9 +125,6 @@ class AttestationWidget : AppWidgetProvider() {
     }
 
     companion object {
-        const val CERTIFICATE_SHORTCUT_URI: String = "tousanticovid://attestations/"
-        const val NEW_CERTIFICATE_SHORTCUT_URI: String = "tousanticovid://attestations//new_attestation"
-
         /**
          * Is used for asking the widget to update himself
          * @param newCertificate true if you call after creating a certificate, setup a work manager to update the widget once the certificate is no more valid

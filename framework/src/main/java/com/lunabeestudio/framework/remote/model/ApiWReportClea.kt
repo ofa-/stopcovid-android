@@ -33,4 +33,3 @@ internal class ApiWReportCleaVisit(
     val qrCodeScanTime: Long,
     val qrCode: String,
 )
-

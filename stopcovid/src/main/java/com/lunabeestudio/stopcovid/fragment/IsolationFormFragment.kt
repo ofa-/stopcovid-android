@@ -158,8 +158,10 @@ class IsolationFormFragment : MainFragment() {
                     ?: Calendar.getInstance().apply {
                         timeInMillis = System.currentTimeMillis()
                     }.timeInMillis
-                MaterialAlertDialogBuilder(requireContext()).showSpinnerDayPicker(strings, initialTimestamp,
-                    PICKER_DAY_IN_PAST) { newDate ->
+                MaterialAlertDialogBuilder(requireContext()).showSpinnerDayPicker(
+                    strings, initialTimestamp,
+                    PICKER_DAY_IN_PAST
+                ) { newDate ->
                     text = dateFormat.format(Date(newDate))
                     viewModel.updateLastContactDate(newDate)
                 }
@@ -231,8 +233,10 @@ class IsolationFormFragment : MainFragment() {
                     ?: Calendar.getInstance().apply {
                         timeInMillis = System.currentTimeMillis()
                     }.timeInMillis
-                MaterialAlertDialogBuilder(requireContext()).showSpinnerDayPicker(strings, initialTimestamp,
-                    PICKER_DAY_IN_PAST) { newDate ->
+                MaterialAlertDialogBuilder(requireContext()).showSpinnerDayPicker(
+                    strings, initialTimestamp,
+                    PICKER_DAY_IN_PAST
+                ) { newDate ->
                     text = dateFormat.format(Date(newDate))
                     viewModel.updateIndexSymptomsEndDate(newDate)
                 }
@@ -289,53 +293,57 @@ class IsolationFormFragment : MainFragment() {
     }
 
     private fun positiveTestItems(): List<GenericItem> {
-        return listOf(pickerEditTextItem {
-            placeholder = "-"
-            hint = strings["isolationFormController.positiveCase.positiveTestDate"]
-            text = isolationManager.isolationPositiveTestingDate?.let { timestamp ->
-                dateFormat.format(Date(timestamp))
-            }
-            onClick = {
-                val initialTimestamp = isolationManager.isolationPositiveTestingDate
-                    ?: Calendar.getInstance().apply {
-                        timeInMillis = System.currentTimeMillis()
-                    }.timeInMillis
-                MaterialAlertDialogBuilder(requireContext()).showSpinnerDayPicker(
-                    strings,
-                    initialTimestamp,
-                    PICKER_DAY_IN_PAST
-                ) { newDate ->
-                    text = dateFormat.format(Date(newDate))
-                    viewModel.updatePositiveTestingDate(newDate)
+        return listOf(
+            pickerEditTextItem {
+                placeholder = "-"
+                hint = strings["isolationFormController.positiveCase.positiveTestDate"]
+                text = isolationManager.isolationPositiveTestingDate?.let { timestamp ->
+                    dateFormat.format(Date(timestamp))
                 }
+                onClick = {
+                    val initialTimestamp = isolationManager.isolationPositiveTestingDate
+                        ?: Calendar.getInstance().apply {
+                            timeInMillis = System.currentTimeMillis()
+                        }.timeInMillis
+                    MaterialAlertDialogBuilder(requireContext()).showSpinnerDayPicker(
+                        strings,
+                        initialTimestamp,
+                        PICKER_DAY_IN_PAST
+                    ) { newDate ->
+                        text = dateFormat.format(Date(newDate))
+                        viewModel.updatePositiveTestingDate(newDate)
+                    }
+                }
+                identifier = hint.hashCode().toLong()
             }
-            identifier = hint.hashCode().toLong()
-        })
+        )
     }
 
     private fun symptomsStartDateItems(): List<GenericItem> {
-        return listOf(pickerEditTextItem {
-            placeholder = "-"
-            hint = strings["isolationFormController.positiveCase.symptomsStartDate"]
-            text = isolationManager.isolationSymptomsStartDate?.let { timestamp ->
-                dateFormat.format(Date(timestamp))
-            }
-            onClick = {
-                val initialTimestamp = isolationManager.isolationSymptomsStartDate
-                    ?: Calendar.getInstance().apply {
-                        timeInMillis = System.currentTimeMillis()
-                    }.timeInMillis
-                MaterialAlertDialogBuilder(requireContext()).showSpinnerDayPicker(
-                    strings,
-                    initialTimestamp,
-                    PICKER_DAY_IN_PAST
-                ) { newDate ->
-                    text = dateFormat.format(Date(newDate))
-                    viewModel.updateSymptomsStartDate(newDate)
+        return listOf(
+            pickerEditTextItem {
+                placeholder = "-"
+                hint = strings["isolationFormController.positiveCase.symptomsStartDate"]
+                text = isolationManager.isolationSymptomsStartDate?.let { timestamp ->
+                    dateFormat.format(Date(timestamp))
                 }
+                onClick = {
+                    val initialTimestamp = isolationManager.isolationSymptomsStartDate
+                        ?: Calendar.getInstance().apply {
+                            timeInMillis = System.currentTimeMillis()
+                        }.timeInMillis
+                    MaterialAlertDialogBuilder(requireContext()).showSpinnerDayPicker(
+                        strings,
+                        initialTimestamp,
+                        PICKER_DAY_IN_PAST
+                    ) { newDate ->
+                        text = dateFormat.format(Date(newDate))
+                        viewModel.updateSymptomsStartDate(newDate)
+                    }
+                }
+                identifier = hint.hashCode().toLong()
             }
-            identifier = hint.hashCode().toLong()
-        })
+        )
     }
 
     private fun readRecommendationItems(): List<GenericItem> {

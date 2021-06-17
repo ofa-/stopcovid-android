@@ -10,9 +10,6 @@
 
 package com.lunabeestudio.analytics.network.model
 
-import com.lunabeestudio.analytics.model.Infos
-import com.lunabeestudio.analytics.model.TimestampedEvent
-
 class TimestampedEventRQ(
     var name: String,
     var timestamp: String,

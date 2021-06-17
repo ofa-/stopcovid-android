@@ -55,7 +55,6 @@ class BleProximityNotificationFactoryTest {
         // Then
         verify(bluetoothAdapter, times(1)).bluetoothLeAdvertiser
         assertThat(result).isInstanceOf(BleProximityNotificationWithAdvertiser::class.java)
-
     }
 
     @Test
@@ -70,9 +69,5 @@ class BleProximityNotificationFactoryTest {
         // Then
         verify(bluetoothAdapter, times(1)).bluetoothLeAdvertiser
         assertThat(result).isInstanceOf(BleProximityNotificationWithoutAdvertiser::class.java)
-
     }
-
-
-
 }

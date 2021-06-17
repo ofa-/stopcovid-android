@@ -27,7 +27,7 @@ var SharedPreferences.lastInfoCenterRefresh: Long
 @OptIn(ExperimentalTime::class)
 var SharedPreferences.lastInfoCenterFetch: Duration
     get() = getLong(Constants.SharedPrefs.LAST_INFO_CENTER_FETCH, 0L).milliseconds
-    set(value) = edit { putLong(Constants.SharedPrefs.LAST_INFO_CENTER_FETCH, value.toLongMilliseconds()) }
+    set(value) = edit { putLong(Constants.SharedPrefs.LAST_INFO_CENTER_FETCH, value.inWholeMilliseconds) }
 
 var SharedPreferences.areInfoNotificationsEnabled: Boolean
     get() = getBoolean(Constants.SharedPrefs.ARE_INFO_NOTIFICATIONS_ENABLED, true)

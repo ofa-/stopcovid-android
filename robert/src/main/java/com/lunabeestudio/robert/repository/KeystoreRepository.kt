@@ -10,11 +10,11 @@
 
 package com.lunabeestudio.robert.repository
 
+import com.lunabeestudio.domain.model.AtRiskStatus
 import com.lunabeestudio.domain.model.Calibration
 import com.lunabeestudio.domain.model.Configuration
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.robert.datasource.LocalKeystoreDataSource
-import com.lunabeestudio.domain.model.AtRiskStatus
 
 internal class KeystoreRepository(
     private val keystoreDataSource: LocalKeystoreDataSource,
@@ -139,12 +139,6 @@ internal class KeystoreRepository(
         get() = keystoreDataSource.proximityActive
         set(value) {
             keystoreDataSource.proximityActive = value
-        }
-
-    var isSick: Boolean?
-        get() = keystoreDataSource.isSick
-        set(value) {
-            keystoreDataSource.isSick = value
         }
 
     var reportDate: Long?

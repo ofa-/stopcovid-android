@@ -10,10 +10,10 @@
 
 package com.lunabeestudio.stopcovid.manager
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
 import android.location.Location
-import androidx.core.content.edit
 import androidx.core.util.AtomicFile
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -23,7 +23,6 @@ import com.google.gson.reflect.TypeToken
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.robert.utils.Event
 import com.lunabeestudio.stopcovid.coreui.ConfigConstant
-import com.lunabeestudio.stopcovid.coreui.extension.getETagSharedPrefs
 import com.lunabeestudio.stopcovid.coreui.extension.saveTo
 import com.lunabeestudio.stopcovid.extension.chosenPostalCode
 import com.lunabeestudio.stopcovid.extension.currentVaccinationReferenceDepartmentCode
@@ -31,6 +30,7 @@ import com.lunabeestudio.stopcovid.extension.currentVaccinationReferenceLatitude
 import com.lunabeestudio.stopcovid.extension.currentVaccinationReferenceLongitude
 import com.lunabeestudio.stopcovid.extension.hasChosenPostalCode
 import com.lunabeestudio.stopcovid.extension.location
+import com.lunabeestudio.stopcovid.extension.newFile
 import com.lunabeestudio.stopcovid.extension.zipGeolocVersion
 import com.lunabeestudio.stopcovid.model.PostalCodeDetails
 import com.lunabeestudio.stopcovid.model.VaccinationCenter
@@ -85,9 +85,12 @@ object VaccinationCenterManager {
     }
 
     private suspend fun initializeCurrentDepartmentIfNeeded(context: Context, sharedPreferences: SharedPreferences) {
-        if ((sharedPreferences.currentVaccinationReferenceDepartmentCode == null
-                || sharedPreferences.zipGeolocVersion < ZIP_GEOLOC_VERSION)
-            && sharedPreferences.chosenPostalCode != null) {
+        if ((
+            sharedPreferences.currentVaccinationReferenceDepartmentCode == null
+                || sharedPreferences.zipGeolocVersion < ZIP_GEOLOC_VERSION
+            )
+            && sharedPreferences.chosenPostalCode != null
+        ) {
             postalCodeDidUpdate(context, sharedPreferences, sharedPreferences.chosenPostalCode)
         }
     }
@@ -105,7 +108,8 @@ object VaccinationCenterManager {
             sharedPreferences.currentVaccinationReferenceLongitude = foundDetails?.longitude
             sharedPreferences.zipGeolocVersion = ZIP_GEOLOC_VERSION
             if (foundDetails?.department != sharedPreferences.currentVaccinationReferenceDepartmentCode
-                || _vaccinationCenters.value?.peekContent().isNullOrEmpty()) {
+                || _vaccinationCenters.value?.peekContent().isNullOrEmpty()
+            ) {
                 // Department changed, let's download the new infos
                 Timber.d("Department code did update")
                 sharedPreferences.currentVaccinationReferenceDepartmentCode = foundDetails?.department
@@ -147,9 +151,12 @@ object VaccinationCenterManager {
     @Suppress("BlockingMethodInNonBlockingContext")
     private suspend fun postalCodesDetails(context: Context): Map<String, PostalCodeDetails>? {
         return withContext(Dispatchers.IO) {
-            gson.fromJson<Map<String, PostalCodeDetails>>(context.assets.open(ConfigConstant.Vaccination.ASSET_ZIP_GEOLOC_FILE_PATH).use {
-                it.readBytes().toString(Charsets.UTF_8)
-            }, postalCodesDetailsType)
+            gson.fromJson(
+                context.assets.open(ConfigConstant.Vaccination.ASSET_ZIP_GEOLOC_FILE_PATH).use {
+                    it.readBytes().toString(Charsets.UTF_8)
+                },
+                postalCodesDetailsType
+            )
         }
     }
 
@@ -186,10 +193,6 @@ object VaccinationCenterManager {
         sharedPreferences.currentVaccinationReferenceDepartmentCode = null
         sharedPreferences.currentVaccinationReferenceLatitude = null
         sharedPreferences.currentVaccinationReferenceLongitude = null
-        context.getETagSharedPrefs().edit {
-            remove(lastUpdateFileName)
-            remove(centersFileName)
-        }
     }
 
     private suspend fun loadLocal(context: Context, sharedPreferences: SharedPreferences): List<VaccinationCenter>? {
@@ -209,6 +212,7 @@ object VaccinationCenterManager {
         }
     }
 
+    @SuppressLint("BinaryOperationInTimber")
     private suspend fun fetchLast(context: Context, sharedPreferences: SharedPreferences): Boolean {
         val atomicLastUpdateFile = AtomicFile(localLastUpdateFile(context, sharedPreferences))
         var lastUpdateFileOutPutStream: FileOutputStream? = null
@@ -225,16 +229,18 @@ object VaccinationCenterManager {
             lastUpdateFileOutPutStream = "${url}${sharedPreferences.currentVaccinationReferenceDepartmentCode}/$lastUpdateFileName".saveTo(
                 context,
                 atomicLastUpdateFile,
-                lastUpdateFileName,
             )
             if (lastUpdateFileOutPutStream != null) {
                 val vaccinationCenterLastUpdate = gson.fromJson(
-                    atomicLastUpdateFile.baseFile.readText(),
+                    atomicLastUpdateFile.newFile.readText(),
                     VaccinationCenterLastUpdate::class.java
                 )
 
                 if (vaccinationCenterLastUpdate.sha1 != previousVaccinationCenterLastUpdate?.sha1) {
-                    Timber.d("Downloaded Sha1 (${vaccinationCenterLastUpdate.sha1}) is different than our file Sha1 (${previousVaccinationCenterLastUpdate?.sha1}). Let's fetch the new file")
+                    Timber.d(
+                        "Downloaded Sha1 (${vaccinationCenterLastUpdate.sha1}) is different than our file " +
+                            "Sha1 (${previousVaccinationCenterLastUpdate?.sha1}). Let's fetch the new file"
+                    )
                     val fetched = fetchLastCenters(context, sharedPreferences)
                     if (!fetched) {
                         atomicLastUpdateFile.failWrite(lastUpdateFileOutPutStream)
@@ -266,10 +272,9 @@ object VaccinationCenterManager {
             centersFileOutPutStream = "${url}${sharedPreferences.currentVaccinationReferenceDepartmentCode}/$centersFileName".saveTo(
                 context,
                 atomicCentersFile,
-                centersFileName,
             )
             if (centersFileOutPutStream != null) {
-                val list = gson.fromJson<List<VaccinationCenter?>>(atomicCentersFile.baseFile.readText(), vaccinationCentersType)
+                val list = gson.fromJson<List<VaccinationCenter?>>(atomicCentersFile.newFile.readText(), vaccinationCentersType)
                 if (list.any { it == null }) {
                     atomicCentersFile.failWrite(centersFileOutPutStream)
                     false

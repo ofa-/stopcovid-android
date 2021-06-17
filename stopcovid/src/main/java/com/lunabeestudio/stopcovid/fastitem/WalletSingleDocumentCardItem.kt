@@ -40,6 +40,5 @@ class WalletSingleDocumentCardItem : AbstractBindingItem<ItemWalletSingleDocumen
     }
 }
 
-fun walletSingleDocumentCardItem(block: (WalletSingleDocumentCardItem.() -> Unit)): WalletSingleDocumentCardItem = WalletSingleDocumentCardItem().apply(
-    block
-)
+fun walletSingleDocumentCardItem(block: (WalletSingleDocumentCardItem.() -> Unit)): WalletSingleDocumentCardItem =
+    WalletSingleDocumentCardItem().apply(block)

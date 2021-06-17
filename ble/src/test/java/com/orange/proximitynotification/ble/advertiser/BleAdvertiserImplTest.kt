@@ -77,5 +77,4 @@ class BleAdvertiserImplTest {
         // Then
         assertThat(result.isSuccess).isTrue()
     }
-
 }

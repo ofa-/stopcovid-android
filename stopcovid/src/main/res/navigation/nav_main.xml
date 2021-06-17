@@ -341,6 +341,7 @@
         android:id="@+id/keyFiguresFragment"
         android:name="com.lunabeestudio.stopcovid.fragment.KeyFiguresFragment"
         tools:layout="@layout/fragment_recycler_view">
+        <deepLink app:uri="tousanticovid://allFigures"/>
         <action
             android:id="@+id/action_keyFiguresFragment_to_postalCodeBottomSheetFragment"
             app:destination="@id/postalCodeBottomSheetFragment"

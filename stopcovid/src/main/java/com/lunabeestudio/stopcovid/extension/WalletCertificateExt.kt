@@ -26,22 +26,31 @@ fun WalletCertificate.fullDescription(strings: LocalizedStrings, configuration: 
         is SanitaryCertificate -> {
             text = text?.replace("<${SanitaryCertificate.SanitaryCertificateFields.FIRST_NAME.code}>", firstName ?: "N/A")
             text = text?.replace("<${SanitaryCertificate.SanitaryCertificateFields.NAME.code}>", name ?: "N/A")
-            text = text?.replace("<${SanitaryCertificate.SanitaryCertificateFields.BIRTH_DATE.code}>",
-                birthDate ?: "N/A")
+            text = text?.replace(
+                "<${SanitaryCertificate.SanitaryCertificateFields.BIRTH_DATE.code}>",
+                birthDate ?: "N/A"
+            )
 
-            val genderString = strings["wallet.proof.${type.stringKey}.${SanitaryCertificate.SanitaryCertificateFields.GENDER.code}.$gender"]
+            val genderString =
+                strings["wallet.proof.${type.stringKey}.${SanitaryCertificate.SanitaryCertificateFields.GENDER.code}.$gender"]
             text = text?.replace("<${SanitaryCertificate.SanitaryCertificateFields.GENDER.code}>", genderString ?: "N/A")
 
             val analysisCodeString = strings.stringsFormat("wallet.proof.${type.stringKey}.loinc.$analysisCode", analysisCode)
-            text = text?.replace("<${SanitaryCertificate.SanitaryCertificateFields.ANALYSIS_CODE.code}>",
-                analysisCodeString ?: "LOINC:$analysisCode")
+            text = text?.replace(
+                "<${SanitaryCertificate.SanitaryCertificateFields.ANALYSIS_CODE.code}>",
+                analysisCodeString ?: "LOINC:$analysisCode"
+            )
 
             val analysisDateFormat = SimpleDateFormat("d MMM yyyy, HH:mm")
             val dateString = analysisDate?.let { analysisDateFormat.format(it) } ?: "N/A"
             text = text?.replace("<${SanitaryCertificate.SanitaryCertificateFields.ANALYSIS_DATE.code}>", dateString)
 
-            val resultString = strings["wallet.proof.${type.stringKey}.${SanitaryCertificate.SanitaryCertificateFields.TEST_RESULT.code}.$testResult"]
-            text = text?.replace("<${SanitaryCertificate.SanitaryCertificateFields.TEST_RESULT.code}>", resultString ?: "N/A")
+            val resultString =
+                strings["wallet.proof.${type.stringKey}.${SanitaryCertificate.SanitaryCertificateFields.TEST_RESULT.code}.$testResult"]
+            text = text?.replace(
+                oldValue = "<${SanitaryCertificate.SanitaryCertificateFields.TEST_RESULT.code}>",
+                newValue = resultString ?: "N/A"
+            )
 
             if (testResult == "N") {
                 val timeIndicator = validityString(configuration, strings)
@@ -53,31 +62,43 @@ fun WalletCertificate.fullDescription(strings: LocalizedStrings, configuration: 
         is VaccinationCertificate -> {
             text = text?.replace("<${VaccinationCertificate.VaccinationCertificateFields.FIRST_NAME.code}>", firstName ?: "N/A")
             text = text?.replace("<${VaccinationCertificate.VaccinationCertificateFields.NAME.code}>", name ?: "N/A")
-            text = text?.replace("<${VaccinationCertificate.VaccinationCertificateFields.BIRTH_DATE.code}>",
-                birthDate ?: "N/A")
+            text = text?.replace(
+                "<${VaccinationCertificate.VaccinationCertificateFields.BIRTH_DATE.code}>",
+                birthDate ?: "N/A"
+            )
             text = text?.replace("<${VaccinationCertificate.VaccinationCertificateFields.DISEASE_NAME.code}>", diseaseName ?: "N/A")
-            text = text?.replace("<${VaccinationCertificate.VaccinationCertificateFields.PROPHYLACTIC_AGENT.code}>",
-                prophylacticAgent ?: "N/A")
+            text = text?.replace(
+                "<${VaccinationCertificate.VaccinationCertificateFields.PROPHYLACTIC_AGENT.code}>",
+                prophylacticAgent ?: "N/A"
+            )
             text = text?.replace("<${VaccinationCertificate.VaccinationCertificateFields.VACCINE_NAME.code}>", vaccineName ?: "N/A")
             text = text?.replace("<${VaccinationCertificate.VaccinationCertificateFields.VACCINE_MAKER.code}>", vaccineMaker ?: "N/A")
-            text = text?.replace("<${VaccinationCertificate.VaccinationCertificateFields.LAST_VACCINATION_STATE_RANK.code}>",
-                lastVaccinationStateRank ?: "N/A")
-            text = text?.replace("<${VaccinationCertificate.VaccinationCertificateFields.COMPLETE_CYCLE_DOSE_COUNT.code}>",
-                completeCycleDosesCount ?: "N/A")
+            text = text?.replace(
+                "<${VaccinationCertificate.VaccinationCertificateFields.LAST_VACCINATION_STATE_RANK.code}>",
+                lastVaccinationStateRank ?: "N/A"
+            )
+            text = text?.replace(
+                "<${VaccinationCertificate.VaccinationCertificateFields.COMPLETE_CYCLE_DOSE_COUNT.code}>",
+                completeCycleDosesCount ?: "N/A"
+            )
 
-            text = text?.replace("<${VaccinationCertificate.VaccinationCertificateFields.LAST_VACCINATION_DATE.code}>",
-                lastVaccinationDate?.let { dateFormat.format(it) } ?: "N/A")
+            text = text?.replace(
+                "<${VaccinationCertificate.VaccinationCertificateFields.LAST_VACCINATION_DATE.code}>",
+                lastVaccinationDate?.let { dateFormat.format(it) } ?: "N/A"
+            )
 
-            val vaccinationState = strings["wallet.proof.${type.stringKey}.${VaccinationCertificate.VaccinationCertificateFields.VACCINATION_CYCLE_STATE.code}.$vaccinationCycleState"]
-            text = text?.replace("<${VaccinationCertificate.VaccinationCertificateFields.VACCINATION_CYCLE_STATE.code}>",
-                vaccinationState ?: "N/A")
-
+            val vaxCode = VaccinationCertificate.VaccinationCertificateFields.VACCINATION_CYCLE_STATE.code
+            val vaccinationState = strings["wallet.proof.${type.stringKey}.$vaxCode.$vaccinationCycleState"]
+            text = text?.replace("<$vaxCode>", vaccinationState ?: "N/A")
             text ?: ""
         }
     }
 }
 
-fun VaccinationCertificate.statusStringKey(): String = "wallet.proof.${type.stringKey}.${VaccinationCertificate.VaccinationCertificateFields.VACCINATION_CYCLE_STATE.code}.$vaccinationCycleState"
+fun VaccinationCertificate.statusStringKey(): String {
+    val vaxCode = VaccinationCertificate.VaccinationCertificateFields.VACCINATION_CYCLE_STATE.code
+    return "wallet.proof.${type.stringKey}.$vaxCode.$vaccinationCycleState"
+}
 
 fun WalletCertificate.tagStringKey(): String {
     return "wallet.proof.${type.stringKey}.pillTitle"

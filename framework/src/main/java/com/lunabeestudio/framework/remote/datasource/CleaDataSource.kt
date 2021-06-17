@@ -1,6 +1,7 @@
 package com.lunabeestudio.framework.remote.datasource
 
 import android.content.Context
+import com.lunabeestudio.domain.model.CacheConfig
 import com.lunabeestudio.domain.model.Cluster
 import com.lunabeestudio.domain.model.ClusterIndex
 import com.lunabeestudio.domain.model.VenueQrCode
@@ -13,6 +14,7 @@ import com.lunabeestudio.framework.utils.RequestHelper
 import com.lunabeestudio.robert.datasource.RemoteCleaDataSource
 import com.lunabeestudio.robert.model.RobertResult
 import com.lunabeestudio.robert.model.RobertResultData
+import java.io.File
 
 class CleaDataSource(
     val context: Context,
@@ -21,19 +23,23 @@ class CleaDataSource(
     private val cleaStatusFallbackBaseUrl: String,
 ) : RemoteCleaDataSource {
 
+    private val cacheConfig = CacheConfig(File(context.cacheDir, "http_cache"), 30 * 1024 * 1024)
+
     private var filesDir = context.filesDir
 
     private fun getCleaStatusApi(cleaStatusBaseUrl: String): CleaStatusApi = RetrofitClient.getService(
         context = context,
         baseUrl = cleaStatusBaseUrl,
         clazz = CleaStatusApi::class.java,
+        cacheConfig,
     )
 
     private var cleaReportApi: CleaReportApi = RetrofitClient.getService(
         context,
         cleaReportBaseUrl,
         cleaReportCertificateSha256,
-        CleaReportApi::class.java
+        CleaReportApi::class.java,
+        null,
     )
 
     override suspend fun wreportClea(

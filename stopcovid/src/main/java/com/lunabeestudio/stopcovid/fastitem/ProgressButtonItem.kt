@@ -62,5 +62,7 @@ class ProgressButtonItem(lifecycleOwner: LifecycleOwner) : BaseItem<ProgressButt
     }
 }
 
-fun progressButtonItem(lifecycleOwner: LifecycleOwner,
-    block: (ProgressButtonItem.() -> Unit)): ProgressButtonItem = ProgressButtonItem(lifecycleOwner).apply(block)
+fun progressButtonItem(
+    lifecycleOwner: LifecycleOwner,
+    block: (ProgressButtonItem.() -> Unit)
+): ProgressButtonItem = ProgressButtonItem(lifecycleOwner).apply(block)

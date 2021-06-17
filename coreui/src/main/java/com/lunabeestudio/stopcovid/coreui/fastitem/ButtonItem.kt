@@ -22,10 +22,11 @@ import com.google.android.material.button.MaterialButton
 import com.lunabeestudio.stopcovid.coreui.R
 import com.lunabeestudio.stopcovid.coreui.extension.safeEmojiSpanify
 
-open class ButtonItem(@LayoutRes layout: Int = R.layout.item_button,
+open class ButtonItem(
+    @LayoutRes layout: Int = R.layout.item_button,
     vh: (v: View) -> ViewHolder = ButtonItem::ViewHolder,
-    @IdRes id: Int = R.id.item_default_button)
-    : BaseItem<ButtonItem.ViewHolder>(layout, vh, id) {
+    @IdRes id: Int = R.id.item_default_button
+) : BaseItem<ButtonItem.ViewHolder>(layout, vh, id) {
     var text: String? = null
     var gravity: Int = Gravity.NO_GRAVITY
     var isButtonEnabled: Boolean = true

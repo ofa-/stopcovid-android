@@ -43,7 +43,8 @@ class QrCodeCardItem : AbstractBindingItem<ItemQrCodeCardBinding>() {
     override fun createBinding(inflater: LayoutInflater, parent: ViewGroup?): ItemQrCodeCardBinding {
         val binding = ItemQrCodeCardBinding.inflate(inflater, parent, false)
         val tagColor = ColorStateList.valueOf(
-            R.attr.colorPrimary.fetchSystemColor(binding.root.context))
+            R.attr.colorPrimary.fetchSystemColor(binding.root.context)
+        )
 
         binding.tag1.chip.chipBackgroundColor = tagColor
         binding.tag2.chip.chipBackgroundColor = tagColor

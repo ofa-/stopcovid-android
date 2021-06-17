@@ -27,6 +27,7 @@ import android.view.View
 import android.widget.RemoteViews
 import androidx.core.content.ContextCompat
 import com.lunabeestudio.robert.RobertManager
+import com.lunabeestudio.stopcovid.Constants.Url.PROXIMITY_FRAGMENT_URI
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.toDimensSize
 import com.lunabeestudio.stopcovid.coreui.manager.LocalizedStrings
@@ -65,24 +66,23 @@ class ProximityWidget : AppWidgetProvider() {
         setStyleWidgetWithSize(appWidgetManager, views, appWidgetId, context)
         views.setViewVisibility(R.id.infoTextView, View.VISIBLE)
         // --- UPDATE RISK LEVEL ---
-        //if user not registered
+        // if user not registered
         if (!robertManager.isRegistered) {
             displayNotRegistered(views, strings)
         }
-        //if the user is sick
-        else if (robertManager.isSick) {
+        // if the user is sick
+        else if (robertManager.isImmune) {
             displaySick(views, strings)
         }
-        //Display the risk level if not sick
+        // Display the risk level if not sick
         else if (robertManager.atRiskStatus?.riskLevel != null) {
             displayRisk(views, robertManager, strings)
-
         } else {
             displayNoRisk(views, strings)
         }
         // update Proximity status
         views.setTextViewText(R.id.titleWidgetTextView, getProximityText(context, strings, robertManager))
-        //setIntent widget click
+        // setIntent widget click
         setIntent(context, views)
         // Instruct the widget manager to update the widget
         appWidgetManager.updateAppWidget(appWidgetId, views)
@@ -100,7 +100,7 @@ class ProximityWidget : AppWidgetProvider() {
         views.apply {
             setInt(R.id.riskLayout, "setBackgroundResource", R.drawable.bg_widget_sick)
             setTextViewText(R.id.riskTextView, strings["home.healthSection.isSick.standaloneTitle"])
-            //no info for sick status
+            // no info for sick status
             setViewVisibility(R.id.infoTextView, View.GONE)
         }
     }
@@ -146,21 +146,21 @@ class ProximityWidget : AppWidgetProvider() {
             val heightWidget = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT)
             views.apply {
                 if (heightWidget > R.dimen.widget_2_row_min_height.toDimensSize(context)) {
-                    //2 row Widget height
+                    // 2 row Widget height
                     setInt(R.id.riskTextView, "setMaxLines", 10)
                     setInt(R.id.infoTextView, "setMaxLines", 10)
                     setInt(R.id.textLayout, "setGravity", Gravity.NO_GRAVITY)
-                    //4 column Widget width
+                    // 4 column Widget width
                     if (widthWidget > R.dimen.widget_4_column_min_width.toDimensSize(context)) {
                         setInt(R.id.textLayout, "setGravity", Gravity.CENTER_VERTICAL)
                         setViewVisibility(R.id.riskImageView, View.VISIBLE)
                     } else {
-                        //3 column Widget width
+                        // 3 column Widget width
                         setViewVisibility(R.id.riskImageView, View.GONE)
                         setInt(R.id.textLayout, "setGravity", Gravity.NO_GRAVITY)
                     }
                 } else {
-                    //1 row widget height
+                    // 1 row widget height
                     setInt(R.id.riskTextView, "setMaxLines", 2)
                     setInt(R.id.infoTextView, "setMaxLines", 1)
                     setViewVisibility(R.id.riskImageView, View.GONE)
@@ -177,20 +177,24 @@ class ProximityWidget : AppWidgetProvider() {
             val stringFinal = String.format(phrase, coloredString)
             val indexStartColored = stringFinal.indexOf(coloredString)
             stringSpan = SpannableString(stringFinal)
-            stringSpan.setSpan(ForegroundColorSpan(ContextCompat.getColor(context, R.color.color_no_risk)),
+            stringSpan.setSpan(
+                ForegroundColorSpan(ContextCompat.getColor(context, R.color.color_no_risk)),
                 indexStartColored,
                 indexStartColored + coloredString.length,
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
         } else {
             val phrase = strings["widget.proximity.disabled.main"] ?: "TousAntiCovid est %s"
             val coloredString = strings["widget.proximity.disabled.second"] ?: "désactivé"
             val stringFinal = String.format(phrase, coloredString)
             val indexStartColored = stringFinal.indexOf(coloredString)
             stringSpan = SpannableString(stringFinal)
-            stringSpan.setSpan(ForegroundColorSpan(ContextCompat.getColor(context, R.color.color_monza)),
+            stringSpan.setSpan(
+                ForegroundColorSpan(ContextCompat.getColor(context, R.color.color_monza)),
                 indexStartColored,
                 indexStartColored + coloredString.length,
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
         }
         return stringSpan
     }
@@ -198,7 +202,7 @@ class ProximityWidget : AppWidgetProvider() {
     private fun setIntent(context: Context, views: RemoteViews) {
         val intent = Intent(
             Intent.ACTION_VIEW,
-            Uri.parse("tousanticovid://proximity/")
+            Uri.parse(PROXIMITY_FRAGMENT_URI)
         )
         val pendingIntent =
             PendingIntent.getActivity(context, 0, intent, 0)

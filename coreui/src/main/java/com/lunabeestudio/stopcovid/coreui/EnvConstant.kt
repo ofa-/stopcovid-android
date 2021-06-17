@@ -22,7 +22,8 @@ enum class EnvConstant {
         override val analyticsCertificateSha256: String = "sha256/KhFx3fIev58nbXs9m2WqXDbqYrE/7r4J9cP1QqPHtVk="
         override val configFilename: String = "config.json"
         override val calibrationFilename: String = "calibrationBle.json"
-        override val serverPublicKey: String = "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEAc9IDt6qJq453SwyWPB94JaLB2VfTAcL43YVtMr3HhDCd22gKaQXIbX1d+tNhfvaKM51sxeaXziPjntUzbTNiw=="
+        override val serverPublicKey: String =
+            "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEAc9IDt6qJq453SwyWPB94JaLB2VfTAcL43YVtMr3HhDCd22gKaQXIbX1d+tNhfvaKM51sxeaXziPjntUzbTNiw=="
     };
 
     abstract val captchaApiKey: String

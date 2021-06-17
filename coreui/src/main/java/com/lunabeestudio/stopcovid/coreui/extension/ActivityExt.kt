@@ -34,7 +34,7 @@ fun Activity.showSoftKeyBoard() {
 fun Activity.hideSoftKeyBoard() {
     val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
     var view = currentFocus
-    //If no view currently has focus, create a new one, just so we can grab a window token from it
+    // If no view currently has focus, create a new one, just so we can grab a window token from it
     if (view == null) {
         view = (findViewById(android.R.id.content) as? ViewGroup)?.rootView
     }

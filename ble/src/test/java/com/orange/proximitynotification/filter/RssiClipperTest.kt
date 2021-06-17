@@ -18,7 +18,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.Date
 
-
 @RunWith(ZohhakRunner::class)
 class RssiClipperTest {
 

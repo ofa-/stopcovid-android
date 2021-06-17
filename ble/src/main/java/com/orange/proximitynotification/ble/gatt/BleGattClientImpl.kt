@@ -184,7 +184,8 @@ internal class BleGattClientImpl(
             connectionStateChannel.sendValueWithStatus(status, newState)
 
             if (previousConnectionState == BluetoothProfile.STATE_CONNECTED
-                && newState == BluetoothProfile.STATE_DISCONNECTED) {
+                && newState == BluetoothProfile.STATE_DISCONNECTED
+            ) {
                 closeGattOperationChannels(BleGattClientException("client is no more connected"))
             }
         }

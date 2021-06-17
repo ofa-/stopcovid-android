@@ -185,5 +185,4 @@ class VaccinationCertificate(override val value: String) : WalletCertificate(Wal
         VACCINATION_CYCLE_STATE("LA"),
         SIGNATURE(null)
     }
-
 }

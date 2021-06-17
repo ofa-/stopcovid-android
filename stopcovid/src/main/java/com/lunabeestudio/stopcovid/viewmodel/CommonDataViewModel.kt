@@ -13,7 +13,6 @@ package com.lunabeestudio.stopcovid.viewmodel
 import android.app.NotificationManager
 import android.content.Context
 import androidx.annotation.CallSuper
-import androidx.core.content.edit
 import androidx.lifecycle.ViewModel
 import androidx.preference.PreferenceManager
 import androidx.work.WorkManager
@@ -23,7 +22,6 @@ import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.StopCovid
 import com.lunabeestudio.stopcovid.coreui.UiConstants
-import com.lunabeestudio.stopcovid.coreui.extension.getETagSharedPrefs
 import com.lunabeestudio.stopcovid.manager.IsolationManager
 import com.lunabeestudio.stopcovid.manager.VaccinationCenterManager
 import com.lunabeestudio.stopcovid.manager.VenuesManager
@@ -65,11 +63,6 @@ abstract class CommonDataViewModel(
         (application.getAppContext() as StopCovid).cancelActivateReminder()
         eraseIsolation()
         VaccinationCenterManager.clearAllData(application.getAppContext())
-        application.getAppContext()
-            .getETagSharedPrefs()
-            .edit {
-                clear()
-            }
     }
 
     protected fun clearNotifications(application: RobertApplication) {
