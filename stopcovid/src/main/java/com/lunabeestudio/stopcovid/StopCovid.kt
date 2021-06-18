@@ -94,6 +94,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import okhttp3.Cache
 import timber.log.Timber
 import java.io.File
@@ -227,6 +228,10 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
                 R.drawable.maintenance,
                 ConfigConstant.Maintenance.URL
             )
+        }
+
+        runBlocking {
+            dccCertificatesManager.initialize(this@StopCovid)
         }
 
         WalletManager.initialize(ProcessLifecycleOwner.get(), secureKeystoreDataSource)
