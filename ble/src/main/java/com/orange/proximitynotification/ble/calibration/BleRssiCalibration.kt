@@ -15,6 +15,4 @@ object BleRssiCalibration {
     fun calibrate(rssi: Int, rxCompensationGain: Int, txCompensationGain: Int): Int {
         return rssi - txCompensationGain - rxCompensationGain
     }
-
 }
-

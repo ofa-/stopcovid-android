@@ -14,6 +14,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
+import com.lunabeestudio.domain.model.WalletCertificateType
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.extension.callPhone
@@ -100,13 +101,21 @@ class WalletInfoFragment : MainFragment() {
             vaccinCertificateCaption = strings["walletController.documents.vaccin"]
             onVaccinCertificateClick = {
                 findParentFragmentByType<WalletContainerFragment>()?.findNavControllerOrNull()
-                    ?.safeNavigate(WalletContainerFragmentDirections.actionWalletContainerFragmentToVaccinDocumentExplanationFragment())
+                    ?.safeNavigate(
+                        WalletContainerFragmentDirections.actionWalletContainerFragmentToCertificateDocumentExplanationFragment(
+                            WalletCertificateType.VACCINATION_EUROPE
+                        )
+                    )
             }
 
             testCertificateCaption = strings["walletController.documents.test"]
             onTestCertificateClick = {
                 findParentFragmentByType<WalletContainerFragment>()?.findNavControllerOrNull()
-                    ?.safeNavigate(WalletContainerFragmentDirections.actionWalletContainerFragmentToTestDocumentExplanationFragment())
+                    ?.safeNavigate(
+                        WalletContainerFragmentDirections.actionWalletContainerFragmentToCertificateDocumentExplanationFragment(
+                            WalletCertificateType.SANITARY_EUROPE
+                        )
+                    )
             }
         }
 

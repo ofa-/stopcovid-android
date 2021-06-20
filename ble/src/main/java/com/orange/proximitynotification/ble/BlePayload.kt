@@ -34,7 +34,6 @@ data class BlePayload(
 
         private const val SIZE = PROXIMITY_PAYLOAD_SIZE + VERSION_SIZE + TX_POWER_LEVEL_SIZE
 
-
         fun from(data: ByteArray): BlePayload {
 
             require(data.size >= SIZE) { "Expecting a byte array of $SIZE bytes. Got ${data.size}." }

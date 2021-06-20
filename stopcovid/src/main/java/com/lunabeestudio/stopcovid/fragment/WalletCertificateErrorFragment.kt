@@ -12,13 +12,13 @@ package com.lunabeestudio.stopcovid.fragment
 
 import androidx.navigation.fragment.navArgs
 import com.lunabeestudio.domain.model.WalletCertificateError
-import com.lunabeestudio.domain.model.WalletCertificateType
 import com.lunabeestudio.stopcovid.R
-import com.lunabeestudio.stopcovid.coreui.ConfigConstant
 import com.lunabeestudio.stopcovid.coreui.extension.callPhone
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.fastitem.cardWithActionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
+import com.lunabeestudio.stopcovid.extension.certificateThumbnailFilename
+import com.lunabeestudio.stopcovid.extension.errorStringKey
 import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.fastitem.phoneSupportItem
 import com.lunabeestudio.stopcovid.fastitem.walletSingleDocumentCardItem
@@ -39,10 +39,7 @@ class WalletCertificateErrorFragment : MainFragment() {
             identifier = items.size.toLong()
         }
 
-        items += when (args.certificateType) {
-            WalletCertificateType.SANITARY -> getTestItems()
-            WalletCertificateType.VACCINATION -> getVaccinItems()
-        }
+        items += getCertificateItems()
 
         items += spaceItem {
             spaceRes = R.dimen.spacing_medium
@@ -66,18 +63,18 @@ class WalletCertificateErrorFragment : MainFragment() {
         return items
     }
 
-    private fun getTestItems(): MutableList<GenericItem> {
+    private fun getCertificateItems(): MutableList<GenericItem> {
         val items = mutableListOf<GenericItem>()
 
         items += cardWithActionItem {
             when (args.certificateError) {
                 WalletCertificateError.INVALID_CERTIFICATE_SIGNATURE -> {
-                    mainTitle = strings["walletCertificateErrorController.explanations.invalidSignature.testCertificate.title"]
-                    mainBody = strings["walletCertificateErrorController.explanations.invalidSignature.testCertificate.subtitle"]
+                    mainTitle = strings["walletCertificateErrorController.explanations.invalidSignature.${args.certificateType.errorStringKey}.title"]
+                    mainBody = strings["walletCertificateErrorController.explanations.invalidSignature.${args.certificateType.errorStringKey}.subtitle"]
                 }
                 WalletCertificateError.MALFORMED_CERTIFICATE -> {
-                    mainTitle = strings["walletCertificateErrorController.explanations.invalidFormat.testCertificate.title"]
-                    mainBody = strings["walletCertificateErrorController.explanations.invalidFormat.testCertificate.subtitle"]
+                    mainTitle = strings["walletCertificateErrorController.explanations.invalidFormat.${args.certificateType.errorStringKey}.title"]
+                    mainBody = strings["walletCertificateErrorController.explanations.invalidFormat.${args.certificateType.errorStringKey}.subtitle"]
                 }
             }
 
@@ -88,53 +85,17 @@ class WalletCertificateErrorFragment : MainFragment() {
             identifier = items.size.toLong()
         }
         items += walletSingleDocumentCardItem {
-            mainTitle = strings["walletCertificateErrorController.checkDocument.testCertificate.title"]
-            mainBody = strings["walletCertificateErrorController.checkDocument.testCertificate.subtitle"]
+            mainTitle = strings["walletCertificateErrorController.checkDocument.${args.certificateType.errorStringKey}.title"]
+            mainBody = strings["walletCertificateErrorController.checkDocument.${args.certificateType.errorStringKey}.subtitle"]
             onClick = {
                 findNavControllerOrNull()
                     ?.safeNavigate(
                         WalletCertificateErrorFragmentDirections
-                            .actionWalletAddCertificateFragmentToTestDocumentExplanationFragment()
+                            .actionWalletAddCertificateFragmentToCertificateDocumentExplanationFragment(args.certificateType)
                     )
             }
-            certificateFile = File(requireContext().filesDir, ConfigConstant.Wallet.TEST_CERTIFICATE_THUMBNAIL_FILE)
+            certificateFile = File(requireContext().filesDir, args.certificateType.certificateThumbnailFilename)
             identifier = mainBody.hashCode().toLong()
-        }
-
-        return items
-    }
-
-    private fun getVaccinItems(): MutableList<GenericItem> {
-        val items = mutableListOf<GenericItem>()
-
-        items += cardWithActionItem {
-            when (args.certificateError) {
-                WalletCertificateError.INVALID_CERTIFICATE_SIGNATURE -> {
-                    mainTitle = strings["walletCertificateErrorController.explanations.invalidSignature.vaccinCertificate.title"]
-                    mainBody = strings["walletCertificateErrorController.explanations.invalidSignature.vaccinCertificate.subtitle"]
-                }
-                WalletCertificateError.MALFORMED_CERTIFICATE -> {
-                    mainTitle = strings["walletCertificateErrorController.explanations.invalidFormat.vaccinCertificate.title"]
-                    mainBody = strings["walletCertificateErrorController.explanations.invalidFormat.vaccinCertificate.subtitle"]
-                }
-            }
-            identifier = mainBody.hashCode().toLong()
-        }
-        items += spaceItem {
-            spaceRes = R.dimen.spacing_medium
-            identifier = items.size.toLong()
-        }
-        items += walletSingleDocumentCardItem {
-            mainTitle = strings["walletCertificateErrorController.checkDocument.vaccinCertificate.title"]
-            mainBody = strings["walletCertificateErrorController.checkDocument.vaccinCertificate.subtitle"]
-            onClick = {
-                findNavControllerOrNull()
-                    ?.safeNavigate(
-                        WalletCertificateErrorFragmentDirections
-                            .actionWalletAddCertificateFragmentToVaccinDocumentExplanationFragment()
-                    )
-            }
-            certificateFile = File(requireContext().filesDir, ConfigConstant.Wallet.VACCIN_CERTIFICATE_THUMBNAIL_FILE)
         }
 
         return items

@@ -9,6 +9,11 @@ import com.lunabeestudio.robert.model.RobertResultData
 interface RemoteCleaDataSource {
 
     suspend fun wreportClea(cleaApiVersion: String, token: String, pivotDate: Long, venueQrCodeList: List<VenueQrCode>): RobertResult
-    suspend fun cleaClusterIndex(apiVersion: String): RobertResultData<ClusterIndex>
-    suspend fun cleaClusterList(apiVersion: String, iteration: String, clusterPrefix: String): RobertResultData<List<Cluster>>
+    suspend fun cleaClusterIndex(apiVersion: String, cleaStatusBaseUrl: String?): RobertResultData<ClusterIndex>
+    suspend fun cleaClusterList(
+        apiVersion: String,
+        iteration: String,
+        clusterPrefix: String,
+        cleaStatusBaseUrl: String?
+    ): RobertResultData<List<Cluster>>
 }

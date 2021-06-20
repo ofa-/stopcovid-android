@@ -36,7 +36,6 @@ class CleaServiceTest {
             server.url("/").toString(),
             "sha256/tb6+ch/VeDZl6rHlWfL4fCAQHyCmkexJhYBa7drUmxY=",
             server.url("/").toString(),
-            "sha256/tb6+ch/VeDZl6rHlWfL4fCAQHyCmkexJhYBa7drUmxY="
         )
     }
 
@@ -47,7 +46,7 @@ class CleaServiceTest {
                 .setBody(ResourcesHelper.readTestFileAsString("clusterIndexSuccess"))
         )
         val result = runBlocking {
-            dataSource.cleaClusterIndex("v1")
+            dataSource.cleaClusterIndex("v1", null)
         }
         assertThat(result).isInstanceOf(RobertResultData.Success::class.java)
     }
@@ -59,7 +58,7 @@ class CleaServiceTest {
                 .setBody(ResourcesHelper.readTestFileAsString("clusterIndexFailure"))
         )
         val result = runBlocking {
-            dataSource.cleaClusterIndex("v1")
+            dataSource.cleaClusterIndex("v1", null)
         }
         assertThat(result).isInstanceOf(RobertResultData.Failure::class.java)
     }

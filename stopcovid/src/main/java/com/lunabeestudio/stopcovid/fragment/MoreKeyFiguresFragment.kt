@@ -13,7 +13,6 @@ package com.lunabeestudio.stopcovid.fragment
 import android.os.Bundle
 import android.view.View
 import com.lunabeestudio.stopcovid.extension.fillItems
-import com.lunabeestudio.stopcovid.manager.LinksManager
 import com.lunabeestudio.stopcovid.manager.MoreKeyFiguresManager
 import com.mikepenz.fastadapter.GenericItem
 

@@ -60,6 +60,5 @@ class HelloBuilder(
         }
 
         return hello ?: throw IllegalArgumentException("The provided time is not valid for the ebid.")
-
     }
 }

@@ -2,7 +2,6 @@ package com.lunabeestudio.stopcovid.extension
 
 import com.lunabeestudio.domain.model.Attestation
 import com.lunabeestudio.domain.model.Configuration
-import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.stopcovid.Constants
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime

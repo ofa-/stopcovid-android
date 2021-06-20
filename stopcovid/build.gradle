@@ -10,7 +10,7 @@
 
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-parcelize'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'androidx.navigation.safeargs.kotlin'
 
@@ -34,19 +34,21 @@ android {
 
             packagingOptions {
                 exclude 'DebugProbesKt.bin'
-                exclude 'META-INF/AL2.0'
-                exclude 'META-INF/LGPL2.1'
+                pickFirst 'META-INF/AL2.0'
+                pickFirst 'META-INF/LGPL2.1'
+                pickFirst 'META-INF/ASL-2.0.txt'
+                pickFirst 'META-INF/LGPL-3.0.txt'
+                pickFirst 'draftv3/schema'
+                pickFirst 'draftv4/schema'
             }
             signingConfig signingConfigs.release
         }
     }
 
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-    kotlinOptions.jvmTarget = JavaVersion.VERSION_1_8.toString()
     kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
+    compileOptions {
+        coreLibraryDesugaringEnabled = true
+    }
 
     // minSdkVersion & targetSdkVersion
     // duped below from ../build.gradle
@@ -55,8 +57,8 @@ android {
         applicationId "fr.gouv.android.stopcovid"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 244
-        versionName "3.1.4"
+        versionCode 274
+        versionName "3.2.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -80,6 +82,7 @@ android {
 }
 
 dependencies {
+    coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:_"
 
     implementation "com.github.PhilJay:MPAndroidChart:_"
 
@@ -91,7 +94,7 @@ dependencies {
     implementation "com.airbnb.android:lottie:_"
 
     implementation("com.journeyapps:zxing-android-embedded:_") { transitive = false }
-    implementation "com.google.zxing:core:_" // 3.4 require minSdk 24
+    implementation "com.google.zxing:core:3.3.3" // 3.4 require minSdk 24
 
     implementation "com.github.razir.progressbutton:progressbutton:_"
 
@@ -102,6 +105,7 @@ dependencies {
     implementation project(path: ':framework')
     implementation project(path: ':robert')
     implementation project(path: ':domain')
+    implementation project(path: ':dgca-decoder')
 
     androidTestImplementation "androidx.test.ext:junit:_"
     androidTestImplementation "androidx.test:runner:_"

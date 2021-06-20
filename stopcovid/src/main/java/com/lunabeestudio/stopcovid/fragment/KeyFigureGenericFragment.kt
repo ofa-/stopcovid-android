@@ -129,5 +129,4 @@ abstract class KeyFigureGenericFragment : MainFragment() {
         }
         return ShareManager.getShareCaptureUriFromBitmap(binding.root.context, bitmap, filenameWithoutExt)
     }
-
 }

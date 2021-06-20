@@ -21,8 +21,8 @@ import com.lunabeestudio.stopcovid.fastitem.keyFigureCardItem
 import com.lunabeestudio.stopcovid.model.DepartmentKeyFigure
 import com.lunabeestudio.stopcovid.model.KeyFigure
 import java.text.NumberFormat
+import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
-import kotlin.time.seconds
 
 private const val CORSICA_KEY: String = "20"
 private const val CORSE_DU_SUD_KEY: String = "2A"
@@ -83,12 +83,14 @@ fun List<KeyFigure>?.getDepartmentLabel(postalCode: String?): String? {
 }
 
 @OptIn(ExperimentalTime::class)
-fun KeyFigure.itemForFigure(context: Context,
+fun KeyFigure.itemForFigure(
+    context: Context,
     sharedPrefs: SharedPreferences,
     numberFormat: NumberFormat,
     strings: LocalizedStrings,
     useDateTime: Boolean,
-    block: (KeyFigureCardItem.() -> Unit)): KeyFigureCardItem {
+    block: (KeyFigureCardItem.() -> Unit)
+): KeyFigureCardItem {
     return keyFigureCardItem {
         val extractDate: Long
         if (sharedPrefs.hasChosenPostalCode) {
@@ -116,9 +118,9 @@ fun KeyFigure.itemForFigure(context: Context,
         updatedAt = strings.stringsFormat(
             "keyFigures.update",
             if (useDateTime) {
-                extractDate.seconds.getRelativeDateTimeString(context, strings["common.justNow"])
+                Duration.seconds(extractDate).getRelativeDateTimeString(context, strings["common.justNow"])
             } else {
-                extractDate.seconds.getRelativeDateString()
+                Duration.seconds(extractDate).getRelativeDateString()
             }
         )
 

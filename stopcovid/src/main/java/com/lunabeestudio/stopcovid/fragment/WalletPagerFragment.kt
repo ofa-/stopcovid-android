@@ -127,7 +127,7 @@ class WalletPagerFragment : BaseFragment() {
                     /* no-op */
                 }
             }
-            
+
             tabSelectedListener?.let { tabLayout.addOnTabSelectedListener(it) }
         }
     }

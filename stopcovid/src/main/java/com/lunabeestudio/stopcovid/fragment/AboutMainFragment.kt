@@ -15,7 +15,6 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
@@ -36,14 +35,17 @@ abstract class AboutMainFragment : MainFragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return if (item.itemId == R.id.item_text) {
-            findNavControllerOrNull()?.safeNavigate(R.id.nav_about, null, navOptions {
-                anim {
-                    enter = R.anim.nav_default_enter_anim
-                    popEnter = R.anim.nav_default_pop_enter_anim
-                    popExit = R.anim.nav_default_pop_exit_anim
-                    exit = R.anim.nav_default_exit_anim
+            findNavControllerOrNull()?.safeNavigate(
+                R.id.nav_about, null,
+                navOptions {
+                    anim {
+                        enter = R.anim.nav_default_enter_anim
+                        popEnter = R.anim.nav_default_pop_enter_anim
+                        popExit = R.anim.nav_default_pop_exit_anim
+                        exit = R.anim.nav_default_exit_anim
+                    }
                 }
-            })
+            )
             true
         } else {
             super.onOptionsItemSelected(item)

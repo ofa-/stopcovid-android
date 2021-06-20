@@ -9,6 +9,9 @@ import com.github.mikephil.charting.components.YAxis
 import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.LineDataSet
 import com.lunabeestudio.stopcovid.Constants
+import com.lunabeestudio.stopcovid.Constants.Chart.WIDGET_CIRCLE_SIZE
+import com.lunabeestudio.stopcovid.Constants.Chart.WIDGET_LINE_WIDTH
+import com.lunabeestudio.stopcovid.Constants.Chart.WIDGET_MARGIN_SIZE
 
 // Chart extensions :
 fun LineDataSet.setupStyle(lineColor: Int) {
@@ -16,6 +19,15 @@ fun LineDataSet.setupStyle(lineColor: Int) {
     val circleCount = values.size
     circleRadius = radius(circleCount)
     lineWidth = lineWidth(circleCount)
+    color = lineColor
+    setCircleColor(color)
+    setDrawCircleHole(false)
+}
+
+fun LineDataSet.setupStyleWidget(lineColor: Int) {
+    setDrawValues(false)
+    circleRadius = WIDGET_CIRCLE_SIZE
+    lineWidth = WIDGET_LINE_WIDTH
     color = lineColor
     setCircleColor(color)
     setDrawCircleHole(false)
@@ -36,6 +48,17 @@ fun LineChart.setupStyle() {
     axisRight.apply {
         isEnabled = false
     }
+}
+
+fun LineChart.setupStyleWidget() {
+    legend.isEnabled = false
+    description.isEnabled = false
+    setTouchEnabled(false)
+    setViewPortOffsets(0f, 0f, 0f, 0f)
+    contentRect.set(WIDGET_MARGIN_SIZE, 0f, this.width.toFloat() - WIDGET_MARGIN_SIZE, this.height.toFloat())
+    axisRight.isEnabled = false
+    xAxis.isEnabled = false
+    axisLeft.isEnabled = false
 }
 
 fun BarChart.setupStyle() {

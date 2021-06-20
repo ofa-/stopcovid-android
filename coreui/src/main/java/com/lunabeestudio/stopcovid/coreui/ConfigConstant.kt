@@ -12,7 +12,7 @@ package com.lunabeestudio.stopcovid.coreui
 
 object ConfigConstant {
     private const val BASE_URL: String = "https://app.tousanticovid.gouv.fr/"
-    private const val VERSION_PATH: String = "json/version-32/"
+    private const val VERSION_PATH: String = "json/version-33/"
     private const val VERSIONED_SERVER_URL: String = BASE_URL + VERSION_PATH
     const val SERVER_CERTIFICATE_SHA256: String = "sha256/ckVocY6+T4RvpXWtbqOF45qEvNls4oFWi83BryOQgOk="
 
@@ -101,6 +101,35 @@ object ConfigConstant {
         const val VACCIN_CERTIFICATE_FULL_FILE: String = "vaccin-certificate-full.png"
         private const val VACCIN_CERTIFICATE_FULL_TEMPLATE_FILE: String = "vaccin-certificate-full-%s.png"
         const val VACCIN_CERTIFICATE_FULL_TEMPLATE_URL: String = URL + VACCIN_CERTIFICATE_FULL_TEMPLATE_FILE
+
+        const val VACCIN_EUROPE_CERTIFICATE_FULL_FILE: String = "vaccin-europe-certificate-full.png"
+        private const val VACCIN_EUROPE_CERTIFICATE_FULL_TEMPLATE_FILE: String = "vaccin-europe-certificate-full-%s.png"
+        val VACCIN_EUROPE_CERTIFICATE_FULL_TEMPLATE_URL: String = URL + VACCIN_EUROPE_CERTIFICATE_FULL_TEMPLATE_FILE
+
+        const val VACCIN_EUROPE_CERTIFICATE_THUMBNAIL_FILE: String = "vaccin-europe-certificate.png"
+        private const val VACCIN_EUROPE_CERTIFICATE_THUMBNAIL_TEMPLATE_FILE: String = "vaccin-europe-certificate-%s.png"
+        val VACCIN_EUROPE_CERTIFICATE_THUMBNAIL_TEMPLATE_URL: String = URL + VACCIN_EUROPE_CERTIFICATE_THUMBNAIL_TEMPLATE_FILE
+
+        const val TEST_EUROPE_CERTIFICATE_THUMBNAIL_FILE: String = "test-europe-certificate.png"
+        private const val TEST_EUROPE_CERTIFICATE_THUMBNAIL_TEMPLATE_FILE: String = "test-europe-certificate-%s.png"
+        val TEST_EUROPE_CERTIFICATE_THUMBNAIL_TEMPLATE_URL: String = URL + TEST_EUROPE_CERTIFICATE_THUMBNAIL_TEMPLATE_FILE
+
+        const val TEST_EUROPE_CERTIFICATE_FULL_FILE: String = "test-europe-certificate-full.png"
+        private const val TEST_EUROPE_CERTIFICATE_FULL_TEMPLATE_FILE: String = "test-europe-certificate-full-%s.png"
+        val TEST_EUROPE_CERTIFICATE_FULL_TEMPLATE_URL: String = URL + TEST_EUROPE_CERTIFICATE_FULL_TEMPLATE_FILE
+
+        const val RECOVERY_EUROPE_CERTIFICATE_THUMBNAIL_FILE: String = "recovery-europe-certificate.png"
+        private const val RECOVERY_EUROPE_CERTIFICATE_THUMBNAIL_TEMPLATE_FILE: String = "recovery-europe-certificate-%s.png"
+        val RECOVERY_EUROPE_CERTIFICATE_THUMBNAIL_TEMPLATE_URL: String = URL + RECOVERY_EUROPE_CERTIFICATE_THUMBNAIL_TEMPLATE_FILE
+
+        const val RECOVERY_EUROPE_CERTIFICATE_FULL_FILE: String = "recovery-europe-certificate-full.png"
+        private const val RECOVERY_EUROPE_CERTIFICATE_FULL_TEMPLATE_FILE: String = "recovery-europe-certificate-full-%s.png"
+        val RECOVERY_EUROPE_CERTIFICATE_FULL_TEMPLATE_URL: String = URL + RECOVERY_EUROPE_CERTIFICATE_FULL_TEMPLATE_FILE
+    }
+
+    object DccCertificates {
+        const val FOLDER: String = "Certs/"
+        const val URL: String = VERSIONED_SERVER_URL + FOLDER
     }
 
     object Config {

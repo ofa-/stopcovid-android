@@ -30,4 +30,3 @@ internal fun ApiCluster.toDomain() = try {
     Timber.e(e)
     null
 }
-

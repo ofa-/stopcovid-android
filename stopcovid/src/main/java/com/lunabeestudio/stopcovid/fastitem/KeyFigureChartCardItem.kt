@@ -35,8 +35,8 @@ import com.lunabeestudio.stopcovid.model.ChartData
 import com.lunabeestudio.stopcovid.model.KeyFigureChartType
 import com.lunabeestudio.stopcovid.model.LimitLineData
 import com.mikepenz.fastadapter.binding.AbstractBindingItem
+import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
-import kotlin.time.seconds
 
 class KeyFigureChartCardItem : AbstractBindingItem<ItemKeyFigureChartCardBinding>() {
     override val type: Int = R.id.item_key_figure_chart_card
@@ -81,9 +81,12 @@ class KeyFigureChartCardItem : AbstractBindingItem<ItemKeyFigureChartCardBinding
 
         if (chartType == KeyFigureChartType.BARS) {
             val dataSetArray = chartData.map { (description, _, entries, color) ->
-                BarDataSet(entries.mapIndexed { _, entry ->
-                    BarEntry(entry.x, entry.y)
-                }, description).apply {
+                BarDataSet(
+                    entries.mapIndexed { _, entry ->
+                        BarEntry(entry.x, entry.y)
+                    },
+                    description
+                ).apply {
                     setupStyle(color)
                 }
             }.toTypedArray()
@@ -103,7 +106,6 @@ class KeyFigureChartCardItem : AbstractBindingItem<ItemKeyFigureChartCardBinding
                 }
                 binding.keyFigureBarChart.isVisible = true
             }
-
         } else {
             val dataSetArray = chartData.map {
                 LineDataSet(it.entries, it.description).apply {
@@ -134,7 +136,7 @@ class KeyFigureChartCardItem : AbstractBindingItem<ItemKeyFigureChartCardBinding
             setupStyle()
             valueFormatter = object : ValueFormatter() {
                 override fun getFormattedValue(value: Float): String {
-                    return value.toLong().seconds.getRelativeDateShortString(binding.root.context) ?: ""
+                    return Duration.seconds(value.toLong()).getRelativeDateShortString(binding.root.context) ?: ""
                 }
             }
         }
@@ -157,10 +159,8 @@ class KeyFigureChartCardItem : AbstractBindingItem<ItemKeyFigureChartCardBinding
             }
         }
     }
-
 }
 
 fun keyFigureCardChartItem(block: (KeyFigureChartCardItem.() -> Unit)): KeyFigureChartCardItem = KeyFigureChartCardItem().apply(
     block
 )
-

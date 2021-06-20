@@ -54,7 +54,6 @@ class ProximityFilter(private val config: Config) {
         val riskThreshold: Double = 0.2
     )
 
-
     /**
      * Processing output
      */
@@ -172,7 +171,4 @@ class ProximityFilter(private val config: Config) {
             risk = risk
         )
     }
-
-
 }
-

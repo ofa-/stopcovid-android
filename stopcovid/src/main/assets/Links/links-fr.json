@@ -9,6 +9,20 @@
         ]
     },
     {
+        "section": "👉 Où récupérer son certificat",
+        "description" : "Vous pouvez récupérer votre certificat de vaccination sur https://attestation-vaccin.ameli.fr/ et votre certificat de test sur https://sidep.gouv.fr",
+        "links": [
+	        {
+                "label": "Votre certificat de vaccination",
+                "url": "https://attestation-vaccin.ameli.fr/"
+            },
+            {
+                "label": "Votre certificat de test",
+                "url": "https://sidep.gouv.fr/"
+            }
+        ]
+    },
+    {
         "section": "Où se faire dépister",
         "description" : "Pour trouver où se faire dépister, rendez vous sur Santé.fr.",
         "links": [

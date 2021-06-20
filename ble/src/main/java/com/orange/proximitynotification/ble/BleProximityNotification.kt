@@ -107,7 +107,3 @@ internal abstract class BleProximityNotification(
         calibratedRssi = calibratedRssi
     )
 }
-
-
-
-

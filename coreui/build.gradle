@@ -10,7 +10,6 @@
 
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
 
 android {
     buildTypes {
@@ -24,14 +23,8 @@ android {
         }
     }
     defaultConfig {
-        buildConfigField 'Boolean', 'ENABLE_ETAG', 'false'
     }
 
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-    kotlinOptions.jvmTarget = JavaVersion.VERSION_1_8.toString()
     kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
 
     buildFeatures.viewBinding = true

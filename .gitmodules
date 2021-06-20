@@ -1,0 +1,3 @@
+[submodule "dgca-app-core-android"]
+	path = dgca-app-core-android
+	url = git@github.com:LunabeeStudio/dgca-app-core-android.git

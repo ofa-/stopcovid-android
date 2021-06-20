@@ -16,8 +16,6 @@ import android.view.Gravity
 import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.preference.PreferenceManager
-import com.lunabeestudio.analytics.manager.AnalyticsManager
-import com.lunabeestudio.analytics.model.AppEventName
 import com.lunabeestudio.domain.extension.ntpTimeSToUnixTimeMs
 import com.lunabeestudio.robert.extension.observeEventAndConsume
 import com.lunabeestudio.stopcovid.R
@@ -31,7 +29,6 @@ import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
 import com.lunabeestudio.stopcovid.coreui.model.Action
 import com.lunabeestudio.stopcovid.coreui.model.CardTheme
 import com.lunabeestudio.stopcovid.extension.getGradientBackground
-import com.lunabeestudio.stopcovid.extension.getRelativeDateTimeString
 import com.lunabeestudio.stopcovid.extension.getString
 import com.lunabeestudio.stopcovid.extension.hideRiskStatus
 import com.lunabeestudio.stopcovid.extension.openInExternalBrowser
@@ -54,7 +51,6 @@ import java.util.Date
 import java.util.IllegalFormatException
 import java.util.Locale
 import kotlin.time.ExperimentalTime
-import kotlin.time.milliseconds
 
 class HealthFragment : TimeMainFragment() {
 
@@ -148,7 +144,7 @@ class HealthFragment : TimeMainFragment() {
                         dateLabel = strings["myHealthStateHeaderCell.exposureDate.title"]
                         dateValue = date
                     }
-                    
+
                     statusUpdateAction = refreshStatusActions(robertManager.liveUpdatingRiskStatus.value?.peekContent())
                 }
                 items += spaceItem {

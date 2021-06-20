@@ -17,6 +17,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.lunabeestudio.domain.model.AtRiskStatus
 import com.lunabeestudio.domain.model.Attestation
 import com.lunabeestudio.domain.model.Calibration
 import com.lunabeestudio.domain.model.Configuration
@@ -25,7 +26,6 @@ import com.lunabeestudio.domain.model.RawWalletCertificate
 import com.lunabeestudio.domain.model.VenueQrCode
 import com.lunabeestudio.framework.local.LocalCryptoManager
 import com.lunabeestudio.robert.datasource.LocalKeystoreDataSource
-import com.lunabeestudio.domain.model.AtRiskStatus
 import java.lang.reflect.Type
 
 class SecureKeystoreDataSource(context: Context, private val cryptoManager: LocalCryptoManager) : LocalKeystoreDataSource {
@@ -109,10 +109,6 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
     override var proximityActive: Boolean?
         get() = getEncryptedValue(SHARED_PREF_KEY_PROXIMITY_ACTIVE, Boolean::class.java)
         set(value) = setEncryptedValue(SHARED_PREF_KEY_PROXIMITY_ACTIVE, value)
-
-    override var isSick: Boolean?
-        get() = getEncryptedValue(SHARED_PREF_KEY_IS_SICK, Boolean::class.java, useCache = false)
-        set(value) = setEncryptedValue(SHARED_PREF_KEY_IS_SICK, value, useCache = false)
 
     override var saveAttestationData: Boolean?
         get() = getEncryptedValue(SHARED_PREF_KEY_SAVE_ATTESTATION_DATA, Boolean::class.java)
@@ -349,7 +345,6 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
         private const val SHARED_PREF_KEY_LAST_RISK_RECEIVED_DATE = "shared.pref.last_risk_received_date"
         private const val SHARED_PREF_KEY_LAST_EXPOSURE_TIMEFRAME = "shared.pref.last_exposure_timeframe"
         private const val SHARED_PREF_KEY_PROXIMITY_ACTIVE = "shared.pref.proximity_active"
-        private const val SHARED_PREF_KEY_IS_SICK = "shared.pref.is_sick"
         private const val SHARED_PREF_KEY_SAVE_ATTESTATION_DATA = "shared.pref.save_attestation_data"
         private const val SHARED_PREF_KEY_SAVED_ATTESTATION_DATA = "shared.pref.saved_attestation_data"
         private const val SHARED_PREF_KEY_ATTESTATIONS = "shared.pref.attestations_v2"

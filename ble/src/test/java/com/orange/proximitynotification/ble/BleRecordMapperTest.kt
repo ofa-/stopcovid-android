@@ -60,9 +60,7 @@ class BleRecordMapperTest {
         )
         assertThat(result).isEqualTo(expected)
         verify(settings, atLeastOnce()).rxCompensationGain
-
     }
-
 
     @Test
     fun toProximityInfo_given_already_calibrated_RSSI() {
@@ -93,6 +91,5 @@ class BleRecordMapperTest {
         )
         assertThat(result).isEqualTo(expected)
         verify(settings, never()).rxCompensationGain
-
     }
 }

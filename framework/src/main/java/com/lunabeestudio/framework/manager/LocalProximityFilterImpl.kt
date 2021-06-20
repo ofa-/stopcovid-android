@@ -17,17 +17,17 @@ import com.lunabeestudio.robert.RobertConstant
 import com.lunabeestudio.robert.manager.LocalProximityFilter
 import com.orange.proximitynotification.filter.ProximityFilter
 import com.orange.proximitynotification.filter.TimestampedRssi
-import timber.log.Timber
 import java.util.Date
 import kotlin.time.ExperimentalTime
-import kotlin.time.milliseconds
 
 class LocalProximityFilterImpl : LocalProximityFilter {
 
     @OptIn(ExperimentalTime::class)
-    override fun filter(localProximityList: List<LocalProximity>,
+    override fun filter(
+        localProximityList: List<LocalProximity>,
         mode: LocalProximityFilter.Mode,
-        configJson: String): List<LocalProximity> {
+        configJson: String
+    ): List<LocalProximity> {
         val config = Gson().fromJson(configJson, ProximityFilter.Config::class.java)
         val proximityFilter = ProximityFilter(config)
 

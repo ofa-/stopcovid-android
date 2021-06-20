@@ -87,5 +87,4 @@ class RiskComputerTest {
         assertThat(result).hasSize(15)
         assertThat(result.sum()).isEqualTo(0.0)
     }
-
 }

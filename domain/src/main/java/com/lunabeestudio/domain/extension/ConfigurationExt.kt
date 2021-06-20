@@ -16,7 +16,7 @@ import java.util.Locale
 import java.util.concurrent.TimeUnit
 
 fun Configuration.walletOldCertificateThresholdInMs(type: WalletCertificateType): Long? {
-    return walletOldCertificateThresholdInDays[type.code.toLowerCase(Locale.getDefault())]?.let {
+    return walletOldCertificateThresholdInDays[type.code.lowercase(Locale.getDefault())]?.let {
         TimeUnit.DAYS.toMillis(it.toLong())
     }
 }

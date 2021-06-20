@@ -4,7 +4,6 @@ fun String.removePublicKeyDecoration(): String {
     return this
         .replace("-----BEGIN PUBLIC KEY-----", "")
         .replace("-----END PUBLIC KEY-----", "")
-
 }
 
 private val replaceCharacters = arrayOf(
@@ -19,4 +18,3 @@ fun String.fromBase64URL(): String {
     }
     return result
 }
-

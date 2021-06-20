@@ -43,14 +43,14 @@ class WalletDoubleDocumentCardItem : AbstractBindingItem<ItemWalletDoubleDocumen
 
         val parentFile = binding.root.context.filesDir
 
-        val vaccinCertificateThumbnail = File(parentFile, ConfigConstant.Wallet.VACCIN_CERTIFICATE_THUMBNAIL_FILE)
+        val vaccinCertificateThumbnail = File(parentFile, ConfigConstant.Wallet.VACCIN_EUROPE_CERTIFICATE_THUMBNAIL_FILE)
         binding.vaccinCertificateImageView.setImageFileIfValid(vaccinCertificateThumbnail)
         binding.vaccinCertificateTextView.setTextOrHide(vaccinCertificateCaption)
         onVaccinCertificateClick?.let { onClick ->
             binding.vaccinCertificateClickableView.setOnClickListener { onClick() }
         }
 
-        val testCertificateThumbnail = File(parentFile, ConfigConstant.Wallet.TEST_CERTIFICATE_THUMBNAIL_FILE)
+        val testCertificateThumbnail = File(parentFile, ConfigConstant.Wallet.TEST_EUROPE_CERTIFICATE_THUMBNAIL_FILE)
         binding.testCertificateImageView.setImageFileIfValid(testCertificateThumbnail)
         binding.testCertificateTextView.setTextOrHide(testCertificateCaption)
         onTestCertificateClick?.let { onClick ->
@@ -59,4 +59,5 @@ class WalletDoubleDocumentCardItem : AbstractBindingItem<ItemWalletDoubleDocumen
     }
 }
 
-fun walletDoubleDocumentCardItem(block: (WalletDoubleDocumentCardItem.() -> Unit)): WalletDoubleDocumentCardItem = WalletDoubleDocumentCardItem().apply(block)
+fun walletDoubleDocumentCardItem(block: (WalletDoubleDocumentCardItem.() -> Unit)): WalletDoubleDocumentCardItem =
+    WalletDoubleDocumentCardItem().apply(block)

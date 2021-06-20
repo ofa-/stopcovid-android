@@ -81,7 +81,6 @@ class ProximityFilterIntTest {
         }
     }
 
-
     @TestWith(
         separator = ";",
         value = [
@@ -126,7 +125,6 @@ class ProximityFilterIntTest {
         assertThat(okOutput.timestampedRssis.map { it.rssi }).isEqualTo(clippedRssisByRssiThreshold[rssiThreshold])
         assertThat(okOutput.peakCount).isEqualTo(peakCount)
         assertThat(okOutput.meanPeak).isEqualTo(meanPeak)
-
 
         assertThat(okOutput.windowRisks).hasSize(windowRisks.size)
         windowRisks.forEachIndexed { index, d ->
@@ -219,5 +217,4 @@ class ProximityFilterIntTest {
                 .map { it.toDouble() }
         }.getOrElse { emptyList() }
     }
-
 }

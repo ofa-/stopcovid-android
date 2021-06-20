@@ -51,8 +51,8 @@ import com.mikepenz.fastadapter.GenericItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
-import kotlin.time.seconds
 
 class KeyFigureDetailsFragment : KeyFigureGenericFragment() {
 
@@ -150,8 +150,10 @@ class KeyFigureDetailsFragment : KeyFigureGenericFragment() {
                         chartData = arrayOf(
                             localData(figure)
                         ).filterNotNull().toTypedArray()
-                        chartExplanationLabel = chartExplanationLabel(figure,
-                            chartData.plus(listOfNotNull(globalData(figure, true))))
+                        chartExplanationLabel = chartExplanationLabel(
+                            figure,
+                            chartData.plus(listOfNotNull(globalData(figure, true)))
+                        )
                         shareContentDescription = strings["accessibility.hint.keyFigure.chart.share"]
                         onShareCard = { binding ->
                             shareChart(binding)
@@ -254,18 +256,21 @@ class KeyFigureDetailsFragment : KeyFigureGenericFragment() {
         return when {
             chartData.isNotEmpty() && chartData[0].entries.isEmpty() -> stringsFormat(
                 "keyFigureDetailController.section.evolution.subtitle.nodata",
-                strings["${figure.labelKey}.label"])
+                strings["${figure.labelKey}.label"]
+            )
             chartData.size > 1 -> stringsFormat(
                 "keyFigureDetailController.section.evolution.subtitle2Charts",
                 strings["${figure.labelKey}.label"],
-                chartData[0].entries.lastOrNull()?.x?.toLong()?.seconds?.getRelativeDateShortString(requireContext()) ?: "",
+                chartData[0].entries.lastOrNull()?.x?.toLong()?.let { Duration.seconds(it) }?.getRelativeDateShortString(requireContext())
+                    ?: "",
                 chartData[0].currentValueToDisplay?.formatNumberIfNeeded(numberFormat),
                 chartData[1].currentValueToDisplay?.formatNumberIfNeeded(numberFormat)
             )
             chartData.isNotEmpty() -> stringsFormat(
                 "keyFigureDetailController.section.evolution.subtitle",
                 strings["${figure.labelKey}.label"],
-                chartData[0].entries.lastOrNull()?.x?.toLong()?.seconds?.getRelativeDateShortString(requireContext()) ?: "",
+                chartData[0].entries.lastOrNull()?.x?.toLong()?.let { Duration.seconds(it) }?.getRelativeDateShortString(requireContext())
+                    ?: "",
                 chartData[0].currentValueToDisplay?.formatNumberIfNeeded(numberFormat)
             )
             else -> null
@@ -329,7 +334,8 @@ class KeyFigureDetailsFragment : KeyFigureGenericFragment() {
     }
 
     override fun showPostalCodeBottomSheet() {
-        findNavControllerOrNull()?.safeNavigate(KeyFigureDetailsFragmentDirections.actionKeyFigureDetailsFragmentToPostalCodeBottomSheetFragment())
+        findNavControllerOrNull()?.safeNavigate(
+            KeyFigureDetailsFragmentDirections.actionKeyFigureDetailsFragmentToPostalCodeBottomSheetFragment()
+        )
     }
-
 }

@@ -11,6 +11,7 @@
 package com.lunabeestudio.stopcovid.extension
 
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.lunabeestudio.framework.local.datasource.SecureKeystoreDataSource
@@ -18,6 +19,7 @@ import com.lunabeestudio.robert.RobertApplication
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.stopcovid.StopCovid
 import com.lunabeestudio.stopcovid.`interface`.IsolationApplication
+import com.lunabeestudio.stopcovid.manager.DccCertificatesManager
 import com.lunabeestudio.stopcovid.manager.IsolationManager
 
 fun Context.robertManager(): RobertManager = (applicationContext as RobertApplication).robertManager
@@ -26,19 +28,23 @@ fun Context.isolationManager(): IsolationManager = (applicationContext as Isolat
 
 fun Context.secureKeystoreDataSource(): SecureKeystoreDataSource = (applicationContext as StopCovid).secureKeystoreDataSource
 
-fun Context.showExpiredCodeAlert(strings: Map<String, String>) {
+fun Context.dccCertificatesManager(): DccCertificatesManager = (applicationContext as StopCovid).dccCertificatesManager
+
+fun Context.showExpiredCodeAlert(strings: Map<String, String>, listener: DialogInterface.OnDismissListener?) {
     MaterialAlertDialogBuilder(this)
         .setTitle(strings["enterCodeController.alert.expiredCode.title"])
         .setMessage(strings["enterCodeController.alert.expiredCode.message"])
         .setPositiveButton(strings["common.ok"], null)
+        .setOnDismissListener(listener)
         .show()
 }
 
-fun Context.showInvalidCodeAlert(strings: Map<String, String>) {
+fun Context.showInvalidCodeAlert(strings: Map<String, String>, listener: DialogInterface.OnDismissListener?) {
     MaterialAlertDialogBuilder(this)
         .setTitle(strings["enterCodeController.alert.invalidCode.title"])
         .setMessage(strings["enterCodeController.alert.invalidCode.message"])
         .setPositiveButton(strings["common.ok"], null)
+        .setOnDismissListener(listener)
         .show()
 }
 

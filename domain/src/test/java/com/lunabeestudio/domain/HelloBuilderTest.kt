@@ -25,13 +25,16 @@ class HelloBuilderTest {
     @TestWith(
         coercers = [DomainCoercion::class],
         value = [
-            "46, 53544F50434F5631, string, 4276036795200, 70.83.84.79.80.67.79.86.49.-93.59.-49.57.-64.113.102"]
+            "46, 53544F50434F5631, string, 4276036795200, 70.83.84.79.80.67.79.86.49.-93.59.-49.57.-64.113.102"
+        ]
     )
-    fun `build given ecc, ebid, key and time should return expected`(ecc: String,
+    fun `build given ecc, ebid, key and time should return expected`(
+        ecc: String,
         ebid: String,
         key: String,
         currentTimeMillis: Long,
-        expected: Hello?) {
+        expected: Hello?
+    ) {
 
         val buffer = ByteBuffer
             .allocate(8)
@@ -60,12 +63,15 @@ class HelloBuilderTest {
         coercers = [DomainCoercion::class],
         value = [
             "46, 53544F50434F5631, string, 4276036796200",
-            "46, 53544F50434F5631, string, 4276036794200"]
+            "46, 53544F50434F5631, string, 4276036794200"
+        ]
     )
-    fun `build given ecc, ebid, key and bad time should throw IllegalArgumentException`(ecc: String,
+    fun `build given ecc, ebid, key and bad time should throw IllegalArgumentException`(
+        ecc: String,
         ebid: String,
         key: String,
-        currentTimeMillis: Long) {
+        currentTimeMillis: Long
+    ) {
 
         val buffer = ByteBuffer
             .allocate(8)

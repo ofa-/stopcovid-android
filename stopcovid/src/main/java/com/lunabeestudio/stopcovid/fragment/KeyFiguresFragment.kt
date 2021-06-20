@@ -60,7 +60,8 @@ class KeyFiguresFragment : KeyFigureGenericFragment() {
                 items += linkItem {
                     text = strings["keyFiguresController.section.health.button"]
                     onClickListener = View.OnClickListener {
-                        findNavControllerOrNull()?.safeNavigate(KeyFiguresFragmentDirections.actionKeyFiguresFragmentToMoreKeyFigureFragment())
+                        findNavControllerOrNull()
+                            ?.safeNavigate(KeyFiguresFragmentDirections.actionKeyFiguresFragmentToMoreKeyFigureFragment())
                     }
                     identifier = text.hashCode().toLong()
                 }

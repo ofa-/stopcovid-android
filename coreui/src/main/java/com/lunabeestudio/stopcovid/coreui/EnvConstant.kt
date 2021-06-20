@@ -16,21 +16,21 @@ enum class EnvConstant {
         override val baseUrl: String = "https://api.tousanticovid.gouv.fr"
         override val certificateSha256: String = "sha256/xrPKKhmYeHgk4v57GcqYPrFpnI3f1FTmEfol9WIicaI="
         override val cleaStatusBaseUrl: String = "https://s3.fr-par.scw.cloud/clea-batch/"
-        override val cleaStatusCertificateSha256: String = "sha256/LB5QyMD8qDE1y12jAq/yey1VpjsBbVfFNOblb7QyaR0="
         override val cleaReportBaseUrl: String = "https://signal-api.tousanticovid.gouv.fr/"
         override val cleaReportCertificateSha256: String = "sha256/tnjjbtuXZUSyK1uReQhvmtspPS7IUl95cs9G8RvfVUs="
         override val analyticsBaseUrl: String = "https://analytics-api.tousanticovid.gouv.fr"
         override val analyticsCertificateSha256: String = "sha256/KhFx3fIev58nbXs9m2WqXDbqYrE/7r4J9cP1QqPHtVk="
         override val configFilename: String = "config.json"
         override val calibrationFilename: String = "calibrationBle.json"
-        override val serverPublicKey: String = "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEAc9IDt6qJq453SwyWPB94JaLB2VfTAcL43YVtMr3HhDCd22gKaQXIbX1d+tNhfvaKM51sxeaXziPjntUzbTNiw=="
+        override val serverPublicKey: String =
+            "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEAc9IDt6qJq453SwyWPB94JaLB2VfTAcL43YVtMr3HhDCd22gKaQXIbX1d+tNhfvaKM51sxeaXziPjntUzbTNiw=="
+        override val dccCertificatesFilename: String = "dcc-certs.json"
     };
 
     abstract val captchaApiKey: String
     abstract val baseUrl: String
     abstract val certificateSha256: String
     abstract val cleaStatusBaseUrl: String
-    abstract val cleaStatusCertificateSha256: String
     abstract val cleaReportBaseUrl: String
     abstract val cleaReportCertificateSha256: String
     abstract val analyticsBaseUrl: String
@@ -38,4 +38,5 @@ enum class EnvConstant {
     abstract val configFilename: String
     abstract val calibrationFilename: String
     abstract val serverPublicKey: String
+    abstract val dccCertificatesFilename: String
 }

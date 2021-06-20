@@ -46,4 +46,5 @@ class DeleteCardItem : AbstractBindingItem<ItemDeleteCardBinding>() {
 }
 
 fun deleteCardItem(block: (DeleteCardItem.() -> Unit)): DeleteCardItem = DeleteCardItem().apply(
-    block)
+    block
+)

@@ -35,4 +35,5 @@ class PrivateVenueQrCodeItem : AbstractBindingItem<ItemPrivateVenueQrCodeBinding
 }
 
 fun privateVenueQrCodeItem(block: (PrivateVenueQrCodeItem.() -> Unit)): PrivateVenueQrCodeItem = PrivateVenueQrCodeItem().apply(
-    block)
+    block
+)

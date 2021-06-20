@@ -13,9 +13,10 @@ package com.lunabeestudio.stopcovid.fragment
 import android.content.DialogInterface
 import android.os.Bundle
 import android.view.View
-import androidx.preference.PreferenceManager
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
+import com.lunabeestudio.stopcovid.extension.dccCertificatesManager
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.extension.showUnknownErrorAlert
@@ -23,6 +24,7 @@ import com.lunabeestudio.stopcovid.manager.WalletManager
 import com.lunabeestudio.stopcovid.model.WalletCertificateInvalidSignatureException
 import com.lunabeestudio.stopcovid.model.WalletCertificateMalformedException
 import com.lunabeestudio.stopcovid.model.WalletCertificateNoKeyError
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class VerifyWalletQRCodeFragment : QRCodeFragment() {
@@ -31,8 +33,8 @@ class VerifyWalletQRCodeFragment : QRCodeFragment() {
         requireContext().robertManager()
     }
 
-    private val sharedPreferences by lazy {
-        PreferenceManager.getDefaultSharedPreferences(requireContext())
+    private val dccCertificatesManager by lazy {
+        requireContext().dccCertificatesManager()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -45,21 +47,28 @@ class VerifyWalletQRCodeFragment : QRCodeFragment() {
     override fun getExplanationKey(): String = "flashDataMatrixCodeController.explanation"
 
     override fun onCodeScanned(code: String) {
-        try {
-            WalletManager.verifyCertificateCodeValue(sharedPreferences, robertManager.configuration, code)
-            findNavControllerOrNull()?.safeNavigate(
-                VerifyWalletQRCodeFragmentDirections.actionVerifyWalletQRCodeFragmentToVerifyWalletResultFragment(
-                    code
+        lifecycleScope.launch {
+            try {
+                WalletManager.verifyCertificateCodeValue(
+                    robertManager.configuration,
+                    code,
+                    dccCertificatesManager.certificates,
+                    null,
                 )
-            )
-        } catch (e: Exception) {
-            catchWalletException(e) { _, _ ->
-                resumeQrCodeReader()
+                findNavControllerOrNull()?.safeNavigate(
+                    VerifyWalletQRCodeFragmentDirections.actionVerifyWalletQRCodeFragmentToVerifyWalletResultFragment(
+                        code
+                    )
+                )
+            } catch (e: Exception) {
+                catchWalletException(e) {
+                    resumeQrCodeReader()
+                }
             }
         }
     }
 
-    private fun catchWalletException(e: Exception, listener: DialogInterface.OnClickListener? = null) {
+    private fun catchWalletException(e: Exception, listener: DialogInterface.OnDismissListener?) {
         Timber.e(e)
         when (e) {
             is WalletCertificateInvalidSignatureException -> showInvalidCertificateSignatureAlert(listener)
@@ -69,19 +78,21 @@ class VerifyWalletQRCodeFragment : QRCodeFragment() {
         }
     }
 
-    private fun showMalformedCertificateAlert(listener: DialogInterface.OnClickListener?) {
+    private fun showMalformedCertificateAlert(listener: DialogInterface.OnDismissListener?) {
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(strings["wallet.proof.error.1.title"])
             .setMessage(strings["wallet.proof.error.1.message"])
-            .setPositiveButton(strings["common.ok"], listener)
+            .setPositiveButton(strings["common.ok"], null)
+            .setOnDismissListener(listener)
             .show()
     }
 
-    private fun showInvalidCertificateSignatureAlert(listener: DialogInterface.OnClickListener?) {
+    private fun showInvalidCertificateSignatureAlert(listener: DialogInterface.OnDismissListener?) {
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(strings["wallet.proof.error.2.title"])
             .setMessage(strings["wallet.proof.error.2.message"])
-            .setPositiveButton(strings["common.ok"], listener)
+            .setPositiveButton(strings["common.ok"], null)
+            .setOnDismissListener(listener)
             .show()
     }
 }

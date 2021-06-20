@@ -9,6 +9,20 @@
         ]
     },
     {
+        "section": "👉 Where to get your certificate",
+        "description" : "You can get your vaccination certificate on https://attestation-vaccin.ameli.fr/ and your test certificate on https://sidep.gouv.fr",
+        "links": [
+	        {
+                "label": "Your vaccination certificate",
+                "url": "https://attestation-vaccin.ameli.fr/"
+            },
+            {
+                "label": "Your test certificate",
+                "url": "https://sidep.gouv.fr/"
+            }
+        ]
+    },
+    {
         "section": "Where to get tested",
         "description" : "To find out where to get tested, go to Santé.fr.",
         "links": [
@@ -30,7 +44,7 @@
     },
     {
         "section": "l'Assurance Maladie",
-        "description": "Here is several useful information provided by Ameli.fr, including contact tracing and at-risk contact person",
+        "description": "Here are several useful links provided by Ameli.fr, including contact tracing and at-risk contact person",
         "links": [
 	        {
                 "label": "Contact tracing",

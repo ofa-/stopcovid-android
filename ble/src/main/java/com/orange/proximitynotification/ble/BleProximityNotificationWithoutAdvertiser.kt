@@ -49,7 +49,6 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.math.roundToInt
 
-
 private data class BleScannerException(
     val errorCode: Int? = null,
     override val cause: Throwable? = null
@@ -158,7 +157,6 @@ internal class BleProximityNotificationWithoutAdvertiser(
             deviceStatsProvider = { deviceStatsRepository?.get(it) },
             payloadIdProvider = proximityPayloadIdProvider
         )
-
     }
 
     override suspend fun start() {
@@ -221,7 +219,6 @@ internal class BleProximityNotificationWithoutAdvertiser(
                     cause = "Advertise job failed (throwable = $t)"
                 )
             )
-
         } finally {
 
             withContext(NonCancellable) {
@@ -390,7 +387,6 @@ internal class BleProximityNotificationWithoutAdvertiser(
             rxCompensationGain = settings.rxCompensationGain
         )
 
-
     /**
      * Scan for devices having service UUID.
      */
@@ -448,7 +444,6 @@ internal class BleProximityNotificationWithoutAdvertiser(
             }
 
             afterFirstScanAction(results)
-
         } catch (_: CancellationException) {
             null
         } catch (t: Throwable) {
@@ -466,14 +461,12 @@ internal class BleProximityNotificationWithoutAdvertiser(
                     )
                 )
             }
-
         } finally {
             withContext(coroutineContextProvider.main + NonCancellable) {
                 bleScanner.stop()
             }
         }
     }
-
 }
 
 /**
@@ -579,5 +572,4 @@ internal class BleDeviceStatsRepository(maxCacheSize: Int, cacheTimeout: Long) {
         val deviceStats = deviceStatsCache[deviceId] ?: BleDeviceStats()
         deviceStatsCache.put(deviceId, updater(deviceStats))
     }
-
 }

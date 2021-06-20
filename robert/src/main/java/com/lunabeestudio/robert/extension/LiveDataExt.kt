@@ -20,7 +20,10 @@ import com.lunabeestudio.robert.utils.EventObserver
 fun <U, T : Event<U?>> LiveData<T>.observeEventAndConsume(@NonNull owner: LifecycleOwner, @NonNull observer: Observer<U>) {
     val eventObserverId = owner.hashCode()
     this.value?.getContentIfNotHandled(eventObserverId)
-    observe(owner, EventObserver(eventObserverId) {
-        observer.onChanged(it)
-    })
+    observe(
+        owner,
+        EventObserver(eventObserverId) {
+            observer.onChanged(it)
+        }
+    )
 }

@@ -148,7 +148,6 @@ class BleScannedDeviceSelectorTest {
             assertThat(scannedDeviceSelector.isEmpty()).isTrue()
         }
 
-
     @Test
     fun select_given_multiple_devices_with_same_timestamp_should_select_best_ones_using_rssi_average_and_scans_count() =
         runBlockingTest {
@@ -210,7 +209,6 @@ class BleScannedDeviceSelectorTest {
             )
             assertThat(scannedDeviceSelector.isEmpty()).isTrue()
         }
-
 
     @Test
     fun select_given_multiple_devices_without_stats_should_select_ones_with_rssi_timestammp() =
@@ -300,7 +298,6 @@ class BleScannedDeviceSelectorTest {
                 bleScannedDevice(device(3), rssi, byteArrayOf(3), now.plus(3))
             )
 
-
             // When
             val result = scannedDeviceSelector.select()
 
@@ -310,9 +307,7 @@ class BleScannedDeviceSelectorTest {
                 bleScannedDevice(device(2), rssi, null, now.plus(2))
             ).inOrder()
             assertThat(scannedDeviceSelector.isEmpty()).isTrue()
-
         }
-
 
     @Test
     fun select_given_multiple_devices_should_remove_ones_with_too_many_failures_and_select_others_with_best_confidence_score() =
@@ -346,7 +341,6 @@ class BleScannedDeviceSelectorTest {
                 bleScannedDevice(device(2), rssi, null, now.plus(2))
             ).inOrder()
             assertThat(scannedDeviceSelector.isEmpty()).isTrue()
-
         }
 
     @Test
@@ -408,6 +402,4 @@ class BleScannedDeviceSelectorTest {
     }
 
     private fun device(index: Int): BluetoothDevice = bluetoothDevices.getValue(index)
-
 }
-

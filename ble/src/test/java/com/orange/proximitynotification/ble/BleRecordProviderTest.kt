@@ -41,21 +41,25 @@ class BleRecordProviderTest {
         assertThat(result).isEqualTo(expected)
     }
 
-    @TestWith(value = [
-        "-60, true",
-        "-50, true",
-        "-60, false"
-    ])
+    @TestWith(
+        value = [
+            "-60, true",
+            "-50, true",
+            "-60, false"
+        ]
+    )
     fun buildRecord_with_manual_parameters_should_return_expected_record(rssi : Int, isRssiCalibrated : Boolean) {
         // Given
         val payload = payload()
         val timestamp = Date()
 
         // When
-        val result = bleRecordProvider.buildRecord(payload,
+        val result = bleRecordProvider.buildRecord(
+            payload,
             rssi = rssi,
             timestamp = timestamp,
-            isRssiCalibrated = isRssiCalibrated)
+            isRssiCalibrated = isRssiCalibrated
+        )
 
         // Then
         val expected = record(
@@ -66,5 +70,4 @@ class BleRecordProviderTest {
         )
         assertThat(result).isEqualTo(expected)
     }
-
 }

@@ -102,7 +102,8 @@ internal class BleProximityNotificationWithAdvertiser(
                             )
                         )
                     }
-                })
+                }
+            )
         }
 
     private suspend fun startGattServer() {
@@ -188,24 +189,25 @@ internal class BleProximityNotificationWithAdvertiser(
     }
 
     private suspend fun doStartScanner() = withContext(coroutineContextProvider.main) {
-        bleScanner.start(callback = object : BleScanner.Callback {
-            override fun onResult(results: List<BleScannedDevice>) {
-                checkAndHandleScanResults(results)
-            }
+        bleScanner.start(
+            callback = object : BleScanner.Callback {
+                override fun onResult(results: List<BleScannedDevice>) {
+                    checkAndHandleScanResults(results)
+                }
 
-            override fun onError(errorCode: Int) {
-                bleScanner.stop()
+                override fun onError(errorCode: Int) {
+                    bleScanner.stop()
 
-                notifyErrorAsync(
-                    ProximityNotificationError(
-                        ProximityNotificationError.Type.BLE_SCANNER,
-                        errorCode
+                    notifyErrorAsync(
+                        ProximityNotificationError(
+                            ProximityNotificationError.Type.BLE_SCANNER,
+                            errorCode
+                        )
                     )
-                )
+                }
             }
-        })
+        )
     }
-
 
     override suspend fun handleScanResults(results: List<BleScannedDevice>) {
         withContext(coroutineContextProvider.default) {
@@ -224,7 +226,6 @@ internal class BleProximityNotificationWithAdvertiser(
         }
     }
 
-
     private suspend fun stopAdvertiser() = withContext(coroutineContextProvider.main) {
         bleAdvertiser.stop()
     }
@@ -236,8 +237,4 @@ internal class BleProximityNotificationWithAdvertiser(
     private suspend fun stopScanner() = withContext(coroutineContextProvider.main) {
         bleScanner.stop()
     }
-
 }
-
-
-

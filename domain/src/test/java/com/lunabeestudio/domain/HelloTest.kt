@@ -22,7 +22,8 @@ class HelloTest {
     @TestWith(
         coercers = [DomainCoercion::class],
         value = [
-            "70.83.84.79.80.67.79.86.49.-39.-104.-4.-60.-31.-33.-127, 55704"]
+            "70.83.84.79.80.67.79.86.49.-39.-104.-4.-60.-31.-33.-127, 55704"
+        ]
     )
     fun `time given data should return expected`(data: ByteArray, expected: Int) {
         val hello = Hello(data)
@@ -32,13 +33,16 @@ class HelloTest {
     @TestWith(
         coercers = [DomainCoercion::class],
         value = [
-            "70.83.84.79.80.67.79.86.49.-39.-104.-4.-60.-31.-33.-127, 70, 83.84.79.80.67.79.86.49, -39.-104, -4.-60.-31.-33.-127"]
+            "70.83.84.79.80.67.79.86.49.-39.-104.-4.-60.-31.-33.-127, 70, 83.84.79.80.67.79.86.49, -39.-104, -4.-60.-31.-33.-127"
+        ]
     )
-    fun `ecc, ebid, time and mac given data should return expected`(data: ByteArray,
+    fun `ecc, ebid, time and mac given data should return expected`(
+        data: ByteArray,
         expectedEcc: ByteArray,
         expectedEbid: ByteArray,
         expectedTime: ByteArray,
-        expectedMac: ByteArray) {
+        expectedMac: ByteArray
+    ) {
 
         val hello = Hello(data)
 

@@ -10,6 +10,7 @@
 
 package com.lunabeestudio.framework.ble.service
 
+import android.annotation.SuppressLint
 import androidx.annotation.WorkerThread
 import com.lunabeestudio.domain.extension.ntpTimeSToUnixTimeMs
 import com.lunabeestudio.domain.model.CalibrationEntry
@@ -45,8 +46,8 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.util.UUID
 import java.util.concurrent.atomic.AtomicInteger
+import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
-import kotlin.time.seconds
 
 abstract class RobertProximityService : ProximityNotificationService() {
 
@@ -140,7 +141,7 @@ abstract class RobertProximityService : ProximityNotificationService() {
                 txCompensationGain = calibrationEntry.txRSSCorrectionFactor.toInt(),
                 rxCompensationGain = calibrationEntry.rxRSSCorrectionFactor.toInt(),
                 useScannerHardwareBatching = useScannerHardwareBatching,
-                scanReportDelay = robertManager.configuration.scanReportDelay.seconds.toLongMilliseconds()
+                scanReportDelay = Duration.seconds(robertManager.configuration.scanReportDelay).inWholeMilliseconds
             )
 
             robertManager.shouldReloadBleSettings = false
@@ -193,6 +194,7 @@ abstract class RobertProximityService : ProximityNotificationService() {
         }
     }
 
+    @SuppressLint("BinaryOperationInTimber")
     private fun launchRefreshBle() {
         payloadUpdateSchedulerJob?.cancel()
         payloadUpdateSchedulerJob = launch(Dispatchers.IO) {
@@ -213,9 +215,16 @@ abstract class RobertProximityService : ProximityNotificationService() {
                                 val shouldRestartProximityService: Boolean =
                                     shouldRestart
                                         || robertManager.shouldReloadBleSettings
-                                        || (couldRestartFrequently && RESTART_SERVICE_ON_EBID_CHANGE && validUntilTimeMs - System.currentTimeMillis() < 0L)
+                                        || (
+                                            couldRestartFrequently &&
+                                                RESTART_SERVICE_ON_EBID_CHANGE &&
+                                                validUntilTimeMs - System.currentTimeMillis() < 0L
+                                            )
                                         || nonCriticalErrorInARow.get() > 0
-                                Timber.v("shouldRestartProximityService = $shouldRestartProximityService; nonCriticalErrorInARow = $nonCriticalErrorInARow")
+                                Timber.v(
+                                    "shouldRestartProximityService = $shouldRestartProximityService; " +
+                                        "nonCriticalErrorInARow = $nonCriticalErrorInARow"
+                                )
                                 startWaitForErrorOrClear()
                                 if (shouldRestartProximityService) {
                                     restart()
@@ -269,7 +278,8 @@ abstract class RobertProximityService : ProximityNotificationService() {
                     ProximityNotificationError.Type.BLE_ADVERTISER -> BLEAdvertiserException("(${error.cause} [${error.rootErrorCode}])")
                     ProximityNotificationError.Type.BLE_SCANNER -> BLEScannerException("(${error.cause} [${error.rootErrorCode}])")
                     ProximityNotificationError.Type.BLE_GATT -> BLEGattException("(${error.cause} [${error.rootErrorCode}])")
-                    ProximityNotificationError.Type.BLE_PROXIMITY_NOTIFICATION -> BLEProximityNotificationException("(${error.cause} [${error.rootErrorCode}])")
+                    ProximityNotificationError.Type.BLE_PROXIMITY_NOTIFICATION ->
+                        BLEProximityNotificationException("(${error.cause} [${error.rootErrorCode}])")
                 }
             )
         }
@@ -309,4 +319,3 @@ abstract class RobertProximityService : ProximityNotificationService() {
         private const val NON_CRITICAL_ERROR_BEFORE_NOTIFICATION: Int = 5
     }
 }
-

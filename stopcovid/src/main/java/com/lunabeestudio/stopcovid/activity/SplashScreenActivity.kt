@@ -20,8 +20,8 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.system.exitProcess
+import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
-import kotlin.time.seconds
 
 class SplashScreenActivity : BaseActivity() {
 
@@ -41,9 +41,9 @@ class SplashScreenActivity : BaseActivity() {
 
         // Wait 2 + 5 seconds to load strings from file or server. Show blocking error if we still don't have strings.
         splashLoadingJob = lifecycleScope.launchWhenResumed {
-            delay(2.seconds)
+            delay(Duration.seconds(2))
             splashScreenBinding.progressBar.show()
-            delay(5.seconds)
+            delay(Duration.seconds(5))
             splashScreenBinding.progressBar.hide()
             showNoStringsErrorDialog()
         }

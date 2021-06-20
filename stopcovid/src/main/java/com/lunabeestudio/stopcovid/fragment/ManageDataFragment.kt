@@ -123,8 +123,9 @@ class ManageDataFragment : MainFragment() {
         if (sharedPreferences.venuesFeaturedWasActivatedAtLeastOneTime
             || robertManager.configuration.displayRecordVenues
             || !VenuesManager.getVenuesQrCode(
-                requireContext().secureKeystoreDataSource(),
-            ).isNullOrEmpty()) {
+                    requireContext().secureKeystoreDataSource(),
+                ).isNullOrEmpty()
+        ) {
             eraseVenuesItems(items)
             spaceDividerItems(items)
         }
@@ -419,11 +420,13 @@ class ManageDataFragment : MainFragment() {
         }
         val isOptIn = context?.let(AnalyticsManager::isOptIn) ?: false
         items += switchItem {
-            title = strings[if (isOptIn) {
-                "manageDataController.analytics.switch.on"
-            } else {
-                "manageDataController.analytics.switch.off"
-            }]
+            title = strings[
+                if (isOptIn) {
+                    "manageDataController.analytics.switch.on"
+                } else {
+                    "manageDataController.analytics.switch.off"
+                }
+            ]
             isChecked = isOptIn
             onCheckChange = { isChecked ->
                 context?.let {

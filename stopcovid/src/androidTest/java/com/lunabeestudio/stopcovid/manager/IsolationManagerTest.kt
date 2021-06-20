@@ -281,7 +281,7 @@ class IsolationManagerTest {
     }
 
     private fun report(nDaysAgo: Int?, withSymptoms: Boolean = false, symptomsStartedDaysAgo: Int? = null) {
-        secureKeystoreDataSource.isSick = true
+        secureKeystoreDataSource.reportDate = System.currentTimeMillis()
         secureKeystoreDataSource.reportPositiveTestDate = daysAgo(nDaysAgo)
 
         if (withSymptoms) {
@@ -292,7 +292,7 @@ class IsolationManagerTest {
     }
 
     private fun cancelReport() {
-        secureKeystoreDataSource.isSick = false
+        secureKeystoreDataSource.reportDate = null
         secureKeystoreDataSource.reportPositiveTestDate = null
         secureKeystoreDataSource.reportSymptomsStartDate = null
     }
@@ -303,5 +303,4 @@ class IsolationManagerTest {
                 .minus(TimeUnit.DAYS.toMillis(it.toLong()))
         } ?: System.currentTimeMillis()
     }
-
 }

@@ -234,5 +234,4 @@ class AttestationsFragment : QRCodeListFragment() {
             identifier = text.hashCode().toLong()
         }
     }
-
 }

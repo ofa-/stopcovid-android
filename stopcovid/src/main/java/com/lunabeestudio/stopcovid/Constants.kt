@@ -31,9 +31,12 @@ object Constants {
         const val PRIVATE_EVENT_QR_CODE_GENERATION_DATE: String = "Private.Event.QR.Code.Generation.Date"
         const val VENUES_ON_BOARDING_DONE: String = "isVenueOnBoardingDone"
         const val VENUES_FEATURED_ACTIVATED: String = "venuesFeaturedWasActivatedAtLeastOneTime"
-        const val CURRENT_VACCINATION_REFERENCE_DEPARTMENT_CODE: String = "currentVaccinationReferenceDepartmentCode"
-        const val CURRENT_VACCINATION_REFERENCE_LATITUDE: String = "currentVaccinationReferenceLatitude"
-        const val CURRENT_VACCINATION_REFERENCE_LONGITUDE: String = "currentVaccinationReferenceLongitude"
+        const val CURRENT_VACCINATION_REFERENCE_DEPARTMENT_CODE: String =
+            "currentVaccinationReferenceDepartmentCode"
+        const val CURRENT_VACCINATION_REFERENCE_LATITUDE: String =
+            "currentVaccinationReferenceLatitude"
+        const val CURRENT_VACCINATION_REFERENCE_LONGITUDE: String =
+            "currentVaccinationReferenceLongitude"
         const val ALERT_RISK_LEVEL_CHANGED: String = "alertRiskLevelChanged"
         const val HIDE_RISK_STATUS: String = "hideRiskStatus"
         const val SHOW_ERROR_PANEL: String = "showErrorPanel"
@@ -68,6 +71,11 @@ object Constants {
     object Url {
         const val VENUE_ROOT_URL: String = "https://tac.gouv.fr/"
         const val PLAY_STORE_URL: String = "https://play.google.com/store/apps/details?id="
+        const val FIGURES_FRAGMENT_URI: String = "tousanticovid://allFigures/"
+        const val CERTIFICATE_SHORTCUT_URI: String = "tousanticovid://attestations/"
+        const val NEW_CERTIFICATE_SHORTCUT_URI: String = "tousanticovid://attestations//new_attestation"
+        const val VENUE_QRCODE_SHORTCUT_URI: String = "tousanticovid://venueQRCode/"
+        const val PROXIMITY_FRAGMENT_URI: String = "tousanticovid://proximity/"
     }
 
     object Android {
@@ -86,9 +94,18 @@ object Constants {
         const val X_AXIS_LABEL_COUNT: Int = 2
         const val AXIS_LABEL_TEXT_SIZE: Float = 15f
         const val EXTRA_BOTTOM_OFFSET: Float = 16f
+        const val WIDGET_CIRCLE_SIZE: Float = 2f
+        const val WIDGET_LINE_WIDTH: Float = 1f
+        const val WIDGET_MARGIN_SIZE: Float = 6f
     }
 
     object QrCode {
         const val FORMAT_2D_DOC: String = "2D-DOC"
+    }
+
+    object HomeScreenWidget {
+        const val NUMBER_VALUES_GRAPH_FIGURE: Int = 8
+        const val WORKER_UPDATE_FIGURES_NAME: String = "updateFiguresWorker"
+        const val WORKER_UPDATE_FIGURES_PERIODIC_REFRESH_HOURS: Long = 5
     }
 }

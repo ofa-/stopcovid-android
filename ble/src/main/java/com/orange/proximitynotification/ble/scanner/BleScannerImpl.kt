@@ -111,7 +111,6 @@ class BleScannerImpl(
         scanCallback = null
     }
 
-
     private fun buildServiceScanSettings(): ScanSettings {
         return ScanSettings.Builder()
             .setLegacy(true)
@@ -229,5 +228,4 @@ class BleScannerImpl(
             APPLE_MANUFACTURER_ID,
             settings.backgroundServiceManufacturerDataIOS
         )
-
 }

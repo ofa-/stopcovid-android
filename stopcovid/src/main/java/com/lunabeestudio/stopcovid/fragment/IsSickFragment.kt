@@ -12,7 +12,6 @@ package com.lunabeestudio.stopcovid.fragment
 
 import android.view.Gravity
 import android.view.View
-import androidx.navigation.fragment.findNavController
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.callPhone
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull

@@ -10,10 +10,10 @@
 
 package com.lunabeestudio.stopcovid.manager
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
 import android.location.Location
-import androidx.core.content.edit
 import androidx.core.util.AtomicFile
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -23,7 +23,6 @@ import com.google.gson.reflect.TypeToken
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.robert.utils.Event
 import com.lunabeestudio.stopcovid.coreui.ConfigConstant
-import com.lunabeestudio.stopcovid.coreui.extension.getETagSharedPrefs
 import com.lunabeestudio.stopcovid.coreui.extension.saveTo
 import com.lunabeestudio.stopcovid.extension.chosenPostalCode
 import com.lunabeestudio.stopcovid.extension.currentVaccinationReferenceDepartmentCode
@@ -39,7 +38,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.File
-import java.io.FileOutputStream
 import java.lang.reflect.Type
 import kotlin.math.abs
 
@@ -85,9 +83,13 @@ object VaccinationCenterManager {
     }
 
     private suspend fun initializeCurrentDepartmentIfNeeded(context: Context, sharedPreferences: SharedPreferences) {
-        if ((sharedPreferences.currentVaccinationReferenceDepartmentCode == null
-                || sharedPreferences.zipGeolocVersion < ZIP_GEOLOC_VERSION)
-            && sharedPreferences.chosenPostalCode != null) {
+        if (
+            (
+                sharedPreferences.currentVaccinationReferenceDepartmentCode == null
+                    || sharedPreferences.zipGeolocVersion < ZIP_GEOLOC_VERSION
+                )
+            && sharedPreferences.chosenPostalCode != null
+        ) {
             postalCodeDidUpdate(context, sharedPreferences, sharedPreferences.chosenPostalCode)
         }
     }
@@ -105,7 +107,8 @@ object VaccinationCenterManager {
             sharedPreferences.currentVaccinationReferenceLongitude = foundDetails?.longitude
             sharedPreferences.zipGeolocVersion = ZIP_GEOLOC_VERSION
             if (foundDetails?.department != sharedPreferences.currentVaccinationReferenceDepartmentCode
-                || _vaccinationCenters.value?.peekContent().isNullOrEmpty()) {
+                || _vaccinationCenters.value?.peekContent().isNullOrEmpty()
+            ) {
                 // Department changed, let's download the new infos
                 Timber.d("Department code did update")
                 sharedPreferences.currentVaccinationReferenceDepartmentCode = foundDetails?.department
@@ -147,9 +150,12 @@ object VaccinationCenterManager {
     @Suppress("BlockingMethodInNonBlockingContext")
     private suspend fun postalCodesDetails(context: Context): Map<String, PostalCodeDetails>? {
         return withContext(Dispatchers.IO) {
-            gson.fromJson<Map<String, PostalCodeDetails>>(context.assets.open(ConfigConstant.Vaccination.ASSET_ZIP_GEOLOC_FILE_PATH).use {
-                it.readBytes().toString(Charsets.UTF_8)
-            }, postalCodesDetailsType)
+            gson.fromJson(
+                context.assets.open(ConfigConstant.Vaccination.ASSET_ZIP_GEOLOC_FILE_PATH).use {
+                    it.readBytes().toString(Charsets.UTF_8)
+                },
+                postalCodesDetailsType
+            )
         }
     }
 
@@ -186,10 +192,6 @@ object VaccinationCenterManager {
         sharedPreferences.currentVaccinationReferenceDepartmentCode = null
         sharedPreferences.currentVaccinationReferenceLatitude = null
         sharedPreferences.currentVaccinationReferenceLongitude = null
-        context.getETagSharedPrefs().edit {
-            remove(lastUpdateFileName)
-            remove(centersFileName)
-        }
     }
 
     private suspend fun loadLocal(context: Context, sharedPreferences: SharedPreferences): List<VaccinationCenter>? {
@@ -209,9 +211,9 @@ object VaccinationCenterManager {
         }
     }
 
+    @SuppressLint("BinaryOperationInTimber")
     private suspend fun fetchLast(context: Context, sharedPreferences: SharedPreferences): Boolean {
         val atomicLastUpdateFile = AtomicFile(localLastUpdateFile(context, sharedPreferences))
-        var lastUpdateFileOutPutStream: FileOutputStream? = null
 
         return try {
             val previousVaccinationCenterLastUpdate = if (atomicLastUpdateFile.baseFile.exists()) {
@@ -222,68 +224,46 @@ object VaccinationCenterManager {
             } else {
                 null
             }
-            lastUpdateFileOutPutStream = "${url}${sharedPreferences.currentVaccinationReferenceDepartmentCode}/$lastUpdateFileName".saveTo(
+
+            return "$url${sharedPreferences.currentVaccinationReferenceDepartmentCode}/$lastUpdateFileName".saveTo(
                 context,
                 atomicLastUpdateFile,
-                lastUpdateFileName,
-            )
-            if (lastUpdateFileOutPutStream != null) {
+            ) { data ->
                 val vaccinationCenterLastUpdate = gson.fromJson(
-                    atomicLastUpdateFile.baseFile.readText(),
+                    data.decodeToString(),
                     VaccinationCenterLastUpdate::class.java
                 )
 
                 if (vaccinationCenterLastUpdate.sha1 != previousVaccinationCenterLastUpdate?.sha1) {
-                    Timber.d("Downloaded Sha1 (${vaccinationCenterLastUpdate.sha1}) is different than our file Sha1 (${previousVaccinationCenterLastUpdate?.sha1}). Let's fetch the new file")
-                    val fetched = fetchLastCenters(context, sharedPreferences)
-                    if (!fetched) {
-                        atomicLastUpdateFile.failWrite(lastUpdateFileOutPutStream)
-                    } else {
-                        atomicLastUpdateFile.finishWrite(lastUpdateFileOutPutStream)
-                    }
-                    fetched
+                    Timber.d(
+                        "Downloaded Sha1 (${vaccinationCenterLastUpdate.sha1}) is different than our file " +
+                            "Sha1 (${previousVaccinationCenterLastUpdate?.sha1}). Let's fetch the new file"
+                    )
+                    fetchLastCenters(context, sharedPreferences)
                 } else {
                     Timber.d("Previous Sha1 is the same. No need to fetch new centers.")
-                    atomicLastUpdateFile.failWrite(lastUpdateFileOutPutStream)
                     false
                 }
-            } else {
-                // No update etag is still valid
-                false
             }
         } catch (e: Exception) {
             Timber.e(e, "Fetching fail for $lastUpdateFileName")
-            atomicLastUpdateFile.failWrite(lastUpdateFileOutPutStream)
             false
         }
     }
 
     private suspend fun fetchLastCenters(context: Context, sharedPreferences: SharedPreferences): Boolean {
         val atomicCentersFile = AtomicFile(localCentersFile(context, sharedPreferences))
-        var centersFileOutPutStream: FileOutputStream? = null
 
         return try {
-            centersFileOutPutStream = "${url}${sharedPreferences.currentVaccinationReferenceDepartmentCode}/$centersFileName".saveTo(
+            "${url}${sharedPreferences.currentVaccinationReferenceDepartmentCode}/$centersFileName".saveTo(
                 context,
                 atomicCentersFile,
-                centersFileName,
-            )
-            if (centersFileOutPutStream != null) {
-                val list = gson.fromJson<List<VaccinationCenter?>>(atomicCentersFile.baseFile.readText(), vaccinationCentersType)
-                if (list.any { it == null }) {
-                    atomicCentersFile.failWrite(centersFileOutPutStream)
-                    false
-                } else {
-                    atomicCentersFile.finishWrite(centersFileOutPutStream)
-                    true
-                }
-            } else {
-                // No update etag is still valid
-                false
+            ) { data ->
+                val list = gson.fromJson<List<VaccinationCenter?>>(data.decodeToString(), vaccinationCentersType)
+                list.all { it != null }
             }
         } catch (e: Exception) {
             Timber.e(e, "Fetching fail for $centersFileName")
-            atomicCentersFile.failWrite(centersFileOutPutStream)
             false
         }
     }

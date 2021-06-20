@@ -27,7 +27,9 @@ import com.mikepenz.fastadapter.GenericItem
 
 class NewAttestationPickerFragment : MainFragment() {
 
-    private val viewModel: NewAttestationViewModel by activityViewModels { NewAttestationViewModelFactory(requireContext().secureKeystoreDataSource()) }
+    private val viewModel: NewAttestationViewModel by activityViewModels {
+        NewAttestationViewModelFactory(requireContext().secureKeystoreDataSource())
+    }
 
     private val args: NewAttestationPickerFragmentArgs by navArgs()
 

@@ -10,5 +10,4 @@ abstract class QRCodeListFragment : MainFragment() {
     protected val qrCodeSize: Int by lazy {
         R.dimen.qr_code_size.toDimensSize(requireContext()).toInt()
     }
-
 }

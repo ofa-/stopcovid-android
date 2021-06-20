@@ -133,15 +133,13 @@ private fun ProximityFragment.openIsolationForm() {
 }
 
 private fun ProximityFragment.changeStateAction(isolationRecommendationState: IsolationRecommendationStateEnum): Action =
-    Action(label = strings["isolation.recommendation.${isolationRecommendationState.key}.changeMyState"])
-    {
+    Action(label = strings["isolation.recommendation.${isolationRecommendationState.key}.changeMyState"]) {
         isolationManager.resetData()
         openIsolationForm()
     }
 
 private fun ProximityFragment.defineIsolationAction(isolationRecommendationState: IsolationRecommendationStateEnum) =
-    Action(label = strings["isolation.recommendation.${isolationRecommendationState.key}.defineIsolationPeriod"])
-    {
+    Action(label = strings["isolation.recommendation.${isolationRecommendationState.key}.defineIsolationPeriod"]) {
         isolationManager.resetData()
         openIsolationForm()
         executeActionAfterAnimation {
@@ -150,14 +148,12 @@ private fun ProximityFragment.defineIsolationAction(isolationRecommendationState
     }
 
 private fun ProximityFragment.testingSitesAction(isolationRecommendationState: IsolationRecommendationStateEnum) =
-    Action(label = strings["isolation.recommendation.${isolationRecommendationState.key}.testingSites"])
-    {
+    Action(label = strings["isolation.recommendation.${isolationRecommendationState.key}.testingSites"]) {
         strings["myHealthController.testingSites.url"]?.openInExternalBrowser(requireContext())
     }
 
 private fun ProximityFragment.positiveTestAction(isolationRecommendationState: IsolationRecommendationStateEnum) =
-    Action(label = strings["isolation.recommendation.${isolationRecommendationState.key}.positiveTest"])
-    {
+    Action(label = strings["isolation.recommendation.${isolationRecommendationState.key}.positiveTest"]) {
         openIsolationForm()
         executeActionAfterAnimation {
             isolationManager.updateState(IsolationFormStateEnum.POSITIVE)
@@ -168,8 +164,7 @@ private fun ProximityFragment.negativeTestAction(
     isolationRecommendationState: IsolationRecommendationStateEnum,
     openForm: Boolean = true, resetState: Boolean = false,
 ) =
-    Action(label = strings["isolation.recommendation.${isolationRecommendationState.key}.negativeTest"])
-    {
+    Action(label = strings["isolation.recommendation.${isolationRecommendationState.key}.negativeTest"]) {
         if (resetState) {
             isolationManager.resetData()
         }
@@ -194,29 +189,25 @@ private fun ProximityFragment.symptomsAction(isolationRecommendationState: Isola
     }
 
 private fun ProximityFragment.havingDateAction(isolationRecommendationState: IsolationRecommendationStateEnum) =
-    Action(label = strings["isolation.recommendation.${isolationRecommendationState.key}.havingTheDate"])
-    {
+    Action(label = strings["isolation.recommendation.${isolationRecommendationState.key}.havingTheDate"]) {
         openIsolationForm()
         isolationManager.setKnowsIndexSymptomsEndDate(true)
     }
 
 private fun ProximityFragment.scheduleReminderAction(isolationRecommendationState: IsolationRecommendationStateEnum) =
-    Action(label = strings["isolation.recommendation.${isolationRecommendationState.key}.scheduleReminder"])
-    {
+    Action(label = strings["isolation.recommendation.${isolationRecommendationState.key}.scheduleReminder"]) {
         val triggerDate = Date(isolationManager.positiveCaseIsolationEndDate ?: System.currentTimeMillis())
         (context?.applicationContext as? StopCovid)?.setIsolationReminder(triggerDate)
         isolationManager.setFeverReminderScheduled()
     }
 
 private fun ProximityFragment.answerStillHavingFeverAction(isolationRecommendationState: IsolationRecommendationStateEnum) =
-    Action(label = strings["isolation.recommendation.${isolationRecommendationState.key}.stillHavingFever"])
-    {
+    Action(label = strings["isolation.recommendation.${isolationRecommendationState.key}.stillHavingFever"]) {
         openIsolationForm()
     }
 
 private fun ProximityFragment.noMoreFeverAction(isolationRecommendationState: IsolationRecommendationStateEnum) =
-    Action(label = strings["isolation.recommendation.${isolationRecommendationState.key}.noMoreFever"])
-    {
+    Action(label = strings["isolation.recommendation.${isolationRecommendationState.key}.noMoreFever"]) {
         isolationManager.setStillHavingFever(false)
     }
 

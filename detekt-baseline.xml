@@ -1,0 +1,34 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues></ManuallySuppressedIssues>
+  <CurrentIssues>
+    <ID>Indentation:com.lunabeestudio.stopcovid.fragment.OnBoardingGestureFragmentDirections.kt:24</ID>
+    <ID>Indentation:com.lunabeestudio.stopcovid.fragment.ProximityFragmentDirections.kt:166</ID>
+    <ID>Indentation:com.lunabeestudio.stopcovid.fragment.ProximityFragmentDirections.kt:169</ID>
+    <ID>Indentation:com.lunabeestudio.stopcovid.fragment.WalletAddCertificateFragmentDirections.kt:45</ID>
+    <ID>Indentation:com.lunabeestudio.stopcovid.fragment.WalletCertificateErrorFragmentDirections.kt:11</ID>
+    <ID>MaximumLineLength:com.lunabeestudio.domain.model.WalletCertificateType.kt:23</ID>
+    <ID>MaximumLineLength:com.lunabeestudio.domain.model.WalletCertificateType.kt:54</ID>
+    <ID>MaximumLineLength:com.lunabeestudio.framework.crypto.BouncyCastleCryptoDataSourceTest.kt:65</ID>
+    <ID>MaximumLineLength:com.lunabeestudio.framework.crypto.BouncyCastleCryptoDataSourceTest.kt:66</ID>
+    <ID>MaximumLineLength:com.lunabeestudio.framework.crypto.BouncyCastleSignatureVerifierTest.kt:31</ID>
+    <ID>MaximumLineLength:com.lunabeestudio.framework.crypto.BouncyCastleSignatureVerifierTest.kt:33</ID>
+    <ID>MaximumLineLength:com.lunabeestudio.framework.crypto.BouncyCastleSignatureVerifierTest.kt:34</ID>
+    <ID>MaximumLineLength:com.lunabeestudio.stopcovid.clea.CleaTest.kt:101</ID>
+    <ID>MaximumLineLength:com.lunabeestudio.stopcovid.clea.CleaTest.kt:97</ID>
+    <ID>MaximumLineLength:com.lunabeestudio.stopcovid.clea.VenuesManagerTest.kt:180</ID>
+    <ID>MaximumLineLength:com.lunabeestudio.stopcovid.clea.VenuesManagerTest.kt:181</ID>
+    <ID>MaximumLineLength:com.lunabeestudio.stopcovid.clea.VenuesManagerTest.kt:182</ID>
+    <ID>MaximumLineLength:com.lunabeestudio.stopcovid.clea.VenuesManagerTest.kt:183</ID>
+    <ID>MaximumLineLength:com.lunabeestudio.stopcovid.fragment.CaptchaFragmentArgs.kt:78</ID>
+    <ID>MaximumLineLength:com.lunabeestudio.stopcovid.fragment.FullscreenQRCodeFragmentArgs.kt:75</ID>
+    <ID>MaximumLineLength:com.lunabeestudio.stopcovid.fragment.VaccinationActionsBottomSheetFragment.kt:72</ID>
+    <ID>MaximumLineLength:com.lunabeestudio.stopcovid.fragment.VaccinationActionsBottomSheetFragmentArgs.kt:52</ID>
+    <ID>MaximumLineLength:com.lunabeestudio.stopcovid.fragment.WalletCertificateErrorFragmentArgs.kt:82</ID>
+    <ID>MaximumLineLength:com.orange.proximitynotification.filter.ProximityFilterIntTest.kt:143</ID>
+    <ID>MaximumLineLength:com.orange.proximitynotification.filter.ProximityFilterIntTest.kt:144</ID>
+    <ID>MaximumLineLength:com.orange.proximitynotification.filter.ProximityFilterIntTest.kt:145</ID>
+    <ID>MaximumLineLength:com.orange.proximitynotification.filter.ProximityFilterIntTest.kt:147</ID>
+    <ID>MaximumLineLength:com.orange.proximitynotification.filter.ProximityFilterIntTest.kt:149</ID>
+  </CurrentIssues>
+</SmellBaseline>

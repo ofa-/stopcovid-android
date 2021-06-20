@@ -17,6 +17,7 @@ import com.google.gson.reflect.TypeToken
 import com.lunabeestudio.robert.utils.Event
 import com.lunabeestudio.stopcovid.coreui.ConfigConstant
 import com.lunabeestudio.stopcovid.model.KeyFigure
+import com.lunabeestudio.stopcovid.widgetshomescreen.KeyFiguresWidget
 import java.lang.reflect.Type
 
 object KeyFiguresManager : RemoteJsonManager<List<KeyFigure>>() {
@@ -42,15 +43,12 @@ object KeyFiguresManager : RemoteJsonManager<List<KeyFigure>>() {
                 _figures.postValue(Event(figures))
             }
         }
+        KeyFiguresWidget.updateWidget(context)
     }
 
     suspend fun onAppForeground(context: Context) {
         if (fetchLast(context)) {
-            loadLocal(context)?.let { figures ->
-                if (_figures.value?.peekContent() != figures) {
-                    _figures.postValue(Event(figures))
-                }
-            }
+            initialize(context)
         }
     }
 }

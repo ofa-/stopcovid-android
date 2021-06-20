@@ -25,9 +25,11 @@ fun TimestampedEvent.toProto(): ProtoStorage.TimestampedEventProto {
 
 fun List<TimestampedEvent>.toProto(): ProtoStorage.TimestampedEventProtoList {
     val builder = ProtoStorage.TimestampedEventProtoList.newBuilder().apply {
-        this.addAllTimestampedEventProtoList(map {
-            it.toProto()
-        })
+        this.addAllTimestampedEventProtoList(
+            map {
+                it.toProto()
+            }
+        )
     }
     return builder.build()
 }

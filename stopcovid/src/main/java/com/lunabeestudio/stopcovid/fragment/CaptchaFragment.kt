@@ -90,9 +90,11 @@ class CaptchaFragment : MainFragment() {
             } else {
                 null
             }
-            captchaNextFragment.registerPostAction(findNavControllerOrNull(),
+            captchaNextFragment.registerPostAction(
+                findNavControllerOrNull(),
                 sharedPreferences,
-                nextFragmentArgs?.let { VenueQRCodeFragmentArgs.fromBundle(nextFragmentArgs) })
+                nextFragmentArgs?.let { VenueQRCodeFragmentArgs.fromBundle(nextFragmentArgs) }
+            )
         }
         viewModel.covidException.observe(viewLifecycleOwner) { error ->
             if (error is UnauthorizedException && viewModel.code.isNotBlank()) {
@@ -131,20 +133,24 @@ class CaptchaFragment : MainFragment() {
             identifier = items.size.toLong()
         }
         items += titleItem {
-            text = strings[if (viewModel.isImage) {
-                "captchaController.mainMessage.image.title"
-            } else {
-                "captchaController.mainMessage.audio.title"
-            }]
+            text = strings[
+                if (viewModel.isImage) {
+                    "captchaController.mainMessage.image.title"
+                } else {
+                    "captchaController.mainMessage.audio.title"
+                }
+            ]
             gravity = Gravity.CENTER
             identifier = items.size.toLong()
         }
         items += captionItem {
-            text = strings[if (viewModel.isImage) {
-                "captchaController.mainMessage.image.subtitle"
-            } else {
-                "captchaController.mainMessage.audio.subtitle"
-            }]
+            text = strings[
+                if (viewModel.isImage) {
+                    "captchaController.mainMessage.image.subtitle"
+                } else {
+                    "captchaController.mainMessage.audio.subtitle"
+                }
+            ]
             gravity = Gravity.CENTER
             identifier = items.size.toLong()
         }
@@ -162,11 +168,13 @@ class CaptchaFragment : MainFragment() {
             }
         }
         items += linkItem {
-            text = strings[if (viewModel.isImage) {
-                "captchaController.switchToAudio"
-            } else {
-                "captchaController.switchToImage"
-            }]
+            text = strings[
+                if (viewModel.isImage) {
+                    "captchaController.switchToAudio"
+                } else {
+                    "captchaController.switchToImage"
+                }
+            ]
             iconRes = if (viewModel.isImage) {
                 R.drawable.ic_audio
             } else {
@@ -181,11 +189,13 @@ class CaptchaFragment : MainFragment() {
             identifier = 52L
         }
         items += editTextItem {
-            hint = strings[if (viewModel.isImage) {
-                "captchaController.textField.image.placeholder"
-            } else {
-                "captchaController.textField.audio.placeholder"
-            }]
+            hint = strings[
+                if (viewModel.isImage) {
+                    "captchaController.textField.image.placeholder"
+                } else {
+                    "captchaController.textField.audio.placeholder"
+                }
+            ]
             text = viewModel.code
             onTextChange = { text ->
                 viewModel.code = text.toString()
@@ -200,11 +210,13 @@ class CaptchaFragment : MainFragment() {
             identifier = 53L
         }
         buttonItem = buttonItem {
-            text = strings[when {
-                viewModel.code.isBlank() && viewModel.isImage -> "captchaController.generate.image"
-                viewModel.code.isBlank() && !viewModel.isImage -> "captchaController.generate.sound"
-                else -> "captchaController.button.title"
-            }]
+            text = strings[
+                when {
+                    viewModel.code.isBlank() && viewModel.isImage -> "captchaController.generate.image"
+                    viewModel.code.isBlank() && !viewModel.isImage -> "captchaController.generate.sound"
+                    else -> "captchaController.button.title"
+                }
+            ]
             onClickListener = View.OnClickListener {
                 if (viewModel.code.isBlank()) {
                     resetFiles()
@@ -223,11 +235,13 @@ class CaptchaFragment : MainFragment() {
     }
 
     private fun refreshButton() {
-        buttonItem.text = strings[when {
-            viewModel.code.isBlank() && viewModel.isImage -> "captchaController.generate.image"
-            viewModel.code.isBlank() && !viewModel.isImage -> "captchaController.generate.sound"
-            else -> "captchaController.button.title"
-        }]
+        buttonItem.text = strings[
+            when {
+                viewModel.code.isBlank() && viewModel.isImage -> "captchaController.generate.image"
+                viewModel.code.isBlank() && !viewModel.isImage -> "captchaController.generate.sound"
+                else -> "captchaController.button.title"
+            }
+        ]
         if (binding?.recyclerView?.isComputingLayout == false) {
             binding?.recyclerView?.adapter?.notifyItemChanged(buttonItem.identifier.toInt())
         }

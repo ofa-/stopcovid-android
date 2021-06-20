@@ -30,12 +30,14 @@ object LBMaintenanceHttpClient {
      * @param onSuccess : success completion, return the file as a string
      * @param onFailure : failure completion, return the exception
      */
-    suspend fun get(context: Context,
+    suspend fun get(
+        context: Context,
         urlString: String,
         onSuccess: suspend (result: String) -> Unit,
-        onFailure: suspend (e: Exception) -> Unit) {
+        onFailure: suspend (e: Exception) -> Unit
+    ) {
         try {
-            val okHttpClient = RetrofitClient.getDefaultOKHttpClient(context, urlString, ConfigConstant.SERVER_CERTIFICATE_SHA256)
+            val okHttpClient = RetrofitClient.getDefaultOKHttpClient(context, urlString, ConfigConstant.SERVER_CERTIFICATE_SHA256, null)
             val request: Request = Request.Builder()
                 .url(urlString)
                 .build()

@@ -52,7 +52,8 @@ abstract class QRCodeFragment : BaseFragment() {
         super.onResume()
         if (isReadyToStartScanFlow) {
             if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA)
-                != PackageManager.PERMISSION_GRANTED) {
+                != PackageManager.PERMISSION_GRANTED
+            ) {
                 if (!showingRationale) {
                     showingRationale = true
                     context?.showPermissionRationale(

@@ -108,7 +108,7 @@ class CodeFragment : MainFragment() {
     private fun verifyCode() {
         val trimmedCode = code.trim()
         if (!trimmedCode.isReportCodeValid()) {
-            context?.showInvalidCodeAlert(strings)
+            context?.showInvalidCodeAlert(strings, null)
         } else {
             findNavControllerOrNull()?.safeNavigate(CodeFragmentDirections.actionCodeFragmentToSymptomsOriginFragment(trimmedCode))
         }

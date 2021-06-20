@@ -11,7 +11,6 @@
 package com.lunabeestudio.stopcovid.fragment
 
 import android.view.Gravity
-import androidx.navigation.fragment.findNavController
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem

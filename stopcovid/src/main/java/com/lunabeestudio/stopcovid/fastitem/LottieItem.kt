@@ -14,7 +14,6 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.annotation.RawRes
 import com.airbnb.lottie.LottieCompositionFactory
-import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.databinding.ItemLottieBinding
 import com.mikepenz.fastadapter.binding.AbstractBindingItem
 

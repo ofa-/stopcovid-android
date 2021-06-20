@@ -14,10 +14,12 @@ import java.security.KeyPair
 
 interface SharedCryptoDataSource {
     fun createECDHKeyPair(): KeyPair
-    fun getEncryptionKeys(rawServerPublicKey: ByteArray,
+    fun getEncryptionKeys(
+        rawServerPublicKey: ByteArray,
         rawLocalPrivateKey: ByteArray,
         kADerivation: ByteArray,
-        kEADerivation: ByteArray): Pair<ByteArray, ByteArray>
+        kEADerivation: ByteArray
+    ): Pair<ByteArray, ByteArray>
 
     fun decrypt(key: ByteArray, encryptedData: ByteArray): ByteArray
 }

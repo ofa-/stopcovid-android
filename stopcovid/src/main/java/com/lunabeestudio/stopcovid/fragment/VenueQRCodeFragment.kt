@@ -10,6 +10,7 @@
 
 package com.lunabeestudio.stopcovid.fragment
 
+import android.content.DialogInterface
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
@@ -29,6 +30,7 @@ import com.lunabeestudio.stopcovid.manager.VenuesManager
 import com.lunabeestudio.stopcovid.model.CaptchaNextFragment
 import com.lunabeestudio.stopcovid.model.VenueExpiredException
 import com.lunabeestudio.stopcovid.model.VenueInvalidFormatException
+import timber.log.Timber
 
 class VenueQRCodeFragment : QRCodeFragment() {
 
@@ -84,12 +86,19 @@ class VenueQRCodeFragment : QRCodeFragment() {
             AnalyticsManager.reportAppEvent(requireContext(), AppEventName.e14, null)
             findNavControllerOrNull()
                 ?.safeNavigate(VenueQRCodeFragmentDirections.actionVenueQrCodeFragmentToVenueConfirmationFragment())
-        } catch (e: VenueExpiredException) {
-            context?.showExpiredCodeAlert(strings)
-        } catch (e: VenueInvalidFormatException) {
-            context?.showInvalidCodeAlert(strings)
         } catch (e: Exception) {
-            showUnknownErrorAlert(null)
+            catchVenueException(e) {
+                resumeQrCodeReader()
+            }
+        }
+    }
+
+    private fun catchVenueException(e: Exception, listener: DialogInterface.OnDismissListener) {
+        Timber.e(e)
+        when (e) {
+            is VenueExpiredException -> context?.showExpiredCodeAlert(strings, listener)
+            is VenueInvalidFormatException -> context?.showInvalidCodeAlert(strings, listener)
+            else -> showUnknownErrorAlert(listener)
         }
     }
 }

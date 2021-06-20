@@ -9,16 +9,10 @@
  */
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
 
 android {
     defaultConfig {
         buildConfigField 'String', 'BLE_VERSION', '"2.2.0"'
-    }
-
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8.toString()
-        targetCompatibility JavaVersion.VERSION_1_8.toString()
     }
 
     kotlinOptions {

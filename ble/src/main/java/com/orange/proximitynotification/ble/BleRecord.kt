@@ -21,4 +21,3 @@ internal data class BleRecord(
     val txPowerLevel: Int
         get() = payload.txPowerLevel
 }
-

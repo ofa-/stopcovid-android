@@ -124,7 +124,6 @@ class RobertServiceTest {
         assertThat(result).isInstanceOf(RobertResultData.Success::class.java)
         assertThat((result as RobertResultData.Success).data.reportValidationToken).isEqualTo("token")
 
-
         testDataErrors {
             dataSource.report("", "", emptyList())
         }

@@ -16,6 +16,8 @@ import com.lunabeestudio.analytics.BuildConfig
 import com.lunabeestudio.analytics.manager.AnalyticsManager
 import com.lunabeestudio.analytics.model.AnalyticsResult
 import com.lunabeestudio.analytics.network.model.SendAnalyticsRQ
+import com.lunabeestudio.analytics.network.model.SendAppAnalyticsRQ
+import com.lunabeestudio.analytics.network.model.SendHealthAnalyticsRQ
 import okhttp3.CertificatePinner
 import okhttp3.ConnectionSpec
 import okhttp3.HttpUrl.Companion.toHttpUrl
@@ -38,34 +40,36 @@ internal object AnalyticsServerManager {
         return Retrofit.Builder()
             .baseUrl(baseUrl)
             .addConverterFactory(MoshiConverterFactory.create())
-            .client(OkHttpClient.Builder().apply {
-                if (!BuildConfig.DEBUG) {
-                    val requireTls12 = ConnectionSpec.Builder(ConnectionSpec.RESTRICTED_TLS)
-                        .tlsVersions(TlsVersion.TLS_1_2)
-                        .build()
-                    connectionSpecs(listOf(requireTls12))
-                }
-                if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N) {
-                    certificatePinner(
-                        CertificatePinner.Builder()
-                            .add(
-                                baseUrl.toHttpUrl().host,
-                                certificateSha256
-                            )
+            .client(
+                OkHttpClient.Builder().apply {
+                    if (!BuildConfig.DEBUG) {
+                        val requireTls12 = ConnectionSpec.Builder(ConnectionSpec.RESTRICTED_TLS)
+                            .tlsVersions(TlsVersion.TLS_1_2)
                             .build()
-                    )
-                    val certificates: HandshakeCertificates = HandshakeCertificates.Builder()
-                        .addTrustedCertificate(certificateFromString(context, "analytics_api_tousanticovid_gouv_fr"))
-                        .build()
-                    sslSocketFactory(certificates.sslSocketFactory(), certificates.trustManager)
-                }
-                addInterceptor(getDefaultHeaderInterceptor(token))
-                addInterceptor(getLogInterceptor())
-                callTimeout(30L, TimeUnit.SECONDS)
-                connectTimeout(30L, TimeUnit.SECONDS)
-                readTimeout(30L, TimeUnit.SECONDS)
-                writeTimeout(30L, TimeUnit.SECONDS)
-            }.build())
+                        connectionSpecs(listOf(requireTls12))
+                    }
+                    if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N) {
+                        certificatePinner(
+                            CertificatePinner.Builder()
+                                .add(
+                                    baseUrl.toHttpUrl().host,
+                                    certificateSha256
+                                )
+                                .build()
+                        )
+                        val certificates: HandshakeCertificates = HandshakeCertificates.Builder()
+                            .addTrustedCertificate(certificateFromString(context, "analytics_api_tousanticovid_gouv_fr"))
+                            .build()
+                        sslSocketFactory(certificates.sslSocketFactory(), certificates.trustManager)
+                    }
+                    addInterceptor(getDefaultHeaderInterceptor(token))
+                    addInterceptor(getLogInterceptor())
+                    callTimeout(30L, TimeUnit.SECONDS)
+                    connectTimeout(30L, TimeUnit.SECONDS)
+                    readTimeout(30L, TimeUnit.SECONDS)
+                    writeTimeout(30L, TimeUnit.SECONDS)
+                }.build()
+            )
             .build()
             .create(AnalyticsApi::class.java)
     }
@@ -80,7 +84,16 @@ internal object AnalyticsServerManager {
         sendAnalyticsRQ: SendAnalyticsRQ
     ): AnalyticsResult {
         return try {
-            val result = getRetrofit(context, baseUrl, certificateSha256, token).sendAnalytics(apiVersion, sendAnalyticsRQ)
+            val result = when (sendAnalyticsRQ) {
+                is SendAppAnalyticsRQ -> getRetrofit(context, baseUrl, certificateSha256, token).sendAppAnalytics(
+                    apiVersion,
+                    sendAnalyticsRQ
+                )
+                is SendHealthAnalyticsRQ -> getRetrofit(context, baseUrl, certificateSha256, token).sendHealthAnalytics(
+                    apiVersion,
+                    sendAnalyticsRQ
+                )
+            }
             if (result.isSuccessful) {
                 AnalyticsResult.Success()
             } else {

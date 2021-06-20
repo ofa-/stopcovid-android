@@ -82,6 +82,4 @@ class ProximityPayloadIdProviderWithCacheTest {
             assertThat(result).isEqualTo(proximityPayloadId)
             verifyNoMoreInteractions(proximityPayloadIdProvider)
         }
-
-
 }

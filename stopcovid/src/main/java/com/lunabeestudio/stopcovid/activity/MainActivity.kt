@@ -98,15 +98,18 @@ class MainActivity : BaseActivity() {
 
             (extraData ?: intent.data)?.let { data ->
                 if (navController.graph.hasDeepLink(data)) {
-                    navController.navigate(data, navOptions {
-                        anim {
-                            enter = R.anim.nav_default_enter_anim
-                            exit = R.anim.nav_default_exit_anim
-                            popEnter = R.anim.nav_default_pop_enter_anim
-                            popExit = R.anim.nav_default_pop_exit_anim
+                    navController.navigate(
+                        data,
+                        navOptions {
+                            anim {
+                                enter = R.anim.nav_default_enter_anim
+                                exit = R.anim.nav_default_exit_anim
+                                popEnter = R.anim.nav_default_pop_enter_anim
+                                popExit = R.anim.nav_default_pop_exit_anim
+                            }
+                            launchSingleTop = true
                         }
-                        launchSingleTop = true
-                    })
+                    )
                 }
             }
 
@@ -117,7 +120,7 @@ class MainActivity : BaseActivity() {
     private fun fixIntentData(intent: Intent) {
         // since we use '#' to separate the code, we replace it to pass a clean URL to the nav_graph deeplink handle
         val uri = intent.data?.let {
-            DeeplinkManager.transformAnchorParam(it)
+            DeeplinkManager.transformFragmentToCodeParam(it)
         }
         val uriBuilder = uri?.buildUpon()
             ?.path(intent.data?.path?.takeIf { it != "/" })

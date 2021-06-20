@@ -85,3 +85,5 @@ fun String.sha256(): String = MessageDigest
 fun String.fixQuoteInString(): String = replace("'", "")
 
 fun String?.safeParseColor(): Int = Color.parseColor(this ?: "#0B0091")
+
+fun String?.orNA(): String = this ?: "N/A"

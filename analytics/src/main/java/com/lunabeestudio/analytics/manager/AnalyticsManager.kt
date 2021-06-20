@@ -32,7 +32,8 @@ import com.lunabeestudio.analytics.model.HealthEventName
 import com.lunabeestudio.analytics.model.HealthInfos
 import com.lunabeestudio.analytics.model.TimestampedEvent
 import com.lunabeestudio.analytics.network.AnalyticsServerManager
-import com.lunabeestudio.analytics.network.model.SendAnalyticsRQ
+import com.lunabeestudio.analytics.network.model.SendAppAnalyticsRQ
+import com.lunabeestudio.analytics.network.model.SendHealthAnalyticsRQ
 import com.lunabeestudio.analytics.proto.ProtoStorage
 import com.lunabeestudio.analytics.proxy.AnalyticsInfosProvider
 import com.lunabeestudio.analytics.proxy.AnalyticsRobertManager
@@ -157,7 +158,7 @@ object AnalyticsManager : LifecycleObserver {
         val appInfos = getAppInfos(context, analyticsInfosProvider, receivedHelloMessagesCount)
         val appEvents = getAppEvents(context)
         val appErrors = getErrors(context.filesDir)
-        val sendAnalyticsRQ = SendAnalyticsRQ(
+        val sendAnalyticsRQ = SendAppAnalyticsRQ(
             installationUuid = getSharedPrefs(context).installationUUID ?: UUID.randomUUID().toString(),
             infos = appInfos,
             events = appEvents.toAPI(),
@@ -196,7 +197,7 @@ object AnalyticsManager : LifecycleObserver {
     ) {
         val healthInfos = getHealthInfos(context, robertManager, analyticsInfosProvider)
         val healthEvents = getHealthEvents(context)
-        val sendAnalyticsRQ = SendAnalyticsRQ(
+        val sendAnalyticsRQ = SendHealthAnalyticsRQ(
             installationUuid = UUID.randomUUID().toString(),
             infos = healthInfos,
             events = healthEvents.toAPI(),
@@ -294,7 +295,7 @@ object AnalyticsManager : LifecycleObserver {
         if (getSharedPrefs(context).isOptIn) {
             if (desc?.contains("No address associated with hostname") != true) {
                 CoroutineScope(Dispatchers.IO).launch {
-                    val name = "ERR-${wsName.toUpperCase(Locale.getDefault())}-${wsVersion.toUpperCase(Locale.getDefault())}-$errorCode"
+                    val name = "ERR-${wsName.uppercase(Locale.getDefault())}-${wsVersion.uppercase(Locale.getDefault())}-$errorCode"
                     val timestampedEventList = getErrors(filesDir).toMutableList()
                     timestampedEventList += TimestampedEvent(name, dateFormat.format(Date()), desc ?: "")
                     val file = File(File(filesDir, FOLDER_NAME), FILE_NAME_APP_ERRORS)

@@ -92,31 +92,33 @@ class AppMaintenanceActivity : AppCompatActivity() {
                 gravity = DrawableButton.GRAVITY_CENTER
             }
             lifecycleScope.launch {
-                AppMaintenanceManager.updateCheckForMaintenanceUpgrade(this@AppMaintenanceActivity,
+                AppMaintenanceManager.updateCheckForMaintenanceUpgrade(
+                    this@AppMaintenanceActivity,
                     appIsFreeCompletion = {
                         startActivity(Intent(this@AppMaintenanceActivity, OnBoardingActivity::class.java))
                         finishAndRemoveTask()
-
                     },
                     appIsBlockedCompletion = { info ->
                         binding.refreshButton.hideProgress(strings["common.tryAgain"])
                         binding.swipeRefreshLayout.isRefreshing = false
                         fillScreen(info)
-                    })
+                    }
+                )
             }
         }
         binding.swipeRefreshLayout.setOnRefreshListener {
             lifecycleScope.launch {
-                AppMaintenanceManager.updateCheckForMaintenanceUpgrade(this@AppMaintenanceActivity,
+                AppMaintenanceManager.updateCheckForMaintenanceUpgrade(
+                    this@AppMaintenanceActivity,
                     appIsFreeCompletion = {
                         startActivity(Intent(this@AppMaintenanceActivity, OnBoardingActivity::class.java))
                         finishAndRemoveTask()
-
                     },
                     appIsBlockedCompletion = { info ->
                         binding.swipeRefreshLayout.isRefreshing = false
                         fillScreen(info)
-                    })
+                    }
+                )
             }
         }
     }

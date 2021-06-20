@@ -29,7 +29,4 @@ interface ProximityPayloadIdProvider {
      * @return [ProximityPayloadId] extracted or null if not found
      */
     suspend fun fromProximityPayload(proximityPayload: ProximityPayload): ProximityPayloadId?
-
 }
-
-

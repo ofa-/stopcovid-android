@@ -39,13 +39,14 @@ class ServiceDataSource(
 ) : RemoteServiceDataSource {
 
     private var filesDir = context.filesDir
-    private var api: StopCovidApi = RetrofitClient.getService(context, baseUrl, certificateSha256, StopCovidApi::class.java)
+    private var api: StopCovidApi = RetrofitClient.getService(context, baseUrl, certificateSha256, StopCovidApi::class.java, null)
     private var reportProgressUpdate: ((Float) -> Unit)? = null
     private var reportApi: StopCovidApi = RetrofitClient.getService(
         context,
         baseUrl,
         certificateSha256,
         StopCovidApi::class.java,
+        null,
     ) {
         reportProgressUpdate?.invoke(it)
     }
@@ -53,7 +54,7 @@ class ServiceDataSource(
 
     override suspend fun generateCaptcha(apiVersion: String, type: String, language: String): RobertResultData<String> {
 
-        val result = RequestHelper.tryCatchRequestData(context, filesDir, apiVersion, "captcha-${type}") {
+        val result = RequestHelper.tryCatchRequestData(context, filesDir, apiVersion, "captcha-$type") {
             api.captcha(apiVersion, CaptchaRQ(type = type, locale = language))
         }
         return when (result) {
@@ -109,12 +110,13 @@ class ServiceDataSource(
     override suspend fun status(apiVersion: String, ssu: ServerStatusUpdate): RobertResultData<StatusReport> {
         val result = RequestHelper.tryCatchRequestData(context, filesDir, apiVersion, "status") {
             api.status(
-                apiVersion, ApiStatusRQ(
-                ebid = ssu.ebid,
-                epochId = ssu.epochId,
-                time = ssu.time,
-                mac = ssu.mac
-            )
+                apiVersion,
+                ApiStatusRQ(
+                    ebid = ssu.ebid,
+                    epochId = ssu.epochId,
+                    time = ssu.time,
+                    mac = ssu.mac
+                )
             )
         }
         return when (result) {

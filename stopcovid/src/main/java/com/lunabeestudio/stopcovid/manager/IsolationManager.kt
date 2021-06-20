@@ -143,7 +143,7 @@ class IsolationManager(
     private val contactCaseIsolationContactCalculatedDate: Long
         get() {
             return when {
-                robertManager.isSick -> isolationLastContactDate
+                robertManager.isImmune -> isolationLastContactDate
                 else -> isolationLastContactDate
             } ?: System.currentTimeMillis()
         }
@@ -291,7 +291,7 @@ class IsolationManager(
 
     fun updateStateBasedOnAppMainStateIfNeeded() {
         when {
-            robertManager.isSick -> IsolationFormStateEnum.POSITIVE
+            robertManager.isImmune -> IsolationFormStateEnum.POSITIVE
             isAtRisk == true -> IsolationFormStateEnum.CONTACT
             else -> null
         }?.let {
@@ -311,7 +311,7 @@ class IsolationManager(
 
     private fun calculateInitialCase(): IsolationRecommendationStateEnum {
         return when {
-            isAtRisk == true || robertManager.isSick -> {
+            isAtRisk == true || robertManager.isImmune -> {
                 IsolationRecommendationStateEnum.INITIAL_CASE_AT_RISK_OR_SICK
             }
             else -> IsolationRecommendationStateEnum.INITIAL_CASE_SAFE
@@ -406,7 +406,6 @@ class IsolationManager(
                 } else {
                     recommendation = IsolationRecommendationStateEnum.POSITIVE_CASE_NO_SYMPTOMS
                 }
-
             }
         }
 

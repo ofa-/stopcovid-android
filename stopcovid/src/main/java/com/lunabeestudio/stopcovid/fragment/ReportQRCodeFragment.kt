@@ -22,8 +22,9 @@ class ReportQRCodeFragment : QRCodeFragment() {
 
     override fun onCodeScanned(code: String) {
         if (!code.isReportCodeValid()) {
-            context?.showInvalidCodeAlert(strings)
-            findNavControllerOrNull()?.navigateUp()
+            context?.showInvalidCodeAlert(strings) {
+                resumeQrCodeReader()
+            }
         } else {
             findNavControllerOrNull()?.safeNavigate(ReportQRCodeFragmentDirections.actionReportQrCodeFragmentToSymptomsOriginFragment(code))
         }

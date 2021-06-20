@@ -69,4 +69,3 @@ enum class KeyFigureChartType {
     BARS,
     LINES
 }
-

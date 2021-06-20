@@ -1,9 +1,6 @@
 package com.lunabeestudio.stopcovid.manager
 
 import android.content.Context
-import android.util.MalformedJsonException
-import androidx.core.content.edit
-import com.lunabeestudio.stopcovid.coreui.extension.getETagSharedPrefs
 import com.lunabeestudio.stopcovid.coreui.extension.saveTo
 import com.lunabeestudio.stopcovid.model.BackendException
 import kotlinx.coroutines.Dispatchers
@@ -53,12 +50,12 @@ abstract class RemoteFileManager {
     }
 
     protected open suspend fun fetchLast(context: Context): Boolean {
-        val tmpFileName = "${localFileName}.bck"
+        val tmpFileName = "$localFileName.bck"
         val tmpFile = File(context.filesDir, tmpFileName)
 
         return try {
             Timber.v("Fetching remote data at $remoteFileUrl")
-            if (remoteFileUrl.saveTo(context, tmpFile, localFileName)) {
+            if (remoteFileUrl.saveTo(context, tmpFile)) {
                 if (fileNotCorrupted(tmpFile)) {
                     tmpFile.copyTo(File(context.filesDir, localFileName), overwrite = true, bufferSize = 4 * 1024)
                 } else {
@@ -79,9 +76,6 @@ abstract class RemoteFileManager {
     abstract suspend fun fileNotCorrupted(file: File): Boolean
 
     fun clearLocal(context: Context) {
-        context.getETagSharedPrefs().edit {
-            remove(localFileName)
-        }
         File(context.filesDir, localFileName).delete()
     }
 }

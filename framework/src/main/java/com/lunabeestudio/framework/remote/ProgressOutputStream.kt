@@ -10,7 +10,6 @@
 
 package com.lunabeestudio.framework.remote
 
-import com.lunabeestudio.framework.remote.UploadProgressRequestBody
 import okio.IOException
 import java.io.OutputStream
 

@@ -19,7 +19,6 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Build
 import androidx.core.app.NotificationCompat
-import androidx.core.content.edit
 import androidx.emoji.bundled.BundledEmojiCompatConfig
 import androidx.emoji.text.EmojiCompat
 import androidx.lifecycle.Lifecycle
@@ -57,7 +56,6 @@ import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.ConfigConstant
 import com.lunabeestudio.stopcovid.coreui.EnvConstant
 import com.lunabeestudio.stopcovid.coreui.UiConstants
-import com.lunabeestudio.stopcovid.coreui.extension.getETagSharedPrefs
 import com.lunabeestudio.stopcovid.coreui.manager.CalibrationManager
 import com.lunabeestudio.stopcovid.coreui.manager.ConfigManager
 import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
@@ -70,7 +68,9 @@ import com.lunabeestudio.stopcovid.fragment.AboutFragment
 import com.lunabeestudio.stopcovid.manager.AppMaintenanceManager
 import com.lunabeestudio.stopcovid.manager.AttestationsManager
 import com.lunabeestudio.stopcovid.manager.CalibDataSource
+import com.lunabeestudio.stopcovid.manager.CertificatesDocumentsManager
 import com.lunabeestudio.stopcovid.manager.ConfigDataSource
+import com.lunabeestudio.stopcovid.manager.DccCertificatesManager
 import com.lunabeestudio.stopcovid.manager.FormManager
 import com.lunabeestudio.stopcovid.manager.InfoCenterManager
 import com.lunabeestudio.stopcovid.manager.IsolationManager
@@ -79,7 +79,6 @@ import com.lunabeestudio.stopcovid.manager.LinksManager
 import com.lunabeestudio.stopcovid.manager.MoreKeyFiguresManager
 import com.lunabeestudio.stopcovid.manager.PrivacyManager
 import com.lunabeestudio.stopcovid.manager.ProximityManager
-import com.lunabeestudio.stopcovid.manager.CertificatesDocumentsManager
 import com.lunabeestudio.stopcovid.manager.RisksLevelManager
 import com.lunabeestudio.stopcovid.manager.VaccinationCenterManager
 import com.lunabeestudio.stopcovid.manager.VenuesManager
@@ -96,11 +95,13 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import okhttp3.Cache
 import timber.log.Timber
 import java.io.File
 import java.util.Calendar
 import java.util.Date
 import java.util.concurrent.TimeUnit
+import kotlin.math.roundToInt
 import kotlin.random.Random
 import kotlin.time.ExperimentalTime
 import kotlin.time.hours
@@ -146,7 +147,6 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
                 EnvConstant.Prod.cleaReportBaseUrl,
                 EnvConstant.Prod.cleaReportCertificateSha256,
                 EnvConstant.Prod.cleaStatusBaseUrl,
-                EnvConstant.Prod.cleaStatusCertificateSha256
             ),
             BouncyCastleCryptoDataSource(),
             ConfigDataSource,
@@ -157,6 +157,7 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
     }
 
     private val certificatesDocumentsManager: CertificatesDocumentsManager = CertificatesDocumentsManager(this)
+    val dccCertificatesManager: DccCertificatesManager by lazy { DccCertificatesManager() }
 
     init {
         System.setProperty("kotlinx.coroutines.debug", if (BuildConfig.DEBUG) "on" else "off")
@@ -176,14 +177,19 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
             ConfigManager.clearLocal(this)
             CalibrationManager.clearLocal(this)
             FormManager.clearLocal(this)
-            this.getETagSharedPrefs().edit {
-                clear()
-            }
             secureKeystoreDataSource.configuration = secureKeystoreDataSource.configuration?.apply {
                 version = 0
             }
             secureKeystoreDataSource.calibration = secureKeystoreDataSource.calibration?.apply {
                 version = 0
+            }
+            val okHttpCacheDir = File(cacheDir, "http_cache")
+            if (okHttpCacheDir.exists()) {
+                try {
+                    Cache(okHttpCacheDir, OKHTTP_MAX_CACHE_SIZE_BYTES).delete()
+                } catch (e: Exception) {
+                    Timber.e(e)
+                }
             }
         }
 
@@ -281,6 +287,9 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
             certificatesDocumentsManager.onAppForeground(this@StopCovid)
         }
         appCoroutineScope.launch {
+            dccCertificatesManager.onAppForeground(this@StopCovid)
+        }
+        appCoroutineScope.launch {
             robertManager.refreshConfig(this@StopCovid)
         }
         AnalyticsManager.reportAppEvent(this, AppEventName.e3)
@@ -319,7 +328,8 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
 
     override fun notifyAtRiskLevelChange() {
         RisksLevelManager.getCurrentLevel(robertManager.atRiskStatus?.riskLevel)?.let { riskLevel ->
-            AnalyticsManager.reportHealthEvent(this, HealthEventName.eh2, null)
+            AnalyticsManager.reportHealthEvent(this, HealthEventName.eh2, riskLevel.riskLevel.roundToInt().toString())
+            AnalyticsManager.reportAppEvent(this, AppEventName.e2)
             val inputData = Data.Builder()
                 .putString(AtRiskNotificationWorker.INPUT_DATA_TITLE_KEY, riskLevel.labels.notifTitle)
                 .putString(AtRiskNotificationWorker.INPUT_DATA_MESSAGE_KEY, riskLevel.labels.notifBody)
@@ -557,6 +567,7 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
 
     companion object {
         private const val LOCAL_PROXIMITY_DIR = "local_proximity"
+        private const val OKHTTP_MAX_CACHE_SIZE_BYTES: Long = 30 * 1024 * 1024
     }
 
     override fun getBaseUrl(): String {

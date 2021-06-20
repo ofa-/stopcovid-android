@@ -138,7 +138,8 @@ open class SecureFileLocalProximityDataSource(
     private suspend fun dumpCache() {
         dumpRequested.set(true)
 
-        @Suppress("BlockingMethodInNonBlockingContext") val doDump = suspend {
+        @Suppress("BlockingMethodInNonBlockingContext")
+        val doDump = suspend {
             var lastDumpedIndex: Int
             var dumpTime = System.currentTimeMillis()
 

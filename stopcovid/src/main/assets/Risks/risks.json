@@ -37,6 +37,16 @@
                         "action": "risk.section.mcc.url",
                         "type": "web"
                     }
+            },
+            {
+                "section": "risk0.section.test.title",
+                "description" : "risk0.section.test.body",
+                "link" :
+                    {
+                        "label": "risk.section.test.button",
+                        "action": "risk.section.test.url",
+                        "type": "web"
+                    }
             }
         ]
     },
@@ -151,7 +161,7 @@
             "notifTitle" : "risk3.notif.title",
             "notifBody" : "risk3.notif.sub"
         },
-        "color" : {"from" : "#A47984", "to" : "#7E4F5B"},
+        "color" : {"from" : "#DD5860", "to" : "#D02E39"},
         "contactDateFormat" : "range",
         "sections" : [
             {

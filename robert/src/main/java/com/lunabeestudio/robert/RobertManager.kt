@@ -30,7 +30,9 @@ interface RobertManager : AnalyticsRobertManager {
 
     var shouldReloadBleSettings: Boolean
 
-    val canActivateProximity: Boolean
+    val isImmune: Boolean
+
+    val isSick: Boolean
 
     val isRegistered: Boolean
 
@@ -42,8 +44,6 @@ interface RobertManager : AnalyticsRobertManager {
     override val atRiskStatus: AtRiskStatus?
 
     val atRiskLastRefresh: Long?
-
-    val isSick: Boolean
 
     val reportSymptomsStartDate: Long?
 

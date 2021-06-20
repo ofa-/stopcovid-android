@@ -16,8 +16,10 @@ import java.io.File
 internal object RequestHelper {
 
     @Suppress("BlockingMethodInNonBlockingContext")
-    suspend fun tryCatchRequest(context: Context, filesDir: File, apiVersion: String,
-        analyticsServiceName: String?, doRequest: suspend () -> Response<ApiCommonRS>): RobertResult {
+    suspend fun tryCatchRequest(
+        context: Context, filesDir: File, apiVersion: String,
+        analyticsServiceName: String?, doRequest: suspend () -> Response<ApiCommonRS>
+    ): RobertResult {
         return try {
             val result = doRequest()
             if (result.isSuccessful) {
@@ -51,8 +53,10 @@ internal object RequestHelper {
     }
 
     @Suppress("BlockingMethodInNonBlockingContext")
-    suspend fun <T> tryCatchRequestData(context: Context, filesDir: File, apiVersion: String,
-        analyticsServiceName: String?, doRequest: suspend () -> Response<T>): RobertResultData<T> {
+    suspend fun <T> tryCatchRequestData(
+        context: Context, filesDir: File, apiVersion: String,
+        analyticsServiceName: String?, doRequest: suspend () -> Response<T>
+    ): RobertResultData<T> {
         return try {
             val result = doRequest()
             if (result.isSuccessful) {

@@ -38,7 +38,6 @@ class ProximityPayloadTest {
         }
 
         // Then
-
     }
 
     @Test

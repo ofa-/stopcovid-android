@@ -18,16 +18,20 @@ import javax.crypto.CipherInputStream
 import javax.crypto.CipherOutputStream
 import javax.crypto.SecretKey
 
-class SelfDestroyCipherInputStream(inputStream: InputStream, cipher: Cipher, private val key: SecretKey)
-    : CipherInputStream(inputStream, cipher) {
+class SelfDestroyCipherInputStream(inputStream: InputStream, cipher: Cipher, private val key: SecretKey) : CipherInputStream(
+    inputStream,
+    cipher
+) {
     override fun close() {
         super.close()
         key.safeDestroy()
     }
 }
 
-class SelfDestroyCipherOutputStream(outputStream: OutputStream, cipher: Cipher, private val key: SecretKey)
-    : CipherOutputStream(outputStream, cipher) {
+class SelfDestroyCipherOutputStream(outputStream: OutputStream, cipher: Cipher, private val key: SecretKey) : CipherOutputStream(
+    outputStream,
+    cipher
+) {
     override fun close() {
         super.close()
         key.safeDestroy()

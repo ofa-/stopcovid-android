@@ -14,13 +14,9 @@ import android.os.Bundle
 import android.view.View
 import androidx.core.os.bundleOf
 import androidx.fragment.app.setFragmentResult
-import androidx.navigation.fragment.navArgs
-import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 
 class WalletQRCodeFragment : QRCodeFragment() {
-
-    private val args: WalletQRCodeFragmentArgs by navArgs()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -36,9 +32,8 @@ class WalletQRCodeFragment : QRCodeFragment() {
             WalletContainerFragment.SCANNED_CODE_RESULT_KEY,
             bundleOf(
                 WalletContainerFragment.SCANNED_CODE_BUNDLE_KEY to code,
-                WalletContainerFragment.SCANNED_CERTIFICATE_TYPE_REQUESTED_BUNDLE_KEY to args.certificateType.name,
             )
         )
-        findNavControllerOrNull()?.popBackStack(R.id.walletAddCertificateFragment, true)
+        findNavControllerOrNull()?.popBackStack()
     }
 }

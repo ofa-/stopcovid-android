@@ -31,7 +31,8 @@ class LoadingVisibilityDelayDelegate(
     var showLoading: () -> Unit,
     var hideLoading: () -> Unit,
     var minLoadingShowDurationMs: Long = DEFAULT_MIN_LOADING_SHOW_DURATION_MS,
-    var delayBeforeShowMs: Long = DEFAULT_DELAY_BEFORE_SHOW_MS) : CoroutineScope {
+    var delayBeforeShowMs: Long = DEFAULT_DELAY_BEFORE_SHOW_MS
+) : CoroutineScope {
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Main + job

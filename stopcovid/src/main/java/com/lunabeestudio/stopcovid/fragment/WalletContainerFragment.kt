@@ -10,13 +10,15 @@
 
 package com.lunabeestudio.stopcovid.fragment
 
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.URLUtil
 import androidx.fragment.app.setFragmentResultListener
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
-import androidx.preference.PreferenceManager
 import com.lunabeestudio.analytics.manager.AnalyticsManager
 import com.lunabeestudio.analytics.model.AppEventName
 import com.lunabeestudio.domain.model.WalletCertificateType
@@ -24,12 +26,15 @@ import com.lunabeestudio.stopcovid.coreui.extension.appCompatActivity
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.fragment.BaseFragment
 import com.lunabeestudio.stopcovid.databinding.FragmentWalletContainerBinding
+import com.lunabeestudio.stopcovid.extension.dccCertificatesManager
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
 import com.lunabeestudio.stopcovid.extension.showUnknownErrorAlert
 import com.lunabeestudio.stopcovid.extension.walletCertificateError
 import com.lunabeestudio.stopcovid.manager.WalletManager
+import com.lunabeestudio.stopcovid.model.WalletCertificate
+import kotlinx.coroutines.launch
 
 class WalletContainerFragment : BaseFragment() {
 
@@ -45,8 +50,8 @@ class WalletContainerFragment : BaseFragment() {
         requireContext().secureKeystoreDataSource()
     }
 
-    private val sharedPreferences by lazy {
-        PreferenceManager.getDefaultSharedPreferences(requireContext())
+    private val dccCertificatesManager by lazy {
+        requireContext().dccCertificatesManager()
     }
 
     private var confirmationAsked: Boolean = false
@@ -61,21 +66,34 @@ class WalletContainerFragment : BaseFragment() {
         confirmationAsked = savedInstanceState?.getBoolean(CONFIRMATION_ASKED_KEY) == true
 
         val certificateCode = args.code
-        if (certificateCode != null && !confirmationAsked) {
-            if (checkCodeValue(certificateCode)) {
-                findNavControllerOrNull()?.safeNavigate(
-                    WalletContainerFragmentDirections.actionWalletContainerFragmentToConfirmAddWalletCertificateFragment(
-                        certificateCode
+        val certificateFormat = args.certificateFormat?.let { WalletCertificateType.Format.fromValue(it) }
+
+        if (certificateCode != null && certificateFormat != null && !confirmationAsked) {
+            lifecycleScope.launch {
+                if (checkCodeValue(certificateCode, certificateFormat)) {
+                    findNavControllerOrNull()?.safeNavigate(
+                        WalletContainerFragmentDirections.actionWalletContainerFragmentToConfirmAddWalletCertificateFragment(
+                            certificateCode
+                        )
                     )
-                )
-                confirmationAsked = true
+                    confirmationAsked = true
+                }
             }
         }
 
         setFragmentResultListener(SCANNED_CODE_RESULT_KEY) { _, bundle ->
-            val url = bundle.getString(SCANNED_CODE_BUNDLE_KEY)
-            val certificateType = WalletCertificateType.valueOf(bundle.getString(SCANNED_CERTIFICATE_TYPE_REQUESTED_BUNDLE_KEY)!!)
-            url?.let { processUrlValue(it, certificateType) }
+            val scannedData = bundle.getString(SCANNED_CODE_BUNDLE_KEY)
+            scannedData?.let { data ->
+                if (URLUtil.isValidUrl(data)) {
+                    lifecycleScope.launch {
+                        processUrlValue(data)
+                    }
+                } else {
+                    lifecycleScope.launch {
+                        processCodeValue(data, certificateFormat)
+                    }
+                }
+            }
         }
 
         setFragmentResultListener(CONFIRM_ADD_CODE_RESULT_KEY) { _, bundle ->
@@ -83,7 +101,9 @@ class WalletContainerFragment : BaseFragment() {
             val confirm = bundle.getBoolean(CONFIRM_ADD_CODE_BUNDLE_KEY_CONFIRM)
 
             if (confirm && code != null) {
-                processCodeValue(code)
+                lifecycleScope.launch {
+                    processCodeValue(code, certificateFormat)
+                }
             }
         }
     }
@@ -92,7 +112,7 @@ class WalletContainerFragment : BaseFragment() {
         binding = FragmentWalletContainerBinding.inflate(inflater, container, false)
         binding.walletBottomSheetButton.setOnClickListener {
             findNavControllerOrNull()
-                ?.safeNavigate(WalletContainerFragmentDirections.actionWalletContainerFragmentToWalletAddCertificateFragment())
+                ?.safeNavigate(WalletContainerFragmentDirections.actionProximityFragmentToWalletQRCodeFragment())
         }
         return binding.root
     }
@@ -107,35 +127,47 @@ class WalletContainerFragment : BaseFragment() {
         outState.putBoolean(CONFIRMATION_ASKED_KEY, confirmationAsked)
     }
 
-    private fun processUrlValue(url: String, certificateType: WalletCertificateType) {
+    private suspend fun processUrlValue(url: String) {
         try {
             val certificateCode = WalletManager.extractCertificateCodeFromUrl(url)
-            processCodeValue(certificateCode)
+            val certificateFormat = Uri.parse(url).lastPathSegment?.let { WalletCertificateType.Format.fromValue(it) }
+            processCodeValue(certificateCode, certificateFormat)
         } catch (e: Exception) {
-            handleCertificateError(e, certificateType)
+            handleCertificateError(e, null)
         }
     }
 
-    private fun checkCodeValue(certificateCode: String): Boolean {
+    private suspend fun checkCodeValue(certificateCode: String, certificateFormat: WalletCertificateType.Format): Boolean {
         return try {
-            WalletManager.verifyCertificateCodeValue(sharedPreferences, robertManager.configuration, certificateCode)
+            WalletManager.verifyCertificateCodeValue(
+                robertManager.configuration,
+                certificateCode,
+                dccCertificatesManager.certificates,
+                certificateFormat,
+            )
             true
         } catch (e: Exception) {
             handleCertificateError(e, certificateCode)
         }
     }
 
-    private fun processCodeValue(certificateCode: String) {
+    private suspend fun processCodeValue(certificateCode: String, certificateFormat: WalletCertificateType.Format?) {
         try {
-            WalletManager.processCertificateCode(sharedPreferences, robertManager, keystoreDataSource, certificateCode)
+            WalletManager.processCertificateCode(
+                robertManager,
+                keystoreDataSource,
+                certificateCode,
+                dccCertificatesManager.certificates,
+                certificateFormat,
+            )
             context?.let { AnalyticsManager.reportAppEvent(it, AppEventName.e13, null) }
         } catch (e: Exception) {
             handleCertificateError(e, certificateCode)
         }
     }
 
-    private fun handleCertificateError(error: Exception, certificateCode: String): Boolean {
-        val certificateType = WalletManager.extractCertificateType(certificateCode)
+    private suspend fun handleCertificateError(error: Exception, certificateCode: String?): Boolean {
+        val certificateType = certificateCode?.let { WalletCertificate.getTypeFromValue(it) }
         if (certificateType != null) {
             handleCertificateError(error, certificateType)
         } else {
@@ -162,7 +194,6 @@ class WalletContainerFragment : BaseFragment() {
     companion object {
         const val SCANNED_CODE_RESULT_KEY: String = "SCANNED_CODE_RESULT_KEY"
         const val SCANNED_CODE_BUNDLE_KEY: String = "SCANNED_CODE_BUNDLE_KEY"
-        const val SCANNED_CERTIFICATE_TYPE_REQUESTED_BUNDLE_KEY: String = "SCANNED_CERTIFICATE_TYPE_REQUESTED_BUNDLE_KEY"
         const val CONFIRM_ADD_CODE_RESULT_KEY: String = "CONFIRM_ADD_CODE_RESULT_KEY"
         const val CONFIRM_ADD_CODE_BUNDLE_KEY_CONFIRM: String = "CONFIRM_ADD_CODE_BUNDLE_KEY_CONFIRM"
         const val CONFIRM_ADD_CODE_BUNDLE_KEY_CODE: String = "CONFIRM_ADD_CODE_BUNDLE_KEY_CODE"

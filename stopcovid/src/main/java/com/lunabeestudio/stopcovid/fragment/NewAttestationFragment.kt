@@ -51,12 +51,13 @@ import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
-import java.util.Locale
 
 class NewAttestationFragment : MainFragment() {
 
     private val gson: Gson = Gson()
-    private val viewModel: NewAttestationViewModel by activityViewModels { NewAttestationViewModelFactory(requireContext().secureKeystoreDataSource()) }
+    private val viewModel: NewAttestationViewModel by activityViewModels {
+        NewAttestationViewModelFactory(requireContext().secureKeystoreDataSource())
+    }
     private val dateFormat: DateFormat = SimpleDateFormat.getDateInstance(DateFormat.LONG)
     private val dateTimeFormat: DateFormat = SimpleDateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.SHORT)
 
@@ -250,7 +251,8 @@ class NewAttestationFragment : MainFragment() {
                 textInputType = when (formField.type) {
                     "text" -> when (formField.contentType) {
                         "firstName", "lastName" -> EditorInfo.TYPE_CLASS_TEXT or EditorInfo.TYPE_TEXT_VARIATION_PERSON_NAME
-                        "addressLine1", "addressCity", "addressCountry" -> EditorInfo.TYPE_CLASS_TEXT or EditorInfo.TYPE_TEXT_VARIATION_POSTAL_ADDRESS
+                        "addressLine1", "addressCity", "addressCountry" ->
+                            EditorInfo.TYPE_CLASS_TEXT or EditorInfo.TYPE_TEXT_VARIATION_POSTAL_ADDRESS
                         else -> EditorInfo.TYPE_CLASS_TEXT
                     }
                     "number" -> EditorInfo.TYPE_CLASS_NUMBER or EditorInfo.TYPE_NUMBER_VARIATION_NORMAL
@@ -278,14 +280,18 @@ class NewAttestationFragment : MainFragment() {
                 datePicker.isSaveFromParentEnabled = false
                 datePicker.isSaveEnabled = false
                 date.set(year, monthOfYear, dayOfMonth)
-                TimePickerDialog(context, { timePicker, hourOfDay, minute ->
-                    // Fix crash https://issuetracker.google.com/issues/37055335
-                    timePicker.isSaveFromParentEnabled = false
-                    timePicker.isSaveEnabled = false
-                    date.set(Calendar.HOUR_OF_DAY, hourOfDay)
-                    date.set(Calendar.MINUTE, minute)
-                    onDatePicked.invoke(date.timeInMillis)
-                }, currentDate[Calendar.HOUR_OF_DAY], currentDate[Calendar.MINUTE], true)
+                TimePickerDialog(
+                    context,
+                    { timePicker, hourOfDay, minute ->
+                        // Fix crash https://issuetracker.google.com/issues/37055335
+                        timePicker.isSaveFromParentEnabled = false
+                        timePicker.isSaveEnabled = false
+                        date.set(Calendar.HOUR_OF_DAY, hourOfDay)
+                        date.set(Calendar.MINUTE, minute)
+                        onDatePicked.invoke(date.timeInMillis)
+                    },
+                    currentDate[Calendar.HOUR_OF_DAY], currentDate[Calendar.MINUTE], true
+                )
                     .show()
             },
             currentDate[Calendar.YEAR],

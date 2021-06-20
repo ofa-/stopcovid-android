@@ -37,6 +37,4 @@ data class ProximityPayload(val data: ByteArray) {
     override fun hashCode(): Int {
         return data.contentHashCode()
     }
-
-
 }
