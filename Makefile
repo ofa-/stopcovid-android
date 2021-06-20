@@ -55,3 +55,8 @@ $(keystore):
 
 local.properties:
 	cp $@.sample $@
+
+build: buildSrc
+buildSrc:
+	git submodule update --init
+	ln -s dgca-app-core-android/buildSrc .

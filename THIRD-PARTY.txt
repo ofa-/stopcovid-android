@@ -43,6 +43,10 @@ Component: PhotoView
 License Text URL: http://www.apache.org/licenses/LICENSE-2.0
 Source Code: https://github.com/Baseflow/PhotoView
 
+Component: EU Digital COVID Certificate App Core - Android
+License Text URL: http://www.apache.org/licenses/LICENSE-2.0
+Source Code: https://github.com/eu-digital-green-certificates/dgca-app-core-android
+
 ================================================================================
 BSD 3-Clause
 ================================================================================

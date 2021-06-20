@@ -22,7 +22,7 @@ jobs:
       - run: base64 -d > stopcovid/my-release-key.jks
              <<< "${{ secrets.KEYSTORE }}"
 
-      - run: bash ./gradlew assembleRelease
+      - run: make build
 
       - uses: actions/upload-artifact@v1
         with:

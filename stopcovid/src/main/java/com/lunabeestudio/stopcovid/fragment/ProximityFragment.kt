@@ -465,10 +465,8 @@ class ProximityFragment : TimeMainFragment() {
         addSectionSeparator(items)
 
         // Attestation
-        if (robertManager.configuration.displayAttestation || robertManager.configuration.displaySanitaryCertificatesWallet) {
             addAttestationItems(items)
             addSectionSeparator(items)
-        }
 
         // Venue items
             addVenueItems(items, isSick)
@@ -1208,7 +1206,7 @@ class ProximityFragment : TimeMainFragment() {
 
     private fun updateErrorLayout(activityMainBinding: ActivityMainBinding?, deviceSetup: DeviceSetup?) {
         activityMainBinding?.errorTextView?.text = ProximityManager.getErrorText(this, robertManager, currentServiceError, strings)
-        val clickListener = ProximityManager.getErrorClickListener(this, robertManager, currentServiceError, {
+        val clickListener = getErrorClickListener()
 
         getActivityBinding()?.errorTextView?.setOnClickListener(clickListener)
         if (clickListener != null) {

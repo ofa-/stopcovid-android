@@ -57,7 +57,7 @@ android {
         applicationId "fr.gouv.android.stopcovid"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 274
+        versionCode 276
         versionName "3.2.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -110,4 +110,9 @@ dependencies {
     androidTestImplementation "androidx.test.ext:junit:_"
     androidTestImplementation "androidx.test:runner:_"
     androidTestImplementation "com.squareup.okhttp3:mockwebserver:_"
+}
+
+configurations {
+    implementation.exclude module:'gauva-jdk5'
+    all*.exclude group: 'com.google.guava', module: 'listenablefuture'
 }
