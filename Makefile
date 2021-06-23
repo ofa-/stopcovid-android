@@ -22,7 +22,7 @@ cat.%:
 	@$(ADB) cat $(FILES)/$*
 
 load: data.load.txt
-	$(MAKE) cp rm --ignore-errors --quiet
+	$(MAKE) save rm --ignore-errors --quiet
 	$(ADB) tee -a $(FILES)/localProximity.txt	< data.load.txt \
 							> /dev/null
 log:
