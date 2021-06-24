@@ -17,6 +17,7 @@ import android.view.View
 import android.view.WindowManager
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -24,6 +25,7 @@ import com.lunabeestudio.robert.RobertApplication
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.StopCovid
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
+import com.lunabeestudio.stopcovid.coreui.extension.isNightMode
 import com.lunabeestudio.stopcovid.coreui.fastitem.buttonItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
@@ -70,7 +72,14 @@ class SendHistoryFragment : MainFragment() {
                 progressDialog?.dismiss()
                 progressDialog = null
                 onBackPressedCallback.isEnabled = true
-                activity?.window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                activity?.let { activity ->
+                    activity.window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                    // Fix loosing status bar light status
+                    WindowInsetsControllerCompat(
+                        activity.window,
+                        activity.window.decorView
+                    ).isAppearanceLightStatusBars = !activity.isNightMode()
+                }
             } else {
                 if (progressDialog == null) {
                     context?.let { context ->

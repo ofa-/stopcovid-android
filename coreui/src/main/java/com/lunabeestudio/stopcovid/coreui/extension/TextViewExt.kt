@@ -10,7 +10,7 @@ fun TextView.setTextOrHide(
     if (value.isNullOrEmpty()) {
         visibility = View.GONE
     } else {
-        text = value
+        text = value.safeEmojiSpanify()
         ifVisibleBlock?.let { apply(it) }
         visibility = View.VISIBLE
     }

@@ -3,6 +3,7 @@ package com.lunabeestudio.stopcovid.coreui.fastitem
 import android.content.res.ColorStateList
 import android.graphics.drawable.GradientDrawable
 import android.util.LayoutDirection
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -43,6 +44,7 @@ class CardWithActionsItem(private val cardTheme: CardTheme) : AbstractBindingIte
     var mainBody: String? = null
     var mainMaxLines: Int? = null
     var mainLayoutDirection: Int = LayoutDirection.INHERIT
+    var mainGravity: Int = Gravity.NO_GRAVITY
 
     @DrawableRes
     var mainImage: Int? = null
@@ -76,6 +78,9 @@ class CardWithActionsItem(private val cardTheme: CardTheme) : AbstractBindingIte
             this@CardWithActionsItem.mainMaxLines?.let { maxLines = it }
         }
         binding.mainImageView.setImageResourceOrHide(mainImage)
+        binding.mainHeaderTextView.gravity = mainGravity
+        binding.mainTitleTextView.gravity = mainGravity
+        binding.mainBodyTextView.gravity = mainGravity
 
         if (mainLayoutVisible) {
             binding.mainLayout.visibility = View.VISIBLE

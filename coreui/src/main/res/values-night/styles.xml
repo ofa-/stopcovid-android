@@ -12,7 +12,6 @@
     <style name="Theme.StopCovid" parent="Theme.Base.StopCovid">
         <item name="colorPrimary">@color/color_malibu</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:windowLightStatusBar" tools:targetApi="m">false</item>
 
         <item name="dividerColor">@color/color_mine_shaft</item>
     </style>

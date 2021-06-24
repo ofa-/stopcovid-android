@@ -75,5 +75,6 @@
     <dimen name="widget_second_figure_min_font_size">5sp</dimen>
     <dimen name="widget_figures_graph_size">100dp</dimen>
 
-
+    <dimen name="bottom_sheet_top_space_shadow_height">8dp</dimen>
+    <dimen name="bottom_sheet_top_shadow_height">16dp</dimen>
 </resources>

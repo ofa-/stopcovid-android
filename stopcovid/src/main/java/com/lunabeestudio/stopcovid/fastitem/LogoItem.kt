@@ -10,10 +10,12 @@
 
 package com.lunabeestudio.stopcovid.fastitem
 
+import android.content.res.ColorStateList
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageSwitcher
+import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.core.view.isInvisible
 import androidx.recyclerview.widget.RecyclerView
@@ -28,6 +30,9 @@ class LogoItem : AbstractBindingItem<ItemLogoBinding>() {
     var imageRes: Int? = null
     var isInvisible: Boolean = false
 
+    @ColorInt
+    var imageTint: Int? = null
+
     override fun createBinding(inflater: LayoutInflater, parent: ViewGroup?): ItemLogoBinding {
         return ItemLogoBinding.inflate(inflater, parent, false)
     }
@@ -36,6 +41,16 @@ class LogoItem : AbstractBindingItem<ItemLogoBinding>() {
         super.bindView(binding, payloads)
         imageRes?.let(binding.imageSwitcher::setImageResource)
         binding.imageSwitcher.isInvisible = isInvisible
+        imageTint?.let { tint ->
+            binding.imageView1.imageTintList = ColorStateList.valueOf(tint)
+            binding.imageView2.imageTintList = ColorStateList.valueOf(tint)
+        }
+    }
+
+    override fun unbindView(binding: ItemLogoBinding) {
+        super.unbindView(binding)
+        binding.imageView1.imageTintList = null
+        binding.imageView2.imageTintList = null
     }
 
     class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {

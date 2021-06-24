@@ -101,3 +101,7 @@ var SharedPreferences.alertRiskLevelChanged: Boolean
 var SharedPreferences.hideRiskStatus: Boolean
     get() = getBoolean(Constants.SharedPrefs.HIDE_RISK_STATUS, false)
     set(value) = edit { putBoolean(Constants.SharedPrefs.HIDE_RISK_STATUS, value) }
+
+var SharedPreferences.hasUsedUniversalQrScan: Boolean
+    get() = getBoolean(Constants.SharedPrefs.HAS_USED_UNIVERSAL_QR_SCAN, false)
+    set(value) = edit { putBoolean(Constants.SharedPrefs.HAS_USED_UNIVERSAL_QR_SCAN, value) }

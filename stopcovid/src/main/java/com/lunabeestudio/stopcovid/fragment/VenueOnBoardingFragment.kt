@@ -11,17 +11,13 @@
 package com.lunabeestudio.stopcovid.fragment
 
 import android.content.SharedPreferences
-import android.view.Gravity
 import androidx.navigation.fragment.navArgs
 import androidx.preference.PreferenceManager
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
-import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
-import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
-import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
 import com.lunabeestudio.stopcovid.extension.isVenueOnBoardingDone
 import com.lunabeestudio.stopcovid.extension.safeNavigate
-import com.lunabeestudio.stopcovid.fastitem.logoItem
+import com.lunabeestudio.stopcovid.manager.SignalInfosManager
 import com.mikepenz.fastadapter.GenericItem
 
 class VenueOnBoardingFragment : BottomSheetMainFragment() {
@@ -39,32 +35,5 @@ class VenueOnBoardingFragment : BottomSheetMainFragment() {
         findNavControllerOrNull()?.safeNavigate(R.id.venueQrCodeFragment, args.venueArgs)
     }
 
-    override fun getItems(): List<GenericItem> {
-        val items = ArrayList<GenericItem>()
-
-        items += logoItem {
-            imageRes = R.drawable.signal
-            identifier = R.drawable.signal.toLong()
-        }
-        items += spaceItem {
-            spaceRes = R.dimen.spacing_xlarge
-            identifier = items.size.toLong()
-        }
-        items += titleItem {
-            text = strings["venuesRecording.onboardingController.mainMessage.title"]
-            gravity = Gravity.CENTER
-            identifier = items.size.toLong()
-        }
-        items += captionItem {
-            text = strings["venuesRecording.onboardingController.mainMessage.message"]
-            gravity = Gravity.CENTER
-            identifier = items.size.toLong()
-        }
-        items += spaceItem {
-            spaceRes = R.dimen.spacing_xlarge
-            identifier = items.size.toLong()
-        }
-
-        return items
-    }
+    override fun getItems(): List<GenericItem> = SignalInfosManager.getInfosItems(requireContext(), strings)
 }

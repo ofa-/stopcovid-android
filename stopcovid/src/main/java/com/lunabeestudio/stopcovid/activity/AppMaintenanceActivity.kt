@@ -15,6 +15,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.github.razir.progressbutton.DrawableButton
@@ -24,6 +25,7 @@ import com.github.razir.progressbutton.showProgress
 import com.google.gson.Gson
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.ConfigConstant
+import com.lunabeestudio.stopcovid.coreui.extension.isNightMode
 import com.lunabeestudio.stopcovid.coreui.manager.LocalizedStrings
 import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
 import com.lunabeestudio.stopcovid.databinding.ActivityAppMaintenanceBinding
@@ -46,6 +48,7 @@ class AppMaintenanceActivity : AppCompatActivity() {
 
         binding = ActivityAppMaintenanceBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = !isNightMode()
         val info = Gson().fromJson(intent.getStringExtra(EXTRA_INFO), Info::class.java)
         fillScreen(info)
         bindProgressButton(binding.refreshButton)

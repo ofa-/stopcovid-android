@@ -37,6 +37,7 @@ object Constants {
             "currentVaccinationReferenceLongitude"
         const val ALERT_RISK_LEVEL_CHANGED: String = "alertRiskLevelChanged"
         const val HIDE_RISK_STATUS: String = "hideRiskStatus"
+        const val HAS_USED_UNIVERSAL_QR_SCAN: String = "hasUsedUniversalQrScan"
     }
 
     object Notification {
@@ -70,8 +71,8 @@ object Constants {
         const val FIGURES_FRAGMENT_URI: String = "tousanticovid://allFigures/"
         const val CERTIFICATE_SHORTCUT_URI: String = "tousanticovid://attestations/"
         const val NEW_CERTIFICATE_SHORTCUT_URI: String = "tousanticovid://attestations//new_attestation"
-        const val VENUE_QRCODE_SHORTCUT_URI: String = "tousanticovid://venueQRCode/"
         const val PROXIMITY_FRAGMENT_URI: String = "tousanticovid://proximity/"
+        const val UNIVERSAL_QRCODE_SHORTCUT_URI: String = "tousanticovid://universalQRCode/"
     }
 
     object Android {

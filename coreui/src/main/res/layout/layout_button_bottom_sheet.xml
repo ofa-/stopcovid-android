@@ -24,6 +24,18 @@
             app:behavior_hideable="false"
             app:layout_behavior="@string/bottom_sheet_behavior">
 
+            <Space
+                android:id="@+id/bottomSheetTopSpace"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/bottom_sheet_top_space_shadow_height"
+                app:layout_constraintTop_toTopOf="@id/bottomSheetCardView" />
+
+            <include
+                layout="@layout/top_shadow"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/bottom_sheet_top_shadow_height"
+                app:layout_constraintBottom_toBottomOf="@id/bottomSheetTopSpace" />
+
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/bottomSheetCardView"
                 style="@style/Widget.MaterialComponents.CardView"

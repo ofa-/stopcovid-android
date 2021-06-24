@@ -55,7 +55,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         android:background="@color/color_alert"
-        android:visibility="invisible">
+        android:visibility="invisible"
+        tools:visibility="visible">
 
         <TextView
             android:id="@+id/errorTextView"

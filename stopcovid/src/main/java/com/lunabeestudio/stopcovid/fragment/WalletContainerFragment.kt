@@ -22,6 +22,8 @@ import androidx.navigation.fragment.navArgs
 import com.lunabeestudio.analytics.manager.AnalyticsManager
 import com.lunabeestudio.analytics.model.AppEventName
 import com.lunabeestudio.domain.model.WalletCertificateType
+import com.lunabeestudio.robert.extension.safeEnumValueOf
+import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.extension.appCompatActivity
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.fragment.BaseFragment
@@ -32,6 +34,7 @@ import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
 import com.lunabeestudio.stopcovid.extension.showUnknownErrorAlert
 import com.lunabeestudio.stopcovid.extension.walletCertificateError
+import com.lunabeestudio.stopcovid.manager.DeeplinkManager
 import com.lunabeestudio.stopcovid.manager.WalletManager
 import com.lunabeestudio.stopcovid.model.WalletCertificate
 import kotlinx.coroutines.launch
@@ -68,21 +71,30 @@ class WalletContainerFragment : BaseFragment() {
         val certificateCode = args.code
         val certificateFormat = args.certificateFormat?.let { WalletCertificateType.Format.fromValue(it) }
 
-        if (certificateCode != null && certificateFormat != null && !confirmationAsked) {
+        if (certificateCode != null && !confirmationAsked && args.origin == DeeplinkManager.Origin.EXTERNAL) {
             lifecycleScope.launch {
                 if (checkCodeValue(certificateCode, certificateFormat)) {
                     findNavControllerOrNull()?.safeNavigate(
                         WalletContainerFragmentDirections.actionWalletContainerFragmentToConfirmAddWalletCertificateFragment(
-                            certificateCode
+                            certificateCode,
+                            certificateFormat?.name,
                         )
                     )
                     confirmationAsked = true
                 }
             }
+        } else if (certificateCode != null && args.origin == DeeplinkManager.Origin.UNIVERSAL) {
+            lifecycleScope.launch {
+                processCodeValue(certificateCode, certificateFormat)
+            }
         }
 
-        setFragmentResultListener(SCANNED_CODE_RESULT_KEY) { _, bundle ->
-            val scannedData = bundle.getString(SCANNED_CODE_BUNDLE_KEY)
+        setupResultListener()
+    }
+
+    private fun setupResultListener() {
+        setFragmentResultListener(WalletQRCodeFragment.SCANNED_CODE_RESULT_KEY) { _, bundle ->
+            val scannedData = bundle.getString(WalletQRCodeFragment.SCANNED_CODE_BUNDLE_KEY)
             scannedData?.let { data ->
                 if (URLUtil.isValidUrl(data)) {
                     lifecycleScope.launch {
@@ -90,7 +102,7 @@ class WalletContainerFragment : BaseFragment() {
                     }
                 } else {
                     lifecycleScope.launch {
-                        processCodeValue(data, certificateFormat)
+                        processCodeValue(data, null)
                     }
                 }
             }
@@ -98,6 +110,9 @@ class WalletContainerFragment : BaseFragment() {
 
         setFragmentResultListener(CONFIRM_ADD_CODE_RESULT_KEY) { _, bundle ->
             val code = bundle.getString(CONFIRM_ADD_CODE_BUNDLE_KEY_CODE)
+            val certificateFormat = bundle.getString(CONFIRM_ADD_CODE_BUNDLE_KEY_FORMAT)?.let {
+                safeEnumValueOf<WalletCertificateType.Format>(it)
+            }
             val confirm = bundle.getBoolean(CONFIRM_ADD_CODE_BUNDLE_KEY_CONFIRM)
 
             if (confirm && code != null) {
@@ -137,7 +152,7 @@ class WalletContainerFragment : BaseFragment() {
         }
     }
 
-    private suspend fun checkCodeValue(certificateCode: String, certificateFormat: WalletCertificateType.Format): Boolean {
+    private suspend fun checkCodeValue(certificateCode: String, certificateFormat: WalletCertificateType.Format?): Boolean {
         return try {
             WalletManager.verifyCertificateCodeValue(
                 robertManager.configuration,
@@ -148,6 +163,7 @@ class WalletContainerFragment : BaseFragment() {
             true
         } catch (e: Exception) {
             handleCertificateError(e, certificateCode)
+            false
         }
     }
 
@@ -160,23 +176,23 @@ class WalletContainerFragment : BaseFragment() {
                 dccCertificatesManager.certificates,
                 certificateFormat,
             )
-            context?.let { AnalyticsManager.reportAppEvent(it, AppEventName.e13, null) }
+            context?.let { context ->
+                AnalyticsManager.reportAppEvent(context, AppEventName.e13, null)
+                strings["walletController.addCertificate.addSucceeded"]?.let {
+                    (activity as? MainActivity)?.showSnackBar(it)
+                }
+            }
         } catch (e: Exception) {
             handleCertificateError(e, certificateCode)
         }
     }
 
-    private suspend fun handleCertificateError(error: Exception, certificateCode: String?): Boolean {
-        val certificateType = certificateCode?.let { WalletCertificate.getTypeFromValue(it) }
-        if (certificateType != null) {
-            handleCertificateError(error, certificateType)
-        } else {
-            showUnknownErrorAlert(null)
-        }
-        return false
+    private suspend fun handleCertificateError(error: Exception, certificateCode: String?) {
+        val certificateType = certificateCode?.let { WalletCertificate.getTypeFromValue(it) } ?: WalletCertificateType.SANITARY
+        handleCertificateError(error, certificateType)
     }
 
-    private fun handleCertificateError(error: Exception, certificateType: WalletCertificateType): Boolean {
+    private fun handleCertificateError(error: Exception, certificateType: WalletCertificateType) {
         val certificateError = error.walletCertificateError()
         if (certificateError != null) {
             findNavControllerOrNull()?.safeNavigate(
@@ -188,15 +204,13 @@ class WalletContainerFragment : BaseFragment() {
         } else {
             showUnknownErrorAlert(null)
         }
-        return false
     }
 
     companion object {
-        const val SCANNED_CODE_RESULT_KEY: String = "SCANNED_CODE_RESULT_KEY"
-        const val SCANNED_CODE_BUNDLE_KEY: String = "SCANNED_CODE_BUNDLE_KEY"
         const val CONFIRM_ADD_CODE_RESULT_KEY: String = "CONFIRM_ADD_CODE_RESULT_KEY"
         const val CONFIRM_ADD_CODE_BUNDLE_KEY_CONFIRM: String = "CONFIRM_ADD_CODE_BUNDLE_KEY_CONFIRM"
         const val CONFIRM_ADD_CODE_BUNDLE_KEY_CODE: String = "CONFIRM_ADD_CODE_BUNDLE_KEY_CODE"
+        const val CONFIRM_ADD_CODE_BUNDLE_KEY_FORMAT: String = "CONFIRM_ADD_CODE_BUNDLE_KEY_FORMAT"
 
         const val CONFIRMATION_ASKED_KEY: String = "confirmationAsked"
     }

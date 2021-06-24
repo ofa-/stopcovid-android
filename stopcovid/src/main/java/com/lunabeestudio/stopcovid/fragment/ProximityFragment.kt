@@ -20,13 +20,9 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.ServiceConnection
 import android.content.SharedPreferences
-import android.content.pm.ShortcutInfo
-import android.content.pm.ShortcutManager
 import android.graphics.Color
-import android.graphics.drawable.Icon
 import android.location.LocationManager
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.os.SystemClock
@@ -35,13 +31,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
-import androidx.annotation.RequiresApi
+import android.webkit.URLUtil
 import androidx.core.app.ShareCompat
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.view.ViewCompat
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
+import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.navOptions
@@ -104,6 +100,7 @@ import com.lunabeestudio.stopcovid.fastitem.numbersCardItem
 import com.lunabeestudio.stopcovid.fastitem.onOffLottieItem
 import com.lunabeestudio.stopcovid.fastitem.proximityButtonItem
 import com.lunabeestudio.stopcovid.manager.AppMaintenanceManager
+import com.lunabeestudio.stopcovid.manager.DeeplinkManager
 import com.lunabeestudio.stopcovid.manager.InfoCenterManager
 import com.lunabeestudio.stopcovid.manager.KeyFiguresManager
 import com.lunabeestudio.stopcovid.manager.ProximityManager
@@ -116,6 +113,7 @@ import com.lunabeestudio.stopcovid.model.DeviceSetup
 import com.lunabeestudio.stopcovid.model.KeyFigure
 import com.lunabeestudio.stopcovid.model.NoEphemeralBluetoothIdentifierFound
 import com.lunabeestudio.stopcovid.service.ProximityService
+import com.lunabeestudio.stopcovid.utils.ExtendedFloatingActionButtonScrollListener
 import com.lunabeestudio.stopcovid.viewmodel.ProximityViewModel
 import com.lunabeestudio.stopcovid.viewmodel.ProximityViewModelFactory
 import com.mikepenz.fastadapter.GenericItem
@@ -182,6 +180,8 @@ class ProximityFragment : TimeMainFragment() {
     private var lastAdapterRefresh: Long = 0L
     private var currentServiceError: CovidException? = null
     private var boundedService: ProximityService? = null
+    private var showErrorLayoutAnimationInProgress: Boolean = false
+    private var hideErrorLayoutAnimationInProgress: Boolean = false
 
     private val proximityServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
@@ -225,6 +225,32 @@ class ProximityFragment : TimeMainFragment() {
         }
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setFragmentResultListener(UniversalQrScanFragment.SCANNED_CODE_RESULT_KEY) { _, bundle ->
+            val scannedData = bundle.getString(UniversalQrScanFragment.SCANNED_CODE_BUNDLE_KEY)
+            scannedData?.let { data ->
+                if (URLUtil.isValidUrl(data)) {
+                    val uri = Uri.parse(data).buildUpon()
+                        .appendQueryParameter(DeeplinkManager.DEEPLINK_CERTIFICATE_ORIGIN_PARAMETER, DeeplinkManager.Origin.UNIVERSAL.name)
+                        .build()
+                    val finalUri = DeeplinkManager.transformFragmentToCodeParam(uri)
+                    (activity as? MainActivity)?.processDeeplink(finalUri)
+                } else {
+                    lifecycleScope.launch {
+                        findNavControllerOrNull()
+                            ?.navigate(
+                                ProximityFragmentDirections.actionProximityFragmentToWalletContainerFragment(
+                                    code = data,
+                                    origin = DeeplinkManager.Origin.UNIVERSAL,
+                                )
+                            )
+                    }
+                }
+            }
+        }
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = super.onCreateView(inflater, container, savedInstanceState)
         activity?.registerReceiver(receiver, IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED))
@@ -239,66 +265,25 @@ class ProximityFragment : TimeMainFragment() {
 
         isProximityOn = ProximityManager.isProximityOn(requireContext(), robertManager)
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
-            setupAppShortcuts()
-        }
         if (arguments?.getBoolean(START_PROXIMITY_ARG_KEY) == true) {
             arguments?.remove(START_PROXIMITY_ARG_KEY)
             activateProximity()
         }
 
+        setupExtendedFab()
+
         return view
     }
 
-    @RequiresApi(Build.VERSION_CODES.N_MR1)
-    private fun setupAppShortcuts() {
-        getSystemService(requireContext(), ShortcutManager::class.java)?.let { shortcutManager ->
-            val certificateShortcut = createCertificateShortcut()
-            val venueQrCodeShortcut = createVenueQrCodeShortcut()
-
-            shortcutManager.setDynamicShortcuts(listOfNotNull(certificateShortcut, venueQrCodeShortcut))
-        }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.N_MR1)
-    private fun createCertificateShortcut(): ShortcutInfo? {
-        return if (robertManager.configuration.displayAttestation) {
-            val builder = ShortcutInfo.Builder(context, CURFEW_CERTIFICATE_SHORTCUT_ID)
-
-            builder.setShortLabel(strings["attestationsController.title"] ?: "Attestations")
-            builder.setLongLabel(strings["home.moreSection.curfewCertificate"] ?: "Attestation de déplacement")
-
-            val intent = Intent(
-                Intent.ACTION_VIEW,
-                Uri.parse(Constants.Url.CERTIFICATE_SHORTCUT_URI)
-            )
-            builder
-                .setIcon(Icon.createWithResource(context, R.drawable.ic_document))
-                .setIntent(intent)
-            builder.build()
-        } else {
-            null
-        }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.N_MR1)
-    private fun createVenueQrCodeShortcut(): ShortcutInfo? {
-        return if (robertManager.configuration.displayRecordVenues) {
-            val builder = ShortcutInfo.Builder(context, VENUE_QRCODE_SHORTCUT_ID)
-
-            builder.setShortLabel(strings["appShortcut.venues"] ?: "Scanner un lieu")
-            builder.setLongLabel(strings["home.venuesSection.recordCell.title"] ?: "Enregistrez l’historique des lieux que vous fréquentez")
-
-            val intent = Intent(
-                Intent.ACTION_VIEW,
-                Uri.parse(Constants.Url.VENUE_QRCODE_SHORTCUT_URI)
-            )
-            builder
-                .setIcon(Icon.createWithResource(context, R.drawable.ic_qr_code_scanner))
-                .setIntent(intent)
-            builder.build()
-        } else {
-            null
+    private fun setupExtendedFab() {
+        binding?.floatingActionButton?.let { fab ->
+            fab.text = strings["home.qrScan.button.title"]
+            fab.setOnClickListener {
+                AnalyticsManager.reportAppEvent(requireContext(), AppEventName.e18, null)
+                findNavControllerOrNull()?.navigate(ProximityFragmentDirections.actionProximityFragmentToUniversalQrScanFragment())
+            }
+            binding?.recyclerView?.addOnScrollListener(ExtendedFloatingActionButtonScrollListener(fab))
+            fab.show()
         }
     }
 
@@ -1177,6 +1162,14 @@ class ProximityFragment : TimeMainFragment() {
 
     private fun updateErrorLayout(activityMainBinding: ActivityMainBinding?, deviceSetup: DeviceSetup?) {
         activityMainBinding?.errorTextView?.text = ProximityManager.getErrorText(this, robertManager, currentServiceError, strings)
+        // refresh padding in case error text length change
+        activityMainBinding?.errorLayout?.let { errorLayout ->
+            if (errorLayout.isVisible) {
+                errorLayout.post {
+                    binding?.root?.updatePadding(bottom = errorLayout.height)
+                }
+            }
+        }
         val clickListener = ProximityManager.getErrorClickListener(
             this, robertManager, currentServiceError,
             {
@@ -1206,43 +1199,53 @@ class ProximityFragment : TimeMainFragment() {
     }
 
     private fun hideErrorLayout(activityMainBinding: ActivityMainBinding?) {
-        activityMainBinding?.errorTextView?.isClickable = false
-        val errorLayout = activityMainBinding?.errorLayout
-        errorLayout?.animate()?.apply {
-            duration = resources.getInteger(android.R.integer.config_mediumAnimTime).toLong()
-            interpolator = this@ProximityFragment.interpolator
-            setUpdateListener { valueAnimator ->
-                binding?.recyclerView
-                    ?.updatePadding(bottom = (errorLayout.height.toFloat() * (1f - valueAnimator.animatedValue as Float)).toInt())
-            }
-            translationY(errorLayout.height.toFloat())
-            withEndAction {
-                errorLayout.isInvisible = true
-                binding?.recyclerView?.let {
-                    getAppBarLayout()?.refreshLift(it)
+        activityMainBinding?.errorLayout?.let { errorLayout ->
+            if (!hideErrorLayoutAnimationInProgress && (showErrorLayoutAnimationInProgress || errorLayout.isVisible)) {
+                hideErrorLayoutAnimationInProgress = true
+                activityMainBinding.errorTextView.isClickable = false
+                errorLayout.animate()?.apply {
+                    duration = resources.getInteger(android.R.integer.config_mediumAnimTime).toLong()
+                    interpolator = this@ProximityFragment.interpolator
+                    setUpdateListener { valueAnimator ->
+                        binding?.root
+                            ?.updatePadding(bottom = (errorLayout.height.toFloat() * (1f - valueAnimator.animatedValue as Float)).toInt())
+                    }
+                    translationY(errorLayout.height.toFloat())
+                    withEndAction {
+                        errorLayout.isInvisible = true
+                        binding?.recyclerView?.let {
+                            getAppBarLayout()?.refreshLift(it)
+                        }
+                        hideErrorLayoutAnimationInProgress = false
+                    }
+                    start()
                 }
             }
-            start()
         }
     }
 
     private fun showErrorLayout(activityMainBinding: ActivityMainBinding?) {
-        val errorLayout = activityMainBinding?.errorLayout
-        errorLayout?.post {
-            context?.let {
-                errorLayout.isVisible = true
-                errorLayout.animate().apply {
-                    duration = resources.getInteger(android.R.integer.config_mediumAnimTime).toLong()
-                    interpolator = this@ProximityFragment.interpolator
-                    setUpdateListener { valueAnimator ->
-                        binding?.recyclerView
-                            ?.updatePadding(bottom = (errorLayout.height.toFloat() * valueAnimator.animatedValue as Float).toInt())
+        activityMainBinding?.errorLayout?.let { errorLayout ->
+            if (!showErrorLayoutAnimationInProgress && (hideErrorLayoutAnimationInProgress || errorLayout.isInvisible)) {
+                showErrorLayoutAnimationInProgress = true
+                errorLayout.post {
+                    context?.let {
+                        errorLayout.isVisible = true
+                        errorLayout.animate().apply {
+                            duration = resources.getInteger(android.R.integer.config_mediumAnimTime).toLong()
+                            interpolator = this@ProximityFragment.interpolator
+                            setUpdateListener { valueAnimator ->
+                                binding?.root
+                                    ?.updatePadding(bottom = (errorLayout.height.toFloat() * valueAnimator.animatedValue as Float).toInt())
+                            }
+                            translationY(0f)
+                            withEndAction {
+                                activityMainBinding.errorTextView.isClickable = true
+                                showErrorLayoutAnimationInProgress = false
+                            }
+                            start()
+                        }
                     }
-                    translationY(0f)
-                    withEndAction {
-                        activityMainBinding.errorTextView.isClickable = true
-                    }
-                    start()
                 }
             }
         }
@@ -1267,8 +1270,6 @@ class ProximityFragment : TimeMainFragment() {
 
     companion object {
         private const val PROXIMITY_BUTTON_DELAY: Long = 2000L
-        private const val CURFEW_CERTIFICATE_SHORTCUT_ID: String = "curfewCertificateShortcut"
-        private const val VENUE_QRCODE_SHORTCUT_ID: String = "venueQRCodeShortcut"
         const val START_PROXIMITY_ARG_KEY: String = "START_PROXIMITY_ARG_KEY"
     }
 }

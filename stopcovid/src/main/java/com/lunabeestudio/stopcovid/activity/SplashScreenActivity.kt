@@ -5,12 +5,14 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.lunabeestudio.robert.utils.Event
 import com.lunabeestudio.stopcovid.R
+import com.lunabeestudio.stopcovid.coreui.extension.isNightMode
 import com.lunabeestudio.stopcovid.coreui.manager.LocalizedStrings
 import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
 import com.lunabeestudio.stopcovid.databinding.ActivitySplashScreenBinding
@@ -49,6 +51,7 @@ class SplashScreenActivity : BaseActivity() {
         }
 
         setContentView(splashScreenBinding.root)
+        WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = !isNightMode()
 
         if (StringsManager.strings.isEmpty()) {
             val stringsObserver = object : Observer<Event<LocalizedStrings>> {
@@ -74,6 +77,7 @@ class SplashScreenActivity : BaseActivity() {
         if (onBoardingDone) {
             val intent = Intent(this@SplashScreenActivity, MainActivity::class.java).apply {
                 data = intent.data
+                addFlags(intent.flags)
             }
             startActivity(
                 intent,

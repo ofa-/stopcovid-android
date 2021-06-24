@@ -17,9 +17,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
-import androidx.core.view.isVisible
+import androidx.navigation.ui.NavigationUI
 import com.journeyapps.barcodescanner.BarcodeResult
-import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.UiConstants
 import com.lunabeestudio.stopcovid.coreui.extension.appCompatActivity
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
@@ -45,7 +44,28 @@ abstract class QRCodeFragment : BaseFragment() {
         savedInstanceState: Bundle?,
     ): View? {
         binding = FragmentQrCodeBinding.inflate(inflater, container, false)
+        setupToolbar()
         return binding?.root
+    }
+
+    private fun setupToolbar() {
+        // remove shadow
+        binding?.appBarLayout?.outlineProvider = null
+        // replace previous activity action bar
+        appCompatActivity?.setSupportActionBar(binding?.toolbar)
+        // show back arrow
+        appCompatActivity?.supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        // no title
+        appCompatActivity?.supportActionBar?.title = null
+
+        binding?.toolbar?.let { toolbar ->
+            findNavControllerOrNull()?.let { navController ->
+                NavigationUI.setupWithNavController(
+                    toolbar,
+                    navController
+                )
+            }
+        }
     }
 
     override fun onResume() {
@@ -102,8 +122,6 @@ abstract class QRCodeFragment : BaseFragment() {
     }
 
     override fun refreshScreen() {
-        (activity as? MainActivity)?.binding?.tabLayout?.isVisible = false
-        appCompatActivity?.supportActionBar?.title = strings[getTitleKey()]
         binding?.title?.text = strings[getExplanationKey()]
     }
 

@@ -29,4 +29,6 @@ enum class AppEventName {
     e15,
     e16,
     e17,
+    e18,
+    e19,
 }

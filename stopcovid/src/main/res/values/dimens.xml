@@ -21,6 +21,4 @@
 <resources>
     <dimen name="certificate_double_thumbnail_height">140dp</dimen>
     <dimen name="certificate_single_thumbnail_height">250dp</dimen>
-    <dimen name="wallet_bottom_sheet_top_space_shadow_height">8dp</dimen>
-    <dimen name="wallet_bottom_sheet_top_shadow_height">16dp</dimen>
 </resources>

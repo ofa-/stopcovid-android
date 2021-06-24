@@ -182,7 +182,7 @@ class SanitaryCertificate private constructor(override val value: String) : Fren
             null
         }
 
-        fun getTypeFromValue(value: String): WalletCertificateType? = if (headerDetectionRegex.matches(value)) {
+        fun getTypeFromValue(value: String): WalletCertificateType? = if (headerDetectionRegex.containsMatchIn(value)) {
             WalletCertificateType.SANITARY
         } else {
             null
@@ -295,7 +295,7 @@ class VaccinationCertificate private constructor(override val value: String) : F
             null
         }
 
-        fun getTypeFromValue(value: String): WalletCertificateType? = if (headerDetectionRegex.matches(value)) {
+        fun getTypeFromValue(value: String): WalletCertificateType? = if (headerDetectionRegex.containsMatchIn(value)) {
             WalletCertificateType.VACCINATION
         } else {
             null

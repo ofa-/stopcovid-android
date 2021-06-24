@@ -532,7 +532,7 @@
     "home.healthSection.isSick.title": "Take care",
     "home.healthSection.isSick.subtitle": "Find out more",
     "myHealthController.sick.title": "Health recommendations",
-    "home.attestationSection.title": "Form & Wallet",
+    "home.attestationSection.title": "My wallet",
     "home.attestationSection.cell.title":"My forms",
     "home.attestationSection.cell.subtitle.noAttestations": "Tap here",
     "home.attestationSection.cell.subtitle.oneAttestation": "1 form",
@@ -566,13 +566,13 @@
     "common.error.secretKey": "Database encryption failure. Please try again or restart your phone.",
     "home.venuesSection.title": "Cahier de rappel",
     "home.venuesSection.recordCell.title": "Scan a venue QR code",
-    "home.venuesSection.recordCell.subtitle": "Be alerted in case of exposure in a venue (currently being deployed)",
+    "home.venuesSection.recordCell.subtitle": "Be alerted in case of exposure in a venue",
     "home.venuesSection.privateCell.title": "Are you organising a private event?",
     "home.venuesSection.privateCell.subtitle": "Protect your guests by creating your own code",
     "home.moreSection.venuesHistory": "Venues history",
     "venuesRecording.onboardingController.title": "TousAntiCovid Signal",
    "venuesRecording.onboardingController.mainMessage.title": "Le cahier de rappel numérique.\nEasier and anonymous.",
-   "venuesRecording.onboardingController.mainMessage.message": "TousAntiCovid Signal is the simple and anonymous alternative to the \"cahier de rappel\".\n\n👉 Why: to be alerted and alert others if you are exposed to COVID-19 in a place you have been to.\n\n🔒 It's anonymous: no personal data is collected either on the venue or on the people.\n\n🙂 It's simple: scan the QR Code in the places that have set up Signal. If you are positive, do not forget to identify yourself in TousAntiCovid to anonymously inform other users.\n\nExperimentation phase in a limited number of places.",
+   "venuesRecording.onboardingController.mainMessage.message": "TousAntiCovid Signal is the simple and anonymous alternative to the \"cahier de rappel\".\n\n👉 Why: to be alerted and alert others if you are exposed to COVID-19 in a place you have been to.\n\n🔒 It's anonymous: no personal data is collected either on the venue or on the people.\n\n🙂 It's simple: scan the QR Code in the places that have set up Signal. If you are positive, do not forget to identify yourself in TousAntiCovid to anonymously inform other users.",
     "venuesRecording.onboardingController.button.participate": "Scan a QR Code",
     "venuesRecording.confirmationController.title": "Location recorded",
     "erp.confirmationMessage.default.title": "Thank you!",
@@ -595,7 +595,7 @@
     "onboarding.venuesController.title": "TousAntiCovid Signal",
     "onboarding.venuesController.bottomButton": "Continue",
     "onboarding.venuesController.mainMessage.title": "Le cahier de rappel numérique.\nEasier and anonymous.",
-    "onboarding.venuesController.mainMessage.subtitle": "TousAntiCovid Signal is the simple and anonymous alternative to the \"cahier de rappel\".\n\n👉 Why: to be alerted and alert others if you are exposed to COVID-19 in a place you have been to.\n\n🔒 It's anonymous: no personal data is collected either on the venue or on the people.\n\n🙂 It's simple: scan the QR Code in the places that have set up Signal. If you are positive, do not forget to identify yourself in TousAntiCovid to anonymously inform other users.\n\nExperimentation phase in a limited number of places.",
+    "onboarding.venuesController.mainMessage.subtitle": "TousAntiCovid Signal is the simple and anonymous alternative to the \"cahier de rappel\".\n\n👉 Why: to be alerted and alert others if you are exposed to COVID-19 in a place you have been to.\n\n🔒 It's anonymous: no personal data is collected either on the venue or on the people.\n\n🙂 It's simple: scan the QR Code in the places that have set up Signal. If you are positive, do not forget to identify yourself in TousAntiCovid to anonymously inform other users.",
     "home.healthSection.warningContact.cellTitle": "Possible at-risk exposure",
     "home.healthSection.warningContact.cellSubtitle": "See our recommendations",
     "myHealthController.state.warning.title": "You may have been exposed to at least one user who has tested positive for COVID-19 in the past few days",
@@ -962,7 +962,7 @@
 
    "walletController.title": "Wallet",
    "walletController.explanations.title": "How does it work?",
-   "walletController.explanations.subtitle": "To digitalize your test and vaccination certificates and always have them at hand, it's simple:\n- for your tests, you will receive a text message or an e-mail from SI-DEP platform with instructions.\n- for your vaccination, you will have a QR Code to scan on your certificate. Since May 27th, you can get your vaccination certificates (including old ones) on https://attestation-vaccin.ameli.fr/\n\nThese certificates will have to be presented during checks for your travels 👉 experimentation in progress.\n\nIf you have a problem, you can call 0 800 08 71 48.",
+   "walletController.explanations.subtitle": "To digitalize your test and vaccination certificates and always have them at hand, it's simple:\n- for your tests, you will receive a text message or an e-mail from SI-DEP platform with instructions.\n- for your vaccination, you will have a QR Code to scan on your certificate. Since May 27th, you can get your vaccination certificates (including old ones) on https://attestation-vaccin.ameli.fr/\n\nThese certificates will have to be presented during checks for your travels.\n\nIf you have a problem, you can call 0 800 08 71 48.",
    "walletController.flashButton.title": "Scan QR Code",
    "walletController.flashExplanation": "On your SI-DEP document (test) or vaccination certificate, you have a QR Code that you can scan to add your certificate in this wallet.",
    "walletController.recentCertificatesSection.title": "Recent certificates",
@@ -975,7 +975,7 @@
    "walletController.menu.delete.alert.title": "Confirmation",
    "walletController.menu.delete.alert.message": "Are you sure you want to delete this certificate?",
    
-   "home.attestationSection.sanitaryCertificates.cell.title": "My wallet",
+   "home.attestationSection.sanitaryCertificates.cell.title": "Open my wallet",
    "home.attestationSection.sanitaryCertificates.cell.subtitle": "Your test and vaccination certificates",
    
    "flashWalletCodeController.title": "Scan",
@@ -1230,13 +1230,14 @@
    "universalQrScanExplanationsController.title": "New!",
    "universalQrScanExplanationsController.explanation.title": "QR Codes. Made easier.",
    "universalQrScanExplanationsController.explanation.subtitle": "Scanning QR Codes in TousAntiCovid is now easier.\nOn the top right corner, you have now a button that helps you scan:\n\n👉 a QR Code to import a test or vaccination certificate\n\n👉 a QR Code for the \"cahier de rappel numérique\" (TousAntiCovid Signal, in venues)\n\n👉 a QR Code if you tested positive to alert people you have been in contact with",
+   "universalQrScanExplanationsController.explanation.android.subtitle": "Scanning QR Codes in TousAntiCovid is now easier.\nOn the bottom right corner, you have now a button that helps you scan:\n\n👉 a QR Code to import a test or vaccination certificate\n\n👉 a QR Code for the \"cahier de rappel numérique\" (TousAntiCovid Signal, in venues)\n\n👉 a QR Code if you tested positive to alert people you have been in contact with",
    "universalQrScanExplanationsController.button.title": "Ok!",
 
    "wallet.proof.europe.test.description": "🇪🇺 Digital Covid Certificate\n👉 Tap here to present it\n\n<FULL_NAME>\nDate of birth <BIRTHDATE>\n<ANALYSIS_RESULT> - <ANALYSIS_CODE>\nTested on <FROM_DATE>",
    "wallet.proof.europe.test.positive": "Positive",
    "wallet.proof.europe.test.negative": "✅ Negative",
    "wallet.proof.europe.vaccine.description": "🇪🇺 Digital Covid Certificate\n👉 Tap here to present it\n\n<FULL_NAME>\nDate of birth <BIRTHDATE>\n<VACCINE_NAME>\nInjection date: <DATE>",
-   "wallet.proof.europe.recovery.description": "🇪🇺 Digital Covid Certificate\n👉 Tap here to present it\n\n<FULL_NAME>\nDate of birth <BIRTHDATE>\nFrom <FROM_DATE>, to <TO_DATE>",
+   "wallet.proof.europe.recovery.description": "🇪🇺 Digital Covid Certificate\n👉 Tap here to present it\n\n<FULL_NAME>\nDate of birth <BIRTHDATE>\nValid from <FROM_DATE> to <TO_DATE>",
    "wallet.proof.europe.vaccine.doses" : "Vaccination %d of %d",
    
    "walletCertificateErrorController.explanations.invalidSignature.vaccinationEurope.title": "⚠️ Not authentic",
@@ -1269,6 +1270,6 @@
 
    "appShortcut.qrScan": "Scan TousAntiCovid QR Code",
    "home.qrScan.button.title": "Scan a QR Code",
-   "confirmWalletQrCodeController.explanation.title.fromUniversalQrScan": "You've just scanned a TousAntiCovid QR Code to add a certificate in your wallet."
-
+   "confirmWalletQrCodeController.explanation.title.fromUniversalQrScan": "You've just scanned a TousAntiCovid QR Code to add a certificate in your wallet.",
+   "walletController.addCertificate.addSucceeded": "Certificat successfully added"
 }

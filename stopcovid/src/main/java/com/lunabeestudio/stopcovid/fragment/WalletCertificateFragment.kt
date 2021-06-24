@@ -162,12 +162,14 @@ class WalletCertificateFragment : QRCodeListFragment() {
             this.formatText = formatText
             tag1Text = strings[certificate.tagStringKey()]
 
-            if (certificate is VaccinationCertificate) {
-                tag2Text = strings[certificate.statusStringKey()]
-            } else if ((certificate as? EuropeanCertificate)?.type == WalletCertificateType.VACCINATION_EUROPE) {
-                certificate.greenCertificate.vaccineDose?.let { (first, second) ->
-                    tag2Text = stringsFormat("wallet.proof.europe.vaccine.doses", first, second)
-                }
+            when {
+                certificate is VaccinationCertificate -> tag2Text = strings[certificate.statusStringKey()]
+                (certificate as? EuropeanCertificate)?.type == WalletCertificateType.VACCINATION_EUROPE ->
+                    certificate.greenCertificate.vaccineDose?.let { (first, second) ->
+                        tag2Text = stringsFormat("wallet.proof.europe.vaccine.doses", first, second)
+                    }
+                (certificate as? EuropeanCertificate)?.type == WalletCertificateType.RECOVERY_EUROPE ->
+                    tag2Text = strings["enum.HCertType.recovery"]
             }
 
             this.allowShare = true

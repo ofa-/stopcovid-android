@@ -135,12 +135,12 @@ object VenuesManager {
         keystoreDataSource: SecureKeystoreDataSource,
     ) {
         if (!keystoreDataSource.venuesQrCode?.filter {
-                @Suppress("SENSELESS_COMPARISON")
-                isExpired(
+            @Suppress("SENSELESS_COMPARISON")
+            isExpired(
                     robertManager,
                     it.ntpTimestamp.ntpTimeSToUnixTimeMs()
                 ) || it.ltid == null // This test is added to handle "old" venues that may have null here due to JSON parsing handling
-            }.isNullOrEmpty()
+        }.isNullOrEmpty()
         ) {
             keystoreDataSource.venuesQrCode = keystoreDataSource.venuesQrCode?.filter { venueQrCode ->
                 @Suppress("SENSELESS_COMPARISON")

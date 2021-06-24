@@ -486,7 +486,7 @@
    "home.healthSection.isSick.title":"Prenez soin de vous",
    "home.healthSection.isSick.subtitle":"En savoir plus",
    "myHealthController.sick.title":"Recommandations sanitaires",
-   "home.attestationSection.title":"Attestations & Carnet",
+   "home.attestationSection.title":"Mon carnet",
    "home.attestationSection.cell.title":"Mes attestations",
    "home.attestationSection.cell.subtitle.noAttestations":"Appuyez ici",
    "home.attestationSection.cell.subtitle.oneAttestation":"1 attestation",
@@ -525,13 +525,13 @@
    
    "home.venuesSection.title": "Cahier de rappel",
    "home.venuesSection.recordCell.title": "Scanner un QR Code lieu",
-   "home.venuesSection.recordCell.subtitle": "Soyez alerté en cas d'exposition dans un lieu (en cours d'expérimentation)",
+   "home.venuesSection.recordCell.subtitle": "Soyez alerté en cas d'exposition dans un lieu",
    "home.venuesSection.privateCell.title": "Vous organisez un événement privé ?",
    "home.venuesSection.privateCell.subtitle": "Créez votre propre code, permettant de protéger vos invités",
    "home.moreSection.venuesHistory": "Journal du cahier de rappel",
    "venuesRecording.onboardingController.title": "TousAntiCovid Signal",
    "venuesRecording.onboardingController.mainMessage.title": "Le cahier de rappel numérique.\nPlus simple et anonyme.",
-   "venuesRecording.onboardingController.mainMessage.message": "TousAntiCovid Signal est l'alternative simple et anonyme aux cahiers de rappel.\n\n👉 Pourquoi : pour être alerté et alerter les autres en cas d’exposition à la COVID-19 dans un lieu que vous avez fréquenté.\n\n🔒 C'est anonyme : aucune donnée nominative n’est collectée ni sur le lieu ni sur les personnes.\n\n🙂 C'est simple : scannez le QR Code dans les lieux qui ont mis en place Signal. Si vous êtes positif, n’oubliez pas de vous déclarer dans TousAntiCovid pour informer anonymement les autres utilisateurs.\n\nEn phase d'expérimentation dans un nombre limité de lieux.",
+   "venuesRecording.onboardingController.mainMessage.message": "TousAntiCovid Signal est l'alternative simple et anonyme aux cahiers de rappel.\n\n👉 Pourquoi : pour être alerté et alerter les autres en cas d’exposition à la COVID-19 dans un lieu que vous avez fréquenté.\n\n🔒 C'est anonyme : aucune donnée nominative n’est collectée ni sur le lieu ni sur les personnes.\n\n🙂 C'est simple : scannez le QR Code dans les lieux qui ont mis en place Signal. Si vous êtes positif, n’oubliez pas de vous déclarer dans TousAntiCovid pour informer anonymement les autres utilisateurs.",
    "venuesRecording.onboardingController.button.participate": "Je scanne",
    "venuesRecording.confirmationController.title": "Ajouté",
    "erp.confirmationMessage.default.title": "Merci !",
@@ -557,7 +557,7 @@
    "onboarding.venuesController.title":"TousAntiCovid Signal",
    "onboarding.venuesController.bottomButton":"Continuer",
    "onboarding.venuesController.mainMessage.title":"Le cahier de rappel numérique.\nPlus simple et anonyme.",
-   "onboarding.venuesController.mainMessage.subtitle":"TousAntiCovid Signal est l'alternative simple et anonyme aux cahiers de rappel.\n\n👉 Pourquoi : pour être alerté et alerter les autres en cas d’exposition à la COVID-19 dans un lieu que vous avez fréquenté.\n\n🔒 C'est anonyme : aucune donnée nominative n’est collectée ni sur le lieu ni sur les personnes.\n\n🙂 C'est simple : scannez le QR Code dans les lieux qui ont mis en place Signal. Si vous êtes positif, n’oubliez pas de vous déclarer dans TousAntiCovid pour informer anonymement les autres utilisateurs.\n\nEn phase d'expérimentation dans un nombre limité de lieux.",
+   "onboarding.venuesController.mainMessage.subtitle":"TousAntiCovid Signal est l'alternative simple et anonyme aux cahiers de rappel.\n\n👉 Pourquoi : pour être alerté et alerter les autres en cas d’exposition à la COVID-19 dans un lieu que vous avez fréquenté.\n\n🔒 C'est anonyme : aucune donnée nominative n’est collectée ni sur le lieu ni sur les personnes.\n\n🙂 C'est simple : scannez le QR Code dans les lieux qui ont mis en place Signal. Si vous êtes positif, n’oubliez pas de vous déclarer dans TousAntiCovid pour informer anonymement les autres utilisateurs.",
    
    "home.healthSection.warningContact.cellTitle": "Info : possible exposition à risque",
    "home.healthSection.warningContact.cellSubtitle": "Consultez nos recommandations",
@@ -967,7 +967,7 @@
    "walletController.menu.delete.alert.title": "Confirmation",
    "walletController.menu.delete.alert.message": "Êtes-vous sûr de vouloir supprimer ce certificat ?",
    
-   "home.attestationSection.sanitaryCertificates.cell.title": "Mon carnet",
+   "home.attestationSection.sanitaryCertificates.cell.title": "Ouvrir mon carnet",
    "home.attestationSection.sanitaryCertificates.cell.subtitle": "Vos certificats de test et de vaccination",
    
    "flashWalletCodeController.title": "Scannez",
@@ -1141,7 +1141,7 @@
    
    "enum.HCertType.test": "Test",
    "enum.HCertType.vaccine": "Vaccin",
-   "enum.HCertType.recovery": "Recovery",
+   "enum.HCertType.recovery": "Rétablissement",
    "enum.HCertValidity.valid": "Valide",
    "enum.HCertValidity.invalid": "Non valide",
 
@@ -1231,15 +1231,16 @@
    "universalQrScanController.error.wrongUrl": "Le code scanné n'est pas un lien valide",
    "universalQrScanExplanationsController.title": "Nouveau !",
    "universalQrScanExplanationsController.explanation.title": "Les QR Codes. Plus facile.",
-   "universalQrScanExplanationsController.explanation.subtitle": "Scanner un QR Code dans TousAntiCovid est désormais plus simple.\nTout en haut à droite, vous avez désormais un bouton qui vous permet de scanner :\n\n👉 un QR Code pour importer un certificat de test ou vaccination.\n\n👉 un QR Code du “cahier de rappel numérique” (TousAntiCovid Signal)\n\n👉 un QR code pour vous déclarer positif dans TousAntiCovid et alerter les personnes que vous avez croisées.",
+   "universalQrScanExplanationsController.explanation.subtitle": "Scanner un QR Code dans TousAntiCovid est désormais plus simple.\nTout en haut à droite, vous avez désormais un bouton qui vous permet de scanner :\n\n👉 un QR Code pour importer un certificat de test ou vaccination.\n\n👉 un QR Code du \"cahier de rappel numérique\" (TousAntiCovid Signal)\n\n👉 un QR code pour vous déclarer positif dans TousAntiCovid et alerter les personnes que vous avez croisées.",
+    "universalQrScanExplanationsController.explanation.android.subtitle": "Scanner un QR Code dans TousAntiCovid est désormais plus simple.\nEn bas à droite, vous avez désormais un bouton qui vous permet de scanner :\n\n👉 un QR Code pour importer un certificat de test ou vaccination.\n\n👉 un QR Code du \"cahier de rappel numérique\" (TousAntiCovid Signal)\n\n👉 un QR code pour vous déclarer positif dans TousAntiCovid et alerter les personnes que vous avez croisées.",
    "universalQrScanExplanationsController.button.title": "Ok !",
 
    "wallet.proof.europe.test.description": "🇪🇺 Certificat COVID numérique\n👉 Appuyez ici pour le présenter\n\n<FULL_NAME>\nné(e) le <BIRTHDATE>\n<ANALYSIS_RESULT> - <ANALYSIS_CODE>\nDate du test : <FROM_DATE>",
    "wallet.proof.europe.test.positive": "Positif",
    "wallet.proof.europe.test.negative": "✅ Négatif",
    "wallet.proof.europe.vaccine.description": "🇪🇺 Certificat COVID numérique\n👉 Appuyez ici pour le présenter\n\n<FULL_NAME>\nné(e) le <BIRTHDATE>\n<VACCINE_NAME>\nDate de l'injection : <DATE>",
-   "wallet.proof.europe.recovery.description": "🇪🇺 Certificat COVID numérique\n👉 Appuyez ici pour le présenter\n\n<FULL_NAME>\nné(e) le <BIRTHDATE>\nDepuis le <FROM_DATE>, jusqu'au <TO_DATE>",
-   "wallet.proof.europe.vaccine.doses" : "Vaccin %d sur %d",
+   "wallet.proof.europe.recovery.description": "🇪🇺 Certificat COVID numérique\n👉 Appuyez ici pour le présenter\n\n<FULL_NAME>\nné(e) le <BIRTHDATE>\nValide du <FROM_DATE> au <TO_DATE>",
+   
    
    "walletCertificateErrorController.explanations.invalidSignature.vaccinationEurope.title": "⚠️ Non authentique",
    "walletCertificateErrorController.explanations.invalidSignature.vaccinationEurope.subtitle": "Ce certificat n'est pas authentique.\n\nAssurez-vous que vous tentez de scanner le QR Code sur le bon document 👇",
@@ -1271,6 +1272,6 @@
 
    "appShortcut.qrScan": "Scanner QR Code TousAntiCovid",
    "home.qrScan.button.title": "Scanner un QR Code",
-   "confirmWalletQrCodeController.explanation.title.fromUniversalQrScan": "Vous venez de scanner un QR code TousAntiCovid pour ajouter un certificat dans votre carnet."
-
+   "confirmWalletQrCodeController.explanation.title.fromUniversalQrScan": "Vous venez de scanner un QR code TousAntiCovid pour ajouter un certificat dans votre carnet.",
+   "walletController.addCertificate.addSucceeded": "Certificat ajouté avec succès"
 }

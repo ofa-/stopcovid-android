@@ -23,6 +23,16 @@
         ]
     },
     {
+        "section": "✈️ Travel",
+        "description" : "Re-open EU provides information on the various measures in place, including on quarantine and testing requirements for travellers, the EU Digital COVID certificate to help you exercise your right to free movement, and mobile coronavirus contact tracing and warning apps. The information is updated frequently and available in 24 languages. This should help you plan your travel in Europe, while staying safe and healthy.",
+        "links": [
+	        {
+                "label": "Go to Re-open EU",
+                "url": "https://reopen.europa.eu/en/from-to/FRA/"
+            }
+        ]
+    },
+    {
         "section": "Where to get tested",
         "description" : "To find out where to get tested, go to Santé.fr.",
         "links": [
