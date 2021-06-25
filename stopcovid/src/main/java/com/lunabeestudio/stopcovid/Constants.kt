@@ -41,6 +41,7 @@ object Constants {
         const val HIDE_RISK_STATUS: String = "hideRiskStatus"
         const val SHOW_ERROR_PANEL: String = "showErrorPanel"
         const val SHOW_ACTIVATION_REMINDER: String = "showActivationReminder"
+        const val HAS_USED_UNIVERSAL_QR_SCAN: String = "hasUsedUniversalQrScan"
     }
 
     object Notification {
@@ -74,8 +75,8 @@ object Constants {
         const val FIGURES_FRAGMENT_URI: String = "tousanticovid://allFigures/"
         const val CERTIFICATE_SHORTCUT_URI: String = "tousanticovid://attestations/"
         const val NEW_CERTIFICATE_SHORTCUT_URI: String = "tousanticovid://attestations//new_attestation"
-        const val VENUE_QRCODE_SHORTCUT_URI: String = "tousanticovid://venueQRCode/"
         const val PROXIMITY_FRAGMENT_URI: String = "tousanticovid://proximity/"
+        const val UNIVERSAL_QRCODE_SHORTCUT_URI: String = "tousanticovid://universalQRCode/"
     }
 
     object Android {

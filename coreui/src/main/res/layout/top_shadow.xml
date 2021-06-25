@@ -10,9 +10,6 @@
 
 <View
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="@dimen/bottom_sheet_top_shadow_height"
-    android:background="@drawable/shape_top_shadow"
-    tools:layout_constraintBottom_toTopOf="@id/walletBottomSheetCard"
-    tools:showIn="@layout/fragment_wallet_container" />
+    android:background="@drawable/shape_top_shadow" />

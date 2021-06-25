@@ -56,7 +56,8 @@ class ConfirmAddWalletCertificateFragment : MainFragment() {
                     WalletContainerFragment.CONFIRM_ADD_CODE_RESULT_KEY,
                     bundleOf(
                         WalletContainerFragment.CONFIRM_ADD_CODE_BUNDLE_KEY_CONFIRM to true,
-                        WalletContainerFragment.CONFIRM_ADD_CODE_BUNDLE_KEY_CODE to args.certificateCode
+                        WalletContainerFragment.CONFIRM_ADD_CODE_BUNDLE_KEY_CODE to args.certificateCode,
+                        WalletContainerFragment.CONFIRM_ADD_CODE_BUNDLE_KEY_FORMAT to args.certificateFormat,
                     )
                 )
                 findNavControllerOrNull()?.navigateUp()

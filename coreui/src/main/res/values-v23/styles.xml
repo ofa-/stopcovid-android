@@ -11,7 +11,6 @@
 
     <style name="Theme.StopCovid" parent="Theme.Base.StopCovid">
         <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:windowLightStatusBar">true</item>
         <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">false</item>
     </style>
 </resources>

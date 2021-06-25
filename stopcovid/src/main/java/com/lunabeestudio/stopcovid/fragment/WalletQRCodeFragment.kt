@@ -29,11 +29,14 @@ class WalletQRCodeFragment : QRCodeFragment() {
 
     override fun onCodeScanned(code: String) {
         setFragmentResult(
-            WalletContainerFragment.SCANNED_CODE_RESULT_KEY,
-            bundleOf(
-                WalletContainerFragment.SCANNED_CODE_BUNDLE_KEY to code,
-            )
+            SCANNED_CODE_RESULT_KEY,
+            bundleOf(SCANNED_CODE_BUNDLE_KEY to code)
         )
         findNavControllerOrNull()?.popBackStack()
+    }
+
+    companion object {
+        const val SCANNED_CODE_RESULT_KEY: String = "WALLET_QR_CODE_FRAGMENT.SCANNED_CODE_RESULT_KEY"
+        const val SCANNED_CODE_BUNDLE_KEY: String = "WALLET_QR_CODE_FRAGMENT.SCANNED_CODE_BUNDLE_KEY"
     }
 }

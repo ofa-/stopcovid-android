@@ -10,19 +10,12 @@
 
 package com.lunabeestudio.stopcovid.fragment
 
-import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
-import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.manager.SignalInfosManager
 import com.mikepenz.fastadapter.GenericItem
 
-class OnBoardingVenuesFragment : OnBoardingFragment() {
+class VenueMoreInfoFragment : MainFragment() {
 
-    override fun getTitleKey(): String = "onboarding.venuesController.title"
-    override fun getButtonTitleKey(): String = "onboarding.venuesController.bottomButton"
-    override fun getOnButtonClick(): () -> Unit = {
-        findNavControllerOrNull()
-            ?.safeNavigate(OnBoardingVenuesFragmentDirections.actionOnBoardingVenuesFragmentToOnBoardingGestureFragment())
-    }
+    override fun getTitleKey(): String = "venuesRecording.onboardingController.title"
 
     override fun getItems(): List<GenericItem> = SignalInfosManager.getInfosItems(requireContext(), strings)
 }

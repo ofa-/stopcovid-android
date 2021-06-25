@@ -117,3 +117,7 @@ var SharedPreferences.showErrorPanel: Boolean
 var SharedPreferences.showActivationReminderDialog: Boolean
     get() = getBoolean(Constants.SharedPrefs.SHOW_ACTIVATION_REMINDER, false)
     set(value) = edit { putBoolean(Constants.SharedPrefs.SHOW_ACTIVATION_REMINDER, value) }
+
+var SharedPreferences.hasUsedUniversalQrScan: Boolean
+    get() = getBoolean(Constants.SharedPrefs.HAS_USED_UNIVERSAL_QR_SCAN, false)
+    set(value) = edit { putBoolean(Constants.SharedPrefs.HAS_USED_UNIVERSAL_QR_SCAN, value) }

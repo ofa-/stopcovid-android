@@ -12,12 +12,14 @@ package com.lunabeestudio.stopcovid.activity
 
 import android.os.Bundle
 import android.view.accessibility.AccessibilityEvent
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupActionBarWithNavController
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.databinding.LayoutButtonBottomSheetBinding
 import com.lunabeestudio.stopcovid.coreui.extension.applyAndConsumeWindowInsetBottom
+import com.lunabeestudio.stopcovid.coreui.extension.isNightMode
 import com.lunabeestudio.stopcovid.databinding.ActivityOnBoardingBinding
 import kotlin.time.ExperimentalTime
 
@@ -39,6 +41,7 @@ class OnBoardingActivity : BaseActivity() {
         mergeBinding = LayoutButtonBottomSheetBinding.bind(binding.root)
 
         setContentView(binding.root)
+        WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = !isNightMode()
         setSupportActionBar(binding.toolbar)
         setupActionBarWithNavController(navController)
 
