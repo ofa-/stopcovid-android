@@ -156,7 +156,7 @@ class WalletCertificateFragment : QRCodeListFragment() {
 
         return qrCodeCardItem {
             qrCodeBitmap = bitmap
-            text = certificate.fullDescription(strings, robertManager.configuration)
+            text = ""
             share = strings["walletController.menu.share"]
             delete = strings["walletController.menu.delete"]
             this.formatText = formatText

@@ -77,7 +77,7 @@ class FullscreenQRCodeFragment : BaseFragment() {
         )
         binding?.topSpace?.isVisible = args.qrCodeFormat == BarcodeFormat.DATA_MATRIX
         binding?.formatTextView?.setTextOrHide(formatText())
-        binding?.textView?.text = args.qrCodeValueDisplayed
+        binding?.textView?.text = ""
     }
 
     private fun formatText(): String? {
