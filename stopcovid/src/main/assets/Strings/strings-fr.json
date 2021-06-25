@@ -975,7 +975,7 @@
    "walletController.flashButton.title": "Scanner le QR Code",
    "walletController.flashExplanation": "Sur votre document SI-DEP de test (pas laboratoire), ou sur votre preuve de vaccination papier (depuis le 3 mai, 11h), vous avez un QR Code que vous pouvez scanner pour ajouter le certificat dans ce carnet.",
    "walletController.recentCertificatesSection.title": "Certificats récents",
-   "walletController.recentCertificatesSection.subtitle": "Dans cette section, vous avez les certificats de vaccination et les certificats de test de moins de 3 jours. 👉 Appuyez sur un certificat pour le passer en plein écran.",
+   "walletController.recentCertificatesSection.subtitle": "👉 Appuyez sur un certificat pour le passer en plein écran.",
    "walletController.oldCertificatesSection.title": "Certificats plus anciens",
    "walletController.oldCertificatesSection.subtitle": "Ces certificats de test ont plus de 3 jours.",
    "walletController.menu.share": "Partager le certificat",
