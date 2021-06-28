@@ -137,13 +137,40 @@ fun WalletCertificate.fullDescription(strings: LocalizedStrings, configuration: 
     }
 }
 
+fun EuropeanCertificate.tagStringKey(): String {
+    return when (this.type) {
+        WalletCertificateType.VACCINATION,
+        WalletCertificateType.VACCINATION_EUROPE,
+        -> "wallet.proof.vaccinationCertificate.pillTitle"
+        else -> ""
+    }
+}
+
+fun EuropeanCertificate.statusStringKey(): String {
+    return when (this.type) {
+        WalletCertificateType.VACCINATION,
+        WalletCertificateType.VACCINATION_EUROPE,
+        -> "wallet.proof.vaccinationCertificate.LA." + this.greenCertificate.vaccineDose?.let {
+                                (first, second) -> when { (first == second) -> "TE" else -> "CO" }}
+        WalletCertificateType.RECOVERY_EUROPE -> "enum.HCertType.recovery"
+        else -> ""
+   }
+}
+
+fun WalletCertificate.tagStringKey() = when (this) {
+    is EuropeanCertificate -> tagStringKey()
+    is FrenchCertificate -> "wallet.proof.${type.stringKey}.pillTitle"
+}
+
+fun WalletCertificate.statusStringKey() = when (this) {
+    is EuropeanCertificate -> statusStringKey()
+    is VaccinationCertificate -> statusStringKey() // french only
+    is FrenchCertificate -> ""
+}
+
 fun VaccinationCertificate.statusStringKey(): String {
     val vaxCode = VaccinationCertificate.VaccinationCertificateFields.VACCINATION_CYCLE_STATE.code
     return "wallet.proof.${type.stringKey}.$vaxCode.$vaccinationCycleState"
-}
-
-fun WalletCertificate.tagStringKey(): String {
-    return "wallet.proof.${type.stringKey}.pillTitle"
 }
 
 fun WalletCertificate.isRecent(configuration: Configuration): Boolean {

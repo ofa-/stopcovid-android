@@ -130,28 +130,19 @@ class WalletCertificateFragment : QRCodeListFragment() {
     }
 
     private fun codeItemFromWalletDocument(certificate: WalletCertificate): QrCodeCardItem {
-        val bitmap: Bitmap
-        val formatText: String?
-
-        when (certificate) {
-            is FrenchCertificate -> {
-                bitmap = barcodeEncoder.encodeBitmap(
-                    certificate.value,
-                    BarcodeFormat.DATA_MATRIX,
-                    qrCodeSize,
-                    qrCodeSize
-                )
-                formatText = Constants.QrCode.FORMAT_2D_DOC
-            }
-            is EuropeanCertificate -> {
-                bitmap = barcodeEncoder.encodeBitmap(
-                    certificate.value,
-                    BarcodeFormat.QR_CODE,
-                    qrCodeSize,
-                    qrCodeSize
-                )
-                formatText = null
-            }
+        val barcodeFormat = when (certificate) {
+            is FrenchCertificate -> BarcodeFormat.DATA_MATRIX
+            is EuropeanCertificate -> BarcodeFormat.QR_CODE
+        }
+        val bitmap = barcodeEncoder.encodeBitmap(
+            certificate.value,
+            barcodeFormat,
+            qrCodeSize,
+            qrCodeSize
+        )
+        val formatText = when (certificate) {
+            is FrenchCertificate -> Constants.QrCode.FORMAT_2D_DOC
+            is EuropeanCertificate -> "🇪🇺 EU-DGC 🇪🇺"
         }
 
         return qrCodeCardItem {
@@ -161,16 +152,7 @@ class WalletCertificateFragment : QRCodeListFragment() {
             delete = strings["walletController.menu.delete"]
             this.formatText = formatText
             tag1Text = strings[certificate.tagStringKey()]
-
-            when {
-                certificate is VaccinationCertificate -> tag2Text = strings[certificate.statusStringKey()]
-                (certificate as? EuropeanCertificate)?.type == WalletCertificateType.VACCINATION_EUROPE ->
-                    certificate.greenCertificate.vaccineDose?.let { (first, second) ->
-                        tag2Text = stringsFormat("wallet.proof.europe.vaccine.doses", first, second)
-                    }
-                (certificate as? EuropeanCertificate)?.type == WalletCertificateType.RECOVERY_EUROPE ->
-                    tag2Text = strings["enum.HCertType.recovery"]
-            }
+            tag2Text = strings[certificate.statusStringKey()]
 
             this.allowShare = true
             onShare = {
