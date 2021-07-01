@@ -16,6 +16,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.appcompat.view.ContextThemeWrapper
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.isVisible
 import androidx.navigation.fragment.navArgs
 import com.google.zxing.BarcodeFormat
@@ -52,18 +53,28 @@ class FullscreenQRCodeFragment : BaseFragment() {
 
     override fun onResume() {
         super.onResume()
-        activity?.window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        val params: WindowManager.LayoutParams? = activity?.window?.attributes
-        params?.screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_FULL
-        activity?.window?.attributes = params
+        activity?.let { activity ->
+            val windowInsetsController = WindowInsetsControllerCompat(activity.window, activity.window.decorView)
+            val isAppearanceLightStatusBars = windowInsetsController.isAppearanceLightStatusBars
+            activity.window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+            val params: WindowManager.LayoutParams? = activity.window?.attributes
+            params?.screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_FULL
+            activity.window?.attributes = params // this call make the status bars loose its appearance
+            windowInsetsController.isAppearanceLightStatusBars = isAppearanceLightStatusBars
+        }
     }
 
     override fun onPause() {
         super.onPause()
-        activity?.window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        val params: WindowManager.LayoutParams? = activity?.window?.attributes
-        params?.screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
-        activity?.window?.attributes = params
+        activity?.let { activity ->
+            val windowInsetsController = WindowInsetsControllerCompat(activity.window, activity.window.decorView)
+            val isAppearanceLightStatusBars = windowInsetsController.isAppearanceLightStatusBars
+            activity.window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+            val params: WindowManager.LayoutParams? = activity.window?.attributes
+            params?.screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
+            activity.window?.attributes = params // this call make the status bars loose its appearance
+            windowInsetsController.isAppearanceLightStatusBars = isAppearanceLightStatusBars
+        }
     }
 
     override fun refreshScreen() {

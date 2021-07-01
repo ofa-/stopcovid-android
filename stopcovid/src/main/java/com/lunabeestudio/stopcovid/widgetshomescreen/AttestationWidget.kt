@@ -36,6 +36,7 @@ import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.concurrent.TimeUnit
+import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 import kotlin.time.hours
 import kotlin.time.milliseconds
@@ -152,7 +153,7 @@ class AttestationWidget : AppWidgetProvider() {
                     val attestationDuration = System.currentTimeMillis().milliseconds - timestampAttestation
                     val duration = context.robertManager().configuration.qrCodeExpiredHours.toDouble().hours
                     // add 5 minutes to the timing delay to be sure updating the widget after the end of validity
-                    val finalDuration = duration + 5.minutes - attestationDuration
+                    val finalDuration = duration + Duration.minutes(5) - attestationDuration
                     val updateAttestationWorker: WorkRequest =
                         OneTimeWorkRequestBuilder<UpdateAttestationWorker>()
                             .setInitialDelay(finalDuration.inMilliseconds.toLong(), TimeUnit.MILLISECONDS)

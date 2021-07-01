@@ -3,6 +3,7 @@ package com.lunabeestudio.stopcovid.extension
 import android.annotation.SuppressLint
 import com.lunabeestudio.domain.extension.walletOldCertificateThresholdInMs
 import com.lunabeestudio.domain.model.Configuration
+import com.lunabeestudio.domain.model.RawWalletCertificate
 import com.lunabeestudio.domain.model.WalletCertificateType
 import com.lunabeestudio.stopcovid.coreui.extension.stringsFormat
 import com.lunabeestudio.stopcovid.coreui.manager.LocalizedStrings
@@ -167,3 +168,6 @@ fun SanitaryCertificate.validityString(configuration: Configuration, strings: Lo
         strings.stringsFormat("wallet.proof.moreThanSpecificHours", maxValidityInHours)
     }
 }
+
+val WalletCertificate.raw: RawWalletCertificate
+    get() = RawWalletCertificate(type, value, timestamp)

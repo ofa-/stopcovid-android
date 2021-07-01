@@ -12,6 +12,7 @@ import com.lunabeestudio.domain.model.RawWalletCertificate
 import com.lunabeestudio.domain.model.WalletCertificateType
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.robert.datasource.LocalKeystoreDataSource
+import com.lunabeestudio.stopcovid.extension.raw
 import com.lunabeestudio.stopcovid.model.DccCertificates
 import com.lunabeestudio.stopcovid.model.EuropeanCertificate
 import com.lunabeestudio.stopcovid.model.FrenchCertificate
@@ -61,7 +62,7 @@ object WalletManager {
         certificateCode: String,
         dccCertificates: DccCertificates,
         certificateFormat: WalletCertificateType.Format?,
-    ) {
+    ): WalletCertificate {
         val walletCertificate = verifyCertificateCodeValue(
             robertManager.configuration,
             certificateCode,
@@ -69,6 +70,8 @@ object WalletManager {
             certificateFormat,
         )
         saveCertificate(localKeystoreDataSource, walletCertificate)
+
+        return walletCertificate
     }
 
     fun extractCertificateCodeFromUrl(urlValue: String): String {
@@ -95,7 +98,8 @@ object WalletManager {
         val walletCertificate = certificateFromValue(codeValue)
 
         if (walletCertificate == null ||
-            (certificateFormat != null && walletCertificate.type.format != certificateFormat)) {
+            (certificateFormat != null && walletCertificate.type.format != certificateFormat)
+        ) {
             throw WalletCertificateMalformedException()
         }
 
@@ -117,7 +121,7 @@ object WalletManager {
 
     private fun saveCertificate(localKeystoreDataSource: LocalKeystoreDataSource, walletCertificate: WalletCertificate) {
         val walletCertificates = localKeystoreDataSource.rawWalletCertificates?.toMutableList() ?: mutableListOf()
-        walletCertificates.add(RawWalletCertificate(walletCertificate.type, walletCertificate.value, walletCertificate.timestamp))
+        walletCertificates.add(walletCertificate.raw)
         localKeystoreDataSource.rawWalletCertificates = walletCertificates
     }
 

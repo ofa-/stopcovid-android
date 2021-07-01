@@ -17,10 +17,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.webkit.URLUtil
 import androidx.fragment.app.setFragmentResultListener
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
-import com.lunabeestudio.analytics.manager.AnalyticsManager
-import com.lunabeestudio.analytics.model.AppEventName
 import com.lunabeestudio.domain.model.WalletCertificateType
 import com.lunabeestudio.robert.extension.safeEnumValueOf
 import com.lunabeestudio.stopcovid.activity.MainActivity
@@ -36,7 +35,10 @@ import com.lunabeestudio.stopcovid.extension.showUnknownErrorAlert
 import com.lunabeestudio.stopcovid.extension.walletCertificateError
 import com.lunabeestudio.stopcovid.manager.DeeplinkManager
 import com.lunabeestudio.stopcovid.manager.WalletManager
+import com.lunabeestudio.stopcovid.model.EuropeanCertificate
 import com.lunabeestudio.stopcovid.model.WalletCertificate
+import com.lunabeestudio.stopcovid.viewmodel.WalletViewModel
+import com.lunabeestudio.stopcovid.viewmodel.WalletViewModelFactory
 import kotlinx.coroutines.launch
 
 class WalletContainerFragment : BaseFragment() {
@@ -57,6 +59,10 @@ class WalletContainerFragment : BaseFragment() {
         requireContext().dccCertificatesManager()
     }
 
+    private val viewModel: WalletViewModel by viewModels {
+        WalletViewModelFactory(robertManager, keystoreDataSource, dccCertificatesManager)
+    }
+
     private var confirmationAsked: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,24 +74,26 @@ class WalletContainerFragment : BaseFragment() {
 
         confirmationAsked = savedInstanceState?.getBoolean(CONFIRMATION_ASKED_KEY) == true
 
-        val certificateCode = args.code
-        val certificateFormat = args.certificateFormat?.let { WalletCertificateType.Format.fromValue(it) }
+        if (savedInstanceState == null) { // do not replay navigation on config change
+            val certificateCode = args.code
+            val certificateFormat = args.certificateFormat?.let { WalletCertificateType.Format.fromValue(it) }
 
-        if (certificateCode != null && !confirmationAsked && args.origin == DeeplinkManager.Origin.EXTERNAL) {
-            lifecycleScope.launch {
-                if (checkCodeValue(certificateCode, certificateFormat)) {
-                    findNavControllerOrNull()?.safeNavigate(
-                        WalletContainerFragmentDirections.actionWalletContainerFragmentToConfirmAddWalletCertificateFragment(
-                            certificateCode,
-                            certificateFormat?.name,
+            if (certificateCode != null && !confirmationAsked && args.origin == DeeplinkManager.Origin.EXTERNAL) {
+                lifecycleScope.launchWhenResumed {
+                    if (checkCodeValue(certificateCode, certificateFormat)) {
+                        findNavControllerOrNull()?.safeNavigate(
+                            WalletContainerFragmentDirections.actionWalletContainerFragmentToConfirmAddWalletCertificateFragment(
+                                certificateCode,
+                                certificateFormat?.name,
+                            )
                         )
-                    )
-                    confirmationAsked = true
+                        confirmationAsked = true
+                    }
                 }
-            }
-        } else if (certificateCode != null && args.origin == DeeplinkManager.Origin.UNIVERSAL) {
-            lifecycleScope.launch {
-                processCodeValue(certificateCode, certificateFormat)
+            } else if (certificateCode != null && args.origin == DeeplinkManager.Origin.UNIVERSAL) {
+                lifecycleScope.launchWhenResumed {
+                    processCodeValue(certificateCode, certificateFormat)
+                }
             }
         }
 
@@ -169,15 +177,16 @@ class WalletContainerFragment : BaseFragment() {
 
     private suspend fun processCodeValue(certificateCode: String, certificateFormat: WalletCertificateType.Format?) {
         try {
-            WalletManager.processCertificateCode(
-                robertManager,
-                keystoreDataSource,
-                certificateCode,
-                dccCertificatesManager.certificates,
-                certificateFormat,
-            )
-            context?.let { context ->
-                AnalyticsManager.reportAppEvent(context, AppEventName.e13, null)
+            val certificate = viewModel.processCodeValue(requireContext(), certificateCode, certificateFormat)
+
+            val vaccination = (certificate as? EuropeanCertificate)?.greenCertificate?.vaccinations?.lastOrNull()
+            if (vaccination != null && vaccination.doseNumber >= vaccination.totalSeriesOfDoses) {
+                findNavControllerOrNull()?.safeNavigate(
+                    WalletContainerFragmentDirections.actionProximityFragmentToVaccineCompletionFragment(
+                        certificate.value
+                    )
+                )
+            } else {
                 strings["walletController.addCertificate.addSucceeded"]?.let {
                     (activity as? MainActivity)?.showSnackBar(it)
                 }

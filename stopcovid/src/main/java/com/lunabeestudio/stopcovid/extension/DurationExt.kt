@@ -13,9 +13,9 @@ fun Duration.getRelativeDateTimeString(context: Context, nowString: String?): St
     val now = System.currentTimeMillis().milliseconds
 
     return when {
-        now - this <= 1.minutes -> nowString
+        now - this <= Duration.minutes(1) -> nowString
         now - this <= Duration.days(1) -> DateUtils.getRelativeTimeSpanString(
-            this.coerceAtMost(now - 1.minutes).inWholeMilliseconds,
+            this.coerceAtMost(now - Duration.minutes(1)).inWholeMilliseconds,
             now.inWholeMilliseconds,
             DateUtils.MINUTE_IN_MILLIS,
             DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_SHOW_YEAR or DateUtils.FORMAT_ABBREV_MONTH,

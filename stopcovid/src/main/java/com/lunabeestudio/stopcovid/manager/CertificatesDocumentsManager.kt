@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.drawable.Drawable
 import com.lunabeestudio.stopcovid.coreui.ConfigConstant
 import com.lunabeestudio.stopcovid.coreui.extension.getFirstSupportedLanguage
+import kotlinx.coroutines.sync.Mutex
 import timber.log.Timber
 import java.io.File
 
@@ -29,6 +30,8 @@ abstract class RemoteImageDocumentManager(private val context: Context) : Remote
 }
 
 class CertificatesDocumentsManager(context: Context) {
+
+    private val fetchMtx: Mutex = Mutex()
 
     private val certificateDocumentRemoteFileManager = object : RemoteImageDocumentManager(context) {
         override val localFileName: String = ConfigConstant.Wallet.TEST_CERTIFICATE_THUMBNAIL_FILE
@@ -85,15 +88,23 @@ class CertificatesDocumentsManager(context: Context) {
     }
 
     suspend fun fetchLastImages(context: Context): Boolean {
-        return certificateDocumentRemoteFileManager.fetchLastImage(context)
-            .and(fullCertificateDocumentRemoteFileManager.fetchLastImage(context))
-            .and(vaccinDocumentRemoteFileManager.fetchLastImage(context))
-            .and(fullVaccinDocumentRemoteFileManager.fetchLastImage(context))
-            .and(vaccinEuropeDocumentRemoteFileManager.fetchLastImage(context))
-            .and(fullVaccinEuropeDocumentRemoteFileManager.fetchLastImage(context))
-            .and(certificateEuropeDocumentRemoteFileManager.fetchLastImage(context))
-            .and(fullCertificateEuropeDocumentRemoteFileManager.fetchLastImage(context))
-            .and(recoveryEuropeDocumentRemoteFileManager.fetchLastImage(context))
-            .and(fullRecoveryEuropeDocumentRemoteFileManager.fetchLastImage(context))
+        return if (fetchMtx.tryLock()) {
+            try {
+                certificateDocumentRemoteFileManager.fetchLastImage(context)
+                    .and(fullCertificateDocumentRemoteFileManager.fetchLastImage(context))
+                    .and(vaccinDocumentRemoteFileManager.fetchLastImage(context))
+                    .and(fullVaccinDocumentRemoteFileManager.fetchLastImage(context))
+                    .and(vaccinEuropeDocumentRemoteFileManager.fetchLastImage(context))
+                    .and(fullVaccinEuropeDocumentRemoteFileManager.fetchLastImage(context))
+                    .and(certificateEuropeDocumentRemoteFileManager.fetchLastImage(context))
+                    .and(fullCertificateEuropeDocumentRemoteFileManager.fetchLastImage(context))
+                    .and(recoveryEuropeDocumentRemoteFileManager.fetchLastImage(context))
+                    .and(fullRecoveryEuropeDocumentRemoteFileManager.fetchLastImage(context))
+            } finally {
+                fetchMtx.unlock()
+            }
+        } else {
+            false
+        }
     }
 }

@@ -15,6 +15,7 @@ import android.os.Build
 import com.lunabeestudio.analytics.BuildConfig
 import com.lunabeestudio.analytics.manager.AnalyticsManager
 import com.lunabeestudio.analytics.model.AnalyticsResult
+import com.lunabeestudio.analytics.model.AnalyticsServiceName
 import com.lunabeestudio.analytics.network.model.SendAnalyticsRQ
 import com.lunabeestudio.analytics.network.model.SendAppAnalyticsRQ
 import com.lunabeestudio.analytics.network.model.SendHealthAnalyticsRQ
@@ -118,14 +119,21 @@ internal object AnalyticsServerManager {
             if (result.isSuccessful) {
                 AnalyticsResult.Success()
             } else {
-                AnalyticsManager.reportWSError(context, context.filesDir, "analytics", apiVersion, result.code(), result.message())
+                AnalyticsManager.reportWSError(
+                    context,
+                    context.filesDir,
+                    AnalyticsServiceName.ANALYTICS,
+                    apiVersion,
+                    result.code(),
+                    result.message()
+                )
                 AnalyticsResult.Failure(HttpException(result))
             }
         } catch (e: Exception) {
             AnalyticsManager.reportWSError(
                 context,
                 context.filesDir,
-                "analytics",
+                AnalyticsServiceName.ANALYTICS,
                 apiVersion,
                 (e as? HttpException)?.code() ?: 0,
                 e.message

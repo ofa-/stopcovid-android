@@ -36,3 +36,11 @@ BSD 3-Clause
 Component: Android Scanner Compat Library
 License Text URL: https://github.com/NordicSemiconductor/Android-Scanner-Compat-Library/blob/master/LICENSE
 Source Code: https://github.com/NordicSemiconductor/Android-Scanner-Compat-Library
+
+================================================================================
+ISC License
+================================================================================
+
+Component: Konfetti
+License Text URL: https://opensource.org/licenses/ISC
+Source Code: https://github.com/DanielMartinus/Konfetti

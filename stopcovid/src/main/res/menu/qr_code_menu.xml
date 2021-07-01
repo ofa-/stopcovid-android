@@ -16,8 +16,13 @@
         android:title="Share"
         tools:ignore="HardcodedText" />
     <item
-        android:id="@+id/qr_code_menu_delete"
+        android:id="@+id/qr_code_menu_covert"
         android:orderInCategory="2"
+        android:title="Convert"
+        tools:ignore="HardcodedText" />
+    <item
+        android:id="@+id/qr_code_menu_delete"
+        android:orderInCategory="3"
         android:title="Delete"
         tools:ignore="HardcodedText" />
 </menu>

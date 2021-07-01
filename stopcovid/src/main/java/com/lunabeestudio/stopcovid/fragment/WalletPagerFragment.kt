@@ -28,6 +28,7 @@ import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.extension.findParentFragmentByType
 import com.lunabeestudio.stopcovid.coreui.extension.refreshLift
 import com.lunabeestudio.stopcovid.coreui.fragment.BaseFragment
+import com.lunabeestudio.stopcovid.extension.dccCertificatesManager
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
@@ -49,12 +50,16 @@ class WalletPagerFragment : BaseFragment() {
         requireContext().secureKeystoreDataSource()
     }
 
+    private val dccCertificatesManager by lazy {
+        requireContext().dccCertificatesManager()
+    }
+
     private val viewModel: WalletViewModel by viewModels(
         {
             findParentFragmentByType<WalletContainerFragment>() ?: requireParentFragment()
         },
         {
-            WalletViewModelFactory(robertManager, keystoreDataSource)
+            WalletViewModelFactory(robertManager, keystoreDataSource, dccCertificatesManager)
         }
     )
 

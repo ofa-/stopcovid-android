@@ -2,11 +2,11 @@
   "config": [
 	{
       "name": "lastUpdate",
-      "value": "9 June 2021"
+      "value": "28 June 2021"
     },
     {
       "name": "version",
-      "value": 63
+      "value": 70
     },
     {
       "name": "versionCalibrationBle",
@@ -79,7 +79,8 @@
     {
       "name": "app.wallet.oldCertificateThresholdInDays",
       "value": {
-        "b2": 3
+        "b2": 3,
+        "test": 3
       }
     },
     {
@@ -131,7 +132,7 @@
     },
     {
       "name": "app.displayAttestation",
-      "value": true
+      "value": false
     },
     {
       "name": "app.push.displayOnSuccess",
@@ -242,6 +243,31 @@
       "value": [ ]
     },
     {
+      "name": "app.displayCertificateConversion",
+      "value": false
+    },
+    {
+      "name": "app.certificateConversionUrl",
+      "value": "https://portail.tacv.myservices-ingroupe.com/api/client/convertor/decode/decodeDocument"
+    },
+    {
+      "name":"app.wallet.vaccin.daysAfterCompletion",
+      "value":[
+        {
+          "code":"DEFAULT",
+          "value":14
+        },
+			  {
+          "code":"EU/1/20/1525",
+          "value":28
+        }
+      ]
+    },
+    {
+      "name": "app.wallet.certificateConversionSidepOnlyCode",
+      "value": ["945584"]
+    },
+    {
       "name": "ble.serviceUUID",
       "value": "0000fd64-0000-1000-8000-00805f9b34fb"
     },
@@ -267,7 +293,7 @@
     },
     {
       "name": "ble.dontUseScannerHardwareBatching",
-      "value": [ "G3121", "E5603", "SM-G981B", "CDY-NX9A", "SM-J530F", "SM-G770F", "SM-G780F", "SM-G781B", "SM-G960F", "SM-G965F", "SM-G970F", "SM-G973F", "SM-G975F", "SM-G977B", "SM-G980F",  "SM-G981B", "SM-G985F", "SM-G986B", "SM-G988B", "SM-G991B", "SM-G996B", "SM-G998B", "SM-N770F", "SM-N970F", "SM-N975F", "SM-N976B", "SM-N980F", "SM-N981B", "SM-N985F", "SM-N986B", "SM-F700F", "SM-F707B", "SM-F900F", "SM-F916B", "SM-A025G", "SM-A125F", "SM-A326B", "SM-A415F", "SM-A415FN", "SM-A505FN", "SM-A525F", "SM-A526B", "SM-A715F", "SM-A805F", "SM-M115F", "SM-M315F", "SM-M317F", "SM-M515F", "SM-A202F", "SM-A207F", "SM-G715FN", "SM-J730F", "SM-A515F" ]
+      "value": [ "G3121", "E5603", "SM-G981B", "CDY-NX9A", "SM-J530F", "SM-G770F", "SM-G780F", "SM-G781B", "SM-G960F", "SM-G965F", "SM-G970F", "SM-G973F", "SM-G975F", "SM-G977B", "SM-G980F",  "SM-G981B", "SM-G985F", "SM-G986B", "SM-G988B", "SM-G991B", "SM-G996B", "SM-G998B", "SM-N770F", "SM-N970F", "SM-N975F", "SM-N976B", "SM-N980F", "SM-N981B", "SM-N985F", "SM-N986B", "SM-F700F", "SM-F707B", "SM-F900F", "SM-F916B", "SM-A025G", "SM-A125F", "SM-A326B", "SM-A415F", "SM-A415FN", "SM-A505FN", "SM-A525F", "SM-A526B", "SM-A715F", "SM-A805F", "SM-M115F", "SM-M315F", "SM-M317F", "SM-M515F", "SM-A202F", "SM-A207F", "SM-G715FN", "SM-J730F", "SM-A515F", "SM-J600FN" ]
 	},
     {
       "name": "ble.calibration",

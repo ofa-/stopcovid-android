@@ -14,13 +14,16 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.LayoutRes
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.AppBarLayout
+import com.lunabeestudio.stopcovid.coreui.R
 import com.lunabeestudio.stopcovid.coreui.databinding.FragmentRecyclerViewBinding
 import com.lunabeestudio.stopcovid.coreui.extension.closeKeyboardOnScroll
+import com.lunabeestudio.stopcovid.coreui.extension.setTextOrHide
 import com.lunabeestudio.stopcovid.coreui.extension.viewLifecycleOwnerOrNull
 import com.mikepenz.fastadapter.GenericItem
 import com.mikepenz.fastadapter.adapters.FastItemAdapter
@@ -38,17 +41,21 @@ abstract class FastAdapterFragment : BaseFragment() {
     private var onScrollListener: RecyclerView.OnScrollListener? = null
     private var refreshScreenJob: Job? = null
 
+    @LayoutRes
+    protected open val layout: Int = R.layout.fragment_recycler_view
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View? {
         adapter.attachDefaultListeners = false
-        binding = FragmentRecyclerViewBinding.inflate(inflater, container, false)
+        val view = inflater.inflate(layout, container, false)
+        binding = FragmentRecyclerViewBinding.bind(view)
         binding?.recyclerView?.layoutManager = LinearLayoutManager(requireContext())
         binding?.recyclerView?.adapter = adapter
         onScrollListener = binding?.recyclerView?.closeKeyboardOnScroll(context)
-        return binding?.root
+        return view
     }
 
     override fun refreshScreen() {
@@ -65,10 +72,11 @@ abstract class FastAdapterFragment : BaseFragment() {
         }
     }
 
-    protected fun showLoading() {
+    protected fun showLoading(loadingText: String? = null) {
         binding?.recyclerView?.isVisible = false
         binding?.emptyLayout?.isVisible = false
         binding?.loadingLayout?.isVisible = true
+        binding?.loadingDescriptionTextView?.setTextOrHide(loadingText)
     }
 
     protected fun showEmpty() {

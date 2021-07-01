@@ -51,6 +51,7 @@ object Constants {
         const val ACTIVATE_REMINDER: String = "StopCovid.Activate.Reminder.Worker"
         const val ISOLATION_REMINDER: String = "StopCovid.Isolation.Reminder.Worker"
         const val TIME_CHANGED: String = "StopCovid.TimeChanged.Worker"
+        const val VACCINATION_COMPLETED_REMINDER: String = "StopCovid.VaccinationCompleted.Reminder.Worker"
     }
 
     object ServerConstant {

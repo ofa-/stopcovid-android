@@ -67,4 +67,8 @@ class Configuration(
     val cleaUrls: List<String>,
     val covidPlusWarning: Int,
     val covidPlusNoTracing: Int,
+    var displayCertificateConversion: Boolean,
+    var certificateConversionUrl: String,
+    var daysAfterCompletion: Map<String, Int>,
+    var certificateConversionSidepOnlyCode: List<String>,
 )

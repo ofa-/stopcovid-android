@@ -32,7 +32,8 @@ object UiConstants {
         BLUETOOTH("error", 6),
         NEWS("news", 7),
         ACTIVATE_REMINDER("reminder", 8),
-        ISOLATION_REMINDER("reminder", 9)
+        ISOLATION_REMINDER("reminder", 9),
+        CERTIFICATE_REMINDER("reminder", 10),
     }
 
     val SUPPORTED_LANGUAGE: Array<String> = arrayOf("en", "fr")
