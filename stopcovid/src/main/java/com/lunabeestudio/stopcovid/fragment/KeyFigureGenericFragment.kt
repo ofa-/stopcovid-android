@@ -97,7 +97,7 @@ abstract class KeyFigureGenericFragment : MainFragment() {
             strings
         ) { postalCode ->
             sharedPrefs.chosenPostalCode = postalCode
-            viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwnerOrNull()?.lifecycleScope?.launch {
                 (activity as? MainActivity)?.showProgress(true)
                 VaccinationCenterManager.postalCodeDidUpdate(requireContext(), sharedPrefs, postalCode)
                 (activity as? MainActivity)?.showProgress(false)

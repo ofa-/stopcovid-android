@@ -90,7 +90,7 @@ fun KeyFigure.itemForFigure(
     strings: LocalizedStrings,
     useDateTime: Boolean,
     block: (KeyFigureCardItem.() -> Unit)
-): KeyFigureCardItem {
+): KeyFigureCardItem? {
     return keyFigureCardItem {
         val extractDate: Long
         if (sharedPrefs.hasChosenPostalCode) {
@@ -131,5 +131,9 @@ fun KeyFigure.itemForFigure(
         strings[colorStringKey(context.isNightMode())]?.let {
             color = Color.parseColor(it)
         }
-    }.apply(block)
+    }
+        .apply(block)
+        .takeIf {
+            it.label != null
+        }
 }

@@ -22,6 +22,7 @@ import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
+import com.lunabeestudio.stopcovid.coreui.extension.viewLifecycleOwnerOrNull
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.cardWithActionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
@@ -171,7 +172,7 @@ class VaccinationFragment : MainFragment() {
                 label = strings["common.retry"]
                 iconRes = R.drawable.ic_refresh
                 onClickListener = View.OnClickListener {
-                    viewLifecycleOwner.lifecycleScope.launch {
+                    viewLifecycleOwnerOrNull()?.lifecycleScope?.launch {
                         (activity as? MainActivity)?.showProgress(true)
                         val refreshStart = System.currentTimeMillis()
                         VaccinationCenterManager.onAppForeground(requireContext(), sharedPrefs)
@@ -227,7 +228,7 @@ class VaccinationFragment : MainFragment() {
             strings
         ) { postalCode ->
             sharedPrefs.chosenPostalCode = postalCode
-            viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwnerOrNull()?.lifecycleScope?.launch {
                 (activity as? MainActivity)?.showProgress(true)
                 VaccinationCenterManager.postalCodeDidUpdate(requireContext(), sharedPrefs, postalCode)
                 (activity as? MainActivity)?.showProgress(false)

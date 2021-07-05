@@ -7,69 +7,22 @@
   ~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   ~ Created by Lunabee Studio / Date - 2020/27/05 - for the TOUS-ANTI-COVID project
   -->
-<network-security-config xmlns:tools="http://schemas.android.com/tools">
+<network-security-config>
     <domain-config cleartextTrafficPermitted="false">
         <domain includeSubdomains="true">api.tousanticovid.gouv.fr</domain>
-        <pin-set tools:ignore="MissingBackupPin">
-            <pin digest="SHA-256">xrPKKhmYeHgk4v57GcqYPrFpnI3f1FTmEfol9WIicaI=</pin>
-        </pin-set>
-        <trust-anchors>
-            <certificates src="@raw/api_tousanticovid_gouv_fr" />
-        </trust-anchors>
-    </domain-config>
-    <domain-config cleartextTrafficPermitted="false">
-        <domain includeSubdomains="true">tacw.tousanticovid.gouv.fr</domain>
-        <pin-set tools:ignore="MissingBackupPin">
-            <pin digest="SHA-256">b7w+uqyD+XILNIlRc3XVmEROwFCVTv5yOchb2i5FJbo=</pin>
-        </pin-set>
-        <trust-anchors>
-            <certificates src="@raw/tacw_tousanticovid_gouv_fr" />
-        </trust-anchors>
-    </domain-config>
-    <domain-config cleartextTrafficPermitted="false">
         <domain includeSubdomains="true">app.tousanticovid.gouv.fr</domain>
-        <pin-set tools:ignore="MissingBackupPin">
-            <pin digest="SHA-256">ckVocY6+T4RvpXWtbqOF45qEvNls4oFWi83BryOQgOk=</pin>
-        </pin-set>
-        <trust-anchors>
-            <certificates src="@raw/app_tousanticovid_gouv_fr" />
-        </trust-anchors>
-    </domain-config>
-    <domain-config cleartextTrafficPermitted="false">
         <domain includeSubdomains="true">analytics-api.tousanticovid.gouv.fr</domain>
-        <pin-set tools:ignore="MissingBackupPin">
-            <pin digest="SHA-256">KhFx3fIev58nbXs9m2WqXDbqYrE/7r4J9cP1QqPHtVk=</pin>
-        </pin-set>
-        <trust-anchors>
-            <certificates src="@raw/analytics_api_tousanticovid_gouv_fr" />
-        </trust-anchors>
-    </domain-config>
-    <domain-config cleartextTrafficPermitted="false">
         <domain includeSubdomains="true">signal-api.tousanticovid.gouv.fr</domain>
-        <pin-set tools:ignore="MissingBackupPin">
-            <pin digest="SHA-256">tnjjbtuXZUSyK1uReQhvmtspPS7IUl95cs9G8RvfVUs=</pin>
-        </pin-set>
         <trust-anchors>
-            <certificates src="@raw/signal_api_tousanticovid_gouv_fr" />
+            <certificates src="@raw/certigna_services" />
         </trust-anchors>
     </domain-config>
     <domain-config cleartextTrafficPermitted="false">
         <domain includeSubdomains="true">s3.fr-par.scw.cloud</domain>
-        <pin-set tools:ignore="MissingBackupPin">
-            <pin digest="SHA-256">LB5QyMD8qDE1y12jAq/yey1VpjsBbVfFNOblb7QyaR0=</pin>
-        </pin-set>
-        <trust-anchors>
-            <certificates src="@raw/s3_fr_par_scw_cloud" />
-        </trust-anchors>
-    </domain-config>
-    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="true">signal-static.oos.cloudgouv-eu-west-1.outscale.com</domain>
         <domain includeSubdomains="true">portail.tacv.myservices-ingroupe.com</domain>
-        <pin-set tools:ignore="MissingBackupPin">
-            <pin digest="SHA-256">tlRuGxB3uGL0nVnnz6bXoGQi5aGuZ0rfqGlUlndK/yc=</pin>
-        </pin-set>
         <trust-anchors>
-            <certificates src="@raw/ingroupe_com_isrg_root_x1" />
-            <certificates src="@raw/ingroupe_com_r3" />
+            <certificates src="@raw/r3" />
         </trust-anchors>
     </domain-config>
 </network-security-config>

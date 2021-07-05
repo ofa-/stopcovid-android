@@ -286,6 +286,8 @@ class WalletCertificateFragment : MainFragment() {
                 is RobertResultData.Success -> {
                     if (processConvertedCertificate(result.data, WalletCertificateType.Format.WALLET_DCC)) {
                         viewModel.removeCertificate(certificate)
+                    } else {
+                        showConversionFailedAlert()
                     }
                 }
                 null -> showUnknownErrorAlert(null)
@@ -332,7 +334,6 @@ class WalletCertificateFragment : MainFragment() {
             }
             true
         } catch (e: Exception) {
-            showUnknownErrorAlert(null)
             false
         }
     }

@@ -39,7 +39,6 @@ class RobertServiceTest {
         dataSource = ServiceDataSource(
             ApplicationProvider.getApplicationContext(),
             server.url("/api/v1.0/").toString(),
-            ""
         )
     }
 

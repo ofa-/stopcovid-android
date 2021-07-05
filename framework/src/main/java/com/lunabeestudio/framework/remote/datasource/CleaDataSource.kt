@@ -20,7 +20,6 @@ import java.io.File
 class CleaDataSource(
     val context: Context,
     cleaReportBaseUrl: String,
-    cleaReportCertificateSha256: String,
     private val cleaStatusFallbackBaseUrl: String,
 ) : RemoteCleaDataSource {
 
@@ -38,7 +37,6 @@ class CleaDataSource(
     private var cleaReportApi: CleaReportApi = RetrofitClient.getService(
         context,
         cleaReportBaseUrl,
-        cleaReportCertificateSha256,
         CleaReportApi::class.java,
         null,
     )

@@ -349,7 +349,11 @@ class RobertManagerImpl(
     }
 
     override fun deactivateProximity(application: RobertApplication) {
-        keystoreRepository.proximityActive = false
+        try {
+            keystoreRepository.proximityActive = false
+        } catch (e: Exception) {
+            Timber.e(e)
+        }
         application.refreshProximityService()
     }
 
@@ -391,7 +395,12 @@ class RobertManagerImpl(
                                 RobertResultData.Failure(error.error ?: UnknownException())
                             }
                         }
-                        processStatusResults(robertApplication, statusResult.await(), cleaStatusResult.await())
+                        try {
+                            processStatusResults(robertApplication, statusResult.await(), cleaStatusResult.await())
+                        } catch (e: RobertException) {
+                            Timber.e(e)
+                            RobertResult.Failure(e)
+                        }
                     }
                 } else {
                     Timber.v("Previous success Status called too close")
@@ -842,7 +851,11 @@ class RobertManagerImpl(
         deactivateProximity(application)
         ephemeralBluetoothIdentifierRepository.removeAll()
         localProximityRepository.removeAll()
-        keystoreRepository.isRegistered = false
+        try {
+            keystoreRepository.isRegistered = false
+        } catch (e: Exception) {
+            Timber.e(e)
+        }
         keystoreRepository.kA = null
         keystoreRepository.kEA = null
         keystoreRepository.timeStart = null
@@ -863,7 +876,11 @@ class RobertManagerImpl(
         keystoreRepository.reportToSendEndTime = null
         keystoreRepository.declarationToken = null
         AnalyticsManager.unregister(application.getAppContext())
-        keystoreRepository.atRiskModelVersion = AT_RISK_MODEL_VERSION
+        try {
+            keystoreRepository.atRiskModelVersion = AT_RISK_MODEL_VERSION
+        } catch (e: Exception) {
+            Timber.e(e)
+        }
         keystoreRepository.cleaLastStatusIteration = null
     }
 

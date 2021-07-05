@@ -65,9 +65,9 @@ class KeyFiguresFragment : KeyFigureGenericFragment() {
                     }
                     identifier = text.hashCode().toLong()
                 }
-                keyFigures.filter { it.category == KeyFigureCategory.HEALTH }.forEach { figure ->
-                    items += itemForFigure(figure, false)
-                }
+                keyFigures
+                    .filter { it.category == KeyFigureCategory.HEALTH }
+                    .mapNotNullTo(items) { itemForFigure(it, true) }
 
                 items += spaceItem {
                     spaceRes = R.dimen.spacing_large
@@ -78,9 +78,9 @@ class KeyFiguresFragment : KeyFigureGenericFragment() {
                     text = strings["keyFiguresController.section.app"]
                     identifier = items.count().toLong()
                 }
-                keyFigures.filter { it.category == KeyFigureCategory.APP }.forEach { figure ->
-                    items += itemForFigure(figure, true)
-                }
+                keyFigures
+                    .filter { it.category == KeyFigureCategory.APP }
+                    .mapNotNullTo(items) { itemForFigure(it, true) }
             }
         }
 
@@ -88,7 +88,7 @@ class KeyFiguresFragment : KeyFigureGenericFragment() {
     }
 
     @OptIn(ExperimentalTime::class)
-    private fun itemForFigure(figure: KeyFigure, useDateTime: Boolean): KeyFigureCardItem {
+    private fun itemForFigure(figure: KeyFigure, useDateTime: Boolean): KeyFigureCardItem? {
         return figure.itemForFigure(
             requireContext(),
             sharedPrefs,

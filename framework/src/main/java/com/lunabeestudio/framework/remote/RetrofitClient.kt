@@ -15,7 +15,6 @@ import android.os.Build
 import com.lunabeestudio.domain.model.CacheConfig
 import com.lunabeestudio.framework.BuildConfig
 import okhttp3.Cache
-import okhttp3.CertificatePinner
 import okhttp3.ConnectionSpec
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.Interceptor
@@ -35,7 +34,6 @@ object RetrofitClient {
     internal fun <T> getService(
         context: Context,
         baseUrl: String,
-        certificateSHA256: String,
         clazz: Class<T>,
         cacheConfig: CacheConfig?,
         onProgressUpdate: ((Float) -> Unit)? = null,
@@ -43,35 +41,19 @@ object RetrofitClient {
         return Retrofit.Builder()
             .baseUrl(baseUrl.toHttpUrl())
             .addConverterFactory(MoshiConverterFactory.create())
-            .client(getDefaultOKHttpClient(context, baseUrl, certificateSHA256, cacheConfig, onProgressUpdate))
+            .client(getDefaultOKHttpClient(context, cacheConfig, onProgressUpdate))
             .build().create(clazz)
     }
 
-    internal fun <T> getService(
-        context: Context,
-        baseUrl: String,
-        clazz: Class<T>,
-        cacheConfig: CacheConfig?,
-        onProgressUpdate: ((Float) -> Unit)? = null,
-    ): T {
+    internal fun <T> getFileService(context: Context, baseUrl: String, clazz: Class<T>): T {
         return Retrofit.Builder()
             .baseUrl(baseUrl.toHttpUrl())
-            .addConverterFactory(MoshiConverterFactory.create())
-            .client(getDefaultOKHttpClient(context, baseUrl, null, cacheConfig, onProgressUpdate))
-            .build().create(clazz)
-    }
-
-    internal fun <T> getFileService(context: Context, baseUrl: String, certificateSHA256: String, clazz: Class<T>): T {
-        return Retrofit.Builder()
-            .baseUrl(baseUrl.toHttpUrl())
-            .client(getFileOKHttpClient(context, baseUrl, certificateSHA256))
+            .client(getFileOKHttpClient(context))
             .build().create(clazz)
     }
 
     fun getDefaultOKHttpClient(
         context: Context,
-        url: String?,
-        certificateSHA256: String?,
         cacheConfig: CacheConfig?,
         onProgressUpdate: ((Float) -> Unit)? = null,
     ): OkHttpClient {
@@ -82,20 +64,10 @@ object RetrofitClient {
             if (!BuildConfig.DEBUG) {
                 connectionSpecs(listOf(requireTls12))
             }
-            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N && certificateSHA256 != null && url != null) {
-                certificatePinner(
-                    CertificatePinner.Builder()
-                        .add(url.toHttpUrl().host, certificateSHA256)
-                        .build()
-                )
+            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N) {
                 val certificates: HandshakeCertificates = HandshakeCertificates.Builder()
-                    .addTrustedCertificate(certificateFromString(context, "api_tousanticovid_gouv_fr"))
-                    .addTrustedCertificate(certificateFromString(context, "tacw_tousanticovid_gouv_fr"))
-                    .addTrustedCertificate(certificateFromString(context, "app_tousanticovid_gouv_fr"))
-                    .addTrustedCertificate(certificateFromString(context, "s3_fr_par_scw_cloud"))
-                    .addTrustedCertificate(certificateFromString(context, "signal_api_tousanticovid_gouv_fr"))
-                    .addTrustedCertificate(certificateFromString(context, "ingroupe_com_isrg_root_x1"))
-                    .addTrustedCertificate(certificateFromString(context, "ingroupe_com_r3"))
+                    .addTrustedCertificate(certificateFromString(context, "certigna_services"))
+                    .addTrustedCertificate(certificateFromString(context, "r3"))
                     .build()
                 sslSocketFactory(certificates.sslSocketFactory(), certificates.trustManager)
             }
@@ -112,7 +84,7 @@ object RetrofitClient {
         }.build()
     }
 
-    private fun getFileOKHttpClient(context: Context, url: String, certificateSHA256: String): OkHttpClient {
+    private fun getFileOKHttpClient(context: Context): OkHttpClient {
         val requireTls12 = ConnectionSpec.Builder(ConnectionSpec.RESTRICTED_TLS)
             .tlsVersions(TlsVersion.TLS_1_2)
             .build()
@@ -121,13 +93,8 @@ object RetrofitClient {
                 connectionSpecs(listOf(requireTls12))
             }
             if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N) {
-                certificatePinner(
-                    CertificatePinner.Builder()
-                        .add(url.toHttpUrl().host, certificateSHA256)
-                        .build()
-                )
                 val certificates: HandshakeCertificates = HandshakeCertificates.Builder()
-                    .addTrustedCertificate(certificateFromString(context, "api_tousanticovid_gouv_fr"))
+                    .addTrustedCertificate(certificateFromString(context, "certigna_services"))
                     .build()
                 sslSocketFactory(certificates.sslSocketFactory(), certificates.trustManager)
             }

@@ -1028,23 +1028,33 @@
    "walletCertificateVerifiedController.proofValidated": "Verified certificate",
    "walletCertificateVerifiedController.validateAnotherProof": "Verify another certificate",
    
-      "keyfigure.variantsuk.label":"UK variant",
-   "keyfigure.variantsuk.shortLabel":"UK variant",
-   "keyfigure.variantsuk.description":"This indicator reflects the percentage of British variants (UK 20I/501Y.V1) among the screened tests.",
+    "keyfigure.mutationL452R.label":"Mutation L452R (dont variant Delta)",
+    "keyfigure.mutationL452R.shortLabel":"L452R",
+    "keyfigure.mutationL452R.description":" Cet indicateur reflète le pourcentage de tests avec une présence de la mutation L452R (portée notamment par les variants Delta) parmi les tests criblés la recherchant avec un résultat interprétable.",
    
-   "keyfigure.variantsuk.colorCode.light":"#4C76EB",
-   "keyfigure.variantsuk.colorCode.dark":"#A6B6E3",
+    "keyfigure.mutationL452R.colorCode.light":"#F49F54",
+    "keyfigure.mutationL452R.colorCode.dark":"#F49F54",
    
-    "keyfigure.variantsuk.learnMore": "In case of a positive test (RT-PCR or antigen), a second so-called screening RT-PCR test is carried out in order to detect the variants of interest known to date and to assess their geographical spread.\n\nThis indicator relies on data related to screening results stopped on D-3 and updated daily.\n\nIt represents the share of the UK variant among all the screened tests. Data has been collected in SI-DEP since January 25, 2021.",
+    "keyfigure.mutationL452R.learnMore": " En cas de test (RT-PCR ou antigénique) de première intention positif, un second test RT-PCR dit de criblage est réalisé afin de détecter les mutations d’intérêt connus à ce jour et d’évaluer leur diffusion sur l’ensemble du territoire.\n\nCet indicateur porte sur les données relatives aux résultats de criblage arrêtés à J-3 et mis à jour quotidiennement.\n\nIl exprime la part du mutations L452R (portée notamment par les variants Delta) parmi tous les tests criblés la recherchant avec un résultat interprétable. Les données sont collectées dans SI-DEP depuis le 31 mai 2021.",
     
-    "keyfigure.variantssabr.label":"South African or Brazilian variants",
-	"keyfigure.variantssabr.shortLabel":"SA or BR variants",
-	"keyfigure.variantssabr.description":"This indicator reflects the percentage of South African or Brazilian variants (20H/501Y.V2 (SA) ou 20J/501Y.V3 (BR)) among the screened tests.",
-	
-	"keyfigure.variantssabr.colorCode.light":"#F49F54",
-	"keyfigure.variantssabr.colorCode.dark":"#F49F54",
-	
-	"keyfigure.variantssabr.learnMore": "In case of a positive test (RT-PCR or antigen), a second so-called screening RT-PCR test is carried out in order to detect the variants of interest known to date and to assess their geographical spread.\n\nThis indicator relies on data related to screening results stopped on D-3 and updated daily.\n\nIt represents the share of the South African or Brazilian variants among all the screened tests. Data has been collected in SI-DEP since January 25, 2021.",
+    
+    "keyfigure.mutationE484K.label":"Mutation E484K (dont variant Beta, Gamma)",
+   "keyfigure.mutationE484K.shortLabel":" E484K",
+   "keyfigure.mutationE484K.description":"Cet indicateur reflète le pourcentage de tests avec une présence de la mutation E484K (portée notamment par les variants Beta et Gamma) parmi les tests criblés la recherchant avec un résultat interprétable.",
+  
+   "keyfigure.mutationE484K.colorCode.light":"#4C76EB",
+   "keyfigure.mutationE484K.colorCode.dark":"#73D3FF",
+  
+    "keyfigure.mutationE484K.learnMore": "En cas de test (RT-PCR ou antigénique) de première intention positif, un second test RT-PCR dit de criblage est réalisé afin de détecter les mutations d’intérêt connus à ce jour et d’évaluer leur diffusion sur l’ensemble du territoire.\n\nCet indicateur porte sur les données relatives aux résultats de criblage arrêtés à J-3 et mis à jour quotidiennement.\n\nIl exprime la part du mutations E484K (portée notamment par les variants Beta et Gamma) parmi tous les tests criblés la recherchant avec un résultat interprétable. Les données sont collectées dans SI-DEP depuis le 31 mai 2021.",
+    
+    "keyfigure.mutationE484Q.label":"Mutation E484Q",
+        "keyfigure.mutationE484Q.shortLabel":"E484Q",
+        "keyfigure.mutationE484Q.description":"Cet indicateur reflète le pourcentage de tests avec une présence de la mutation E484Q parmi les tests criblés la recherchant avec un résultat interprétable.",
+       
+        "keyfigure.mutationE484Q.colorCode.light":"#F454A6",
+        "keyfigure.mutationE484Q.colorCode.dark":"#F454A6",
+       
+        "keyfigure.mutationE484Q.learnMore": "En cas de test (RT-PCR ou antigénique) de première intention positif, un second test RT-PCR dit de criblage est réalisé afin de détecter les mutations d’intérêt connus à ce jour et d’évaluer leur diffusion sur l’ensemble du territoire.\n\nCet indicateur porte sur les données relatives aux résultats de criblage arrêtés à J-3 et mis à jour quotidiennement.\n\nIl exprime la part du mutations E484Q parmi tous les tests criblés la recherchant avec un résultat interprétable. Les données sont collectées dans SI-DEP depuis le 31 mai 2021.",
     
     "manageDataController.walletData.confirmationDialog.title": "Confirmation",
     "manageDataController.walletData.confirmationDialog.message": "Are you sure you want to delete all your certificates?",
@@ -1091,7 +1101,7 @@
    "walletController.whenToUse.title": "Pass: when & how",
    "walletController.whenToUse.subtitle": "According to the law of May 31 (on the health crisis), the test or vaccination certificates must be presented at the entrance of an event of more than 1,000 people or to travel (including in Corsica and France Overseas).\n\nFor what concerns the pass in France for events with more 1,000 people, the following certificates are accepted:\n\n👉 a complete vaccination certificate (all necessary doses) and completed more than 2 weeks ago for all vaccines, except Janssen/Johnson & Johnson for which it is 4 weeks.\n\n👉 a negative test certificate (RT-PCR or antigen) of less than 48 hours\n\n👉 a positive test certificate (RT-PCR or antigen), at least 15 days and less than 6 months old.\n\nFor travels, more information on the following link 👇",
    "walletController.whenToUse.button": "Travels",
-   "walletController.whenToUse.url": "https://www.gouvernement.fr/info-coronavirus/deplacements",
+   "walletController.whenToUse.url": "https://bonjour.tousanticovid.gouv.fr/voyager.html",
    "walletController.phone.title": "Need help?",
    "walletController.phone.subtitle": "Call us 0 800 08 71 48.",
    "walletController.phone.number": "0800087148",
@@ -1242,7 +1252,7 @@
    "wallet.proof.europe.test.positive": "Positive",
    "wallet.proof.europe.test.negative": "✅ Negative",
    "wallet.proof.europe.vaccine.description": "🇪🇺 Digital Covid Certificate\n👉 Tap here to present it\n\n<FULL_NAME>\nDate of birth <BIRTHDATE>\n<VACCINE_NAME>\nInjection date: <DATE>",
-   "wallet.proof.europe.recovery.description": "🇪🇺 Digital Covid Certificate\n👉 Tap here to present it\n\n<FULL_NAME>\nDate of birth <BIRTHDATE>\nValid from <FROM_DATE>, to <TO_DATE>",
+   "wallet.proof.europe.recovery.description": "🇪🇺 Digital Covid Certificate\n👉 Tap here to present it\n\n<FULL_NAME>\nDate of birth <BIRTHDATE>\nTested on <DATE>",
    "wallet.proof.europe.vaccine.doses" : "Vaccination %d of %d",
    
    "walletCertificateErrorController.explanations.invalidSignature.vaccinationEurope.title": "⚠️ Not authentic",
@@ -1282,9 +1292,9 @@
    "walletController.convertCertificate.error.message": "This service cannot convert your certificate now. You can also get your \"EU Digital COVID Certificate\" on SI-DEP and Améli.fr platforms.",
    "walletController.convertCertificate.error.url1": "https://attestation-vaccin.ameli.fr",
    "walletController.convertCertificate.error.url2": "https://sidep.gouv.fr",
-   "vaccineCompletionController.pending.explanation.title": "You're almost there.\nLe %s.",
-   "vaccineCompletionController.pending.explanation.message": "The %s, it will be the day when your vaccination is complete and finalized as part of the French health pass 🇫🇷.\n\nIn the TousAntiCovid Carnet, you have an Information tab that will give you information on the health pass, and in particular on travel to other countries.",
-   "vaccineCompletionController.pending.button.notifyMe.title": "Notify me on %s",
+   "vaccineCompletionController.pending.explanation.title": "You're almost there.\n%@.",
+   "vaccineCompletionController.pending.explanation.body": "On %@, it will be the day when your vaccination is complete and finalized as part of the French health pass 🇫🇷.\n\nIn the TousAntiCovid Carnet, you have an Information tab that will give you information on the health pass, and in particular on travel to other countries.",
+   "vaccineCompletionController.pending.button.notifyMe.title": "Notify me on %@",
    "vaccineCompletionController.pending.button.notifyMe.feedback": "Ok you will be notified",
    "vaccineCompletionNotification.title": "🎉 Certificate of vaccination",
    "vaccineCompletionNotification.message": "Your vaccination certificate is now valid for the French health pass!",
@@ -1295,5 +1305,8 @@
    "walletController.convertCertificate.antigenicAlert.message":"Antigen tests cannot be converted from 2D-DOC certificates, as mandatory information is missing for an \"EU Digital COVID Certificate\". You can nevertheless go to the SI-DEP portal to retrieve the certificate.",
    "walletController.convertCertificate.antigenicAlert.link":"Go to SI-DEP",
    "walletController.convertCertificate.antigenicAlert.urlLink":"https://sidep.gouv.fr",
-   "appMaintenanceController.later.button.title": "Later"
+   "appMaintenanceController.later.button.title": "Later",
+
+   "walletController.convertCertificate.error.url1.title": "Open Améli.fr",
+   "walletController.convertCertificate.error.url2.title": "Open SI-DEP"
 }

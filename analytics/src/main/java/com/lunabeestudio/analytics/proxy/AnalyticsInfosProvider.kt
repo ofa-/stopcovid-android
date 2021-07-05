@@ -12,7 +12,6 @@ package com.lunabeestudio.analytics.proxy
 
 interface AnalyticsInfosProvider {
     fun getBaseUrl(): String
-    fun getCertificateSha256(): String
     fun getApiVersion(): String
     fun getAppVersion(): String
     fun getAppBuild(): Int

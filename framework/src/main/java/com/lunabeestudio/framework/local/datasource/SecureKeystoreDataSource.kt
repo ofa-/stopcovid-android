@@ -49,11 +49,9 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
     override var isRegistered: Boolean
         get() {
             val value: Boolean? = getEncryptedValue(SHARED_PREF_KEY_IS_REGISTERED, Boolean::class.java)
-            return if (value == null) {
-                isRegistered = kA != null && kEA != null
-                false
-            } else {
-                value
+            return value ?: (kA != null && kEA != null).let {
+                isRegistered = it
+                it
             }
         }
         set(value) = setEncryptedValue(SHARED_PREF_KEY_IS_REGISTERED, value)

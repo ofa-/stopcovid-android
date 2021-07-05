@@ -166,7 +166,6 @@ object AnalyticsManager : LifecycleObserver {
             val result = AnalyticsServerManager.sendAnalytics(
                 context,
                 analyticsInfosProvider.getBaseUrl(),
-                analyticsInfosProvider.getCertificateSha256(),
                 analyticsInfosProvider.getApiVersion(),
                 token,
                 sendAnalyticsRQ
@@ -205,7 +204,6 @@ object AnalyticsManager : LifecycleObserver {
             val result = AnalyticsServerManager.sendAnalytics(
                 context,
                 analyticsInfosProvider.getBaseUrl(),
-                analyticsInfosProvider.getCertificateSha256(),
                 analyticsInfosProvider.getApiVersion(),
                 token,
                 sendAnalyticsRQ,
@@ -236,7 +234,6 @@ object AnalyticsManager : LifecycleObserver {
                 val result = AnalyticsServerManager.deleteAnalytics(
                     context,
                     analyticsInfosProvider.getBaseUrl(),
-                    analyticsInfosProvider.getCertificateSha256(),
                     analyticsInfosProvider.getApiVersion(),
                     token,
                     installationUUID,

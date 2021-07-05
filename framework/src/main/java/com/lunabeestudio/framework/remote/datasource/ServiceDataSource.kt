@@ -36,25 +36,22 @@ import java.io.File
 class ServiceDataSource(
     private val context: Context,
     baseUrl: String,
-    certificateSha256: String
 ) : RemoteServiceDataSource {
 
     private var filesDir = context.filesDir
-    private var api: StopCovidApi = RetrofitClient.getService(context, baseUrl, certificateSha256, StopCovidApi::class.java, null)
+    private var api: StopCovidApi = RetrofitClient.getService(context, baseUrl, StopCovidApi::class.java, null)
     private var reportProgressUpdate: ((Float) -> Unit)? = null
     private var reportApi: StopCovidApi = RetrofitClient.getService(
         context,
         baseUrl,
-        certificateSha256,
         StopCovidApi::class.java,
         null,
     ) {
         reportProgressUpdate?.invoke(it)
     }
-    private var fileApi: StopCovidApi = RetrofitClient.getFileService(context, baseUrl, certificateSha256, StopCovidApi::class.java)
+    private var fileApi: StopCovidApi = RetrofitClient.getFileService(context, baseUrl, StopCovidApi::class.java)
 
     override suspend fun generateCaptcha(apiVersion: String, type: String, language: String): RobertResultData<String> {
-
         val result = RequestHelper.tryCatchRequestData(
             context,
             filesDir,

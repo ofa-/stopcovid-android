@@ -30,8 +30,13 @@ import okhttp3.RequestBody.Companion.toRequestBody
 
 class InGroupeDatasource(
     private val context: Context,
-    private val certificateSHA256: String,
 ) : RemoteCertificateDataSource {
+
+    private val okHttpClient = RetrofitClient.getDefaultOKHttpClient(
+        context = context,
+        cacheConfig = null
+    )
+    private val gson = Gson()
 
     override suspend fun convertCertificate(
         url: String,
@@ -39,14 +44,6 @@ class InGroupeDatasource(
         from: WalletCertificateType.Format,
         to: WalletCertificateType.Format
     ): RobertResultData<String> {
-        val okHttpClient = RetrofitClient.getDefaultOKHttpClient(
-            context = context,
-            url = url,
-            certificateSHA256 = certificateSHA256,
-            cacheConfig = null
-        )
-
-        val gson = Gson()
 
         val apiConvertRQ = ApiConvertRQ(chainEncoded = encodedCertificate, destination = to.toApiKey(), source = from.toApiKey())
         val mediaType = "application/json".toMediaTypeOrNull()
@@ -59,29 +56,41 @@ class InGroupeDatasource(
 
         @Suppress("BlockingMethodInNonBlockingContext")
         return withContext(Dispatchers.IO) {
-            val response = okHttpClient.newCall(request).execute()
-            val bodyRs = response.body?.string()
+            try {
+                val response = okHttpClient.newCall(request).execute()
+                val bodyRs = response.body?.string()
 
-            if (response.isSuccessful && bodyRs != null) {
-                RobertResultData.Success(bodyRs)
-            } else {
-                var analyticsErrorDesc: String? = null
-                try {
-                    val error = gson.fromJson(bodyRs, ApiConvertErrorRS::class.java)
-                    analyticsErrorDesc = "${error.msgError} (${error.codeError})"
-                    RobertResultData.Failure(BackendException("${error.msgError} (${error.codeError})"))
-                } catch (e: Exception) {
-                    RobertResultData.Failure(BackendException("Unable to parse body result: $bodyRs"))
-                } finally {
-                    AnalyticsManager.reportWSError(
-                        context,
-                        context.filesDir,
-                        AnalyticsServiceName.CERTIFICATE_CONVERSION,
-                        "0",
-                        response.code,
-                        analyticsErrorDesc,
-                    )
+                if (response.isSuccessful && bodyRs != null) {
+                    RobertResultData.Success(bodyRs)
+                } else {
+                    var analyticsErrorDesc: String? = null
+                    try {
+                        val error = gson.fromJson(bodyRs, ApiConvertErrorRS::class.java)
+                        analyticsErrorDesc = "${error.msgError} (${error.codeError})"
+                        RobertResultData.Failure(BackendException("${error.msgError} (${error.codeError})"))
+                    } catch (e: JsonSyntaxException) {
+                        RobertResultData.Failure(BackendException("Unable to parse body result: $bodyRs"))
+                    } finally {
+                        AnalyticsManager.reportWSError(
+                            context,
+                            context.filesDir,
+                            AnalyticsServiceName.CERTIFICATE_CONVERSION,
+                            "0",
+                            response.code,
+                            analyticsErrorDesc,
+                        )
+                    }
                 }
+            } catch (e: Exception) {
+                AnalyticsManager.reportWSError(
+                    context,
+                    context.filesDir,
+                    AnalyticsServiceName.CERTIFICATE_CONVERSION,
+                    "0",
+                    0,
+                    e.message,
+                )
+                RobertResultData.Failure(BackendException("Unknown error : ${e.message}"))
             }
         }
     }

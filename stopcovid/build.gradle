@@ -45,8 +45,8 @@ android {
         applicationId "fr.gouv.android.stopcovid"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 292
-        versionName "3.3.0"
+        versionCode 298
+        versionName "3.3.4"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
