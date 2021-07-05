@@ -33,6 +33,8 @@ class LogoItem : AbstractBindingItem<ItemLogoBinding>() {
     @ColorInt
     var imageTint: Int? = null
 
+    var onClick: (() -> Unit)? = null
+
     override fun createBinding(inflater: LayoutInflater, parent: ViewGroup?): ItemLogoBinding {
         return ItemLogoBinding.inflate(inflater, parent, false)
     }
@@ -44,6 +46,9 @@ class LogoItem : AbstractBindingItem<ItemLogoBinding>() {
         imageTint?.let { tint ->
             binding.imageView1.imageTintList = ColorStateList.valueOf(tint)
             binding.imageView2.imageTintList = ColorStateList.valueOf(tint)
+        }
+        binding.imageSwitcher.setOnClickListener {
+            onClick?.let { it1 -> it1() }
         }
     }
 

@@ -71,6 +71,7 @@ import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.model.Action
 import com.lunabeestudio.stopcovid.coreui.model.CardTheme
 import com.lunabeestudio.stopcovid.databinding.ActivityMainBinding
+import com.lunabeestudio.stopcovid.databinding.FragmentRecyclerViewFabBinding
 import com.lunabeestudio.stopcovid.extension.addIsolationItems
 import com.lunabeestudio.stopcovid.extension.chosenPostalCode
 import com.lunabeestudio.stopcovid.extension.colorStringKey
@@ -138,6 +139,10 @@ import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 
 class ProximityFragment : TimeMainFragment() {
+
+    override val layout: Int = R.layout.fragment_recycler_view_fab
+
+    private var fragmentRecyclerViewFabBinding: FragmentRecyclerViewFabBinding? = null
 
     private val numberFormat: NumberFormat = NumberFormat.getNumberInstance(Locale.getDefault())
 
@@ -252,7 +257,7 @@ class ProximityFragment : TimeMainFragment() {
                 } else {
                     lifecycleScope.launch {
                         findNavControllerOrNull()
-                            ?.navigate(
+                            ?.safeNavigate(
                                 ProximityFragmentDirections.actionProximityFragmentToWalletContainerFragment(
                                     code = data,
                                     origin = DeeplinkManager.Origin.UNIVERSAL,
@@ -266,6 +271,9 @@ class ProximityFragment : TimeMainFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = super.onCreateView(inflater, container, savedInstanceState)
+
+        fragmentRecyclerViewFabBinding = view?.let { FragmentRecyclerViewFabBinding.bind(it) }
+
         activity?.registerReceiver(receiver, IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED))
         activity?.registerReceiver(receiver, IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION))
         activity?.registerReceiver(errorReceiver, IntentFilter(Constants.Notification.SERVICE_ERROR))
@@ -289,14 +297,13 @@ class ProximityFragment : TimeMainFragment() {
     }
 
     private fun setupExtendedFab() {
-        binding?.floatingActionButton?.let { fab ->
+        fragmentRecyclerViewFabBinding?.floatingActionButton?.let { fab ->
             fab.text = strings["home.qrScan.button.title"]
             fab.setOnClickListener {
                 AnalyticsManager.reportAppEvent(requireContext(), AppEventName.e18, null)
-                findNavControllerOrNull()?.navigate(ProximityFragmentDirections.actionProximityFragmentToUniversalQrScanFragment())
+                findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToUniversalQrScanFragment())
             }
             binding?.recyclerView?.addOnScrollListener(ExtendedFloatingActionButtonScrollListener(fab))
-            fab.show()
         }
     }
 

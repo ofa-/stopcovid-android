@@ -47,10 +47,12 @@ import com.lunabeestudio.framework.local.datasource.SecureFileLocalProximityData
 import com.lunabeestudio.framework.local.datasource.SecureKeystoreDataSource
 import com.lunabeestudio.framework.manager.LocalProximityFilterImpl
 import com.lunabeestudio.framework.remote.datasource.CleaDataSource
+import com.lunabeestudio.framework.remote.datasource.InGroupeDatasource
 import com.lunabeestudio.framework.remote.datasource.ServiceDataSource
 import com.lunabeestudio.robert.RobertApplication
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.robert.RobertManagerImpl
+import com.lunabeestudio.robert.repository.CertificateRepository
 import com.lunabeestudio.stopcovid.`interface`.IsolationApplication
 import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.ConfigConstant
@@ -94,6 +96,7 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import okhttp3.Cache
@@ -104,6 +107,7 @@ import java.util.Date
 import java.util.concurrent.TimeUnit
 import kotlin.math.roundToInt
 import kotlin.random.Random
+import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 import kotlin.time.hours
 import kotlin.time.milliseconds
@@ -160,6 +164,12 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
     private val certificatesDocumentsManager: CertificatesDocumentsManager = CertificatesDocumentsManager(this)
     val dccCertificatesManager: DccCertificatesManager by lazy { DccCertificatesManager() }
 
+    val certificateRepository: CertificateRepository by lazy {
+        CertificateRepository(InGroupeDatasource(this, EnvConstant.Prod.conversionCertificateSha256), secureKeystoreDataSource)
+    }
+
+    private var firstResume = false
+
     init {
         System.setProperty("kotlinx.coroutines.debug", if (BuildConfig.DEBUG) "on" else "off")
     }
@@ -167,6 +177,7 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
     override fun onCreate() {
         super.onCreate()
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
+        firstResume = true
 
         Timber.plant(WarnTree())
 
@@ -252,12 +263,17 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
         AttestationsManager.migrateAttestationsIfNeeded(robertManager, secureKeystoreDataSource, StringsManager.strings)
     }
 
+    @OptIn(ExperimentalTime::class)
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     fun onAppResume() {
         isAppInForeground = true
 
 /*
         appCoroutineScope.launch {
+            if (firstResume) {
+                delay(Duration.seconds(1)) // Add some delay to let the main activity start
+            }
+            firstResume = false
             AppMaintenanceManager.checkForMaintenanceUpgrade(this@StopCovid)
         }
 */

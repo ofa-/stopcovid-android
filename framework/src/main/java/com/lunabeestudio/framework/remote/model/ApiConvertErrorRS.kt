@@ -5,12 +5,12 @@
  *
  * Authors
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Created by Lunabee Studio / Date - 2020/04/05 - for the TOUS-ANTI-COVID project
+ * Created by Lunabee Studio / Date - 2021/23/6 - for the TOUS-ANTI-COVID project
  */
 
 package com.lunabeestudio.framework.remote.model
 
-internal class ApiRegisterRQ(
-    val captcha: String,
-    val clientPublicECDHKey: String
+internal class ApiConvertErrorRS private constructor(
+    val codeError: String,
+    val msgError: String,
 )

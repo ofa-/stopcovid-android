@@ -18,6 +18,7 @@ import com.lunabeestudio.stopcovid.coreui.extension.fetchSystemColor
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.fastitem.buttonItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.cardWithActionItem
+import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.fastitem.logoItem
 import com.mikepenz.fastadapter.GenericItem
 
@@ -45,7 +46,7 @@ class UniversalQrScanExplanationsFragment : MainFragment() {
             text = strings["universalQrScanExplanationsController.button.title"]
             width = ViewGroup.LayoutParams.MATCH_PARENT
             onClickListener = View.OnClickListener {
-                findNavControllerOrNull()?.navigate(
+                findNavControllerOrNull()?.safeNavigate(
                     UniversalQrScanExplanationsFragmentDirections.actionUniversalQrScanExplanationsFragmentToUniversalQrScanFragment()
                 )
             }

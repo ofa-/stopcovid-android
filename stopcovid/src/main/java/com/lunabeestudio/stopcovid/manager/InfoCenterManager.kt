@@ -48,7 +48,6 @@ import java.lang.reflect.Type
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 import kotlin.time.milliseconds
-import kotlin.time.minutes
 
 object InfoCenterManager {
 
@@ -66,7 +65,7 @@ object InfoCenterManager {
     private val typeInfoCenterStrings: Type = object : TypeToken<Map<String, String>>() {}.type
 
     @OptIn(ExperimentalTime::class)
-    private val refreshMinDelay: Duration = 5.minutes
+    private val refreshMinDelay: Duration = Duration.minutes(5)
 
     private var lastUpdatedAt: InfoCenterLastUpdatedAt? = null
 
@@ -122,7 +121,9 @@ object InfoCenterManager {
             { it },
             typeInfoCenterEntry
         )?.let { infos ->
-            val sortedInfos = infos.sortedByDescending { it.timestamp }
+            val sortedInfos = infos
+                .filter { it.timestamp < System.currentTimeMillis() / 1000 }
+                .sortedByDescending { it.timestamp }
             if (this.infos.value?.peekContent() != sortedInfos) {
                 this._infos.postValue(Event(sortedInfos))
             }

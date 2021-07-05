@@ -18,6 +18,7 @@ import androidx.fragment.app.setFragmentResult
 import androidx.preference.PreferenceManager
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.extension.hasUsedUniversalQrScan
+import com.lunabeestudio.stopcovid.extension.safeNavigate
 
 class UniversalQrScanFragment : QRCodeFragment() {
 
@@ -30,7 +31,7 @@ class UniversalQrScanFragment : QRCodeFragment() {
         if (!sharedPrefs.hasUsedUniversalQrScan) {
             isReadyToStartScanFlow = false
             sharedPrefs.hasUsedUniversalQrScan = true
-            findNavControllerOrNull()?.navigate(
+            findNavControllerOrNull()?.safeNavigate(
                 UniversalQrScanFragmentDirections.actionUniversalQrScanFragmentToUniversalQrScanExplanationsFragment()
             )
         }

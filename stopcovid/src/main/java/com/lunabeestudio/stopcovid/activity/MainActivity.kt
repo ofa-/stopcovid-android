@@ -182,14 +182,20 @@ class MainActivity : BaseActivity() {
             R.id.walletQRCodeFragment,
             R.id.universalQrScanFragment,
             R.id.verifyWalletQRCodeFragment,
-        ).contains(destination.id).let { isQrCodeFragment ->
+            R.id.vaccineCompletionFragment,
+        ).contains(destination.id).let { noAppBarFragment ->
             lifecycleScope.launchWhenResumed {
                 val windowInsetsController = WindowInsetsControllerCompat(window, window.decorView)
-                if (isQrCodeFragment) {
+                windowInsetsController.isAppearanceLightStatusBars =
+                    if (!noAppBarFragment || destination.id == R.id.vaccineCompletionFragment) {
+                        !isNightMode()
+                    } else {
+                        false
+                    }
+                if (noAppBarFragment) {
                     // wait for default fragment switch animation time
                     delay(200L)
 
-                    windowInsetsController.isAppearanceLightStatusBars = false
                     binding.appBarLayout.isVisible = false
 
                     // Fix issue where appBarLayout take space even when gone
@@ -202,7 +208,6 @@ class MainActivity : BaseActivity() {
                     // wait for default fragment switch animation time
                     delay(200L)
 
-                    windowInsetsController.isAppearanceLightStatusBars = !isNightMode()
                     binding.appBarLayout.isVisible = true
 
                     // Fix issue where appBarLayout take space even when gone

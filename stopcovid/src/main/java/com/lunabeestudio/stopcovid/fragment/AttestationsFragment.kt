@@ -15,11 +15,13 @@ import android.view.View
 import androidx.fragment.app.viewModels
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.zxing.BarcodeFormat
+import com.journeyapps.barcodescanner.BarcodeEncoder
 import com.lunabeestudio.domain.model.Attestation
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
+import com.lunabeestudio.stopcovid.coreui.extension.toDimensSize
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.extension.isExpired
@@ -45,7 +47,12 @@ import com.lunabeestudio.domain.model.FormEntry
 import androidx.fragment.app.activityViewModels
 
 
-class AttestationsFragment : QRCodeListFragment() {
+class AttestationsFragment : MainFragment() {
+
+    private val barcodeEncoder: BarcodeEncoder = BarcodeEncoder()
+    private val qrCodeSize: Int by lazy {
+        R.dimen.qr_code_size.toDimensSize(requireContext()).toInt()
+    }
 
     private val robertManager: RobertManager by lazy {
         requireContext().robertManager()
@@ -187,20 +194,24 @@ class AttestationsFragment : QRCodeListFragment() {
     }
 
     private fun qrCodeItemFromAttestation(attestation: Attestation, allowShare: Boolean): QrCodeCardItem {
-        val bitmap = barcodeEncoder.encodeBitmap(
-            attestation.qrCode,
-            BarcodeFormat.QR_CODE,
-            qrCodeSize,
-            qrCodeSize
-        )
+        val generateBarcode = {
+            barcodeEncoder.encodeBitmap(
+                attestation.qrCode,
+                BarcodeFormat.QR_CODE,
+                qrCodeSize,
+                qrCodeSize
+            )
+        }
         return qrCodeCardItem {
-            qrCodeBitmap = bitmap
+            this.generateBarcode = generateBarcode
             text = attestation.footer
             share = strings["attestationsController.menu.share"]
             delete = strings["attestationsController.menu.delete"]
             this.allowShare = allowShare
-            onShare = {
-                val uri = ShareManager.getShareCaptureUriFromBitmap(requireContext(), bitmap, "qrCode")
+            onShare = { barcodeBitmap ->
+                val uri = barcodeBitmap?.let { bitmap ->
+                    ShareManager.getShareCaptureUriFromBitmap(requireContext(), bitmap, "qrCode")
+                }
                 val text = listOf(
                     attestation.qrCodeString,
                     strings["attestationsController.menu.share.text"]

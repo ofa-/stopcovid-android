@@ -20,11 +20,13 @@ import com.lunabeestudio.stopcovid.coreui.ConfigConstant
 import com.lunabeestudio.stopcovid.coreui.network.OkHttpClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import okhttp3.CacheControl
 import okhttp3.Request
 import retrofit2.HttpException
 import retrofit2.Response
 import java.io.File
 import java.net.HttpURLConnection
+import java.util.concurrent.TimeUnit
 
 @Suppress("BlockingMethodInNonBlockingContext")
 suspend fun String.saveTo(context: Context, file: File): Boolean {
@@ -32,6 +34,7 @@ suspend fun String.saveTo(context: Context, file: File): Boolean {
         val cacheConfig = CacheConfig(File(context.cacheDir, "http_cache"), 30 * 1024 * 1024)
         val okHttpClient = OkHttpClient.getDefaultOKHttpClient(context, this@saveTo, ConfigConstant.SERVER_CERTIFICATE_SHA256, cacheConfig)
         val request: Request = Request.Builder().apply {
+            cacheControl(CacheControl.Builder().maxAge(10, TimeUnit.MINUTES).build())
             url(this@saveTo)
         }.build()
 
@@ -58,6 +61,7 @@ suspend fun String.saveTo(context: Context, atomicFile: AtomicFile, validData: s
         val cacheConfig = CacheConfig(File(context.cacheDir, "http_cache"), 30 * 1024 * 1024)
         val okHttpClient = OkHttpClient.getDefaultOKHttpClient(context, this@saveTo, ConfigConstant.SERVER_CERTIFICATE_SHA256, cacheConfig)
         val request: Request = Request.Builder().apply {
+            cacheControl(CacheControl.Builder().maxAge(10, TimeUnit.MINUTES).build())
             url(this@saveTo)
         }.build()
 

@@ -1,6 +1,7 @@
 package com.lunabeestudio.framework.remote.datasource
 
 import android.content.Context
+import com.lunabeestudio.analytics.model.AnalyticsServiceName
 import com.lunabeestudio.domain.model.CacheConfig
 import com.lunabeestudio.domain.model.Cluster
 import com.lunabeestudio.domain.model.ClusterIndex
@@ -48,7 +49,7 @@ class CleaDataSource(
         pivotDate: Long,
         venueQrCodeList: List<VenueQrCode>,
     ): RobertResult {
-        return RequestHelper.tryCatchRequest(context, filesDir, cleaApiVersion, "wreport") {
+        return RequestHelper.tryCatchRequest(context, filesDir, cleaApiVersion, AnalyticsServiceName.WREPORT) {
             cleaReportApi.wreport(cleaApiVersion, "Bearer $token", ApiWReportClea.fromVenueQrCodeList(pivotDate, venueQrCodeList))
         }
     }

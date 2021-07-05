@@ -30,6 +30,7 @@ import com.lunabeestudio.stopcovid.coreui.manager.LocalizedStrings
 import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
 import com.lunabeestudio.stopcovid.databinding.ActivityAppMaintenanceBinding
 import com.lunabeestudio.stopcovid.extension.openInExternalBrowser
+import com.lunabeestudio.stopcovid.extension.setTextOrHide
 import com.lunabeestudio.stopcovid.manager.AppMaintenanceManager
 import com.lunabeestudio.stopcovid.model.Info
 import kotlinx.coroutines.launch
@@ -59,12 +60,7 @@ class AppMaintenanceActivity : AppCompatActivity() {
      * @param info information
      */
     private fun fillScreen(info: Info) {
-        if (info.message != null) {
-            binding.textView.text = info.message
-            binding.textView.visibility = View.VISIBLE
-        } else {
-            binding.textView.visibility = View.GONE
-        }
+        binding.textView.setTextOrHide(info.message)
         if (info.buttonTitle != null && info.buttonUrl != null) {
             binding.button.text = info.buttonTitle
             binding.button.setOnClickListener {
@@ -98,8 +94,7 @@ class AppMaintenanceActivity : AppCompatActivity() {
                 AppMaintenanceManager.updateCheckForMaintenanceUpgrade(
                     this@AppMaintenanceActivity,
                     appIsFreeCompletion = {
-                        startActivity(Intent(this@AppMaintenanceActivity, OnBoardingActivity::class.java))
-                        finishAndRemoveTask()
+                        navToApp()
                     },
                     appIsBlockedCompletion = { info ->
                         binding.refreshButton.hideProgress(strings["common.tryAgain"])
@@ -114,8 +109,7 @@ class AppMaintenanceActivity : AppCompatActivity() {
                 AppMaintenanceManager.updateCheckForMaintenanceUpgrade(
                     this@AppMaintenanceActivity,
                     appIsFreeCompletion = {
-                        startActivity(Intent(this@AppMaintenanceActivity, OnBoardingActivity::class.java))
-                        finishAndRemoveTask()
+                        navToApp()
                     },
                     appIsBlockedCompletion = { info ->
                         binding.swipeRefreshLayout.isRefreshing = false
@@ -124,6 +118,15 @@ class AppMaintenanceActivity : AppCompatActivity() {
                 )
             }
         }
+        binding.skipButton.setTextOrHide(strings["appMaintenanceController.later.button.title"])
+        binding.skipButton.setOnClickListener {
+            navToApp()
+        }
+    }
+
+    private fun navToApp() {
+        startActivity(Intent(this@AppMaintenanceActivity, SplashScreenActivity::class.java))
+        finishAndRemoveTask()
     }
 
     private fun startOpenInStore() {
@@ -134,15 +137,9 @@ class AppMaintenanceActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * If user try to quitStopCovid this screen, it quitStopCovid the app.
-     * This activity is blocking the app
-     */
     override fun onBackPressed() {
-        val intent = Intent(Intent.ACTION_MAIN)
-        intent.addCategory(Intent.CATEGORY_HOME)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        startActivity(intent)
+        super.onBackPressed()
+        navToApp()
     }
 
     companion object {

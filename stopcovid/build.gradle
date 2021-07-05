@@ -57,8 +57,8 @@ android {
         applicationId "fr.gouv.android.stopcovid"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 282
-        versionName "3.2.1"
+        versionCode 292
+        versionName "3.3.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -99,6 +99,8 @@ dependencies {
     implementation "com.github.razir.progressbutton:progressbutton:_"
 
     implementation "com.github.chrisbanes:photoview:_"
+
+    implementation "nl.dionsegijn:konfetti:_"
 
     implementation project(path: ':analytics')
     implementation project(path: ':coreui')

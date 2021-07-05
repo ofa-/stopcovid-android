@@ -25,18 +25,22 @@ import com.lunabeestudio.stopcovid.extension.setTextOrHide
 import com.mikepenz.fastadapter.binding.AbstractBindingItem
 
 class QrCodeCardItem : AbstractBindingItem<ItemQrCodeCardBinding>() {
-    var qrCodeBitmap: Bitmap? = null
+    var generateBarcode: (() -> Bitmap)? = null
     var text: String? = null
     var tag1Text: String? = null
     var tag2Text: String? = null
     var formatText: String? = null
     var share: String? = null
     var delete: String? = null
+    var convertText: String? = null
     var allowShare: Boolean = false
-    var onShare: (() -> Unit)? = null
+    var onShare: ((barcodeBitmap: Bitmap?) -> Unit)? = null
     var onDelete: (() -> Unit)? = null
+    var onConvert: (() -> Unit)? = null
     var onClick: (() -> Unit)? = null
     var actionContentDescription: String? = null
+    var onTag1Click: (() -> Unit)? = null
+    var onTag2Click: (() -> Unit)? = null
 
     override val type: Int = R.id.item_attestation_qr_code
 
@@ -55,48 +59,80 @@ class QrCodeCardItem : AbstractBindingItem<ItemQrCodeCardBinding>() {
     override fun bindView(binding: ItemQrCodeCardBinding, payloads: List<Any>) {
         super.bindView(binding, payloads)
         binding.textView.text = text
-        binding.imageView.setImageBitmap(qrCodeBitmap)
+
+        val bitmap = generateBarcode?.invoke()
+        binding.imageView.setImageBitmap(bitmap)
+
         binding.constraintLayout.setOnClickListener {
             onClick?.invoke()
         }
         binding.actionButton.setOnClickListener {
-            showMenu(it)
+            showMenu(it, bitmap)
         }
         binding.formatTextView.setTextOrHide(formatText)
 
         binding.tag1.chip.text = tag1Text
         binding.tag1.chip.isVisible = !tag1Text.isNullOrEmpty()
+        onTag1Click?.let { onClick ->
+            binding.tag1.chip.isEnabled = true
+            binding.tag1.chip.setOnClickListener {
+                onClick()
+            }
+        }
 
         binding.tag2.chip.text = tag2Text
         binding.tag2.chip.isVisible = !tag2Text.isNullOrEmpty()
+        onTag2Click?.let { onClick ->
+            binding.tag2.chip.isEnabled = true
+            binding.tag2.chip.setOnClickListener {
+                onClick()
+            }
+        }
 
         binding.tagLayout.isVisible = !(tag1Text.isNullOrEmpty() && tag2Text.isNullOrEmpty())
 
         binding.actionButton.contentDescription = actionContentDescription
     }
 
-    private fun showMenu(v: View) {
+    override fun unbindView(binding: ItemQrCodeCardBinding) {
+        super.unbindView(binding)
+        binding.imageView.setImageBitmap(null)
+        binding.tag1.chip.setOnClickListener(null)
+        binding.tag1.chip.isEnabled = false
+        binding.tag2.chip.setOnClickListener(null)
+        binding.tag2.chip.isEnabled = false
+    }
+
+    private fun showMenu(v: View, bitmap: Bitmap?) {
         PopupMenu(v.context, v).apply {
-            setOnMenuItemClickListener(::onMenuItemClick)
+            setOnMenuItemClickListener { onMenuItemClick(it, bitmap) }
 
             inflate(R.menu.qr_code_menu)
 
             menu.findItem(R.id.qr_code_menu_share).title = share
-            menu.findItem(R.id.qr_code_menu_delete).title = delete
             menu.findItem(R.id.qr_code_menu_share).isVisible = allowShare
+
+            menu.findItem(R.id.qr_code_menu_delete).title = delete
+
+            menu.findItem(R.id.qr_code_menu_covert).title = convertText
+            menu.findItem(R.id.qr_code_menu_covert).isVisible = onConvert != null
 
             show()
         }
     }
 
-    private fun onMenuItemClick(item: MenuItem): Boolean {
+    private fun onMenuItemClick(item: MenuItem, bitmap: Bitmap?): Boolean {
         return when (item.itemId) {
             R.id.qr_code_menu_delete -> {
                 onDelete?.invoke()
                 true
             }
             R.id.qr_code_menu_share -> {
-                onShare?.invoke()
+                onShare?.invoke(bitmap)
+                true
+            }
+            R.id.qr_code_menu_covert -> {
+                onConvert?.invoke()
                 true
             }
             else -> false

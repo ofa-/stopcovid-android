@@ -11,6 +11,7 @@
 package com.lunabeestudio.framework.remote.datasource
 
 import android.content.Context
+import com.lunabeestudio.analytics.model.AnalyticsServiceName
 import com.lunabeestudio.domain.model.LocalProximity
 import com.lunabeestudio.domain.model.RegisterReport
 import com.lunabeestudio.domain.model.ReportResponse
@@ -54,7 +55,12 @@ class ServiceDataSource(
 
     override suspend fun generateCaptcha(apiVersion: String, type: String, language: String): RobertResultData<String> {
 
-        val result = RequestHelper.tryCatchRequestData(context, filesDir, apiVersion, "captcha-$type") {
+        val result = RequestHelper.tryCatchRequestData(
+            context,
+            filesDir,
+            apiVersion,
+            AnalyticsServiceName.CAPTCHA_TYPE.format(type)
+        ) {
             api.captcha(apiVersion, CaptchaRQ(type = type, locale = language))
         }
         return when (result) {
@@ -65,7 +71,7 @@ class ServiceDataSource(
 
     override suspend fun getCaptcha(apiVersion: String, captchaId: String, type: String, path: String): RobertResult {
 
-        val result = RequestHelper.tryCatchRequestData(context, filesDir, apiVersion, "captcha") {
+        val result = RequestHelper.tryCatchRequestData(context, filesDir, apiVersion, AnalyticsServiceName.CAPTCHA) {
             fileApi.getCaptcha(apiVersion, captchaId, type)
         }
         return when (result) {
@@ -92,7 +98,7 @@ class ServiceDataSource(
         clientPublicECDHKey: String,
     ): RobertResultData<RegisterReport> {
 
-        val result = RequestHelper.tryCatchRequestData(context, filesDir, apiVersion, "register") {
+        val result = RequestHelper.tryCatchRequestData(context, filesDir, apiVersion, AnalyticsServiceName.REGISTER) {
             api.registerV2(apiVersion, ApiRegisterV2RQ(captcha = captcha, captchaId = captchaId, clientPublicECDHKey = clientPublicECDHKey))
         }
         return when (result) {
@@ -102,13 +108,13 @@ class ServiceDataSource(
     }
 
     override suspend fun unregister(apiVersion: String, ssu: ServerStatusUpdate): RobertResult {
-        return RequestHelper.tryCatchRequest(context, filesDir, apiVersion, "unregister") {
+        return RequestHelper.tryCatchRequest(context, filesDir, apiVersion, AnalyticsServiceName.UNREGISTER) {
             api.unregister(apiVersion, ApiUnregisterRQ(ebid = ssu.ebid, epochId = ssu.epochId, time = ssu.time, mac = ssu.mac))
         }
     }
 
     override suspend fun status(apiVersion: String, ssu: ServerStatusUpdate): RobertResultData<StatusReport> {
-        val result = RequestHelper.tryCatchRequestData(context, filesDir, apiVersion, "status") {
+        val result = RequestHelper.tryCatchRequestData(context, filesDir, apiVersion, AnalyticsServiceName.STATUS) {
             api.status(
                 apiVersion,
                 ApiStatusRQ(
@@ -132,7 +138,7 @@ class ServiceDataSource(
         onProgressUpdate: ((Float) -> Unit)?,
     ): RobertResultData<ReportResponse> {
 
-        val result = RequestHelper.tryCatchRequestData(context, filesDir, apiVersion, "report") {
+        val result = RequestHelper.tryCatchRequestData(context, filesDir, apiVersion, AnalyticsServiceName.REPORT) {
             reportProgressUpdate = onProgressUpdate
             reportApi.report(apiVersion, ApiReportRQ.fromLocalProximityList(token, localProximityList))
         }
@@ -144,7 +150,7 @@ class ServiceDataSource(
     }
 
     override suspend fun deleteExposureHistory(apiVersion: String, ssu: ServerStatusUpdate): RobertResult {
-        return RequestHelper.tryCatchRequest(context, filesDir, apiVersion, "deleteExposureHistory") {
+        return RequestHelper.tryCatchRequest(context, filesDir, apiVersion, AnalyticsServiceName.DELETE_EXPOSURE_HISTORY) {
             api.deleteExposureHistory(
                 apiVersion,
                 ApiDeleteExposureHistoryRQ(ebid = ssu.ebid, epochId = ssu.epochId, time = ssu.time, mac = ssu.mac)

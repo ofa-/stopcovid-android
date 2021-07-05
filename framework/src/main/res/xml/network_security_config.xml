@@ -62,4 +62,14 @@
             <certificates src="@raw/s3_fr_par_scw_cloud" />
         </trust-anchors>
     </domain-config>
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="true">portail.tacv.myservices-ingroupe.com</domain>
+        <pin-set tools:ignore="MissingBackupPin">
+            <pin digest="SHA-256">tlRuGxB3uGL0nVnnz6bXoGQi5aGuZ0rfqGlUlndK/yc=</pin>
+        </pin-set>
+        <trust-anchors>
+            <certificates src="@raw/ingroupe_com_isrg_root_x1" />
+            <certificates src="@raw/ingroupe_com_r3" />
+        </trust-anchors>
+    </domain-config>
 </network-security-config>

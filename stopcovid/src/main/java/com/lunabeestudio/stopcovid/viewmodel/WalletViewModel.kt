@@ -10,21 +10,27 @@
 
 package com.lunabeestudio.stopcovid.viewmodel
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.map
+import com.lunabeestudio.analytics.manager.AnalyticsManager
+import com.lunabeestudio.analytics.model.AppEventName
+import com.lunabeestudio.domain.model.WalletCertificateType
 import com.lunabeestudio.framework.local.datasource.SecureKeystoreDataSource
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.robert.datasource.LocalKeystoreDataSource
 import com.lunabeestudio.stopcovid.extension.isOld
 import com.lunabeestudio.stopcovid.extension.isRecent
+import com.lunabeestudio.stopcovid.manager.DccCertificatesManager
 import com.lunabeestudio.stopcovid.manager.WalletManager
 import com.lunabeestudio.stopcovid.model.WalletCertificate
 
 class WalletViewModel(
     private val robertManager: RobertManager,
-    private val keystoreDataSource: LocalKeystoreDataSource
+    private val keystoreDataSource: LocalKeystoreDataSource,
+    private val dccCertificatesManager: DccCertificatesManager,
 ) : ViewModel() {
 
     val certificates: LiveData<List<WalletCertificate>?>
@@ -49,12 +55,33 @@ class WalletViewModel(
     fun isEmpty(): Boolean {
         return certificates.value.isNullOrEmpty()
     }
+
+    suspend fun processCodeValue(
+        context: Context,
+        certificateCode: String,
+        certificateFormat: WalletCertificateType.Format?
+    ): WalletCertificate {
+        val certificate = WalletManager.processCertificateCode(
+            robertManager,
+            keystoreDataSource,
+            certificateCode,
+            dccCertificatesManager.certificates,
+            certificateFormat,
+        )
+        AnalyticsManager.reportAppEvent(context, AppEventName.e13, null)
+
+        return certificate
+    }
 }
 
-class WalletViewModelFactory(private val robertManager: RobertManager, private val secureKeystoreDataSource: SecureKeystoreDataSource) :
+class WalletViewModelFactory(
+    private val robertManager: RobertManager,
+    private val secureKeystoreDataSource: SecureKeystoreDataSource,
+    private val dccCertificatesManager: DccCertificatesManager
+) :
     ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         @Suppress("UNCHECKED_CAST")
-        return WalletViewModel(robertManager, secureKeystoreDataSource) as T
+        return WalletViewModel(robertManager, secureKeystoreDataSource, dccCertificatesManager) as T
     }
 }

@@ -25,6 +25,7 @@ enum class EnvConstant {
         override val serverPublicKey: String =
             "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEAc9IDt6qJq453SwyWPB94JaLB2VfTAcL43YVtMr3HhDCd22gKaQXIbX1d+tNhfvaKM51sxeaXziPjntUzbTNiw=="
         override val dccCertificatesFilename: String = "dcc-certs.json"
+        override val conversionCertificateSha256: String = "sha256/tlRuGxB3uGL0nVnnz6bXoGQi5aGuZ0rfqGlUlndK/yc="
     };
 
     abstract val captchaApiKey: String
@@ -39,4 +40,6 @@ enum class EnvConstant {
     abstract val calibrationFilename: String
     abstract val serverPublicKey: String
     abstract val dccCertificatesFilename: String
+    abstract val conversionCertificateSha256: String
+
 }

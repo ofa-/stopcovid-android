@@ -19,12 +19,13 @@ abstract class RemoteJsonManager<T> : RemoteFileManager() {
 
     protected suspend fun loadLocal(context: Context): T? {
         return withContext(Dispatchers.IO) {
-            val fileString = loadLocalBytes(context)?.toString(Charsets.UTF_8)
-            try {
-                gson.fromJson<T>(fileString!!, type)
-            } catch (e: Exception) {
-                Timber.e(e)
-                null
+            loadLocalBytes(context)?.toString(Charsets.UTF_8)?.let { fileString ->
+                try {
+                    gson.fromJson<T>(fileString, type)
+                } catch (e: Exception) {
+                    Timber.e(e)
+                    null
+                }
             }
         }
     }
