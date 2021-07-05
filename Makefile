@@ -48,6 +48,10 @@ build: $(keystore) local.properties .
 install:
 	./gradlew installRelease
 
+install.downgrade:
+	adb install -d -r ./stopcovid/build/outputs/apk/release/stopcovid-release.apk
+
+
 $(keystore):
 	echo "password,password,,,,,,,yes" | tr , "\n" |\
 	keytool -genkey -v -keystore $(keystore) \
