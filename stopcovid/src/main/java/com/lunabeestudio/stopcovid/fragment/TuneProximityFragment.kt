@@ -224,11 +224,13 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
     }
 
     private val minPings = 10
+    private val nbConsideredItems = 20000
     private fun compactList(): String {
         var currentDay = ""
         var nbEbidPerDay = 0
         var nbLowPingEbids = 0
         return localProximityItems
+            .slice(0 until min(nbConsideredItems, localProximityItems.size))
             .groupBy { it.ebidBase64 }
             .map { (_, group) ->
                 val it = group.last()
