@@ -38,12 +38,13 @@
 
         <ImageView
             android:id="@+id/imageView"
-            android:layout_width="@dimen/qr_code_fullscreen_size"
-            android:layout_height="@dimen/qr_code_fullscreen_size"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/spacing_large"
+            android:layout_marginTop="@dimen/spacing_large"
             android:layout_marginBottom="@dimen/spacing_large"
             android:adjustViewBounds="true"
-            android:paddingHorizontal="@dimen/spacing_large"
+            android:scaleType="fitXY"
             tools:ignore="ContentDescription"
             tools:src="@tools:sample/avatars" />
 
