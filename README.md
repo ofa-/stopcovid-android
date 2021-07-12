@@ -6,7 +6,7 @@ _Extended_ StopCovid app, featuring:
 - proximity info screen & notifications
 - proximity data access via adb
 - private venues QR code screen
-- 2D-DOC certificate verifier
+- certificates verifier
 - one-click attestations
 - settings > preferences
 - no "maintenance" mode
