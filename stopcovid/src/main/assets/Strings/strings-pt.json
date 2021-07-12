@@ -1012,7 +1012,7 @@
    "flashDataMatrixCodeController.alert.invalidCode.title": "Invalid code",
    "flashDataMatrixCodeController.alert.invalidCode.message": "The code is not valid. Please try again.",
    
-   "home.moreSection.verifySanitaryCertificate": "Verify a 2D-DOC certificate",
+   "home.moreSection.verifySanitaryCertificate": "Verify a certificate",
    "wallet.proof.sanitaryCertificate.F5.P": "Positive",
    "wallet.proof.sanitaryCertificate.F5.N": "✅ Negative",
    "wallet.proof.sanitaryCertificate.F5.I": "Undetermined",
