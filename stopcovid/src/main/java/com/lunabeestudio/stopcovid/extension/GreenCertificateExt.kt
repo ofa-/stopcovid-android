@@ -55,12 +55,10 @@ val GreenCertificate.testResultCode: String?
     }
 
 val GreenCertificate.testDateTimeOfCollection: Date?
-    get() = tests?.lastOrNull()?.dateTimeOfCollection?.let(yearMonthDayUsParser()::parseOrNull)
+    get() = tests?.lastOrNull()?.dateTimeOfCollection
+        ?.let(::parseToOffsetDateTimeOrNull)?.toInstant()?.let { Date.from(it) }
 
-val GreenCertificate.recoveryValidFrom: Date?
-    get() = recoveryStatements?.lastOrNull()?.certificateValidFrom?.let(yearMonthDayUsParser()::parseOrNull)
-
-val GreenCertificate.recoveryValidUntil: Date?
-    get() = recoveryStatements?.lastOrNull()?.certificateValidUntil?.let(yearMonthDayUsParser()::parseOrNull)
+val GreenCertificate.recoveryDateOfFirstPositiveTest: Date?
+    get() = recoveryStatements?.lastOrNull()?.dateOfFirstPositiveTest?.let(yearMonthDayUsParser()::parseOrNull)
 
 private fun yearMonthDayUsParser() = SimpleDateFormat("yyyy-MM-dd", Locale.US)

@@ -26,6 +26,7 @@ import com.lunabeestudio.robert.datasource.ConfigurationDataSource
 import com.lunabeestudio.robert.datasource.LocalKeystoreDataSource
 import com.lunabeestudio.robert.datasource.RemoteServiceDataSource
 import com.lunabeestudio.robert.datasource.SharedCryptoDataSource
+import com.lunabeestudio.robert.model.RobertException
 import com.lunabeestudio.robert.model.RobertResult
 import com.lunabeestudio.robert.model.RobertResultData
 
@@ -54,20 +55,25 @@ internal class RemoteServiceRepository(
         val publicKey64 = Base64.encodeToString(keyPair.public.encoded, Base64.NO_WRAP)
         val registerResult = remoteServiceDataSource.registerV2(apiVersion, captcha, captchaId, publicKey64)
 
-        if (registerResult is RobertResultData.Success) {
-            sharedCryptoDataSource.getEncryptionKeys(
-                rawServerPublicKey = Base64.decode(serverPublicKey, Base64.NO_WRAP),
-                rawLocalPrivateKey = keyPair.private.encoded,
-                kADerivation = RobertConstant.KA_STRING_INPUT.toByteArray(),
-                kEADerivation = RobertConstant.KEA_STRING_INPUT.toByteArray()
-            ).let {
-                keystoreDataSource.isRegistered = true
-                keystoreDataSource.kA = it.first
-                keystoreDataSource.kEA = it.second
+        return if (registerResult is RobertResultData.Success) {
+            try {
+                sharedCryptoDataSource.getEncryptionKeys(
+                    rawServerPublicKey = Base64.decode(serverPublicKey, Base64.NO_WRAP),
+                    rawLocalPrivateKey = keyPair.private.encoded,
+                    kADerivation = RobertConstant.KA_STRING_INPUT.toByteArray(),
+                    kEADerivation = RobertConstant.KEA_STRING_INPUT.toByteArray()
+                ).let {
+                    keystoreDataSource.isRegistered = true
+                    keystoreDataSource.kA = it.first
+                    keystoreDataSource.kEA = it.second
+                }
+                registerResult
+            } catch (e: RobertException) {
+                RobertResultData.Failure(e)
             }
+        } else {
+            registerResult
         }
-
-        return registerResult
     }
 
     suspend fun unregister(apiVersion: String, serverStatusUpdate: ServerStatusUpdate): RobertResult =

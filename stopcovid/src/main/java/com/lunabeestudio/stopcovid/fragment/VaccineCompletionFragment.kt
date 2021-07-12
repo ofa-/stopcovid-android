@@ -36,7 +36,6 @@ import com.lunabeestudio.stopcovid.coreui.fastitem.cardWithActionItem
 import com.lunabeestudio.stopcovid.databinding.FragmentRecyclerViewKonfettiBinding
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.vaccineDate
-import com.lunabeestudio.stopcovid.extension.vaccineMedicinalProduct
 import com.lunabeestudio.stopcovid.fastitem.logoItem
 import com.lunabeestudio.stopcovid.model.EuropeanCertificate
 import com.lunabeestudio.stopcovid.viewmodel.VaccineCompletionViewModel
@@ -157,7 +156,7 @@ class VaccineCompletionFragment : MainFragment() {
 
     override fun getItems(): List<GenericItem> {
         val greenCertificate = (viewModel.certificate.value as? EuropeanCertificate)?.greenCertificate
-        val vaccineMedicinalProduct = greenCertificate?.vaccineMedicinalProduct
+        val vaccineMedicinalProduct: String? = null // greenCertificate?.vaccineMedicinalProduct
         val vaccineDate = greenCertificate?.vaccineDate ?: return emptyList()
 
         val items = mutableListOf<GenericItem>()
@@ -171,10 +170,14 @@ class VaccineCompletionFragment : MainFragment() {
             identifier = R.drawable.ic_thumbsup.toLong()
         }
 
-        val daysAfterCompletion =
+        val daysAfterCompletion = try {
             configuration.daysAfterCompletion[vaccineMedicinalProduct]
                 ?: configuration.daysAfterCompletion[DEFAULT_KEY]
                 ?: return emptyList()
+        } catch (e: NullPointerException) {
+            Timber.e(e)
+            return emptyList()
+        }
 
         val completedDate = Calendar.getInstance().apply {
             time = vaccineDate

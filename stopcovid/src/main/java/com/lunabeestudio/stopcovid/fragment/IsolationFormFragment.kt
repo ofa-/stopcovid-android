@@ -21,6 +21,7 @@ import com.lunabeestudio.robert.extension.observeEventAndConsume
 import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
+import com.lunabeestudio.stopcovid.coreui.extension.viewLifecycleOwnerOrNull
 import com.lunabeestudio.stopcovid.coreui.fastitem.buttonItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
@@ -367,7 +368,7 @@ class IsolationFormFragment : MainFragment() {
     }
 
     private fun scrollToBottom() {
-        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
+        viewLifecycleOwnerOrNull()?.lifecycleScope?.launch(Dispatchers.Main) {
             delay(Constants.Android.ANIMATION_DELAY)
             binding?.recyclerView?.smoothScrollToPosition(Int.MAX_VALUE)
         }

@@ -900,7 +900,7 @@ class ProximityFragment : TimeMainFragment() {
             strings
         ) { postalCode ->
             sharedPrefs.chosenPostalCode = postalCode
-            viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwnerOrNull()?.lifecycleScope?.launch {
                 (activity as? MainActivity)?.showProgress(true)
                 VaccinationCenterManager.postalCodeDidUpdate(requireContext(), sharedPrefs, postalCode)
                 (activity as? MainActivity)?.showProgress(false)
@@ -1022,7 +1022,7 @@ class ProximityFragment : TimeMainFragment() {
                     .show()
             }
             !robertManager.isRegistered -> {
-                viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+                viewLifecycleOwnerOrNull()?.lifecycleScope?.launch(Dispatchers.IO) {
                     if (viewModel.refreshConfig(requireContext().applicationContext as RobertApplication)) {
                         withContext(Dispatchers.Main) {
                             findNavControllerOrNull()
@@ -1233,7 +1233,7 @@ class ProximityFragment : TimeMainFragment() {
                 }
             }
         ) {
-            viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
+            viewLifecycleOwnerOrNull()?.lifecycleScope?.launch(Dispatchers.Main) {
                 deactivateProximity(false)
                 delay(PROXIMITY_BUTTON_DELAY)
                 activateProximity()

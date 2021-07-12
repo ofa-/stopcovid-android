@@ -145,12 +145,10 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
             ServiceDataSource(
                 this,
                 EnvConstant.Prod.baseUrl,
-                EnvConstant.Prod.certificateSha256,
             ),
             CleaDataSource(
                 this,
                 EnvConstant.Prod.cleaReportBaseUrl,
-                EnvConstant.Prod.cleaReportCertificateSha256,
                 EnvConstant.Prod.cleaStatusBaseUrl,
             ),
             BouncyCastleCryptoDataSource(),
@@ -165,7 +163,7 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
     val dccCertificatesManager: DccCertificatesManager by lazy { DccCertificatesManager() }
 
     val certificateRepository: CertificateRepository by lazy {
-        CertificateRepository(InGroupeDatasource(this, EnvConstant.Prod.conversionCertificateSha256), secureKeystoreDataSource)
+        CertificateRepository(InGroupeDatasource(this), secureKeystoreDataSource)
     }
 
     private var firstResume = false
@@ -330,7 +328,14 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
     }
 
     override fun refreshProximityService() {
-        if (robertManager.isProximityActive && ProximityManager.getDeviceSetup(this, robertManager) == DeviceSetup.BLE) {
+        val isProximityActive = try {
+            robertManager.isProximityActive
+        } catch (e: Exception) {
+            // On some device Keychain might not be ready and crash the app
+            Timber.e(e)
+            false
+        }
+        if (isProximityActive && ProximityManager.getDeviceSetup(this, robertManager) == DeviceSetup.BLE) {
             ProximityService.start(this)
         } else {
             ProximityService.stop(this)
@@ -593,10 +598,6 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
 
     override fun getBaseUrl(): String {
         return EnvConstant.Prod.analyticsBaseUrl
-    }
-
-    override fun getCertificateSha256(): String {
-        return EnvConstant.Prod.analyticsCertificateSha256
     }
 
     override fun getApiVersion(): String {

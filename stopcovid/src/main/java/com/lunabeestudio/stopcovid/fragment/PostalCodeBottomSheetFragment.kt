@@ -21,6 +21,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
+import com.lunabeestudio.stopcovid.coreui.extension.viewLifecycleOwnerOrNull
 import com.lunabeestudio.stopcovid.coreui.manager.LocalizedStrings
 import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
 import com.lunabeestudio.stopcovid.databinding.FragmentPostalCodeBottomSheetBinding
@@ -51,7 +52,7 @@ class PostalCodeBottomSheetFragment : BottomSheetDialogFragment() {
             text = strings["home.infoSection.updatePostalCode.alert.deletePostalCode"]
             setOnClickListener {
                 sharedPrefs.chosenPostalCode = null
-                viewLifecycleOwner.lifecycleScope.launch {
+                viewLifecycleOwnerOrNull()?.lifecycleScope?.launch {
                     context?.let { context ->
                         (activity as? MainActivity)?.showProgress(true)
                         VaccinationCenterManager.postalCodeDidUpdate(context, sharedPrefs, null)
@@ -79,7 +80,7 @@ class PostalCodeBottomSheetFragment : BottomSheetDialogFragment() {
             ) { postalCode ->
                 if (sharedPrefs.chosenPostalCode != postalCode) {
                     sharedPrefs.chosenPostalCode = postalCode
-                    viewLifecycleOwner.lifecycleScope.launch {
+                    viewLifecycleOwnerOrNull()?.lifecycleScope?.launch {
                         context?.let { context ->
                             (activity as? MainActivity)?.showProgress(true)
                             VaccinationCenterManager.postalCodeDidUpdate(context, sharedPrefs, postalCode)

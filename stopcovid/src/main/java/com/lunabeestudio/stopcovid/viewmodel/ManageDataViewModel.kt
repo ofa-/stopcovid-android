@@ -23,14 +23,13 @@ import com.lunabeestudio.robert.model.RobertResult
 import com.lunabeestudio.stopcovid.coreui.utils.SingleLiveEvent
 import com.lunabeestudio.stopcovid.extension.toCovidException
 import com.lunabeestudio.stopcovid.manager.IsolationManager
-import com.lunabeestudio.stopcovid.manager.WalletManager
 import com.lunabeestudio.stopcovid.model.CovidException
 import com.lunabeestudio.stopcovid.model.NeedRegisterException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class ManageDataViewModel(
-    private val secureKeystoreDataSource: SecureKeystoreDataSource,
+    secureKeystoreDataSource: SecureKeystoreDataSource,
     private val robertManager: RobertManager,
     isolationManager: IsolationManager,
 ) : CommonDataViewModel(secureKeystoreDataSource, robertManager, isolationManager) {
@@ -54,6 +53,11 @@ class ManageDataViewModel(
 
     override fun eraseIsolation() {
         super.eraseIsolation()
+        eraseLocalSuccess.postValue(null)
+    }
+
+    override fun eraseCertificates() {
+        super.eraseCertificates()
         eraseLocalSuccess.postValue(null)
     }
 
@@ -129,11 +133,6 @@ class ManageDataViewModel(
         } else {
             covidException.postValue(NeedRegisterException())
         }
-    }
-
-    fun eraseCertificates() {
-        WalletManager.deleteAllCertificates(secureKeystoreDataSource)
-        eraseLocalSuccess.postValue(null)
     }
 }
 

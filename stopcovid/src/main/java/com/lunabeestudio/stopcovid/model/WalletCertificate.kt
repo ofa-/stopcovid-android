@@ -4,7 +4,7 @@ import android.util.Base64
 import com.lunabeestudio.domain.model.WalletCertificateType
 import com.lunabeestudio.framework.crypto.BouncyCastleSignatureVerifier
 import com.lunabeestudio.stopcovid.extension.certificateType
-import com.lunabeestudio.stopcovid.extension.recoveryValidFrom
+import com.lunabeestudio.stopcovid.extension.recoveryDateOfFirstPositiveTest
 import com.lunabeestudio.stopcovid.extension.testDateTimeOfCollection
 import com.lunabeestudio.stopcovid.extension.vaccineDate
 import dgca.verifier.app.decoder.base45.DefaultBase45Service
@@ -329,7 +329,7 @@ class EuropeanCertificate private constructor(value: String) : WalletCertificate
             WalletCertificateType.VACCINATION -> null
             WalletCertificateType.SANITARY_EUROPE -> greenCertificate.testDateTimeOfCollection?.time
             WalletCertificateType.VACCINATION_EUROPE -> greenCertificate.vaccineDate?.time
-            WalletCertificateType.RECOVERY_EUROPE -> greenCertificate.recoveryValidFrom?.time
+            WalletCertificateType.RECOVERY_EUROPE -> greenCertificate.recoveryDateOfFirstPositiveTest?.time
         } ?: -1
     }
 

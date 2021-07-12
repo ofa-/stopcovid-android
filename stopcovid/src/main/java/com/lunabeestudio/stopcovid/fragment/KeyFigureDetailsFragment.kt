@@ -89,7 +89,7 @@ class KeyFigureDetailsFragment : KeyFigureGenericFragment() {
             identifier = items.count().toLong()
         }
         keyFigure?.let { figure ->
-            items += figure.itemForFigure(
+            figure.itemForFigure(
                 context = requireContext(),
                 sharedPrefs = sharedPrefs,
                 numberFormat = numberFormat,
@@ -112,6 +112,8 @@ class KeyFigureDetailsFragment : KeyFigureGenericFragment() {
                         }
                     }
                 }
+            }?.let {
+                items += it
             }
 
             items += spaceItem {

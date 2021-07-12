@@ -5,9 +5,11 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.lunabeestudio.stopcovid.coreui.fragment.BaseFragment
 
 fun BaseFragment.showUnknownErrorAlert(listener: DialogInterface.OnDismissListener?) {
-    MaterialAlertDialogBuilder(requireContext())
-        .setTitle(strings["common.error.unknown"])
-        .setPositiveButton(strings["common.ok"], null)
-        .setOnDismissListener(listener)
-        .show()
+    context?.let { context ->
+        MaterialAlertDialogBuilder(context)
+            .setTitle(strings["common.error.unknown"])
+            .setPositiveButton(strings["common.ok"], null)
+            .setOnDismissListener(listener)
+            .show()
+    }
 }

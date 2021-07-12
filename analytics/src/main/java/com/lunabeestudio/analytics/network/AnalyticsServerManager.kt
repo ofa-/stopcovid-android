@@ -19,9 +19,7 @@ import com.lunabeestudio.analytics.model.AnalyticsServiceName
 import com.lunabeestudio.analytics.network.model.SendAnalyticsRQ
 import com.lunabeestudio.analytics.network.model.SendAppAnalyticsRQ
 import com.lunabeestudio.analytics.network.model.SendHealthAnalyticsRQ
-import okhttp3.CertificatePinner
 import okhttp3.ConnectionSpec
-import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.TlsVersion
@@ -37,7 +35,7 @@ import java.util.concurrent.TimeUnit
 
 internal object AnalyticsServerManager {
 
-    private fun getRetrofit(context: Context, baseUrl: String, certificateSha256: String, token: String): AnalyticsApi {
+    private fun getRetrofit(context: Context, baseUrl: String, token: String): AnalyticsApi {
         return Retrofit.Builder()
             .baseUrl(baseUrl)
             .addConverterFactory(MoshiConverterFactory.create())
@@ -50,16 +48,8 @@ internal object AnalyticsServerManager {
                         connectionSpecs(listOf(requireTls12))
                     }
                     if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N) {
-                        certificatePinner(
-                            CertificatePinner.Builder()
-                                .add(
-                                    baseUrl.toHttpUrl().host,
-                                    certificateSha256
-                                )
-                                .build()
-                        )
                         val certificates: HandshakeCertificates = HandshakeCertificates.Builder()
-                            .addTrustedCertificate(certificateFromString(context, "analytics_api_tousanticovid_gouv_fr"))
+                            .addTrustedCertificate(certificateFromString(context, "certigna_services"))
                             .build()
                         sslSocketFactory(certificates.sslSocketFactory(), certificates.trustManager)
                     }
@@ -79,18 +69,17 @@ internal object AnalyticsServerManager {
     suspend fun sendAnalytics(
         context: Context,
         baseUrl: String,
-        certificateSha256: String,
         apiVersion: String,
         token: String,
         sendAnalyticsRQ: SendAnalyticsRQ
     ): AnalyticsResult {
         return try {
             val result = when (sendAnalyticsRQ) {
-                is SendAppAnalyticsRQ -> getRetrofit(context, baseUrl, certificateSha256, token).sendAppAnalytics(
+                is SendAppAnalyticsRQ -> getRetrofit(context, baseUrl, token).sendAppAnalytics(
                     apiVersion,
                     sendAnalyticsRQ
                 )
-                is SendHealthAnalyticsRQ -> getRetrofit(context, baseUrl, certificateSha256, token).sendHealthAnalytics(
+                is SendHealthAnalyticsRQ -> getRetrofit(context, baseUrl, token).sendHealthAnalytics(
                     apiVersion,
                     sendAnalyticsRQ
                 )
@@ -109,13 +98,12 @@ internal object AnalyticsServerManager {
     suspend fun deleteAnalytics(
         context: Context,
         baseUrl: String,
-        certificateSha256: String,
         apiVersion: String,
         token: String,
         installationUuid: String,
     ): AnalyticsResult {
         return try {
-            val result = getRetrofit(context, baseUrl, certificateSha256, token).deleteAnalytics(apiVersion, installationUuid)
+            val result = getRetrofit(context, baseUrl, token).deleteAnalytics(apiVersion, installationUuid)
             if (result.isSuccessful) {
                 AnalyticsResult.Success()
             } else {

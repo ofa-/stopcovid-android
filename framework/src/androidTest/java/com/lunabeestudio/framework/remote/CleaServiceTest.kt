@@ -34,7 +34,6 @@ class CleaServiceTest {
         dataSource = CleaDataSource(
             ApplicationProvider.getApplicationContext(),
             server.url("/").toString(),
-            "sha256/tb6+ch/VeDZl6rHlWfL4fCAQHyCmkexJhYBa7drUmxY=",
             server.url("/").toString(),
         )
     }

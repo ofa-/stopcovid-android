@@ -30,6 +30,7 @@ fun WalletCertificate.shortDescription(): String {
 fun WalletCertificate.fullDescription(strings: LocalizedStrings, configuration: Configuration): String {
     var text = strings["wallet.proof.${type.stringKey}.description"]
     val dateFormat = SimpleDateFormat("d MMM yyyy")
+    val analysisDateFormat = SimpleDateFormat("d MMM yyyy, HH:mm")
     return when (this) {
         is SanitaryCertificate -> {
             text = text?.replace("<${SanitaryCertificate.SanitaryCertificateFields.FIRST_NAME.code}>", firstName.orNA())
@@ -49,7 +50,6 @@ fun WalletCertificate.fullDescription(strings: LocalizedStrings, configuration: 
                 analysisCodeString ?: "LOINC:$analysisCode"
             )
 
-            val analysisDateFormat = SimpleDateFormat("d MMM yyyy, HH:mm")
             val dateString = analysisDate?.let { analysisDateFormat.format(it) }.orNA()
             text = text?.replace("<${SanitaryCertificate.SanitaryCertificateFields.ANALYSIS_DATE.code}>", dateString)
 
@@ -119,8 +119,7 @@ fun WalletCertificate.fullDescription(strings: LocalizedStrings, configuration: 
                 text = strings["wallet.proof.europe.recovery.description"]
                 text = text?.replace("<FULL_NAME>", fullName())
                 text = text?.replace("<BIRTHDATE>", this.greenCertificate.formattedDateOfBirthDate(dateFormat))
-                text = text?.replace("<FROM_DATE>", this.greenCertificate.recoveryValidFrom?.let(dateFormat::format).orNA())
-                text = text?.replace("<TO_DATE>", this.greenCertificate.recoveryValidUntil?.let(dateFormat::format).orNA())
+                text = text?.replace("<DATE>", this.greenCertificate.recoveryDateOfFirstPositiveTest?.let(dateFormat::format).orNA())
                 text ?: ""
             }
             WalletCertificateType.SANITARY_EUROPE -> {
@@ -131,7 +130,10 @@ fun WalletCertificate.fullDescription(strings: LocalizedStrings, configuration: 
                 text = text?.replace("<ANALYSIS_CODE>", testName.orNA())
                 val testResult = this.greenCertificate.testResultCode?.let { strings["wallet.proof.europe.test.$it"] }
                 text = text?.replace("<ANALYSIS_RESULT>", testResult.orNA())
-                text = text?.replace("<FROM_DATE>", this.greenCertificate.testDateTimeOfCollection?.let(dateFormat::format).orNA())
+                text = text?.replace(
+                    "<FROM_DATE>",
+                    this.greenCertificate.testDateTimeOfCollection?.let(analysisDateFormat::format).orNA()
+                )
                 text ?: ""
             }
         }

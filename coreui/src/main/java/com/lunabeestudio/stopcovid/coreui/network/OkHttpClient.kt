@@ -44,7 +44,7 @@ object OkHttpClient {
                         .build()
                 )
                 val certificates: HandshakeCertificates = HandshakeCertificates.Builder()
-                    .addTrustedCertificate(certificateFromString(context, "app_tousanticovid_gouv_fr"))
+                    .addTrustedCertificate(certificateFromString(context, "certigna_services"))
                     .build()
                 sslSocketFactory(certificates.sslSocketFactory(), certificates.trustManager)
             }

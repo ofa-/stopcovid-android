@@ -25,6 +25,7 @@ import com.lunabeestudio.stopcovid.coreui.UiConstants
 import com.lunabeestudio.stopcovid.manager.IsolationManager
 import com.lunabeestudio.stopcovid.manager.VaccinationCenterManager
 import com.lunabeestudio.stopcovid.manager.VenuesManager
+import com.lunabeestudio.stopcovid.manager.WalletManager
 import com.lunabeestudio.stopcovid.widgetshomescreen.AttestationWidget
 
 abstract class CommonDataViewModel(
@@ -53,6 +54,11 @@ abstract class CommonDataViewModel(
         isolationManager.resetData()
     }
 
+    @CallSuper
+    open fun eraseCertificates() {
+        WalletManager.deleteAllCertificates(secureKeystoreDataSource)
+    }
+
     protected suspend fun clearLocalData(application: RobertApplication) {
         robertManager.clearLocalData(application)
         WorkManager.getInstance(application.getAppContext())
@@ -62,6 +68,7 @@ abstract class CommonDataViewModel(
         eraseVenues(application)
         (application.getAppContext() as StopCovid).cancelActivateReminder()
         eraseIsolation()
+        eraseCertificates()
         VaccinationCenterManager.clearAllData(application.getAppContext())
     }
 
