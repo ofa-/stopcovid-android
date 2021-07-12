@@ -29,6 +29,12 @@ import com.lunabeestudio.stopcovid.coreui.fragment.BaseFragment
 import com.lunabeestudio.stopcovid.databinding.FragmentFullscreenQrcodeBinding
 import com.lunabeestudio.stopcovid.extension.setTextOrHide
 
+import android.view.MotionEvent
+import android.view.ScaleGestureDetector
+import android.view.ScaleGestureDetector.SimpleOnScaleGestureListener
+import kotlin.math.max
+import kotlin.math.min
+
 class FullscreenQRCodeFragment : BaseFragment() {
 
     private val args: FullscreenQRCodeFragmentArgs by navArgs()
@@ -40,6 +46,9 @@ class FullscreenQRCodeFragment : BaseFragment() {
 
     private var binding: FragmentFullscreenQrcodeBinding? = null
 
+    private lateinit var scaleGestureDetector: ScaleGestureDetector
+    private var scaleFactor = 1.0f
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -48,7 +57,23 @@ class FullscreenQRCodeFragment : BaseFragment() {
         val themedInflater = LayoutInflater.from(ContextThemeWrapper(context, R.style.Theme_Base_StopCovid_ForceLight))
         binding = FragmentFullscreenQrcodeBinding.inflate(themedInflater, container, false)
         appCompatActivity?.supportActionBar?.title = null
+
+        scaleGestureDetector = ScaleGestureDetector(requireActivity(), ScaleListener())
+        binding?.root?.setOnTouchListener(View.OnTouchListener { view, motionEvent ->
+            scaleGestureDetector.onTouchEvent(motionEvent)
+        })
+
         return binding?.root
+    }
+
+    private inner class ScaleListener : SimpleOnScaleGestureListener() {
+       override fun onScale(scaleGestureDetector: ScaleGestureDetector): Boolean {
+          scaleFactor *= scaleGestureDetector.scaleFactor
+          scaleFactor = max(0.1f, min(scaleFactor, 10.0f))
+          binding?.imageView?.scaleX = scaleFactor
+          binding?.imageView?.scaleY = scaleFactor
+          return true
+       }
     }
 
     override fun onResume() {
