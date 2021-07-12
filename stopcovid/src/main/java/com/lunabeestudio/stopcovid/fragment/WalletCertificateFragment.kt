@@ -64,11 +64,19 @@ import com.mikepenz.fastadapter.GenericItem
 import kotlinx.coroutines.launch
 import kotlin.time.ExperimentalTime
 
+import android.content.SharedPreferences
+import androidx.preference.PreferenceManager
+import com.lunabeestudio.stopcovid.extension.showCertificateDetails
+
 class WalletCertificateFragment : MainFragment() {
 
     private val barcodeEncoder: BarcodeEncoder = BarcodeEncoder()
     private val qrCodeSize: Int by lazy {
         R.dimen.qr_code_size.toDimensSize(requireContext()).toInt()
+    }
+
+    private val sharedPrefs: SharedPreferences by lazy {
+        PreferenceManager.getDefaultSharedPreferences(requireContext())
     }
 
     private val robertManager by lazy {
@@ -183,10 +191,13 @@ class WalletCertificateFragment : MainFragment() {
             }
             is EuropeanCertificate -> null
         }
+        val certificateDetails = if (sharedPrefs.showCertificateDetails) {
+           certificate.fullDescription(strings, robertManager.configuration)
+        } else { "" }
 
         return qrCodeCardItem {
             this.generateBarcode = generateBarcode
-            text = ""
+            text = certificateDetails
             share = strings["walletController.menu.share"]
             delete = strings["walletController.menu.delete"]
             convertText = strings["walletController.menu.convertToEurope"]

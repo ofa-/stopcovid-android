@@ -74,6 +74,7 @@
     "manageDataController.preferences.section.title": "Preferenze",
     "manageDataController.preferences.switch.sendAnalyticsToServer": "Invia le statistiche al server",
     "manageDataController.preferences.switch.showActivationReminder": "Mostra promemoria di attivazione",
+    "manageDataController.preferences.switch.showCertificateDetails": "Mostra i dettagli del certificato",
     "manageDataController.preferences.switch.showErrorPanel": "Mostrare la bandiera di attivazione",
     "proximityController.title": "Prossimità",
     "proximityController.tuneProximity": "Prossimità",

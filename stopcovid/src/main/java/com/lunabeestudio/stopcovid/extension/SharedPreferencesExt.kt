@@ -110,6 +110,10 @@ var SharedPreferences.hideRiskStatus: Boolean
     get() = getBoolean(Constants.SharedPrefs.HIDE_RISK_STATUS, false)
     set(value) = edit { putBoolean(Constants.SharedPrefs.HIDE_RISK_STATUS, value) }
 
+var SharedPreferences.showCertificateDetails: Boolean
+    get() = getBoolean(Constants.SharedPrefs.SHOW_CERTIFICATE_DETAILS, false)
+    set(value) = edit { putBoolean(Constants.SharedPrefs.SHOW_CERTIFICATE_DETAILS, value) }
+
 var SharedPreferences.showErrorPanel: Boolean
     get() = getBoolean(Constants.SharedPrefs.SHOW_ERROR_PANEL, false)
     set(value) = edit { putBoolean(Constants.SharedPrefs.SHOW_ERROR_PANEL, value) }

@@ -37,6 +37,7 @@ import com.lunabeestudio.stopcovid.extension.isolationManager
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
+import com.lunabeestudio.stopcovid.extension.showCertificateDetails
 import com.lunabeestudio.stopcovid.extension.showErrorPanel
 import com.lunabeestudio.stopcovid.extension.showActivationReminderDialog
 import com.lunabeestudio.stopcovid.extension.venuesFeaturedWasActivatedAtLeastOneTime
@@ -378,6 +379,17 @@ class ManageDataFragment : MainFragment() {
             isChecked = sharedPreferences.showErrorPanel
             onCheckChange = { isChecked ->
                 sharedPreferences.showErrorPanel = isChecked
+            }
+            identifier = items.count().toLong()
+        }
+        items += spaceItem {
+            spaceRes = R.dimen.spacing_medium
+        }
+        items += switchItem {
+            title = strings["manageDataController.preferences.switch.showCertificateDetails"]
+            isChecked = sharedPreferences.showCertificateDetails
+            onCheckChange = { isChecked ->
+                sharedPreferences.showCertificateDetails = isChecked
             }
             identifier = items.count().toLong()
         }

@@ -39,6 +39,7 @@ object Constants {
             "currentVaccinationReferenceLongitude"
         const val ALERT_RISK_LEVEL_CHANGED: String = "alertRiskLevelChanged"
         const val HIDE_RISK_STATUS: String = "hideRiskStatus"
+        const val SHOW_CERTIFICATE_DETAILS: String = "showCertificateDetails"
         const val SHOW_ERROR_PANEL: String = "showErrorPanel"
         const val SHOW_ACTIVATION_REMINDER: String = "showActivationReminder"
         const val HAS_USED_UNIVERSAL_QR_SCAN: String = "hasUsedUniversalQrScan"
