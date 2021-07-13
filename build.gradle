@@ -12,12 +12,6 @@ buildscript {
     repositories {
         google()
         mavenCentral()
-        jcenter {
-            content {
-                // https://issuetracker.google.com/issues/179291081 & https://youtrack.jetbrains.com/issue/KT-44730
-                includeModule("org.jetbrains.trove4j", "trove4j")
-            }
-        }
     }
     dependencies {
         classpath "com.android.tools.build:gradle:_"
@@ -62,12 +56,6 @@ allprojects {
         google()
         mavenCentral()
         maven { url 'https://jitpack.io' }
-        jcenter {
-            content {
-                // https://issuetracker.google.com/issues/179291081 & https://youtrack.jetbrains.com/issue/KT-44730
-                includeModule("org.jetbrains.trove4j", "trove4j")
-            }
-        }
     }
 }
 
