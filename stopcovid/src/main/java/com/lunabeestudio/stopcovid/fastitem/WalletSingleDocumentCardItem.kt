@@ -26,6 +26,7 @@ class WalletSingleDocumentCardItem : AbstractBindingItem<ItemWalletSingleDocumen
 
     var onClick: (() -> Unit)? = null
     var certificateFile: File? = null
+    var certificateDrawable: Int = 0
 
     override fun createBinding(inflater: LayoutInflater, parent: ViewGroup?): ItemWalletSingleDocumentCardBinding {
         return ItemWalletSingleDocumentCardBinding.inflate(inflater, parent, false)
@@ -36,7 +37,11 @@ class WalletSingleDocumentCardItem : AbstractBindingItem<ItemWalletSingleDocumen
         binding.mainTitleTextView.text = mainTitle
         binding.mainBodyTextView.text = mainBody
         onClick?.let { onClick -> binding.rootLayout.setOnClickListener { onClick() } }
-        certificateFile?.let { binding.certificateImageView.setImageFileIfValid(it) }
+        certificateFile?.let {
+            if (!binding.certificateImageView.setImageFileIfValid(it)) {
+                binding.certificateImageView.setImageResource(certificateDrawable)
+            }
+        }
     }
 }
 

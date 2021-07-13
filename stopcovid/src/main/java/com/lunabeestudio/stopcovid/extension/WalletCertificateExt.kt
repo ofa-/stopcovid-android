@@ -100,44 +100,52 @@ fun WalletCertificate.fullDescription(strings: LocalizedStrings, configuration: 
             text = text?.replace("<$vaxCode>", vaccinationState.orNA())
             text ?: ""
         }
-        is EuropeanCertificate -> when (this.type) {
-            WalletCertificateType.SANITARY,
-            WalletCertificateType.VACCINATION -> {
-                Timber.e("Unexpected type ${this.type} with ${this.javaClass.simpleName}")
-                ""
-            }
-            WalletCertificateType.VACCINATION_EUROPE -> {
-                text = strings["wallet.proof.europe.vaccine.description"]
-                text = text?.replace("<FULL_NAME>", fullName())
-                text = text?.replace("<BIRTHDATE>", this.greenCertificate.formattedDateOfBirthDate(dateFormat))
-                val vacName = this.greenCertificate.vaccineMedicinalProduct?.let { strings["vac.product.$it"] }
-                text = text?.replace("<VACCINE_NAME>", vacName.orNA())
-                text = text?.replace("<DATE>", this.greenCertificate.vaccineDate?.let(dateFormat::format).orNA())
-                text ?: ""
-            }
-            WalletCertificateType.RECOVERY_EUROPE -> {
-                text = strings["wallet.proof.europe.recovery.description"]
-                text = text?.replace("<FULL_NAME>", fullName())
-                text = text?.replace("<BIRTHDATE>", this.greenCertificate.formattedDateOfBirthDate(dateFormat))
-                text = text?.replace("<DATE>", this.greenCertificate.recoveryDateOfFirstPositiveTest?.let(dateFormat::format).orNA())
-                text ?: ""
-            }
-            WalletCertificateType.SANITARY_EUROPE -> {
-                text = strings["wallet.proof.europe.test.description"]
-                text = text?.replace("<FULL_NAME>", fullName())
-                text = text?.replace("<BIRTHDATE>", this.greenCertificate.formattedDateOfBirthDate(dateFormat))
-                val testName = this.greenCertificate.testType?.let { strings["test.man.$it"] }
-                text = text?.replace("<ANALYSIS_CODE>", testName.orNA())
-                val testResult = this.greenCertificate.testResultCode?.let { strings["wallet.proof.europe.test.$it"] }
-                text = text?.replace("<ANALYSIS_RESULT>", testResult.orNA())
-                text = text?.replace(
-                    "<FROM_DATE>",
-                    this.greenCertificate.testDateTimeOfCollection?.let(analysisDateFormat::format).orNA()
-                )
-                text ?: ""
-            }
+        is EuropeanCertificate -> formatDccText(
+            strings["wallet.proof.europe.${this.type.code}.description"],
+            strings,
+            dateFormat,
+            analysisDateFormat
+        )
+    }
+}
+
+fun EuropeanCertificate.formatDccText(
+    inputText: String?,
+    strings: LocalizedStrings,
+    dateFormat: SimpleDateFormat,
+    analysisDateFormat: SimpleDateFormat
+): String {
+    var formattedText = inputText
+    formattedText = formattedText?.replace("<FULL_NAME>", fullName())
+    formattedText = formattedText?.replace("<BIRTHDATE>", this.greenCertificate.formattedDateOfBirthDate(dateFormat))
+    when (this.type) {
+        WalletCertificateType.SANITARY,
+        WalletCertificateType.VACCINATION -> {
+            Timber.e("Unexpected type ${this.type} with ${this.javaClass.simpleName}")
+        }
+        WalletCertificateType.VACCINATION_EUROPE -> {
+            val vacName = this.greenCertificate.vaccineMedicinalProduct?.let { strings["vac.product.$it"] }
+            formattedText = formattedText?.replace("<VACCINE_NAME>", vacName.orNA())
+            formattedText = formattedText?.replace("<DATE>", this.greenCertificate.vaccineDate?.let(dateFormat::format).orNA())
+        }
+        WalletCertificateType.RECOVERY_EUROPE -> {
+            formattedText = formattedText?.replace(
+                "<DATE>",
+                this.greenCertificate.recoveryDateOfFirstPositiveTest?.let(dateFormat::format).orNA()
+            )
+        }
+        WalletCertificateType.SANITARY_EUROPE -> {
+            val testName = this.greenCertificate.testType?.let { strings["test.man.$it"] }
+            formattedText = formattedText?.replace("<ANALYSIS_CODE>", testName.orNA())
+            val testResult = this.greenCertificate.testResultCode?.let { strings["wallet.proof.europe.test.$it"] }
+            formattedText = formattedText?.replace("<ANALYSIS_RESULT>", testResult.orNA())
+            formattedText = formattedText?.replace(
+                "<FROM_DATE>",
+                this.greenCertificate.testDateTimeOfCollection?.let(analysisDateFormat::format).orNA()
+            )
         }
     }
+    return formattedText.orEmpty()
 }
 
 fun EuropeanCertificate.tagStringKey(): String {
@@ -156,6 +164,7 @@ fun EuropeanCertificate.statusStringKey(): String {
         -> "wallet.proof.vaccinationCertificate.LA." + this.greenCertificate.vaccineDose?.let {
                                 (first, second) -> when { (first == second) -> "TE" else -> "CO" }}
         WalletCertificateType.RECOVERY_EUROPE -> "enum.HCertType.recovery"
+        WalletCertificateType.SANITARY_EUROPE -> "enum.HCertType.test"
         else -> ""
    }
 }

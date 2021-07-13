@@ -24,10 +24,14 @@
     },
     {
         "section": "✈️ Travel",
-        "description" : "Re-open EU provides information on the various measures in place, including on quarantine and testing requirements for travellers, the EU Digital COVID certificate to help you exercise your right to free movement, and mobile coronavirus contact tracing and warning apps. The information is updated frequently and available in 24 languages. This should help you plan your travel in Europe, while staying safe and healthy.",
+        "description" : "Re-open EU provides information on the various measures in place in Europe. This should help you plan your travel in Europe, while staying safe and healthy.\n\nDiplomatie.gouv.fr gives you information for each country, in particular if you want to come to France.",
         "links": [
 	        {
-                "label": "Go to Re-open EU",
+                "label": "Go to Diplomatie.gouv.fr 🇫🇷",
+                "url": "https://www.diplomatie.gouv.fr/en/"
+            },
+	        {
+                "label": "Go to Re-open EU 🇪🇺",
                 "url": "https://reopen.europa.eu/en/from-to/FRA/"
             }
         ]

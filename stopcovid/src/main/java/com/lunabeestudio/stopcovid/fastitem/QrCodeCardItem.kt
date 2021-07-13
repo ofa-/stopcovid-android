@@ -72,6 +72,7 @@ class QrCodeCardItem : AbstractBindingItem<ItemQrCodeCardBinding>() {
         binding.formatTextView.setTextOrHide(formatText)
 
         binding.tag1.chip.text = tag1Text
+        binding.tag1.chip.setTextColor(R.attr.colorOnPrimary.fetchSystemColor(binding.root.context))
         binding.tag1.chip.isVisible = !tag1Text.isNullOrEmpty()
         onTag1Click?.let { onClick ->
             binding.tag1.chip.isEnabled = true
@@ -81,6 +82,7 @@ class QrCodeCardItem : AbstractBindingItem<ItemQrCodeCardBinding>() {
         }
 
         binding.tag2.chip.text = tag2Text
+        binding.tag2.chip.setTextColor(R.attr.colorOnPrimary.fetchSystemColor(binding.root.context))
         binding.tag2.chip.isVisible = !tag2Text.isNullOrEmpty()
         onTag2Click?.let { onClick ->
             binding.tag2.chip.isEnabled = true

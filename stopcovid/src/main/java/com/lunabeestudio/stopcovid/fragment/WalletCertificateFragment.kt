@@ -227,13 +227,21 @@ class WalletCertificateFragment : MainFragment() {
                     .show()
             }
             onClick = {
-                findParentFragmentByType<WalletContainerFragment>()?.findNavControllerOrNull()?.safeNavigate(
-                    WalletContainerFragmentDirections.actionWalletContainerFragmentToFullscreenQRCodeFragment(
-                        certificate.value,
-                        certificate.type.barcodeFormat,
-                        certificate.shortDescription()
+                if (certificate is EuropeanCertificate) {
+                    findParentFragmentByType<WalletContainerFragment>()?.findNavControllerOrNull()?.safeNavigate(
+                        WalletContainerFragmentDirections.actionWalletContainerFragmentToFullscreenDccFragment(
+                            certificate.keyCertificateId,
+                        )
                     )
-                )
+                } else {
+                    findParentFragmentByType<WalletContainerFragment>()?.findNavControllerOrNull()?.safeNavigate(
+                        WalletContainerFragmentDirections.actionWalletContainerFragmentToFullscreenQRCodeFragment(
+                            certificate.value,
+                            certificate.type.barcodeFormat,
+                            certificate.shortDescription()
+                        )
+                    )
+                }
             }
             onConvert = conversionLambda
             actionContentDescription = strings["accessibility.hint.otherActions"]
@@ -315,7 +323,7 @@ class WalletCertificateFragment : MainFragment() {
             val vaccination = (certificate as? EuropeanCertificate)?.greenCertificate?.vaccinations?.lastOrNull()
             if (vaccination != null && vaccination.doseNumber >= vaccination.totalSeriesOfDoses) {
                 findParentFragmentByType<WalletContainerFragment>()?.findNavControllerOrNull()?.safeNavigate(
-                    WalletContainerFragmentDirections.actionProximityFragmentToVaccineCompletionFragment(
+                    WalletContainerFragmentDirections.actionWalletContainerFragmentToVaccineCompletionFragment(
                         certificate.value
                     )
                 )

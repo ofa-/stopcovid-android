@@ -17,6 +17,7 @@ import com.lunabeestudio.stopcovid.coreui.extension.callPhone
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.fastitem.cardWithActionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
+import com.lunabeestudio.stopcovid.extension.certificateThumbnailDrawable
 import com.lunabeestudio.stopcovid.extension.certificateThumbnailFilename
 import com.lunabeestudio.stopcovid.extension.errorStringKey
 import com.lunabeestudio.stopcovid.extension.safeNavigate
@@ -67,14 +68,16 @@ class WalletCertificateErrorFragment : MainFragment() {
         val items = mutableListOf<GenericItem>()
 
         items += cardWithActionItem {
+            val errorStringKey = args.certificateType.errorStringKey
             when (args.certificateError) {
                 WalletCertificateError.INVALID_CERTIFICATE_SIGNATURE -> {
-                    mainTitle = strings["walletCertificateErrorController.explanations.invalidSignature.${args.certificateType.errorStringKey}.title"]
-                    mainBody = strings["walletCertificateErrorController.explanations.invalidSignature.${args.certificateType.errorStringKey}.subtitle"]
+                    mainTitle = strings["walletCertificateErrorController.explanations.invalidSignature.$errorStringKey.title"]
+                    mainBody =
+                        strings["walletCertificateErrorController.explanations.invalidSignature.$errorStringKey.subtitle"]
                 }
                 WalletCertificateError.MALFORMED_CERTIFICATE -> {
-                    mainTitle = strings["walletCertificateErrorController.explanations.invalidFormat.${args.certificateType.errorStringKey}.title"]
-                    mainBody = strings["walletCertificateErrorController.explanations.invalidFormat.${args.certificateType.errorStringKey}.subtitle"]
+                    mainTitle = strings["walletCertificateErrorController.explanations.invalidFormat.$errorStringKey.title"]
+                    mainBody = strings["walletCertificateErrorController.explanations.invalidFormat.$errorStringKey.subtitle"]
                 }
             }
 
@@ -95,6 +98,7 @@ class WalletCertificateErrorFragment : MainFragment() {
                     )
             }
             certificateFile = File(requireContext().filesDir, args.certificateType.certificateThumbnailFilename)
+            certificateDrawable = args.certificateType.certificateThumbnailDrawable
             identifier = mainBody.hashCode().toLong()
         }
 

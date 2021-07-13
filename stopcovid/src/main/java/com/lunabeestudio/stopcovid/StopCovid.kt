@@ -109,8 +109,6 @@ import kotlin.math.roundToInt
 import kotlin.random.Random
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
-import kotlin.time.hours
-import kotlin.time.milliseconds
 
 class StopCovid : Application(), LifecycleObserver, RobertApplication, IsolationApplication {
 
@@ -580,8 +578,8 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
 
     @OptIn(ExperimentalTime::class)
     private fun refreshStatusIfNeeded() {
-        val elapsedTimeSinceRefresh = (System.currentTimeMillis() - (robertManager.atRiskLastRefresh ?: 0L)).milliseconds
-        val checkStatusFrequency = robertManager.configuration.checkStatusFrequencyHour.toDouble().hours
+        val elapsedTimeSinceRefresh = Duration.milliseconds(System.currentTimeMillis() - (robertManager.atRiskLastRefresh ?: 0L))
+        val checkStatusFrequency = Duration.hours(robertManager.configuration.checkStatusFrequencyHour.toDouble())
         if (robertManager.isRegistered && elapsedTimeSinceRefresh > checkStatusFrequency) {
             appCoroutineScope.launch {
                 robertManager.updateStatus(this@StopCovid)

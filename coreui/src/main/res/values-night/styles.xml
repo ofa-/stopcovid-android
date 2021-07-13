@@ -25,4 +25,34 @@
         <item name="widgetBackgroundColor">@color/color_indigo</item>
     </style>
 
+    <style name="Theme.Base.StopCovid.ForceLight" parent="Theme.MaterialComponents.Light.NoActionBar" >
+        <item name="android:windowBackground">?colorSurface</item>
+        <item name="android:windowSoftInputMode">adjustResize</item>
+
+        <item name="colorPrimary">@color/color_indigo</item>
+        <item name="colorPrimaryVariant">?colorPrimary</item>
+        <item name="colorPrimaryDark">?colorPrimary</item>
+        <item name="colorOnPrimary">@color/color_on_primary</item>
+        <item name="colorSecondary">?colorPrimary</item>
+        <item name="colorSecondaryVariant">?colorSecondary</item>
+        <item name="colorOnSecondary">?colorOnPrimary</item>
+        <item name="colorAccent">?colorPrimary</item>
+        <item name="colorControlNormal">?colorPrimary</item>
+
+        <item name="appBarLayoutStyle">@style/Widget.MaterialComponents.AppBarLayout.Surface</item>
+        <item name="toolbarStyle">@style/Widget.StopCovid.Toolbar.Surface</item>
+        <item name="actionMenuTextColor">?colorControlNormal</item>
+        <item name="snackbarTextViewStyle">@style/Widget.StopCovid.Snackbar.TextView</item>
+
+        <item name="android:windowTranslucentNavigation">true</item>
+
+        <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.StopCovid.MediumComponent</item>
+        <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.StopCovid.SmallComponent</item>
+
+        <item name="materialCardViewStyle">@style/Widget.App.CardView</item>
+        <item name="bottomSheetDialogTheme">@style/ThemeOverlay.StopCovid.BottomSheetDialog</item>
+
+        <item name="dividerColor">@color/color_mercury</item>
+    </style>
+
 </resources>

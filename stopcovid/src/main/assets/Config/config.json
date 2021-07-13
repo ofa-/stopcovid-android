@@ -2,11 +2,11 @@
   "config": [
 	{
       "name": "lastUpdate",
-      "value": "28 June 2021"
+      "value": "9 Jul 2021"
     },
     {
       "name": "version",
-      "value": 70
+      "value": 75
     },
     {
       "name": "versionCalibrationBle",
@@ -34,7 +34,7 @@
     },
     {
 	    "name" : "app.cleaUrls",
-	    "value" : ["https://s3.fr-par.scw.cloud/clea-batch/", "https://signal-static.oos.cloudgouv-eu-west-1.outscale.com/", "https://signal-static.oos.cloudgouv-eu-west-1.outscale.com/"]
+	    "value" : ["https://s3.fr-par.scw.cloud/clea-batch/", "https://signal-static.oos.cloudgouv-eu-west-1.outscale.com/", "https://signal-static.tousanticovid.gouv.fr/"]
     },
     {
 	    "name" : "app.ameliUrl",
@@ -101,7 +101,8 @@
 	          	"AHP1": "-----BEGIN PUBLIC KEY-----MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEPnxJntwNwme9uHSasmGFFwdC0FWNEpucgzhjr+/AZ6UuTm3kL3ogEUAwKU0tShEVmZNK4/lM05h+0ZvtboJM/A==-----END PUBLIC KEY-----",
 	            "AHP2": "-----BEGIN PUBLIC KEY-----MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEOYUgmx8pKu0UbyqQ/kt4+PXSpUprkO2YLHmzzoN66XjDW0AnSzXorFPe556p73Vawqaoy3qQKDIDB62IBYWBuA==-----END PUBLIC KEY-----",
 	            "AV01": "-----BEGIN PUBLIC KEY-----MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE1T9uG2bEP7uWND6RT/lJs2y787BkEJoRMMLXvqPKFFC3ckqFAPnFjbiv/odlWH04a1P9CvaCRxG31FMEOFZyXA==-----END PUBLIC KEY-----",
-	            "AV02": "-----BEGIN PUBLIC KEY-----MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE3jL6zQ0aQj9eJHUw4VDHB9sMoviLVIlADnoBwC43Md8p9w655z2bDhYEEajQ2amQzt+eU7HdWrvqY23Do91Izg==-----END PUBLIC KEY-----"
+	            "AV02": "-----BEGIN PUBLIC KEY-----MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE3jL6zQ0aQj9eJHUw4VDHB9sMoviLVIlADnoBwC43Md8p9w655z2bDhYEEajQ2amQzt+eU7HdWrvqY23Do91Izg==-----END PUBLIC KEY-----",
+	             "ING1": "-----BEGIN PUBLIC KEY-----MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEaMOVmK4FAlYeU8tUGpQgtpuLgwSn/arX/4ltKt/wYCole7rB4ECRLtSH4domHU/Z1cjUmVfyGH6NcboWrys9ww==-----END PUBLIC KEY-----"
             }
         }
       ]
@@ -244,7 +245,7 @@
     },
     {
       "name": "app.displayCertificateConversion",
-      "value": false
+      "value": true
     },
     {
       "name": "app.certificateConversionUrl",
@@ -262,6 +263,10 @@
           "value":28
         }
       ]
+    },
+    {
+        "name": "app.wallet.confettiBirthRate",
+        "value": 150.0
     },
     {
       "name": "app.wallet.certificateConversionSidepOnlyCode",

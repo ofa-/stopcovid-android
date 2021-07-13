@@ -35,6 +35,7 @@ import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.manager.ProximityManager
 import com.lunabeestudio.stopcovid.manager.RisksLevelManager
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -43,6 +44,7 @@ import kotlinx.coroutines.launch
  * Implementation of App Widget functionality.
  */
 class ProximityWidget : AppWidgetProvider() {
+    @OptIn(DelicateCoroutinesApi::class)
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
         // Sometimes strings are not loaded
         GlobalScope.launch(Dispatchers.Main) {

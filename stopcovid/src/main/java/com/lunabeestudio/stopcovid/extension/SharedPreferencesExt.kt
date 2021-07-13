@@ -15,7 +15,6 @@ import androidx.core.content.edit
 import com.lunabeestudio.stopcovid.Constants
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
-import kotlin.time.milliseconds
 
 val SharedPreferences.isOnBoardingDone: Boolean
     get() = getBoolean(Constants.SharedPrefs.ON_BOARDING_DONE, false)
@@ -26,7 +25,7 @@ var SharedPreferences.lastInfoCenterRefresh: Long
 
 @OptIn(ExperimentalTime::class)
 var SharedPreferences.lastInfoCenterFetch: Duration
-    get() = getLong(Constants.SharedPrefs.LAST_INFO_CENTER_FETCH, 0L).milliseconds
+    get() = Duration.milliseconds(getLong(Constants.SharedPrefs.LAST_INFO_CENTER_FETCH, 0L))
     set(value) = edit { putLong(Constants.SharedPrefs.LAST_INFO_CENTER_FETCH, value.inWholeMilliseconds) }
 
 var SharedPreferences.areInfoNotificationsEnabled: Boolean

@@ -38,9 +38,6 @@ import java.text.SimpleDateFormat
 import java.util.concurrent.TimeUnit
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
-import kotlin.time.hours
-import kotlin.time.milliseconds
-import kotlin.time.minutes
 
 class AttestationWidget : AppWidgetProvider() {
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
@@ -148,15 +145,16 @@ class AttestationWidget : AppWidgetProvider() {
             // Launch worker for updating when certif no more valid
             if (newCertificate) {
                 // if the certificate is set up with in the past
-                val timestampAttestation = info?.get(Constants.Attestation.KEY_DATE_TIME)?.value?.toLongOrNull()?.milliseconds
+                val timestampAttestation = info?.get(Constants.Attestation.KEY_DATE_TIME)?.value?.toLongOrNull()
+                    ?.let(Duration::milliseconds)
                 if (timestampAttestation != null) {
-                    val attestationDuration = System.currentTimeMillis().milliseconds - timestampAttestation
-                    val duration = context.robertManager().configuration.qrCodeExpiredHours.toDouble().hours
+                    val attestationDuration = Duration.milliseconds(System.currentTimeMillis()) - timestampAttestation
+                    val duration = Duration.hours(context.robertManager().configuration.qrCodeExpiredHours.toDouble())
                     // add 5 minutes to the timing delay to be sure updating the widget after the end of validity
                     val finalDuration = duration + Duration.minutes(5) - attestationDuration
                     val updateAttestationWorker: WorkRequest =
                         OneTimeWorkRequestBuilder<UpdateAttestationWorker>()
-                            .setInitialDelay(finalDuration.inMilliseconds.toLong(), TimeUnit.MILLISECONDS)
+                            .setInitialDelay(finalDuration.inWholeMilliseconds, TimeUnit.MILLISECONDS)
                             .build()
                     WorkManager
                         .getInstance(context)

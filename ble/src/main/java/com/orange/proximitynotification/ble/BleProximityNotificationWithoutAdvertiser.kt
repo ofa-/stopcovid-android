@@ -125,7 +125,7 @@ internal class BleProximityNotificationWithoutAdvertiser(
             minStatCount = 40,
             errorRateThreshold = 0.55F,
             minScanErrorCount = 2,
-            maxTimeSinceLastStatus = 15 * 60 * 1000
+            maxTimeSinceLastStatus = 15L * 60L * 1000L
         )
 
     private val timeouts: Timeouts = when {

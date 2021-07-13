@@ -19,6 +19,5 @@
   -->
 
 <resources>
-    <dimen name="certificate_double_thumbnail_height">140dp</dimen>
     <dimen name="certificate_single_thumbnail_height">250dp</dimen>
 </resources>

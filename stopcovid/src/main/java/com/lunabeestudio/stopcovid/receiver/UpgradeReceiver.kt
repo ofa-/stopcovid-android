@@ -19,6 +19,7 @@ import com.lunabeestudio.stopcovid.service.ProximityService
 import com.lunabeestudio.stopcovid.widgetshomescreen.AttestationWidget
 import com.lunabeestudio.stopcovid.widgetshomescreen.KeyFiguresWidget
 import com.lunabeestudio.stopcovid.widgetshomescreen.ProximityWidget
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -26,6 +27,7 @@ import timber.log.Timber
 
 class UpgradeReceiver : BroadcastReceiver() {
 
+    @OptIn(DelicateCoroutinesApi::class)
     override fun onReceive(context: Context, intent: Intent) {
         try {
             if (intent.action == Intent.ACTION_MY_PACKAGE_REPLACED && context.robertManager().isProximityActive) {

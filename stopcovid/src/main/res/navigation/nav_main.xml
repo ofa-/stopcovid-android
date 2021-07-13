@@ -270,7 +270,7 @@
     <fragment
         android:id="@+id/fullscreenQRCodeFragment"
         android:name="com.lunabeestudio.stopcovid.fragment.FullscreenQRCodeFragment"
-        tools:layout="@layout/fragment_recycler_view">
+        tools:layout="@layout/fragment_fullscreen_qrcode">
         <argument
             android:name="qrCodeValue"
             app:argType="string"
@@ -818,26 +818,41 @@
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
         <action
-            android:id="@+id/action_walletQRCodeFragment_to_walletCertificateErrorFragment"
+            android:id="@+id/action_walletContainerFragment_to_walletCertificateErrorFragment"
             app:destination="@id/walletCertificateErrorFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
         <action
-            android:id="@+id/action_proximityFragment_to_walletQRCodeFragment"
+            android:id="@+id/action_walletContainerFragment_to_walletQRCodeFragment"
             app:destination="@id/walletQRCodeFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
         <action
-            android:id="@+id/action_proximityFragment_to_vaccineCompletionFragment"
+            android:id="@+id/action_walletContainerFragment_to_vaccineCompletionFragment"
             app:destination="@id/vaccineCompletionFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_walletContainerFragment_to_fullscreenDccFragment"
+            app:destination="@id/fullscreenDccFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+    </fragment>
+    <fragment
+        android:id="@+id/fullscreenDccFragment"
+        android:name="com.lunabeestudio.stopcovid.fragment.FullscreenDccFragment"
+        tools:layout="@layout/fragment_fullscreen_dcc">
+        <argument
+            android:name="keyCertificateId"
+            app:argType="string" />
     </fragment>
     <fragment
         android:id="@+id/certificateDocumentExplanationFragment"

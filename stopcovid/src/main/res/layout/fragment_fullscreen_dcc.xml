@@ -19,6 +19,7 @@
   -->
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -33,43 +34,59 @@
         tools:ignore="UseCompoundDrawables">
 
         <Space
-            android:id="@+id/topSpace"
             android:layout_width="0dp"
             android:layout_height="@dimen/spacing_xlarge" />
 
         <ImageView
-            android:id="@+id/imageView"
-            android:layout_width="fill_parent"
+            android:id="@+id/logosImageView"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/spacing_large"
-            android:layout_marginTop="@dimen/spacing_large"
-            android:layout_marginBottom="@dimen/spacing_large"
+            android:layout_marginBottom="@dimen/spacing_xlarge"
             android:adjustViewBounds="true"
-            android:scaleType="fitXY"
+            android:src="@drawable/logos_passport"
+            tools:ignore="ContentDescription" />
+
+        <ImageView
+            android:id="@+id/barcodeImageView"
+            android:layout_width="@dimen/qr_code_fullscreen_size"
+            android:layout_height="@dimen/qr_code_fullscreen_size"
+            android:layout_marginHorizontal="@dimen/spacing_large"
+            android:adjustViewBounds="true"
             tools:ignore="ContentDescription"
             tools:src="@tools:sample/avatars" />
 
-        <TextView
-            android:id="@+id/formatTextView"
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/showMoreSwitch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/spacing_large"
-            android:layout_marginTop="@dimen/spacing_medium"
-            android:layout_marginBottom="@dimen/spacing_large"
-            android:gravity="center"
-            android:textAppearance="@style/TextAppearance.StopCovid.Title.Bold"
-            tools:ignore="SelectableText"
+            android:textAppearance="@style/TextAppearance.StopCovid.Caption.Bold"
+            app:switchPadding="@dimen/spacing_small"
             tools:text="@tools:sample/lorem[2]" />
 
         <TextView
-            android:id="@+id/textView"
-            android:layout_width="wrap_content"
+            android:id="@+id/detailsTextView"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/spacing_large"
             android:layout_marginTop="@dimen/spacing_medium"
-            android:gravity="center"
+            android:gravity="top|center_horizontal"
             android:textAppearance="@style/TextAppearance.StopCovid.Title"
             tools:ignore="SelectableText"
-            tools:text="@tools:sample/lorem[12]" />
+            tools:minLines="5"
+            tools:text="@tools:sample/lorem[3]" />
+
+        <TextView
+            android:id="@+id/explanationTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginHorizontal="@dimen/spacing_large"
+            android:layout_marginTop="@dimen/spacing_medium"
+            android:textAppearance="@style/TextAppearance.StopCovid.Caption"
+            android:visibility="gone"
+            tools:ignore="SelectableText"
+            tools:text="@tools:sample/lorem[40]"
+            tools:visibility="visible" />
     </LinearLayout>
 </ScrollView>

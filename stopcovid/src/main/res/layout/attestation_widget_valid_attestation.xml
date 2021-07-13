@@ -11,13 +11,13 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:theme="@style/Theme.StopCovid.Widget.Attestation"
-    android:background="@drawable/bg_widget"
+    android:id="@+id/certificateWidgetLayout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@drawable/bg_widget"
     android:clickable="true"
     android:focusable="true"
-    android:id="@+id/certificateWidgetLayout">
+    android:theme="@style/Theme.StopCovid.Widget.Attestation">
 
     <ImageView
         android:id="@+id/attestationImageView"
@@ -26,43 +26,47 @@
         android:layout_alignParentEnd="true"
         android:layout_marginStart="@dimen/spacing_medium"
         android:layout_marginTop="@dimen/spacing_large"
+        android:importantForAccessibility="no"
         android:src="@drawable/attestation_card_reverse" />
 
     <ImageView
         android:id="@+id/qrCodeImageView"
         android:layout_width="@dimen/qr_code_widget_size"
         android:layout_height="@dimen/qr_code_widget_size"
+        android:layout_centerVertical="true"
         android:layout_marginStart="@dimen/spacing_medium"
         android:layout_marginEnd="@dimen/spacing_medium"
-        android:layout_centerVertical="true"
+        android:importantForAccessibility="no"
         android:src="@drawable/ic_qr_code_scanner" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
         android:layout_toStartOf="@+id/attestationImageView"
         android:layout_toEndOf="@+id/qrCodeImageView"
-        android:layout_centerVertical="true"
         android:orientation="vertical">
 
         <TextView
             android:id="@+id/dateTextView"
+            style="@style/Widget.StopCovid.Widget.Attestation.TextView.Date"
             android:layout_width="match_parent"
             android:layout_height="25dp"
             android:maxLines="1"
-            style="@style/Widget.StopCovid.Widget.Attestation.TextView.Date"
-            tools:text="15/03/2021, 15:35"
-            android:textAlignment="textEnd"/>
+            android:textAlignment="textEnd"
+            android:textIsSelectable="false"
+            tools:text="15/03/2021, 15:35" />
 
         <TextView
             android:id="@+id/reasonTextView"
+            style="@style/Widget.StopCovid.Widget.Attestation.TextView.Reason"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            style="@style/Widget.StopCovid.Widget.Attestation.TextView.Reason"
-            tools:text="Activité professionnelle, enseignement"
-            android:maxLines="2"
             android:ellipsize="end"
-            android:textAlignment="textEnd" />
+            android:maxLines="2"
+            android:textAlignment="textEnd"
+            android:textIsSelectable="false"
+            tools:text="Activité professionnelle, enseignement" />
     </LinearLayout>
 
 </RelativeLayout>

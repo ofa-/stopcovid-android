@@ -36,6 +36,8 @@ import android.widget.FrameLayout
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import android.webkit.URLUtil
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ShareCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.isInvisible
@@ -58,7 +60,6 @@ import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.StopCovid
 import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.ConfigConstant
-import com.lunabeestudio.stopcovid.coreui.UiConstants
 import com.lunabeestudio.stopcovid.coreui.extension.addRipple
 import com.lunabeestudio.stopcovid.coreui.extension.appCompatActivity
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
@@ -83,6 +84,7 @@ import com.lunabeestudio.stopcovid.extension.getRelativeDateTimeString
 import com.lunabeestudio.stopcovid.extension.getString
 import com.lunabeestudio.stopcovid.extension.hasChosenPostalCode
 import com.lunabeestudio.stopcovid.extension.hideRiskStatus
+import com.lunabeestudio.stopcovid.extension.isValidUUID
 import com.lunabeestudio.stopcovid.extension.isolationManager
 import com.lunabeestudio.stopcovid.extension.labelShortStringKey
 import com.lunabeestudio.stopcovid.extension.openInExternalBrowser
@@ -126,7 +128,6 @@ import com.lunabeestudio.stopcovid.utils.ExtendedFloatingActionButtonScrollListe
 import com.lunabeestudio.stopcovid.viewmodel.ProximityViewModel
 import com.lunabeestudio.stopcovid.viewmodel.ProximityViewModelFactory
 import com.mikepenz.fastadapter.GenericItem
-//import kotlinx.android.synthetic.main.activity_main.view.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -162,11 +163,12 @@ class ProximityFragment : TimeMainFragment() {
         PreferenceManager.getDefaultSharedPreferences(requireContext())
     }
 
-    private lateinit var subTitleItem: TitleItem
+    private var activityResultLauncher: ActivityResultLauncher<Intent>? = null
 
     private var onOffLottieItem: OnOffLottieItem? = null
     private var logoItem: LogoItem? = null
     private var proximityButtonItem: ProximityButtonItem? = null
+    private lateinit var subTitleItem: TitleItem
     private lateinit var infoCenterCardItem: CardWithActionsItem
     private var healthItem: CardWithActionsItem? = null
     private var shouldRefresh: Boolean = false
@@ -247,7 +249,11 @@ class ProximityFragment : TimeMainFragment() {
         super.onCreate(savedInstanceState)
         setFragmentResultListener(UniversalQrScanFragment.SCANNED_CODE_RESULT_KEY) { _, bundle ->
             val scannedData = bundle.getString(UniversalQrScanFragment.SCANNED_CODE_BUNDLE_KEY)
-            scannedData?.let { data ->
+            if (scannedData?.isValidUUID() == true) {
+                "$REPORT_UUID_DEEPLINK$scannedData"
+            } else {
+                scannedData
+            }?.let { data ->
                 if (URLUtil.isValidUrl(data)) {
                     val uri = Uri.parse(data).buildUpon()
                         .appendQueryParameter(DeeplinkManager.DEEPLINK_CERTIFICATE_ORIGIN_PARAMETER, DeeplinkManager.Origin.UNIVERSAL.name)
@@ -265,6 +271,11 @@ class ProximityFragment : TimeMainFragment() {
                             )
                     }
                 }
+            }
+        }
+        activityResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                refreshScreen()
             }
         }
     }
@@ -726,28 +737,30 @@ class ProximityFragment : TimeMainFragment() {
         }
 
         KeyFiguresManager.highlightedFigures?.let { figure ->
-            items += highlightedNumberCardItem {
-                label = "${strings[figure.labelShortStringKey]} (${strings["common.country.france"]})"
-                updatedAt = strings["keyfigure.dailyUpdates"]
-                value = figure.valueGlobalToDisplay.formatNumberIfNeeded(numberFormat)
-                onClickListener = View.OnClickListener {
-                    AnalyticsManager.reportAppEvent(requireContext(), AppEventName.e9, null)
-                    findNavControllerOrNull()?.safeNavigate(
-                        ProximityFragmentDirections.actionProximityFragmentToKeyFigureDetailsFragment(
-                            figure.labelKey
+            strings[figure.labelShortStringKey]?.let { shortTitle ->
+                items += highlightedNumberCardItem {
+                    label = "$shortTitle (${strings["common.country.france"]})"
+                    updatedAt = strings["keyfigure.dailyUpdates"]
+                    value = figure.valueGlobalToDisplay.formatNumberIfNeeded(numberFormat)
+                    onClickListener = View.OnClickListener {
+                        AnalyticsManager.reportAppEvent(requireContext(), AppEventName.e9, null)
+                        findNavControllerOrNull()?.safeNavigate(
+                            ProximityFragmentDirections.actionProximityFragmentToKeyFigureDetailsFragment(
+                                figure.labelKey
+                            )
                         )
-                    )
+                    }
+                    strings[figure.colorStringKey(darkMode)]?.let {
+                        color = Color.parseColor(it)
+                    }
+                    identifier = "highlightedNumberCard".hashCode().toLong()
                 }
-                strings[figure.colorStringKey(darkMode)]?.let {
-                    color = Color.parseColor(it)
+                items += spaceItem {
+                    spaceRes = R.dimen.spacing_medium
+                    identifier = items.count().toLong()
                 }
-                identifier = "highlightedNumberCard".hashCode().toLong()
+                isHighlighted = true
             }
-            items += spaceItem {
-                spaceRes = R.dimen.spacing_medium
-                identifier = items.count().toLong()
-            }
-            isHighlighted = true
         }
 
         items += numbersCardItem {
@@ -828,17 +841,21 @@ class ProximityFragment : TimeMainFragment() {
 
     private fun generateFromKeyFigure(keyFigure: KeyFigure?, fromDepartment: Boolean = false): NumbersCardItem.DataFigure? {
         return keyFigure?.let {
-            NumbersCardItem.DataFigure(
-                strings[keyFigure.labelShortStringKey],
-                if (fromDepartment) {
-                    keyFigure.getKeyFigureForPostalCode(sharedPrefs.chosenPostalCode)?.valueToDisplay?.formatNumberIfNeeded(numberFormat)
-                } else {
-                    keyFigure.valueGlobalToDisplay.formatNumberIfNeeded(numberFormat)
-                },
-                strings[keyFigure.colorStringKey(requireContext().isNightMode())]?.let {
-                    Color.parseColor(it)
-                }
-            )
+            strings[keyFigure.labelShortStringKey]?.let { label ->
+                NumbersCardItem.DataFigure(
+                    label,
+                    if (fromDepartment) {
+                        keyFigure.getKeyFigureForPostalCode(sharedPrefs.chosenPostalCode)
+                            ?.valueToDisplay
+                            ?.formatNumberIfNeeded(numberFormat)
+                    } else {
+                        keyFigure.valueGlobalToDisplay.formatNumberIfNeeded(numberFormat)
+                    },
+                    strings[keyFigure.colorStringKey(requireContext().isNightMode())]?.let {
+                        Color.parseColor(it)
+                    }
+                )
+            }
         }
     }
 
@@ -1225,13 +1242,16 @@ class ProximityFragment : TimeMainFragment() {
 
     private fun getErrorClickListener() : View.OnClickListener? {
         val clickListener = ProximityManager.getErrorClickListener(
-            this, robertManager, currentServiceError,
+            this,
+            robertManager,
+            activityResultLauncher,
+            currentServiceError,
             {
                 if (SystemClock.elapsedRealtime() > proximityClickThreshold) {
                     proximityClickThreshold = SystemClock.elapsedRealtime() + PROXIMITY_BUTTON_DELAY
                     activateProximity()
                 }
-            }
+            },
         ) {
             viewLifecycleOwnerOrNull()?.lifecycleScope?.launch(Dispatchers.Main) {
                 deactivateProximity(false)
@@ -1270,7 +1290,9 @@ class ProximityFragment : TimeMainFragment() {
 
     private fun showErrorLayout(activityMainBinding: ActivityMainBinding?) {
         activityMainBinding?.errorLayout?.let { errorLayout ->
-            if (!showErrorLayoutAnimationInProgress && (hideErrorLayoutAnimationInProgress || errorLayout.isInvisible)) {
+            if (!showErrorLayoutAnimationInProgress
+                && (hideErrorLayoutAnimationInProgress || errorLayout.isInvisible || errorLayout.translationY != 0f)
+            ) {
                 showErrorLayoutAnimationInProgress = true
                 errorLayout.post {
                     context?.let {
@@ -1292,16 +1314,6 @@ class ProximityFragment : TimeMainFragment() {
                     }
                 }
             }
-        }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == UiConstants.Activity.BATTERY.ordinal) {
-            if (resultCode == Activity.RESULT_OK) {
-                refreshScreen()
-            }
-        } else {
-            super.onActivityResult(requestCode, resultCode, data)
         }
     }
 
@@ -1363,5 +1375,6 @@ class ProximityFragment : TimeMainFragment() {
     companion object {
         private const val PROXIMITY_BUTTON_DELAY: Long = 2000L
         const val START_PROXIMITY_ARG_KEY: String = "START_PROXIMITY_ARG_KEY"
+        private const val REPORT_UUID_DEEPLINK: String = "https://bonjour.tousanticovid.gouv.fr/app/code/"
     }
 }

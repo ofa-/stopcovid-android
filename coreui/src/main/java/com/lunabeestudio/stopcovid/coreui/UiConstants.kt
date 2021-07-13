@@ -11,9 +11,6 @@
 package com.lunabeestudio.stopcovid.coreui
 
 object UiConstants {
-    enum class Activity {
-        BATTERY, BLUETOOTH
-    }
 
     enum class Permissions {
         CAMERA, LOCATION

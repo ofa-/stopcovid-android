@@ -95,9 +95,9 @@
             android:background="@drawable/ripple_rounded"
             android:padding="@dimen/spacing_large"
             android:src="@drawable/ic_more"
-            android:tint="?colorControlNormal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            app:tint="?colorControlNormal"
             tools:ignore="ContentDescription" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 

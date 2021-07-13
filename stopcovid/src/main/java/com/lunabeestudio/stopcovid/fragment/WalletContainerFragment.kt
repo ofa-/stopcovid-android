@@ -135,7 +135,7 @@ class WalletContainerFragment : BaseFragment() {
         binding = FragmentWalletContainerBinding.inflate(inflater, container, false)
         binding.walletBottomSheetButton.setOnClickListener {
             findNavControllerOrNull()
-                ?.safeNavigate(WalletContainerFragmentDirections.actionProximityFragmentToWalletQRCodeFragment())
+                ?.safeNavigate(WalletContainerFragmentDirections.actionWalletContainerFragmentToWalletQRCodeFragment())
         }
         return binding.root
     }
@@ -182,7 +182,7 @@ class WalletContainerFragment : BaseFragment() {
             val vaccination = (certificate as? EuropeanCertificate)?.greenCertificate?.vaccinations?.lastOrNull()
             if (vaccination != null && vaccination.doseNumber >= vaccination.totalSeriesOfDoses) {
                 findNavControllerOrNull()?.safeNavigate(
-                    WalletContainerFragmentDirections.actionProximityFragmentToVaccineCompletionFragment(
+                    WalletContainerFragmentDirections.actionWalletContainerFragmentToVaccineCompletionFragment(
                         certificate.value
                     )
                 )
@@ -205,7 +205,7 @@ class WalletContainerFragment : BaseFragment() {
         val certificateError = error.walletCertificateError()
         if (certificateError != null) {
             findNavControllerOrNull()?.safeNavigate(
-                WalletContainerFragmentDirections.actionWalletQRCodeFragmentToWalletCertificateErrorFragment(
+                WalletContainerFragmentDirections.actionWalletContainerFragmentToWalletCertificateErrorFragment(
                     certificateType,
                     certificateError,
                 )

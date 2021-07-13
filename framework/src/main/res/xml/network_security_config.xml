@@ -11,18 +11,25 @@
     <domain-config cleartextTrafficPermitted="false">
         <domain includeSubdomains="true">api.tousanticovid.gouv.fr</domain>
         <domain includeSubdomains="true">app.tousanticovid.gouv.fr</domain>
+        <domain includeSubdomains="true">app-static.tousanticovid.gouv.fr</domain>
         <domain includeSubdomains="true">analytics-api.tousanticovid.gouv.fr</domain>
         <domain includeSubdomains="true">signal-api.tousanticovid.gouv.fr</domain>
+        <domain includeSubdomains="true">signal-static.tousanticovid.gouv.fr</domain>
         <trust-anchors>
             <certificates src="@raw/certigna_services" />
         </trust-anchors>
     </domain-config>
     <domain-config cleartextTrafficPermitted="false">
         <domain includeSubdomains="true">s3.fr-par.scw.cloud</domain>
-        <domain includeSubdomains="true">signal-static.oos.cloudgouv-eu-west-1.outscale.com</domain>
         <domain includeSubdomains="true">portail.tacv.myservices-ingroupe.com</domain>
         <trust-anchors>
             <certificates src="@raw/r3" />
+        </trust-anchors>
+    </domain-config>
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="true">signal-static.oos.cloudgouv-eu-west-1.outscale.com</domain>
+        <trust-anchors>
+            <certificates src="@raw/l1k" />
         </trust-anchors>
     </domain-config>
 </network-security-config>
