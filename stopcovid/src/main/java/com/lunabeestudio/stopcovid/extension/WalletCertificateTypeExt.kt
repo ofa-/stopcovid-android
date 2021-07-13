@@ -51,6 +51,15 @@ val WalletCertificateType.certificateThumbnailFilename: String
         WalletCertificateType.RECOVERY_EUROPE -> ConfigConstant.Wallet.RECOVERY_EUROPE_CERTIFICATE_THUMBNAIL_FILE
     }
 
+val WalletCertificateType.certificateThumbnailDrawable: Int
+    get() = when (this) {
+        WalletCertificateType.SANITARY -> R.drawable.test_certificate
+        WalletCertificateType.VACCINATION -> R.drawable.vaccin_certificate
+        WalletCertificateType.SANITARY_EUROPE -> R.drawable.test_europe_certificate
+        WalletCertificateType.VACCINATION_EUROPE -> R.drawable.vaccin_europe_certificate
+        WalletCertificateType.RECOVERY_EUROPE -> R.drawable.recovery_europe_certificate
+    }
+
 val WalletCertificateType.certificateDrawable: Int
     get() = when (this) {
         WalletCertificateType.SANITARY -> R.drawable.test_certificate_full

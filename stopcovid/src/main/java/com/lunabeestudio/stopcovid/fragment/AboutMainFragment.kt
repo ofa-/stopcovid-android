@@ -30,6 +30,10 @@ abstract class AboutMainFragment : MainFragment() {
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.text_menu, menu)
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu) {
+        super.onPrepareOptionsMenu(menu)
         menu.findItem(R.id.item_text).title = strings["common.about"]
     }
 

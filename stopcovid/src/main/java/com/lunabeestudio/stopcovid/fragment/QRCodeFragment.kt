@@ -16,10 +16,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.navigation.ui.NavigationUI
 import com.journeyapps.barcodescanner.BarcodeResult
-import com.lunabeestudio.stopcovid.coreui.UiConstants
 import com.lunabeestudio.stopcovid.coreui.extension.appCompatActivity
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.extension.openAppSettings
@@ -30,6 +31,7 @@ import com.lunabeestudio.stopcovid.extension.openInExternalBrowser
 
 abstract class QRCodeFragment : BaseFragment() {
 
+    private var permissionResultLauncher: ActivityResultLauncher<String>? = null
     abstract fun getTitleKey(): String
     abstract fun getExplanationKey(): String
     abstract fun onCodeScanned(code: String)
@@ -37,6 +39,36 @@ abstract class QRCodeFragment : BaseFragment() {
 
     protected var binding: FragmentQrCodeBinding? = null
     private var showingRationale: Boolean = false
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        permissionResultLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
+            if (isGranted) {
+                resumeQrCodeReader()
+            } else if (!shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)) {
+                showingRationale = true
+                context?.showPermissionRationale(
+                    strings = strings,
+                    messageKey = "common.needCameraAccessToScan",
+                    positiveKey = "common.settings",
+                    neutralKey = "common.readMore",
+                    cancelable = false,
+                    positiveAction = {
+                        openAppSettings()
+                        showingRationale = false
+                    },
+                    neutralAction = {
+                        strings["common.privacyPolicy"]?.openInExternalBrowser(requireContext())
+                        showingRationale = false
+                    },
+                    negativeAction = {
+                        findNavControllerOrNull()?.navigateUp()
+                        showingRationale = false
+                    }
+                )
+            }
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -83,10 +115,7 @@ abstract class QRCodeFragment : BaseFragment() {
                         neutralKey = "common.readMore",
                         cancelable = false,
                         positiveAction = {
-                            requestPermissions(
-                                arrayOf(Manifest.permission.CAMERA),
-                                UiConstants.Permissions.CAMERA.ordinal
-                            )
+                            permissionResultLauncher?.launch(Manifest.permission.CAMERA)
                             showingRationale = false
                         },
                         neutralAction = {
@@ -123,36 +152,5 @@ abstract class QRCodeFragment : BaseFragment() {
 
     override fun refreshScreen() {
         binding?.title?.text = strings[getExplanationKey()]
-    }
-
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        if (requestCode == UiConstants.Permissions.CAMERA.ordinal) {
-            if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                resumeQrCodeReader()
-            } else if (!shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)) {
-                showingRationale = true
-                context?.showPermissionRationale(
-                    strings = strings,
-                    messageKey = "common.needCameraAccessToScan",
-                    positiveKey = "common.settings",
-                    neutralKey = "common.readMore",
-                    cancelable = false,
-                    positiveAction = {
-                        openAppSettings()
-                        showingRationale = false
-                    },
-                    neutralAction = {
-                        strings["common.privacyPolicy"]?.openInExternalBrowser(requireContext())
-                        showingRationale = false
-                    },
-                    negativeAction = {
-                        findNavControllerOrNull()?.navigateUp()
-                        showingRationale = false
-                    }
-                )
-            }
-        } else {
-            super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        }
     }
 }

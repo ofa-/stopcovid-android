@@ -14,7 +14,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Build
-import android.security.KeyPairGeneratorSpec
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.util.Base64
@@ -208,7 +207,7 @@ class LocalCryptoManager(private val appContext: Context) {
                 val end: Date = calendar.time
                 @Suppress("DEPRECATION")
                 generator.initialize(
-                    KeyPairGeneratorSpec.Builder(context)
+                    android.security.KeyPairGeneratorSpec.Builder(context)
                         .setAlgorithmParameterSpec(RSAKeyGenParameterSpec(2048, RSAKeyGenParameterSpec.F4))
                         .setAlias(RSA_WRAP_LOCAL_PROTECTION_KEY_ALIAS)
                         .setSubject(X500Principal("CN=stopcovid-robert-android"))
@@ -295,8 +294,7 @@ class LocalCryptoManager(private val appContext: Context) {
         val iv = ByteArray(ivLen)
         inputStream.read(iv)
         val cipher = Cipher.getInstance(AES_GCM_CIPHER_TYPE)
-        val spec: AlgorithmParameterSpec
-        spec = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        val spec: AlgorithmParameterSpec = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             GCMParameterSpec(AES_GCM_KEY_SIZE_IN_BITS, iv)
         } else {
             IvParameterSpec(iv)

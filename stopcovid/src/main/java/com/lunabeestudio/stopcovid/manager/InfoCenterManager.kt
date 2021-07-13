@@ -47,7 +47,6 @@ import java.io.File
 import java.lang.reflect.Type
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
-import kotlin.time.milliseconds
 
 object InfoCenterManager {
 
@@ -237,9 +236,10 @@ object InfoCenterManager {
     @OptIn(ExperimentalTime::class)
     private fun shouldRefresh(context: Context): Boolean {
         val isAppInForeground = (context.applicationContext as? StopCovid)?.isAppInForeground == true
-        val isMinDelayElapsed = System.currentTimeMillis().milliseconds - refreshMinDelay > PreferenceManager.getDefaultSharedPreferences(
-            context
-        ).lastInfoCenterFetch
+        val isMinDelayElapsed =
+            Duration.milliseconds(System.currentTimeMillis()) - refreshMinDelay > PreferenceManager.getDefaultSharedPreferences(
+                context
+            ).lastInfoCenterFetch
         return lastUpdatedAt == null ||
             isLastUpdatedAtDifferent(context) ||
             (isAppInForeground && isMinDelayElapsed)
@@ -248,7 +248,7 @@ object InfoCenterManager {
     @OptIn(ExperimentalTime::class)
     private suspend fun saveLastRefresh(context: Context) {
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
-        sharedPreferences.lastInfoCenterFetch = System.currentTimeMillis().milliseconds
+        sharedPreferences.lastInfoCenterFetch = Duration.milliseconds(System.currentTimeMillis())
         val isAppInBackground = (context.applicationContext as? StopCovid)?.isAppInForeground != true
         if (sharedPreferences.areInfoNotificationsEnabled
             && lastUpdatedAt != null

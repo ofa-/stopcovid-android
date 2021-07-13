@@ -14,10 +14,15 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.os.Build
+import android.os.Bundle
 import android.view.Gravity
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import com.lunabeestudio.stopcovid.R
-import com.lunabeestudio.stopcovid.coreui.UiConstants
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
@@ -30,16 +35,49 @@ import com.mikepenz.fastadapter.GenericItem
 class OnBoardingBatteryFragment : OnBoardingFragment() {
 
     override fun getTitleKey(): String = "onboarding.batteryController.title"
-    override fun getButtonTitleKey(): String? = "onboarding.batteryController.accept"
+    override fun getButtonTitleKey(): String = "onboarding.batteryController.accept"
+
+    private var activityResultLauncher: ActivityResultLauncher<Intent>? = null
 
     @SuppressLint("BatteryLife")
     @RequiresApi(Build.VERSION_CODES.M)
     override fun getOnButtonClick(): () -> Unit = {
         if (!ProximityManager.isBatteryOptimizationOff(requireContext())) {
-            ProximityManager.requestIgnoreBatteryOptimization(this)
+            ProximityManager.requestIgnoreBatteryOptimization(this, activityResultLauncher)
+            setHasOptionsMenu(true)
         } else {
             findNavControllerOrNull()
                 ?.safeNavigate(OnBoardingBatteryFragmentDirections.actionOnBoardingBatteryFragmentToOnBoardingNotificationFragment())
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        activityResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                findNavControllerOrNull()
+                    ?.safeNavigate(OnBoardingBatteryFragmentDirections.actionOnBoardingBatteryFragmentToOnBoardingNotificationFragment())
+            }
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.text_menu, menu)
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu) {
+        super.onPrepareOptionsMenu(menu)
+        menu.findItem(R.id.item_text).title = strings["common.skip"]
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return if (item.itemId == R.id.item_text) {
+            findNavControllerOrNull()
+                ?.safeNavigate(OnBoardingBatteryFragmentDirections.actionOnBoardingBatteryFragmentToOnBoardingNotificationFragment())
+            true
+        } else {
+            super.onOptionsItemSelected(item)
         }
     }
 
@@ -66,16 +104,5 @@ class OnBoardingBatteryFragment : OnBoardingFragment() {
         }
 
         return items
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == UiConstants.Activity.BATTERY.ordinal) {
-            if (resultCode == Activity.RESULT_OK) {
-                findNavControllerOrNull()
-                    ?.safeNavigate(OnBoardingBatteryFragmentDirections.actionOnBoardingBatteryFragmentToOnBoardingNotificationFragment())
-            }
-        } else {
-            super.onActivityResult(requestCode, resultCode, data)
-        }
     }
 }

@@ -52,6 +52,7 @@
             android:layout_marginTop="@dimen/spacing_large"
             android:adjustViewBounds="true"
             android:background="@drawable/shape_document_stroke"
-            android:src="@drawable/vaccin_certificate" />
+            android:importantForAccessibility="no"
+            android:src="@drawable/vaccin_europe_certificate" />
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

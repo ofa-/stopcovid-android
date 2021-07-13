@@ -4,13 +4,10 @@ import android.content.Context
 import android.text.format.DateUtils
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
-import kotlin.time.days
-import kotlin.time.milliseconds
-import kotlin.time.minutes
 
 @OptIn(ExperimentalTime::class)
 fun Duration.getRelativeDateTimeString(context: Context, nowString: String?): String? {
-    val now = System.currentTimeMillis().milliseconds
+    val now = Duration.milliseconds(System.currentTimeMillis())
 
     return when {
         now - this <= Duration.minutes(1) -> nowString
@@ -35,7 +32,7 @@ fun Duration.getRelativeDateTimeString(context: Context, nowString: String?): St
 }
 
 @OptIn(ExperimentalTime::class)
-fun Duration.getRelativeDateString(): String? {
+fun Duration.getRelativeDateString(): String {
     return DateUtils.getRelativeTimeSpanString(
         this.inWholeMilliseconds,
         System.currentTimeMillis(),
@@ -46,7 +43,7 @@ fun Duration.getRelativeDateString(): String? {
 }
 
 @OptIn(ExperimentalTime::class)
-fun Duration.getRelativeDateShortString(context: Context): String? {
+fun Duration.getRelativeDateShortString(context: Context): String {
     return DateUtils.formatDateTime(
         context,
         this.inWholeMilliseconds,

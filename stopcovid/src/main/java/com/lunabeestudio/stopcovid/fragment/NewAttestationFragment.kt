@@ -98,6 +98,10 @@ class NewAttestationFragment : MainFragment() {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.text_menu, menu)
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu) {
+        super.onPrepareOptionsMenu(menu)
         menu.findItem(R.id.item_text).title = strings["newAttestationController.generate"]
     }
 

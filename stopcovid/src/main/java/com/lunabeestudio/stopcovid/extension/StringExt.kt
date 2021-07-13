@@ -73,8 +73,15 @@ fun String.formatNumberIfNeeded(numberFormat: NumberFormat): String {
     }
 }
 
-@SuppressWarnings("DefaultLocale")
-fun String.capitalizeWords(): String = split(" ").joinToString(" ") { it.capitalize(Locale.getDefault()) }
+private fun String.titleCaseFirstChar(): String = replaceFirstChar {
+    if (it.isLowerCase()) {
+        it.titlecase(Locale.getDefault())
+    } else {
+        it.toString()
+    }
+}
+
+fun String.capitalizeWords(): String = split(" ").joinToString(" ") { it.titleCaseFirstChar() }
 
 fun String.sha256(): String = MessageDigest
     .getInstance("SHA-256")

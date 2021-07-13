@@ -107,7 +107,7 @@ class VaccinationActionsBottomSheetFragment : BottomSheetDialogFragment() {
                         sharingTexts += formattedPhone
                     }
                 }
-                ShareCompat.IntentBuilder.from(requireActivity())
+                ShareCompat.IntentBuilder(requireActivity())
                     .setType("text/plain")
                     .setText(sharingTexts.joinToString(". "))
                     .startChooser()

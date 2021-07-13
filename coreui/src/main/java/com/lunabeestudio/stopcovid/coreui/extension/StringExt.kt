@@ -31,7 +31,7 @@ import java.util.concurrent.TimeUnit
 @Suppress("BlockingMethodInNonBlockingContext")
 suspend fun String.saveTo(context: Context, file: File): Boolean {
     return withContext(Dispatchers.IO) {
-        val cacheConfig = CacheConfig(File(context.cacheDir, "http_cache"), 30 * 1024 * 1024)
+        val cacheConfig = CacheConfig(File(context.cacheDir, "http_cache"), 30L * 1024L * 1024L)
         val okHttpClient = OkHttpClient.getDefaultOKHttpClient(context, this@saveTo, ConfigConstant.SERVER_CERTIFICATE_SHA256, cacheConfig)
         val request: Request = Request.Builder().apply {
             cacheControl(CacheControl.Builder().maxAge(10, TimeUnit.MINUTES).build())
@@ -58,7 +58,7 @@ suspend fun String.saveTo(context: Context, file: File): Boolean {
 @Suppress("BlockingMethodInNonBlockingContext")
 suspend fun String.saveTo(context: Context, atomicFile: AtomicFile, validData: suspend (data: ByteArray) -> Boolean): Boolean {
     return withContext(Dispatchers.IO) {
-        val cacheConfig = CacheConfig(File(context.cacheDir, "http_cache"), 30 * 1024 * 1024)
+        val cacheConfig = CacheConfig(File(context.cacheDir, "http_cache"), 30L * 1024L * 1024L)
         val okHttpClient = OkHttpClient.getDefaultOKHttpClient(context, this@saveTo, ConfigConstant.SERVER_CERTIFICATE_SHA256, cacheConfig)
         val request: Request = Request.Builder().apply {
             cacheControl(CacheControl.Builder().maxAge(10, TimeUnit.MINUTES).build())

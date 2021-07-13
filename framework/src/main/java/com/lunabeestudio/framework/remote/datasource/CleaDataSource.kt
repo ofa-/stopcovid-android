@@ -23,7 +23,7 @@ class CleaDataSource(
     private val cleaStatusFallbackBaseUrl: String,
 ) : RemoteCleaDataSource {
 
-    private val cacheConfig = CacheConfig(File(context.cacheDir, "http_cache"), 30 * 1024 * 1024)
+    private val cacheConfig = CacheConfig(File(context.cacheDir, "http_cache"), 30L * 1024L * 1024L)
 
     private var filesDir = context.filesDir
 

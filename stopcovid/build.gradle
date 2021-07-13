@@ -45,21 +45,10 @@ android {
         applicationId "fr.gouv.android.stopcovid"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 298
-        versionName "3.3.4"
+        versionCode 304
+        versionName "3.3.5"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-    }
-
-    lintOptions {
-        disable "GradleDependency",
-                "IidCompatibilityCheckFailure",
-                "InvalidPackage",
-                "ObsoleteLintCustomCheck",
-                "UnsafeExperimentalUsageError",
-                "UnsafeExperimentalUsageWarning",
-                "VectorPath",
-                "VectorRaster"
     }
 
     testOptions {

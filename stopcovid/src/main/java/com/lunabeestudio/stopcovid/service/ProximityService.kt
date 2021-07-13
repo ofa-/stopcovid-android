@@ -92,7 +92,7 @@ open class ProximityService : RobertProximityService() {
             .setOngoing(true)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setSmallIcon(R.drawable.ic_notification_bar)
-            .setNotificationSilent()
+            .setSilent(true)
             .setStyle(
                 NotificationCompat.BigTextStyle()
                     .bigText(strings["notification.proximityServiceRunning.message"])

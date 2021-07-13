@@ -14,11 +14,13 @@ import android.app.Activity
 import android.bluetooth.BluetoothAdapter
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Bundle
 import android.view.Gravity
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.lunabeestudio.stopcovid.R
-import com.lunabeestudio.stopcovid.coreui.UiConstants
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.extension.openAppSettings
 import com.lunabeestudio.stopcovid.coreui.extension.showPermissionRationale
@@ -37,6 +39,8 @@ class OnBoardingProximityFragment : OnBoardingFragment() {
     private val robertManager by lazy {
         requireContext().robertManager()
     }
+    private var permissionResultLauncher: ActivityResultLauncher<String>? = null
+    private var activityResultLauncher: ActivityResultLauncher<Intent>? = null
 
     override fun getTitleKey(): String = "onboarding.proximityController.title"
     override fun getButtonTitleKey(): String = "onboarding.proximityController.allowProximity"
@@ -48,10 +52,7 @@ class OnBoardingProximityFragment : OnBoardingFragment() {
                 .setTitle(strings["common.permissionsNeeded"])
                 .setMessage(strings["onboarding.proximityController.allowProximity.warning"])
                 .setPositiveButton(strings["common.understand"]) { _, _ ->
-                    requestPermissions(
-                        arrayOf(ProximityManager.getManifestLocationPermission()),
-                        UiConstants.Permissions.LOCATION.ordinal
-                    )
+                    permissionResultLauncher?.launch(ProximityManager.getManifestLocationPermission())
                 }
                 .show()
         } else if (ProximityManager.hasFeatureBLE(requireContext(), robertManager) && !ProximityManager.isBluetoothOn(
@@ -60,9 +61,47 @@ class OnBoardingProximityFragment : OnBoardingFragment() {
             )
         ) {
             val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-            startActivityForResult(enableBtIntent, UiConstants.Activity.BLUETOOTH.ordinal)
+            activityResultLauncher?.launch(enableBtIntent)
         } else {
             startNextController()
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        permissionResultLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
+            if (isGranted) {
+                if (ProximityManager.hasFeatureBLE(requireContext(), robertManager) && !ProximityManager.isBluetoothOn(
+                        requireContext(),
+                        robertManager
+                    )
+                ) {
+                    val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
+                    activityResultLauncher?.launch(enableBtIntent)
+                } else {
+                    startNextController()
+                }
+            } else if (!shouldShowRequestPermissionRationale(ProximityManager.getManifestLocationPermission())) {
+                context?.showPermissionRationale(
+                    strings = strings,
+                    messageKey = "common.needLocalisationAccessToScan",
+                    positiveKey = "common.settings",
+                    neutralKey = "common.readMore",
+                    cancelable = true,
+                    positiveAction = {
+                        openAppSettings()
+                    },
+                    neutralAction = {
+                        strings["common.privacyPolicy"]?.openInExternalBrowser(requireContext())
+                    },
+                    negativeAction = null
+                )
+            }
+        }
+        activityResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                startNextController()
+            }
         }
     }
 
@@ -89,50 +128,6 @@ class OnBoardingProximityFragment : OnBoardingFragment() {
         }
 
         return items
-    }
-
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        if (requestCode == UiConstants.Permissions.LOCATION.ordinal) {
-            if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                if (ProximityManager.hasFeatureBLE(requireContext(), robertManager) && !ProximityManager.isBluetoothOn(
-                        requireContext(),
-                        robertManager
-                    )
-                ) {
-                    val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-                    startActivityForResult(enableBtIntent, UiConstants.Activity.BLUETOOTH.ordinal)
-                } else {
-                    startNextController()
-                }
-            } else if (!shouldShowRequestPermissionRationale(ProximityManager.getManifestLocationPermission())) {
-                context?.showPermissionRationale(
-                    strings = strings,
-                    messageKey = "common.needLocalisationAccessToScan",
-                    positiveKey = "common.settings",
-                    neutralKey = "common.readMore",
-                    cancelable = true,
-                    positiveAction = {
-                        openAppSettings()
-                    },
-                    neutralAction = {
-                        strings["common.privacyPolicy"]?.openInExternalBrowser(requireContext())
-                    },
-                    negativeAction = null
-                )
-            }
-        } else {
-            super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == UiConstants.Activity.BLUETOOTH.ordinal) {
-            if (resultCode == Activity.RESULT_OK) {
-                startNextController()
-            }
-        } else {
-            super.onActivityResult(requestCode, resultCode, data)
-        }
     }
 
     private fun startNextController() {

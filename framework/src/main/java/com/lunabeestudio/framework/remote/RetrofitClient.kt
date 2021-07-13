@@ -68,6 +68,7 @@ object RetrofitClient {
                 val certificates: HandshakeCertificates = HandshakeCertificates.Builder()
                     .addTrustedCertificate(certificateFromString(context, "certigna_services"))
                     .addTrustedCertificate(certificateFromString(context, "r3"))
+                    .addTrustedCertificate(certificateFromString(context, "l1k"))
                     .build()
                 sslSocketFactory(certificates.sslSocketFactory(), certificates.trustManager)
             }

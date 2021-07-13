@@ -11,10 +11,10 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:theme="@style/Theme.StopCovid.Widget"
     android:id="@+id/proximityWidgetLayout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:theme="@style/Theme.StopCovid.Widget">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -34,14 +34,16 @@
                 android:id="@+id/logoImageView"
                 android:layout_width="@dimen/logo_proximity_widget_size"
                 android:layout_height="@dimen/logo_proximity_widget_size"
-                android:layout_marginRight="@dimen/spacing_medium"
+                android:layout_marginEnd="@dimen/spacing_medium"
+                android:importantForAccessibility="no"
                 android:src="@mipmap/ic_launcher" />
 
             <TextView
                 android:id="@+id/titleWidgetTextView"
+                style="@style/Widget.StopCovid.Widget.TextView.Title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                style="@style/Widget.StopCovid.Widget.TextView.Title"
+                android:textIsSelectable="false"
                 tools:text="@string/app_name" />
         </LinearLayout>
 
@@ -61,6 +63,7 @@
                 android:layout_width="@dimen/image_risk_widget_size"
                 android:layout_height="@dimen/image_risk_widget_size"
                 android:layout_alignParentBottom="true"
+                android:importantForAccessibility="no"
                 android:src="@drawable/health_card"
                 android:visibility="gone" />
 
@@ -79,7 +82,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="@dimen/spacing_medium"
-                    tools:text="Pas de risque"/>
+                    android:textIsSelectable="false"
+                    tools:text="Pas de risque" />
 
                 <TextView
                     android:id="@+id/infoTextView"
@@ -87,6 +91,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="@dimen/spacing_small"
+                    android:textIsSelectable="false"
                     tools:text="Appuyez pour avoir des infos" />
 
             </LinearLayout>
@@ -102,6 +107,6 @@
         android:background="@drawable/ripple_widget_proximity"
         android:clickable="true"
         android:focusable="true"
-        android:orientation="vertical"/>
+        android:orientation="vertical" />
 
 </RelativeLayout>

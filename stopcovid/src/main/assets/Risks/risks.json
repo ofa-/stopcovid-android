@@ -51,55 +51,8 @@
         ]
     },
     {
-        "riskLevel" : 1.0,
-        "description" : "Activité de contact Robert sans risque, avec notif",
-        "labels" :
-        {
-            "homeTitle" : "risk1.home.title",
-            "homeSub" : "risk1.home.sub",
-            "detailTitle" : "risk1.details.title",
-            "detailSubtitle" : "risk1.details.sub",
-            "widgetShort" : "risk1.home.title",
-            "widgetLong" : "risk1.details.title",
-            "notifTitle" : "risk1.notif.title",
-            "notifBody" : "risk1.notif.sub"
-        },
-        "color" : {"from" : "#6D7195", "to" : "#484D7A"},
-        "sections" : [
-            {
-                "section": "risk1.section1.title",
-                "description" : "risk1.section1.body"
-            },
-            {
-                "section": "risk.section.measures.title",
-                "description" : "risk.section.measures.body",
-                "link":
-                    {
-                        "label": "risk.section.measures.button",
-                        "action": "GESTURES",
-                        "type": "ctrl"
-                    }
-
-            },
-            {
-                "section": "risk.section.mcc.title",
-                "description" : "risk.section.mcc.body",
-                "link" :
-                    {
-                        "label": "risk.section.mcc.button",
-                        "action": "risk.section.mcc.url",
-                        "type": "web"
-                    }
-            },
-            {
-                "section": "risk.section.limit.title",
-                "description" : "risk.section.limit.body"
-            }
-        ]
-    },
-    {
         "riskLevel" : 2.0,
-        "description" : "TAC-W lieu modéré",
+        "description" : "TAC-S lieu modéré",
         "labels" : {
             "homeTitle" : "risk2.home.title",
             "homeSub" : "risk2.home.sub",
@@ -150,7 +103,7 @@
     },
     {
         "riskLevel" : 3.0,
-        "description" : "TAC W risque élevé",
+        "description" : "TAC-S risque élevé",
         "labels" : {
             "homeTitle" : "risk3.home.title",
             "homeSub" : "risk3.home.sub",

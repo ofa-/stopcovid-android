@@ -23,12 +23,12 @@ import android.os.Build
 import android.os.PowerManager
 import android.provider.Settings
 import android.view.View
+import androidx.activity.result.ActivityResultLauncher
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.core.location.LocationManagerCompat
 import androidx.fragment.app.Fragment
 import com.lunabeestudio.robert.RobertManager
-import com.lunabeestudio.stopcovid.coreui.UiConstants
 import com.lunabeestudio.stopcovid.coreui.extension.openAppSettings
 import com.lunabeestudio.stopcovid.model.CovidException
 import com.lunabeestudio.stopcovid.model.DeviceSetup
@@ -103,6 +103,7 @@ object ProximityManager {
     fun getErrorClickListener(
         fragment: Fragment,
         robertManager: RobertManager,
+        activityResultLauncher: ActivityResultLauncher<Intent>?,
         serviceError: CovidException?,
         activateProximity: () -> Unit,
         restartProximity: () -> Unit,
@@ -120,7 +121,7 @@ object ProximityManager {
         }
         !isAdvertisingValid(robertManager) -> null
         !isBatteryOptimizationOff(fragment.requireContext()) -> View.OnClickListener {
-            requestIgnoreBatteryOptimization(fragment)
+            requestIgnoreBatteryOptimization(fragment, activityResultLauncher)
         }
         needLocalisationTurnedOn(fragment.requireContext()) -> View.OnClickListener {
             fragment.startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
@@ -161,7 +162,7 @@ object ProximityManager {
     )
 
     @SuppressLint("BatteryLife", "InlinedApi")
-    fun requestIgnoreBatteryOptimization(fragment: Fragment) {
+    fun requestIgnoreBatteryOptimization(fragment: Fragment, activityResultLauncher: ActivityResultLauncher<Intent>?) {
         val systemIntent = Intent()
         systemIntent.action = Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
         systemIntent.data = Uri.parse("package:${fragment.requireActivity().packageName}")
@@ -170,7 +171,7 @@ object ProximityManager {
         for (intent in powerIntents) {
             val resolveInfo = intent.resolveActivityInfo(fragment.requireContext().packageManager, PackageManager.MATCH_DEFAULT_ONLY)
             if (resolveInfo?.exported == true) {
-                fragment.startActivityForResult(intent, UiConstants.Activity.BATTERY.ordinal)
+                activityResultLauncher?.launch(intent)
                 break
             }
         }

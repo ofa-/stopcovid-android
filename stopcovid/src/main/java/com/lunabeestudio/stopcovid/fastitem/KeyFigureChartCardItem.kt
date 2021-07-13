@@ -136,7 +136,7 @@ class KeyFigureChartCardItem : AbstractBindingItem<ItemKeyFigureChartCardBinding
             setupStyle()
             valueFormatter = object : ValueFormatter() {
                 override fun getFormattedValue(value: Float): String {
-                    return Duration.seconds(value.toLong()).getRelativeDateShortString(binding.root.context) ?: ""
+                    return Duration.seconds(value.toLong()).getRelativeDateShortString(binding.root.context)
                 }
             }
         }

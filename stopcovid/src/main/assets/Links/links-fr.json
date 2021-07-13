@@ -24,10 +24,14 @@
     },
     {
         "section": "✈️ Voyager",
-        "description" : "\"Re-open EU\" (rouvrir l'Europe) fournit des informations sur les différentes mesures en place, notamment sur les exigences en matière de quarantaine et de tests pour les voyageurs, le certificat COVID numérique de l’UE pour vous aider à exercer votre droit à la libre circulation, et les applications mobiles de traçage et d’avertissement des contacts coronavirus. L'information est mise à jour fréquemment. Cela devrait vous aider à planifier votre voyage en Europe, tout en restant en sécurité et en santé.",
+        "description" : "\"Re-open EU\" (rouvrir l'Europe) fournit des informations sur les différentes mesures en place en Europe. Cela devrait vous aider à planifier votre voyage en Europe, tout en restant en sécurité et en santé.\n\nDiplomatie.gouv.fr vous donne également les informations par pays, si vous souhaitez voyager à l'étranger ou venir en France.",
         "links": [
 	        {
-                "label": "Aller sur Re-open EU",
+                "label": "Aller sur Diplomatie.gouv.fr 🇫🇷",
+                "url": "https://www.diplomatie.gouv.fr/fr/"
+            },
+             {
+                "label": "Aller sur Re-open EU 🇪🇺",
                 "url": "https://reopen.europa.eu/fr/from-to/FRA/"
             }
         ]

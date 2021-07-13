@@ -142,6 +142,10 @@ class MainActivity : BaseActivity() {
                     launchSingleTop = true
                 }
             )
+        } else {
+            strings["universalQrScanController.error.wrongUrl"]?.let { errorMessage ->
+                showErrorSnackBar(errorMessage, Snackbar.LENGTH_SHORT)
+            }
         }
     }
 
