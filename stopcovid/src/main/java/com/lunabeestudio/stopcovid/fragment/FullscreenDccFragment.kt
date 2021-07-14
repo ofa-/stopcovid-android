@@ -123,8 +123,8 @@ class FullscreenDccFragment : ForceLightFragment(R.layout.fragment_fullscreen_dc
                 SimpleDateFormat("d MMM yyyy, HH:mm", Locale.ENGLISH),
             )
         } else {
-            europeanCertificate.fullName()
+            ""
         }
-        explanationTextView.isVisible = !isChecked
+        explanationTextView.isVisible = false
     }
 }
