@@ -77,7 +77,7 @@ class FullscreenDccFragment : ForceLightFragment(R.layout.fragment_fullscreen_dc
             .map { certificates ->
                 certificates
                     ?.filterIsInstance<EuropeanCertificate>()
-                    ?.firstOrNull { it.keyCertificateId == args.keyCertificateId }
+                    ?.firstOrNull { it.greenCertificate.getDgci() == args.keyCertificateId }
             }
             .observe(viewLifecycleOwner) { europeanCertificate ->
                 this.europeanCertificate = europeanCertificate

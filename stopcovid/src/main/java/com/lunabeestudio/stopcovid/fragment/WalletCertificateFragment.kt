@@ -230,7 +230,7 @@ class WalletCertificateFragment : MainFragment() {
                 if (certificate is EuropeanCertificate) {
                     findParentFragmentByType<WalletContainerFragment>()?.findNavControllerOrNull()?.safeNavigate(
                         WalletContainerFragmentDirections.actionWalletContainerFragmentToFullscreenDccFragment(
-                            certificate.keyCertificateId,
+                            certificate.greenCertificate.getDgci(),
                         )
                     )
                 } else {
