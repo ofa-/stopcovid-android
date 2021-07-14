@@ -979,13 +979,6 @@ class ProximityFragment : TimeMainFragment() {
                 Action(R.drawable.ic_link, strings["home.moreSection.usefulLinks"]) {
                     findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToLinksFragment())
                 },
-                Action(R.drawable.ic_share, strings["home.moreSection.appSharing"]) {
-                    AnalyticsManager.reportAppEvent(requireContext(), AppEventName.e4, null)
-                    ShareCompat.IntentBuilder(requireActivity())
-                        .setType("text/plain")
-                        .setText(strings["sharingController.appSharingMessage"])
-                        .startChooser()
-                },
                 Action(R.drawable.ic_history, strings["home.moreSection.venuesHistory"]) {
                     findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToVenuesHistoryFragment())
                 }.takeIf {
