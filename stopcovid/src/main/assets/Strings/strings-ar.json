@@ -1144,6 +1144,14 @@
    "venuesRecording.alert.title": "The alerts",
    "venuesRecording.alert.subtitle": "If a person later tests positive, all people will be informed that they may have been exposed to the virus and will be invited to be tested.\n\nIf three people or more have been in the same place and then test positive, all the other people present in this place will be considered as contacts (because co-exposed) and invited to isolate themselves, to be tested.",
    
+   "europeanCertificate.fullscreen.type.minimum": "Activity",
+   "europeanCertificate.fullscreen.type.border": "Border",
+   "europeanCertificate.fullscreen.type.border.switch": "Border mode",
+   "europeanCertificate.fullscreen.type.minimum.footer" : "👉 This screen with the QR Code has to be used in the scope of the health pass in France for activities with more than 1,000 people or night clubs. For a border crossing, please switch to the \"Border\" mode.",
+   "europeanCertificate.fullscreen.englishDescription.vaccine": "<FULL_NAME>\nDate of birth: <BIRTHDATE>\n<VACCINE_NAME>\nInjection date: <DATE>",
+   "europeanCertificate.fullscreen.englishDescription.recovery": "<FULL_NAME>\nDate of birth: <BIRTHDATE>\nTested on <DATE>",
+   "europeanCertificate.fullscreen.englishDescription.test": "<FULL_NAME>\nDate of birth: <BIRTHDATE>\n<ANALYSIS_RESULT> - <ANALYSIS_CODE>\nTested on <FROM_DATE>",
+
    "manageDataController.analytics.button": "Delete my data",
     "manageDataController.analytics.confirmationDialog.title": "Confirmation",
     "manageDataController.analytics.confirmationDialog.message": "Do you really want to delete your usage data?",
