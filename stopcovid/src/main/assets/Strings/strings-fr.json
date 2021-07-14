@@ -1008,9 +1008,9 @@
    "europeanCertificate.fullscreen.type.border": "Frontière",
    "europeanCertificate.fullscreen.type.border.switch": "Mode frontière",
    "europeanCertificate.fullscreen.type.minimum.footer" : "👉 Cet affichage du QR Code est à utiliser dans le cadre du pass sanitaire sur le territoire français pour les activités de plus de 1 000 personnes et les boîtes de nuit. Pour un passage de frontière, veuillez passer en mode \"Frontière\".",
-   "europeanCertificate.fullscreen.englishDescription.vaccine": "<FULL_NAME>\nDate of birth <BIRTHDATE>\n<VACCINE_NAME>\nInjection date: <DATE>",
-   "europeanCertificate.fullscreen.englishDescription.recovery": "<FULL_NAME>\nDate of birth <BIRTHDATE>\nTested on <DATE>",
-   "europeanCertificate.fullscreen.englishDescription.test": "<FULL_NAME>\nDate of birth <BIRTHDATE>\n<ANALYSIS_RESULT> - <ANALYSIS_CODE>\nTested on <FROM_DATE>",
+   "europeanCertificate.fullscreen.englishDescription.vaccine": "<FULL_NAME>\nDate of birth: <BIRTHDATE>\n<VACCINE_NAME>\nInjection date: <DATE>",
+   "europeanCertificate.fullscreen.englishDescription.recovery": "<FULL_NAME>\nDate of birth: <BIRTHDATE>\nTested on <DATE>",
+   "europeanCertificate.fullscreen.englishDescription.test": "<FULL_NAME>\nDate of birth: <BIRTHDATE>\n<ANALYSIS_RESULT> - <ANALYSIS_CODE>\nTested on <FROM_DATE>",
 
 
    "documentExplanationController.vaccinCertificate.title": "Attestation de vaccin",
