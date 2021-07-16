@@ -34,8 +34,19 @@ val GreenCertificate.certificateType: WalletCertificateType?
 fun GreenCertificate.formattedDateOfBirthDate(dateFormat: DateFormat): String =
     yearMonthDayUsParser().parseOrNull(dateOfBirth)?.let(dateFormat::format) ?: dateOfBirth
 
+val GreenCertificate.countryCode: String?
+    get() = when {
+        vaccinations?.lastOrNull() != null -> vaccinations?.lastOrNull()?.countryOfVaccination
+        tests?.lastOrNull() != null -> tests?.lastOrNull()?.countryOfVaccination
+        recoveryStatements?.lastOrNull() != null -> recoveryStatements?.lastOrNull()?.countryOfVaccination
+        else -> null
+    }
+
+val GreenCertificate.isFrench: Boolean
+    get() = this.countryCode == Locale.FRANCE.country
+
 val GreenCertificate.vaccineMedicinalProduct: String?
-    get() = vaccinations?.lastOrNull()?.medicinalProduct
+    get() = vaccinations?.lastOrNull()?.medicinalProduct?.trim()
 
 val GreenCertificate.vaccineDate: Date?
     get() = vaccinations?.lastOrNull()?.dateOfVaccination?.let(yearMonthDayUsParser()::parseOrNull)
@@ -47,7 +58,10 @@ val GreenCertificate.vaccineDose: Pair<Int, Int>?
     }
 
 val GreenCertificate.testType: String?
-    get() = tests?.lastOrNull()?.typeOfTest
+    get() = tests?.lastOrNull()?.typeOfTest?.trim()
+
+val GreenCertificate.testResultIsNegative: Boolean?
+    get() = tests?.lastOrNull()?.isResultNegative()
 
 val GreenCertificate.testResultCode: String?
     get() = tests?.lastOrNull()?.isResultNegative()?.let { isNegative ->

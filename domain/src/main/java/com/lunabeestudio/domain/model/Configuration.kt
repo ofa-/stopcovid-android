@@ -60,7 +60,6 @@ class Configuration(
     var displaySanitaryCertificatesWallet: Boolean,
     var walletOldCertificateThresholdInDays: Map<String, Float>,
     var walletPublicKeys: List<WalletPublicKey>,
-    var displaySanitaryCertificatesValidation: Boolean,
     var isAnalyticsOn: Boolean,
     var analyticsApiVersion: String,
     var testCertificateValidityThresholds: List<Int>,

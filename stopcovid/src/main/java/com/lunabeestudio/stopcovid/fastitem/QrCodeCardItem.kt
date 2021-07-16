@@ -12,6 +12,9 @@ package com.lunabeestudio.stopcovid.fastitem
 
 import android.content.res.ColorStateList
 import android.graphics.Bitmap
+import android.text.Spannable
+import android.text.method.LinkMovementMethod
+import android.text.style.URLSpan
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -26,7 +29,8 @@ import com.mikepenz.fastadapter.binding.AbstractBindingItem
 
 class QrCodeCardItem : AbstractBindingItem<ItemQrCodeCardBinding>() {
     var generateBarcode: (() -> Bitmap)? = null
-    var text: String? = null
+    var mainDescription: String? = null
+    var footerDescription: Spannable? = null
     var tag1Text: String? = null
     var tag2Text: String? = null
     var formatText: String? = null
@@ -58,7 +62,15 @@ class QrCodeCardItem : AbstractBindingItem<ItemQrCodeCardBinding>() {
 
     override fun bindView(binding: ItemQrCodeCardBinding, payloads: List<Any>) {
         super.bindView(binding, payloads)
-        binding.textView.text = text
+        binding.mainDescriptionTextView.text = mainDescription
+        binding.footerDescriptionTextView.setTextOrHide(footerDescription)
+        footerDescription?.let { spannable ->
+            if (spannable.nextSpanTransition(0, spannable.length, URLSpan::class.java) != spannable.length) {
+                binding.footerDescriptionTextView.movementMethod = LinkMovementMethod.getInstance()
+            } else {
+                binding.footerDescriptionTextView.movementMethod = null
+            }
+        }
 
         val bitmap = generateBarcode?.invoke()
         binding.imageView.setImageBitmap(bitmap)

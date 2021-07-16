@@ -184,7 +184,7 @@ class AttestationsFragment : MainFragment() {
         }
         return qrCodeCardItem {
             this.generateBarcode = generateBarcode
-            text = attestation.footer
+            mainDescription = attestation.footer
             share = strings["attestationsController.menu.share"]
             delete = strings["attestationsController.menu.delete"]
             this.allowShare = allowShare
@@ -222,7 +222,7 @@ class AttestationsFragment : MainFragment() {
                 )
             }
             actionContentDescription = strings["accessibility.hint.otherActions"]
-            identifier = text.hashCode().toLong()
+            identifier = mainDescription.hashCode().toLong()
         }
     }
 }

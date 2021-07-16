@@ -185,7 +185,6 @@ class MainActivity : BaseActivity() {
             R.id.venueQrCodeFragment,
             R.id.walletQRCodeFragment,
             R.id.universalQrScanFragment,
-            R.id.verifyWalletQRCodeFragment,
             R.id.vaccineCompletionFragment,
         ).contains(destination.id).let { noAppBarFragment ->
             lifecycleScope.launchWhenResumed {

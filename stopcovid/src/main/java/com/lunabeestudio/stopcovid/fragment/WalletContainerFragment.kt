@@ -20,6 +20,7 @@ import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.lunabeestudio.domain.model.WalletCertificateType
 import com.lunabeestudio.robert.extension.safeEnumValueOf
 import com.lunabeestudio.stopcovid.activity.MainActivity
@@ -28,6 +29,7 @@ import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.fragment.BaseFragment
 import com.lunabeestudio.stopcovid.databinding.FragmentWalletContainerBinding
 import com.lunabeestudio.stopcovid.extension.dccCertificatesManager
+import com.lunabeestudio.stopcovid.extension.isFrench
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
@@ -63,8 +65,6 @@ class WalletContainerFragment : BaseFragment() {
         WalletViewModelFactory(robertManager, keystoreDataSource, dccCertificatesManager)
     }
 
-    private var confirmationAsked: Boolean = false
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -72,32 +72,37 @@ class WalletContainerFragment : BaseFragment() {
             findNavControllerOrNull()?.navigateUp()
         }
 
-        confirmationAsked = savedInstanceState?.getBoolean(CONFIRMATION_ASKED_KEY) == true
-
         if (savedInstanceState == null) { // do not replay navigation on config change
             val certificateCode = args.code
             val certificateFormat = args.certificateFormat?.let { WalletCertificateType.Format.fromValue(it) }
+            if (certificateCode != null) {
+                handleArgumentsDeeplink(certificateCode, certificateFormat)
+            }
+        }
 
-            if (certificateCode != null && !confirmationAsked && args.origin == DeeplinkManager.Origin.EXTERNAL) {
-                lifecycleScope.launchWhenResumed {
-                    if (checkCodeValue(certificateCode, certificateFormat)) {
+        setupResultListener()
+    }
+
+    private fun handleArgumentsDeeplink(certificateCode: String, certificateFormat: WalletCertificateType.Format?) {
+        lifecycleScope.launchWhenResumed {
+
+            when (args.origin) {
+                DeeplinkManager.Origin.EXTERNAL -> {
+                    val certificate = validateAndGetCertificate(certificateCode, certificateFormat)
+                    if (certificate != null) {
                         findNavControllerOrNull()?.safeNavigate(
                             WalletContainerFragmentDirections.actionWalletContainerFragmentToConfirmAddWalletCertificateFragment(
                                 certificateCode,
                                 certificateFormat?.name,
                             )
                         )
-                        confirmationAsked = true
                     }
                 }
-            } else if (certificateCode != null && args.origin == DeeplinkManager.Origin.UNIVERSAL) {
-                lifecycleScope.launchWhenResumed {
+                DeeplinkManager.Origin.UNIVERSAL -> {
                     processCodeValue(certificateCode, certificateFormat)
                 }
             }
         }
-
-        setupResultListener()
     }
 
     private fun setupResultListener() {
@@ -145,11 +150,6 @@ class WalletContainerFragment : BaseFragment() {
         binding.walletBottomSheetButton.text = strings["walletController.addCertificate"]
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putBoolean(CONFIRMATION_ASKED_KEY, confirmationAsked)
-    }
-
     private suspend fun processUrlValue(url: String) {
         try {
             val certificateCode = WalletManager.extractCertificateCodeFromUrl(url)
@@ -160,7 +160,10 @@ class WalletContainerFragment : BaseFragment() {
         }
     }
 
-    private suspend fun checkCodeValue(certificateCode: String, certificateFormat: WalletCertificateType.Format?): Boolean {
+    private suspend fun validateAndGetCertificate(
+        certificateCode: String,
+        certificateFormat: WalletCertificateType.Format?
+    ): WalletCertificate? {
         return try {
             WalletManager.verifyCertificateCodeValue(
                 robertManager.configuration,
@@ -168,16 +171,34 @@ class WalletContainerFragment : BaseFragment() {
                 dccCertificatesManager.certificates,
                 certificateFormat,
             )
-            true
         } catch (e: Exception) {
             handleCertificateError(e, certificateCode)
-            false
+            null
         }
     }
 
     private suspend fun processCodeValue(certificateCode: String, certificateFormat: WalletCertificateType.Format?) {
+        val certificate = validateAndGetCertificate(certificateCode, certificateFormat)
+
+        if (certificate != null) {
+            val onContinueProcess: (() -> Unit) = {
+                lifecycleScope.launch {
+                    processCertificate(certificate)
+                }
+            }
+
+            val dcc = (certificate as? EuropeanCertificate)
+            if (dcc != null && !dcc.greenCertificate.isFrench) {
+                showAlertForeignDcc(onContinueProcess)
+            } else {
+                onContinueProcess()
+            }
+        }
+    }
+
+    private suspend fun processCertificate(certificate: WalletCertificate) {
         try {
-            val certificate = viewModel.processCodeValue(requireContext(), certificateCode, certificateFormat)
+            viewModel.saveCertificate(requireContext(), certificate)
 
             val vaccination = (certificate as? EuropeanCertificate)?.greenCertificate?.vaccinations?.lastOrNull()
             if (vaccination != null && vaccination.doseNumber >= vaccination.totalSeriesOfDoses) {
@@ -192,7 +213,7 @@ class WalletContainerFragment : BaseFragment() {
                 }
             }
         } catch (e: Exception) {
-            handleCertificateError(e, certificateCode)
+            handleCertificateError(e, certificate.type.code)
         }
     }
 
@@ -215,12 +236,23 @@ class WalletContainerFragment : BaseFragment() {
         }
     }
 
+    private fun showAlertForeignDcc(
+        onContinue: (() -> Unit),
+    ) {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(strings["common.warning"])
+            .setMessage(strings["walletController.addForeignCertificate.alert.message"])
+            .setPositiveButton(strings["walletController.addForeignCertificate.alert.add"]) { _, _ ->
+                onContinue()
+            }
+            .setNegativeButton(strings["common.cancel"], null)
+            .show()
+    }
+
     companion object {
         const val CONFIRM_ADD_CODE_RESULT_KEY: String = "CONFIRM_ADD_CODE_RESULT_KEY"
         const val CONFIRM_ADD_CODE_BUNDLE_KEY_CONFIRM: String = "CONFIRM_ADD_CODE_BUNDLE_KEY_CONFIRM"
         const val CONFIRM_ADD_CODE_BUNDLE_KEY_CODE: String = "CONFIRM_ADD_CODE_BUNDLE_KEY_CODE"
         const val CONFIRM_ADD_CODE_BUNDLE_KEY_FORMAT: String = "CONFIRM_ADD_CODE_BUNDLE_KEY_FORMAT"
-
-        const val CONFIRMATION_ASKED_KEY: String = "confirmationAsked"
     }
 }

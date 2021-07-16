@@ -21,8 +21,8 @@
         android:id="@+id/constraintLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/spacing_large"
-        android:background="?selectableItemBackground">
+        android:background="?selectableItemBackground"
+        android:paddingBottom="@dimen/spacing_large">
 
         <ImageView
             android:id="@+id/imageView"
@@ -31,7 +31,7 @@
             android:layout_marginHorizontal="@dimen/spacing_large"
             android:layout_marginTop="@dimen/spacing_large"
             android:importantForAccessibility="no"
-            app:layout_constraintBottom_toTopOf="@id/textView"
+            app:layout_constraintBottom_toTopOf="@id/mainDescriptionTextView"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -55,7 +55,7 @@
             tools:text="@tools:sample/lorem[3]" />
 
         <TextView
-            android:id="@+id/textView"
+            android:id="@+id/mainDescriptionTextView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/spacing_large"
@@ -74,10 +74,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/footerDescriptionTextView"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/textView">
+            app:layout_constraintTop_toBottomOf="@id/mainDescriptionTextView">
 
             <include
                 android:id="@+id/tag1"
@@ -87,6 +87,22 @@
                 android:id="@+id/tag2"
                 layout="@layout/item_tag" />
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/footerDescriptionTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/spacing_large"
+            android:layout_marginTop="@dimen/spacing_medium"
+            android:layout_marginBottom="@dimen/spacing_large"
+            android:gravity="center"
+            android:textAppearance="@style/TextAppearance.StopCovid.Caption"
+            android:textIsSelectable="false"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tagLayout"
+            tools:text="@tools:sample/lorem[12]" />
 
         <ImageButton
             android:id="@+id/actionButton"

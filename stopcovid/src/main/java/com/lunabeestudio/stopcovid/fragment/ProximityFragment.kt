@@ -452,6 +452,12 @@ class ProximityFragment : TimeMainFragment() {
         }
         addSectionSeparator(items)
 
+        // Attestation
+        if (robertManager.configuration.displayAttestation || robertManager.configuration.displaySanitaryCertificatesWallet) {
+            addAttestationItems(items)
+            addSectionSeparator(items)
+        }
+
         // Health items
         addHealthItems(items, showAsSick)
         if (robertManager.configuration.displayIsolation) {
@@ -465,21 +471,15 @@ class ProximityFragment : TimeMainFragment() {
         }
         addSectionSeparator(items)
 
-        // News items
-        addNewsItems(items)
-        addSectionSeparator(items)
-
-        // Attestation
-        if (robertManager.configuration.displayAttestation || robertManager.configuration.displaySanitaryCertificatesWallet) {
-            addAttestationItems(items)
-            addSectionSeparator(items)
-        }
-
         // Venue items
         if (robertManager.configuration.displayRecordVenues) {
             addVenueItems(items, isSick)
             addSectionSeparator(items)
         }
+
+        // News items
+        addNewsItems(items)
+        addSectionSeparator(items)
 
         // More items
         addMoreItems(items)
@@ -983,13 +983,6 @@ class ProximityFragment : TimeMainFragment() {
                 },
                 Action(R.drawable.ic_settings, strings["common.settings"]) {
                     findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToManageDataFragment())
-                },
-                Action(R.drawable.ic_2d_doc, strings["home.moreSection.verifySanitaryCertificate"]) {
-                    findNavControllerOrNull()?.safeNavigate(
-                        ProximityFragmentDirections.actionProximityFragmentToVerifyWalletQRCodeFragment()
-                    )
-                }.takeIf {
-                    robertManager.configuration.displaySanitaryCertificatesValidation
                 },
                 Action(R.drawable.ic_privacy, strings["home.moreSection.privacy"]) {
                     findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToPrivacyFragment())

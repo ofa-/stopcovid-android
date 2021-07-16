@@ -17,6 +17,7 @@ import dgca.verifier.app.decoder.model.GreenCertificate
 import dgca.verifier.app.decoder.model.VerificationResult
 import dgca.verifier.app.decoder.prefixvalidation.DefaultPrefixValidationService
 import dgca.verifier.app.decoder.schema.DefaultSchemaValidator
+import dgca.verifier.app.decoder.services.X509
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -347,7 +348,7 @@ class EuropeanCertificate private constructor(value: String) : WalletCertificate
         val verificationResult = VerificationResult()
         val certificate = publicKey.base64ToX509Certificate()
         checkNotNull(certificate) { "Fail to get X509 certificate from public key $publicKey" }
-        VerificationCryptoService().validate(cose, certificate, verificationResult)
+        VerificationCryptoService(X509()).validate(cose, certificate, verificationResult)
         if (!verificationResult.coseVerified) {
             throw WalletCertificateInvalidSignatureException()
         }

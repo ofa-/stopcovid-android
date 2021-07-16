@@ -988,5 +988,9 @@
    "documentExplanationController.vaccinCertificate.title": "Attestation de vaccin",
    "documentExplanationController.testCertificate.title": "Certificat de test",
    "documentExplanationController.vaccinCertificate.explanation": "Voici un exemple de document de l'Assurance Maladie avec le certificat de vaccination. Le QR Code à flasher avec TousAntiCovid est à droite, indiqué par le carré orange.\n\n🇪🇺 Le nouveau \"Certificat COVID Numérique UE\" est également accepté dans TousAntiCovid.",
-   "documentExplanationController.testCertificate.explanation": "Voici un exemple de document SIDEP avec le certificat du test COVID. Le QR Code à flasher avec TousAntiCovid est à gauche, indiqué par le carré orange.\n\n🇪🇺 Le nouveau \"Certificat COVID Numérique UE\" est également accepté dans TousAntiCovid dès le 25 juin matin."
+   "documentExplanationController.testCertificate.explanation": "Voici un exemple de document SIDEP avec le certificat du test COVID. Le QR Code à flasher avec TousAntiCovid est à gauche, indiqué par le carré orange.\n\n🇪🇺 Le nouveau \"Certificat COVID Numérique UE\" est également accepté dans TousAntiCovid dès le 25 juin matin.",
+   "wallet.proof.europe.test.positiveSidepError": "🔴 Ce certificat n’est valable que sur le territoire français, mais pas pour passer les frontières européennes.\nVous devez vous rendre sur https://sidep.gouv.fr pour récupérer un certificat de rétablissement et l’importer dans TousAntiCovid.",
+   "walletController.certificateWarning": "🔴 Vous avez au moins un certificat qui mérite votre attention.",
+   "walletController.addForeignCertificate.alert.message": "Votre \"Certificat COVID Europe\" n'est pas français.\n\nVous pouvez l'ajouter également dans le carnet, mais TousAntiCovid ne vérifiera pas son authenticité.",
+   "walletController.addForeignCertificate.alert.add": "Ajouter"
 }
