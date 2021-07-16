@@ -804,7 +804,7 @@
    "home.attestationSection.sanitaryCertificates.cell.subtitle":"Your test and vaccination certificates",
    "flashWalletCodeController.title":"Scan",
    "flashWalletCodeController.explanation":"Scan the QR Code on your SI-DEP document (test) or certificate (vaccination).",
-   "confirmWalletQrCodeController.title":"Test wallet",
+   "confirmWalletQrCodeController.title":"Wallet",
    "confirmWalletQrCodeController.explanation.title":"You have just hit a TousAntiCovid link to add a certificate to your wallet.",
    "confirmWalletQrCodeController.explanation.subtitle":"Do you want to add this certificate to your wallet?",
    "confirmWalletQrCodeController.confirm":"Add",
@@ -1041,5 +1041,9 @@
    "documentExplanationController.vaccinCertificate.title": "Vaccination certificate",
    "documentExplanationController.testCertificate.title": "Test certificate",
    "documentExplanationController.vaccinCertificate.explanation": "Here is an example of the document from the Assurance Maladie with the vaccination certificate. The QR Code to scan with TousAntiCovid is highlighted with the orange square.\n\n🇪🇺 The brand new French \"EU Digital COVID Certificate\" is also accepted in TousAntiCovid.",
-   "documentExplanationController.testCertificate.explanation": "Here is an example of the SIDEP document for the test certificate. The QR Code to scan with TousAntiCovid is highlighted with the orange square.\n\n🇪🇺 The brand new French \"EU Digital COVID Certificate\" is also accepted in TousAntiCovid."
+   "documentExplanationController.testCertificate.explanation": "Here is an example of the SIDEP document for the test certificate. The QR Code to scan with TousAntiCovid is highlighted with the orange square.\n\n🇪🇺 The brand new French \"EU Digital COVID Certificate\" is also accepted in TousAntiCovid.",
+   "wallet.proof.europe.test.positiveSidepError": "🔴 This certificate is only valid in France, but not for crossing European borders.\nYou must go to https://sidep.gouv.fr to retrieve a recovery certificate and import it in TousAntiCovid.",
+   "walletController.certificateWarning": "🔴 You have at least one certificate that deserves your attention.",
+   "walletController.addForeignCertificate.alert.message": "Your \"COVID Europe Certificate\" is not French.\n\nYou can also add it to the wallet, but TousAntiCovid will not verify its authenticity.",
+   "walletController.addForeignCertificate.alert.add": "Add"
 }

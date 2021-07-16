@@ -451,6 +451,10 @@ class ProximityFragment : TimeMainFragment() {
 
         addSectionSeparator(items)
 
+        // Attestation
+            addAttestationItems(items)
+            addSectionSeparator(items)
+
         // Health items
         addHealthItems(items, showAsSick)
         if (robertManager.configuration.displayIsolation) {
@@ -464,17 +468,13 @@ class ProximityFragment : TimeMainFragment() {
         }
         addSectionSeparator(items)
 
-        // News items
-        addNewsItems(items)
-        addSectionSeparator(items)
-
-        // Attestation
-            addAttestationItems(items)
-            addSectionSeparator(items)
-
         // Venue items
             addVenueItems(items, isSick)
             addSectionSeparator(items)
+
+        // News items
+        addNewsItems(items)
+        addSectionSeparator(items)
 
         // More items
         addMoreItems(items)
@@ -991,9 +991,6 @@ class ProximityFragment : TimeMainFragment() {
                     findNavControllerOrNull()?.safeNavigate(
                         ProximityFragmentDirections.actionProximityFragmentToVerifyWalletQRCodeFragment()
                     )
-                }.takeIf {
-                    true ||
-                    robertManager.configuration.displaySanitaryCertificatesValidation
                 },
                 Action(R.drawable.ic_settings, strings["common.settings"]) {
                     findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToManageDataFragment())

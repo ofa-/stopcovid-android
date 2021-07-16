@@ -27,6 +27,7 @@ import com.lunabeestudio.stopcovid.databinding.FragmentFullscreenDccBinding
 import com.lunabeestudio.stopcovid.extension.dccCertificatesManager
 import com.lunabeestudio.stopcovid.extension.formatDccText
 import com.lunabeestudio.stopcovid.extension.fullName
+import com.lunabeestudio.stopcovid.extension.isFrench
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
 import com.lunabeestudio.stopcovid.model.EuropeanCertificate
@@ -77,7 +78,7 @@ class FullscreenDccFragment : ForceLightFragment(R.layout.fragment_fullscreen_dc
             .map { certificates ->
                 certificates
                     ?.filterIsInstance<EuropeanCertificate>()
-                    ?.firstOrNull { it.greenCertificate.getDgci() == args.keyCertificateId }
+                    ?.firstOrNull { it.value == args.certificateValue }
             }
             .observe(viewLifecycleOwner) { europeanCertificate ->
                 this.europeanCertificate = europeanCertificate
@@ -89,6 +90,7 @@ class FullscreenDccFragment : ForceLightFragment(R.layout.fragment_fullscreen_dc
         val europeanCertificate = europeanCertificate ?: return
 
         binding?.apply {
+            logosImageView.isVisible = europeanCertificate.greenCertificate.isFrench
             val minLines = strings["europeanCertificate.fullscreen.englishDescription.${europeanCertificate.type.code}"]
                 ?.count { it == '\n' }
                 ?.plus(1)

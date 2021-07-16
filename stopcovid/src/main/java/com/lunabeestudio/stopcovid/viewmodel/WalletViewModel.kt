@@ -17,7 +17,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.map
 import com.lunabeestudio.analytics.manager.AnalyticsManager
 import com.lunabeestudio.analytics.model.AppEventName
-import com.lunabeestudio.domain.model.WalletCertificateType
 import com.lunabeestudio.framework.local.datasource.SecureKeystoreDataSource
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.robert.datasource.LocalKeystoreDataSource
@@ -56,21 +55,16 @@ class WalletViewModel(
         return certificates.value.isNullOrEmpty()
     }
 
-    suspend fun processCodeValue(
+    fun saveCertificate(
         context: Context,
-        certificateCode: String,
-        certificateFormat: WalletCertificateType.Format?
-    ): WalletCertificate {
-        val certificate = WalletManager.processCertificateCode(
-            robertManager,
+        walletCertificate: WalletCertificate
+    ) {
+        WalletManager.saveCertificate(
             keystoreDataSource,
-            certificateCode,
-            dccCertificatesManager.certificates,
-            certificateFormat,
+            walletCertificate,
         )
-        AnalyticsManager.reportAppEvent(context, AppEventName.e13, null)
 
-        return certificate
+        AnalyticsManager.reportAppEvent(context, AppEventName.e13, null)
     }
 }
 

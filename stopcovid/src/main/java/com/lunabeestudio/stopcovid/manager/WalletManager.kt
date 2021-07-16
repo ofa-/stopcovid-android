@@ -10,8 +10,8 @@ import com.lunabeestudio.domain.extension.walletPublicKey
 import com.lunabeestudio.domain.model.Configuration
 import com.lunabeestudio.domain.model.RawWalletCertificate
 import com.lunabeestudio.domain.model.WalletCertificateType
-import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.robert.datasource.LocalKeystoreDataSource
+import com.lunabeestudio.stopcovid.extension.isFrench
 import com.lunabeestudio.stopcovid.extension.raw
 import com.lunabeestudio.stopcovid.model.DccCertificates
 import com.lunabeestudio.stopcovid.model.EuropeanCertificate
@@ -56,24 +56,6 @@ object WalletManager {
         _walletCertificateLiveData.postValue(walletCertificates)
     }
 
-    suspend fun processCertificateCode(
-        robertManager: RobertManager,
-        localKeystoreDataSource: LocalKeystoreDataSource,
-        certificateCode: String,
-        dccCertificates: DccCertificates,
-        certificateFormat: WalletCertificateType.Format?,
-    ): WalletCertificate {
-        val walletCertificate = verifyCertificateCodeValue(
-            robertManager.configuration,
-            certificateCode,
-            dccCertificates,
-            certificateFormat,
-        )
-        saveCertificate(localKeystoreDataSource, walletCertificate)
-
-        return walletCertificate
-    }
-
     fun extractCertificateCodeFromUrl(urlValue: String): String {
         var code = Uri.parse(urlValue).fragment
 
@@ -112,14 +94,15 @@ object WalletManager {
 
         if (key != null) {
             walletCertificate.verifyKey(key)
-        } else {
+        } else if ((walletCertificate as? EuropeanCertificate)?.greenCertificate?.isFrench == true) {
+            // Only check French certificates
             throw WalletCertificateNoKeyError()
         }
 
         return walletCertificate
     }
 
-    private fun saveCertificate(localKeystoreDataSource: LocalKeystoreDataSource, walletCertificate: WalletCertificate) {
+    fun saveCertificate(localKeystoreDataSource: LocalKeystoreDataSource, walletCertificate: WalletCertificate) {
         val walletCertificates = localKeystoreDataSource.rawWalletCertificates?.toMutableList() ?: mutableListOf()
         walletCertificates.add(walletCertificate.raw)
         localKeystoreDataSource.rawWalletCertificates = walletCertificates

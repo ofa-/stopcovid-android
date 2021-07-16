@@ -851,7 +851,7 @@
         android:name="com.lunabeestudio.stopcovid.fragment.FullscreenDccFragment"
         tools:layout="@layout/fragment_fullscreen_dcc">
         <argument
-            android:name="keyCertificateId"
+            android:name="certificateValue"
             app:argType="string" />
     </fragment>
     <fragment

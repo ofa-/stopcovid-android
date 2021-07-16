@@ -100,12 +100,19 @@ fun WalletCertificate.fullDescription(strings: LocalizedStrings, configuration: 
             text = text?.replace("<$vaxCode>", vaccinationState.orNA())
             text ?: ""
         }
-        is EuropeanCertificate -> formatDccText(
-            strings["wallet.proof.europe.${this.type.code}.description"],
-            strings,
-            dateFormat,
-            analysisDateFormat
-        )
+        is EuropeanCertificate -> {
+            val prefix = if (this.greenCertificate.isFrench) {
+                ""
+            } else {
+                this.greenCertificate.countryCode?.countryCodeToFlagEmoji ?: ""
+            }
+            formatDccText(
+                prefix + strings["wallet.proof.europe.${this.type.code}.description"],
+                strings,
+                dateFormat,
+                analysisDateFormat
+            )
+        }
     }
 }
 
@@ -124,7 +131,7 @@ fun EuropeanCertificate.formatDccText(
             Timber.e("Unexpected type ${this.type} with ${this.javaClass.simpleName}")
         }
         WalletCertificateType.VACCINATION_EUROPE -> {
-            val vacName = this.greenCertificate.vaccineMedicinalProduct?.let { strings["vac.product.$it"] }
+            val vacName = this.greenCertificate.vaccineMedicinalProduct?.let { strings["vac.product.$it"] ?: it }
             formattedText = formattedText?.replace("<VACCINE_NAME>", vacName.orNA())
             formattedText = formattedText?.replace("<DATE>", this.greenCertificate.vaccineDate?.let(dateFormat::format).orNA())
         }
@@ -135,7 +142,7 @@ fun EuropeanCertificate.formatDccText(
             )
         }
         WalletCertificateType.SANITARY_EUROPE -> {
-            val testName = this.greenCertificate.testType?.let { strings["test.man.$it"] }
+            val testName = this.greenCertificate.testType?.let { strings["test.man.$it"] ?: it }
             formattedText = formattedText?.replace("<ANALYSIS_CODE>", testName.orNA())
             val testResult = this.greenCertificate.testResultCode?.let { strings["wallet.proof.europe.test.$it"] }
             formattedText = formattedText?.replace("<ANALYSIS_RESULT>", testResult.orNA())

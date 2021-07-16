@@ -48,11 +48,13 @@ import com.lunabeestudio.stopcovid.extension.shortDescription
 import com.lunabeestudio.stopcovid.extension.showUnknownErrorAlert
 import com.lunabeestudio.stopcovid.extension.statusStringKey
 import com.lunabeestudio.stopcovid.extension.tagStringKey
+import com.lunabeestudio.stopcovid.extension.testResultIsNegative
 import com.lunabeestudio.stopcovid.extension.vaccineDose
 import com.lunabeestudio.stopcovid.fastitem.QrCodeCardItem
 import com.lunabeestudio.stopcovid.fastitem.bigTitleItem
 import com.lunabeestudio.stopcovid.fastitem.qrCodeCardItem
 import com.lunabeestudio.stopcovid.manager.ShareManager
+import com.lunabeestudio.stopcovid.manager.WalletManager
 import com.lunabeestudio.stopcovid.model.EuropeanCertificate
 import com.lunabeestudio.stopcovid.model.FrenchCertificate
 import com.lunabeestudio.stopcovid.model.SanitaryCertificate
@@ -122,6 +124,20 @@ class WalletCertificateFragment : MainFragment() {
         items += spaceItem {
             spaceRes = R.dimen.spacing_large
             identifier = items.size.toLong()
+        }
+
+        val hasSidepErrorCertificate = viewModel.certificates.value?.any { certificate ->
+            (certificate as? EuropeanCertificate)?.greenCertificate?.testResultIsNegative == false
+        } == true
+        if (hasSidepErrorCertificate) {
+            items += captionItem {
+                text = strings["walletController.certificateWarning"]
+                identifier = text.hashCode().toLong()
+            }
+            items += spaceItem {
+                spaceRes = R.dimen.spacing_large
+                identifier = items.size.toLong()
+            }
         }
 
         if (!viewModel.recentCertificates.isNullOrEmpty()) {
@@ -197,7 +213,15 @@ class WalletCertificateFragment : MainFragment() {
 
         return qrCodeCardItem {
             this.generateBarcode = generateBarcode
-            text = certificateDetails
+            mainDescription = certificateDetails
+            footerDescription = if ((certificate as? EuropeanCertificate)?.greenCertificate?.testResultIsNegative == false) {
+                // Fix SIDEP has generated positive test instead of recovery
+                val span = strings["wallet.proof.europe.test.positiveSidepError"]?.let { SpannableString(it) }
+                span?.let { Linkify.addLinks(it, Linkify.WEB_URLS) }
+                span
+            } else {
+                null
+            }
             share = strings["walletController.menu.share"]
             delete = strings["walletController.menu.delete"]
             convertText = strings["walletController.menu.convertToEurope"]
@@ -210,7 +234,7 @@ class WalletCertificateFragment : MainFragment() {
                 val uri = barcodeBitmap?.let { bitmap ->
                     ShareManager.getShareCaptureUriFromBitmap(requireContext(), bitmap, "qrCode")
                 }
-                val text = text.takeIf { uri != null }
+                val text = mainDescription.takeIf { uri != null }
                 ShareManager.shareImageAndText(requireContext(), uri, text) {
                     strings["common.error.unknown"]?.let { showErrorSnackBar(it) }
                 }
@@ -230,7 +254,7 @@ class WalletCertificateFragment : MainFragment() {
                 if (certificate is EuropeanCertificate) {
                     findParentFragmentByType<WalletContainerFragment>()?.findNavControllerOrNull()?.safeNavigate(
                         WalletContainerFragmentDirections.actionWalletContainerFragmentToFullscreenDccFragment(
-                            certificate.greenCertificate.getDgci(),
+                            certificate.value,
                         )
                     )
                 } else {
@@ -318,7 +342,14 @@ class WalletCertificateFragment : MainFragment() {
 
     private suspend fun processConvertedCertificate(certificateCode: String, certificateFormat: WalletCertificateType.Format?): Boolean {
         return try {
-            val certificate = viewModel.processCodeValue(requireContext(), certificateCode, certificateFormat)
+            val certificate = WalletManager.verifyCertificateCodeValue(
+                robertManager.configuration,
+                certificateCode,
+                dccCertificatesManager.certificates,
+                certificateFormat,
+            )
+
+            viewModel.saveCertificate(requireContext(), certificate)
 
             val vaccination = (certificate as? EuropeanCertificate)?.greenCertificate?.vaccinations?.lastOrNull()
             if (vaccination != null && vaccination.doseNumber >= vaccination.totalSeriesOfDoses) {

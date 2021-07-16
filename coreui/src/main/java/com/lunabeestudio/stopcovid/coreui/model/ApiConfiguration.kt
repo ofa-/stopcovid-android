@@ -201,7 +201,6 @@ internal fun ApiConfiguration.toDomain(gson: Gson) = Configuration(
     ),
     cleaReportApiVersion = cleaReportApiVersion,
     cleaStatusApiVersion = cleaStatusApiVersion,
-    displaySanitaryCertificatesValidation = displaySanitaryCertificatesValidation,
     isAnalyticsOn = isAnalyticsOn,
     analyticsApiVersion = analyticsApiVersion,
     testCertificateValidityThresholds = gson.fromJson(testCertificateValidityThresholds, object : TypeToken<List<Int>>() {}.type),
