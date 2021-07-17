@@ -1008,8 +1008,8 @@
    "confirmWalletQrCodeController.explanation.subtitle":"Do you want to add this certificate to your wallet?",
    "confirmWalletQrCodeController.confirm":"Add",
    
-   "flashDataMatrixCodeController.title": "2D-DOC certificate",
-   "flashDataMatrixCodeController.explanation": "Verify a certificate by scanning the 2D-DOC",
+   "flashDataMatrixCodeController.title": "Covid Certificate",
+   "flashDataMatrixCodeController.explanation": "Scan a certificate to verify it",
    "flashDataMatrixCodeController.alert.invalidCode.title": "Invalid code",
    "flashDataMatrixCodeController.alert.invalidCode.message": "The code is not valid. Please try again.",
    
