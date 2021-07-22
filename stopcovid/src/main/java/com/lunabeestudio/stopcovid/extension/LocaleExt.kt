@@ -5,15 +5,12 @@
  *
  * Authors
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Created by Lunabee Studio / Date - 2020/10/29 - for the TOUS-ANTI-COVID project
+ * Created by Lunabee Studio / Date - 2021/20/7 - for the TOUS-ANTI-COVID project
  */
 
 package com.lunabeestudio.stopcovid.extension
 
-import android.widget.TextView
-import androidx.core.view.isVisible
+import java.util.Locale
 
-fun TextView.setTextOrHide(text: CharSequence?) {
-    setText(text)
-    isVisible = !text.isNullOrBlank()
-}
+val Locale.flaggedCountry: String
+    get() = "${country.countryCodeToFlagEmoji} ${getDisplayLanguage(this).capitalizeWords()}"

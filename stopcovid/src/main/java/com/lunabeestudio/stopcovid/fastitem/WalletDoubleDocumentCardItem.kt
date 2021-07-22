@@ -38,8 +38,8 @@ class WalletDoubleDocumentCardItem : AbstractBindingItem<ItemWalletDoubleDocumen
 
     override fun bindView(binding: ItemWalletDoubleDocumentCardBinding, payloads: List<Any>) {
         super.bindView(binding, payloads)
-        binding.mainTitleTextView.text = mainTitle
-        binding.mainBodyTextView.text = mainBody
+        binding.mainTitleTextView.setTextOrHide(mainTitle)
+        binding.mainBodyTextView.setTextOrHide(mainBody)
 
         val parentFile = binding.root.context.filesDir
 

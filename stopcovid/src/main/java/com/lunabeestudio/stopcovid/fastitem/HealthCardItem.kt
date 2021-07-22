@@ -21,9 +21,9 @@ import com.lunabeestudio.stopcovid.coreui.databinding.ItemActionBinding
 import com.lunabeestudio.stopcovid.coreui.extension.safeEmojiSpanify
 import com.lunabeestudio.stopcovid.coreui.extension.setImageResourceOrHide
 import com.lunabeestudio.stopcovid.coreui.extension.setOnClickListenerOrHideRipple
+import com.lunabeestudio.stopcovid.coreui.extension.setTextOrHide
 import com.lunabeestudio.stopcovid.coreui.fastitem.BaseItem
 import com.lunabeestudio.stopcovid.coreui.model.Action
-import com.lunabeestudio.stopcovid.extension.setTextOrHide
 
 class HealthCardItem(layoutRes: Int) : BaseItem<HealthCardItem.ViewHolder>(
     layoutRes, ::ViewHolder, R.id.item_contact + layoutRes
@@ -41,11 +41,11 @@ class HealthCardItem(layoutRes: Int) : BaseItem<HealthCardItem.ViewHolder>(
 
     override fun bindView(holder: ViewHolder, payloads: List<Any>) {
         super.bindView(holder, payloads)
-        holder.headerTextView.setTextOrHide(header.safeEmojiSpanify())
-        holder.titleTextView.setTextOrHide(title.safeEmojiSpanify())
-        holder.captionTextView.setTextOrHide(caption.safeEmojiSpanify())
-        holder.dateLabelTextView.setTextOrHide(dateLabel.safeEmojiSpanify())
-        holder.dateValueTextView.setTextOrHide(dateValue.safeEmojiSpanify())
+        holder.headerTextView.setTextOrHide(header)
+        holder.titleTextView.setTextOrHide(title)
+        holder.captionTextView.setTextOrHide(caption)
+        holder.dateLabelTextView.setTextOrHide(dateLabel)
+        holder.dateValueTextView.setTextOrHide(dateValue)
         gradientBackground?.let { holder.rootLayout.background = it }
 
         statusUpdateAction?.let { action ->

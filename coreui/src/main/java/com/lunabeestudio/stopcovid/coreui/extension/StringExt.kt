@@ -16,7 +16,6 @@ import android.net.Uri
 import androidx.core.util.AtomicFile
 import androidx.emoji.text.EmojiCompat
 import com.lunabeestudio.domain.model.CacheConfig
-import com.lunabeestudio.stopcovid.coreui.ConfigConstant
 import com.lunabeestudio.stopcovid.coreui.network.OkHttpClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -32,7 +31,7 @@ import java.util.concurrent.TimeUnit
 suspend fun String.saveTo(context: Context, file: File): Boolean {
     return withContext(Dispatchers.IO) {
         val cacheConfig = CacheConfig(File(context.cacheDir, "http_cache"), 30L * 1024L * 1024L)
-        val okHttpClient = OkHttpClient.getDefaultOKHttpClient(context, this@saveTo, ConfigConstant.SERVER_CERTIFICATE_SHA256, cacheConfig)
+        val okHttpClient = OkHttpClient.getDefaultOKHttpClient(context, cacheConfig)
         val request: Request = Request.Builder().apply {
             cacheControl(CacheControl.Builder().maxAge(10, TimeUnit.MINUTES).build())
             url(this@saveTo)
@@ -59,7 +58,7 @@ suspend fun String.saveTo(context: Context, file: File): Boolean {
 suspend fun String.saveTo(context: Context, atomicFile: AtomicFile, validData: suspend (data: ByteArray) -> Boolean): Boolean {
     return withContext(Dispatchers.IO) {
         val cacheConfig = CacheConfig(File(context.cacheDir, "http_cache"), 30L * 1024L * 1024L)
-        val okHttpClient = OkHttpClient.getDefaultOKHttpClient(context, this@saveTo, ConfigConstant.SERVER_CERTIFICATE_SHA256, cacheConfig)
+        val okHttpClient = OkHttpClient.getDefaultOKHttpClient(context, cacheConfig)
         val request: Request = Request.Builder().apply {
             cacheControl(CacheControl.Builder().maxAge(10, TimeUnit.MINUTES).build())
             url(this@saveTo)
@@ -99,7 +98,7 @@ fun String.callPhone(context: Context) {
     context.startActivity(callIntent)
 }
 
-fun String?.safeEmojiSpanify(): CharSequence? {
+fun CharSequence?.safeEmojiSpanify(): CharSequence? {
     return try {
         EmojiCompat.get().process(this ?: "")
     } catch (e: IllegalStateException) {

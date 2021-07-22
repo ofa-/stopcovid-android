@@ -3,7 +3,7 @@ package com.lunabeestudio.stopcovid.manager
 import android.content.Context
 import android.graphics.drawable.Drawable
 import com.lunabeestudio.stopcovid.coreui.ConfigConstant
-import com.lunabeestudio.stopcovid.coreui.extension.getFirstSupportedLanguage
+import com.lunabeestudio.stopcovid.coreui.extension.getApplicationLanguage
 import kotlinx.coroutines.sync.Mutex
 import timber.log.Timber
 import java.io.File
@@ -12,7 +12,7 @@ abstract class RemoteImageDocumentManager(private val context: Context) : Remote
     abstract val remoteFileUrlTemplate: String
 
     final override val remoteFileUrl: String
-        get() = remoteFileUrlTemplate.format(context.getFirstSupportedLanguage())
+        get() = remoteFileUrlTemplate.format(context.getApplicationLanguage())
     final override val assetFilePath: String? = null
 
     final override suspend fun fileNotCorrupted(file: File): Boolean {

@@ -23,8 +23,8 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.core.view.isVisible
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.fetchSystemColor
+import com.lunabeestudio.stopcovid.coreui.extension.setTextOrHide
 import com.lunabeestudio.stopcovid.databinding.ItemQrCodeCardBinding
-import com.lunabeestudio.stopcovid.extension.setTextOrHide
 import com.mikepenz.fastadapter.binding.AbstractBindingItem
 
 class QrCodeCardItem : AbstractBindingItem<ItemQrCodeCardBinding>() {
@@ -62,7 +62,7 @@ class QrCodeCardItem : AbstractBindingItem<ItemQrCodeCardBinding>() {
 
     override fun bindView(binding: ItemQrCodeCardBinding, payloads: List<Any>) {
         super.bindView(binding, payloads)
-        binding.mainDescriptionTextView.text = mainDescription
+        binding.mainDescriptionTextView.setTextOrHide(mainDescription)
         binding.footerDescriptionTextView.setTextOrHide(footerDescription)
         footerDescription?.let { spannable ->
             if (spannable.nextSpanTransition(0, spannable.length, URLSpan::class.java) != spannable.length) {

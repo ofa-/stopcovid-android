@@ -2,11 +2,11 @@
   "config": [
 	{
       "name": "lastUpdate",
-      "value": "9 Jul 2021"
+      "value": "16 Jul 2021"
     },
     {
       "name": "version",
-      "value": 75
+      "value": 76
     },
     {
       "name": "versionCalibrationBle",
@@ -118,6 +118,10 @@
     {
       "name": "app.isolation.durationCovid",
       "value": 864000
+    },
+    {
+      "name": "app.minFilesRefreshInterval",
+      "value": 5
     },
     {
       "name": "app.displayRecordVenues",
@@ -256,7 +260,7 @@
       "value":[
         {
           "code":"DEFAULT",
-          "value":14
+          "value":7
         },
 			  {
           "code":"EU/1/20/1525",

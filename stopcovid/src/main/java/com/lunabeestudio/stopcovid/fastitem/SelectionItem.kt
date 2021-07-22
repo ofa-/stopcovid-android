@@ -15,6 +15,7 @@ import android.view.ViewGroup
 import androidx.core.view.isInvisible
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.safeEmojiSpanify
+import com.lunabeestudio.stopcovid.coreui.extension.setTextOrHide
 import com.lunabeestudio.stopcovid.databinding.ItemSelectionBinding
 import com.mikepenz.fastadapter.binding.AbstractBindingItem
 
@@ -33,7 +34,7 @@ class SelectionItem : AbstractBindingItem<ItemSelectionBinding>() {
     override fun bindView(binding: ItemSelectionBinding, payloads: List<Any>) {
         super.bindView(binding, payloads)
         binding.titleTextView.text = title.safeEmojiSpanify()
-        binding.captionTextView.text = caption.safeEmojiSpanify()
+        binding.captionTextView.setTextOrHide(caption)
         binding.selectionRootLayout.setOnClickListener {
             onClick?.invoke()
         }

@@ -10,14 +10,17 @@
 
 package com.lunabeestudio.stopcovid.coreui
 
+import java.util.Locale
+
 object UiConstants {
 
     enum class Permissions {
         CAMERA, LOCATION
     }
 
-    object SharePrefs {
+    object SharedPrefs {
         const val LAST_STRINGS_REFRESH: String = "Last.Strings.Refresh"
+        const val USER_LANGUAGE: String = "User.Language"
     }
 
     enum class Notification(val channelId: String, val notificationId: Int) {
@@ -33,7 +36,7 @@ object UiConstants {
         CERTIFICATE_REMINDER("reminder", 10),
     }
 
-    val SUPPORTED_LANGUAGE: Array<String> = arrayOf("en", "fr")
+    val SUPPORTED_LOCALES: Array<Locale> = arrayOf(Locale.UK, Locale.FRANCE)
 
     const val DEFAULT_LANGUAGE: String = "en"
 }

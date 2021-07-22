@@ -12,7 +12,7 @@ package com.lunabeestudio.stopcovid.manager
 
 import android.content.Context
 import com.google.gson.reflect.TypeToken
-import com.lunabeestudio.stopcovid.coreui.extension.getFirstSupportedLanguage
+import com.lunabeestudio.stopcovid.coreui.extension.getApplicationLanguage
 import com.lunabeestudio.stopcovid.coreui.manager.ServerManager
 import com.lunabeestudio.stopcovid.model.Section
 import java.lang.reflect.Type
@@ -24,7 +24,7 @@ abstract class SectionManager : ServerManager<Sections>() {
     private var prevLanguage: String? = null
 
     suspend fun initialize(context: Context) {
-        prevLanguage = context.getFirstSupportedLanguage()
+        prevLanguage = context.getApplicationLanguage()
         loadLocal(context)?.let {
             setSections(it)
         }
@@ -33,7 +33,7 @@ abstract class SectionManager : ServerManager<Sections>() {
     abstract fun setSections(sections: Sections)
 
     suspend fun onAppForeground(context: Context) {
-        val newLanguage = context.getFirstSupportedLanguage()
+        val newLanguage = context.getApplicationLanguage()
         val languageHasChanged = prevLanguage != newLanguage
 
         if (languageHasChanged) {

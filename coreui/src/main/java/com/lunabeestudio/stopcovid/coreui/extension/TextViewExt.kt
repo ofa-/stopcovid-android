@@ -4,7 +4,7 @@ import android.view.View
 import android.widget.TextView
 
 fun TextView.setTextOrHide(
-    value: String?,
+    value: CharSequence?,
     ifVisibleBlock: (TextView.() -> Unit)? = null
 ) {
     if (value.isNullOrEmpty()) {

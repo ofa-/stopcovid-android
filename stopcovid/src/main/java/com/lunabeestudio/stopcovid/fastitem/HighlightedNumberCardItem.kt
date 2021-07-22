@@ -7,8 +7,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.lunabeestudio.stopcovid.R
+import com.lunabeestudio.stopcovid.coreui.extension.setTextOrHide
 import com.lunabeestudio.stopcovid.databinding.ItemHighlightedNumberCardBinding
-import com.lunabeestudio.stopcovid.extension.setTextOrHide
 import com.mikepenz.fastadapter.binding.AbstractBindingItem
 
 class HighlightedNumberCardItem : AbstractBindingItem<ItemHighlightedNumberCardBinding>() {

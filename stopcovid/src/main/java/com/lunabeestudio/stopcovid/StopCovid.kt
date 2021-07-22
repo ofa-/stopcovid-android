@@ -166,6 +166,17 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
 
     private var firstResume = false
 
+    private val sharedPreferenceChangeListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+        if (key == UiConstants.SharedPrefs.USER_LANGUAGE) {
+            appCoroutineScope.launch {
+                StringsManager.onAppForeground(this@StopCovid)
+                PrivacyManager.onAppForeground(this@StopCovid)
+                LinksManager.onAppForeground(this@StopCovid)
+                MoreKeyFiguresManager.onAppForeground(this@StopCovid)
+            }
+        }
+    }
+
     init {
         System.setProperty("kotlinx.coroutines.debug", if (BuildConfig.DEBUG) "on" else "off")
     }
@@ -251,6 +262,8 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
 //      startAppMaintenanceWorker(false)
         AboutFragment.Downloader(applicationContext).autoDeleteFile()
         AnalyticsManager.init(this)
+
+        sharedPrefs.registerOnSharedPreferenceChangeListener(sharedPreferenceChangeListener)
 
         sharedPrefs.lastVersionCode = BuildConfig.VERSION_CODE
     }

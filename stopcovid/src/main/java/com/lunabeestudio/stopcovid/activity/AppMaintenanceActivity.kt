@@ -26,11 +26,11 @@ import com.google.gson.Gson
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.ConfigConstant
 import com.lunabeestudio.stopcovid.coreui.extension.isNightMode
+import com.lunabeestudio.stopcovid.coreui.extension.setTextOrHide
 import com.lunabeestudio.stopcovid.coreui.manager.LocalizedStrings
 import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
 import com.lunabeestudio.stopcovid.databinding.ActivityAppMaintenanceBinding
 import com.lunabeestudio.stopcovid.extension.openInExternalBrowser
-import com.lunabeestudio.stopcovid.extension.setTextOrHide
 import com.lunabeestudio.stopcovid.manager.AppMaintenanceManager
 import com.lunabeestudio.stopcovid.model.Info
 import kotlinx.coroutines.launch

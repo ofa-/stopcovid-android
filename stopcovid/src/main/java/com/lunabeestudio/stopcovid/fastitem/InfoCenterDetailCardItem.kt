@@ -20,9 +20,9 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.lunabeestudio.stopcovid.R
+import com.lunabeestudio.stopcovid.coreui.extension.setTextOrHide
 import com.lunabeestudio.stopcovid.databinding.ItemInfoCenterDetailCardBinding
 import com.lunabeestudio.stopcovid.extension.openInExternalBrowser
-import com.lunabeestudio.stopcovid.extension.setTextOrHide
 import com.lunabeestudio.stopcovid.model.InfoCenterTag
 import com.mikepenz.fastadapter.adapters.FastItemAdapter
 import com.mikepenz.fastadapter.binding.AbstractBindingItem

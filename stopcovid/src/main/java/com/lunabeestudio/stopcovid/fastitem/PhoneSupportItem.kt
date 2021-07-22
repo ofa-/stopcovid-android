@@ -13,8 +13,8 @@ package com.lunabeestudio.stopcovid.fastitem
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.lunabeestudio.stopcovid.R
+import com.lunabeestudio.stopcovid.coreui.extension.setTextOrHide
 import com.lunabeestudio.stopcovid.databinding.ItemPhoneSupportBinding
-import com.lunabeestudio.stopcovid.extension.setTextOrHide
 import com.mikepenz.fastadapter.binding.AbstractBindingItem
 
 class PhoneSupportItem() : AbstractBindingItem<ItemPhoneSupportBinding>() {
