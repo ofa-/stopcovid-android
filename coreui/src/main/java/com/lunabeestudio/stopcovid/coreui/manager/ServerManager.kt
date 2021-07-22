@@ -17,7 +17,7 @@ import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import com.lunabeestudio.stopcovid.coreui.BuildConfig
 import com.lunabeestudio.stopcovid.coreui.UiConstants
-import com.lunabeestudio.stopcovid.coreui.extension.getFirstSupportedLanguage
+import com.lunabeestudio.stopcovid.coreui.extension.getApplicationLanguage
 import com.lunabeestudio.stopcovid.coreui.extension.saveTo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -39,7 +39,7 @@ abstract class ServerManager<T> {
     private val extension: String = ".json"
 
     protected suspend fun loadLocal(context: Context): T? {
-        val currentLanguage = context.getFirstSupportedLanguage()
+        val currentLanguage = context.getApplicationLanguage()
 
         return loadFromFiles(context, currentLanguage)
             ?: loadFromAssets(context, currentLanguage)
@@ -55,7 +55,7 @@ abstract class ServerManager<T> {
     }
 
     private suspend fun fetchLast(context: Context): Boolean {
-        val languageCode = context.getFirstSupportedLanguage()
+        val languageCode = context.getApplicationLanguage()
         val filename = "$prefix$languageCode$extension"
         val tmpFile = File(context.filesDir, "$filename.bck")
         return try {
@@ -135,7 +135,7 @@ abstract class ServerManager<T> {
     }
 
     fun clearLocal(context: Context) {
-        val filename = "$prefix${context.getFirstSupportedLanguage()}$extension"
+        val filename = "$prefix${context.getApplicationLanguage()}$extension"
         File(context.filesDir, filename).delete()
         val defaultFilename = "$prefix${UiConstants.DEFAULT_LANGUAGE}$extension"
         File(context.filesDir, defaultFilename).delete()

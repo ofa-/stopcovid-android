@@ -22,7 +22,10 @@ import com.lunabeestudio.robert.RobertApplication
 import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.activity.MainActivity
+import com.lunabeestudio.stopcovid.coreui.UiConstants
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
+import com.lunabeestudio.stopcovid.coreui.extension.getApplicationLanguage
+import com.lunabeestudio.stopcovid.coreui.extension.userLanguage
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.dividerItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.lightButtonItem
@@ -30,6 +33,7 @@ import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.switchItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
 import com.lunabeestudio.stopcovid.extension.areInfoNotificationsEnabled
+import com.lunabeestudio.stopcovid.extension.flaggedCountry
 import com.lunabeestudio.stopcovid.extension.getString
 import com.lunabeestudio.stopcovid.extension.hideRiskStatus
 import com.lunabeestudio.stopcovid.extension.isolationManager
@@ -38,6 +42,7 @@ import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
 import com.lunabeestudio.stopcovid.extension.venuesFeaturedWasActivatedAtLeastOneTime
 import com.lunabeestudio.stopcovid.fastitem.dangerButtonItem
+import com.lunabeestudio.stopcovid.fastitem.selectionItem
 import com.lunabeestudio.stopcovid.manager.ProximityManager
 import com.lunabeestudio.stopcovid.manager.VenuesManager
 import com.lunabeestudio.stopcovid.model.DeviceSetup
@@ -106,6 +111,8 @@ class ManageDataFragment : MainFragment() {
         manageNotificationsItems(items)
         spaceDividerItems(items)
         hideRiskStatusItems(items)
+        spaceDividerItems(items)
+        userLanguageItems(items)
         spaceDividerItems(items)
         eraseAttestationItems(items)
         spaceDividerItems(items)
@@ -363,6 +370,30 @@ class ManageDataFragment : MainFragment() {
                 sharedPreferences.hideRiskStatus = isChecked
             }
             identifier = items.count().toLong()
+        }
+    }
+
+    private fun userLanguageItems(items: MutableList<GenericItem>) {
+        items += titleItem {
+            text = strings["manageDataController.userLanguage.title"]
+            identifier = items.count().toLong()
+        }
+        items += spaceItem {
+            spaceRes = R.dimen.spacing_medium
+        }
+        items += captionItem {
+            text = strings["manageDataController.userLanguage.subtitle"]
+            identifier = items.count().toLong()
+        }
+        UiConstants.SUPPORTED_LOCALES.mapTo(items) { locale ->
+            selectionItem {
+                title = locale.flaggedCountry
+                showSelection = requireContext().getApplicationLanguage().equals(locale.language, false)
+                onClick = {
+                    sharedPreferences.userLanguage = locale.language
+                }
+                identifier = locale.language.hashCode().toLong()
+            }
         }
     }
 

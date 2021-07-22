@@ -15,9 +15,7 @@ import android.os.Build
 import com.lunabeestudio.domain.model.CacheConfig
 import com.lunabeestudio.stopcovid.coreui.BuildConfig
 import okhttp3.Cache
-import okhttp3.CertificatePinner
 import okhttp3.ConnectionSpec
-import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.TlsVersion
@@ -29,7 +27,7 @@ import java.security.cert.X509Certificate
 import java.util.concurrent.TimeUnit
 
 object OkHttpClient {
-    fun getDefaultOKHttpClient(context: Context, url: String, certificateSHA256: String, cacheConfig: CacheConfig?): OkHttpClient {
+    fun getDefaultOKHttpClient(context: Context, cacheConfig: CacheConfig?): OkHttpClient {
         val requireTls12 = ConnectionSpec.Builder(ConnectionSpec.RESTRICTED_TLS)
             .tlsVersions(TlsVersion.TLS_1_2)
             .build()
@@ -38,11 +36,6 @@ object OkHttpClient {
                 connectionSpecs(listOf(requireTls12))
             }
             if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N) {
-                certificatePinner(
-                    CertificatePinner.Builder()
-                        .add(url.toHttpUrl().host, certificateSHA256)
-                        .build()
-                )
                 val certificates: HandshakeCertificates = HandshakeCertificates.Builder()
                     .addTrustedCertificate(certificateFromString(context, "certigna_services"))
                     .build()

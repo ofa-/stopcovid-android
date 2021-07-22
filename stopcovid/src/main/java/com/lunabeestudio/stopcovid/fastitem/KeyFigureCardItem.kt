@@ -17,8 +17,8 @@ import android.view.ViewGroup
 import androidx.core.view.isGone
 import androidx.core.view.isInvisible
 import com.lunabeestudio.stopcovid.R
+import com.lunabeestudio.stopcovid.coreui.extension.setTextOrHide
 import com.lunabeestudio.stopcovid.databinding.ItemKeyFigureCardBinding
-import com.lunabeestudio.stopcovid.extension.setTextOrHide
 import com.lunabeestudio.stopcovid.model.Trend
 import com.mikepenz.fastadapter.binding.AbstractBindingItem
 

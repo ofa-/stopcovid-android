@@ -29,6 +29,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.location.LocationManagerCompat
 import androidx.fragment.app.Fragment
 import com.lunabeestudio.robert.RobertManager
+import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.openAppSettings
 import com.lunabeestudio.stopcovid.model.CovidException
 import com.lunabeestudio.stopcovid.model.DeviceSetup
@@ -161,13 +162,21 @@ object ProximityManager {
         Intent().setComponent(ComponentName("com.asus.mobilemanager", "com.asus.mobilemanager.MainActivity"))
     )
 
-    @SuppressLint("BatteryLife", "InlinedApi")
-    fun requestIgnoreBatteryOptimization(fragment: Fragment, activityResultLauncher: ActivityResultLauncher<Intent>?) {
+    @SuppressLint("InlinedApi")
+    private fun getIgnoreBatteryOptimizationIntents(context: Context): List<Intent> {
+        val miuiIntent = Intent("miui.intent.action.HIDDEN_APPS_CONFIG_ACTIVITY")
+        miuiIntent.putExtra("package_name", context.packageName)
+        miuiIntent.putExtra("package_label", context.getString(R.string.app_name))
         val systemIntent = Intent()
         systemIntent.action = Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
-        systemIntent.data = Uri.parse("package:${fragment.requireActivity().packageName}")
-        val powerIntents = arrayListOf(systemIntent)
+        systemIntent.data = Uri.parse("package:${context.packageName}")
+        val powerIntents = arrayListOf(miuiIntent, systemIntent)
         powerIntents.addAll(powerManagerIntents)
+        return powerIntents
+    }
+
+    fun requestIgnoreBatteryOptimization(fragment: Fragment, activityResultLauncher: ActivityResultLauncher<Intent>?) {
+        val powerIntents = getIgnoreBatteryOptimizationIntents(fragment.requireContext())
         for (intent in powerIntents) {
             val resolveInfo = intent.resolveActivityInfo(fragment.requireContext().packageManager, PackageManager.MATCH_DEFAULT_ONLY)
             if (resolveInfo?.exported == true) {
@@ -177,14 +186,13 @@ object ProximityManager {
         }
     }
 
-    @SuppressLint("BatteryLife", "InlinedApi")
     private fun hasActivityToResolveIgnoreBatteryOptimization(context: Context): Boolean {
-        val systemIntent = Intent()
-        systemIntent.action = Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
-        systemIntent.data = Uri.parse("package:${context.packageName}")
-        val powerIntents = arrayListOf(systemIntent)
-        powerIntents.addAll(powerManagerIntents)
+        val powerIntents = getIgnoreBatteryOptimizationIntents(context)
         for (intent in powerIntents) {
+            intent.apply {
+                putExtra("package_name", context.packageName)
+                putExtra("package_label", context.getString(R.string.app_name))
+            }
             val resolveInfo = intent.resolveActivityInfo(context.packageManager, PackageManager.MATCH_DEFAULT_ONLY)
             if (resolveInfo?.exported == true) {
                 return true

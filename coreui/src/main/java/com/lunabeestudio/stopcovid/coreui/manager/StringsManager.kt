@@ -18,7 +18,7 @@ import com.lunabeestudio.robert.utils.Event
 import com.lunabeestudio.stopcovid.coreui.ConfigConstant
 import com.lunabeestudio.stopcovid.coreui.UiConstants
 import com.lunabeestudio.stopcovid.coreui.extension.fixFormatter
-import com.lunabeestudio.stopcovid.coreui.extension.getFirstSupportedLanguage
+import com.lunabeestudio.stopcovid.coreui.extension.getApplicationLanguage
 import java.lang.reflect.Type
 
 typealias LocalizedStrings = HashMap<String, String>
@@ -40,14 +40,14 @@ object StringsManager : ServerManager<LocalizedStrings>() {
     private var prevLanguage: String? = null
 
     suspend fun initialize(context: Context) {
-        prevLanguage = context.getFirstSupportedLanguage()
+        prevLanguage = context.getApplicationLanguage()
         loadLocal(context)?.let {
             strings = it
         }
     }
 
     suspend fun onAppForeground(context: Context) {
-        val newLanguage = context.getFirstSupportedLanguage()
+        val newLanguage = context.getApplicationLanguage()
         val languageHasChanged = prevLanguage != newLanguage
 
         if (languageHasChanged) {
@@ -69,6 +69,6 @@ object StringsManager : ServerManager<LocalizedStrings>() {
     override val folderName: String = ConfigConstant.Labels.FOLDER
     override val prefix: String = ConfigConstant.Labels.FILE_PREFIX
     override val type: Type = object : TypeToken<LocalizedStrings>() {}.type
-    override val lastRefreshSharedPrefsKey: String = UiConstants.SharePrefs.LAST_STRINGS_REFRESH
+    override val lastRefreshSharedPrefsKey: String = UiConstants.SharedPrefs.LAST_STRINGS_REFRESH
     override fun transform(input: String): String = input.fixFormatter()
 }

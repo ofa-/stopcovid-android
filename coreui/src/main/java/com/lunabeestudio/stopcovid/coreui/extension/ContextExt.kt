@@ -14,6 +14,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.net.Uri
+import androidx.preference.PreferenceManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.lunabeestudio.stopcovid.coreui.UiConstants
 import java.util.Locale
@@ -80,11 +81,13 @@ fun Context.showPermissionRationale(
     }
 }
 
-fun Context.getFirstSupportedLanguage(): String {
-    return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+fun Context.getApplicationLanguage(): String {
+    val userLanguage = PreferenceManager.getDefaultSharedPreferences(this).userLanguage
+    val supportedLanguages = UiConstants.SUPPORTED_LOCALES.map { it.language }
+    return userLanguage ?: if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
         val locales = resources.configuration.locales.toList()
-        locales.firstOrNull { UiConstants.SUPPORTED_LANGUAGE.contains(it.language) }?.language ?: UiConstants.DEFAULT_LANGUAGE
+        locales.firstOrNull { supportedLanguages.contains(it.language) }?.language ?: UiConstants.DEFAULT_LANGUAGE
     } else {
-        Locale.getDefault().language.takeIf { UiConstants.SUPPORTED_LANGUAGE.contains(it) } ?: UiConstants.DEFAULT_LANGUAGE
+        Locale.getDefault().language.takeIf { supportedLanguages.contains(it) } ?: UiConstants.DEFAULT_LANGUAGE
     }
 }

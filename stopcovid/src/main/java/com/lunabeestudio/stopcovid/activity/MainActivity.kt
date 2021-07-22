@@ -39,19 +39,28 @@ import com.google.android.material.snackbar.Snackbar
 import com.lunabeestudio.robert.extension.observeEventAndConsume
 import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.R
+import com.lunabeestudio.stopcovid.coreui.UiConstants
+import com.lunabeestudio.stopcovid.coreui.databinding.ItemDividerBinding
 import com.lunabeestudio.stopcovid.coreui.extension.applyAndConsumeWindowInsetBottom
+import com.lunabeestudio.stopcovid.coreui.extension.getApplicationLanguage
 import com.lunabeestudio.stopcovid.coreui.extension.isNightMode
+import com.lunabeestudio.stopcovid.coreui.extension.setTextOrHide
 import com.lunabeestudio.stopcovid.coreui.extension.showSnackBar
+import com.lunabeestudio.stopcovid.coreui.extension.userLanguage
 import com.lunabeestudio.stopcovid.coreui.manager.LocalizedStrings
 import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
 import com.lunabeestudio.stopcovid.databinding.ActivityMainBinding
+import com.lunabeestudio.stopcovid.databinding.DialogUserLanguageBinding
+import com.lunabeestudio.stopcovid.databinding.ItemSelectionBinding
 import com.lunabeestudio.stopcovid.extension.alertRiskLevelChanged
+import com.lunabeestudio.stopcovid.extension.flaggedCountry
 import com.lunabeestudio.stopcovid.extension.isLaunchedFromHistory
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.showAlertRiskLevelChanged
 import com.lunabeestudio.stopcovid.manager.DeeplinkManager
 import com.lunabeestudio.stopcovid.manager.RisksLevelManager
 import kotlinx.coroutines.delay
+import java.util.Locale
 
 class MainActivity : BaseActivity() {
 
@@ -93,6 +102,8 @@ class MainActivity : BaseActivity() {
         if (intent?.isLaunchedFromHistory == false) {
             handleIntent(intent)
         }
+
+        showLanguageDialogIfNeeded()
     }
 
     override fun onResume() {
@@ -294,6 +305,50 @@ class MainActivity : BaseActivity() {
 
     override fun onSupportNavigateUp(): Boolean {
         return navController.navigateUp()
+    }
+
+    fun showLanguageDialogIfNeeded() {
+        if (sharedPrefs.userLanguage == null &&
+            UiConstants.SUPPORTED_LOCALES.map { it.language }.none { it == Locale.getDefault().language }) {
+
+            val userLanguageSelectionView = DialogUserLanguageBinding.inflate(layoutInflater)
+
+            var languageViewMap: Map<Locale, ItemSelectionBinding> = emptyMap()
+            languageViewMap = UiConstants.SUPPORTED_LOCALES.associateWith { locale ->
+                val selectionBinding = ItemSelectionBinding.inflate(layoutInflater, userLanguageSelectionView.root, false)
+                selectionBinding.titleTextView.setTextOrHide(locale.flaggedCountry)
+                selectionBinding.captionTextView.isVisible = false
+                selectionBinding.selectionImageView.isInvisible = locale.language != getApplicationLanguage()
+                selectionBinding.root.setOnClickListener {
+                    sharedPrefs.userLanguage = locale.language
+                    languageViewMap.forEach { (loopLocale, loopSelectionBinding) ->
+                        loopSelectionBinding.selectionImageView.isInvisible = loopLocale.language != locale.language
+                    }
+                }
+                selectionBinding
+            }
+
+            languageViewMap.values.forEachIndexed { idx, selectionBinding ->
+                val divider = ItemDividerBinding.inflate(layoutInflater, userLanguageSelectionView.root, false)
+                val dividerPos = idx * 2
+                userLanguageSelectionView.root.addView(divider.root, dividerPos)
+                userLanguageSelectionView.root.addView(selectionBinding.root, dividerPos + 1)
+            }
+
+            userLanguageSelectionView.userLanguageDialogFooter.text = strings["userLanguageController.footer"]
+
+            MaterialAlertDialogBuilder(this)
+                .setTitle(strings["userLanguageController.title"])
+                .setMessage(strings["userLanguageController.subtitle"])
+                .setView(userLanguageSelectionView.root)
+                .setPositiveButton(strings["userLanguageController.button.title"]) { _, _ ->
+                    if (sharedPrefs.userLanguage == null) {
+                        sharedPrefs.userLanguage = getApplicationLanguage()
+                    }
+                }
+                .setCancelable(false)
+                .show()
+        }
     }
 
     companion object {

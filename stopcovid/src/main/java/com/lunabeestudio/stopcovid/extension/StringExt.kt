@@ -99,8 +99,8 @@ fun String?.orNA(): String = this ?: "N/A"
 val String.countryCodeToFlagEmoji: String
     get() {
         return try {
-            val firstLetter = Character.codePointAt(this, 0) - 0x41 + 0x1F1E6
-            val secondLetter = Character.codePointAt(this, 1) - 0x41 + 0x1F1E6
+            val firstLetter = Character.codePointAt(this.uppercase(), 0) - 0x41 + 0x1F1E6
+            val secondLetter = Character.codePointAt(this.uppercase(), 1) - 0x41 + 0x1F1E6
             String(Character.toChars(firstLetter)) + String(Character.toChars(secondLetter))
         } catch (e: Exception) {
             Timber.e(e)

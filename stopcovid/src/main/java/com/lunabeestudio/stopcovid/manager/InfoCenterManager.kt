@@ -30,7 +30,7 @@ import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.ConfigConstant
 import com.lunabeestudio.stopcovid.coreui.UiConstants
 import com.lunabeestudio.stopcovid.coreui.extension.fixFormatter
-import com.lunabeestudio.stopcovid.coreui.extension.getFirstSupportedLanguage
+import com.lunabeestudio.stopcovid.coreui.extension.getApplicationLanguage
 import com.lunabeestudio.stopcovid.coreui.extension.saveTo
 import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
 import com.lunabeestudio.stopcovid.extension.areInfoNotificationsEnabled
@@ -84,13 +84,13 @@ object InfoCenterManager {
 
     fun initialize(context: Context) {
         CoroutineScope(Dispatchers.IO).launch {
-            prevLanguage = context.getFirstSupportedLanguage()
+            prevLanguage = context.getApplicationLanguage()
             loadLocal(context)
         }
     }
 
     suspend fun refreshIfNeeded(context: Context) {
-        val newLanguage = context.getFirstSupportedLanguage()
+        val newLanguage = context.getApplicationLanguage()
         val forceRefresh = prevLanguage != newLanguage
         fetchLastTimestamp(context)
         if (fetchLast(context, infosPrefix, null, forceRefresh)
@@ -196,7 +196,7 @@ object InfoCenterManager {
     }
 
     private fun localFileExists(context: Context, prefix: String): Boolean {
-        val fileName = "$prefix${context.getFirstSupportedLanguage()}.json"
+        val fileName = "$prefix${context.getApplicationLanguage()}.json"
         val file = File(context.filesDir, fileName)
         return file.exists()
     }
@@ -209,7 +209,7 @@ object InfoCenterManager {
         transform: (String) -> String,
         type: Type,
     ): T? {
-        val fileName = "$prefix${if (isLocalized) context.getFirstSupportedLanguage() else ""}.json"
+        val fileName = "$prefix${if (isLocalized) context.getApplicationLanguage() else ""}.json"
         var file = File(context.filesDir, fileName)
         if (!file.exists() && fallbackFileName != null) {
             file = File(context.filesDir, fallbackFileName)

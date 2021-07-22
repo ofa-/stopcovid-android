@@ -21,13 +21,13 @@ import androidx.core.view.isGone
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.lunabeestudio.stopcovid.coreui.extension.callPhone
+import com.lunabeestudio.stopcovid.coreui.extension.setTextOrHide
 import com.lunabeestudio.stopcovid.coreui.extension.stringsFormat
 import com.lunabeestudio.stopcovid.coreui.manager.LocalizedStrings
 import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
 import com.lunabeestudio.stopcovid.databinding.FragmentVaccinationActionsBottomSheetBinding
 import com.lunabeestudio.stopcovid.extension.location
 import com.lunabeestudio.stopcovid.extension.openInExternalBrowser
-import com.lunabeestudio.stopcovid.extension.setTextOrHide
 
 class VaccinationActionsBottomSheetFragment : BottomSheetDialogFragment() {
 

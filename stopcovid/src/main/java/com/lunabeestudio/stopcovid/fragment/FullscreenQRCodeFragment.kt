@@ -19,9 +19,9 @@ import com.journeyapps.barcodescanner.BarcodeEncoder
 import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.appCompatActivity
+import com.lunabeestudio.stopcovid.coreui.extension.setTextOrHide
 import com.lunabeestudio.stopcovid.coreui.extension.toDimensSize
 import com.lunabeestudio.stopcovid.databinding.FragmentFullscreenQrcodeBinding
-import com.lunabeestudio.stopcovid.extension.setTextOrHide
 
 class FullscreenQRCodeFragment : ForceLightFragment(R.layout.fragment_fullscreen_qrcode) {
 
