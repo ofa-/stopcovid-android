@@ -41,8 +41,10 @@ import com.lunabeestudio.stopcovid.coreui.extension.toDimensSize
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.extension.barcodeFormat
+import com.lunabeestudio.stopcovid.extension.countryCode
 import com.lunabeestudio.stopcovid.extension.dccCertificatesManager
 import com.lunabeestudio.stopcovid.extension.fullDescription
+import com.lunabeestudio.stopcovid.extension.isFrench
 import com.lunabeestudio.stopcovid.extension.openInExternalBrowser
 import com.lunabeestudio.stopcovid.extension.raw
 import com.lunabeestudio.stopcovid.extension.robertManager
@@ -237,7 +239,6 @@ class WalletCertificateFragment : MainFragment() {
                 formatText = Constants.QrCode.FORMAT_2D_DOC
                 conversionLambda = if (robertManager.configuration.displayCertificateConversion) {
                     {
-                        AnalyticsManager.reportAppEvent(requireContext(), AppEventName.e20, null)
                         showConversionConfirmationAlert(certificate)
                     }
                 } else {
@@ -261,13 +262,18 @@ class WalletCertificateFragment : MainFragment() {
         return qrCodeCardItem {
             this.generateBarcode = generateBarcode
             mainDescription = certificate.fullDescription(strings, robertManager.configuration)
-            footerDescription = if ((certificate as? EuropeanCertificate)?.greenCertificate?.testResultIsNegative == false) {
-                // Fix SIDEP has generated positive test instead of recovery
-                val span = strings["wallet.proof.europe.test.positiveSidepError"]?.let { SpannableString(it) }
-                span?.let { Linkify.addLinks(it, Linkify.WEB_URLS) }
-                span
-            } else {
-                null
+            val greenCertificate = (certificate as? EuropeanCertificate)?.greenCertificate
+            footerDescription = when {
+                greenCertificate == null -> null
+                greenCertificate.testResultIsNegative == false -> {
+                    // Fix SIDEP has generated positive test instead of recovery
+                    strings["wallet.proof.europe.test.positiveSidepError"]?.toSpannable()?.also {
+                        Linkify.addLinks(it, Linkify.WEB_URLS)
+                    }
+                }
+                !greenCertificate.isFrench ->
+                    strings["wallet.proof.europe.foreignCountryWarning.${greenCertificate.countryCode?.lowercase()}"]?.toSpannable()
+                else -> null
             }
             share = strings["walletController.menu.share"]
             delete = strings["walletController.menu.delete"]
@@ -364,6 +370,7 @@ class WalletCertificateFragment : MainFragment() {
                 .setMessage(strings["walletController.menu.convertToEurope.alert.message"])
                 .setPositiveButton(strings["common.ok"]) { _, _ ->
                     requestCertificateConversion(certificate)
+                    AnalyticsManager.reportAppEvent(requireContext(), AppEventName.e20, null)
                 }
                 .setNegativeButton(strings["common.cancel"], null)
                 .setNeutralButton(strings["walletController.menu.convertToEurope.alert.terms"]) { _, _ ->
@@ -427,7 +434,8 @@ class WalletCertificateFragment : MainFragment() {
                 certificateFormat,
             )
 
-            viewModel.saveCertificate(requireContext(), certificate)
+            viewModel.saveCertificate(certificate)
+            AnalyticsManager.reportAppEvent(requireContext(), AppEventName.e21, null)
 
             val vaccination = (certificate as? EuropeanCertificate)?.greenCertificate?.vaccinations?.lastOrNull()
             if (vaccination != null && vaccination.doseNumber >= vaccination.totalSeriesOfDoses) {

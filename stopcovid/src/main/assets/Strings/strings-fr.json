@@ -1,4 +1,4 @@
-{
+{ 
    "app.name":"TousAntiCovid",
    "onboarding.welcomeController.title":"Bienvenue",
    "onboarding.welcomeController.mainMessage.title":"Soyez alertés et alertez les autres en cas d’exposition à la COVID-19",
@@ -555,7 +555,7 @@
    "keyfigure.nombrevaccinations.colorCode.dark":"#31D158",
    "keyfigure.nombrevaccinations.label":"Nombre total de personnes vaccinées",
    "keyfigure.nombrevaccinations.shortLabel":"Total vaccinés",
-   "keyfigure.nombrevaccinations.description":"Cet indicateur représente le nombre total de personnes primo-vaccinées (personnes ayant reçu une première injection).\nLes données sont consolidées le lendemain de leur remontée pour tenir compte des dernières données de vaccination de la veille au soir.",
+   "keyfigure.nombrevaccinations.description":"Cet indicateur représente le nombre total de personnes vaccinées (personnes ayant reçu toutes leurs doses).\nLes données sont consolidées le lendemain de leur remontée pour tenir compte des dernières données de vaccination de la veille au soir.\n\n👉 Changement le 26 juillet : cet indicateur porte désormais sur les personnes vaccinées, ayant reçu toutes leurs doses.",
    "enterCodeController.alert.expiredCode.title":"Expiré",
    "enterCodeController.alert.expiredCode.message":"Votre présence dans ce lieu date de plus de 15 jours. Il n'est donc plus utile d'un point de vue sanitaire de l'ajouter à votre historique.",
    "keyFigureDetailController.section.evolution.title":"Evolution",
@@ -971,7 +971,7 @@
    
    "keyfigure.couvcompletvaccination.label":"Couverture vaccinale",
    "keyfigure.couvcompletvaccination.shortLabel":"Couverture vaccinale",
-   "keyfigure.couvcompletvaccination.description":"Cet indicateur reflète la part de la population vaccinée avec un schéma complet (l'ensemble des doses nécessaires).",
+   "keyfigure.couvcompletvaccination.description":"Cet indicateur reflète la part de la population vaccinée de plus de 12 ans avec un schéma complet (l'ensemble des doses nécessaires).\n\n👉 Changement le 24 juillet : cet indicateur porte désormais sur la population vaccinée de plus de 12 ans.",
    "keyfigure.couvcompletvaccination.colorCode.light":"#18B1BF",
    "keyfigure.couvcompletvaccination.colorCode.dark":"#72E1EB",
    "common.skip":"Passer",
@@ -1015,5 +1015,6 @@
    "flashWalletCodeController.footer.link.android": "https://play.google.com/store/apps/details?id=com.ingroupe.verify.anticovid",
    "universalQrScanController.footer.text": "⚠️ Pour les professionnels, la vérification de certificats est uniquement permise avec l’application “TAC Vérif” que vous pouvez trouver sur les Stores.\nAppuyez pour en savoir plus.",
    "universalQrScanController.footer.link.ios": "https://apps.apple.com/fr/app/tousanticovid-verif/id1562303493",
-   "universalQrScanController.footer.link.android": "https://play.google.com/store/apps/details?id=com.ingroupe.verify.anticovid"
+   "universalQrScanController.footer.link.android": "https://play.google.com/store/apps/details?id=com.ingroupe.verify.anticovid",
+   "wallet.proof.europe.foreignCountryWarning.gb": "⚠️ Veuillez contacter le NHS - L'authenticité des certificats NHS n'est pas en conformité avec les normes de l'UE. Des travaux sont en cours."
 }

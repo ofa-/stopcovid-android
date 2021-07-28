@@ -672,7 +672,8 @@
         tools:layout="@layout/fragment_qr_code" />
     <fragment
         android:id="@+id/confirmAddWalletCertificateFragment"
-        android:name="com.lunabeestudio.stopcovid.fragment.ConfirmAddWalletCertificateFragment">
+        android:name="com.lunabeestudio.stopcovid.fragment.ConfirmAddWalletCertificateFragment"
+        tools:layout="@layout/fragment_confirm_add_wallet_certificate">
         <argument
             android:name="certificateCode"
             app:argType="string" />

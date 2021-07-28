@@ -10,13 +10,10 @@
 
 package com.lunabeestudio.stopcovid.viewmodel
 
-import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.map
-import com.lunabeestudio.analytics.manager.AnalyticsManager
-import com.lunabeestudio.analytics.model.AppEventName
 import com.lunabeestudio.framework.local.datasource.SecureKeystoreDataSource
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.robert.datasource.LocalKeystoreDataSource
@@ -61,16 +58,11 @@ class WalletViewModel(
         return certificates.value.isNullOrEmpty()
     }
 
-    fun saveCertificate(
-        context: Context,
-        walletCertificate: WalletCertificate
-    ) {
+    fun saveCertificate(walletCertificate: WalletCertificate) {
         WalletManager.saveCertificate(
             keystoreDataSource,
             walletCertificate,
         )
-
-        AnalyticsManager.reportAppEvent(context, AppEventName.e13, null)
     }
 
     fun toggleFavorite(

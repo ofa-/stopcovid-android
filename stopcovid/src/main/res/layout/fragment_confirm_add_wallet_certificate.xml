@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ This Source Code Form is subject to the terms of the Mozilla Public
+  ~ License, v. 2.0. If a copy of the MPL was not distributed with this
+  ~ file, You can obtain one at https://mozilla.org/MPL/2.0/.
+  ~
+  ~ Authors
+  ~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ Created by Lunabee Studio / Date - 2021/26/7 - for the TOUS-ANTI-COVID project
+  -->
+
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/walletLogoImageView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:contentDescription="@null"
+            android:src="@drawable/wallet"
+            app:layout_constraintBottom_toTopOf="@id/walletLogoDivider"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="packed" />
+
+        <include
+            android:id="@+id/walletLogoDivider"
+            layout="@layout/item_divider"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/divider_height"
+            android:layout_marginStart="@dimen/spacing_xlarge"
+            android:layout_marginEnd="@dimen/spacing_xlarge"
+            app:layout_constraintBottom_toTopOf="@id/walletCaptionTextView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/walletLogoImageView" />
+
+        <include
+            android:id="@+id/walletCaptionTextView"
+            layout="@layout/item_caption"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/spacing_large"
+            android:layout_marginVertical="@dimen/spacing_small"
+            app:layout_constraintBottom_toTopOf="@id/walletTitleTextView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <include
+            android:id="@+id/walletTitleTextView"
+            layout="@layout/item_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/spacing_large"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/walletAddButton"
+            style="@style/Widget.StopCovid.Button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/spacing_large"
+            android:layout_marginTop="@dimen/spacing_large"
+            android:textAllCaps="false"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/walletTitleTextView"
+            tools:text="@tools:sample/lorem[2]" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/walletCancelButton"
+            style="@style/Widget.StopCovid.Button.Danger"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/spacing_large"
+            android:layout_marginTop="@dimen/spacing_large"
+            android:textAllCaps="false"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/walletAddButton"
+            tools:text="@tools:sample/lorem[2]" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

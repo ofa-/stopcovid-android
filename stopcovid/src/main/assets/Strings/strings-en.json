@@ -590,7 +590,7 @@
    "keyfigure.nombrevaccinations.colorCode.dark":"#31D158",
    "keyfigure.nombrevaccinations.label":"Total number of vaccinated people",
    "keyfigure.nombrevaccinations.shortLabel":"Total vaccinated",
-   "keyfigure.nombrevaccinations.description":"This indicator represents the total number of people vaccinated for the first time (people who received a first injection).\n\nThe data are consolidated the day after they are reported to take into account the latest vaccination data from the night before.",
+   "keyfigure.nombrevaccinations.description":"This indicator represents the total number of people vaccinated (people who received all required injections).\nThe data are consolidated the day after they are reported to take into account the latest vaccination data from the night before.\n\n👉 Change on July 26: this indicator now relates to people vaccinated, having received all their injections.",
    "enterCodeController.alert.expiredCode.title":"Expired",
    "enterCodeController.alert.expiredCode.message":"Your presence in this venue dates back more than 15 days. It is therefore no longer useful from a health point of view to add it to your history.",
    "keyFigureDetailController.section.evolution.title":"Evolution",
@@ -998,7 +998,7 @@
    "walletController.convertCertificate.error.url2.title":"Open SI-DEP",
    "keyfigure.couvcompletvaccination.label":"Vaccination coverage",
    "keyfigure.couvcompletvaccination.shortLabel":"Vaccination coverage",
-   "keyfigure.couvcompletvaccination.description":"This figure gives the proportion of the population fully vaccinated (all required doses).",
+   "keyfigure.couvcompletvaccination.description":"This figure gives the proportion of the population over 12 years old fully vaccinated (all required doses).\n\n👉 Change on July 24: this indicator now relates to the vaccinated population over 12 years old.",
    "keyfigure.couvcompletvaccination.colorCode.light":"#18B1BF",
    "keyfigure.couvcompletvaccination.colorCode.dark":"#72E1EB",
    "common.skip":"Skip",
@@ -1040,5 +1040,6 @@
    "flashWalletCodeController.footer.link.android": "https://play.google.com/store/apps/details?id=com.ingroupe.verify.anticovid",
    "universalQrScanController.footer.text": "⚠️ For professionals, certificate verification is only allowed with the “TAC Verification” application that you can find on the Stores.\nTap to find out more.",
    "universalQrScanController.footer.link.ios": "https://apps.apple.com/fr/app/tousanticovid-verif/id1562303493",
-   "universalQrScanController.footer.link.android": "https://play.google.com/store/apps/details?id=com.ingroupe.verify.anticovid"
+   "universalQrScanController.footer.link.android": "https://play.google.com/store/apps/details?id=com.ingroupe.verify.anticovid",
+   "wallet.proof.europe.foreignCountryWarning.gb": "⚠️ Please contact the NHS - The authenticity of NHS certificates does not comply with EU standards. Work is in progress."
 }
