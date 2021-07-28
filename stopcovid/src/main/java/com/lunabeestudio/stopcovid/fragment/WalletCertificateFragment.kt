@@ -147,17 +147,10 @@ class WalletCertificateFragment : MainFragment() {
             }
         }
 
+        if (!viewModel.favoriteCertificates.isNullOrEmpty()) {
         items += bigTitleItem {
             text = strings["walletController.favoriteCertificateSection.title"]
             identifier = text.hashCode().toLong()
-        }
-        if (viewModel.favoriteCertificates.isNullOrEmpty()) {
-            items += captionItem {
-                val spannedSubtitle = strings["walletController.favoriteCertificateSection.subtitle"]?.toSpannable()
-                transformHeartEmoji(spannedSubtitle)
-                text = spannedSubtitle
-                identifier = text.hashCode().toLong()
-            }
         }
         viewModel.favoriteCertificates?.forEach { certificate ->
             items += codeItemFromWalletDocument(certificate)
@@ -165,6 +158,7 @@ class WalletCertificateFragment : MainFragment() {
         items += spaceItem {
             spaceRes = R.dimen.spacing_large
             identifier = items.size.toLong()
+        }
         }
 
         if (!viewModel.recentCertificates.isNullOrEmpty()) {
