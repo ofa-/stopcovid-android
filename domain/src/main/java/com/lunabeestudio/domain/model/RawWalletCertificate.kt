@@ -1,3 +1,9 @@
 package com.lunabeestudio.domain.model
 
-class RawWalletCertificate(val type: WalletCertificateType, val value: String, val timestamp: Long)
+data class RawWalletCertificate(
+    val id: String,
+    val type: WalletCertificateType,
+    val value: String,
+    val timestamp: Long,
+    var isFavorite: Boolean
+)

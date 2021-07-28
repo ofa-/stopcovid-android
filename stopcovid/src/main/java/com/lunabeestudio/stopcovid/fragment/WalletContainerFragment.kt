@@ -62,7 +62,7 @@ class WalletContainerFragment : BaseFragment() {
     }
 
     private val viewModel: WalletViewModel by viewModels {
-        WalletViewModelFactory(robertManager, keystoreDataSource, dccCertificatesManager)
+        WalletViewModelFactory(robertManager, keystoreDataSource)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -165,7 +165,7 @@ class WalletContainerFragment : BaseFragment() {
         certificateFormat: WalletCertificateType.Format?
     ): WalletCertificate? {
         return try {
-            WalletManager.verifyCertificateCodeValue(
+            WalletManager.verifyAndGetCertificateCodeValue(
                 robertManager.configuration,
                 certificateCode,
                 dccCertificatesManager.certificates,
@@ -218,7 +218,7 @@ class WalletContainerFragment : BaseFragment() {
     }
 
     private suspend fun handleCertificateError(error: Exception, certificateCode: String?) {
-        val certificateType = certificateCode?.let { WalletCertificate.getTypeFromValue(it) } ?: WalletCertificateType.SANITARY
+        val certificateType = certificateCode?.let { WalletCertificate.getTypeFromValue(it) } ?: WalletCertificateType.VACCINATION_EUROPE
         handleCertificateError(error, certificateType)
     }
 

@@ -39,6 +39,11 @@ import timber.log.Timber
 
 class VenueQRCodeFragment : QRCodeFragment() {
 
+    override fun getTitleKey(): String = "venueFlashCodeController.title"
+    override val explanationKey: String = "venueFlashCodeController.explanation"
+    override val footerKey: String? = null
+    override fun onFooterClick() {}
+
     private val args: VenueQRCodeFragmentArgs by navArgs()
 
     private val sharedPrefs: SharedPreferences by lazy {
@@ -111,9 +116,6 @@ class VenueQRCodeFragment : QRCodeFragment() {
             super.onOptionsItemSelected(item)
         }
     }
-
-    override fun getTitleKey(): String = "venueFlashCodeController.title"
-    override fun getExplanationKey(): String = "venueFlashCodeController.explanation"
 
     override fun onCodeScanned(code: String) {
         try {

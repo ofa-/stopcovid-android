@@ -45,6 +45,10 @@ class QrCodeCardItem : AbstractBindingItem<ItemQrCodeCardBinding>() {
     var actionContentDescription: String? = null
     var onTag1Click: (() -> Unit)? = null
     var onTag2Click: (() -> Unit)? = null
+    var favoriteContentDescription: String? = null
+    var favoriteState: FavoriteState = FavoriteState.HIDDEN
+    var onFavoriteClick: (() -> Unit)? = null
+    var bottomText: String? = null
 
     override val type: Int = R.id.item_attestation_qr_code
 
@@ -106,6 +110,21 @@ class QrCodeCardItem : AbstractBindingItem<ItemQrCodeCardBinding>() {
         binding.tagLayout.isVisible = !(tag1Text.isNullOrEmpty() && tag2Text.isNullOrEmpty())
 
         binding.actionButton.contentDescription = actionContentDescription
+
+        binding.favoriteButton.isVisible = favoriteState != FavoriteState.HIDDEN
+        binding.favoriteButton.contentDescription = favoriteContentDescription
+        binding.favoriteButton.setOnClickListener {
+            onFavoriteClick?.invoke()
+        }
+        when (favoriteState) {
+            FavoriteState.HIDDEN -> {
+                /* no-op */
+            }
+            FavoriteState.NOT_CHECKED -> binding.favoriteButton.setImageResource(R.drawable.ic_empty_heart)
+            FavoriteState.CHECKED -> binding.favoriteButton.setImageResource(R.drawable.ic_filled_heart)
+        }
+
+        binding.bottomActionTextView.setTextOrHide(bottomText)
     }
 
     override fun unbindView(binding: ItemQrCodeCardBinding) {
@@ -151,6 +170,10 @@ class QrCodeCardItem : AbstractBindingItem<ItemQrCodeCardBinding>() {
             }
             else -> false
         }
+    }
+
+    enum class FavoriteState {
+        HIDDEN, NOT_CHECKED, CHECKED
     }
 }
 

@@ -21,7 +21,7 @@ import com.lunabeestudio.stopcovid.coreui.extension.safeEmojiSpanify
 class CaptionItem : BaseItem<CaptionItem.ViewHolder>(
     R.layout.item_caption, CaptionItem::ViewHolder, R.id.item_caption
 ) {
-    var text: String? = null
+    var text: CharSequence? = null
     var gravity: Int = Gravity.NO_GRAVITY
 
     @StyleRes

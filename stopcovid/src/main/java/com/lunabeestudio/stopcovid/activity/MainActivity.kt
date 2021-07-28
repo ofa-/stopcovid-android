@@ -309,7 +309,8 @@ class MainActivity : BaseActivity() {
 
     fun showLanguageDialogIfNeeded() {
         if (sharedPrefs.userLanguage == null &&
-            UiConstants.SUPPORTED_LOCALES.map { it.language }.none { it == Locale.getDefault().language }) {
+            UiConstants.SUPPORTED_LOCALES.map { it.language }.none { it == Locale.getDefault().language }
+        ) {
 
             val userLanguageSelectionView = DialogUserLanguageBinding.inflate(layoutInflater)
 

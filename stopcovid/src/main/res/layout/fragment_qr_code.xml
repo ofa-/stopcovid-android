@@ -42,7 +42,16 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/bg_qr_code"
-        android:fitsSystemWindows="true" />
+        android:fitsSystemWindows="true"
+        tools:backgroundTint="#00F" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/bg_qr_code"
+        android:fitsSystemWindows="true"
+        android:rotation="180"
+        tools:backgroundTint="#F00" />
 
     <TextView
         android:id="@+id/title"
@@ -64,4 +73,22 @@
         android:scaleType="centerInside"
         android:src="@drawable/qr_code_placeholder"
         tools:ignore="ContentDescription" />
+
+    <TextView
+        android:id="@+id/footer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/spacing_xlarge"
+        android:layout_marginBottom="@dimen/spacing_large"
+        android:background="?selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:textAppearance="@style/TextAppearance.StopCovid.Caption.Small"
+        android:textColor="@android:color/white"
+        android:textIsSelectable="false"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:text="@tools:sample/lorem[30]" />
 </androidx.constraintlayout.widget.ConstraintLayout>

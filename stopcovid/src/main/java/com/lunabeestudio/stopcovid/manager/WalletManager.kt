@@ -22,10 +22,11 @@ import com.lunabeestudio.stopcovid.model.WalletCertificateNoKeyError
 import com.lunabeestudio.stopcovid.model.getForKeyId
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.util.UUID
 
 object WalletManager {
 
-    private var _walletCertificateLiveData: MutableLiveData<List<WalletCertificate>?> = MutableLiveData(null)
+    private val _walletCertificateLiveData: MutableLiveData<List<WalletCertificate>?> = MutableLiveData(null)
     val walletCertificateLiveData: LiveData<List<WalletCertificate>?>
         get() = _walletCertificateLiveData
 
@@ -33,10 +34,27 @@ object WalletManager {
         lifecycleOwner: LifecycleOwner,
         localKeystoreDataSource: LocalKeystoreDataSource,
     ) {
+        migrateCertificates(localKeystoreDataSource)
         localKeystoreDataSource.rawWalletCertificatesLiveData.observe(lifecycleOwner) { rawWalletList ->
             lifecycleOwner.lifecycleScope.launch {
                 loadFromLocalKeystoreDataSource(rawWalletList)
             }
+        }
+    }
+
+    // id + isFavorite migration (null due to reflection)
+    private fun migrateCertificates(localKeystoreDataSource: LocalKeystoreDataSource) {
+        val certificatesToMigrate = localKeystoreDataSource.rawWalletCertificates?.filter { it.id == null || it.isFavorite == null }
+        if (!certificatesToMigrate.isNullOrEmpty()) {
+            localKeystoreDataSource.rawWalletCertificates =
+                localKeystoreDataSource.rawWalletCertificates?.toMutableList()?.apply {
+                    removeAll(certificatesToMigrate)
+                    addAll(
+                        certificatesToMigrate.map {
+                            it.copy(id = it.id ?: UUID.randomUUID().toString(), isFavorite = it.isFavorite ?: false)
+                        }
+                    )
+                }
         }
     }
 
@@ -45,9 +63,9 @@ object WalletManager {
     ) {
         val walletCertificates = rawWalletList?.mapNotNull { rawWallet ->
             try {
-                val certificate = certificateFromValue(rawWallet.value)
-                certificate?.parse()
-                certificate
+                WalletCertificate.createCertificateFromRaw(rawWallet)?.apply {
+                    parse()
+                }
             } catch (e: Exception) {
                 Timber.e(e)
                 null
@@ -71,13 +89,13 @@ object WalletManager {
         return code ?: throw WalletCertificateMalformedException()
     }
 
-    suspend fun verifyCertificateCodeValue(
+    suspend fun verifyAndGetCertificateCodeValue(
         configuration: Configuration,
         codeValue: String,
         dccCertificates: DccCertificates,
         certificateFormat: WalletCertificateType.Format?,
     ): WalletCertificate {
-        val walletCertificate = certificateFromValue(codeValue)
+        val walletCertificate = getCertificateFromValue(codeValue)
 
         if (walletCertificate == null ||
             (certificateFormat != null && walletCertificate.type.format != certificateFormat)
@@ -108,13 +126,30 @@ object WalletManager {
         localKeystoreDataSource.rawWalletCertificates = walletCertificates
     }
 
-    private suspend fun certificateFromValue(value: String): WalletCertificate? {
-        return WalletCertificate.fromValue(value)
+    fun toggleFavorite(localKeystoreDataSource: LocalKeystoreDataSource, walletCertificate: EuropeanCertificate) {
+        val walletCertificates = localKeystoreDataSource.rawWalletCertificates?.toMutableList() ?: mutableListOf()
+
+        walletCertificates.firstOrNull { it.id == walletCertificate.id }?.let { rawWalletCertificate ->
+            if (!walletCertificate.isFavorite) {
+                // Remove current favorite if there is one
+                walletCertificates.firstOrNull { it.isFavorite }?.let { currentFavorite ->
+                    currentFavorite.isFavorite = false
+                }
+            }
+
+            rawWalletCertificate.isFavorite = !rawWalletCertificate.isFavorite
+        }
+
+        localKeystoreDataSource.rawWalletCertificates = walletCertificates
+    }
+
+    private suspend fun getCertificateFromValue(value: String): WalletCertificate? {
+        return WalletCertificate.createCertificateFromValue(value)
     }
 
     fun deleteCertificate(localKeystoreDataSource: LocalKeystoreDataSource, walletCertificate: WalletCertificate) {
         val walletCertificates = localKeystoreDataSource.rawWalletCertificates?.toMutableList() ?: mutableListOf()
-        walletCertificates.firstOrNull { it.value == walletCertificate.value }?.let { walletCertificates.remove(it) }
+        walletCertificates.firstOrNull { it.id == walletCertificate.id }?.let { walletCertificates.remove(it) }
         localKeystoreDataSource.rawWalletCertificates = walletCertificates
     }
 

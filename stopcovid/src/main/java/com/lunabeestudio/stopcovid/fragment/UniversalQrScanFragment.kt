@@ -18,9 +18,14 @@ import androidx.fragment.app.setFragmentResult
 import androidx.preference.PreferenceManager
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.extension.hasUsedUniversalQrScan
+import com.lunabeestudio.stopcovid.extension.openInExternalBrowser
 import com.lunabeestudio.stopcovid.extension.safeNavigate
 
 class UniversalQrScanFragment : QRCodeFragment() {
+
+    override fun getTitleKey(): String = "universalQrScanController.title"
+    override val explanationKey: String = "universalQrScanController.explanation"
+    override val footerKey: String = "universalQrScanController.footer.text"
 
     private val sharedPrefs: SharedPreferences by lazy {
         PreferenceManager.getDefaultSharedPreferences(requireContext())
@@ -37,14 +42,16 @@ class UniversalQrScanFragment : QRCodeFragment() {
         }
     }
 
-    override fun getTitleKey(): String = "universalQrScanController.title"
-    override fun getExplanationKey(): String = "universalQrScanController.explanation"
-
     override fun onCodeScanned(code: String) {
         setFragmentResult(
             SCANNED_CODE_RESULT_KEY,
             bundleOf(SCANNED_CODE_BUNDLE_KEY to code)
         )
+        findNavControllerOrNull()?.popBackStack()
+    }
+
+    override fun onFooterClick() {
+        strings["universalQrScanController.footer.link.android"]?.openInExternalBrowser(requireContext())
         findNavControllerOrNull()?.popBackStack()
     }
 

@@ -46,6 +46,8 @@ import androidx.navigation.navOptions
 import androidx.preference.PreferenceManager
 import com.airbnb.lottie.utils.Utils
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.zxing.BarcodeFormat
+import com.journeyapps.barcodescanner.BarcodeEncoder
 import com.lunabeestudio.analytics.manager.AnalyticsManager
 import com.lunabeestudio.analytics.model.AppEventName
 import com.lunabeestudio.robert.RobertApplication
@@ -61,6 +63,7 @@ import com.lunabeestudio.stopcovid.coreui.extension.appCompatActivity
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.extension.isNightMode
 import com.lunabeestudio.stopcovid.coreui.extension.refreshLift
+import com.lunabeestudio.stopcovid.coreui.extension.toDimensSize
 import com.lunabeestudio.stopcovid.coreui.extension.viewLifecycleOwnerOrNull
 import com.lunabeestudio.stopcovid.coreui.fastitem.CardWithActionsItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.cardWithActionItem
@@ -102,6 +105,7 @@ import com.lunabeestudio.stopcovid.fastitem.logoItem
 import com.lunabeestudio.stopcovid.fastitem.numbersCardItem
 import com.lunabeestudio.stopcovid.fastitem.onOffLottieItem
 import com.lunabeestudio.stopcovid.fastitem.proximityButtonItem
+import com.lunabeestudio.stopcovid.fastitem.smallQrCodeCardItem
 import com.lunabeestudio.stopcovid.manager.AppMaintenanceManager
 import com.lunabeestudio.stopcovid.manager.DeeplinkManager
 import com.lunabeestudio.stopcovid.manager.InfoCenterManager
@@ -153,6 +157,8 @@ class ProximityFragment : TimeMainFragment() {
     private val sharedPrefs: SharedPreferences by lazy {
         PreferenceManager.getDefaultSharedPreferences(requireContext())
     }
+
+    private val barcodeEncoder by lazy(LazyThreadSafetyMode.NONE) { BarcodeEncoder() }
 
     private var activityResultLauncher: ActivityResultLauncher<Intent>? = null
 
@@ -400,6 +406,9 @@ class ProximityFragment : TimeMainFragment() {
             refreshScreen()
         }
         viewModel.activeAttestationCount.observeEventAndConsume(viewLifecycleOwner) {
+            refreshScreen()
+        }
+        viewModel.favoriteDcc.observeEventAndConsume(viewLifecycleOwner) {
             refreshScreen()
         }
     }
@@ -866,11 +875,11 @@ class ProximityFragment : TimeMainFragment() {
                     findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToAttestationsFragment())
                 }
                 mainTitle = strings["home.attestationSection.cell.title"]
-                val attestationCount = viewModel.activeAttestationCount.value
-                mainBody = when (val count = attestationCount?.peekContent()) {
+                val attestationCount = viewModel.activeAttestationCount.value?.peekContent()
+                mainBody = when (attestationCount) {
                     0, null -> strings["home.attestationSection.cell.subtitle.noAttestations"]
                     1 -> strings["home.attestationSection.cell.subtitle.oneAttestation"]
-                    else -> stringsFormat("home.attestationSection.cell.subtitle.multipleAttestations", count)
+                    else -> stringsFormat("home.attestationSection.cell.subtitle.multipleAttestations", attestationCount)
                 }
                 identifier = R.drawable.attestation_card.toLong()
             }
@@ -884,6 +893,33 @@ class ProximityFragment : TimeMainFragment() {
         }
 
         if (robertManager.configuration.displaySanitaryCertificatesWallet) {
+            val favoriteDcc = viewModel.favoriteDcc.value?.peekContent()
+            if (favoriteDcc != null) {
+                items += smallQrCodeCardItem {
+                    val qrCodeSize = R.dimen.card_image_height.toDimensSize(requireContext()).toInt()
+                    title = strings["home.walletSection.favoriteCertificate.cell.title"]
+                    body = strings["home.walletSection.favoriteCertificate.cell.subtitle"]
+                    generateBarcode = {
+                        barcodeEncoder.encodeBitmap(
+                            favoriteDcc.value,
+                            BarcodeFormat.QR_CODE,
+                            qrCodeSize,
+                            qrCodeSize,
+                        )
+                    }
+                    onClick = {
+                        findNavControllerOrNull()?.safeNavigate(
+                            ProximityFragmentDirections.actionProximityFragmentToFullscreenDccFragment(favoriteDcc.id)
+                        )
+                    }
+                    identifier = favoriteDcc.id.hashCode().toLong()
+                }
+                items += spaceItem {
+                    spaceRes = R.dimen.spacing_medium
+                    identifier = items.count().toLong()
+                }
+            }
+
             items += cardWithActionItem(CardTheme.Primary) {
                 mainImage = R.drawable.wallet_card
                 mainLayoutDirection = LayoutDirection.RTL

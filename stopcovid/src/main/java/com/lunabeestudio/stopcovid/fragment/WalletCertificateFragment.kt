@@ -12,11 +12,15 @@ package com.lunabeestudio.stopcovid.fragment
 
 import android.graphics.Bitmap
 import android.os.Bundle
+import android.text.Spannable
 import android.text.SpannableString
 import android.text.method.LinkMovementMethod
+import android.text.style.ImageSpan
 import android.text.util.Linkify
 import android.view.View
 import android.widget.TextView
+import androidx.core.content.ContextCompat
+import androidx.core.text.toSpannable
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -64,6 +68,7 @@ import com.lunabeestudio.stopcovid.viewmodel.WalletViewModel
 import com.lunabeestudio.stopcovid.viewmodel.WalletViewModelFactory
 import com.mikepenz.fastadapter.GenericItem
 import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 import kotlin.time.ExperimentalTime
 
 class WalletCertificateFragment : MainFragment() {
@@ -90,7 +95,7 @@ class WalletCertificateFragment : MainFragment() {
             findParentFragmentByType<WalletContainerFragment>() ?: requireParentFragment()
         },
         {
-            WalletViewModelFactory(robertManager, keystoreDataSource, dccCertificatesManager)
+            WalletViewModelFactory(robertManager, keystoreDataSource)
         }
     )
 
@@ -132,6 +137,26 @@ class WalletCertificateFragment : MainFragment() {
             }
         }
 
+        items += bigTitleItem {
+            text = strings["walletController.favoriteCertificateSection.title"]
+            identifier = text.hashCode().toLong()
+        }
+        if (viewModel.favoriteCertificates.isNullOrEmpty()) {
+            items += captionItem {
+                val spannedSubtitle = strings["walletController.favoriteCertificateSection.subtitle"]?.toSpannable()
+                transformHeartEmoji(spannedSubtitle)
+                text = spannedSubtitle
+                identifier = text.hashCode().toLong()
+            }
+        }
+        viewModel.favoriteCertificates?.forEach { certificate ->
+            items += codeItemFromWalletDocument(certificate)
+        }
+        items += spaceItem {
+            spaceRes = R.dimen.spacing_large
+            identifier = items.size.toLong()
+        }
+
         if (!viewModel.recentCertificates.isNullOrEmpty()) {
             items += bigTitleItem {
                 text = strings["walletController.recentCertificatesSection.title"]
@@ -169,6 +194,29 @@ class WalletCertificateFragment : MainFragment() {
         }
 
         return items
+    }
+
+    private fun transformHeartEmoji(spannedSubtitle: Spannable?) {
+        val heartIndex = spannedSubtitle?.indexOf("❤️") ?: -1
+        if (heartIndex >= 0) {
+            ContextCompat.getDrawable(requireContext(), R.drawable.ic_empty_heart)?.let { drawable ->
+                val textHeight = R.dimen.caption_font_size.toDimensSize(requireContext())
+                val ratio = textHeight / drawable.intrinsicHeight.toFloat()
+                drawable.setBounds(
+                    0,
+                    0,
+                    (drawable.intrinsicWidth * ratio).roundToInt(),
+                    (drawable.intrinsicHeight * ratio).roundToInt()
+                )
+                spannedSubtitle
+                    ?.setSpan(
+                        ImageSpan(drawable),
+                        heartIndex,
+                        heartIndex + 1,
+                        Spannable.SPAN_INCLUSIVE_EXCLUSIVE,
+                    )
+            }
+        }
     }
 
     private fun codeItemFromWalletDocument(certificate: WalletCertificate): QrCodeCardItem {
@@ -264,7 +312,7 @@ class WalletCertificateFragment : MainFragment() {
                 if (certificate is EuropeanCertificate) {
                     findParentFragmentByType<WalletContainerFragment>()?.findNavControllerOrNull()?.safeNavigate(
                         WalletContainerFragmentDirections.actionWalletContainerFragmentToFullscreenDccFragment(
-                            certificate.value,
+                            id = certificate.id,
                         )
                     )
                 } else {
@@ -279,7 +327,24 @@ class WalletCertificateFragment : MainFragment() {
             }
             onConvert = conversionLambda
             actionContentDescription = strings["accessibility.hint.otherActions"]
-            identifier = certificate.value.hashCode().toLong()
+            favoriteContentDescription = strings["accessibility.hint.addToFavorite"]
+
+            favoriteState = when {
+                certificate is FrenchCertificate -> QrCodeCardItem.FavoriteState.HIDDEN
+                certificate is EuropeanCertificate && certificate.isFavorite -> QrCodeCardItem.FavoriteState.CHECKED
+                else -> QrCodeCardItem.FavoriteState.NOT_CHECKED
+            }
+
+            onFavoriteClick = {
+                if ((certificate as? EuropeanCertificate)?.isFavorite != true) {
+                    binding?.recyclerView?.smoothScrollToPosition(0)
+                }
+
+                (certificate as? EuropeanCertificate)?.let(viewModel::toggleFavorite)
+            }
+            bottomText = strings["walletController.favoriteCertificateSection.openFullScreen"]
+
+            identifier = certificate.id.hashCode().toLong()
         }
     }
 
@@ -350,9 +415,12 @@ class WalletCertificateFragment : MainFragment() {
             }
     }
 
-    private suspend fun processConvertedCertificate(certificateCode: String, certificateFormat: WalletCertificateType.Format?): Boolean {
+    private suspend fun processConvertedCertificate(
+        certificateCode: String,
+        certificateFormat: WalletCertificateType.Format?,
+    ): Boolean {
         return try {
-            val certificate = WalletManager.verifyCertificateCodeValue(
+            val certificate = WalletManager.verifyAndGetCertificateCodeValue(
                 robertManager.configuration,
                 certificateCode,
                 dccCertificatesManager.certificates,

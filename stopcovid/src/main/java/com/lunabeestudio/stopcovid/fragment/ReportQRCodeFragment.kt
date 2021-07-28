@@ -18,7 +18,9 @@ import com.lunabeestudio.stopcovid.extension.showInvalidCodeAlert
 class ReportQRCodeFragment : QRCodeFragment() {
 
     override fun getTitleKey(): String = "declareController.title"
-    override fun getExplanationKey(): String = "scanCodeController.explanation"
+    override val explanationKey: String = "scanCodeController.explanation"
+    override val footerKey: String? = null
+    override fun onFooterClick() {}
 
     override fun onCodeScanned(code: String) {
         if (!code.isReportCodeValid()) {

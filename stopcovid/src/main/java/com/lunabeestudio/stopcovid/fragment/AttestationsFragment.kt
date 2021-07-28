@@ -222,6 +222,7 @@ class AttestationsFragment : MainFragment() {
                 )
             }
             actionContentDescription = strings["accessibility.hint.otherActions"]
+            bottomText = strings["walletController.favoriteCertificateSection.openFullScreen"]
             identifier = mainDescription.hashCode().toLong()
         }
     }
