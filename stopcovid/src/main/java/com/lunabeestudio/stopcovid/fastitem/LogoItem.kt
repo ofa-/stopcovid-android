@@ -16,12 +16,15 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageSwitcher
 import androidx.annotation.ColorInt
+import androidx.annotation.DimenRes
 import androidx.annotation.DrawableRes
 import androidx.core.view.isInvisible
 import androidx.recyclerview.widget.RecyclerView
 import com.lunabeestudio.stopcovid.R
+import com.lunabeestudio.stopcovid.coreui.extension.toDimensSize
 import com.lunabeestudio.stopcovid.databinding.ItemLogoBinding
 import com.mikepenz.fastadapter.binding.AbstractBindingItem
+import kotlin.math.roundToInt
 
 class LogoItem : AbstractBindingItem<ItemLogoBinding>() {
     override val type: Int = R.id.item_logo
@@ -34,6 +37,9 @@ class LogoItem : AbstractBindingItem<ItemLogoBinding>() {
     var imageTint: Int? = null
 
     var onClick: (() -> Unit)? = null
+
+    @DimenRes
+    var minLogoHeightRes: Int = R.dimen.min_logo_height
 
     override fun createBinding(inflater: LayoutInflater, parent: ViewGroup?): ItemLogoBinding {
         return ItemLogoBinding.inflate(inflater, parent, false)
@@ -50,12 +56,21 @@ class LogoItem : AbstractBindingItem<ItemLogoBinding>() {
         binding.imageSwitcher.setOnClickListener {
             onClick?.let { it1 -> it1() }
         }
+        binding.imageSwitcher.minimumHeight = if (minLogoHeightRes == NO_MINIMUM_HEIGHT) {
+            0
+        } else {
+            minLogoHeightRes.toDimensSize(binding.imageSwitcher.context).roundToInt()
+        }
     }
 
     override fun unbindView(binding: ItemLogoBinding) {
         super.unbindView(binding)
         binding.imageView1.imageTintList = null
         binding.imageView2.imageTintList = null
+    }
+
+    companion object {
+        const val NO_MINIMUM_HEIGHT: Int = -1
     }
 
     class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {

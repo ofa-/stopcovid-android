@@ -26,7 +26,9 @@ import com.lunabeestudio.stopcovid.extension.isExpired
 import com.lunabeestudio.stopcovid.extension.toCovidException
 import com.lunabeestudio.stopcovid.manager.IsolationFormStateEnum
 import com.lunabeestudio.stopcovid.manager.IsolationManager
+import com.lunabeestudio.stopcovid.manager.WalletManager
 import com.lunabeestudio.stopcovid.model.CovidException
+import com.lunabeestudio.stopcovid.model.EuropeanCertificate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlin.time.ExperimentalTime
@@ -50,6 +52,16 @@ class ProximityViewModel(
             it?.filter { attestation ->
                 !attestation.isExpired(robertManager.configuration)
             }?.count() ?: 0
+        )
+    }
+
+    val favoriteDcc: LiveData<Event<EuropeanCertificate?>> = WalletManager.walletCertificateLiveData.map { list ->
+        Event(
+            list
+                ?.filterIsInstance<EuropeanCertificate>()
+                ?.firstOrNull { certificate ->
+                    (certificate as? EuropeanCertificate)?.isFavorite == true
+                }
         )
     }
 

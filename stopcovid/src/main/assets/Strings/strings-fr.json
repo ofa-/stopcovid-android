@@ -1,4 +1,4 @@
-{  
+{ 
    "app.name":"TousAntiCovid",
    "onboarding.welcomeController.title":"Bienvenue",
    "onboarding.welcomeController.mainMessage.title":"Soyez alertés et alertez les autres en cas d’exposition à la COVID-19",
@@ -583,7 +583,7 @@
    "keyfigure.nombrevaccinations.colorCode.dark":"#31D158",
    "keyfigure.nombrevaccinations.label":"Nombre total de personnes vaccinées",
    "keyfigure.nombrevaccinations.shortLabel":"Total vaccinés",
-   "keyfigure.nombrevaccinations.description":"Cet indicateur représente le nombre total de personnes primo-vaccinées (personnes ayant reçu une première injection).\nLes données sont consolidées le lendemain de leur remontée pour tenir compte des dernières données de vaccination de la veille au soir.",
+   "keyfigure.nombrevaccinations.description":"Cet indicateur représente le nombre total de personnes vaccinées (personnes ayant reçu toutes leurs doses).\nLes données sont consolidées le lendemain de leur remontée pour tenir compte des dernières données de vaccination de la veille au soir.\n\n👉 Changement le 26 juillet : cet indicateur porte désormais sur les personnes vaccinées, ayant reçu toutes leurs doses.",
    "enterCodeController.alert.expiredCode.title":"Expiré",
    "enterCodeController.alert.expiredCode.message":"Votre présence dans ce lieu date de plus de 15 jours. Il n'est donc plus utile d'un point de vue sanitaire de l'ajouter à votre historique.",
    "keyFigureDetailController.section.evolution.title":"Evolution",
@@ -851,7 +851,7 @@
    "walletController.documents.vaccin":"Attestation de vaccin",
    "walletController.documents.test":"Résultat de test",
    "walletController.whenToUse.title":"Pass sanitaire : quand et comment ?",
-   "walletController.whenToUse.subtitle":"Selon la loi du 31 mai relative à la gestion de la sortie de crise sanitaire, les certificats de test ou de vaccination devront être présentés en France à l’entrée d’un événement de plus de 1 000 personnes ou pour voyager (y compris en Corse et en Outre-mer).\n\nDans le cadre du pass sanitaire conditionnant l'accès aux événements de plus de 1 000 personnes en France 🇫🇷, il est accepté :\n\n👉 un certificat de vaccination complet (toutes les doses nécessaires) et réalisé il y a plus de 1 semaine pour tous les vaccins, sauf Janssen/Johnson & Johnson pour lequel c’est 4 semaines.\n\n👉 un certificat de test RT-PCR ou antigénique négatif de moins de 48h\n\n👉 un certificat de test RT-PCR ou antigénique positif, datant d'au moins 11 jours et de moins de 6 mois.\n\nPour les voyages et les conditions de validité du pass sanitaire par pays, plus d'information sur le lien suivant 👇",
+   "walletController.whenToUse.subtitle":"Selon le décret du 16 juillet 2021, les certificats de test ou de vaccination devront être présentés en France pour les lieux et activités soumis au pass sanitaire sur le territoire français.\n\nDans le cadre du pass sanitaire conditionnant l'accès à ces lieux et activités en France 🇫🇷, il est accepté :\n\n👉 un certificat de vaccination complet (toutes les doses nécessaires) et réalisé il y a plus de 1 semaine pour tous les vaccins, sauf Janssen/Johnson & Johnson pour lequel c’est 4 semaines.\n\n👉 un certificat de test RT-PCR ou antigénique négatif de moins de 48h\n\n👉 un certificat de test RT-PCR (pas antigénique) positif, datant d'au moins 11 jours et de moins de 6 mois.\n\nPour les voyages et les conditions de validité du pass sanitaire par pays, plus d'information sur le lien suivant 👇",
    "walletController.whenToUse.button":"Infos voyages",
    "walletController.whenToUse.url":"https://bonjour.tousanticovid.gouv.fr/voyager.html",
    "walletController.phone.title":"Besoin d'aide ?",
@@ -999,7 +999,7 @@
    
    "keyfigure.couvcompletvaccination.label":"Couverture vaccinale",
    "keyfigure.couvcompletvaccination.shortLabel":"Couverture vaccinale",
-   "keyfigure.couvcompletvaccination.description":"Cet indicateur reflète la part de la population vaccinée avec un schéma complet (l'ensemble des doses nécessaires).",
+   "keyfigure.couvcompletvaccination.description":"Cet indicateur reflète la part de la population vaccinée de plus de 12 ans avec un schéma complet (l'ensemble des doses nécessaires).\n\n👉 Changement le 24 juillet : cet indicateur porte désormais sur la population vaccinée de plus de 12 ans.",
    "keyfigure.couvcompletvaccination.colorCode.light":"#18B1BF",
    "keyfigure.couvcompletvaccination.colorCode.dark":"#72E1EB",
    "common.skip":"Passer",
@@ -1007,7 +1007,7 @@
    "europeanCertificate.fullscreen.type.minimum": "Activité",
    "europeanCertificate.fullscreen.type.border": "Frontière",
    "europeanCertificate.fullscreen.type.border.switch": "Mode frontière",
-   "europeanCertificate.fullscreen.type.minimum.footer" : "👉 Cet affichage du QR Code est à utiliser dans le cadre du pass sanitaire sur le territoire français pour les activités de plus de 1 000 personnes et les boîtes de nuit. Pour un passage de frontière, veuillez passer en mode \"Frontière\".",
+   "europeanCertificate.fullscreen.type.minimum.footer" : "👉 Cet affichage du QR Code est à utiliser pour les lieux et activités soumis au pass sanitaire sur le territoire français. Pour un passage de frontière, veuillez passer en mode \"Frontière\".",
    "europeanCertificate.fullscreen.englishDescription.vaccine": "<FULL_NAME>\nDate of birth: <BIRTHDATE>\n<VACCINE_NAME>\nInjection date: <DATE>",
    "europeanCertificate.fullscreen.englishDescription.recovery": "<FULL_NAME>\nDate of birth: <BIRTHDATE>\nTested on <DATE>",
    "europeanCertificate.fullscreen.englishDescription.test": "<FULL_NAME>\nDate of birth: <BIRTHDATE>\n<ANALYSIS_RESULT> - <ANALYSIS_CODE>\nTested on <FROM_DATE>",
@@ -1036,5 +1036,13 @@
    "userLanguageController.title":"Langue",
    "userLanguageController.subtitle":"Veuillez sélectionner la langue que vous préférez :",
    "userLanguageController.footer":"Vous pouvez modifier cela plus tard dans les paramètres de l'application.",
-   "userLanguageController.button.title":"OK"
+   "userLanguageController.button.title":"OK",
+   "accessibility.hint.addToFavorite": "Ajouter en favori",
+   "flashWalletCodeController.footer.text": "⚠️ Pour les professionnels, la vérification de certificats est uniquement permise avec l’application “TAC Vérif” que vous pouvez trouver sur les Stores.\nAppuyez pour en savoir plus.",
+   "flashWalletCodeController.footer.link.ios": "https://apps.apple.com/fr/app/tousanticovid-verif/id1562303493",
+   "flashWalletCodeController.footer.link.android": "https://play.google.com/store/apps/details?id=com.ingroupe.verify.anticovid",
+   "universalQrScanController.footer.text": "⚠️ Pour les professionnels, la vérification de certificats est uniquement permise avec l’application “TAC Vérif” que vous pouvez trouver sur les Stores.\nAppuyez pour en savoir plus.",
+   "universalQrScanController.footer.link.ios": "https://apps.apple.com/fr/app/tousanticovid-verif/id1562303493",
+   "universalQrScanController.footer.link.android": "https://play.google.com/store/apps/details?id=com.ingroupe.verify.anticovid",
+   "wallet.proof.europe.foreignCountryWarning.gb": "⚠️ Veuillez contacter le NHS - L'authenticité des certificats NHS n'est pas en conformité avec les normes de l'UE. Des travaux sont en cours."
 }

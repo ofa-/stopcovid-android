@@ -21,6 +21,8 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.lunabeestudio.analytics.manager.AnalyticsManager
+import com.lunabeestudio.analytics.model.AppEventName
 import com.lunabeestudio.domain.model.WalletCertificateType
 import com.lunabeestudio.robert.extension.safeEnumValueOf
 import com.lunabeestudio.stopcovid.activity.MainActivity
@@ -62,7 +64,7 @@ class WalletContainerFragment : BaseFragment() {
     }
 
     private val viewModel: WalletViewModel by viewModels {
-        WalletViewModelFactory(robertManager, keystoreDataSource, dccCertificatesManager)
+        WalletViewModelFactory(robertManager, keystoreDataSource)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -165,7 +167,7 @@ class WalletContainerFragment : BaseFragment() {
         certificateFormat: WalletCertificateType.Format?
     ): WalletCertificate? {
         return try {
-            WalletManager.verifyCertificateCodeValue(
+            WalletManager.verifyAndGetCertificateCodeValue(
                 robertManager.configuration,
                 certificateCode,
                 dccCertificatesManager.certificates,
@@ -198,7 +200,8 @@ class WalletContainerFragment : BaseFragment() {
 
     private suspend fun processCertificate(certificate: WalletCertificate) {
         try {
-            viewModel.saveCertificate(requireContext(), certificate)
+            viewModel.saveCertificate(certificate)
+            AnalyticsManager.reportAppEvent(requireContext(), AppEventName.e13, null)
 
             val vaccination = (certificate as? EuropeanCertificate)?.greenCertificate?.vaccinations?.lastOrNull()
             if (vaccination != null && vaccination.doseNumber >= vaccination.totalSeriesOfDoses) {
@@ -218,7 +221,7 @@ class WalletContainerFragment : BaseFragment() {
     }
 
     private suspend fun handleCertificateError(error: Exception, certificateCode: String?) {
-        val certificateType = certificateCode?.let { WalletCertificate.getTypeFromValue(it) } ?: WalletCertificateType.SANITARY
+        val certificateType = certificateCode?.let { WalletCertificate.getTypeFromValue(it) } ?: WalletCertificateType.VACCINATION_EUROPE
         handleCertificateError(error, certificateType)
     }
 

@@ -215,4 +215,4 @@ fun SanitaryCertificate.validityString(configuration: Configuration, strings: Lo
 }
 
 val WalletCertificate.raw: RawWalletCertificate
-    get() = RawWalletCertificate(type, value, timestamp)
+    get() = RawWalletCertificate(id, type, value, timestamp, (this as? EuropeanCertificate)?.isFavorite ?: false)

@@ -52,4 +52,5 @@
     <item name="item_phone_support" type="id" />
     <item name="wallet_pager" type="id" />
     <item name="item_add_certificate_card" type="id" />
+    <item name="item_small_qr_code_card_item" type="id" />
 </resources>

@@ -1,6 +1,6 @@
 {
   "config": [
-	{
+    {
       "name": "lastUpdate",
       "value": "16 Jul 2021"
     },
@@ -33,12 +33,16 @@
       "value": "v1"
     },
     {
-	    "name" : "app.cleaUrls",
-	    "value" : ["https://s3.fr-par.scw.cloud/clea-batch/", "https://signal-static.oos.cloudgouv-eu-west-1.outscale.com/", "https://signal-static.tousanticovid.gouv.fr/"]
+        "name" : "app.cleaUrls",
+        "value" : ["https://s3.fr-par.scw.cloud/clea-batch/", "https://signal-static.oos.cloudgouv-eu-west-1.outscale.com/", "https://signal-static.tousanticovid.gouv.fr/"]
     },
     {
-	    "name" : "app.ameliUrl",
-	    "value" : "https://declare.ameli.fr/tousanticovid/t/%@/"
+        "name" : "app.ameliUrl",
+        "value" : "https://declare.ameli.fr/tousanticovid/t/%@/"
+    },
+    {
+        "name" : "app.ratingsKeyFiguresOpeningThreshold",
+        "value" : 10
     },
     {
         "name" : "app.contagiousSpan",
@@ -97,12 +101,12 @@
         {
           "auth": "FR03",
           "pubKeys":
-          	{
-	          	"AHP1": "-----BEGIN PUBLIC KEY-----MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEPnxJntwNwme9uHSasmGFFwdC0FWNEpucgzhjr+/AZ6UuTm3kL3ogEUAwKU0tShEVmZNK4/lM05h+0ZvtboJM/A==-----END PUBLIC KEY-----",
-	            "AHP2": "-----BEGIN PUBLIC KEY-----MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEOYUgmx8pKu0UbyqQ/kt4+PXSpUprkO2YLHmzzoN66XjDW0AnSzXorFPe556p73Vawqaoy3qQKDIDB62IBYWBuA==-----END PUBLIC KEY-----",
-	            "AV01": "-----BEGIN PUBLIC KEY-----MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE1T9uG2bEP7uWND6RT/lJs2y787BkEJoRMMLXvqPKFFC3ckqFAPnFjbiv/odlWH04a1P9CvaCRxG31FMEOFZyXA==-----END PUBLIC KEY-----",
-	            "AV02": "-----BEGIN PUBLIC KEY-----MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE3jL6zQ0aQj9eJHUw4VDHB9sMoviLVIlADnoBwC43Md8p9w655z2bDhYEEajQ2amQzt+eU7HdWrvqY23Do91Izg==-----END PUBLIC KEY-----",
-	             "ING1": "-----BEGIN PUBLIC KEY-----MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEaMOVmK4FAlYeU8tUGpQgtpuLgwSn/arX/4ltKt/wYCole7rB4ECRLtSH4domHU/Z1cjUmVfyGH6NcboWrys9ww==-----END PUBLIC KEY-----"
+              {
+                  "AHP1": "-----BEGIN PUBLIC KEY-----MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEPnxJntwNwme9uHSasmGFFwdC0FWNEpucgzhjr+/AZ6UuTm3kL3ogEUAwKU0tShEVmZNK4/lM05h+0ZvtboJM/A==-----END PUBLIC KEY-----",
+                "AHP2": "-----BEGIN PUBLIC KEY-----MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEOYUgmx8pKu0UbyqQ/kt4+PXSpUprkO2YLHmzzoN66XjDW0AnSzXorFPe556p73Vawqaoy3qQKDIDB62IBYWBuA==-----END PUBLIC KEY-----",
+                "AV01": "-----BEGIN PUBLIC KEY-----MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE1T9uG2bEP7uWND6RT/lJs2y787BkEJoRMMLXvqPKFFC3ckqFAPnFjbiv/odlWH04a1P9CvaCRxG31FMEOFZyXA==-----END PUBLIC KEY-----",
+                "AV02": "-----BEGIN PUBLIC KEY-----MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE3jL6zQ0aQj9eJHUw4VDHB9sMoviLVIlADnoBwC43Md8p9w655z2bDhYEEajQ2amQzt+eU7HdWrvqY23Do91Izg==-----END PUBLIC KEY-----",
+                 "ING1": "-----BEGIN PUBLIC KEY-----MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEaMOVmK4FAlYeU8tUGpQgtpuLgwSn/arX/4ltKt/wYCole7rB4ECRLtSH4domHU/Z1cjUmVfyGH6NcboWrys9ww==-----END PUBLIC KEY-----"
             }
         }
       ]
@@ -262,7 +266,7 @@
           "code":"DEFAULT",
           "value":7
         },
-			  {
+              {
           "code":"EU/1/20/1525",
           "value":28
         }
@@ -303,7 +307,7 @@
     {
       "name": "ble.dontUseScannerHardwareBatching",
       "value": [ "G3121", "E5603", "SM-G981B", "CDY-NX9A", "SM-J530F", "SM-G770F", "SM-G780F", "SM-G781B", "SM-G960F", "SM-G965F", "SM-G970F", "SM-G973F", "SM-G975F", "SM-G977B", "SM-G980F",  "SM-G981B", "SM-G985F", "SM-G986B", "SM-G988B", "SM-G991B", "SM-G996B", "SM-G998B", "SM-N770F", "SM-N970F", "SM-N975F", "SM-N976B", "SM-N980F", "SM-N981B", "SM-N985F", "SM-N986B", "SM-F700F", "SM-F707B", "SM-F900F", "SM-F916B", "SM-A025G", "SM-A125F", "SM-A326B", "SM-A415F", "SM-A415FN", "SM-A505FN", "SM-A525F", "SM-A526B", "SM-A715F", "SM-A805F", "SM-M115F", "SM-M315F", "SM-M317F", "SM-M515F", "SM-A202F", "SM-A207F", "SM-G715FN", "SM-J730F", "SM-A515F", "SM-J600FN" ]
-	},
+    },
     {
       "name": "ble.calibration",
       "value": [

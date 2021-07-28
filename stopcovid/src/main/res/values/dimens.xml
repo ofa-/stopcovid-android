@@ -20,4 +20,5 @@
 
 <resources>
     <dimen name="certificate_single_thumbnail_height">250dp</dimen>
+    <dimen name="small_qr_code_size">80dp</dimen>
 </resources>

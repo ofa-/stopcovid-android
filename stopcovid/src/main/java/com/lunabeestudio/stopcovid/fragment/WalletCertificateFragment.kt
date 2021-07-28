@@ -12,11 +12,15 @@ package com.lunabeestudio.stopcovid.fragment
 
 import android.graphics.Bitmap
 import android.os.Bundle
+import android.text.Spannable
 import android.text.SpannableString
 import android.text.method.LinkMovementMethod
+import android.text.style.ImageSpan
 import android.text.util.Linkify
 import android.view.View
 import android.widget.TextView
+import androidx.core.content.ContextCompat
+import androidx.core.text.toSpannable
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -37,8 +41,10 @@ import com.lunabeestudio.stopcovid.coreui.extension.toDimensSize
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.extension.barcodeFormat
+import com.lunabeestudio.stopcovid.extension.countryCode
 import com.lunabeestudio.stopcovid.extension.dccCertificatesManager
 import com.lunabeestudio.stopcovid.extension.fullDescription
+import com.lunabeestudio.stopcovid.extension.isFrench
 import com.lunabeestudio.stopcovid.extension.openInExternalBrowser
 import com.lunabeestudio.stopcovid.extension.raw
 import com.lunabeestudio.stopcovid.extension.robertManager
@@ -64,6 +70,7 @@ import com.lunabeestudio.stopcovid.viewmodel.WalletViewModel
 import com.lunabeestudio.stopcovid.viewmodel.WalletViewModelFactory
 import com.mikepenz.fastadapter.GenericItem
 import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 import kotlin.time.ExperimentalTime
 
 import android.content.SharedPreferences
@@ -98,7 +105,7 @@ class WalletCertificateFragment : MainFragment() {
             findParentFragmentByType<WalletContainerFragment>() ?: requireParentFragment()
         },
         {
-            WalletViewModelFactory(robertManager, keystoreDataSource, dccCertificatesManager)
+            WalletViewModelFactory(robertManager, keystoreDataSource)
         }
     )
 
@@ -140,13 +147,29 @@ class WalletCertificateFragment : MainFragment() {
             }
         }
 
+        items += bigTitleItem {
+            text = strings["walletController.favoriteCertificateSection.title"]
+            identifier = text.hashCode().toLong()
+        }
+        if (viewModel.favoriteCertificates.isNullOrEmpty()) {
+            items += captionItem {
+                val spannedSubtitle = strings["walletController.favoriteCertificateSection.subtitle"]?.toSpannable()
+                transformHeartEmoji(spannedSubtitle)
+                text = spannedSubtitle
+                identifier = text.hashCode().toLong()
+            }
+        }
+        viewModel.favoriteCertificates?.forEach { certificate ->
+            items += codeItemFromWalletDocument(certificate)
+        }
+        items += spaceItem {
+            spaceRes = R.dimen.spacing_large
+            identifier = items.size.toLong()
+        }
+
         if (!viewModel.recentCertificates.isNullOrEmpty()) {
             items += bigTitleItem {
                 text = strings["walletController.recentCertificatesSection.title"]
-                identifier = text.hashCode().toLong()
-            }
-            items += captionItem {
-                text = strings["walletController.recentCertificatesSection.subtitle"]
                 identifier = text.hashCode().toLong()
             }
             viewModel.recentCertificates?.forEach { certificate ->
@@ -179,6 +202,29 @@ class WalletCertificateFragment : MainFragment() {
         return items
     }
 
+    private fun transformHeartEmoji(spannedSubtitle: Spannable?) {
+        val heartIndex = spannedSubtitle?.indexOf("❤️") ?: -1
+        if (heartIndex >= 0) {
+            ContextCompat.getDrawable(requireContext(), R.drawable.ic_empty_heart)?.let { drawable ->
+                val textHeight = R.dimen.caption_font_size.toDimensSize(requireContext())
+                val ratio = textHeight / drawable.intrinsicHeight.toFloat()
+                drawable.setBounds(
+                    0,
+                    0,
+                    (drawable.intrinsicWidth * ratio).roundToInt(),
+                    (drawable.intrinsicHeight * ratio).roundToInt()
+                )
+                spannedSubtitle
+                    ?.setSpan(
+                        ImageSpan(drawable),
+                        heartIndex,
+                        heartIndex + 1,
+                        Spannable.SPAN_INCLUSIVE_EXCLUSIVE,
+                    )
+            }
+        }
+    }
+
     private fun codeItemFromWalletDocument(certificate: WalletCertificate): QrCodeCardItem {
         val barcodeFormat = when (certificate) {
             is FrenchCertificate -> BarcodeFormat.DATA_MATRIX
@@ -198,7 +244,6 @@ class WalletCertificateFragment : MainFragment() {
             is FrenchCertificate -> {
                 if (robertManager.configuration.displayCertificateConversion) {
                     {
-                        AnalyticsManager.reportAppEvent(requireContext(), AppEventName.e20, null)
                         showConversionConfirmationAlert(certificate)
                     }
                 } else {
@@ -214,13 +259,18 @@ class WalletCertificateFragment : MainFragment() {
         return qrCodeCardItem {
             this.generateBarcode = generateBarcode
             mainDescription = certificateDetails
-            footerDescription = if ((certificate as? EuropeanCertificate)?.greenCertificate?.testResultIsNegative == false) {
-                // Fix SIDEP has generated positive test instead of recovery
-                val span = strings["wallet.proof.europe.test.positiveSidepError"]?.let { SpannableString(it) }
-                span?.let { Linkify.addLinks(it, Linkify.WEB_URLS) }
-                span
-            } else {
-                null
+            val greenCertificate = (certificate as? EuropeanCertificate)?.greenCertificate
+            footerDescription = when {
+                greenCertificate == null -> null
+                greenCertificate.testResultIsNegative == false -> {
+                    // Fix SIDEP has generated positive test instead of recovery
+                    strings["wallet.proof.europe.test.positiveSidepError"]?.toSpannable()?.also {
+                        Linkify.addLinks(it, Linkify.WEB_URLS)
+                    }
+                }
+                !greenCertificate.isFrench ->
+                    strings["wallet.proof.europe.foreignCountryWarning.${greenCertificate.countryCode?.lowercase()}"]?.toSpannable()
+                else -> null
             }
             share = strings["walletController.menu.share"]
             delete = strings["walletController.menu.delete"]
@@ -254,7 +304,7 @@ class WalletCertificateFragment : MainFragment() {
                 if (certificate is EuropeanCertificate) {
                     findParentFragmentByType<WalletContainerFragment>()?.findNavControllerOrNull()?.safeNavigate(
                         WalletContainerFragmentDirections.actionWalletContainerFragmentToFullscreenDccFragment(
-                            certificate.value,
+                            id = certificate.id,
                         )
                     )
                 } else {
@@ -269,7 +319,23 @@ class WalletCertificateFragment : MainFragment() {
             }
             onConvert = conversionLambda
             actionContentDescription = strings["accessibility.hint.otherActions"]
-            identifier = certificate.value.hashCode().toLong()
+            favoriteContentDescription = strings["accessibility.hint.addToFavorite"]
+
+            favoriteState = when {
+                certificate is FrenchCertificate -> QrCodeCardItem.FavoriteState.HIDDEN
+                certificate is EuropeanCertificate && certificate.isFavorite -> QrCodeCardItem.FavoriteState.CHECKED
+                else -> QrCodeCardItem.FavoriteState.NOT_CHECKED
+            }
+
+            onFavoriteClick = {
+                if ((certificate as? EuropeanCertificate)?.isFavorite != true) {
+                    binding?.recyclerView?.smoothScrollToPosition(0)
+                }
+
+                (certificate as? EuropeanCertificate)?.let(viewModel::toggleFavorite)
+            }
+
+            identifier = certificate.id.hashCode().toLong()
         }
     }
 
@@ -289,6 +355,7 @@ class WalletCertificateFragment : MainFragment() {
                 .setMessage(strings["walletController.menu.convertToEurope.alert.message"])
                 .setPositiveButton(strings["common.ok"]) { _, _ ->
                     requestCertificateConversion(certificate)
+                    AnalyticsManager.reportAppEvent(requireContext(), AppEventName.e20, null)
                 }
                 .setNegativeButton(strings["common.cancel"], null)
                 .setNeutralButton(strings["walletController.menu.convertToEurope.alert.terms"]) { _, _ ->
@@ -340,16 +407,20 @@ class WalletCertificateFragment : MainFragment() {
             }
     }
 
-    private suspend fun processConvertedCertificate(certificateCode: String, certificateFormat: WalletCertificateType.Format?): Boolean {
+    private suspend fun processConvertedCertificate(
+        certificateCode: String,
+        certificateFormat: WalletCertificateType.Format?,
+    ): Boolean {
         return try {
-            val certificate = WalletManager.verifyCertificateCodeValue(
+            val certificate = WalletManager.verifyAndGetCertificateCodeValue(
                 robertManager.configuration,
                 certificateCode,
                 dccCertificatesManager.certificates,
                 certificateFormat,
             )
 
-            viewModel.saveCertificate(requireContext(), certificate)
+            viewModel.saveCertificate(certificate)
+            AnalyticsManager.reportAppEvent(requireContext(), AppEventName.e21, null)
 
             val vaccination = (certificate as? EuropeanCertificate)?.greenCertificate?.vaccinations?.lastOrNull()
             if (vaccination != null && vaccination.doseNumber >= vaccination.totalSeriesOfDoses) {

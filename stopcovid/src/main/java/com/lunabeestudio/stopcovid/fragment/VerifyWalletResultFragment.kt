@@ -40,7 +40,7 @@ class VerifyWalletResultFragment : BaseFragment() {
 
         lifecycleScope.launch {
             certificate = try {
-                WalletManager.verifyCertificateCodeValue(
+                WalletManager.verifyAndGetCertificateCodeValue(
                     robertManager.configuration,
                     args.certificateCode,
                     dccCertificatesManager.certificates,

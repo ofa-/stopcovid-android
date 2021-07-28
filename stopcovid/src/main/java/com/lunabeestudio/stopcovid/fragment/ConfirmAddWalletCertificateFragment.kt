@@ -1,83 +1,71 @@
 package com.lunabeestudio.stopcovid.fragment
 
+import android.os.Bundle
 import android.view.Gravity
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
+import androidx.core.view.doOnNextLayout
+import androidx.core.view.isVisible
 import androidx.fragment.app.setFragmentResult
 import androidx.navigation.fragment.navArgs
-import com.lunabeestudio.stopcovid.R
+import com.lunabeestudio.stopcovid.activity.MainActivity
+import com.lunabeestudio.stopcovid.coreui.extension.appCompatActivity
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
-import com.lunabeestudio.stopcovid.coreui.fastitem.buttonItem
-import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
-import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
-import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
-import com.lunabeestudio.stopcovid.fastitem.dangerButtonItem
-import com.lunabeestudio.stopcovid.fastitem.logoItem
-import com.mikepenz.fastadapter.GenericItem
+import com.lunabeestudio.stopcovid.coreui.extension.safeEmojiSpanify
+import com.lunabeestudio.stopcovid.coreui.extension.setTextOrHide
+import com.lunabeestudio.stopcovid.coreui.fragment.BaseFragment
+import com.lunabeestudio.stopcovid.databinding.FragmentConfirmAddWalletCertificateBinding
 
-class ConfirmAddWalletCertificateFragment : MainFragment() {
+class ConfirmAddWalletCertificateFragment : BaseFragment() {
 
     private val args: ConfirmAddWalletCertificateFragmentArgs by navArgs()
 
-    override fun getTitleKey(): String = "confirmWalletQrCodeController.title"
+    private lateinit var binding: FragmentConfirmAddWalletCertificateBinding
 
-    override fun getItems(): List<GenericItem> {
-        val items = arrayListOf<GenericItem>()
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        binding = FragmentConfirmAddWalletCertificateBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
-        items += logoItem {
-            imageRes = R.drawable.wallet
-            identifier = R.drawable.wallet.toLong()
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        if ((activity as? MainActivity)?.binding?.tabLayout?.isVisible == true) {
+            postponeEnterTransition()
+            (activity as? MainActivity)?.binding?.appBarLayout?.doOnNextLayout {
+                startPostponedEnterTransition()
+            }
+            (activity as? MainActivity)?.binding?.tabLayout?.isVisible = false
         }
-        items += spaceItem {
-            spaceRes = R.dimen.spacing_large
-            identifier = items.count().toLong()
-        }
-        items += captionItem {
-            text = strings["confirmWalletQrCodeController.explanation.title"]
-            gravity = Gravity.CENTER
-            identifier = "confirmWalletQrCodeController.explanation.title".hashCode().toLong()
-        }
-        items += titleItem {
-            text = strings["confirmWalletQrCodeController.explanation.subtitle"]
-            gravity = Gravity.CENTER
-            identifier = "confirmWalletQrCodeController.explanation.subtitle".hashCode().toLong()
-        }
-        items += spaceItem {
-            spaceRes = R.dimen.spacing_large
-            identifier = items.count().toLong()
-        }
-        items += buttonItem {
-            text = strings["confirmWalletQrCodeController.confirm"]
-            gravity = Gravity.CENTER
-            width = ViewGroup.LayoutParams.MATCH_PARENT
-            onClickListener = View.OnClickListener {
-                setFragmentResult(
-                    WalletContainerFragment.CONFIRM_ADD_CODE_RESULT_KEY,
-                    bundleOf(
-                        WalletContainerFragment.CONFIRM_ADD_CODE_BUNDLE_KEY_CONFIRM to true,
-                        WalletContainerFragment.CONFIRM_ADD_CODE_BUNDLE_KEY_CODE to args.certificateCode,
-                        WalletContainerFragment.CONFIRM_ADD_CODE_BUNDLE_KEY_FORMAT to args.certificateFormat,
-                    )
+    }
+
+    override fun refreshScreen() {
+        appCompatActivity?.supportActionBar?.title = strings["confirmWalletQrCodeController.title"]
+
+        binding.walletCaptionTextView.textView.setTextOrHide(strings["confirmWalletQrCodeController.explanation.title"])
+        binding.walletCaptionTextView.textView.gravity = Gravity.CENTER
+
+        binding.walletTitleTextView.textSwitcher.setText(strings["confirmWalletQrCodeController.explanation.subtitle"]?.safeEmojiSpanify())
+        binding.walletTitleTextView.textView1.gravity = Gravity.CENTER
+        binding.walletTitleTextView.textView2.gravity = Gravity.CENTER
+
+        binding.walletAddButton.setTextOrHide(strings["confirmWalletQrCodeController.confirm"])
+        binding.walletAddButton.setOnClickListener {
+            setFragmentResult(
+                WalletContainerFragment.CONFIRM_ADD_CODE_RESULT_KEY,
+                bundleOf(
+                    WalletContainerFragment.CONFIRM_ADD_CODE_BUNDLE_KEY_CONFIRM to true,
+                    WalletContainerFragment.CONFIRM_ADD_CODE_BUNDLE_KEY_CODE to args.certificateCode,
+                    WalletContainerFragment.CONFIRM_ADD_CODE_BUNDLE_KEY_FORMAT to args.certificateFormat,
                 )
-                findNavControllerOrNull()?.navigateUp()
-            }
-            identifier = "confirmWalletQrCodeController.confirm".hashCode().toLong()
-        }
-        items += dangerButtonItem {
-            text = strings["common.cancel"]
-            gravity = Gravity.CENTER
-            width = ViewGroup.LayoutParams.MATCH_PARENT
-            onClickListener = View.OnClickListener {
-                findNavControllerOrNull()?.navigateUp()
-            }
-            identifier = "common.cancel".hashCode().toLong()
-        }
-        items += spaceItem {
-            spaceRes = R.dimen.spacing_large
-            identifier = items.count().toLong()
+            )
+            findNavControllerOrNull()?.navigateUp()
         }
 
-        return items
+        binding.walletCancelButton.setTextOrHide(strings["common.cancel"])
+        binding.walletCancelButton.setOnClickListener {
+            findNavControllerOrNull()?.navigateUp()
+        }
     }
 }

@@ -24,6 +24,7 @@ import com.journeyapps.barcodescanner.BarcodeResult
 import com.lunabeestudio.stopcovid.coreui.extension.appCompatActivity
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.extension.openAppSettings
+import com.lunabeestudio.stopcovid.coreui.extension.setTextOrHide
 import com.lunabeestudio.stopcovid.coreui.extension.showPermissionRationale
 import com.lunabeestudio.stopcovid.coreui.fragment.BaseFragment
 import com.lunabeestudio.stopcovid.databinding.FragmentQrCodeBinding
@@ -33,7 +34,9 @@ abstract class QRCodeFragment : BaseFragment() {
 
     private var permissionResultLauncher: ActivityResultLauncher<String>? = null
     abstract fun getTitleKey(): String
-    abstract fun getExplanationKey(): String
+    abstract val explanationKey: String
+    abstract val footerKey: String?
+    abstract fun onFooterClick()
     abstract fun onCodeScanned(code: String)
     protected var isReadyToStartScanFlow: Boolean = true
 
@@ -151,6 +154,8 @@ abstract class QRCodeFragment : BaseFragment() {
     }
 
     override fun refreshScreen() {
-        binding?.title?.text = strings[getExplanationKey()]
+        binding?.title?.setTextOrHide(strings[explanationKey])
+        binding?.footer?.setTextOrHide(footerKey?.let(strings::get).takeIf { !it.isNullOrBlank() })
+        binding?.footer?.setOnClickListener { onFooterClick() }
     }
 }

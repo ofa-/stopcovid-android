@@ -1,6 +1,7 @@
 package com.lunabeestudio.stopcovid.model
 
 import android.util.Base64
+import com.lunabeestudio.domain.model.RawWalletCertificate
 import com.lunabeestudio.domain.model.WalletCertificateType
 import com.lunabeestudio.framework.crypto.BouncyCastleSignatureVerifier
 import com.lunabeestudio.stopcovid.extension.certificateType
@@ -25,8 +26,10 @@ import java.security.SignatureException
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.util.UUID
 
 sealed class WalletCertificate(
+    val id: String,
     open val value: String,
 ) {
     abstract val type: WalletCertificateType
@@ -43,9 +46,23 @@ sealed class WalletCertificate(
     abstract fun verifyKey(publicKey: String)
 
     companion object {
-        suspend fun fromValue(value: String): WalletCertificate? {
+        suspend fun createCertificateFromValue(value: String): WalletCertificate? {
             return withContext(Dispatchers.Default) {
-                SanitaryCertificate.fromValue(value) ?: VaccinationCertificate.fromValue(value) ?: EuropeanCertificate.fromValue(value)
+                SanitaryCertificate.getCertificate(value)
+                    ?: VaccinationCertificate.getCertificate(value)
+                    ?: EuropeanCertificate.getCertificate(value)
+            }
+        }
+
+        suspend fun createCertificateFromRaw(rawWalletCertificate: RawWalletCertificate): WalletCertificate? {
+            return withContext(Dispatchers.Default) {
+                SanitaryCertificate.getCertificate(rawWalletCertificate.value, rawWalletCertificate.id)
+                    ?: VaccinationCertificate.getCertificate(rawWalletCertificate.value, rawWalletCertificate.id)
+                    ?: EuropeanCertificate.getCertificate(
+                        rawWalletCertificate.value,
+                        rawWalletCertificate.id,
+                        rawWalletCertificate.isFavorite
+                    )
             }
         }
 
@@ -59,7 +76,7 @@ sealed class WalletCertificate(
     }
 }
 
-sealed class FrenchCertificate(value: String) : WalletCertificate(value) {
+sealed class FrenchCertificate(id: String, value: String) : WalletCertificate(id, value) {
     var keyAuthority: String = ""
     var keySignature: String = ""
 
@@ -98,7 +115,7 @@ sealed class FrenchCertificate(value: String) : WalletCertificate(value) {
     }
 }
 
-class SanitaryCertificate private constructor(override val value: String) : FrenchCertificate(value) {
+class SanitaryCertificate private constructor(id: String, override val value: String) : FrenchCertificate(id, value) {
     override val type: WalletCertificateType = WalletCertificateType.SANITARY
 
     var birthDate: String? = null
@@ -179,8 +196,11 @@ class SanitaryCertificate private constructor(override val value: String) : Fren
             .plus("B2") // Characters 20 and 21 represent the wallet certificate type (sanitary, ...)
             .toRegex()
 
-        fun fromValue(value: String): SanitaryCertificate? = if (validationRegex.matches(value)) {
-            SanitaryCertificate(value)
+        fun getCertificate(
+            value: String,
+            id: String = UUID.randomUUID().toString(),
+        ): SanitaryCertificate? = if (validationRegex.matches(value)) {
+            SanitaryCertificate(id, value)
         } else {
             null
         }
@@ -193,7 +213,7 @@ class SanitaryCertificate private constructor(override val value: String) : Fren
     }
 }
 
-class VaccinationCertificate private constructor(override val value: String) : FrenchCertificate(value) {
+class VaccinationCertificate private constructor(id: String, override val value: String) : FrenchCertificate(id, value) {
     override val type: WalletCertificateType = WalletCertificateType.VACCINATION
 
     var birthDate: String? = null
@@ -294,8 +314,11 @@ class VaccinationCertificate private constructor(override val value: String) : F
             .plus("L1") // Characters 20 and 21 represent the wallet certificate type (sanitary, ...)
             .toRegex()
 
-        fun fromValue(value: String): VaccinationCertificate? = if (validationRegex.matches(value)) {
-            VaccinationCertificate(value)
+        fun getCertificate(
+            value: String,
+            id: String = UUID.randomUUID().toString(),
+        ): VaccinationCertificate? = if (validationRegex.matches(value)) {
+            VaccinationCertificate(id, value)
         } else {
             null
         }
@@ -309,7 +332,7 @@ class VaccinationCertificate private constructor(override val value: String) : F
 }
 
 @OptIn(ExperimentalUnsignedTypes::class)
-class EuropeanCertificate private constructor(value: String) : WalletCertificate(value) {
+class EuropeanCertificate private constructor(id: String, value: String, val isFavorite: Boolean) : WalletCertificate(id, value) {
     override val timestamp: Long
     override val type: WalletCertificateType
     private val kid: ByteArray
@@ -355,9 +378,13 @@ class EuropeanCertificate private constructor(value: String) : WalletCertificate
     }
 
     companion object {
-        fun fromValue(value: String): EuropeanCertificate? {
+        fun getCertificate(
+            value: String,
+            id: String = UUID.randomUUID().toString(),
+            isFavorite: Boolean = false,
+        ): EuropeanCertificate? {
             return try {
-                EuropeanCertificate(value)
+                EuropeanCertificate(id, value, isFavorite)
             } catch (e: IllegalStateException) {
                 Timber.e(e)
                 null

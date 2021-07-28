@@ -10,26 +10,22 @@
 
 package com.lunabeestudio.stopcovid.viewmodel
 
-import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.map
-import com.lunabeestudio.analytics.manager.AnalyticsManager
-import com.lunabeestudio.analytics.model.AppEventName
 import com.lunabeestudio.framework.local.datasource.SecureKeystoreDataSource
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.robert.datasource.LocalKeystoreDataSource
 import com.lunabeestudio.stopcovid.extension.isOld
 import com.lunabeestudio.stopcovid.extension.isRecent
-import com.lunabeestudio.stopcovid.manager.DccCertificatesManager
 import com.lunabeestudio.stopcovid.manager.WalletManager
+import com.lunabeestudio.stopcovid.model.EuropeanCertificate
 import com.lunabeestudio.stopcovid.model.WalletCertificate
 
 class WalletViewModel(
     private val robertManager: RobertManager,
     private val keystoreDataSource: LocalKeystoreDataSource,
-    private val dccCertificatesManager: DccCertificatesManager,
 ) : ViewModel() {
 
     val certificates: LiveData<List<WalletCertificate>?>
@@ -39,12 +35,19 @@ class WalletViewModel(
 
     val recentCertificates: List<WalletCertificate>?
         get() = certificates.value?.filter {
-            it.isRecent(robertManager.configuration)
+            it.isRecent(robertManager.configuration) &&
+                (it as? EuropeanCertificate)?.isFavorite != true
         }?.sortedByDescending { it.timestamp }
 
     val olderCertificates: List<WalletCertificate>?
         get() = certificates.value?.filter {
-            it.isOld(robertManager.configuration)
+            it.isOld(robertManager.configuration) &&
+                (it as? EuropeanCertificate)?.isFavorite != true
+        }?.sortedByDescending { it.timestamp }
+
+    val favoriteCertificates: List<WalletCertificate>?
+        get() = certificates.value?.filter {
+            (it as? EuropeanCertificate)?.isFavorite == true
         }?.sortedByDescending { it.timestamp }
 
     fun removeCertificate(certificate: WalletCertificate) {
@@ -55,27 +58,30 @@ class WalletViewModel(
         return certificates.value.isNullOrEmpty()
     }
 
-    fun saveCertificate(
-        context: Context,
-        walletCertificate: WalletCertificate
-    ) {
+    fun saveCertificate(walletCertificate: WalletCertificate) {
         WalletManager.saveCertificate(
             keystoreDataSource,
             walletCertificate,
         )
+    }
 
-        AnalyticsManager.reportAppEvent(context, AppEventName.e13, null)
+    fun toggleFavorite(
+        walletCertificate: EuropeanCertificate,
+    ) {
+        WalletManager.toggleFavorite(
+            keystoreDataSource,
+            walletCertificate,
+        )
     }
 }
 
 class WalletViewModelFactory(
     private val robertManager: RobertManager,
-    private val secureKeystoreDataSource: SecureKeystoreDataSource,
-    private val dccCertificatesManager: DccCertificatesManager
+    private val secureKeystoreDataSource: SecureKeystoreDataSource
 ) :
     ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         @Suppress("UNCHECKED_CAST")
-        return WalletViewModel(robertManager, secureKeystoreDataSource, dccCertificatesManager) as T
+        return WalletViewModel(robertManager, secureKeystoreDataSource) as T
     }
 }

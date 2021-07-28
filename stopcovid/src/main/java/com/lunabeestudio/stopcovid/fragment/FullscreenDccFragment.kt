@@ -24,7 +24,6 @@ import com.lunabeestudio.stopcovid.coreui.extension.appCompatActivity
 import com.lunabeestudio.stopcovid.coreui.extension.findParentFragmentByType
 import com.lunabeestudio.stopcovid.coreui.extension.toDimensSize
 import com.lunabeestudio.stopcovid.databinding.FragmentFullscreenDccBinding
-import com.lunabeestudio.stopcovid.extension.dccCertificatesManager
 import com.lunabeestudio.stopcovid.extension.formatDccText
 import com.lunabeestudio.stopcovid.extension.fullName
 import com.lunabeestudio.stopcovid.extension.isFrench
@@ -48,16 +47,12 @@ class FullscreenDccFragment : ForceLightFragment(R.layout.fragment_fullscreen_dc
         requireContext().secureKeystoreDataSource()
     }
 
-    private val dccCertificatesManager by lazy {
-        requireContext().dccCertificatesManager()
-    }
-
     private val viewModel: WalletViewModel by viewModels(
         {
             findParentFragmentByType<WalletContainerFragment>() ?: requireParentFragment()
         },
         {
-            WalletViewModelFactory(robertManager, keystoreDataSource, dccCertificatesManager)
+            WalletViewModelFactory(robertManager, keystoreDataSource)
         }
     )
 
@@ -78,7 +73,7 @@ class FullscreenDccFragment : ForceLightFragment(R.layout.fragment_fullscreen_dc
             .map { certificates ->
                 certificates
                     ?.filterIsInstance<EuropeanCertificate>()
-                    ?.firstOrNull { it.value == args.certificateValue }
+                    ?.firstOrNull { it.id == args.id }
             }
             .observe(viewLifecycleOwner) { europeanCertificate ->
                 this.europeanCertificate = europeanCertificate

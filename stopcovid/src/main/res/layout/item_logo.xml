@@ -31,7 +31,7 @@
             android:adjustViewBounds="true"
             android:importantForAccessibility="no"
             android:scaleType="fitCenter"
-            tools:src="@drawable/home" />
+            tools:src="@drawable/wallet" />
 
         <ImageView
             android:id="@+id/imageView2"
@@ -41,6 +41,6 @@
             android:adjustViewBounds="true"
             android:importantForAccessibility="no"
             android:scaleType="fitCenter"
-            tools:src="@drawable/home" />
+            tools:src="@drawable/wallet" />
     </ImageSwitcher>
 </FrameLayout>

@@ -392,7 +392,7 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
             toggleListDisplay()
         }
         onLongClick = {
-            copyToClipboard(this.text ?: "")
+            copyToClipboard(this.text.toString())
         }
     }
 

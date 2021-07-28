@@ -44,12 +44,14 @@ class VerifyWalletQRCodeFragment : QRCodeFragment() {
     }
 
     override fun getTitleKey(): String = "flashDataMatrixCodeController.title"
-    override fun getExplanationKey(): String = "flashDataMatrixCodeController.explanation"
+    override val explanationKey: String = "flashDataMatrixCodeController.explanation"
+    override val footerKey: String? = null
+    override fun onFooterClick() {}
 
     override fun onCodeScanned(code: String) {
         lifecycleScope.launch {
             try {
-                WalletManager.verifyCertificateCodeValue(
+                WalletManager.verifyAndGetCertificateCodeValue(
                     robertManager.configuration,
                     code,
                     dccCertificatesManager.certificates,

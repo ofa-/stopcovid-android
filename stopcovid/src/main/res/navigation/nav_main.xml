@@ -177,6 +177,13 @@
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_proximityFragment_to_fullscreenDccFragment"
+            app:destination="@id/fullscreenDccFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
     </fragment>
     <fragment
         android:id="@+id/isolationFormFragment"
@@ -701,7 +708,8 @@
         tools:layout="@layout/fragment_qr_code" />
     <fragment
         android:id="@+id/confirmAddWalletCertificateFragment"
-        android:name="com.lunabeestudio.stopcovid.fragment.ConfirmAddWalletCertificateFragment">
+        android:name="com.lunabeestudio.stopcovid.fragment.ConfirmAddWalletCertificateFragment"
+        tools:layout="@layout/fragment_confirm_add_wallet_certificate">
         <argument
             android:name="certificateCode"
             app:argType="string" />
@@ -851,7 +859,7 @@
         android:name="com.lunabeestudio.stopcovid.fragment.FullscreenDccFragment"
         tools:layout="@layout/fragment_fullscreen_dcc">
         <argument
-            android:name="certificateValue"
+            android:name="id"
             app:argType="string" />
     </fragment>
     <fragment

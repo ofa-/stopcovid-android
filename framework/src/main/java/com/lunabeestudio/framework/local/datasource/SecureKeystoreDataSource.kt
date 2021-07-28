@@ -116,7 +116,7 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
         get() = getEncryptedValue(SHARED_PREF_KEY_SAVED_ATTESTATION_DATA, object : TypeToken<Map<String, FormEntry>>() {}.type)
         set(value) = setEncryptedValue(SHARED_PREF_KEY_SAVED_ATTESTATION_DATA, value)
 
-    private var _attestationsLiveData: MutableLiveData<List<Attestation>?> = MutableLiveData(attestations)
+    private val _attestationsLiveData: MutableLiveData<List<Attestation>?> = MutableLiveData(attestations)
     override val attestationsLiveData: LiveData<List<Attestation>?>
         get() = _attestationsLiveData
 
@@ -133,7 +133,9 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
             setEncryptedValue(SHARED_PREF_KEY_WALLET_CERTIFICATES, value)
             _rawWalletCertificatesLiveData.postValue(value)
         }
-    private var _rawWalletCertificatesLiveData: MutableLiveData<List<RawWalletCertificate>?> = MutableLiveData(rawWalletCertificates)
+    private val _rawWalletCertificatesLiveData: MutableLiveData<List<RawWalletCertificate>?> by lazy {
+        MutableLiveData(rawWalletCertificates)
+    }
     override val rawWalletCertificatesLiveData: LiveData<List<RawWalletCertificate>?>
         get() = _rawWalletCertificatesLiveData
 
