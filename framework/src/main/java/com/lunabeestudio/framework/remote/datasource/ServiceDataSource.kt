@@ -38,10 +38,10 @@ class ServiceDataSource(
     baseUrl: String,
 ) : RemoteServiceDataSource {
 
-    private var filesDir = context.filesDir
-    private var api: StopCovidApi = RetrofitClient.getService(context, baseUrl, StopCovidApi::class.java, null)
+    private val filesDir = context.filesDir
+    private val api: StopCovidApi = RetrofitClient.getService(context, baseUrl, StopCovidApi::class.java, null)
     private var reportProgressUpdate: ((Float) -> Unit)? = null
-    private var reportApi: StopCovidApi = RetrofitClient.getService(
+    private val reportApi: StopCovidApi = RetrofitClient.getService(
         context,
         baseUrl,
         StopCovidApi::class.java,

@@ -109,6 +109,9 @@ class WalletCertificateFragment : MainFragment() {
         viewModel.certificates.observe(viewLifecycleOwner) {
             refreshScreen()
         }
+        viewModel.blacklist.observe(viewLifecycleOwner) {
+            refreshScreen()
+        }
     }
 
     override fun refreshScreen() {
@@ -125,10 +128,11 @@ class WalletCertificateFragment : MainFragment() {
             identifier = items.size.toLong()
         }
 
-        val hasSidepErrorCertificate = viewModel.certificates.value?.any { certificate ->
+        val hasErrorCertificate = viewModel.certificates.value?.any { certificate ->
             (certificate as? EuropeanCertificate)?.greenCertificate?.testResultIsNegative == false
+                || viewModel.blacklist.value?.contains((certificate as? EuropeanCertificate)?.sha256) == true
         } == true
-        if (hasSidepErrorCertificate) {
+        if (hasErrorCertificate) {
             items += captionItem {
                 text = strings["walletController.certificateWarning"]
                 identifier = text.hashCode().toLong()
@@ -147,7 +151,7 @@ class WalletCertificateFragment : MainFragment() {
             items += captionItem {
                 val spannedSubtitle = strings["walletController.favoriteCertificateSection.subtitle"]?.toSpannable()
                 transformHeartEmoji(spannedSubtitle)
-                text = spannedSubtitle
+                spannedText = spannedSubtitle
                 identifier = text.hashCode().toLong()
             }
         }
@@ -265,6 +269,8 @@ class WalletCertificateFragment : MainFragment() {
             val greenCertificate = (certificate as? EuropeanCertificate)?.greenCertificate
             footerDescription = when {
                 greenCertificate == null -> null
+                viewModel.blacklist.value?.contains((certificate as? EuropeanCertificate)?.sha256) == true ->
+                    strings["wallet.blacklist.warning"]?.toSpannable()
                 greenCertificate.testResultIsNegative == false -> {
                     // Fix SIDEP has generated positive test instead of recovery
                     strings["wallet.proof.europe.test.positiveSidepError"]?.toSpannable()?.also {
@@ -387,6 +393,7 @@ class WalletCertificateFragment : MainFragment() {
                 certificate.raw,
                 WalletCertificateType.Format.WALLET_DCC
             )
+
             when (result) {
                 is RobertResultData.Failure -> showConversionFailedAlert()
                 is RobertResultData.Success -> {
@@ -398,6 +405,7 @@ class WalletCertificateFragment : MainFragment() {
                 }
                 null -> showUnknownErrorAlert(null)
             }
+
             showData()
         }
     }

@@ -19,6 +19,7 @@ import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.robert.datasource.LocalKeystoreDataSource
 import com.lunabeestudio.stopcovid.extension.isOld
 import com.lunabeestudio.stopcovid.extension.isRecent
+import com.lunabeestudio.stopcovid.manager.BlacklistManager
 import com.lunabeestudio.stopcovid.manager.WalletManager
 import com.lunabeestudio.stopcovid.model.EuropeanCertificate
 import com.lunabeestudio.stopcovid.model.WalletCertificate
@@ -30,6 +31,9 @@ class WalletViewModel(
 
     val certificates: LiveData<List<WalletCertificate>?>
         get() = WalletManager.walletCertificateLiveData
+
+    val blacklist: LiveData<List<String>?>
+        get() = BlacklistManager.blacklistedDCCHashes
 
     val certificatesCount: LiveData<Int> = certificates.map { it?.size ?: 0 }
 

@@ -79,6 +79,10 @@ class FullscreenDccFragment : ForceLightFragment(R.layout.fragment_fullscreen_dc
                 this.europeanCertificate = europeanCertificate
                 refreshScreen()
             }
+        binding?.detailsTextSwitcher?.setInAnimation(view.context, R.anim.fade_in)
+        binding?.detailsTextSwitcher?.setOutAnimation(view.context, R.anim.fade_out)
+        binding?.explanationTextSwitcher?.setInAnimation(view.context, R.anim.fade_in)
+        binding?.explanationTextSwitcher?.setOutAnimation(view.context, R.anim.fade_out)
     }
 
     override fun refreshScreen() {
@@ -89,12 +93,12 @@ class FullscreenDccFragment : ForceLightFragment(R.layout.fragment_fullscreen_dc
             val minLines = strings["europeanCertificate.fullscreen.englishDescription.${europeanCertificate.type.code}"]
                 ?.count { it == '\n' }
                 ?.plus(1)
-            minLines?.let(detailsTextView::setMinLines)
+            minLines?.let(detailsTextView1::setMinLines)
+            minLines?.let(detailsTextView2::setMinLines)
             showMoreSwitch.text = strings["europeanCertificate.fullscreen.type.border.switch"]
             showMoreSwitch.setOnCheckedChangeListener { _, isChecked ->
                 refreshDetails(isChecked, europeanCertificate)
             }
-            explanationTextView.text = strings["europeanCertificate.fullscreen.type.minimum.footer"]
             refreshDetails(showMoreSwitch.isChecked, europeanCertificate)
             barcodeImageView.setImageBitmap(
                 barcodeEncoder.encodeBitmap(
@@ -112,16 +116,24 @@ class FullscreenDccFragment : ForceLightFragment(R.layout.fragment_fullscreen_dc
         isChecked: Boolean,
         europeanCertificate: EuropeanCertificate
     ) {
-        detailsTextView.text = if (isChecked) {
-            europeanCertificate.formatDccText(
-                strings["europeanCertificate.fullscreen.englishDescription.${europeanCertificate.type.code}"],
-                strings,
-                SimpleDateFormat("d MMM yyyy", Locale.ENGLISH),
-                SimpleDateFormat("d MMM yyyy, HH:mm", Locale.ENGLISH),
-            )
-        } else {
-            europeanCertificate.fullName()
-        }
-        explanationTextView.isVisible = !isChecked
+        detailsTextSwitcher.setText(
+            if (isChecked) {
+                europeanCertificate.formatDccText(
+                    strings["europeanCertificate.fullscreen.englishDescription.${europeanCertificate.type.code}"],
+                    strings,
+                    SimpleDateFormat("d MMM yyyy", Locale.ENGLISH),
+                    SimpleDateFormat("d MMM yyyy, HH:mm", Locale.ENGLISH),
+                )
+            } else {
+                europeanCertificate.fullName()
+            }
+        )
+        explanationTextSwitcher.setText(
+            if (isChecked) {
+                europeanCertificate.sha256
+            } else {
+                strings["europeanCertificate.fullscreen.type.minimum.footer"]
+            }
+        )
     }
 }

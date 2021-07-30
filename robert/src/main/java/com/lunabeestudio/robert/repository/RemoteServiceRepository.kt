@@ -60,12 +60,14 @@ internal class RemoteServiceRepository(
                 sharedCryptoDataSource.getEncryptionKeys(
                     rawServerPublicKey = Base64.decode(serverPublicKey, Base64.NO_WRAP),
                     rawLocalPrivateKey = keyPair.private.encoded,
-                    kADerivation = RobertConstant.KA_STRING_INPUT.toByteArray(),
-                    kEADerivation = RobertConstant.KEA_STRING_INPUT.toByteArray()
+                    derivationDataArray = listOf(
+                        RobertConstant.KA_STRING_INPUT.toByteArray(),
+                        RobertConstant.KEA_STRING_INPUT.toByteArray()
+                    )
                 ).let {
                     keystoreDataSource.isRegistered = true
-                    keystoreDataSource.kA = it.first
-                    keystoreDataSource.kEA = it.second
+                    keystoreDataSource.kA = it.getOrNull(0)
+                    keystoreDataSource.kEA = it.getOrNull(1)
                 }
                 registerResult
             } catch (e: RobertException) {

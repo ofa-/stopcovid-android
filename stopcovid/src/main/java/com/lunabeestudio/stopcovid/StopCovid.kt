@@ -68,6 +68,7 @@ import com.lunabeestudio.stopcovid.extension.isObsolete
 import com.lunabeestudio.stopcovid.extension.lastVersionCode
 import com.lunabeestudio.stopcovid.manager.AppMaintenanceManager
 import com.lunabeestudio.stopcovid.manager.AttestationsManager
+import com.lunabeestudio.stopcovid.manager.BlacklistManager
 import com.lunabeestudio.stopcovid.manager.CalibDataSource
 import com.lunabeestudio.stopcovid.manager.CertificatesDocumentsManager
 import com.lunabeestudio.stopcovid.manager.ConfigDataSource
@@ -159,9 +160,9 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
     private val certificatesDocumentsManager: CertificatesDocumentsManager = CertificatesDocumentsManager(this)
     val dccCertificatesManager: DccCertificatesManager by lazy { DccCertificatesManager() }
 
-    val certificateRepository: CertificateRepository by lazy {
-        CertificateRepository(InGroupeDatasource(this), secureKeystoreDataSource)
-    }
+    private val cryptoDataSource = BouncyCastleCryptoDataSource()
+
+    lateinit var certificateRepository: CertificateRepository
 
     private var firstResume = false
 
@@ -211,6 +212,16 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
             }
         }
 
+        certificateRepository = CertificateRepository(
+            InGroupeDatasource(
+                this,
+                cryptoDataSource,
+                robertManager,
+                EnvConstant.Prod.conversionBaseUrl,
+            ),
+            robertManager,
+        )
+
         appCoroutineScope.launch {
             MoreKeyFiguresManager.initialize(this@StopCovid)
         }
@@ -238,6 +249,9 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
         }
         appCoroutineScope.launch {
             RisksLevelManager.initialize(this@StopCovid)
+        }
+        appCoroutineScope.launch {
+            BlacklistManager.initialize(this@StopCovid)
         }
         appCoroutineScope.launch {
             AppMaintenanceManager.initialize(
@@ -300,6 +314,9 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
         }
         appCoroutineScope.launch {
             RisksLevelManager.onAppForeground(this@StopCovid)
+        }
+        appCoroutineScope.launch {
+            BlacklistManager.onAppForeground(this@StopCovid)
         }
         appCoroutineScope.launch {
             FormManager.onAppForeground(this@StopCovid)

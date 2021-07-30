@@ -26,14 +26,20 @@
          "contentType": "addressLine1"
       },
       {
+         "key":"zip",
+         "type":"text",
+         "contentType": "addressPostalCode"
+      },
+      {
          "key":"city",
          "type":"text",
          "contentType": "addressCity"
       },
       {
-         "key":"zip",
-         "type":"number",
-         "contentType": "addressPostalCode"
+         "key":"country",
+         "type":"text",
+         "contentType": "addressCountry",
+         "defaultValue": "France"
       }
    ],
    [
@@ -85,6 +91,9 @@
             },
             {
 	            "code":"reason_lockdown.demenagement"
+            },
+            {
+	            "code":"reason_lockdown.transit"
             },
             {
 	            "code":"reason_lockdown.achats_culte_culturel"

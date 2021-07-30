@@ -190,7 +190,9 @@ class WalletContainerFragment : BaseFragment() {
             }
 
             val dcc = (certificate as? EuropeanCertificate)
-            if (dcc != null && !dcc.greenCertificate.isFrench) {
+            if (dcc != null && viewModel.blacklist.value?.contains(dcc.sha256) == true) {
+                showBlacklistDcc(onContinueProcess)
+            } else if (dcc != null && !dcc.greenCertificate.isFrench) {
                 showAlertForeignDcc(onContinueProcess)
             } else {
                 onContinueProcess()
@@ -239,8 +241,21 @@ class WalletContainerFragment : BaseFragment() {
         }
     }
 
+    private fun showBlacklistDcc(
+        onContinue: () -> Unit,
+    ) {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(strings["common.warning"])
+            .setMessage(strings["wallet.blacklist.warning"])
+            .setPositiveButton(strings["walletController.addForeignCertificate.alert.add"]) { _, _ ->
+                onContinue()
+            }
+            .setNegativeButton(strings["common.cancel"], null)
+            .show()
+    }
+
     private fun showAlertForeignDcc(
-        onContinue: (() -> Unit),
+        onContinue: () -> Unit,
     ) {
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(strings["common.warning"])

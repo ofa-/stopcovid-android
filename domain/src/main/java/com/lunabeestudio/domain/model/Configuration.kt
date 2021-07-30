@@ -67,7 +67,8 @@ class Configuration(
     val covidPlusWarning: Int,
     val covidPlusNoTracing: Int,
     var displayCertificateConversion: Boolean,
-    var certificateConversionUrl: String,
     var daysAfterCompletion: Map<String, Int>,
     var certificateConversionSidepOnlyCode: List<String>,
+    var conversionPublicKey: Map<String, String>,
+    var conversionApiVersion: Int,
 )

@@ -65,28 +65,55 @@
             app:switchPadding="@dimen/spacing_small"
             tools:text="@tools:sample/lorem[2]" />
 
-        <TextView
-            android:id="@+id/detailsTextView"
+        <TextSwitcher
+            android:id="@+id/detailsTextSwitcher"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/spacing_large"
-            android:layout_marginTop="@dimen/spacing_medium"
-            android:gravity="top|center_horizontal"
-            android:textAppearance="@style/TextAppearance.StopCovid.Title"
-            tools:ignore="SelectableText"
-            tools:minLines="5"
-            tools:text="@tools:sample/lorem[3]" />
+            android:layout_height="wrap_content">
 
-        <TextView
-            android:id="@+id/explanationTextView"
+            <TextView
+                android:id="@+id/detailsTextView1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="top|center_horizontal"
+                android:textAppearance="@style/TextAppearance.StopCovid.Title"
+                tools:ignore="SelectableText"
+                tools:minLines="5"
+                tools:text="@tools:sample/lorem[3]" />
+
+            <TextView
+                android:id="@+id/detailsTextView2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="top|center_horizontal"
+                android:textAppearance="@style/TextAppearance.StopCovid.Title"
+                tools:ignore="SelectableText"
+                tools:minLines="5"
+                tools:text="@tools:sample/lorem[3]" />
+        </TextSwitcher>
+
+        <TextSwitcher
+            android:id="@+id/explanationTextSwitcher"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_marginHorizontal="@dimen/spacing_large"
-            android:layout_marginTop="@dimen/spacing_medium"
-            android:textAppearance="@style/TextAppearance.StopCovid.Caption"
-            android:visibility="gone"
-            tools:ignore="SelectableText"
-            tools:text="@tools:sample/lorem[40]"
-            tools:visibility="visible" />
+            android:layout_marginTop="@dimen/spacing_medium">
+
+            <TextView
+                android:id="@+id/explanationTextView1"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_horizontal"
+                android:textAppearance="@style/TextAppearance.StopCovid.Caption"
+                android:textIsSelectable="true"
+                tools:text="@tools:sample/lorem[40]" />
+
+            <TextView
+                android:id="@+id/explanationTextView2"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:textAppearance="@style/TextAppearance.StopCovid.Caption"
+                tools:ignore="SelectableText"
+                tools:text="@tools:sample/lorem[40]" />
+        </TextSwitcher>
     </LinearLayout>
 </ScrollView>

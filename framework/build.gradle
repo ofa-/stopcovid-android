@@ -89,4 +89,7 @@ dependencies {
     androidTestImplementation "androidx.test.ext:truth:_"
     androidTestImplementation "com.squareup.okhttp3:mockwebserver:_"
     androidTestImplementation "org.apache.commons:commons-text:_"
+    androidTestImplementation "com.squareup.okhttp3:mockwebserver:_"
+    androidTestImplementation "androidx.test.ext:junit:_"
+    androidTestImplementation "io.mockk:mockk-android:_"
 }

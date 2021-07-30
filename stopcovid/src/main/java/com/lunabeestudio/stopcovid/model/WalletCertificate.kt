@@ -5,7 +5,9 @@ import com.lunabeestudio.domain.model.RawWalletCertificate
 import com.lunabeestudio.domain.model.WalletCertificateType
 import com.lunabeestudio.framework.crypto.BouncyCastleSignatureVerifier
 import com.lunabeestudio.stopcovid.extension.certificateType
+import com.lunabeestudio.stopcovid.extension.countryCode
 import com.lunabeestudio.stopcovid.extension.recoveryDateOfFirstPositiveTest
+import com.lunabeestudio.stopcovid.extension.sha256
 import com.lunabeestudio.stopcovid.extension.testDateTimeOfCollection
 import com.lunabeestudio.stopcovid.extension.vaccineDate
 import dgca.verifier.app.decoder.base45.DefaultBase45Service
@@ -337,6 +339,7 @@ class EuropeanCertificate private constructor(id: String, value: String, val isF
     override val type: WalletCertificateType
     private val kid: ByteArray
     private val cose: ByteArray
+    val sha256: String
     val greenCertificate: GreenCertificate
 
     init {
@@ -359,6 +362,7 @@ class EuropeanCertificate private constructor(id: String, value: String, val isF
             WalletCertificateType.VACCINATION_EUROPE -> greenCertificate.vaccineDate?.time
             WalletCertificateType.RECOVERY_EUROPE -> greenCertificate.recoveryDateOfFirstPositiveTest?.time
         } ?: -1
+        sha256 = "${greenCertificate.countryCode?.uppercase()}${greenCertificate.getDgci()}".sha256()
     }
 
     override fun parse() {

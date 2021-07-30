@@ -2,11 +2,11 @@
   "config": [
     {
       "name": "lastUpdate",
-      "value": "16 Jul 2021"
+      "value": "29 Jul 2021"
     },
     {
       "name": "version",
-      "value": 76
+      "value": 77
     },
     {
       "name": "versionCalibrationBle",
@@ -279,6 +279,16 @@
     {
       "name": "app.wallet.certificateConversionSidepOnlyCode",
       "value": ["945584"]
+    },
+    {
+        "name": "app.wallet.conversionPublicKey",
+        "value": {
+            "prd01": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEo+LqBOIH0gXjHCVLIhY9zSpMdSvl7XqRZMquLtFlNROg895C3l2sv/gN8nVluqUtzZT3uTtblzY5jJCMgsbo7w=="
+        }
+    },
+    {
+        "name": "app.wallet.conversionApiVersion",
+        "value": 1
     },
     {
       "name": "ble.serviceUUID",

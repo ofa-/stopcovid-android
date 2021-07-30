@@ -10,15 +10,24 @@
 
 package com.lunabeestudio.framework.remote.server
 
-import com.lunabeestudio.framework.remote.model.ApiConvertRQ
+import com.lunabeestudio.framework.remote.model.ApiConversionRQ
+import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST
+import retrofit2.http.Query
 
 internal interface InGroupeApi {
 
     @POST("/api/client/convertor/decode/decodeDocument")
-    suspend fun convert(
-        @Body convertRQ: ApiConvertRQ,
-    ): Response<String>
+    suspend fun convertV1(
+        @Body apiConversionRQ: ApiConversionRQ,
+    ): Response<ResponseBody>
+
+    @POST("/api/v2/client/convertor/decode/decodeDocument")
+    suspend fun convertV2(
+        @Query("publicKey") publicKey: String,
+        @Query("keyAlias") keyId: String,
+        @Body apiConversionRQ: ApiConversionRQ,
+    ): Response<ResponseBody>
 }
