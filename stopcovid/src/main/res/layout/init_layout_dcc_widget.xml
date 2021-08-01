@@ -1,0 +1,66 @@
+<!--
+  ~ This Source Code Form is subject to the terms of the Mozilla Public
+  ~ License, v. 2.0. If a copy of the MPL was not distributed with this
+  ~ file, You can obtain one at https://mozilla.org/MPL/2.0/.
+  ~
+  ~ Authors
+  ~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ Created by Lunabee Studio / Date - 2021/24/5 - for the TOUS-ANTI-COVID project
+  -->
+
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/dccWidgetLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_widget"
+    android:clickable="true"
+    android:focusable="true"
+    android:theme="@style/Theme.StopCovid.Widget"
+    android:paddingBottom="@dimen/spacing_medium">
+
+    <LinearLayout
+        android:id="@+id/titleLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/spacing_medium"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/logoImageView"
+            android:layout_width="@dimen/logo_proximity_widget_size"
+            android:layout_height="@dimen/logo_proximity_widget_size"
+            android:importantForAccessibility="no"
+            android:src="@mipmap/ic_launcher" />
+
+        <TextView
+            android:id="@+id/titleWidgetTextView"
+            style="@style/Widget.StopCovid.Widget.TextView.Title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/spacing_medium"
+            android:maxLines="1"
+            android:textIsSelectable="false"
+            tools:text="TousAntiCovid" />
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/actionDividerTitleMainLayout"
+        style="@style/Widget.StopCovid.Widget.Divider"
+        android:layout_below="@id/titleLayout"
+        android:layout_marginBottom="@dimen/spacing_medium" >
+
+    </FrameLayout>
+
+    <ImageView
+        android:id="@+id/dccQrCodeImageView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/actionDividerTitleMainLayout"
+        android:layout_marginStart="@dimen/spacing_medium"
+        android:layout_marginEnd="@dimen/spacing_medium"
+        android:layout_marginBottom="@dimen/spacing_medium"
+        tools:src="@drawable/wallet_card" />
+</RelativeLayout>

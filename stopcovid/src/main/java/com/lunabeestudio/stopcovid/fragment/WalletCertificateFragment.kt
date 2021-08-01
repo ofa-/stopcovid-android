@@ -154,6 +154,11 @@ class WalletCertificateFragment : MainFragment() {
                 spannedText = spannedSubtitle
                 identifier = text.hashCode().toLong()
             }
+            items += captionItem {
+                val widgetInfoText = strings["walletController.favoriteCertificateSection.widget"]
+                text = widgetInfoText
+                identifier = text.hashCode().toLong()
+            }
         }
         viewModel.favoriteCertificates?.forEach { certificate ->
             items += codeItemFromWalletDocument(certificate)

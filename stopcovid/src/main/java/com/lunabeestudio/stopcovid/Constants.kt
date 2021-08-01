@@ -74,6 +74,8 @@ object Constants {
         const val NEW_CERTIFICATE_SHORTCUT_URI: String = "tousanticovid://attestations//new_attestation"
         const val PROXIMITY_FRAGMENT_URI: String = "tousanticovid://proximity/"
         const val UNIVERSAL_QRCODE_SHORTCUT_URI: String = "tousanticovid://universalQRCode/"
+        const val WALLET_CERTIFICATE_SHORTCUT_URI: String = "tousanticovid://walletCertificate/list"
+        const val DCC_FULLSCREEN_SHORTCUT_URI: String = "tousanticovid://dccFullScreen/"
     }
 
     object Android {

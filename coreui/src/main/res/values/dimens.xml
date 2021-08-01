@@ -44,6 +44,7 @@
     <dimen name="badge_size">8dp</dimen>
     <dimen name="qr_code_size">140dp</dimen>
     <dimen name="qr_code_widget_size">80dp</dimen>
+    <dimen name="qr_code_widget_dcc_size">200dp</dimen>
     <dimen name="qr_code_fullscreen_size">240dp</dimen>
 
     <dimen name="loading_elevation">40dp</dimen>
@@ -69,6 +70,7 @@
     <dimen name="title_widget_min_font_size">5sp</dimen>
 
     <dimen name="widget_2_row_min_height">35dp</dimen>
+    <dimen name="widget_3_row_min_height">180dp</dimen>
     <dimen name="widget_4_column_min_width">100dp</dimen>
     <dimen name="widget_main_figure_font_size">25sp</dimen>
     <dimen name="widget_second_figure_font_size">20sp</dimen>

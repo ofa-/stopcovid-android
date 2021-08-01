@@ -59,6 +59,9 @@ import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.showAlertRiskLevelChanged
 import com.lunabeestudio.stopcovid.manager.DeeplinkManager
 import com.lunabeestudio.stopcovid.manager.RisksLevelManager
+import com.lunabeestudio.stopcovid.manager.WalletManager
+import com.lunabeestudio.stopcovid.model.EuropeanCertificate
+import com.lunabeestudio.stopcovid.widgetshomescreen.DccWidget
 import kotlinx.coroutines.delay
 import java.util.Locale
 
@@ -104,6 +107,17 @@ class MainActivity : BaseActivity() {
         }
 
         showLanguageDialogIfNeeded()
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
+            setupAppShortcuts()
+        }
+
+        WalletManager.walletCertificateLiveData.observe(this) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
+                setupAppShortcuts()
+            }
+            DccWidget.updateWidget(applicationContext)
+        }
     }
 
     override fun onResume() {
@@ -116,10 +130,6 @@ class MainActivity : BaseActivity() {
                 sharedPrefs,
                 RisksLevelManager.getCurrentLevel(robertManager().atRiskStatus?.riskLevel),
             )
-        }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
-            setupAppShortcuts()
         }
     }
 
@@ -237,8 +247,9 @@ class MainActivity : BaseActivity() {
         ContextCompat.getSystemService(this, ShortcutManager::class.java)?.let { shortcutManager ->
             val curfewCertificateShortcut = createCurfewCertificateShortcut()
             val universalQrCodeShortcut = createUniversalQrCodeShortcut()
+            val favDccShortcut = createFavDccShortcut()
 
-            shortcutManager.setDynamicShortcuts(listOfNotNull(curfewCertificateShortcut, universalQrCodeShortcut))
+            shortcutManager.setDynamicShortcuts(listOfNotNull(curfewCertificateShortcut, universalQrCodeShortcut, favDccShortcut))
         }
     }
 
@@ -263,6 +274,30 @@ class MainActivity : BaseActivity() {
         } else {
             null
         }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.N_MR1)
+    private fun createFavDccShortcut(): ShortcutInfo? {
+        val favCertificate = WalletManager.walletCertificateLiveData.value?.filter {
+            (it as? EuropeanCertificate)?.isFavorite == true
+        }?.firstOrNull() ?: return null
+
+        val builder = ShortcutInfo.Builder(this, FAV_DCC_SHORTCUT_ID)
+
+        builder.setShortLabel(strings["walletController.favoriteCertificateSection.title"] ?: "Mon certificat favori")
+        builder.setLongLabel(strings["walletController.favoriteCertificateSection.title"] ?: "Mon certificat favori")
+
+        val url: String = Constants.Url.DCC_FULLSCREEN_SHORTCUT_URI + favCertificate.id
+        val intent = Intent(
+            Intent.ACTION_VIEW,
+            Uri.parse(url)
+        )
+        intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS)
+
+        builder
+            .setIcon(Icon.createWithResource(this, R.drawable.ic_filled_heart))
+            .setIntent(intent)
+        return builder.build()
     }
 
     @RequiresApi(Build.VERSION_CODES.N_MR1)
@@ -355,5 +390,6 @@ class MainActivity : BaseActivity() {
     companion object {
         private const val CURFEW_CERTIFICATE_SHORTCUT_ID: String = "curfewCertificateShortcut"
         private const val UNIVERSAL_QRCODE_SHORTCUT_ID: String = "universalQRCodeShortcut"
+        private const val FAV_DCC_SHORTCUT_ID: String = "favDccShortcut"
     }
 }

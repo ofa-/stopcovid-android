@@ -70,11 +70,11 @@ class WalletViewModel(
     }
 
     fun toggleFavorite(
-        walletCertificate: EuropeanCertificate,
+        walletCertificate: EuropeanCertificate
     ) {
         WalletManager.toggleFavorite(
             keystoreDataSource,
-            walletCertificate,
+            walletCertificate
         )
     }
 }
