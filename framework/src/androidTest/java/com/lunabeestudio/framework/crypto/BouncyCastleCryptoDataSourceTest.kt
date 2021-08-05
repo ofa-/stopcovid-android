@@ -50,19 +50,24 @@ class BouncyCastleCryptoDataSourceTest {
         val keys = bcCryptoDataSource.getEncryptionKeys(
             serverPublicKey.encoded,
             localPrivateKey.encoded,
-            "test".toByteArray(),
-            "test2".toByteArray()
+            listOf(
+                "test".toByteArray(),
+                "test2".toByteArray(),
+            )
         )
 
-        val kA = Base64.encodeToString(keys.first, Base64.NO_WRAP)
-        val kEA = Base64.encodeToString(keys.second, Base64.NO_WRAP)
+        val kA = Base64.encodeToString(keys[0], Base64.NO_WRAP)
+        val kEA = Base64.encodeToString(keys[1], Base64.NO_WRAP)
 
         assertThat(kA).isEqualTo("mwuOwJO0qxPG7JuZibow6RzByIwDcvzEEx3jbW84t8k=")
         assertThat(kEA).isEqualTo("Xl0TXEspgkuTBniuUEcNFPqQvoHM006/tpyyE4NRFyY=")
     }
 
     companion object {
-        private const val MOCK_SERVER_PUB_KEY: String = "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEIk7OAGcqyGpnmeTQiEDU0Uih9h3wMhwGmv6lqYuupR6I9aqLTBGSQvi6YIA+r7ZvxilaRBxzdxIuMXlTUTDxhw=="
-        private const val MOCK_LOCAL_KEY: String = "MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQg8Ss533Vz+z0GG/l2sxYBtA2vD0NR1WW3tgNRJ/uq67uhRANCAATkgJaihoP8jim8eAOfswWt9LcKE0iKKqc0ItWDmJrI6LxU+oa4qgI/CDEbRBQIAAYwvCCPLLNH8TJBCjf9kBfX"
+        private const val MOCK_SERVER_PUB_KEY: String =
+            "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEIk7OAGcqyGpnmeTQiEDU0Uih9h3wMhwGmv6lqYuupR6I9aqLTBGSQvi6YIA+r7ZvxilaRBxzdxIuMXlTUTDxhw=="
+        private const val MOCK_LOCAL_KEY: String =
+            "MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQg8Ss533Vz+z0GG/l2sxYBtA2vD0NR1WW3tgNRJ/uq67uhRANCAATkgJaihoP8jim8eAOfsw" +
+                "Wt9LcKE0iKKqc0ItWDmJrI6LxU+oa4qgI/CDEbRBQIAAYwvCCPLLNH8TJBCjf9kBfX"
     }
 }

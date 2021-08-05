@@ -460,8 +460,8 @@ class ProximityFragment : TimeMainFragment() {
 
         addSectionSeparator(items)
 
-        // Attestation
-            addAttestationItems(items)
+        // Wallet
+            addWalletItems(items)
             addSectionSeparator(items)
 
         // Health items
@@ -480,6 +480,12 @@ class ProximityFragment : TimeMainFragment() {
         // Venue items
             addVenueItems(items, isSick)
             addSectionSeparator(items)
+
+        // Attestation
+        if (robertManager.configuration.displayAttestation) {
+            addAttestationItems(items)
+            addSectionSeparator(items)
+        }
 
         // News items
         addNewsItems(items)
@@ -868,76 +874,78 @@ class ProximityFragment : TimeMainFragment() {
         }
     }
 
-    private fun addAttestationItems(items: ArrayList<GenericItem>) {
+    private fun addWalletItems(items: ArrayList<GenericItem>) {
         items += bigTitleItem {
-            text = strings["home.attestationSection.title"]
+            text = strings["home.walletSection.title"]
             identifier = items.count().toLong()
             importantForAccessibility = ViewCompat.IMPORTANT_FOR_ACCESSIBILITY_NO
         }
 
-        if (robertManager.configuration.displayAttestation) {
-            items += cardWithActionItem {
-                mainImage = R.drawable.attestation_card
-                onCardClick = {
-                    AnalyticsManager.reportAppEvent(requireContext(), AppEventName.e11, null)
-                    findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToAttestationsFragment())
+        val favoriteDcc = viewModel.favoriteDcc.value?.peekContent()
+        if (favoriteDcc != null) {
+            items += smallQrCodeCardItem {
+                val qrCodeSize = R.dimen.card_image_height.toDimensSize(requireContext()).toInt()
+                title = strings["home.walletSection.favoriteCertificate.cell.title"]
+                body = strings["home.walletSection.favoriteCertificate.cell.subtitle"]
+                generateBarcode = {
+                    barcodeEncoder.encodeBitmap(
+                        favoriteDcc.value,
+                        BarcodeFormat.QR_CODE,
+                        qrCodeSize,
+                        qrCodeSize,
+                    )
                 }
-                mainTitle = strings["home.attestationSection.cell.title"]
-                val attestationCount = viewModel.activeAttestationCount.value?.peekContent()
-                mainBody = when (attestationCount) {
-                    0, null -> strings["home.attestationSection.cell.subtitle.noAttestations"]
-                    1 -> strings["home.attestationSection.cell.subtitle.oneAttestation"]
-                    else -> stringsFormat("home.attestationSection.cell.subtitle.multipleAttestations", attestationCount)
+                onClick = {
+                    findNavControllerOrNull()?.safeNavigate(
+                        ProximityFragmentDirections.actionProximityFragmentToFullscreenDccFragment(favoriteDcc.id)
+                    )
                 }
-                identifier = R.drawable.attestation_card.toLong()
+                identifier = favoriteDcc.id.hashCode().toLong()
             }
-
-            if (robertManager.configuration.displaySanitaryCertificatesWallet) {
-                items += spaceItem {
-                    spaceRes = R.dimen.spacing_medium
-                    identifier = items.count().toLong()
-                }
+            items += spaceItem {
+                spaceRes = R.dimen.spacing_medium
+                identifier = items.count().toLong()
             }
         }
 
-        if (robertManager.configuration.displaySanitaryCertificatesWallet) {
-            val favoriteDcc = viewModel.favoriteDcc.value?.peekContent()
-            if (favoriteDcc != null) {
-                items += smallQrCodeCardItem {
-                    val qrCodeSize = R.dimen.card_image_height.toDimensSize(requireContext()).toInt()
-                    title = strings["home.walletSection.favoriteCertificate.cell.title"]
-                    body = strings["home.walletSection.favoriteCertificate.cell.subtitle"]
-                    generateBarcode = {
-                        barcodeEncoder.encodeBitmap(
-                            favoriteDcc.value,
-                            BarcodeFormat.QR_CODE,
-                            qrCodeSize,
-                            qrCodeSize,
-                        )
-                    }
-                    onClick = {
-                        findNavControllerOrNull()?.safeNavigate(
-                            ProximityFragmentDirections.actionProximityFragmentToFullscreenDccFragment(favoriteDcc.id)
-                        )
-                    }
-                    identifier = favoriteDcc.id.hashCode().toLong()
-                }
-                items += spaceItem {
-                    spaceRes = R.dimen.spacing_medium
-                    identifier = items.count().toLong()
-                }
+        items += cardWithActionItem(CardTheme.Primary) {
+            mainImage = R.drawable.wallet_card
+            mainLayoutDirection = LayoutDirection.RTL
+            onCardClick = {
+                findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToWalletContainerFragment())
             }
+            mainTitle = strings["home.attestationSection.sanitaryCertificates.cell.title"]
+            mainBody = strings["home.attestationSection.sanitaryCertificates.cell.subtitle"]
+            identifier = R.drawable.wallet_card.toLong()
+        }
 
-            items += cardWithActionItem(CardTheme.Primary) {
-                mainImage = R.drawable.wallet_card
-                mainLayoutDirection = LayoutDirection.RTL
-                onCardClick = {
-                    findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToWalletContainerFragment())
-                }
-                mainTitle = strings["home.attestationSection.sanitaryCertificates.cell.title"]
-                mainBody = strings["home.attestationSection.sanitaryCertificates.cell.subtitle"]
-                identifier = R.drawable.wallet_card.toLong()
+        items += spaceItem {
+            spaceRes = R.dimen.spacing_medium
+            identifier = items.count().toLong()
+        }
+    }
+
+    private fun addAttestationItems(items: ArrayList<GenericItem>) {
+        items += bigTitleItem {
+            text = strings["home.attestationsSection.title"]
+            identifier = items.count().toLong()
+            importantForAccessibility = ViewCompat.IMPORTANT_FOR_ACCESSIBILITY_NO
+        }
+
+        items += cardWithActionItem {
+            mainImage = R.drawable.attestation_card
+            onCardClick = {
+                AnalyticsManager.reportAppEvent(requireContext(), AppEventName.e11, null)
+                findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToAttestationsFragment())
             }
+            mainTitle = strings["home.attestationSection.cell.title"]
+            val attestationCount = viewModel.activeAttestationCount.value?.peekContent()
+            mainBody = when (attestationCount) {
+                0, null -> strings["home.attestationSection.cell.subtitle.noAttestations"]
+                1 -> strings["home.attestationSection.cell.subtitle.oneAttestation"]
+                else -> stringsFormat("home.attestationSection.cell.subtitle.multipleAttestations", attestationCount)
+            }
+            identifier = R.drawable.attestation_card.toLong()
         }
 
         items += spaceItem {

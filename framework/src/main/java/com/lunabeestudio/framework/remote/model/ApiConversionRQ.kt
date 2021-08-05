@@ -10,7 +10,7 @@
 
 package com.lunabeestudio.framework.remote.model
 
-internal class ApiConvertRQ(
+internal class ApiConversionRQ(
     val chainEncoded: String,
     val destination: String,
     val source: String

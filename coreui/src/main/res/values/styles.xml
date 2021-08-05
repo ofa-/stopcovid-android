@@ -67,4 +67,10 @@
 
     <style name="Theme.Base.StopCovid.ForceLight" />
 
+    <!-- No darkmode because of the qrCode-->
+    <style name="Theme.StopCovid.DccWidget" parent="Theme.StopCovid.Base.Widget">
+        <item name="widgetBackgroundColor">@android:color/white</item>
+        <item name="android:textColor">@android:color/black</item>
+    </style>
+
 </resources>

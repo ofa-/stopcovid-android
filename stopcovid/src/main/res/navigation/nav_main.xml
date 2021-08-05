@@ -790,6 +790,7 @@
             android:autoVerify="true"
             app:uri="https://bonjour.tousanticovid.gouv.fr/walletdcc.html?code={code}&amp;certificateFormat={certificateFormat}&amp;origin={origin}"
             tools:targetApi="m" />
+        <deepLink app:uri="tousanticovid://walletCertificate/list" />
         <argument
             android:name="code"
             android:defaultValue="@null"
@@ -858,6 +859,9 @@
         android:id="@+id/fullscreenDccFragment"
         android:name="com.lunabeestudio.stopcovid.fragment.FullscreenDccFragment"
         tools:layout="@layout/fragment_fullscreen_dcc">
+        <deepLink
+            app:uri="tousanticovid://dccFullScreen/{id}"
+            tools:targetApi="m" />
         <argument
             android:name="id"
             app:argType="string" />

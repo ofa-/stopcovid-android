@@ -143,4 +143,16 @@
         <item name="android:background">@color/color_black_15</item>
     </style>
 
+    <style name="Widget.StopCovid.Widget.TextView.Info" parent="Widget.MaterialComponents.TextView">
+        <item name="android:textSize">@dimen/caption_font_size</item>
+        <item name="android:textAlignment">center</item>
+    </style>
+
+    <!-- No darkmode because of the qrCode-->
+    <style name="Widget.StopCovid.DccWidget.Divider" parent="">
+        <item name="android:layout_height">@dimen/divider_height</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:background">@color/color_black_15</item>
+    </style>
+
 </resources>

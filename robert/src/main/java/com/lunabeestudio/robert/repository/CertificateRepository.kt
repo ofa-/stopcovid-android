@@ -12,28 +12,33 @@ package com.lunabeestudio.robert.repository
 
 import com.lunabeestudio.domain.model.RawWalletCertificate
 import com.lunabeestudio.domain.model.WalletCertificateType
-import com.lunabeestudio.robert.datasource.LocalKeystoreDataSource
+import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.robert.datasource.RemoteCertificateDataSource
 import com.lunabeestudio.robert.model.RobertResultData
-import com.lunabeestudio.robert.model.UnknownException
 import timber.log.Timber
 
 class CertificateRepository(
     private val remoteDataSource: RemoteCertificateDataSource,
-    private val localKeystoreDataSource: LocalKeystoreDataSource,
+    private val robertManager: RobertManager,
 ) {
     suspend fun convertCertificate(
         certificate: RawWalletCertificate,
         to: WalletCertificateType.Format
     ): RobertResultData<String> {
-        val robertResultData = localKeystoreDataSource.configuration?.certificateConversionUrl?.let { backendUrl ->
-            remoteDataSource.convertCertificate(
-                url = backendUrl,
+
+        val robertResultData = if (robertManager.configuration.conversionApiVersion == 2) {
+            remoteDataSource.convertCertificateV2(
                 encodedCertificate = certificate.value,
                 from = certificate.type.format,
                 to = to
             )
-        } ?: RobertResultData.Failure(UnknownException("No configuration"))
+        } else {
+            remoteDataSource.convertCertificateV1(
+                encodedCertificate = certificate.value,
+                from = certificate.type.format,
+                to = to
+            )
+        }
 
         (robertResultData as? RobertResultData.Failure)?.error?.let { exception ->
             Timber.e(exception)

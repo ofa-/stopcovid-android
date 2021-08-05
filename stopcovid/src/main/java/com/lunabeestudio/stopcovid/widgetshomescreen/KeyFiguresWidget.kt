@@ -84,7 +84,7 @@ class KeyFiguresWidget : AppWidgetProvider() {
         // Set title widget
         views.setTextViewText(
             R.id.titleWidgetTextView,
-            strings["widget.figures.title"] ?: "TousAntiCovid: Chiffres clés"
+            strings["home.infoSection.keyFigures"]
         )
         // Highlighted Figures
         displayHighlightedFigure(strings, numberFormat, views, context)

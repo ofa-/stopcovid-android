@@ -23,6 +23,7 @@ class CaptionItem : BaseItem<CaptionItem.ViewHolder>(
     R.layout.item_caption, CaptionItem::ViewHolder, R.id.item_caption
 ) {
     var text: CharSequence? = null
+    var spannedText: CharSequence? = null
     var gravity: Int = Gravity.NO_GRAVITY
     var onClick: (() -> Unit) = {}
     var onLongClick: (() -> Unit) = {}
@@ -33,7 +34,7 @@ class CaptionItem : BaseItem<CaptionItem.ViewHolder>(
 
     override fun bindView(holder: ViewHolder, payloads: List<Any>) {
         super.bindView(holder, payloads)
-        holder.textView.text = text.safeEmojiSpanify()
+        holder.textView.text = spannedText ?: text.safeEmojiSpanify()
         holder.textView.gravity = gravity
         holder.itemView.run {
             setOnClickListener { onClick() }

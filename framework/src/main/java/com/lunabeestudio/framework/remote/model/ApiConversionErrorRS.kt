@@ -10,7 +10,7 @@
 
 package com.lunabeestudio.framework.remote.model
 
-internal class ApiConvertErrorRS private constructor(
+internal class ApiConversionErrorRS private constructor(
     val codeError: String,
     val msgError: String,
 )

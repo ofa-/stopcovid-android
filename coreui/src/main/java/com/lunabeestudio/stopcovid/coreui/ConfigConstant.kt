@@ -12,7 +12,7 @@ package com.lunabeestudio.stopcovid.coreui
 
 object ConfigConstant {
     private const val BASE_URL: String = "https://app-static.tousanticovid.gouv.fr/"
-    private const val VERSION_PATH: String = "json/version-34/"
+    private const val VERSION_PATH: String = "json/version-35/"
     private const val VERSIONED_SERVER_URL: String = BASE_URL + VERSION_PATH
 
     object Maintenance {
@@ -104,27 +104,27 @@ object ConfigConstant {
 
         const val VACCIN_EUROPE_CERTIFICATE_FULL_FILE: String = "vaccin-europe-certificate-full.png"
         private const val VACCIN_EUROPE_CERTIFICATE_FULL_TEMPLATE_FILE: String = "vaccin-europe-certificate-full-%s.png"
-        val VACCIN_EUROPE_CERTIFICATE_FULL_TEMPLATE_URL: String = URL + VACCIN_EUROPE_CERTIFICATE_FULL_TEMPLATE_FILE
+        const val VACCIN_EUROPE_CERTIFICATE_FULL_TEMPLATE_URL: String = URL + VACCIN_EUROPE_CERTIFICATE_FULL_TEMPLATE_FILE
 
         const val VACCIN_EUROPE_CERTIFICATE_THUMBNAIL_FILE: String = "vaccin-europe-certificate.png"
         private const val VACCIN_EUROPE_CERTIFICATE_THUMBNAIL_TEMPLATE_FILE: String = "vaccin-europe-certificate-%s.png"
-        val VACCIN_EUROPE_CERTIFICATE_THUMBNAIL_TEMPLATE_URL: String = URL + VACCIN_EUROPE_CERTIFICATE_THUMBNAIL_TEMPLATE_FILE
+        const val VACCIN_EUROPE_CERTIFICATE_THUMBNAIL_TEMPLATE_URL: String = URL + VACCIN_EUROPE_CERTIFICATE_THUMBNAIL_TEMPLATE_FILE
 
         const val TEST_EUROPE_CERTIFICATE_THUMBNAIL_FILE: String = "test-europe-certificate.png"
         private const val TEST_EUROPE_CERTIFICATE_THUMBNAIL_TEMPLATE_FILE: String = "test-europe-certificate-%s.png"
-        val TEST_EUROPE_CERTIFICATE_THUMBNAIL_TEMPLATE_URL: String = URL + TEST_EUROPE_CERTIFICATE_THUMBNAIL_TEMPLATE_FILE
+        const val TEST_EUROPE_CERTIFICATE_THUMBNAIL_TEMPLATE_URL: String = URL + TEST_EUROPE_CERTIFICATE_THUMBNAIL_TEMPLATE_FILE
 
         const val TEST_EUROPE_CERTIFICATE_FULL_FILE: String = "test-europe-certificate-full.png"
         private const val TEST_EUROPE_CERTIFICATE_FULL_TEMPLATE_FILE: String = "test-europe-certificate-full-%s.png"
-        val TEST_EUROPE_CERTIFICATE_FULL_TEMPLATE_URL: String = URL + TEST_EUROPE_CERTIFICATE_FULL_TEMPLATE_FILE
+        const val TEST_EUROPE_CERTIFICATE_FULL_TEMPLATE_URL: String = URL + TEST_EUROPE_CERTIFICATE_FULL_TEMPLATE_FILE
 
         const val RECOVERY_EUROPE_CERTIFICATE_THUMBNAIL_FILE: String = "recovery-europe-certificate.png"
         private const val RECOVERY_EUROPE_CERTIFICATE_THUMBNAIL_TEMPLATE_FILE: String = "recovery-europe-certificate-%s.png"
-        val RECOVERY_EUROPE_CERTIFICATE_THUMBNAIL_TEMPLATE_URL: String = URL + RECOVERY_EUROPE_CERTIFICATE_THUMBNAIL_TEMPLATE_FILE
+        const val RECOVERY_EUROPE_CERTIFICATE_THUMBNAIL_TEMPLATE_URL: String = URL + RECOVERY_EUROPE_CERTIFICATE_THUMBNAIL_TEMPLATE_FILE
 
         const val RECOVERY_EUROPE_CERTIFICATE_FULL_FILE: String = "recovery-europe-certificate-full.png"
         private const val RECOVERY_EUROPE_CERTIFICATE_FULL_TEMPLATE_FILE: String = "recovery-europe-certificate-full-%s.png"
-        val RECOVERY_EUROPE_CERTIFICATE_FULL_TEMPLATE_URL: String = URL + RECOVERY_EUROPE_CERTIFICATE_FULL_TEMPLATE_FILE
+        const val RECOVERY_EUROPE_CERTIFICATE_FULL_TEMPLATE_URL: String = URL + RECOVERY_EUROPE_CERTIFICATE_FULL_TEMPLATE_FILE
     }
 
     object DccCertificates {
@@ -142,6 +142,13 @@ object ConfigConstant {
         const val FOLDER: String = "Calibration/"
         const val URL: String = VERSIONED_SERVER_URL + FOLDER
         const val LOCAL_FILENAME: String = "calibrationBle.json"
+    }
+
+    object Blacklist {
+        const val FILENAME: String = "certlist.json"
+        const val FOLDER: String = "CertList/"
+        const val URL: String = VERSIONED_SERVER_URL + FOLDER + FILENAME
+        const val ASSET_FILE_PATH: String = FOLDER + FILENAME
     }
 
     object Store {

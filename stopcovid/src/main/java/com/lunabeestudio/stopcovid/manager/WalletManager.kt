@@ -32,7 +32,7 @@ object WalletManager {
 
     fun initialize(
         lifecycleOwner: LifecycleOwner,
-        localKeystoreDataSource: LocalKeystoreDataSource,
+        localKeystoreDataSource: LocalKeystoreDataSource
     ) {
         migrateCertificates(localKeystoreDataSource)
         localKeystoreDataSource.rawWalletCertificatesLiveData.observe(lifecycleOwner) { rawWalletList ->
@@ -112,7 +112,8 @@ object WalletManager {
 
         if (key != null) {
             walletCertificate.verifyKey(key)
-        } else if ((walletCertificate as? EuropeanCertificate)?.greenCertificate?.isFrench == true) {
+        } else if ((walletCertificate as? EuropeanCertificate)?.greenCertificate?.isFrench == true
+            || walletCertificate !is EuropeanCertificate) {
             // Only check French certificates
             throw WalletCertificateNoKeyError()
         }

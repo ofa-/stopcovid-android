@@ -17,6 +17,7 @@ import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.service.ProximityService
 import com.lunabeestudio.stopcovid.widgetshomescreen.AttestationWidget
+import com.lunabeestudio.stopcovid.widgetshomescreen.DccWidget
 import com.lunabeestudio.stopcovid.widgetshomescreen.KeyFiguresWidget
 import com.lunabeestudio.stopcovid.widgetshomescreen.ProximityWidget
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -40,6 +41,7 @@ class UpgradeReceiver : BroadcastReceiver() {
                 ProximityWidget.updateWidget(context)
                 AttestationWidget.updateWidget(context)
                 KeyFiguresWidget.updateWidget(context)
+                DccWidget.updateWidget(context)
             }
         } catch (t: Throwable) {
             // Keychain may not be fully initialized

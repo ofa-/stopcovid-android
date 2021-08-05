@@ -17,9 +17,9 @@ interface SharedCryptoDataSource {
     fun getEncryptionKeys(
         rawServerPublicKey: ByteArray,
         rawLocalPrivateKey: ByteArray,
-        kADerivation: ByteArray,
-        kEADerivation: ByteArray
-    ): Pair<ByteArray, ByteArray>
+        derivationDataArray: List<ByteArray>
+    ): List<ByteArray>
 
     fun decrypt(key: ByteArray, encryptedData: ByteArray): ByteArray
+    fun encrypt(key: ByteArray, clearData: ByteArray): ByteArray
 }

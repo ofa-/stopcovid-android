@@ -10,12 +10,15 @@
 
 package com.lunabeestudio.framework.crypto
 
+import android.os.Build
 import com.lunabeestudio.domain.extension.safeUse
+import com.lunabeestudio.framework.utils.SelfDestroyCipherOutputStream
 import com.lunabeestudio.robert.datasource.SharedCryptoDataSource
 import com.lunabeestudio.robert.extension.use
 import org.bouncycastle.jce.ECNamedCurveTable
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.bouncycastle.jce.spec.ECParameterSpec
+import java.io.ByteArrayOutputStream
 import java.security.KeyFactory
 import java.security.KeyPair
 import java.security.KeyPairGenerator
@@ -26,6 +29,7 @@ import javax.crypto.Cipher
 import javax.crypto.KeyAgreement
 import javax.crypto.Mac
 import javax.crypto.spec.GCMParameterSpec
+import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
 
 class BouncyCastleCryptoDataSource : SharedCryptoDataSource {
@@ -40,9 +44,8 @@ class BouncyCastleCryptoDataSource : SharedCryptoDataSource {
     override fun getEncryptionKeys(
         rawServerPublicKey: ByteArray,
         rawLocalPrivateKey: ByteArray,
-        kADerivation: ByteArray,
-        kEADerivation: ByteArray
-    ): Pair<ByteArray, ByteArray> {
+        derivationDataArray: List<ByteArray>,
+    ): List<ByteArray> {
         val bouncyCastleProvider = BouncyCastleProvider()
         val keyFactory = KeyFactory.getInstance(ALGORITHM_ECDH, bouncyCastleProvider)
         val serverPublicKey = keyFactory.generatePublic(X509EncodedKeySpec(rawServerPublicKey))
@@ -54,14 +57,12 @@ class BouncyCastleCryptoDataSource : SharedCryptoDataSource {
         keyAgreement.doPhase(serverPublicKey, true)
 
         return keyAgreement.generateSecret().use { sharedSecret ->
-            SecretKeySpec(sharedSecret, HASH_HMACSHA256).safeUse<Pair<ByteArray, ByteArray>> { secretKeySpec ->
+            SecretKeySpec(sharedSecret, HASH_HMACSHA256).safeUse { secretKeySpec ->
                 val hmac = Mac.getInstance(HASH_HMACSHA256)
                 hmac.init(secretKeySpec)
-
-                val kA = hmac.doFinal(kADerivation)
-                val kEA = hmac.doFinal(kEADerivation)
-
-                Pair(kA, kEA)
+                derivationDataArray.map {
+                    hmac.doFinal(it)
+                }
             }
         }
     }
@@ -77,6 +78,32 @@ class BouncyCastleCryptoDataSource : SharedCryptoDataSource {
         }
     }
 
+    override fun encrypt(key: ByteArray, clearData: ByteArray): ByteArray {
+        val secretKey = SecretKeySpec(key, HASH_HMACSHA256)
+        val bos = ByteArrayOutputStream()
+
+        val cipher = Cipher.getInstance(AES_GCM_CIPHER_TYPE)
+        val iv: ByteArray = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            cipher.init(Cipher.ENCRYPT_MODE, secretKey)
+            cipher.iv
+        } else {
+            val iv = ByteArray(AES_GCM_IV_LENGTH)
+            SecureRandom().nextBytes(iv)
+            cipher.init(Cipher.ENCRYPT_MODE, secretKey, IvParameterSpec(iv))
+            iv
+        }
+
+        bos.write(iv)
+
+        SelfDestroyCipherOutputStream(bos, cipher, secretKey).use { cos ->
+            clearData.inputStream().use { input ->
+                input.copyTo(cos, BUFFER_SIZE)
+            }
+        }
+
+        return bos.toByteArray()
+    }
+
     companion object {
         private const val HASH_HMACSHA256 = "HmacSHA256"
         private const val NAMED_CURVE_SPEC = "secp256r1"
@@ -86,5 +113,7 @@ class BouncyCastleCryptoDataSource : SharedCryptoDataSource {
         private const val AES_GCM_CIPHER_TYPE = "AES/GCM/NoPadding"
         private const val AES_GCM_IV_LENGTH = 12
         private const val AES_GCM_TAG_LENGTH_IN_BITS = 128
+
+        private const val BUFFER_SIZE = 4 * 256
     }
 }
