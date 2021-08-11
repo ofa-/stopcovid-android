@@ -42,6 +42,13 @@ object WalletManager {
         }
     }
 
+    // This function adds a way to refresh the liveData if the Keychain wasn't available at app start
+    fun refreshWalletIfNeeded(localKeystoreDataSource: LocalKeystoreDataSource) {
+        if (localKeystoreDataSource.rawWalletCertificatesLiveData.value != localKeystoreDataSource.rawWalletCertificates) {
+            localKeystoreDataSource.rawWalletCertificates = localKeystoreDataSource.rawWalletCertificates
+        }
+    }
+
     // id + isFavorite migration (null due to reflection)
     private fun migrateCertificates(localKeystoreDataSource: LocalKeystoreDataSource) {
         val certificatesToMigrate = localKeystoreDataSource.rawWalletCertificates?.filter { it.id == null || it.isFavorite == null }
@@ -113,7 +120,8 @@ object WalletManager {
         if (key != null) {
             walletCertificate.verifyKey(key)
         } else if ((walletCertificate as? EuropeanCertificate)?.greenCertificate?.isFrench == true
-            || walletCertificate !is EuropeanCertificate) {
+            || walletCertificate !is EuropeanCertificate
+        ) {
             // Only check French certificates
             throw WalletCertificateNoKeyError()
         }

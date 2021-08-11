@@ -144,8 +144,15 @@ object ConfigConstant {
         const val LOCAL_FILENAME: String = "calibrationBle.json"
     }
 
-    object Blacklist {
+    object BlacklistDCC {
         const val FILENAME: String = "certlist.json"
+        const val FOLDER: String = "CertList/"
+        const val URL: String = VERSIONED_SERVER_URL + FOLDER + FILENAME
+        const val ASSET_FILE_PATH: String = FOLDER + FILENAME
+    }
+
+    object Blacklist2DDOC {
+        const val FILENAME: String = "2ddoc_list.json"
         const val FOLDER: String = "CertList/"
         const val URL: String = VERSIONED_SERVER_URL + FOLDER + FILENAME
         const val ASSET_FILE_PATH: String = FOLDER + FILENAME

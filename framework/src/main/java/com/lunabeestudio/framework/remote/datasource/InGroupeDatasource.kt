@@ -35,7 +35,6 @@ import timber.log.Timber
 class InGroupeDatasource(
     private val context: Context,
     private val sharedCryptoDataSource: SharedCryptoDataSource,
-    private val robertManager: RobertManager,
     baseUrl: String,
 ) : RemoteCertificateDataSource {
 
@@ -92,6 +91,7 @@ class InGroupeDatasource(
     }
 
     override suspend fun convertCertificateV2(
+        robertManager: RobertManager,
         encodedCertificate: String,
         from: WalletCertificateType.Format,
         to: WalletCertificateType.Format

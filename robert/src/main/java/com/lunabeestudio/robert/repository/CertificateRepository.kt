@@ -18,16 +18,17 @@ import com.lunabeestudio.robert.model.RobertResultData
 import timber.log.Timber
 
 class CertificateRepository(
-    private val remoteDataSource: RemoteCertificateDataSource,
-    private val robertManager: RobertManager,
+    var remoteDataSource: RemoteCertificateDataSource,
 ) {
     suspend fun convertCertificate(
+        robertManager: RobertManager,
         certificate: RawWalletCertificate,
         to: WalletCertificateType.Format
     ): RobertResultData<String> {
 
         val robertResultData = if (robertManager.configuration.conversionApiVersion == 2) {
             remoteDataSource.convertCertificateV2(
+                robertManager = robertManager,
                 encodedCertificate = certificate.value,
                 from = certificate.type.format,
                 to = to

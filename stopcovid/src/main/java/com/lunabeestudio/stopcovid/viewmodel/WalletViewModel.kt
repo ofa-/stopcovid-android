@@ -19,9 +19,11 @@ import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.robert.datasource.LocalKeystoreDataSource
 import com.lunabeestudio.stopcovid.extension.isOld
 import com.lunabeestudio.stopcovid.extension.isRecent
-import com.lunabeestudio.stopcovid.manager.BlacklistManager
+import com.lunabeestudio.stopcovid.manager.Blacklist2DDOCManager
+import com.lunabeestudio.stopcovid.manager.BlacklistDCCManager
 import com.lunabeestudio.stopcovid.manager.WalletManager
 import com.lunabeestudio.stopcovid.model.EuropeanCertificate
+import com.lunabeestudio.stopcovid.model.FrenchCertificate
 import com.lunabeestudio.stopcovid.model.WalletCertificate
 
 class WalletViewModel(
@@ -32,8 +34,11 @@ class WalletViewModel(
     val certificates: LiveData<List<WalletCertificate>?>
         get() = WalletManager.walletCertificateLiveData
 
-    val blacklist: LiveData<List<String>?>
-        get() = BlacklistManager.blacklistedDCCHashes
+    val blacklistDCC: LiveData<List<String>?>
+        get() = BlacklistDCCManager.blacklistedDCCHashes
+
+    val blacklist2DDOC: LiveData<List<String>?>
+        get() = Blacklist2DDOCManager.blacklisted2DDOCHashes
 
     val certificatesCount: LiveData<Int> = certificates.map { it?.size ?: 0 }
 
@@ -53,6 +58,10 @@ class WalletViewModel(
         get() = certificates.value?.filter {
             (it as? EuropeanCertificate)?.isFavorite == true
         }?.sortedByDescending { it.timestamp }
+
+    init {
+        WalletManager.refreshWalletIfNeeded(keystoreDataSource)
+    }
 
     fun removeCertificate(certificate: WalletCertificate) {
         WalletManager.deleteCertificate(keystoreDataSource, certificate)
@@ -76,6 +85,13 @@ class WalletViewModel(
             keystoreDataSource,
             walletCertificate
         )
+    }
+
+    fun isBlacklisted(certificate: WalletCertificate): Boolean {
+        return when (certificate) {
+            is FrenchCertificate -> blacklist2DDOC.value?.contains(certificate.sha256) == true
+            is EuropeanCertificate -> blacklistDCC.value?.contains(certificate.sha256) == true
+        }
     }
 }
 

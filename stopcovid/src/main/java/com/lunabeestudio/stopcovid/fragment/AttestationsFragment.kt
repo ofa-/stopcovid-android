@@ -217,7 +217,7 @@ class AttestationsFragment : MainFragment() {
                     AttestationsFragmentDirections.actionAttestationsFragmentToFullscreenQRCodeFragment(
                         attestation.qrCode,
                         BarcodeFormat.QR_CODE,
-                        attestation.qrCodeString
+                        attestation.qrCodeString,
                     )
                 )
             }

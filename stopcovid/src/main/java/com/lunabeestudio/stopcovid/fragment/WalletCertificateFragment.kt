@@ -109,7 +109,10 @@ class WalletCertificateFragment : MainFragment() {
         viewModel.certificates.observe(viewLifecycleOwner) {
             refreshScreen()
         }
-        viewModel.blacklist.observe(viewLifecycleOwner) {
+        viewModel.blacklistDCC.observe(viewLifecycleOwner) {
+            refreshScreen()
+        }
+        viewModel.blacklist2DDOC.observe(viewLifecycleOwner) {
             refreshScreen()
         }
     }
@@ -130,7 +133,7 @@ class WalletCertificateFragment : MainFragment() {
 
         val hasErrorCertificate = viewModel.certificates.value?.any { certificate ->
             (certificate as? EuropeanCertificate)?.greenCertificate?.testResultIsNegative == false
-                || viewModel.blacklist.value?.contains((certificate as? EuropeanCertificate)?.sha256) == true
+                || viewModel.isBlacklisted(certificate)
         } == true
         if (hasErrorCertificate) {
             items += captionItem {
@@ -246,7 +249,7 @@ class WalletCertificateFragment : MainFragment() {
                     )
                 }
                 formatText = Constants.QrCode.FORMAT_2D_DOC
-                conversionLambda = if (robertManager.configuration.displayCertificateConversion) {
+                conversionLambda = if (robertManager.configuration.displayCertificateConversion && !viewModel.isBlacklisted(certificate)) {
                     {
                         showConversionConfirmationAlert(certificate)
                     }
@@ -273,9 +276,8 @@ class WalletCertificateFragment : MainFragment() {
             mainDescription = certificate.fullDescription(strings, robertManager.configuration)
             val greenCertificate = (certificate as? EuropeanCertificate)?.greenCertificate
             footerDescription = when {
+                viewModel.isBlacklisted(certificate) -> strings["wallet.blacklist.warning"]?.toSpannable()
                 greenCertificate == null -> null
-                viewModel.blacklist.value?.contains((certificate as? EuropeanCertificate)?.sha256) == true ->
-                    strings["wallet.blacklist.warning"]?.toSpannable()
                 greenCertificate.testResultIsNegative == false -> {
                     // Fix SIDEP has generated positive test instead of recovery
                     strings["wallet.proof.europe.test.positiveSidepError"]?.toSpannable()?.also {
@@ -337,7 +339,8 @@ class WalletCertificateFragment : MainFragment() {
                         WalletContainerFragmentDirections.actionWalletContainerFragmentToFullscreenQRCodeFragment(
                             certificate.value,
                             certificate.type.barcodeFormat,
-                            certificate.shortDescription()
+                            certificate.shortDescription(),
+                            certificate.sha256,
                         )
                     )
                 }
@@ -395,6 +398,7 @@ class WalletCertificateFragment : MainFragment() {
         lifecycleScope.launch {
             showLoading(strings["walletController.convertCertificate.loading"])
             val result = (activity?.application as? StopCovid)?.certificateRepository?.convertCertificate(
+                robertManager,
                 certificate.raw,
                 WalletCertificateType.Format.WALLET_DCC
             )

@@ -175,10 +175,13 @@ class LocalCryptoManager(private val appContext: Context) {
                         .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
                         .build()
                 )
-                sharedPreferences.edit {
-                    putBoolean(SECRET_KEY_GENERATED_SHARED_PREFERENCE, true)
+                val newSecretKey = generator.generateKey()
+                if (keyStore.containsAlias(AES_LOCAL_PROTECTION_KEY_ALIAS)) {
+                    sharedPreferences.edit {
+                        putBoolean(SECRET_KEY_GENERATED_SHARED_PREFERENCE, true)
+                    }
                 }
-                generator.generateKey()
+                newSecretKey
             } else {
                 Timber.e(
                     "Secret key couldn't be found in the KeyStore but data are already encrypted with it\nkeystore aliases = ${
