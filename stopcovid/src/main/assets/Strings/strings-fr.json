@@ -929,7 +929,6 @@
    "europeanCertificate.fullscreen.englishDescription.recovery": "<FULL_NAME>\nDate of birth <BIRTHDATE>\nTested on <DATE>",
    "europeanCertificate.fullscreen.englishDescription.test": "<FULL_NAME>\nDate of birth <BIRTHDATE>\n<ANALYSIS_RESULT> - <ANALYSIS_CODE>\nTested on <FROM_DATE>",
    
-   
    "documentExplanationController.vaccinCertificate.title": "Attestation de vaccin",
    "documentExplanationController.testCertificate.title": "Certificat de test",
    "documentExplanationController.vaccinCertificate.explanation": "Voici un exemple de document de l'Assurance Maladie avec le certificat de vaccination. Le QR Code à flasher avec TousAntiCovid est à droite, indiqué par le carré orange.\n\n🇪🇺 Le nouveau \"Certificat COVID Numérique UE\" est également accepté dans TousAntiCovid.",
@@ -964,7 +963,8 @@
    "wallet.proof.europe.foreignCountryWarning.gb": "❤️ Les certificats du NHS sont désormais reconnus en France. Si le personnel du lieu ne réussit pas à le scanner, veuillez leur demander de forcer une synchronisation, et de mettre à jour l'app \"TousAntiCovid Verif\" sur le Store.",
    "widget.dcc.empty":"Ajoutez ici votre certificat favori en appuyant sur l'icône coeur ❤️ sur le certificat (au format européen) souhaité.",
    "widget.dcc.full":"Appuyez pour passer en plein écran",
-   "walletController.favoriteCertificateSection.widget":"👉 Retrouvez ce certificat favori dans un widget et bientôt sur l'app Apple Watch. Mettez bien à jour TousAntiCovid.",
+   "walletController.favoriteCertificateSection.widget":"👉 Retrouvez ce certificat favori dans un widget. Mettez bien à jour TousAntiCovid.",
+   "walletController.favoriteCertificateSection.widget.ios":"👉 Retrouvez ce certificat favori dans un widget et l'appli Apple Watch. Mettez bien à jour TousAntiCovid.",
    "appShortcut.favoriteDcc": "Certificat favori",
    "keyfigure.nombrevaccinations.colorCode.light":"#51E476",
    "keyfigure.nombrevaccinations.colorCode.dark":"#51E476",
@@ -1065,9 +1065,6 @@
 	
 	"keyfigure.sivicsidepvacsireanonvax.learnMore": "Il s’agit du nombre d'admissions en soins critiques (réanimation, soins intensifs ou en unité de surveillance continue) pour 1 million de personnes non vaccinées, tous âges confondus.\n\nCet indicateur rapporte, sur 7 jours, le nombre d’admissions de patients ayant eu un test PCR positif par date d’admission à la couverture vaccinale datant de 7 jours avant la date d’admission.\n\nCes résultats sont mis à jour de manière hebdomadaire et issus du rapprochement des informations issues de SI-VIC, SI-DEP et VAC-SI, les systèmes d’information portant respectivement sur les hospitalisations et la vaccination Covid-19.",
 
-
-
-
     "walletController.alert.duplicatedCertificate.confirm":"Ajouter à nouveau",
     "walletController.alert.duplicatedCertificate.subtitle":"Vous avez déjà importé ce certificat.\n\nSouhaitez-vous l’importer une nouvelle fois quand même ?",
     "accessibility.wallet.dcc.favorite.define": "Ajouter en favori",
@@ -1080,5 +1077,35 @@
     "accessibility.menu.moreoptions": "Plus d'options",
     "accessibility.attestation.generate": "Générer mon attestation",
     "accessibility.hint.keyFigureChart.share": "Partager l'évolution du chiffre clé",
-    "accessibility.hint.keyFigureChart.label": "Graphique représentant l'évolution du chiffre clé dans le temps"
+    "accessibility.hint.keyFigureChart.label": "Graphique représentant l'évolution du chiffre clé dans le temps",
+    "common.copied": "Copié",
+    "manageDataController.logFiles.title": "Fichiers de logs",
+    "manageDataController.logFiles.subtitle": "Pour aider l'équipe technique, vous pouvez partager ce(s) fichier(s) quand vous contactez l'équipe de support par email.\n\nCes fichiers de logs sont uniquement stockés sur votre smartphone, et ne contiennent pas de données personnelles.",
+    "manageDataController.logFiles.noLogs": "Vous n'avez actuellement aucun fichier de log.",
+    "manageDataController.logFiles.logsFilesCount": "Vous avez actuellement %d fichier(s) de logs.",
+    "manageDataController.logFiles.share.button": "Partager les logs",
+    "manageDataController.logFiles.delete.button": "Supprimer les logs",
+    "manageDataController.logFiles.delete.confirmationDialog.title": "Attention",
+    "manageDataController.logFiles.delete.confirmationDialog.message": "Êtes-vous sûr de vouloir supprimer les fichiers de logs ?",
+
+    "pdfImport.protected.enterPassword.alert.title": "Document protégé",
+    "pdfImport.protected.enterPassword.alert.message": "Veuillez entrer le mot de passe du document afin de pouvoir importer le QR Code.",
+    "pdfImport.protected.enterPassword.alert.placeholder": "Mot de passe",
+    "pdfImport.protected.wrongPassword.alert.title": "Erreur",
+    "pdfImport.protected.wrongPassword.alert.message": "Le mot de passe saisi n'est pas le bon.\nVoulez-vous essayer à nouveau ?",
+
+    "vaccineCompletionController.button.favorite.title": "Ajouter en favori",
+    "vaccineCompletionController.footer.favorite": "En appuyant sur ce bouton, ce certificat sera ajouté en favori dans votre carnet.",
+
+    "accessibility.home.otherOptions": "Autres actions disponibles",
+    "accessibility.isolation.formWasUpdated": "Le formulaire a été mis à jour. Continuez de le parcourir pour répondre aux différentes questions et lire les recommandations le cas échéant.",
+    "accessibility.back.zGesture": "Vous pouvez revenir en arrière en dessinant un Z avec 2 doigts.",
+    "accessibility.closeModal.zGesture": "Vous pouvez fermer cet écran en dessinant un Z avec 2 doigts.",
+    "accessibility.onboarding.explanations.step1": "étape 1",
+    "accessibility.onboarding.explanations.step2": "étape 2",
+    "accessibility.onboarding.explanations.step3": "étape 3",
+
+    "vaccineCompletionController.footer.notify": "En appuyant sur ce bouton, vous recevrez une notification le %@.",
+    "vaccineCompletionController.button.notifyAndFavorite.title": "Me notifier et ajouter en favori ❤️",
+    "vaccineCompletionController.footer.notifyAndFavorite": "En appuyant sur ce bouton, vous recevrez une notification le %@, et ce certificat sera ajouté en favori dans votre carnet."
 }

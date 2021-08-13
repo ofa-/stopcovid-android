@@ -44,7 +44,8 @@ object WalletManager {
 
     // This function adds a way to refresh the liveData if the Keychain wasn't available at app start
     fun refreshWalletIfNeeded(localKeystoreDataSource: LocalKeystoreDataSource) {
-        if (localKeystoreDataSource.rawWalletCertificatesLiveData.value != localKeystoreDataSource.rawWalletCertificates) {
+        if (localKeystoreDataSource.rawWalletCertificatesLiveData.value != localKeystoreDataSource.rawWalletCertificates
+            && !localKeystoreDataSource.rawWalletCertificates.isNullOrEmpty()) {
             localKeystoreDataSource.rawWalletCertificates = localKeystoreDataSource.rawWalletCertificates
         }
     }

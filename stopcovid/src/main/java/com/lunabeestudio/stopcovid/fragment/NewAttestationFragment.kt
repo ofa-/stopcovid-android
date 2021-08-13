@@ -19,6 +19,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.NavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -65,6 +66,13 @@ class NewAttestationFragment : MainFragment() {
         requireContext().robertManager()
     }
 
+    private val onDestinationChangedListener = NavController.OnDestinationChangedListener { _, destination, _ ->
+        if (destination.id == R.id.attestationsFragment) {
+            viewModel.resetInfos()
+            activity?.hideSoftKeyBoard()
+        }
+    }
+
     override fun getTitleKey(): String = "newAttestationController.title"
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -88,12 +96,7 @@ class NewAttestationFragment : MainFragment() {
             refreshScreen()
         }
 
-        findNavControllerOrNull()?.addOnDestinationChangedListener { _, destination, _ ->
-            if (destination.id == R.id.attestationsFragment) {
-                viewModel.resetInfos()
-                activity?.hideSoftKeyBoard()
-            }
-        }
+        findNavControllerOrNull()?.addOnDestinationChangedListener(onDestinationChangedListener)
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -149,7 +152,7 @@ class NewAttestationFragment : MainFragment() {
         FormManager.form.value?.peekContent()?.let { form ->
             form.forEach { section ->
                 section.forEach { formField ->
-                    items += itemForFormField(formField).apply {
+                    items += itemForFormField(formField, items.count()).apply {
                         identifier = formField.key.hashCode().toLong()
                     }
                 }
@@ -182,7 +185,7 @@ class NewAttestationFragment : MainFragment() {
         return items
     }
 
-    private fun itemForFormField(formField: FormField): GenericItem {
+    private fun itemForFormField(formField: FormField, position: Int): GenericItem {
         return when (formField.type) {
             "date" -> pickerEditTextItem {
                 placeholder = strings[formField.attestationPlaceholder()]
@@ -199,7 +202,7 @@ class NewAttestationFragment : MainFragment() {
                     MaterialAlertDialogBuilder(requireContext()).showSpinnerDatePicker(strings, initialTimestamp) { newDate ->
                         text = dateFormat.format(Date(newDate))
                         viewModel.infos[formField.dataKeyValue] = FormEntry(newDate.toString(), formField.type, formField.key)
-                        binding?.recyclerView?.adapter?.notifyDataSetChanged()
+                        binding?.recyclerView?.adapter?.notifyItemChanged(position)
                     }
                 }
             }
@@ -231,7 +234,7 @@ class NewAttestationFragment : MainFragment() {
                                 }.time
                             )
                             viewModel.infos[formField.dataKeyValue] = FormEntry(newDate.toString(), formField.type, formField.key)
-                            binding?.recyclerView?.adapter?.notifyDataSetChanged()
+                            binding?.recyclerView?.adapter?.notifyItemChanged(position)
                         }
                     }
                 }
@@ -320,6 +323,11 @@ class NewAttestationFragment : MainFragment() {
     override fun onSaveInstanceState(outState: Bundle) {
         outState.putString(SAVE_INSTANCE_ATTESTATION_INFOS, gson.toJson(viewModel.infos))
         super.onSaveInstanceState(outState)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        findNavControllerOrNull()?.removeOnDestinationChangedListener(onDestinationChangedListener)
     }
 
     companion object {

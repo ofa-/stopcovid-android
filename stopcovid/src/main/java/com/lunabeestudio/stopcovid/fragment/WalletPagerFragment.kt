@@ -134,12 +134,16 @@ class WalletPagerFragment : BaseFragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        viewPager.adapter = null
         tabLayoutMediator?.detach()
         (activity as? MainActivity)?.binding?.tabLayout?.apply {
             isVisible = false
             tabSelectedListener?.let { removeOnTabSelectedListener(it) }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        viewPager.adapter = null
     }
 
     private inner class WalletPagerAdapter : FragmentStateAdapter(childFragmentManager, lifecycle) {
