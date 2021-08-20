@@ -246,11 +246,11 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
                         val decryptedString = cryptoManager.decryptToString(encryptedText)
                         gson.fromJson<T>(decryptedString, type)
                     }
-                }.getOrNull()
-                if (useCache) {
-                    cache[key] = result
                 }
-                result
+                if (useCache && result.isSuccess) {
+                    cache[key] = result.getOrNull()
+                }
+                result.getOrNull()
             } else {
                 null
             }
@@ -288,9 +288,11 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
             return if (text != null) {
                 val result = kotlin.runCatching {
                     gson.fromJson<T>(text, type)
-                }.getOrNull()
-                cache[key] = result
-                result
+                }
+                if (result.isSuccess) {
+                    cache[key] = result.getOrNull()
+                }
+                result.getOrNull()
             } else {
                 null
             }

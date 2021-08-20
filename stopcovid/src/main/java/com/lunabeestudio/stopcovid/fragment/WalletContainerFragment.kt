@@ -190,8 +190,8 @@ class WalletContainerFragment : BaseFragment() {
             }
 
             val dcc = (certificate as? EuropeanCertificate)
-            if (dcc != null && viewModel.blacklist.value?.contains(dcc.sha256) == true) {
-                showBlacklistDcc(onContinueProcess)
+            if (viewModel.isBlacklisted(certificate)) {
+                showBlacklistedCertificate(onContinueProcess)
             } else if (dcc != null && !dcc.greenCertificate.isFrench) {
                 showAlertForeignDcc(onContinueProcess)
             } else {
@@ -241,7 +241,7 @@ class WalletContainerFragment : BaseFragment() {
         }
     }
 
-    private fun showBlacklistDcc(
+    private fun showBlacklistedCertificate(
         onContinue: () -> Unit,
     ) {
         MaterialAlertDialogBuilder(requireContext())

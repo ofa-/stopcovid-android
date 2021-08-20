@@ -69,7 +69,8 @@ import com.lunabeestudio.stopcovid.extension.lastVersionCode
 import com.lunabeestudio.stopcovid.fragment.AboutFragment
 import com.lunabeestudio.stopcovid.manager.AppMaintenanceManager
 import com.lunabeestudio.stopcovid.manager.AttestationsManager
-import com.lunabeestudio.stopcovid.manager.BlacklistManager
+import com.lunabeestudio.stopcovid.manager.Blacklist2DDOCManager
+import com.lunabeestudio.stopcovid.manager.BlacklistDCCManager
 import com.lunabeestudio.stopcovid.manager.CalibDataSource
 import com.lunabeestudio.stopcovid.manager.CertificatesDocumentsManager
 import com.lunabeestudio.stopcovid.manager.ConfigDataSource
@@ -114,6 +115,16 @@ import kotlin.time.ExperimentalTime
 class StopCovid : Application(), LifecycleObserver, RobertApplication, IsolationApplication {
 
     override val isolationManager: IsolationManager by lazy { IsolationManager(this, robertManager, secureKeystoreDataSource) }
+
+    val certificateRepository: CertificateRepository by lazy {
+        CertificateRepository(
+            InGroupeDatasource(
+                this,
+                cryptoDataSource,
+                EnvConstant.Prod.conversionBaseUrl,
+            )
+        )
+    }
 
     private val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
         Timber.e(throwable)
@@ -163,8 +174,6 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
 
     private val cryptoDataSource = BouncyCastleCryptoDataSource()
 
-    lateinit var certificateRepository: CertificateRepository
-
     private var firstResume = false
 
     private val sharedPreferenceChangeListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
@@ -197,6 +206,8 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
             ConfigManager.clearLocal(this)
             CalibrationManager.clearLocal(this)
             FormManager.clearLocal(this)
+            BlacklistDCCManager.clearLocal(this)
+            Blacklist2DDOCManager.clearLocal(this)
             secureKeystoreDataSource.configuration = secureKeystoreDataSource.configuration?.apply {
                 version = 0
             }
@@ -212,16 +223,6 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
                 }
             }
         }
-
-        certificateRepository = CertificateRepository(
-            InGroupeDatasource(
-                this,
-                cryptoDataSource,
-                robertManager,
-                EnvConstant.Prod.conversionBaseUrl,
-            ),
-            robertManager,
-        )
 
         appCoroutineScope.launch {
             MoreKeyFiguresManager.initialize(this@StopCovid)
@@ -252,7 +253,10 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
             RisksLevelManager.initialize(this@StopCovid)
         }
         appCoroutineScope.launch {
-            BlacklistManager.initialize(this@StopCovid)
+            BlacklistDCCManager.initialize(this@StopCovid)
+        }
+        appCoroutineScope.launch {
+            Blacklist2DDOCManager.initialize(this@StopCovid)
         }
 /*
         appCoroutineScope.launch {
@@ -322,7 +326,10 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
             RisksLevelManager.onAppForeground(this@StopCovid)
         }
         appCoroutineScope.launch {
-            BlacklistManager.onAppForeground(this@StopCovid)
+            BlacklistDCCManager.onAppForeground(this@StopCovid)
+        }
+        appCoroutineScope.launch {
+            Blacklist2DDOCManager.onAppForeground(this@StopCovid)
         }
         appCoroutineScope.launch {
             FormManager.onAppForeground(this@StopCovid)

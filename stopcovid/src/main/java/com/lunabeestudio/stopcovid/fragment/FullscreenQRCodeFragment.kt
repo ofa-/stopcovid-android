@@ -75,6 +75,7 @@ class FullscreenQRCodeFragment : ForceLightFragment(R.layout.fragment_fullscreen
         binding?.topSpace?.isVisible = args.qrCodeFormat == BarcodeFormat.DATA_MATRIX
         binding?.formatTextView?.setTextOrHide(formatText())
         binding?.textView?.text = ""
+        binding?.sha256TextView?.setTextOrHide("")
     }
 
     private fun formatText(): String? {

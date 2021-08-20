@@ -65,6 +65,10 @@ class ProximityViewModel(
         )
     }
 
+    init {
+        WalletManager.refreshWalletIfNeeded(keystoreDataSource)
+    }
+
     suspend fun refreshConfig(application: RobertApplication): Boolean {
         loadingInProgress.postValue(true)
         val result = robertManager.refreshConfig(application)

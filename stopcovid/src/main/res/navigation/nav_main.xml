@@ -290,6 +290,11 @@
             android:name="qrCodeValueDisplayed"
             app:argType="string"
             app:nullable="false" />
+        <argument
+            android:name="qrCodeSha256"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
     </fragment>
     <fragment
         android:id="@+id/captchaFragment"

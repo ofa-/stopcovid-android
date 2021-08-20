@@ -106,6 +106,7 @@ class InGroupeDatasourceTest {
 
         val convertResult = runBlocking {
             inGroupeDatasource.convertCertificateV2(
+                robertManager,
                 inputString,
                 WalletCertificateType.Format.WALLET_2D,
                 WalletCertificateType.Format.WALLET_DCC,
@@ -137,6 +138,7 @@ class InGroupeDatasourceTest {
 
         val convertResult = runBlocking {
             inGroupeDatasource.convertCertificateV2(
+                robertManager,
                 inputString,
                 WalletCertificateType.Format.WALLET_2D,
                 WalletCertificateType.Format.WALLET_DCC,

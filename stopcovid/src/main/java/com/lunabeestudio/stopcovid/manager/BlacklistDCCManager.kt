@@ -17,12 +17,12 @@ import com.google.gson.reflect.TypeToken
 import com.lunabeestudio.stopcovid.coreui.ConfigConstant
 import java.lang.reflect.Type
 
-object BlacklistManager : RemoteJsonManager<List<String>>() {
+object BlacklistDCCManager : RemoteJsonManager<List<String>>() {
 
     override val type: Type = object : TypeToken<List<String>>() {}.type
-    override val localFileName: String = ConfigConstant.Blacklist.FILENAME
-    override val remoteFileUrl: String = ConfigConstant.Blacklist.URL
-    override val assetFilePath: String = ConfigConstant.Blacklist.ASSET_FILE_PATH
+    override val localFileName: String = ConfigConstant.BlacklistDCC.FILENAME
+    override val remoteFileUrl: String = ConfigConstant.BlacklistDCC.URL
+    override val assetFilePath: String = ConfigConstant.BlacklistDCC.ASSET_FILE_PATH
 
     private val _blacklistedDCCHashes: MutableLiveData<List<String>?> = MutableLiveData(null)
     val blacklistedDCCHashes: LiveData<List<String>?>

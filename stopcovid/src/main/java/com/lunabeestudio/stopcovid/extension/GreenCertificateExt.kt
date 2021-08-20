@@ -42,8 +42,9 @@ val GreenCertificate.countryCode: String?
         else -> null
     }
 
+// French Polynesia, New Caledonia, Wallis and Futuna, and Saint Pierre and Miquelon are French territory
 val GreenCertificate.isFrench: Boolean
-    get() = this.countryCode == Locale.FRANCE.country
+    get() = listOf(Locale.FRANCE.country, "NC", "WF", "PM", "PF").contains(this.countryCode)
 
 val GreenCertificate.vaccineMedicinalProduct: String?
     get() = vaccinations?.lastOrNull()?.medicinalProduct?.trim()

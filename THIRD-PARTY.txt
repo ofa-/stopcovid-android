@@ -29,6 +29,7 @@ License Text URL: https://github.com/JakeWharton/timber/blob/master/LICENSE.txt
 Source Code: https://github.com/JakeWharton/timber
 
 Component: Progress button
+License Text URL : http://www.apache.org/licenses/LICENSE-2.0
 Source Code: https://github.com/razir/ProgressButton
 
 Component: QRCode image processing library

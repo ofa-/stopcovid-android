@@ -35,6 +35,7 @@ sealed class WalletCertificate(
     open val value: String,
 ) {
     abstract val type: WalletCertificateType
+    abstract val sha256: String
 
     var keyCertificateId: String = ""
     var firstName: String? = null
@@ -81,6 +82,13 @@ sealed class WalletCertificate(
 sealed class FrenchCertificate(id: String, value: String) : WalletCertificate(id, value) {
     var keyAuthority: String = ""
     var keySignature: String = ""
+    final override val sha256: String
+
+    init {
+        val split = value.split(Separator.UNIT.ascii)
+        val message = split.getOrNull(0)
+        sha256 = message?.sha256().orEmpty()
+    }
 
     enum class Separator(
         val ascii: String,
@@ -339,7 +347,7 @@ class EuropeanCertificate private constructor(id: String, value: String, val isF
     override val type: WalletCertificateType
     private val kid: ByteArray
     private val cose: ByteArray
-    val sha256: String
+    override val sha256: String
     val greenCertificate: GreenCertificate
 
     init {
