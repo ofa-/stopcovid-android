@@ -107,3 +107,5 @@ val String.countryCodeToFlagEmoji: String
             ""
         }
     }
+
+fun String.splitUrlFragment(): List<String> = this.split(Char(0x1E))

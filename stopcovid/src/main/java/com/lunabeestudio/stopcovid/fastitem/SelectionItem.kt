@@ -11,10 +11,10 @@
 package com.lunabeestudio.stopcovid.fastitem
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isInvisible
 import com.lunabeestudio.stopcovid.R
-import com.lunabeestudio.stopcovid.coreui.extension.safeEmojiSpanify
 import com.lunabeestudio.stopcovid.coreui.extension.setTextOrHide
 import com.lunabeestudio.stopcovid.databinding.ItemSelectionBinding
 import com.mikepenz.fastadapter.binding.AbstractBindingItem
@@ -33,11 +33,18 @@ class SelectionItem : AbstractBindingItem<ItemSelectionBinding>() {
 
     override fun bindView(binding: ItemSelectionBinding, payloads: List<Any>) {
         super.bindView(binding, payloads)
-        binding.titleTextView.text = title.safeEmojiSpanify()
+        binding.titleTextView.setTextOrHide(title)
         binding.captionTextView.setTextOrHide(caption)
-        binding.selectionRootLayout.setOnClickListener {
-            onClick?.invoke()
+        val clickListener = onClick?.let { onClick ->
+            View.OnClickListener {
+                onClick()
+            }
         }
+        binding.titleTextView.isEnabled = this.isEnabled
+        binding.captionTextView.isEnabled = this.isEnabled
+        binding.selectionImageView.isEnabled = this.isEnabled
+        binding.selectionRootLayout.setOnClickListener(clickListener)
+        binding.selectionRootLayout.isClickable = clickListener != null
         binding.selectionImageView.isInvisible = !showSelection
     }
 }

@@ -705,7 +705,7 @@
    
    "walletController.title":"Wallet",
    "walletController.recentCertificatesSection.title":"Recent certificates",
-   "walletController.recentCertificatesSection.subtitle":"In this section, you have all your vaccination certificates and test certificates less than 3 days old.\n⚠️ Check eligibility for the pass in the \"Information\" tab.",
+   "walletController.recentCertificatesSection.subtitle":"⚠️ Check eligibility for the pass in the \"Information\" tab.",
    "walletController.oldCertificatesSection.title":"Older certificates",
    "walletController.oldCertificatesSection.subtitle":"These test certificates are more than 3 days old.",
    "walletController.menu.share":"Share the certificate",
@@ -967,7 +967,7 @@
    "home.walletSection.favoriteCertificate.cell.title": "My favorite certificate",
    "home.walletSection.favoriteCertificate.cell.subtitle": "Tap for full screen",
    "walletController.favoriteCertificateSection.title": "My favorite certificate",
-   "walletController.favoriteCertificateSection.subtitle": "Have your favorite certificate here by tapping the ❤️ icon on the certificate you want.",
+   "walletController.favoriteCertificateSection.subtitle": "Have your favorite certificate here by tapping the heart ❤️ icon on the certificate you want.",
    "walletController.favoriteCertificateSection.openFullScreen": "Display full screen",
 
    "manageDataController.userLanguage.title": "Language",
@@ -990,10 +990,10 @@
    "widget.dcc.empty":"Add here your favorite certificate by tapping the heart ❤️ icon you want",
    "widget.dcc.full":"Tap for full screen",
    "walletController.favoriteCertificateSection.widget":"👉 Use the widget to have this favorite certificate. Make sure to have the latest version of TousAntiCovid.",
-   "walletController.favoriteCertificateSection.widget.ios":"👉 Use the widget or the Apple Watch app to have this favorite certificate. Make sure to have the latest version of TousAntiCovid.",
+   "walletController.favoriteCertificateSection.widget.ios":"👉 Use the widget or the Apple Watch app to have this favorite certificate.\n💡 If you have a problem with a widget (all \"black\" for instance), update the app, remove it and put it back from the gallery.",
    "appShortcut.favoriteDcc": "Favorite certificate",
-   "keyfigure.nombrevaccinations.colorCode.light":"#51E476",
-   "keyfigure.nombrevaccinations.colorCode.dark":"#51E476",
+   "keyfigure.nombrevaccinations.colorCode.light":"#007AFF",
+   "keyfigure.nombrevaccinations.colorCode.dark":"#0B84FF",
    "keyfigure.nombrevaccinations.label":"Total first vaccinations",
    "keyfigure.nombrevaccinations.shortLabel":"First vaccinations",
    "keyfigure.nombrevaccinations.description":"This indicator represents the total number of people vaccinated with the first dose.\nThe data are consolidated the day after they are reported to take into account the latest vaccination data from the night before.",
@@ -1009,7 +1009,7 @@
    "universalQrScanController.actionSheet.title":"Please select the way you want to import the QR Code:",
    "universalQrScanController.actionSheet.imagePicker":"Import from a photo",
    "universalQrScanController.actionSheet.documentPicker":"Import from a PDF file",
-   "wallet.blacklist.warning": "🔴⚠️ This certificate seems to be used fraudulently. If this certificate belongs to you, please contact support on 0 800 08 71 48. If this certificate does not belong to you, you risk a fine of 45,000 euros and 3 years in prison.",
+   "wallet.blacklist.warning": "🔴 This certificate seems to be used fraudulently. If this certificate belongs to you, please contact support on 0 800 08 71 48. If this certificate does not belong to you, you risk a fine of 45,000 euros and 3 years in prison.",
    
    "attestation.form.reason_curfew.label":"Motif couvre-feu",
    "attestation.form.reason_curfew.placeholder":"-",
@@ -1107,11 +1107,11 @@
     "manageDataController.logFiles.title": "Log files",
     "manageDataController.logFiles.subtitle": "To help the technical team, you can share these files when you contact the support team by email.\n\nThese log files are only stored on your smartphone, and don't contain personal data.",
     "manageDataController.logFiles.noLogs": "You don't have any log file.",
-    "manageDataController.logFiles.logsFilesCount": "You currently have %d logs file(s).",
+    "manageDataController.logFiles.logsFilesCount": "You currently have %d log file(s).",
     "manageDataController.logFiles.share.button": "Share logs",
     "manageDataController.logFiles.delete.button": "Delete logs",
     "manageDataController.logFiles.delete.confirmationDialog.title": "Warning",
-    "manageDataController.logFiles.delete.confirmationDialog.message": "Are you sure you want to delete the logs files?",
+    "manageDataController.logFiles.delete.confirmationDialog.message": "Are you sure you want to delete the log files?",
 
     "pdfImport.protected.enterPassword.alert.title": "Protected document",
     "pdfImport.protected.enterPassword.alert.message": "Please enter the document password to import the QR Code.",
@@ -1120,7 +1120,7 @@
     "pdfImport.protected.wrongPassword.alert.message": "The provided document password is wrong.\nDo you want to try again?",
 
     "vaccineCompletionController.button.favorite.title": "Add to favorites",
-    "vaccineCompletionController.footer.favorite": "Touch this button if you want to set this certificate as the favorite one in your wallet.",
+    "vaccineCompletionController.footer.favorite": "Tap this button if you want to set this certificate as the favorite one in your wallet.",
 
     "accessibility.home.otherOptions": "Other available actions",
     "accessibility.isolation.formWasUpdated": "The form was updated. Continue to browse it to answer the questions and read the recommandations when available.",
@@ -1130,8 +1130,19 @@
     "accessibility.onboarding.explanations.step2": "Step 2",
     "accessibility.onboarding.explanations.step3": "Step 3",
 
-    "vaccineCompletionController.footer.notify": "En appuyant sur ce bouton, vous recevrez une notification le %@.",
-    "vaccineCompletionController.button.notifyAndFavorite.title": "Me notifier et ajouter en favori ❤️",
-    "vaccineCompletionController.footer.notifyAndFavorite": "En appuyant sur ce bouton, vous recevrez une notification le %@, et ce certificat sera ajouté en favori dans votre carnet."
+    "vaccineCompletionController.footer.notify": "By tapping this button, you will receive a notification on %@.",
+    "vaccineCompletionController.button.notifyAndFavorite.title": "Notify me and add to favorite",
+    "vaccineCompletionController.footer.notifyAndFavorite": "By tapping this button, you will receive a notification on %@, and this certificate will be added as a favorite ❤️ in your TousAntiCovid wallet.",
+
+    "activityPass.fullscreen.title": "Pass Activité",
+    "activityPass.fullscreen.explanation": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+    "activityPass.fullscreen.readMore": "En savoir plus",
+    "activityPass.fullscreen.readMore.url": "",
+    "activityPass.fullscreen.unavailable.alert.title": "Indisponible",
+    "activityPass.fullscreen.unavailable.alert.message": "Votre connexion ou le service de génération de Pass Activité ne sont pas disponibles.\n\nVous pouvez utiliser le certificat dans l'onglet \"Frontière\".",
+    "activityPass.fullscreen.notYet.alert.title": "Pas encore",
+    "activityPass.fullscreen.notYet.alert.message": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+    "activityPass.fullscreen.button.generate": "Générer un Pass Activité",
+    "europeanCertificate.fullscreen.type.activityPass": "Pass Activité"
 
 }

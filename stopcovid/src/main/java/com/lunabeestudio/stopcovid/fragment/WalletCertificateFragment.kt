@@ -21,15 +21,15 @@ import android.view.View
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.text.toSpannable
+import androidx.core.view.doOnNextLayout
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.zxing.BarcodeFormat
 import com.journeyapps.barcodescanner.BarcodeEncoder
-import com.lunabeestudio.analytics.manager.AnalyticsManager
-import com.lunabeestudio.analytics.model.AppEventName
 import com.lunabeestudio.domain.model.WalletCertificateType
+import com.lunabeestudio.robert.extension.observeEventAndConsume
 import com.lunabeestudio.robert.model.RobertResultData
 import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.R
@@ -115,6 +115,8 @@ class WalletCertificateFragment : MainFragment() {
         viewModel.blacklist2DDOC.observe(viewLifecycleOwner) {
             refreshScreen()
         }
+
+        viewModel.scrollEvent.observeEventAndConsume(viewLifecycleOwner, ::scrollToCertificate)
     }
 
     override fun refreshScreen() {
@@ -208,6 +210,14 @@ class WalletCertificateFragment : MainFragment() {
         }
 
         return items
+    }
+
+    private fun scrollToCertificate(certificate: WalletCertificate) {
+        binding?.recyclerView?.doOnNextLayout {
+            fastAdapter.getItemById(certificate.fastAdapterIdentifier())?.second?.let { position ->
+                binding?.recyclerView?.smoothScrollToPosition(position)
+            }
+        }
     }
 
     private fun transformHeartEmoji(spannedSubtitle: Spannable?) {
@@ -357,14 +367,16 @@ class WalletCertificateFragment : MainFragment() {
 
             onFavoriteClick = {
                 if ((certificate as? EuropeanCertificate)?.isFavorite != true) {
-                    binding?.recyclerView?.smoothScrollToPosition(0)
+                    binding?.recyclerView?.doOnNextLayout {
+                        binding?.recyclerView?.smoothScrollToPosition(0)
+                    }
                 }
 
                 (certificate as? EuropeanCertificate)?.let(viewModel::toggleFavorite)
             }
             bottomText = strings["walletController.favoriteCertificateSection.openFullScreen"]
 
-            identifier = certificate.id.hashCode().toLong()
+            identifier = certificate.fastAdapterIdentifier()
         }
     }
 
@@ -384,7 +396,6 @@ class WalletCertificateFragment : MainFragment() {
                 .setMessage(strings["walletController.menu.convertToEurope.alert.message"])
                 .setPositiveButton(strings["common.ok"]) { _, _ ->
                     requestCertificateConversion(certificate)
-                    AnalyticsManager.reportAppEvent(requireContext(), AppEventName.e20, null)
                 }
                 .setNegativeButton(strings["common.cancel"], null)
                 .setNeutralButton(strings["walletController.menu.convertToEurope.alert.terms"]) { _, _ ->
@@ -452,7 +463,6 @@ class WalletCertificateFragment : MainFragment() {
             )
 
             viewModel.saveCertificate(certificate)
-            AnalyticsManager.reportAppEvent(requireContext(), AppEventName.e21, null)
 
             val vaccination = (certificate as? EuropeanCertificate)?.greenCertificate?.vaccinations?.lastOrNull()
             if (vaccination != null && vaccination.doseNumber >= vaccination.totalSeriesOfDoses) {
@@ -471,4 +481,6 @@ class WalletCertificateFragment : MainFragment() {
             false
         }
     }
+
+    private fun WalletCertificate.fastAdapterIdentifier(): Long = id.hashCode().toLong()
 }

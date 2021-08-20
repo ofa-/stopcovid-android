@@ -21,12 +21,16 @@ class SpaceItem : BaseItem<SpaceItem.ViewHolder>(
     R.layout.item_space, SpaceItem::ViewHolder, R.id.item_space
 ) {
     @DimenRes
-    var spaceRes: Int = -1
+    var spaceRes: Int = DEFAULT_HEIGHT
 
     override fun bindView(holder: ViewHolder, payloads: List<Any>) {
         super.bindView(holder, payloads)
         holder.space.apply {
-            if (spaceRes != -1) {
+            if (spaceRes == DEFAULT_HEIGHT) {
+                updateLayoutParams {
+                    height = 0
+                }
+            } else {
                 updateLayoutParams {
                     height = context.resources.getDimensionPixelSize(spaceRes)
                 }
@@ -36,6 +40,10 @@ class SpaceItem : BaseItem<SpaceItem.ViewHolder>(
 
     class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {
         val space: Space = v.findViewById(R.id.space)
+    }
+
+    companion object {
+        const val DEFAULT_HEIGHT: Int = -1
     }
 }
 

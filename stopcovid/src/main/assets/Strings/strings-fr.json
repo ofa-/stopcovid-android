@@ -670,7 +670,7 @@
    
    "walletController.title":"Carnet",
    "walletController.recentCertificatesSection.title":"Certificats récents",
-   "walletController.recentCertificatesSection.subtitle":"Dans cette section, vous avez les certificats de vaccination et les certificats de test de moins de 3 jours.\n⚠️ Vérifiez l'éligibilité pour le pass sanitaire dans \"Informations\".",
+   "walletController.recentCertificatesSection.subtitle":"⚠️ Vérifiez l'éligibilité pour le pass sanitaire dans \"Informations\".",
    "walletController.oldCertificatesSection.title":"Certificats plus anciens",
    "walletController.oldCertificatesSection.subtitle":"Ces certificats de test ont plus de 3 jours.",
    "walletController.menu.share":"Partager le certificat",
@@ -941,7 +941,7 @@
    "home.walletSection.favoriteCertificate.cell.title": "Mon certificat favori",
    "home.walletSection.favoriteCertificate.cell.subtitle": "Appuyez pour l’afficher en plein écran",
    "walletController.favoriteCertificateSection.title": "Mon certificat favori",
-   "walletController.favoriteCertificateSection.subtitle": "Ajoutez ici votre certificat favori en appuyant sur l’icône ❤️ sur le certificat (au format européen) souhaité.",
+   "walletController.favoriteCertificateSection.subtitle": "Ajoutez ici votre certificat favori en appuyant sur l’icône coeur ❤️ sur le certificat (au format européen) souhaité.",
    "walletController.favoriteCertificateSection.openFullScreen": "Afficher en plein écran",
 
    "manageDataController.userLanguage.title":"Langue",
@@ -964,10 +964,10 @@
    "widget.dcc.empty":"Ajoutez ici votre certificat favori en appuyant sur l'icône coeur ❤️ sur le certificat (au format européen) souhaité.",
    "widget.dcc.full":"Appuyez pour passer en plein écran",
    "walletController.favoriteCertificateSection.widget":"👉 Retrouvez ce certificat favori dans un widget. Mettez bien à jour TousAntiCovid.",
-   "walletController.favoriteCertificateSection.widget.ios":"👉 Retrouvez ce certificat favori dans un widget et l'appli Apple Watch. Mettez bien à jour TousAntiCovid.",
+   "walletController.favoriteCertificateSection.widget.ios":"👉 Retrouvez ce certificat favori dans un widget et l'appli Apple Watch.\n💡 Si vous avez un problème avec un widget (ex : tout \"noir\") : mettez à jour l'appli en version 3.7.2 mininum, supprimez le widget et remettez-le. Merci !",
    "appShortcut.favoriteDcc": "Certificat favori",
-   "keyfigure.nombrevaccinations.colorCode.light":"#51E476",
-   "keyfigure.nombrevaccinations.colorCode.dark":"#51E476",
+   "keyfigure.nombrevaccinations.colorCode.light":"#007AFF",
+   "keyfigure.nombrevaccinations.colorCode.dark":"#0B84FF",
    "keyfigure.nombrevaccinations.label":"Total primo vaccinations",
    "keyfigure.nombrevaccinations.shortLabel":"Primo vaccinations",
    "keyfigure.nombrevaccinations.description":"Cet indicateur représente le nombre total de personnes primo vaccinées.\nLes données sont consolidées le lendemain de leur remontée pour tenir compte des dernières données de vaccination de la veille au soir.",
@@ -1082,7 +1082,7 @@
     "manageDataController.logFiles.title": "Fichiers de logs",
     "manageDataController.logFiles.subtitle": "Pour aider l'équipe technique, vous pouvez partager ce(s) fichier(s) quand vous contactez l'équipe de support par email.\n\nCes fichiers de logs sont uniquement stockés sur votre smartphone, et ne contiennent pas de données personnelles.",
     "manageDataController.logFiles.noLogs": "Vous n'avez actuellement aucun fichier de log.",
-    "manageDataController.logFiles.logsFilesCount": "Vous avez actuellement %d fichier(s) de logs.",
+    "manageDataController.logFiles.logsFilesCount": "Vous avez actuellement %d fichier(s) de log.",
     "manageDataController.logFiles.share.button": "Partager les logs",
     "manageDataController.logFiles.delete.button": "Supprimer les logs",
     "manageDataController.logFiles.delete.confirmationDialog.title": "Attention",
@@ -1095,7 +1095,7 @@
     "pdfImport.protected.wrongPassword.alert.message": "Le mot de passe saisi n'est pas le bon.\nVoulez-vous essayer à nouveau ?",
 
     "vaccineCompletionController.button.favorite.title": "Ajouter en favori",
-    "vaccineCompletionController.footer.favorite": "En appuyant sur ce bouton, ce certificat sera ajouté en favori dans votre carnet.",
+    "vaccineCompletionController.footer.favorite": "En appuyant sur ce bouton, ce certificat sera ajouté en favori ❤️ dans votre carnet.",
 
     "accessibility.home.otherOptions": "Autres actions disponibles",
     "accessibility.isolation.formWasUpdated": "Le formulaire a été mis à jour. Continuez de le parcourir pour répondre aux différentes questions et lire les recommandations le cas échéant.",
@@ -1106,6 +1106,18 @@
     "accessibility.onboarding.explanations.step3": "étape 3",
 
     "vaccineCompletionController.footer.notify": "En appuyant sur ce bouton, vous recevrez une notification le %@.",
-    "vaccineCompletionController.button.notifyAndFavorite.title": "Me notifier et ajouter en favori ❤️",
-    "vaccineCompletionController.footer.notifyAndFavorite": "En appuyant sur ce bouton, vous recevrez une notification le %@, et ce certificat sera ajouté en favori dans votre carnet."
+    "vaccineCompletionController.button.notifyAndFavorite.title": "Me notifier et ajouter en favori",
+    "vaccineCompletionController.footer.notifyAndFavorite": "En appuyant sur ce bouton, vous recevrez une notification le %@, et ce certificat sera ajouté en favori ❤️ dans votre carnet.",
+
+    "activityPass.fullscreen.title": "Pass Activité",
+    "activityPass.fullscreen.explanation": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+    "activityPass.fullscreen.readMore": "En savoir plus",
+    "activityPass.fullscreen.readMore.url": "",
+    "activityPass.fullscreen.unavailable.alert.title": "Indisponible",
+    "activityPass.fullscreen.unavailable.alert.message": "Votre connexion ou le service de génération de Pass Activité ne sont pas disponibles.\n\nVous pouvez utiliser le certificat dans l'onglet \"Frontière\".",
+    "activityPass.fullscreen.notYet.alert.title": "Pas encore",
+    "activityPass.fullscreen.notYet.alert.message": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+    "activityPass.fullscreen.button.generate": "Générer un Pass Activité",
+    "europeanCertificate.fullscreen.type.activityPass": "Pass Activité"
+
 }

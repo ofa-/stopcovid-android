@@ -14,7 +14,7 @@ import android.net.Uri
 
 object DeeplinkManager {
     const val DEEPLINK_CODE_PARAMETER: String = "code"
-    const val DEEPLINK_CERTIFICATE_FORMAT_PARAMETER: String = "certificateFormat"
+    private const val DEEPLINK_CERTIFICATE_FORMAT_PARAMETER: String = "certificateFormat"
     const val DEEPLINK_CERTIFICATE_ORIGIN_PARAMETER: String = "origin"
 
     fun transformFragmentToCodeParam(uri: Uri): Uri {

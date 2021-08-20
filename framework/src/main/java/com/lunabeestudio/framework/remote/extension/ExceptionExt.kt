@@ -22,6 +22,7 @@ import com.lunabeestudio.robert.model.UnknownException
 import retrofit2.HttpException
 import java.io.IOException
 import java.net.SocketTimeoutException
+import java.net.UnknownHostException
 import javax.net.ssl.SSLException
 
 internal fun Exception.remoteToRobertException(): RobertException = when (this) {
@@ -29,6 +30,7 @@ internal fun Exception.remoteToRobertException(): RobertException = when (this) 
     is SSLException -> BackendException()
     is SocketTimeoutException,
     is IOException,
+    is UnknownHostException,
     -> NoInternetException()
     is HttpException -> {
         try {

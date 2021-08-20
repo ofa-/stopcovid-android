@@ -37,7 +37,7 @@
         <item name="bottomSheetDialogTheme">@style/ThemeOverlay.StopCovid.BottomSheetDialog</item>
 
         <item name="dividerColor">@color/color_mercury</item>
-
+        <item name="colorDisabled">@color/color_black_38</item>
     </style>
 
     <!-- Base application theme. -->

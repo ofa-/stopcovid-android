@@ -14,6 +14,7 @@
         <item name="android:statusBarColor">@android:color/transparent</item>
 
         <item name="dividerColor">@color/color_mine_shaft</item>
+        <item name="colorDisabled">@color/color_white_15</item>
     </style>
 
     <style name="Theme.StopCovid.Widget" parent="Theme.StopCovid.Base.Widget">
@@ -53,6 +54,7 @@
         <item name="bottomSheetDialogTheme">@style/ThemeOverlay.StopCovid.BottomSheetDialog</item>
 
         <item name="dividerColor">@color/color_mercury</item>
+        <item name="colorDisabled">@color/color_white_15</item>
     </style>
 
 </resources>

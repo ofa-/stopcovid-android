@@ -71,7 +71,7 @@ class SendHistoryFragment : MainFragment() {
             if (inProgress == null) {
                 progressDialog?.dismiss()
                 progressDialog = null
-                onBackPressedCallback.isEnabled = true
+                onBackPressedCallback.isEnabled = false
                 activity?.let { activity ->
                     activity.window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
                     // Fix loosing status bar light status
@@ -81,6 +81,7 @@ class SendHistoryFragment : MainFragment() {
                     ).isAppearanceLightStatusBars = !activity.isNightMode()
                 }
             } else {
+                onBackPressedCallback.isEnabled = true
                 if (progressDialog == null) {
                     context?.let { context ->
                         dialogProgressBarBinding = DialogProgressBarBinding.inflate(LayoutInflater.from(context))

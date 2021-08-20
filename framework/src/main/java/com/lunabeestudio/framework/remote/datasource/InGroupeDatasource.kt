@@ -18,6 +18,7 @@ import com.lunabeestudio.analytics.manager.AnalyticsManager
 import com.lunabeestudio.analytics.model.AnalyticsServiceName
 import com.lunabeestudio.domain.model.WalletCertificateType
 import com.lunabeestudio.framework.remote.RetrofitClient
+import com.lunabeestudio.framework.remote.extension.remoteToRobertException
 import com.lunabeestudio.framework.remote.model.ApiConversionErrorRS
 import com.lunabeestudio.framework.remote.model.ApiConversionRQ
 import com.lunabeestudio.framework.remote.server.InGroupeApi
@@ -26,6 +27,7 @@ import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.robert.datasource.RemoteCertificateDataSource
 import com.lunabeestudio.robert.datasource.SharedCryptoDataSource
 import com.lunabeestudio.robert.model.BackendException
+import com.lunabeestudio.robert.model.NoInternetException
 import com.lunabeestudio.robert.model.RobertResultData
 import com.lunabeestudio.robert.model.UnknownException
 import kotlinx.coroutines.Dispatchers
@@ -77,15 +79,18 @@ class InGroupeDatasource(
                     }
                 }
             } catch (e: Exception) {
-                AnalyticsManager.reportWSError(
-                    context,
-                    context.filesDir,
-                    AnalyticsServiceName.CERTIFICATE_CONVERSION,
-                    "0",
-                    0,
-                    e.message,
-                )
-                RobertResultData.Failure(BackendException("Unknown error : ${e.message}"))
+                val robertException = e.remoteToRobertException()
+                if (robertException !is NoInternetException) {
+                    AnalyticsManager.reportWSError(
+                        context,
+                        context.filesDir,
+                        AnalyticsServiceName.CERTIFICATE_CONVERSION,
+                        "0",
+                        0,
+                        e.message,
+                    )
+                }
+                RobertResultData.Failure(robertException)
             }
         }
     }
@@ -159,15 +164,18 @@ class InGroupeDatasource(
                     }
                 }
             } catch (e: Exception) {
-                AnalyticsManager.reportWSError(
-                    context,
-                    context.filesDir,
-                    AnalyticsServiceName.CERTIFICATE_CONVERSION,
-                    "0",
-                    0,
-                    e.message,
-                )
-                RobertResultData.Failure(BackendException("Unknown error : ${e.message}"))
+                val robertException = e.remoteToRobertException()
+                if (robertException !is NoInternetException) {
+                    AnalyticsManager.reportWSError(
+                        context,
+                        context.filesDir,
+                        AnalyticsServiceName.CERTIFICATE_CONVERSION,
+                        "0",
+                        0,
+                        e.message,
+                    )
+                }
+                RobertResultData.Failure(robertException)
             }
         }
     }

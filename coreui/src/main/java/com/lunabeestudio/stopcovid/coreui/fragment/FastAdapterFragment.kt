@@ -35,7 +35,7 @@ import kotlinx.coroutines.launch
 
 abstract class FastAdapterFragment : BaseFragment() {
     protected var binding: FragmentRecyclerViewBinding? = null
-    private var adapter: FastItemAdapter<GenericItem> = GenericFastItemAdapter()
+    protected val fastAdapter: FastItemAdapter<GenericItem> = GenericFastItemAdapter()
     protected abstract fun getItems(): List<GenericItem>
     protected abstract fun getAppBarLayout(): AppBarLayout?
     private var onScrollListener: RecyclerView.OnScrollListener? = null
@@ -49,11 +49,11 @@ abstract class FastAdapterFragment : BaseFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View? {
-        adapter.attachDefaultListeners = false
+        fastAdapter.attachDefaultListeners = false
         val view = inflater.inflate(layout, container, false)
         binding = FragmentRecyclerViewBinding.bind(view)
         binding?.recyclerView?.layoutManager = LinearLayoutManager(requireContext())
-        binding?.recyclerView?.adapter = adapter
+        binding?.recyclerView?.adapter = fastAdapter
         onScrollListener = binding?.recyclerView?.closeKeyboardOnScroll(context)
         return view
     }
@@ -66,7 +66,7 @@ abstract class FastAdapterFragment : BaseFragment() {
             if (items.isEmpty()) {
                 showEmpty()
             } else {
-                adapter.setNewList(items)
+                fastAdapter.setNewList(items)
                 showData()
             }
         }
