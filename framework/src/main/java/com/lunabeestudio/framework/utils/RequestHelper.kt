@@ -6,6 +6,7 @@ import com.lunabeestudio.framework.remote.datasource.ServiceDataSource
 import com.lunabeestudio.framework.remote.extension.remoteToRobertException
 import com.lunabeestudio.framework.remote.model.ApiCommonRS
 import com.lunabeestudio.robert.model.BackendException
+import com.lunabeestudio.robert.model.NoInternetException
 import com.lunabeestudio.robert.model.RobertResult
 import com.lunabeestudio.robert.model.RobertResultData
 import retrofit2.HttpException
@@ -39,16 +40,19 @@ internal object RequestHelper {
             }
         } catch (e: Exception) {
             Timber.e(ServiceDataSource::class.java.simpleName, e.message ?: "")
-            analyticsServiceName?.let {
-                AnalyticsManager.reportWSError(
-                    context, filesDir,
-                    it,
-                    apiVersion,
-                    (e as? HttpException)?.code() ?: 0,
-                    e.message
-                )
+            val robertException = e.remoteToRobertException()
+            if (robertException !is NoInternetException) {
+                analyticsServiceName?.let {
+                    AnalyticsManager.reportWSError(
+                        context, filesDir,
+                        it,
+                        apiVersion,
+                        (e as? HttpException)?.code() ?: 0,
+                        e.message
+                    )
+                }
             }
-            RobertResult.Failure(error = e.remoteToRobertException())
+            RobertResult.Failure(error = robertException)
         }
     }
 
@@ -67,16 +71,19 @@ internal object RequestHelper {
             }
         } catch (e: Exception) {
             Timber.e(e)
-            analyticsServiceName?.let {
-                AnalyticsManager.reportWSError(
-                    context, filesDir,
-                    it,
-                    apiVersion,
-                    (e as? HttpException)?.code() ?: 0,
-                    e.message
-                )
+            val robertException = e.remoteToRobertException()
+            if (robertException !is NoInternetException) {
+                analyticsServiceName?.let {
+                    AnalyticsManager.reportWSError(
+                        context, filesDir,
+                        it,
+                        apiVersion,
+                        (e as? HttpException)?.code() ?: 0,
+                        e.message
+                    )
+                }
             }
-            RobertResultData.Failure(error = e.remoteToRobertException())
+            RobertResultData.Failure(error = robertException)
         }
     }
 }

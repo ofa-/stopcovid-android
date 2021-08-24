@@ -45,7 +45,8 @@ object WalletManager {
     // This function adds a way to refresh the liveData if the Keychain wasn't available at app start
     fun refreshWalletIfNeeded(localKeystoreDataSource: LocalKeystoreDataSource) {
         if (localKeystoreDataSource.rawWalletCertificatesLiveData.value != localKeystoreDataSource.rawWalletCertificates
-            && !localKeystoreDataSource.rawWalletCertificates.isNullOrEmpty()) {
+            && !localKeystoreDataSource.rawWalletCertificates.isNullOrEmpty()
+        ) {
             localKeystoreDataSource.rawWalletCertificates = localKeystoreDataSource.rawWalletCertificates
         }
     }
@@ -82,8 +83,9 @@ object WalletManager {
         _walletCertificateLiveData.postValue(walletCertificates)
     }
 
-    fun extractCertificateCodeFromUrl(urlValue: String): String {
-        var code = Uri.parse(urlValue).fragment
+    fun extractCertificateDataFromUrl(urlValue: String): Pair<String, WalletCertificateType.Format?> {
+        val uri = Uri.parse(urlValue)
+        var code = uri.fragment
 
         if (code == null) { // Try the old way
             val sanitizer = UrlQuerySanitizer()
@@ -94,7 +96,9 @@ object WalletManager {
             code = sanitizer.getValue("v")
         }
 
-        return code ?: throw WalletCertificateMalformedException()
+        val certificateFormat = uri.lastPathSegment?.let { WalletCertificateType.Format.fromValue(it) }
+
+        return (code ?: throw WalletCertificateMalformedException()) to certificateFormat
     }
 
     suspend fun verifyAndGetCertificateCodeValue(

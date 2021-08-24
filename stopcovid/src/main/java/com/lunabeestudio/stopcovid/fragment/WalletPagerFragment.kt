@@ -143,7 +143,9 @@ class WalletPagerFragment : BaseFragment() {
 
     override fun onDestroy() {
         super.onDestroy()
-        viewPager.adapter = null
+        if (this::viewPager.isInitialized) {
+            viewPager.adapter = null
+        }
     }
 
     private inner class WalletPagerAdapter : FragmentStateAdapter(childFragmentManager, lifecycle) {

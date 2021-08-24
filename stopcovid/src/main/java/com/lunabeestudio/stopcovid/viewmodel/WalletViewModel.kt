@@ -11,12 +11,14 @@
 package com.lunabeestudio.stopcovid.viewmodel
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.map
 import com.lunabeestudio.framework.local.datasource.SecureKeystoreDataSource
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.robert.datasource.LocalKeystoreDataSource
+import com.lunabeestudio.robert.utils.Event
 import com.lunabeestudio.stopcovid.extension.isOld
 import com.lunabeestudio.stopcovid.extension.isRecent
 import com.lunabeestudio.stopcovid.manager.Blacklist2DDOCManager
@@ -31,8 +33,22 @@ class WalletViewModel(
     private val keystoreDataSource: LocalKeystoreDataSource,
 ) : ViewModel() {
 
+    private val _scrollEvent: MutableLiveData<Event<WalletCertificate>> = MutableLiveData()
+    val scrollEvent: LiveData<Event<WalletCertificate>>
+        get() = _scrollEvent
+
+    private var previousCertificatesId = emptyList<String>()
     val certificates: LiveData<List<WalletCertificate>?>
         get() = WalletManager.walletCertificateLiveData
+            .map { certificates ->
+                if (previousCertificatesId.isNotEmpty()) {
+                    certificates
+                        ?.find { it.id !in previousCertificatesId }
+                        ?.let { _scrollEvent.value = Event(it) }
+                }
+                previousCertificatesId = certificates?.map { it.id }.orEmpty()
+                certificates
+            }
 
     val blacklistDCC: LiveData<List<String>?>
         get() = BlacklistDCCManager.blacklistedDCCHashes
@@ -40,22 +56,22 @@ class WalletViewModel(
     val blacklist2DDOC: LiveData<List<String>?>
         get() = Blacklist2DDOCManager.blacklisted2DDOCHashes
 
-    val certificatesCount: LiveData<Int> = certificates.map { it?.size ?: 0 }
+    val certificatesCount: LiveData<Int> = WalletManager.walletCertificateLiveData.map { it?.size ?: 0 }
 
     val recentCertificates: List<WalletCertificate>?
-        get() = certificates.value?.filter {
+        get() = WalletManager.walletCertificateLiveData.value?.filter {
             it.isRecent(robertManager.configuration) &&
                 (it as? EuropeanCertificate)?.isFavorite != true
         }?.sortedByDescending { it.timestamp }
 
     val olderCertificates: List<WalletCertificate>?
-        get() = certificates.value?.filter {
+        get() = WalletManager.walletCertificateLiveData.value?.filter {
             it.isOld(robertManager.configuration) &&
                 (it as? EuropeanCertificate)?.isFavorite != true
         }?.sortedByDescending { it.timestamp }
 
     val favoriteCertificates: List<WalletCertificate>?
-        get() = certificates.value?.filter {
+        get() = WalletManager.walletCertificateLiveData.value?.filter {
             (it as? EuropeanCertificate)?.isFavorite == true
         }?.sortedByDescending { it.timestamp }
 
@@ -68,7 +84,7 @@ class WalletViewModel(
     }
 
     fun isEmpty(): Boolean {
-        return certificates.value.isNullOrEmpty()
+        return WalletManager.walletCertificateLiveData.value.isNullOrEmpty()
     }
 
     fun saveCertificate(walletCertificate: WalletCertificate) {

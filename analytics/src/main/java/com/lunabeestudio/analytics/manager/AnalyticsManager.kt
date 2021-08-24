@@ -47,6 +47,7 @@ import timber.log.Timber
 import java.io.File
 import java.text.DateFormat
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import java.util.UUID
@@ -270,7 +271,7 @@ object AnalyticsManager : LifecycleObserver {
         if (getSharedPrefs(context).isOptIn) {
             CoroutineScope(Dispatchers.IO).launch {
                 val timestampedEventList = getAppEvents(context).toMutableList()
-                timestampedEventList += TimestampedEvent(eventName.name, dateFormat.format(Date()), desc ?: "")
+                timestampedEventList += TimestampedEvent(eventName.name, dateFormat.format(roundedHourDate()), desc ?: "")
                 val file = File(File(context.filesDir, FOLDER_NAME), FILE_NAME_APP_EVENTS)
                 writeTimestampedEventProtoToFile(file, timestampedEventList.toProto())
             }
@@ -283,7 +284,7 @@ object AnalyticsManager : LifecycleObserver {
         if (getSharedPrefs(context).isOptIn) {
             CoroutineScope(Dispatchers.IO).launch {
                 val timestampedEventList = getHealthEvents(context).toMutableList()
-                timestampedEventList += TimestampedEvent(eventName.name, dateFormat.format(Date()), desc ?: "")
+                timestampedEventList += TimestampedEvent(eventName.name, dateFormat.format(roundedHourDate()), desc ?: "")
                 val file = File(File(context.filesDir, FOLDER_NAME), FILE_NAME_HEALTH_EVENTS)
                 writeTimestampedEventProtoToFile(file, timestampedEventList.toProto())
             }
@@ -298,7 +299,7 @@ object AnalyticsManager : LifecycleObserver {
                 CoroutineScope(Dispatchers.IO).launch {
                     val name = "ERR-${wsName.uppercase(Locale.getDefault())}-${wsVersion.uppercase(Locale.getDefault())}-$errorCode"
                     val timestampedEventList = getErrors(filesDir).toMutableList()
-                    timestampedEventList += TimestampedEvent(name, dateFormat.format(Date()), desc ?: "")
+                    timestampedEventList += TimestampedEvent(name, dateFormat.format(roundedHourDate()), "")
                     val file = File(File(filesDir, FOLDER_NAME), FILE_NAME_APP_ERRORS)
                     writeTimestampedEventProtoToFile(file, timestampedEventList.toProto())
                 }
@@ -404,6 +405,14 @@ object AnalyticsManager : LifecycleObserver {
         executeActionOnAtomicFile {
             AtomicFile(File(File(context.filesDir, FOLDER_NAME), FILE_NAME_APP_ERRORS)).delete()
         }
+    }
+
+    private fun roundedHourDate(): Date {
+        return Calendar.getInstance().apply {
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }.time
     }
 
     @Synchronized

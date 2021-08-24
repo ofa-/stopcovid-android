@@ -29,6 +29,9 @@ import retrofit2.HttpException
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import timber.log.Timber
+import java.io.IOException
+import java.net.SocketTimeoutException
+import java.net.UnknownHostException
 import java.security.cert.CertificateFactory
 import java.security.cert.X509Certificate
 import java.util.concurrent.TimeUnit
@@ -118,17 +121,23 @@ internal object AnalyticsServerManager {
                 AnalyticsResult.Failure(HttpException(result))
             }
         } catch (e: Exception) {
-            AnalyticsManager.reportWSError(
-                context,
-                context.filesDir,
-                AnalyticsServiceName.ANALYTICS,
-                apiVersion,
-                (e as? HttpException)?.code() ?: 0,
-                e.message
-            )
+            if (!e.isNoInternetException()) {
+                AnalyticsManager.reportWSError(
+                    context,
+                    context.filesDir,
+                    AnalyticsServiceName.ANALYTICS,
+                    apiVersion,
+                    (e as? HttpException)?.code() ?: 0,
+                    e.message
+                )
+            }
             AnalyticsResult.Failure(e)
         }
     }
+
+    private fun Exception.isNoInternetException(): Boolean = this is SocketTimeoutException
+        || this is IOException
+        || this is UnknownHostException
 
     private fun certificateFromString(context: Context, fileName: String): X509Certificate {
         return CertificateFactory.getInstance("X.509").generateCertificate(
