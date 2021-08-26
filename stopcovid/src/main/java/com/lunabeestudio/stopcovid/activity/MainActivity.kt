@@ -207,6 +207,7 @@ class MainActivity : BaseActivity() {
             R.id.walletQRCodeFragment,
             R.id.universalQrScanFragment,
             R.id.vaccineCompletionFragment,
+            R.id.walletQuantityWarningFragment,
         ).contains(destination.id).let { noAppBarFragment ->
             lifecycleScope.launchWhenResumed {
                 val windowInsetsController = WindowInsetsControllerCompat(window, window.decorView)

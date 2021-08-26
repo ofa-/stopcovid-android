@@ -354,7 +354,7 @@ class EuropeanCertificate private constructor(id: String, value: String, val isF
         val verificationResult = VerificationResult()
         val plainInput = DefaultPrefixValidationService().decode(value, verificationResult)
         val compressedCose = DefaultBase45Service().decode(plainInput, verificationResult)
-        cose = DefaultCompressorService().decode(compressedCose, verificationResult)
+        cose = checkNotNull(DefaultCompressorService().decode(compressedCose, verificationResult))
         val coseData = checkNotNull(DefaultCoseService().decode(cose, verificationResult))
         DefaultSchemaValidator().validate(coseData.cbor, verificationResult)
         if (!verificationResult.isSchemaValid) {
@@ -408,7 +408,7 @@ class EuropeanCertificate private constructor(id: String, value: String, val isF
                 val verificationResult = VerificationResult()
                 val plainInput = DefaultPrefixValidationService().decode(value, verificationResult)
                 val compressedCose = DefaultBase45Service().decode(plainInput, verificationResult)
-                val cose = DefaultCompressorService().decode(compressedCose, verificationResult)
+                val cose = checkNotNull(DefaultCompressorService().decode(compressedCose, verificationResult))
                 val coseData = DefaultCoseService().decode(cose, verificationResult)
                 val greenCertificate = coseData?.let { DefaultCborService().decode(it.cbor, verificationResult) }
 

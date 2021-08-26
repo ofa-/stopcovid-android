@@ -194,38 +194,34 @@ object AnalyticsManager : LifecycleObserver {
         token: String
     ) {
         val healthEvents = getHealthEvents(context)
-        if (healthEvents.isNotEmpty()) {
-            val healthInfos = getHealthInfos(context, robertManager, analyticsInfosProvider)
-            val sendAnalyticsRQ = SendHealthAnalyticsRQ(
-                installationUuid = UUID.randomUUID().toString(),
-                infos = healthInfos,
-                events = healthEvents.toAPI(),
-                errors = emptyList()
+        val healthInfos = getHealthInfos(context, robertManager, analyticsInfosProvider)
+        val sendAnalyticsRQ = SendHealthAnalyticsRQ(
+            installationUuid = UUID.randomUUID().toString(),
+            infos = healthInfos,
+            events = healthEvents.toAPI(),
+            errors = emptyList()
+        )
+        withContext(Dispatchers.IO) {
+            val result = AnalyticsServerManager.sendAnalytics(
+                context,
+                analyticsInfosProvider.getBaseUrl(),
+                analyticsInfosProvider.getApiVersion(),
+                token,
+                sendAnalyticsRQ,
             )
-            withContext(Dispatchers.IO) {
-                val result = AnalyticsServerManager.sendAnalytics(
-                    context,
-                    analyticsInfosProvider.getBaseUrl(),
-                    analyticsInfosProvider.getApiVersion(),
-                    token,
-                    sendAnalyticsRQ,
-                )
-                when (result) {
-                    is AnalyticsResult.Success -> {
-                        withContext(Dispatchers.Main) {
-                            resetHealthEvents(context)
-                        }
+            when (result) {
+                is AnalyticsResult.Success -> {
+                    withContext(Dispatchers.Main) {
+                        resetHealthEvents(context)
                     }
-                    is AnalyticsResult.Failure -> {
-                        Timber.e(result.error)
-                        if ((result.error as? HttpException)?.code() == 413) {
-                            resetHealthEvents(context)
-                        }
+                }
+                is AnalyticsResult.Failure -> {
+                    Timber.e(result.error)
+                    if ((result.error as? HttpException)?.code() == 413) {
+                        resetHealthEvents(context)
                     }
                 }
             }
-        } else {
-            Timber.d("No heath event to report")
         }
     }
 

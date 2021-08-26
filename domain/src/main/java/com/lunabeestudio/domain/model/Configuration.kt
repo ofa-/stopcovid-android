@@ -71,4 +71,5 @@ class Configuration(
     var certificateConversionSidepOnlyCode: List<String>,
     var conversionPublicKey: Map<String, String>,
     var conversionApiVersion: Int,
+    var maxCertBeforeWarning: Int,
 )
