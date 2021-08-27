@@ -39,6 +39,7 @@ import com.lunabeestudio.stopcovid.manager.DeeplinkManager
 import com.lunabeestudio.stopcovid.manager.WalletManager
 import com.lunabeestudio.stopcovid.model.EuropeanCertificate
 import com.lunabeestudio.stopcovid.model.WalletCertificate
+import com.lunabeestudio.stopcovid.model.WalletCertificateMalformedException
 import com.lunabeestudio.stopcovid.viewmodel.WalletViewModel
 import com.lunabeestudio.stopcovid.viewmodel.WalletViewModelFactory
 import kotlinx.coroutines.launch
@@ -75,15 +76,33 @@ class WalletContainerFragment : BaseFragment() {
         setupResultListener()
     }
 
-    private fun handleRawCode(rawCode: String?, certificateFormat: WalletCertificateType.Format?, origin: DeeplinkManager.Origin?) {
+    private fun handleRawCode(
+        rawCode: String?,
+        certificateFormat: WalletCertificateType.Format?,
+        origin: DeeplinkManager.Origin?,
+        skipMaxWarning: Boolean = false,
+    ) {
         val code = rawCode?.splitUrlFragment()
         val certificateValue = code?.getOrNull(0)
         val reportCode = code?.getOrNull(1)
 
         val shouldAddCertificate = robertManager.configuration.displaySanitaryCertificatesWallet && certificateValue != null
         val shouldReport = reportCode != null && robertManager.isRegistered
+        val shouldShowMaxCertificatesWarning = shouldAddCertificate && !skipMaxWarning &&
+            (WalletManager.walletCertificateLiveData.value?.size ?: 0) >= robertManager.configuration.maxCertBeforeWarning
 
         when {
+            shouldShowMaxCertificatesWarning -> {
+                setFragmentResultListener(WalletQuantityWarningFragment.MAX_CERTIFICATES_CONFIRM_ADD_RESULT_KEY) { _, bundle ->
+                    val confirmAdd = bundle.getBoolean(WalletQuantityWarningFragment.MAX_CERTIFICATES_CONFIRM_ADD_BUNDLE_KEY, false)
+                    if (confirmAdd) {
+                        handleRawCode(rawCode, certificateFormat, origin, true)
+                    }
+                }
+                findNavControllerOrNull()?.safeNavigate(
+                    WalletContainerFragmentDirections.actionWalletContainerFragmentToWalletQuantityWarningFragment()
+                )
+            }
             shouldAddCertificate && shouldReport -> findNavControllerOrNull()?.safeNavigate(
                 WalletContainerFragmentDirections.actionWalletContainerFragmentToPositiveTestStepsFragment(
                     positiveTestDccValue = certificateValue!!,
@@ -132,12 +151,18 @@ class WalletContainerFragment : BaseFragment() {
             val scannedData = bundle.getString(WalletQRCodeFragment.SCANNED_CODE_BUNDLE_KEY)
             scannedData?.let { data ->
                 if (URLUtil.isValidUrl(data)) {
-                    val certificateData = WalletManager.extractCertificateDataFromUrl(data)
-                    handleRawCode(
-                        certificateData.first,
-                        certificateData.second,
-                        null,
-                    )
+                    try {
+                        val certificateData = WalletManager.extractCertificateDataFromUrl(data)
+                        handleRawCode(
+                            certificateData.first,
+                            certificateData.second,
+                            null,
+                        )
+                    } catch (e: WalletCertificateMalformedException) {
+                        lifecycleScope.launch {
+                            handleCertificateError(e, null)
+                        }
+                    }
                 } else {
                     handleRawCode(data, null, null)
                 }

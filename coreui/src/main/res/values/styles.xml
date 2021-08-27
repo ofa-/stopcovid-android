@@ -45,9 +45,9 @@
 
     <!-- Base application theme. -->
     <style name="Theme.StopCovid.Colored" parent="Theme.Base.StopCovid">
-        <item name="colorPrimary">@color/color_black_33</item>
+        <item name="colorPrimary">@android:color/white</item>
         <item name="colorOnPrimary">@android:color/white</item>
-        <item name="colorSurface">@color/color_black_33</item>
+        <item name="colorSurface">@android:color/white</item>
         <item name="android:textColor">@android:color/white</item>
     </style>
 

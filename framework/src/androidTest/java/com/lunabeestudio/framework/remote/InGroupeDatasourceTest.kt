@@ -96,7 +96,6 @@ class InGroupeDatasourceTest {
         val inGroupeDatasource = InGroupeDatasource(
             InstrumentationRegistry.getInstrumentation().context,
             BouncyCastleCryptoDataSource(),
-            robertManager,
             server.url("/").toString(),
         )
 
@@ -132,7 +131,6 @@ class InGroupeDatasourceTest {
         val inGroupeDatasource = InGroupeDatasource(
             InstrumentationRegistry.getInstrumentation().context,
             BouncyCastleCryptoDataSource(),
-            robertManager,
             server.url("/").toString(),
         )
 

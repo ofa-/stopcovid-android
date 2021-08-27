@@ -139,6 +139,8 @@ internal class ApiConfiguration(
     val conversionPublicKey: String,
     @SerializedName("app.wallet.conversionApiVersion")
     val conversionApiVersion: Int,
+    @SerializedName("app.wallet.maxCertBeforeWarning")
+    val maxCertBeforeWarning: Int,
 )
 
 internal fun ApiConfiguration.toDomain(gson: Gson) = Configuration(
@@ -223,4 +225,5 @@ internal fun ApiConfiguration.toDomain(gson: Gson) = Configuration(
     certificateConversionSidepOnlyCode = gson.fromJson(certificateConversionSidepOnlyCode, object : TypeToken<List<String>>() {}.type),
     conversionPublicKey = gson.fromJson(conversionPublicKey, object : TypeToken<Map<String, String>>() {}.type),
     conversionApiVersion = conversionApiVersion,
+    maxCertBeforeWarning = maxCertBeforeWarning,
 )

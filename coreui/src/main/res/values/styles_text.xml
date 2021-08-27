@@ -34,6 +34,10 @@
         <item name="android:textSize">@dimen/title_small_font_size</item>
     </style>
 
+    <style name="TextAppearance.StopCovid.WarningText" parent="TextAppearance.AppCompat.Small">
+        <item name="fontFamily">@font/marianne</item>
+    </style>
+
     <style name="TextAppearance.StopCovid.Error" parent="TextAppearance.MaterialComponents.Headline6">
         <item name="android:textSize">@dimen/error_font_size</item>
         <item name="android:textColor">@color/color_on_error</item>

@@ -15,7 +15,6 @@ import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
-import androidx.preference.PreferenceManager
 import com.lunabeestudio.domain.model.WalletCertificateType
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
@@ -50,10 +49,6 @@ class PositiveTestStepsFragment : BottomSheetMainFragment() {
 
     private val robertManager by lazy {
         requireContext().robertManager()
-    }
-
-    private val sharedPreferences by lazy {
-        PreferenceManager.getDefaultSharedPreferences(requireContext())
     }
 
     private val dccCertificatesManager by lazy {
