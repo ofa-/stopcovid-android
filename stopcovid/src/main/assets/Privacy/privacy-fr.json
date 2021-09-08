@@ -4,7 +4,7 @@
         "description": "TousAntiCovid est conforme à la réglementation qui garantit la protection de vos données.",
         "links": [
 	        {
-                "label": "Plus d'informations sur RGPD",
+                "label": "Lire la politique de protection des données",
                 "url": "https://bonjour.tousanticovid.gouv.fr/privacy.html"
             }
         ]
@@ -15,19 +15,19 @@
     },
     {
         "section": "Quelles données sont échangées et pourquoi ?",
-        "description": "Les données échangées entre deux téléphones via Bluetooth sont des pseudo-identifiants.\nUn pseudo-identifiant est renouvelé automatiquement toutes les 15 minutes. C’est par exemple une suite de numéros, de lettres ou de signes, qui ne permet pas par elle-même d’identifier une personne.\n\nLes données sont partagées par votre application avec le serveur, géré par le Ministère des Solidarités et de la Santé, seulement si vous avez été diagnostiqué comme un cas de COVID-19 et avec votre accord. Cela permet alors aux applications des autres utilisateurs d’interroger le serveur pour savoir si elles ont été à proximité de votre application. Si c’est le cas, les utilisateurs seront alertés qu’ils ont été exposés à un risque de contamination. Il leur sera alors recommandé de prendre contact avec leur médecin.\n\nLes personnes alertées n’auront aucune information sur le téléphone portable à l’origine de l’alerte ni sur son propriétaire.\n\nL’application ne tient pas compte des contextes spécifiques et notamment des situations où une protection spécifique est mise en place (équipement des personnels de santé, séparation par une vitre par exemple). Il est toujours possible pour l’utilisateur de désactiver temporairement l’application."
+        "description": "Les données échangées entre deux téléphones via Bluetooth sont des pseudo-identifiants.\nUn pseudo-identifiant est renouvelé automatiquement toutes les 15 minutes. C’est par exemple une suite de numéros, de lettres ou de signes, qui ne permet pas par elle-même d’identifier une personne.\n\nLes données sont partagées par votre application avec le serveur, géré par le Ministère des Solidarités et de la Santé, seulement si vous avez été diagnostiqué comme un cas de COVID-19 et avec votre accord. Cela permet alors aux applications des autres utilisateurs d’interroger le serveur pour savoir si elles ont été à proximité de votre application. Si c’est le cas, les utilisateurs seront alertés qu’ils ont été exposés à un risque de contamination. Il leur sera alors recommandé de prendre contact avec leur médecin.\n\nLes personnes alertées n’auront aucune information sur le téléphone portable à l’origine de l’alerte ni sur son propriétaire.\n\nL’application ne tient pas compte des contextes spécifiques et notamment des situations où une protection spécifique est mise en place (équipement des personnels de santé, séparation par une vitre par exemple). Il est toujours possible pour l’utilisateur de désactiver temporairement l’application.\n\nDes données de TousAntiCovid sont également utilisées pour l'élaboration de statistiques anonymes afin d’adapter les mesures nécessaires pour faire face à l'épidémie et améliorer les performances de l’application et l'expérience utilisateur.\nLes catégories de données utilisées pour l’élaboration des statistiques sont les suivantes:\n- Informations techniques sur le téléphone mobile et sur l’application TousAntiCovid\n- Rubriques de TousAntiCovid consultées, type d’informations et documents générés ou ajoutés par l’utilisateur\n- Statut Covid de l'utilisateur et événements associés\n- Un identifiant de l'application spécifique aux statistiques."
     },
     {
         "section": "Où sont stockées les données ?",
-        "description": "Les données sont stockées sur votre téléphone portable. En cas de test positif, et avec votre consentement, vous pourrez protéger vos proches et les personnes que vous avez croisées en partageant sur le serveur géré par le Ministère des Solidarités et de la Santé cet historique de proximité."
+        "description": "Les données sont stockées sur votre téléphone portable. En cas de test positif, et avec votre consentement, vous pourrez protéger vos proches et les personnes que vous avez croisées en partageant sur le serveur géré par le Ministère des Solidarités et de la Santé cet historique de proximité.\n\nLes données utilisées pour l'élaboration des statistiques anonymes sont stockées sur le serveur central."
     },
     {
         "section": "Combien de temps sont-elles stockées ?",
-        "description": "Les données stockées sur le téléphone et sur le serveur sont automatiquement effacées après 14 jours."
+        "description": "Les données stockées sur le téléphone et sur le serveur sont automatiquement effacées après 14 jours.\n\nLes données utilisées pour l'élaboration des statistiques anonymes et datant de plus de 3 mois sont effacées."
     },
     {
         "section": "Puis-je supprimer les données ?",
-        "description": "Conformément au règlement général sur la protection des données (RGPD), vous pouvez supprimer : les données stockées sur votre téléphone, les données sur le serveur ainsi que les données liées à votre enregistrement (et vous désinscrire)."
+        "description": "Conformément au règlement général sur la protection des données (RGPD), vous pouvez supprimer : les données stockées sur votre téléphone, les données sur le serveur ainsi que les données liées à votre enregistrement (et vous désinscrire).\n\nConformément au règlement générale sur la protection des données, vous pouvez également désactiver l'envoi de ces données pour l'élaboration des statistiques anonymes dans les paramètres de TousAntiCovid."
     },
     {
         "section": "Vous êtes un mineur de moins de 15 ans ?",
@@ -35,7 +35,7 @@
     },
     {
         "section": "Qui a créé TousAntiCovid ?",
-        "description": "Cette application a été réalisée par l'équipe TousAntiCovid, sous la supervision du Ministère des Solidarités et de la Santé et du Secrétariat d'Etat chargé du Numérique.\nL'équipe TousAntiCovid : Inria, ANSSI, Capgemini, Dassault Systèmes, Inserm, Lunabee Studio, Ministère des Solidarités et de la Santé, Orange, Santé Publique France et Withings.\nLe code source de cette plateforme est intégralement ouvert et accessible à l’adresse ci-dessous."
+        "description": "Cette application a été réalisée par l'équipe TousAntiCovid, sous la supervision du Ministère des Solidarités et de la Santé et du Secrétariat d'Etat chargé du Numérique.\nL'équipe TousAntiCovid : Inria, ANSSI, Dassault Systèmes, Inserm, Lunabee Studio, Ministère des Solidarités et de la Santé, Orange, Santé Publique France et Withings.\nLe code source de cette plateforme est intégralement ouvert et accessible à l’adresse ci-dessous."
     },
     {
         "section": "Informations complémentaires",

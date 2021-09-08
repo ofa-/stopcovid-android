@@ -12,9 +12,11 @@ import androidx.preference.PreferenceManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.lunabeestudio.robert.utils.Event
 import com.lunabeestudio.stopcovid.R
+import com.lunabeestudio.stopcovid.StopCovid
 import com.lunabeestudio.stopcovid.coreui.extension.isNightMode
+import com.lunabeestudio.stopcovid.coreui.extension.liveStrings
+import com.lunabeestudio.stopcovid.coreui.extension.strings
 import com.lunabeestudio.stopcovid.coreui.manager.LocalizedStrings
-import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
 import com.lunabeestudio.stopcovid.databinding.ActivitySplashScreenBinding
 import com.lunabeestudio.stopcovid.extension.isOnBoardingDone
 import kotlinx.coroutines.Job
@@ -53,16 +55,16 @@ class SplashScreenActivity : BaseActivity() {
         setContentView(splashScreenBinding.root)
         WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = !isNightMode()
 
-        if (StringsManager.strings.isEmpty()) {
+        if (strings.isEmpty()) {
             val stringsObserver = object : Observer<Event<LocalizedStrings>> {
                 override fun onChanged(strings: Event<LocalizedStrings>?) {
                     if (!strings?.peekContent().isNullOrEmpty()) {
-                        StringsManager.liveStrings.removeObserver(this)
+                        liveStrings.removeObserver(this)
                         startOnBoardingOrMain(onBoardingDone)
                     }
                 }
             }
-            StringsManager.liveStrings.observe(this@SplashScreenActivity, stringsObserver)
+            liveStrings.observe(this@SplashScreenActivity, stringsObserver)
         } else {
             startOnBoardingOrMain(onBoardingDone)
         }
@@ -116,10 +118,12 @@ class SplashScreenActivity : BaseActivity() {
                 .setPositiveButton(R.string.splashScreenErrorDialog_positiveButton) { _, _ ->
                     splashLoadingJob = lifecycleScope.launch {
                         splashScreenBinding.progressBar.show()
-                        StringsManager.initialize(this@SplashScreenActivity)
-                        StringsManager.onAppForeground(this@SplashScreenActivity)
+                        (application as? StopCovid)?.injectionContainer?.stringsManager?.let { stringsManager ->
+                            stringsManager.initialize(this@SplashScreenActivity)
+                            stringsManager.onAppForeground(this@SplashScreenActivity)
+                        }
                         splashScreenBinding.progressBar.hide()
-                        if (StringsManager.strings.isEmpty()) {
+                        if (strings.isEmpty()) {
                             showNoStringsErrorDialog()
                         }
                     }

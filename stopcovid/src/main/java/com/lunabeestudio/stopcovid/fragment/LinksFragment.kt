@@ -13,7 +13,6 @@ package com.lunabeestudio.stopcovid.fragment
 import android.os.Bundle
 import android.view.View
 import com.lunabeestudio.stopcovid.extension.fillItems
-import com.lunabeestudio.stopcovid.manager.LinksManager
 import com.mikepenz.fastadapter.GenericItem
 
 class LinksFragment : MainFragment() {
@@ -23,7 +22,7 @@ class LinksFragment : MainFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        LinksManager.linksSections.observe(viewLifecycleOwner) {
+        linksManager.linksSections.observe(viewLifecycleOwner) {
             refreshScreen()
         }
     }
@@ -31,7 +30,7 @@ class LinksFragment : MainFragment() {
     override fun getItems(): List<GenericItem> {
         val items = arrayListOf<GenericItem>()
 
-        LinksManager.linksSections.value?.fillItems(items)
+        linksManager.linksSections.value?.fillItems(items)
 
         return items
     }

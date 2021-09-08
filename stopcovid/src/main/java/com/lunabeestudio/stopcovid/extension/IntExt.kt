@@ -10,11 +10,12 @@
 
 package com.lunabeestudio.stopcovid.extension
 
+import com.lunabeestudio.stopcovid.coreui.manager.LocalizedStrings
 import com.lunabeestudio.stopcovid.model.Trend
 
-fun Int.getTrend(): Trend? = when {
-    this > 0 -> Trend.UP
-    this == 0 -> Trend.STEADY
-    this < 0 -> Trend.DOWN
+fun Int.getTrend(strings: LocalizedStrings): Trend? = when {
+    this > 0 -> Trend.Up(strings["accessibility.hint.keyFigure.valueUp"])
+    this == 0 -> Trend.Steady(strings["accessibility.hint.keyFigure.valueSteady"])
+    this < 0 -> Trend.Down(strings["accessibility.hint.keyFigure.valueDown"])
     else -> null
 }

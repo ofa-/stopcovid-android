@@ -16,7 +16,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.lunabeestudio.analytics.manager.AnalyticsManager
 import com.lunabeestudio.analytics.model.AppEventName
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
@@ -96,7 +95,7 @@ class ConfirmVenueQrCodeFragment : MainFragment() {
                         args.venueVersion,
                         args.venueTime?.toLong()
                     )
-                    AnalyticsManager.reportAppEvent(requireContext(), AppEventName.e14, null)
+                    analyticsManager.reportAppEvent(requireContext(), AppEventName.e14, null)
                     findNavControllerOrNull()?.navigateUp()
                 } catch (e: VenueExpiredException) {
                     context?.showExpiredCodeAlert(strings, null)

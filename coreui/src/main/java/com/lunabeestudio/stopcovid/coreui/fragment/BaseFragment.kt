@@ -13,20 +13,20 @@ package com.lunabeestudio.stopcovid.coreui.fragment
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
+import com.lunabeestudio.stopcovid.coreui.LocalizedApplication
 import com.lunabeestudio.stopcovid.coreui.extension.stringsFormat
 import com.lunabeestudio.stopcovid.coreui.manager.LocalizedStrings
-import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
 
 abstract class BaseFragment : Fragment() {
 
     abstract fun refreshScreen()
 
     val strings: LocalizedStrings
-        get() = StringsManager.strings
+        get() = (activity?.application as? LocalizedApplication)?.localizedStrings ?: emptyMap()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        StringsManager.liveStrings.observe(viewLifecycleOwner) {
+        (activity?.application as? LocalizedApplication)?.liveLocalizedStrings?.observe(viewLifecycleOwner) {
             refreshScreen()
         }
     }

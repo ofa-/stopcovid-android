@@ -13,12 +13,16 @@ package com.lunabeestudio.stopcovid.worker
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import com.lunabeestudio.stopcovid.StopCovid
 import com.lunabeestudio.stopcovid.manager.AppMaintenanceManager
 
 class MaintenanceWorker(context: Context, workerParams: WorkerParameters) : CoroutineWorker(context, workerParams) {
 
     override suspend fun doWork(): Result {
-        AppMaintenanceManager.checkForMaintenanceUpgrade(applicationContext)
+        AppMaintenanceManager.checkForMaintenanceUpgrade(
+            applicationContext,
+            (applicationContext as StopCovid).injectionContainer.serverManager.okHttpClient
+        )
         return Result.success()
     }
 }

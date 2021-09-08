@@ -10,12 +10,12 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.lunabeestudio.stopcovid.Constants
-import com.lunabeestudio.stopcovid.manager.KeyFiguresManager
+import com.lunabeestudio.stopcovid.extension.keyFiguresManager
 import java.util.concurrent.TimeUnit
 
 class UpdateKeyFiguresWorker(context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
     override suspend fun doWork(): Result {
-        KeyFiguresManager.onAppForeground(applicationContext)
+        applicationContext.keyFiguresManager().onAppForeground(applicationContext)
         return Result.success()
     }
 

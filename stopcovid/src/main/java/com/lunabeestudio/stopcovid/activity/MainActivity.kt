@@ -39,6 +39,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.lunabeestudio.robert.extension.observeEventAndConsume
 import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.R
+import com.lunabeestudio.stopcovid.coreui.LocalizedApplication
 import com.lunabeestudio.stopcovid.coreui.UiConstants
 import com.lunabeestudio.stopcovid.coreui.databinding.ItemDividerBinding
 import com.lunabeestudio.stopcovid.coreui.extension.applyAndConsumeWindowInsetBottom
@@ -48,17 +49,16 @@ import com.lunabeestudio.stopcovid.coreui.extension.setTextOrHide
 import com.lunabeestudio.stopcovid.coreui.extension.showSnackBar
 import com.lunabeestudio.stopcovid.coreui.extension.userLanguage
 import com.lunabeestudio.stopcovid.coreui.manager.LocalizedStrings
-import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
 import com.lunabeestudio.stopcovid.databinding.ActivityMainBinding
 import com.lunabeestudio.stopcovid.databinding.DialogUserLanguageBinding
 import com.lunabeestudio.stopcovid.databinding.ItemSelectionBinding
 import com.lunabeestudio.stopcovid.extension.alertRiskLevelChanged
 import com.lunabeestudio.stopcovid.extension.flaggedCountry
+import com.lunabeestudio.stopcovid.extension.injectionContainer
 import com.lunabeestudio.stopcovid.extension.isLaunchedFromHistory
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.showAlertRiskLevelChanged
 import com.lunabeestudio.stopcovid.manager.DeeplinkManager
-import com.lunabeestudio.stopcovid.manager.RisksLevelManager
 import com.lunabeestudio.stopcovid.manager.WalletManager
 import com.lunabeestudio.stopcovid.model.EuropeanCertificate
 import com.lunabeestudio.stopcovid.widgetshomescreen.DccWidget
@@ -77,7 +77,7 @@ class MainActivity : BaseActivity() {
         PreferenceManager.getDefaultSharedPreferences(this)
     }
 
-    private var strings: LocalizedStrings = StringsManager.strings
+    private var strings: LocalizedStrings = (application as? LocalizedApplication)?.localizedStrings ?: emptyMap()
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
@@ -128,7 +128,7 @@ class MainActivity : BaseActivity() {
             MaterialAlertDialogBuilder(this).showAlertRiskLevelChanged(
                 strings,
                 sharedPrefs,
-                RisksLevelManager.getCurrentLevel(robertManager().atRiskStatus?.riskLevel),
+                injectionContainer.risksLevelManager.getCurrentLevel(robertManager().atRiskStatus?.riskLevel),
             )
         }
     }
@@ -182,7 +182,7 @@ class MainActivity : BaseActivity() {
     }
 
     private fun initStringsObserver() {
-        StringsManager.liveStrings.observeEventAndConsume(this) { strings ->
+        (application as? LocalizedApplication)?.liveLocalizedStrings?.observeEventAndConsume(this) { strings ->
             this.strings = strings
             invalidateOptionsMenu()
         }

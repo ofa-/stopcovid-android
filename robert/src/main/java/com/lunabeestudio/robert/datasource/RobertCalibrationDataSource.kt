@@ -14,7 +14,7 @@ import android.content.Context
 import com.lunabeestudio.domain.model.Calibration
 import com.lunabeestudio.robert.model.RobertResultData
 
-interface CalibrationDataSource {
+interface RobertCalibrationDataSource {
     suspend fun fetchOrLoadCalibration(context: Context): RobertResultData<Calibration>
 
     fun loadCalibration(context: Context): Calibration

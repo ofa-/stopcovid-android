@@ -14,6 +14,7 @@ import android.content.Context
 import android.util.Base64
 import androidx.annotation.WorkerThread
 import com.lunabeestudio.domain.model.Calibration
+import com.lunabeestudio.domain.model.CaptchaType
 import com.lunabeestudio.domain.model.Configuration
 import com.lunabeestudio.domain.model.LocalProximity
 import com.lunabeestudio.domain.model.RegisterReport
@@ -21,8 +22,8 @@ import com.lunabeestudio.domain.model.ReportResponse
 import com.lunabeestudio.domain.model.ServerStatusUpdate
 import com.lunabeestudio.domain.model.StatusReport
 import com.lunabeestudio.robert.RobertConstant
-import com.lunabeestudio.robert.datasource.CalibrationDataSource
-import com.lunabeestudio.robert.datasource.ConfigurationDataSource
+import com.lunabeestudio.robert.datasource.RobertCalibrationDataSource
+import com.lunabeestudio.robert.datasource.RobertConfigurationDataSource
 import com.lunabeestudio.robert.datasource.LocalKeystoreDataSource
 import com.lunabeestudio.robert.datasource.RemoteServiceDataSource
 import com.lunabeestudio.robert.datasource.SharedCryptoDataSource
@@ -35,19 +36,19 @@ internal class RemoteServiceRepository(
     private val remoteServiceDataSource: RemoteServiceDataSource,
     private val sharedCryptoDataSource: SharedCryptoDataSource,
     private val keystoreDataSource: LocalKeystoreDataSource,
-    private val configurationDataSource: ConfigurationDataSource,
-    private val calibrationDataSource: CalibrationDataSource,
+    private val configurationDataSource: RobertConfigurationDataSource,
+    private val calibrationDataSource: RobertCalibrationDataSource,
     private val serverPublicKey: String,
 ) {
 
-    suspend fun generateCaptcha(apiVersion: String, type: String, local: String): RobertResultData<String> =
+    suspend fun generateCaptcha(apiVersion: String, type: CaptchaType, local: String): RobertResultData<String> =
         remoteServiceDataSource.generateCaptcha(apiVersion, type, local)
 
     suspend fun getCaptchaImage(apiVersion: String, captchaId: String, path: String): RobertResult =
-        remoteServiceDataSource.getCaptcha(apiVersion, captchaId, "image", path)
+        remoteServiceDataSource.getCaptcha(apiVersion, captchaId, CaptchaType.IMAGE, path)
 
     suspend fun getCaptchaAudio(apiVersion: String, captchaId: String, path: String): RobertResult =
-        remoteServiceDataSource.getCaptcha(apiVersion, captchaId, "audio", path)
+        remoteServiceDataSource.getCaptcha(apiVersion, captchaId, CaptchaType.AUDIO, path)
 
     suspend fun registerV2(apiVersion: String, captcha: String, captchaId: String): RobertResultData<RegisterReport> {
         val keyPair = sharedCryptoDataSource.createECDHKeyPair()

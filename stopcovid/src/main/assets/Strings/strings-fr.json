@@ -897,7 +897,7 @@
    "walletController.convertCertificate.error.url1":"https://attestation-vaccin.ameli.fr",
    "walletController.convertCertificate.error.url2":"https://sidep.gouv.fr",
    "vaccineCompletionController.pending.explanation.title":"Vous y êtes presque.\nLe %@.",
-   "vaccineCompletionController.pending.explanation.body":"Le %@, ce sera le jour où votre vaccination sera complète et finalisée dans le cadre du pass sanitaire français 🇫🇷.\n\n✈️ Pour les voyages en Europe et passer les frontières, vous avez un onglet \"Informations\" dans le Carnet qui vous donnera des informations (entre autres sur les conditions de validité du pass par pays).\n\n⚠️ Tout usage détourné du certificat relève d’une pratique délictueuse, de faux ou d’usage de faux, sanctionnée par le code pénal (45 000 euros et 3 ans de prison).",
+   "vaccineCompletionController.pending.explanation.body":"Le %@, ce sera le jour où votre vaccination sera complète et finalisée dans le cadre du pass sanitaire français 🇫🇷.\n\n👉 DOSE 3/3 ? Si vous êtes dans ce cas, veuillez présenter votre certificat \"2 doses\" pour la vérification, pour l’instant.\n\n✈️ Pour les voyages en Europe et passer les frontières, vous avez un onglet \"Informations\" dans le Carnet qui vous donnera des indications (entre autres sur les conditions de validité du pass par pays).\n\n⚠️ Tout usage détourné du certificat relève d’une pratique délictueuse, de faux ou d’usage de faux, sanctionnée par le code pénal (45 000 euros et 3 ans de prison).",
    "vaccineCompletionController.pending.button.notifyMe.title":"Me notifier le %@",
    "vaccineCompletionController.pending.button.notifyMe.feedback":"Ok, vous serez notifié",
    "vaccineCompletionNotification.title":"🎉 Certificat de vaccination",
@@ -1137,6 +1137,23 @@
     "walletQuantityWarningController.continue": "Continuer",
     "walletQuantityWarningController.continueAlert.title": "Êtes-vous sûr ?",
     "walletQuantityWarningController.continueAlert.message": "Malgré les risques encourus, êtes-vous sûr de souhaiter importer ce certificat ?",
-    "walletQuantityWarningController.continueAlert.confirm": "Je confirme"
+    "walletQuantityWarningController.continueAlert.confirm": "Je confirme",
+
+    "keyFiguresController.category.vaccine": "Vaccination",
+    "keyFiguresController.category.health": "Épidémio",
+    "keyFiguresController.category.app": "Appli",
+    "keyFiguresController.explanations.vaccine": "Appuyez sur \"en savoir plus\" pour découvrir la source des chiffres sanitaires, leur interprétation, ainsi que leur mise à jour.",
+    "keyFiguresController.explanations.health": "Appuyez sur \"en savoir plus\" pour découvrir la source des chiffres sanitaires, leur interprétation, ainsi que leur mise à jour.",
+    "keyFiguresController.explanations.app": "",
+    "keyFiguresController.fetchError.message": "⚠️ Votre connexion internet n'a pas permis de récupérer les chiffres clés pour cette localité. Veuillez réessayer ultérieurement avec une meilleure connexion.",
+    "keyFiguresController.fetchError.button": "Réessayer",
+
+    "keyFigureDetailController.chartRange.segmentTitle.1000": "Tout",
+    "keyFigureDetailController.chartRange.segmentTitle.90": "Récent",
+    "keyFigureDetailController.chartRange.segmentTitle.30": "Très récent",
+
+    "wallet.autotest.warning": "⚠️ Les autotests supervisés ne sont valables que sur le territoire français dans le cadre du \"pass activité\".",
+    "wallet.expired.pillTitle": "Expiré",
+    "keyFigureChartController.zoomOut": "Dézoomer"
 
 }

@@ -16,11 +16,16 @@ import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.extension.fillItems
+import com.lunabeestudio.stopcovid.extension.injectionContainer
 import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.manager.PrivacyManager
 import com.mikepenz.fastadapter.GenericItem
 
 class OnBoardingPrivacyFragment : OnBoardingFragment() {
+
+    val privacyManager: PrivacyManager by lazy(LazyThreadSafetyMode.NONE) {
+        injectionContainer.privacyManager
+    }
 
     override fun getTitleKey(): String = "onboarding.privacyController.title"
     override fun getButtonTitleKey(): String = "onboarding.privacyController.accept"
@@ -32,7 +37,7 @@ class OnBoardingPrivacyFragment : OnBoardingFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        PrivacyManager.privacySections.observe(viewLifecycleOwner) {
+        privacyManager.privacySections.observe(viewLifecycleOwner) {
             refreshScreen()
         }
     }
@@ -43,7 +48,7 @@ class OnBoardingPrivacyFragment : OnBoardingFragment() {
         items += spaceItem {
             spaceRes = R.dimen.spacing_xlarge
         }
-        PrivacyManager.privacySections.value?.fillItems(items)
+        privacyManager.privacySections.value?.fillItems(items)
 
         return items
     }

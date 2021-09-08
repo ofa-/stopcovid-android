@@ -14,18 +14,19 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.reflect.TypeToken
+import com.lunabeestudio.framework.remote.server.ServerManager
 import com.lunabeestudio.robert.utils.Event
 import com.lunabeestudio.stopcovid.coreui.ConfigConstant
 import com.lunabeestudio.stopcovid.model.KeyFigure
 import com.lunabeestudio.stopcovid.widgetshomescreen.KeyFiguresWidget
 import java.lang.reflect.Type
 
-object KeyFiguresManager : RemoteJsonManager<List<KeyFigure>>() {
+class KeyFiguresManager(serverManager: ServerManager) : RemoteJsonManager<List<KeyFigure>>(serverManager) {
 
     override val type: Type = object : TypeToken<List<KeyFigure>>() {}.type
-    override val localFileName: String = ConfigConstant.KeyFigures.MASTER_LOCAL_FILENAME
-    override val remoteFileUrl: String = ConfigConstant.KeyFigures.MASTER_URL
-    override val assetFilePath: String? = null
+    override fun getLocalFileName(context: Context): String = ConfigConstant.KeyFigures.MASTER_LOCAL_FILENAME
+    override fun getRemoteFileUrl(context: Context): String = ConfigConstant.KeyFigures.MASTER_URL
+    override fun getAssetFilePath(context: Context): String? = null
 
     private val _figures: MutableLiveData<Event<List<KeyFigure>>> = MutableLiveData()
     val figures: LiveData<Event<List<KeyFigure>>>

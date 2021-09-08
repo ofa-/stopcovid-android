@@ -23,6 +23,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.preference.PreferenceManager
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.lunabeestudio.framework.remote.server.ServerManager
 import com.lunabeestudio.robert.utils.Event
 import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.StopCovid
@@ -31,7 +32,6 @@ import com.lunabeestudio.stopcovid.coreui.ConfigConstant
 import com.lunabeestudio.stopcovid.coreui.UiConstants
 import com.lunabeestudio.stopcovid.coreui.extension.fixFormatter
 import com.lunabeestudio.stopcovid.coreui.extension.getApplicationLanguage
-import com.lunabeestudio.stopcovid.coreui.extension.saveTo
 import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
 import com.lunabeestudio.stopcovid.extension.areInfoNotificationsEnabled
 import com.lunabeestudio.stopcovid.extension.lastInfoCenterFetch
@@ -48,16 +48,12 @@ import java.lang.reflect.Type
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 
-object InfoCenterManager {
+class InfoCenterManager(private val serverManager: ServerManager, private val stringsManager: StringsManager) {
 
     private var gson: Gson = Gson()
 
-    private const val lastUpdatePrefix: String = ConfigConstant.InfoCenter.LAST_UPDATE_PREFIX
-    private const val infosPrefix: String = ConfigConstant.InfoCenter.INFOS_PREFIX
-    private const val tagsPrefix: String = ConfigConstant.InfoCenter.TAGS_PREFIX
-    private const val stringPrefix: String = ConfigConstant.InfoCenter.STRINGS_PREFIX
-    private const val stringFallbackFileName: String = ConfigConstant.InfoCenter.LOCAL_FALLBACK_FILENAME
-    private val url: String = ConfigConstant.InfoCenter.URL
+    private fun getUrl(): String = ConfigConstant.InfoCenter.URL
+
     private val typeInfoCenterLastUpdatedAt: Type = object : TypeToken<InfoCenterLastUpdatedAt>() {}.type
     private val typeInfoCenterEntry: Type = object : TypeToken<List<InfoCenterEntry>>() {}.type
     private val typeInfoCenterTag: Type = object : TypeToken<List<InfoCenterTag>>() {}.type
@@ -156,11 +152,9 @@ object InfoCenterManager {
     private suspend fun fetchLastTimestamp(context: Context) {
         try {
             val filename = "$lastUpdatePrefix.json"
-            Timber.v("Fetching remote data at $url$filename")
-            "$url$filename".saveTo(
-                context,
-                File(context.filesDir, filename),
-            )
+            val url = getUrl() + filename
+            Timber.v("Fetching remote data at $url")
+            serverManager.saveTo(url, File(context.filesDir, filename), "application/json")
         } catch (e: Exception) {
             Timber.v("Fetching fail for last timestamp")
         }
@@ -175,11 +169,9 @@ object InfoCenterManager {
         return try {
             if (shouldRefresh(context) || forceRefresh) {
                 val filename = "$prefix${languageCode ?: ""}.json"
-                Timber.v("Fetching remote data at $url$filename")
-                "$url$filename".saveTo(
-                    context,
-                    File(context.filesDir, filename),
-                )
+                val url = getUrl() + filename
+                Timber.v("Fetching remote data at $url")
+                serverManager.saveTo(url, File(context.filesDir, filename), "application/json")
             } else {
                 Timber.v("Use local data")
                 false
@@ -269,10 +261,10 @@ object InfoCenterManager {
 
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        if (StringsManager.strings.isEmpty()) {
-            StringsManager.initialize(context)
+        if (stringsManager.strings.isEmpty()) {
+            stringsManager.initialize(context)
         }
-        val strings = StringsManager.strings
+        val strings = stringsManager.strings
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
@@ -304,5 +296,13 @@ object InfoCenterManager {
             .setContentIntent(pendingIntent)
             .build()
         notificationManager.notify(UiConstants.Notification.TIME.notificationId, notification)
+    }
+
+    companion object {
+        private const val lastUpdatePrefix: String = ConfigConstant.InfoCenter.LAST_UPDATE_PREFIX
+        private const val infosPrefix: String = ConfigConstant.InfoCenter.INFOS_PREFIX
+        private const val tagsPrefix: String = ConfigConstant.InfoCenter.TAGS_PREFIX
+        private const val stringFallbackFileName: String = ConfigConstant.InfoCenter.LOCAL_FALLBACK_FILENAME
+        private const val stringPrefix: String = ConfigConstant.InfoCenter.STRINGS_PREFIX
     }
 }

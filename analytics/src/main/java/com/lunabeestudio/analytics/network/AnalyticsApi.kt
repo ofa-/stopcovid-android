@@ -16,6 +16,7 @@ import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
+import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -26,17 +27,20 @@ internal interface AnalyticsApi {
     suspend fun sendAppAnalytics(
         @Path("apiVersion") apiVersion: String,
         @Body body: SendAppAnalyticsRQ,
+        @Header("Authorization") bearerToken: String,
     ): Response<ResponseBody>
 
     @POST("api/{apiVersion}/analytics")
     suspend fun sendHealthAnalytics(
         @Path("apiVersion") apiVersion: String,
         @Body body: SendHealthAnalyticsRQ,
+        @Header("Authorization") bearerToken: String,
     ): Response<ResponseBody>
 
     @DELETE("api/{apiVersion}/analytics")
     suspend fun deleteAnalytics(
         @Path("apiVersion") apiVersion: String,
         @Query("installationUuid") installationUuid: String,
+        @Header("Authorization") bearerToken: String,
     ): Response<ResponseBody>
 }

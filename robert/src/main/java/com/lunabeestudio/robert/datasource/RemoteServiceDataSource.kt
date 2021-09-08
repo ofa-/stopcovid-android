@@ -10,6 +10,7 @@
 
 package com.lunabeestudio.robert.datasource
 
+import com.lunabeestudio.domain.model.CaptchaType
 import com.lunabeestudio.domain.model.LocalProximity
 import com.lunabeestudio.domain.model.RegisterReport
 import com.lunabeestudio.domain.model.ReportResponse
@@ -19,8 +20,8 @@ import com.lunabeestudio.robert.model.RobertResult
 import com.lunabeestudio.robert.model.RobertResultData
 
 interface RemoteServiceDataSource {
-    suspend fun generateCaptcha(apiVersion: String, type: String, language: String): RobertResultData<String>
-    suspend fun getCaptcha(apiVersion: String, captchaId: String, type: String, path: String): RobertResult
+    suspend fun generateCaptcha(apiVersion: String, type: CaptchaType, language: String): RobertResultData<String>
+    suspend fun getCaptcha(apiVersion: String, captchaId: String, type: CaptchaType, path: String): RobertResult
     suspend fun registerV2(
         apiVersion: String,
         captcha: String,

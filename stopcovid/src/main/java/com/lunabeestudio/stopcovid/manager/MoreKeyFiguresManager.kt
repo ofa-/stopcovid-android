@@ -14,8 +14,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.coreui.ConfigConstant
+import okhttp3.OkHttpClient
 
-object MoreKeyFiguresManager : SectionManager() {
+class MoreKeyFiguresManager(okHttpClient: OkHttpClient) : SectionManager(okHttpClient) {
 
     private val _moreKeyFiguresSections: MutableLiveData<Sections> = MutableLiveData()
     val moreKeyFiguresSections: LiveData<Sections>
@@ -27,7 +28,7 @@ object MoreKeyFiguresManager : SectionManager() {
         }
     }
 
-    override val url: String = ConfigConstant.KeyFigures.URL
+    override fun getUrl(): String = ConfigConstant.KeyFigures.URL
     override val folderName: String = ConfigConstant.KeyFigures.FOLDER
     override val prefix: String = ConfigConstant.KeyFigures.FILE_PREFIX
     override val lastRefreshSharedPrefsKey: String = Constants.SharedPrefs.LAST_MORE_KEY_FIGURES_REFRESH

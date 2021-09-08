@@ -25,7 +25,10 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.TimeZone
 
-class NewAttestationViewModel(private val secureKeystoreDataSource: SecureKeystoreDataSource) : ViewModel() {
+class NewAttestationViewModel(
+    private val secureKeystoreDataSource: SecureKeystoreDataSource,
+    private val formManager: FormManager
+) : ViewModel() {
 
     var shouldSaveInfos: Boolean = secureKeystoreDataSource.saveAttestationData ?: false
     val infos: MutableMap<String, FormEntry> = (secureKeystoreDataSource.savedAttestationData ?: mapOf()).toMutableMap()
@@ -74,7 +77,7 @@ class NewAttestationViewModel(private val secureKeystoreDataSource: SecureKeysto
     }
 
     fun areInfosValid(): Boolean {
-        return FormManager.form.value?.peekContent()?.all { formFields ->
+        return formManager.form.value?.peekContent()?.all { formFields ->
             formFields.all { formField ->
                 !infos[formField.dataKeyValue]?.value.isNullOrBlank()
             }
@@ -82,10 +85,10 @@ class NewAttestationViewModel(private val secureKeystoreDataSource: SecureKeysto
     }
 }
 
-class NewAttestationViewModelFactory(private val secureKeystoreDataSource: SecureKeystoreDataSource) :
+class NewAttestationViewModelFactory(private val secureKeystoreDataSource: SecureKeystoreDataSource, private val formManager: FormManager) :
     ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         @Suppress("UNCHECKED_CAST")
-        return NewAttestationViewModel(secureKeystoreDataSource) as T
+        return NewAttestationViewModel(secureKeystoreDataSource, formManager) as T
     }
 }

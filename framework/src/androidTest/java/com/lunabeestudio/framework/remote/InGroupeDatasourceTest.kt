@@ -23,6 +23,7 @@ package com.lunabeestudio.framework.remote
 import android.util.Base64
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.gson.Gson
+import com.lunabeestudio.analytics.manager.AnalyticsManager
 import com.lunabeestudio.domain.model.Configuration
 import com.lunabeestudio.domain.model.WalletCertificateType
 import com.lunabeestudio.framework.crypto.BouncyCastleCryptoDataSource
@@ -32,7 +33,9 @@ import com.lunabeestudio.framework.testutils.CryptoUtils
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.robert.model.BackendException
 import com.lunabeestudio.robert.model.RobertResultData
+import io.mockk.MockKAnnotations
 import io.mockk.every
+import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import okhttp3.mockwebserver.Dispatcher
@@ -51,8 +54,12 @@ class InGroupeDatasourceTest {
     private lateinit var robertManager: RobertManager
     private lateinit var configuration: Configuration
 
+    @MockK(relaxed = true)
+    private lateinit var analyticsManager: AnalyticsManager
+
     @Before
     fun init() {
+        MockKAnnotations.init(this)
         robertManager = mockk(relaxed = true)
         configuration = mockk(relaxed = true)
         every { robertManager.configuration } returns configuration
@@ -97,6 +104,7 @@ class InGroupeDatasourceTest {
             InstrumentationRegistry.getInstrumentation().context,
             BouncyCastleCryptoDataSource(),
             server.url("/").toString(),
+            analyticsManager,
         )
 
         every { configuration.conversionPublicKey } returns hashMapOf(
@@ -132,6 +140,7 @@ class InGroupeDatasourceTest {
             InstrumentationRegistry.getInstrumentation().context,
             BouncyCastleCryptoDataSource(),
             server.url("/").toString(),
+            analyticsManager,
         )
 
         val convertResult = runBlocking {

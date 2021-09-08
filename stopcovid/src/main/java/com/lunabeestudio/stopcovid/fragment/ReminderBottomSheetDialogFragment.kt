@@ -21,6 +21,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.StopCovid
+import com.lunabeestudio.stopcovid.coreui.LocalizedApplication
 import com.lunabeestudio.stopcovid.coreui.databinding.FragmentRecyclerViewBinding
 import com.lunabeestudio.stopcovid.coreui.extension.stringsFormat
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
@@ -28,7 +29,6 @@ import com.lunabeestudio.stopcovid.coreui.fastitem.dividerItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
 import com.lunabeestudio.stopcovid.coreui.manager.LocalizedStrings
-import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.fastitem.linkItem
 import com.mikepenz.fastadapter.GenericItem
@@ -42,7 +42,7 @@ class ReminderBottomSheetDialogFragment : BottomSheetDialogFragment() {
     }
 
     private val strings: LocalizedStrings
-        get() = StringsManager.strings
+        get() = (activity?.application as? LocalizedApplication)?.localizedStrings ?: emptyMap()
 
     private var binding: FragmentRecyclerViewBinding? = null
     private var adapter: FastItemAdapter<GenericItem> = GenericFastItemAdapter()
@@ -58,7 +58,7 @@ class ReminderBottomSheetDialogFragment : BottomSheetDialogFragment() {
         binding?.recyclerView?.layoutManager = LinearLayoutManager(requireContext())
         binding?.recyclerView?.adapter = adapter
 
-        StringsManager.liveStrings.observe(viewLifecycleOwner) {
+        (activity?.application as? LocalizedApplication)?.liveLocalizedStrings?.observe(viewLifecycleOwner) {
             setItems()
             (dialog as? BottomSheetDialog)?.behavior?.state = BottomSheetBehavior.STATE_EXPANDED
         }

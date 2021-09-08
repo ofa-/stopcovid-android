@@ -26,7 +26,7 @@ import com.lunabeestudio.framework.local.datasource.SecureKeystoreDataSource
 import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.toDimensSize
-import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
+import com.lunabeestudio.stopcovid.extension.stringsManager
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -38,8 +38,8 @@ class DccWidget : AppWidgetProvider() {
 
         GlobalScope.launch(Dispatchers.Main) {
             // load strings and on startup
-            if (StringsManager.strings.isNullOrEmpty()) {
-                StringsManager.initialize(context)
+            if (context.stringsManager().strings.isNullOrEmpty()) {
+                context.stringsManager().initialize(context)
             }
             appWidgetIds.forEach { appWidgetId ->
                 updateDccWidget(context, appWidgetManager, appWidgetId)
@@ -60,10 +60,13 @@ class DccWidget : AppWidgetProvider() {
             val qrBitmap = generateBarcodeFromCertificate(favCertificate, context)
             views.apply {
                 setImageViewBitmap(R.id.dccQrCodeImageView, qrBitmap)
-                setTextViewText(R.id.titleWidgetTextView, StringsManager.strings["walletController.favoriteCertificateSection.title"])
+                setTextViewText(
+                    R.id.titleWidgetTextView,
+                    context.stringsManager().strings["walletController.favoriteCertificateSection.title"]
+                )
                 setTextViewText(
                     R.id.captionQrCodeTextView,
-                    StringsManager.strings["widget.dcc.full"] ?: "Appuyez pour passer en plein écran"
+                    context.stringsManager().strings["widget.dcc.full"] ?: "Appuyez pour passer en plein écran"
                 )
             }
             val uriIntent: String = Constants.Url.DCC_FULLSCREEN_SHORTCUT_URI + favCertificate.id
@@ -73,10 +76,10 @@ class DccWidget : AppWidgetProvider() {
             views.apply {
                 setTextViewText(
                     R.id.infoTextView,
-                    StringsManager.strings["widget.dcc.empty"]
+                    context.stringsManager().strings["widget.dcc.empty"]
                         ?: "Ajoutez ici votre certificat favori en appuyant sur l’icône ❤️ sur le certificat (au format européen) souhaité."
                 )
-                setTextViewText(R.id.titleWidgetTextView, StringsManager.strings["app.name"])
+                setTextViewText(R.id.titleWidgetTextView, context.stringsManager().strings["app.name"])
             }
             val uriIntent: String = Constants.Url.WALLET_CERTIFICATE_SHORTCUT_URI
             setIntent(context, views, uriIntent)

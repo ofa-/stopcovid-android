@@ -29,10 +29,10 @@ import com.lunabeestudio.stopcovid.Constants.Url.CERTIFICATE_SHORTCUT_URI
 import com.lunabeestudio.stopcovid.Constants.Url.NEW_CERTIFICATE_SHORTCUT_URI
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.toDimensSize
-import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
 import com.lunabeestudio.stopcovid.extension.isExpired
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
+import com.lunabeestudio.stopcovid.extension.stringsManager
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.concurrent.TimeUnit
@@ -65,7 +65,7 @@ class AttestationWidget : AppWidgetProvider() {
             uriIntent = Constants.Url.PROXIMITY_FRAGMENT_URI
             views.setTextViewText(
                 R.id.mainTextView,
-                StringsManager.strings["attestationsController.endAttestation"] ?: "Attestations plus nécessaires"
+                context.stringsManager().strings["attestationsController.endAttestation"] ?: "Attestations plus nécessaires"
             )
         } else if (validAttestations.isNullOrEmpty()) {
             // No certificate valid yet
@@ -73,7 +73,7 @@ class AttestationWidget : AppWidgetProvider() {
             uriIntent = NEW_CERTIFICATE_SHORTCUT_URI
             views.setTextViewText(
                 R.id.mainTextView,
-                StringsManager.strings["attestationsController.newAttestation"] ?: "Nouvelle attestation"
+                context.stringsManager().strings["attestationsController.newAttestation"] ?: "Nouvelle attestation"
             )
         }
         // already created a certif

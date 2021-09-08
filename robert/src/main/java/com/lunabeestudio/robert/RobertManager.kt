@@ -14,6 +14,7 @@ import androidx.lifecycle.LiveData
 import com.lunabeestudio.analytics.proxy.AnalyticsRobertManager
 import com.lunabeestudio.domain.model.AtRiskStatus
 import com.lunabeestudio.domain.model.Calibration
+import com.lunabeestudio.domain.model.CaptchaType
 import com.lunabeestudio.domain.model.Configuration
 import com.lunabeestudio.domain.model.HelloBuilder
 import com.lunabeestudio.domain.model.LocalProximity
@@ -55,7 +56,7 @@ interface RobertManager : AnalyticsRobertManager {
 
     suspend fun refreshConfig(application: RobertApplication): RobertResult
 
-    suspend fun generateCaptcha(type: String, local: String): RobertResultData<String>
+    suspend fun generateCaptcha(type: CaptchaType, local: String): RobertResultData<String>
 
     suspend fun getCaptchaImage(captchaId: String, path: String): RobertResult
 

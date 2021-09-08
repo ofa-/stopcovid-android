@@ -19,11 +19,11 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.setFragmentResult
 import androidx.preference.PreferenceManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.lunabeestudio.stopcovid.coreui.LocalizedApplication
 import com.lunabeestudio.stopcovid.coreui.UiConstants
 import com.lunabeestudio.stopcovid.coreui.extension.safeEmojiSpanify
 import com.lunabeestudio.stopcovid.coreui.extension.userLanguage
 import com.lunabeestudio.stopcovid.coreui.manager.LocalizedStrings
-import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
 import com.lunabeestudio.stopcovid.databinding.FragmentUserLanguageBottomSheetBinding
 import com.lunabeestudio.stopcovid.databinding.WidgetLightButtonBinding
 import com.lunabeestudio.stopcovid.extension.flaggedCountry
@@ -34,7 +34,8 @@ class UserLanguageBottomSheetFragment : BottomSheetDialogFragment() {
         PreferenceManager.getDefaultSharedPreferences(requireContext())
     }
 
-    private val strings: LocalizedStrings = StringsManager.strings
+    private val strings: LocalizedStrings
+        get() = (activity?.application as? LocalizedApplication)?.localizedStrings ?: emptyMap()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val binding = FragmentUserLanguageBottomSheetBinding.inflate(inflater, container, false)

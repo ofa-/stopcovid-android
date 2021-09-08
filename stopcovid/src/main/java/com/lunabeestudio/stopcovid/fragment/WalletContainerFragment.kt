@@ -22,6 +22,7 @@ import androidx.navigation.fragment.navArgs
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.lunabeestudio.domain.model.WalletCertificateType
 import com.lunabeestudio.robert.extension.safeEnumValueOf
+import com.lunabeestudio.stopcovid.StopCovid
 import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.extension.appCompatActivity
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
@@ -63,7 +64,13 @@ class WalletContainerFragment : BaseFragment() {
     }
 
     private val viewModel: WalletViewModel by viewModels {
-        WalletViewModelFactory(robertManager, keystoreDataSource)
+        val app = requireActivity().application as StopCovid
+        WalletViewModelFactory(
+            robertManager,
+            keystoreDataSource,
+            app.injectionContainer.blacklistDCCManager,
+            app.injectionContainer.blacklist2DDOCManager,
+        )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

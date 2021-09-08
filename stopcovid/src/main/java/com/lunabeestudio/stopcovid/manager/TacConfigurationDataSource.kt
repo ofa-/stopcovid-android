@@ -13,7 +13,7 @@ package com.lunabeestudio.stopcovid.manager
 import android.content.Context
 import androidx.preference.PreferenceManager
 import com.lunabeestudio.domain.model.Configuration
-import com.lunabeestudio.robert.datasource.ConfigurationDataSource
+import com.lunabeestudio.robert.datasource.RobertConfigurationDataSource
 import com.lunabeestudio.robert.model.RobertResultData
 import com.lunabeestudio.stopcovid.coreui.manager.ConfigManager
 import com.lunabeestudio.stopcovid.extension.remoteToRobertException
@@ -22,13 +22,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
-object ConfigDataSource : ConfigurationDataSource {
+class TacConfigurationDataSource(private val configManager: ConfigManager) : RobertConfigurationDataSource {
 
     override suspend fun fetchOrLoadConfig(context: Context): RobertResultData<Configuration> {
         @Suppress("BlockingMethodInNonBlockingContext")
         return withContext(Dispatchers.IO) {
             try {
-                val configuration = ConfigManager.fetchOrLoad(context)
+                val configuration = configManager.fetchOrLoad(context)
                 if (configuration.displayRecordVenues) {
                     PreferenceManager.getDefaultSharedPreferences(context).venuesFeaturedWasActivatedAtLeastOneTime = true
                 }
@@ -41,7 +41,7 @@ object ConfigDataSource : ConfigurationDataSource {
     }
 
     override fun loadConfig(context: Context): Configuration {
-        val configuration = ConfigManager.load(context)
+        val configuration = configManager.load(context)
         if (configuration.displayRecordVenues) {
             PreferenceManager.getDefaultSharedPreferences(context).venuesFeaturedWasActivatedAtLeastOneTime = true
         }

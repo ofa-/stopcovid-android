@@ -20,10 +20,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.preference.PreferenceManager
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.lunabeestudio.framework.remote.server.ServerManager
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.robert.utils.Event
 import com.lunabeestudio.stopcovid.coreui.ConfigConstant
-import com.lunabeestudio.stopcovid.coreui.extension.saveTo
 import com.lunabeestudio.stopcovid.extension.chosenPostalCode
 import com.lunabeestudio.stopcovid.extension.currentVaccinationReferenceDepartmentCode
 import com.lunabeestudio.stopcovid.extension.currentVaccinationReferenceLatitude
@@ -41,15 +41,13 @@ import java.io.File
 import java.lang.reflect.Type
 import kotlin.math.abs
 
-object VaccinationCenterManager {
+class VaccinationCenterManager(private val serverManager: ServerManager) {
 
     private var gson: Gson = Gson()
     private val postalCodesDetailsType: Type = object : TypeToken<Map<String, PostalCodeDetails>>() {}.type
-    private const val centersFileName: String = ConfigConstant.Vaccination.CENTER_FILENAME
-    private const val lastUpdateFileName: String = ConfigConstant.Vaccination.CENTER_LAST_UPDATE_FILENAME
-    private val url: String = ConfigConstant.Vaccination.URL
+    private fun getUrl(): String = ConfigConstant.Vaccination.URL
+
     private val vaccinationCentersType: Type = object : TypeToken<List<VaccinationCenter>>() {}.type
-    private const val ZIP_GEOLOC_VERSION: Int = 1
 
     private val _vaccinationCenters: MutableLiveData<Event<List<VaccinationCenter>>> = MutableLiveData()
     val vaccinationCenters: LiveData<Event<List<VaccinationCenter>>>
@@ -225,9 +223,9 @@ object VaccinationCenterManager {
                 null
             }
 
-            return "$url${sharedPreferences.currentVaccinationReferenceDepartmentCode}/$lastUpdateFileName".saveTo(
-                context,
-                atomicLastUpdateFile,
+            return serverManager.saveTo(
+                "${getUrl()}${sharedPreferences.currentVaccinationReferenceDepartmentCode}/$lastUpdateFileName",
+                atomicLastUpdateFile
             ) { data ->
                 val vaccinationCenterLastUpdate = gson.fromJson(
                     data.decodeToString(),
@@ -235,7 +233,7 @@ object VaccinationCenterManager {
                 )
 
                 if (vaccinationCenterLastUpdate.sha1 != previousVaccinationCenterLastUpdate?.sha1) {
-                    Timber.d(
+                    Timber.v(
                         "Downloaded Sha1 (${vaccinationCenterLastUpdate.sha1}) is different than our file " +
                             "Sha1 (${previousVaccinationCenterLastUpdate?.sha1}). Let's fetch the new file"
                     )
@@ -255,9 +253,9 @@ object VaccinationCenterManager {
         val atomicCentersFile = AtomicFile(localCentersFile(context, sharedPreferences))
 
         return try {
-            "${url}${sharedPreferences.currentVaccinationReferenceDepartmentCode}/$centersFileName".saveTo(
-                context,
-                atomicCentersFile,
+            serverManager.saveTo(
+                "${getUrl()}${sharedPreferences.currentVaccinationReferenceDepartmentCode}/$centersFileName",
+                atomicCentersFile
             ) { data ->
                 val list = gson.fromJson<List<VaccinationCenter?>>(data.decodeToString(), vaccinationCentersType)
                 list.all { it != null }
@@ -277,4 +275,10 @@ object VaccinationCenterManager {
         context.filesDir,
         "${sharedPreferences.currentVaccinationReferenceDepartmentCode}${ConfigConstant.Vaccination.LAST_UPDATE_SUFFIX}"
     )
+
+    companion object {
+        private const val centersFileName: String = ConfigConstant.Vaccination.CENTER_FILENAME
+        private const val lastUpdateFileName: String = ConfigConstant.Vaccination.CENTER_LAST_UPDATE_FILENAME
+        private const val ZIP_GEOLOC_VERSION: Int = 1
+    }
 }

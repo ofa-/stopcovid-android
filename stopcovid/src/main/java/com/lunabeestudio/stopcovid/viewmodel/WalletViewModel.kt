@@ -28,9 +28,11 @@ import com.lunabeestudio.stopcovid.model.EuropeanCertificate
 import com.lunabeestudio.stopcovid.model.FrenchCertificate
 import com.lunabeestudio.stopcovid.model.WalletCertificate
 
-class WalletViewModel(
+class WalletViewModel constructor(
     private val robertManager: RobertManager,
     private val keystoreDataSource: LocalKeystoreDataSource,
+    private val blacklistDCCManager: BlacklistDCCManager,
+    private val blacklist2DDOCManager: Blacklist2DDOCManager,
 ) : ViewModel() {
 
     private val _scrollEvent: MutableLiveData<Event<WalletCertificate>> = MutableLiveData()
@@ -51,10 +53,10 @@ class WalletViewModel(
             }
 
     val blacklistDCC: LiveData<List<String>?>
-        get() = BlacklistDCCManager.blacklistedDCCHashes
+        get() = blacklistDCCManager.blacklistedDCCHashes
 
     val blacklist2DDOC: LiveData<List<String>?>
-        get() = Blacklist2DDOCManager.blacklisted2DDOCHashes
+        get() = blacklist2DDOCManager.blacklisted2DDOCHashes
 
     val certificatesCount: LiveData<Int> = WalletManager.walletCertificateLiveData.map { it?.size ?: 0 }
 
@@ -113,11 +115,13 @@ class WalletViewModel(
 
 class WalletViewModelFactory(
     private val robertManager: RobertManager,
-    private val secureKeystoreDataSource: SecureKeystoreDataSource
+    private val secureKeystoreDataSource: SecureKeystoreDataSource,
+    private val blacklistDCCManager: BlacklistDCCManager,
+    private val blacklist2DDOCManager: Blacklist2DDOCManager,
 ) :
     ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         @Suppress("UNCHECKED_CAST")
-        return WalletViewModel(robertManager, secureKeystoreDataSource) as T
+        return WalletViewModel(robertManager, secureKeystoreDataSource, blacklistDCCManager, blacklist2DDOCManager) as T
     }
 }

@@ -11,7 +11,6 @@
 package com.lunabeestudio.analytics.manager
 
 import android.content.Context
-import android.content.SharedPreferences
 import android.os.Build
 import androidx.core.util.AtomicFile
 import androidx.lifecycle.LifecycleObserver
@@ -25,6 +24,7 @@ import com.lunabeestudio.analytics.extension.toAPI
 import com.lunabeestudio.analytics.extension.toDomain
 import com.lunabeestudio.analytics.extension.toProto
 import com.lunabeestudio.analytics.model.AnalyticsResult
+import com.lunabeestudio.analytics.model.AnalyticsServiceName
 import com.lunabeestudio.analytics.model.AppEventName
 import com.lunabeestudio.analytics.model.AppInfos
 import com.lunabeestudio.analytics.model.HealthEventName
@@ -41,9 +41,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import okhttp3.OkHttpClient
 import retrofit2.HttpException
 import timber.log.Timber
 import java.io.File
+import java.io.IOException
+import java.net.SocketTimeoutException
+import java.net.UnknownHostException
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -52,51 +56,38 @@ import java.util.Locale
 import java.util.UUID
 import kotlin.random.Random
 
-object AnalyticsManager : LifecycleObserver {
-
-    private const val FOLDER_NAME: String = "TacAnalytics"
-    private const val FILE_NAME_APP_EVENTS: String = "app_events"
-    private const val FILE_NAME_APP_ERRORS: String = "app_errors"
-    private const val FILE_NAME_HEALTH_EVENTS: String = "heath_events"
-    private const val SHARED_PREFS_NAME: String = "TacAnalytics"
-    private const val ANALYTICS_REPORT_MIN_DELAY: Long = 500L
-    private const val ANALYTICS_REPORT_MAX_DELAY: Long = 2000L
+class AnalyticsManager(okHttpClient: OkHttpClient, context: Context) : LifecycleObserver {
 
     private val dateFormat: DateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.FRANCE)
+    private val analyticsServerManager = AnalyticsServerManager(okHttpClient)
 
-    private lateinit var sharedPreferences: SharedPreferences
+    private val sharedPreferences = context.getSharedPreferences(SHARED_PREFS_NAME, Context.MODE_PRIVATE)
 
-    fun isOptIn(context: Context): Boolean = getSharedPrefs(context).isOptIn
-    fun setIsOptIn(context: Context, isOptIn: Boolean) {
-        getSharedPrefs(context).isOptIn = isOptIn
-    }
-
-    fun requestDeleteAnalytics(context: Context) {
-        reportAppEvent(context, AppEventName.e17)
-        getSharedPrefs(context).deleteAnalyticsAfterNextStatus = true
-    }
-
-    fun init(context: Context) {
-        getSharedPrefs(context).apply {
+    init {
+        sharedPreferences.apply {
             if (installationUUID == null) {
                 installationUUID = UUID.randomUUID().toString()
             }
         }
     }
 
-    private fun getSharedPrefs(context: Context): SharedPreferences {
-        if (!AnalyticsManager::sharedPreferences.isInitialized) {
-            sharedPreferences = context.getSharedPreferences(SHARED_PREFS_NAME, Context.MODE_PRIVATE)
-        }
-        return sharedPreferences
+    fun isOptIn(): Boolean = sharedPreferences.isOptIn
+
+    fun setIsOptIn(isOptIn: Boolean) {
+        sharedPreferences.isOptIn = isOptIn
     }
 
-    fun register(context: Context) {
-        getSharedPrefs(context).installationUUID = UUID.randomUUID().toString()
+    fun requestDeleteAnalytics(context: Context) {
+        reportAppEvent(context, AppEventName.e17)
+        sharedPreferences.deleteAnalyticsAfterNextStatus = true
+    }
+
+    fun register() {
+        sharedPreferences.installationUUID = UUID.randomUUID().toString()
     }
 
     fun unregister(context: Context) {
-        getSharedPrefs(context).apply {
+        sharedPreferences.apply {
             installationUUID = null
             proximityStartTime = null
             proximityActiveDuration = 0L
@@ -105,27 +96,27 @@ object AnalyticsManager : LifecycleObserver {
         reset(context)
     }
 
-    fun proximityDidStart(context: Context) {
-        getSharedPrefs(context).proximityStartTime = System.currentTimeMillis()
+    fun proximityDidStart() {
+        sharedPreferences.proximityStartTime = System.currentTimeMillis()
     }
 
-    fun proximityDidStop(context: Context) {
-        getSharedPrefs(context).apply {
-            proximityActiveDuration = getProximityActiveDuration(context)
+    fun proximityDidStop() {
+        sharedPreferences.apply {
+            proximityActiveDuration = getProximityActiveDuration()
             proximityStartTime = null
         }
     }
 
     fun statusDidSucceed(context: Context) {
         reportAppEvent(context, AppEventName.e16)
-        getSharedPrefs(context).apply {
+        sharedPreferences.apply {
             statusSuccessCount += 1
         }
     }
 
-    private fun getProximityActiveDuration(context: Context): Long {
-        val oldDuration = getSharedPrefs(context).proximityActiveDuration
-        val addedDuration = System.currentTimeMillis() - (getSharedPrefs(context).proximityStartTime ?: System.currentTimeMillis())
+    private fun getProximityActiveDuration(): Long {
+        val oldDuration = sharedPreferences.proximityActiveDuration
+        val addedDuration = System.currentTimeMillis() - (sharedPreferences.proximityStartTime ?: System.currentTimeMillis())
         return oldDuration + addedDuration
     }
 
@@ -135,7 +126,7 @@ object AnalyticsManager : LifecycleObserver {
         analyticsInfosProvider: AnalyticsInfosProvider,
         token: String
     ) {
-        if (robertManager.configuration.isAnalyticsOn && getSharedPrefs(context).isOptIn) {
+        if (robertManager.configuration.isAnalyticsOn && sharedPreferences.isOptIn) {
             val receivedHelloMessagesCount = robertManager.getLocalProximityCount()
             sendAppAnalytics(context, analyticsInfosProvider, token, receivedHelloMessagesCount)
             delay(Random.nextLong(ANALYTICS_REPORT_MIN_DELAY, ANALYTICS_REPORT_MAX_DELAY))
@@ -143,7 +134,7 @@ object AnalyticsManager : LifecycleObserver {
         } else {
             reset(context)
         }
-        if (getSharedPrefs(context).deleteAnalyticsAfterNextStatus) {
+        if (sharedPreferences.deleteAnalyticsAfterNextStatus) {
             sendDeleteAnalytics(context, analyticsInfosProvider, token)
         }
     }
@@ -154,18 +145,17 @@ object AnalyticsManager : LifecycleObserver {
         token: String,
         receivedHelloMessagesCount: Int
     ) {
-        val appInfos = getAppInfos(context, analyticsInfosProvider, receivedHelloMessagesCount)
+        val appInfos = getAppInfos(analyticsInfosProvider, receivedHelloMessagesCount)
         val appEvents = getAppEvents(context)
         val appErrors = getErrors(context.filesDir)
         val sendAnalyticsRQ = SendAppAnalyticsRQ(
-            installationUuid = getSharedPrefs(context).installationUUID ?: UUID.randomUUID().toString(),
+            installationUuid = sharedPreferences.installationUUID ?: UUID.randomUUID().toString(),
             infos = appInfos,
             events = appEvents.toAPI(),
             errors = appErrors.toAPI()
         )
         withContext(Dispatchers.IO) {
-            val result = AnalyticsServerManager.sendAnalytics(
-                context,
+            val result = analyticsServerManager.sendAnalytics(
                 analyticsInfosProvider.getBaseUrl(),
                 analyticsInfosProvider.getApiVersion(),
                 token,
@@ -194,7 +184,7 @@ object AnalyticsManager : LifecycleObserver {
         token: String
     ) {
         val healthEvents = getHealthEvents(context)
-        val healthInfos = getHealthInfos(context, robertManager, analyticsInfosProvider)
+        val healthInfos = getHealthInfos(robertManager, analyticsInfosProvider)
         val sendAnalyticsRQ = SendHealthAnalyticsRQ(
             installationUuid = UUID.randomUUID().toString(),
             infos = healthInfos,
@@ -202,8 +192,7 @@ object AnalyticsManager : LifecycleObserver {
             errors = emptyList()
         )
         withContext(Dispatchers.IO) {
-            val result = AnalyticsServerManager.sendAnalytics(
-                context,
+            val result = analyticsServerManager.sendAnalytics(
                 analyticsInfosProvider.getBaseUrl(),
                 analyticsInfosProvider.getApiVersion(),
                 token,
@@ -231,27 +220,49 @@ object AnalyticsManager : LifecycleObserver {
         token: String
     ) {
         withContext(Dispatchers.IO) {
-            getSharedPrefs(context).installationUUID?.let { installationUUID ->
-                val result = AnalyticsServerManager.deleteAnalytics(
-                    context,
+            sharedPreferences.installationUUID?.let { installationUUID ->
+                val apiVersion = analyticsInfosProvider.getApiVersion()
+                val result = analyticsServerManager.deleteAnalytics(
                     analyticsInfosProvider.getBaseUrl(),
-                    analyticsInfosProvider.getApiVersion(),
+                    apiVersion,
                     token,
                     installationUUID,
                 )
                 when (result) {
                     is AnalyticsResult.Success -> {
                         withContext(Dispatchers.Main) {
-                            getSharedPrefs(context).deleteAnalyticsAfterNextStatus = false
+                            sharedPreferences.deleteAnalyticsAfterNextStatus = false
                         }
                     }
                     is AnalyticsResult.Failure -> {
-                        Timber.e(result.error)
+                        val error = result.error
+                        Timber.e(error)
+                        if (error is HttpException) {
+                            reportWSError(
+                                context.filesDir,
+                                AnalyticsServiceName.ANALYTICS,
+                                apiVersion,
+                                error.code(),
+                                error.message()
+                            )
+                        } else if (error?.isNoInternetException() == false) {
+                            reportWSError(
+                                context.filesDir,
+                                AnalyticsServiceName.ANALYTICS,
+                                apiVersion,
+                                (error as? HttpException)?.code() ?: 0,
+                                error.message
+                            )
+                        }
                     }
                 }
             }
         }
     }
+
+    private fun Exception.isNoInternetException(): Boolean = this is SocketTimeoutException
+        || this is IOException
+        || this is UnknownHostException
 
     fun reset(context: Context) {
         resetAppEvents(context)
@@ -262,7 +273,7 @@ object AnalyticsManager : LifecycleObserver {
     @Suppress("BlockingMethodInNonBlockingContext")
     @Synchronized
     fun reportAppEvent(context: Context, eventName: AppEventName, desc: String? = null) {
-        if (getSharedPrefs(context).isOptIn) {
+        if (sharedPreferences.isOptIn) {
             CoroutineScope(Dispatchers.IO).launch {
                 val timestampedEventList = getAppEvents(context).toMutableList()
                 timestampedEventList += TimestampedEvent(eventName.name, dateFormat.format(roundedHourDate()), desc ?: "")
@@ -275,7 +286,7 @@ object AnalyticsManager : LifecycleObserver {
     @Suppress("BlockingMethodInNonBlockingContext")
     @Synchronized
     fun reportHealthEvent(context: Context, eventName: HealthEventName, desc: String? = null) {
-        if (getSharedPrefs(context).isOptIn) {
+        if (sharedPreferences.isOptIn) {
             CoroutineScope(Dispatchers.IO).launch {
                 val timestampedEventList = getHealthEvents(context).toMutableList()
                 timestampedEventList += TimestampedEvent(eventName.name, dateFormat.format(roundedHourDate()), desc ?: "")
@@ -287,8 +298,8 @@ object AnalyticsManager : LifecycleObserver {
 
     @Suppress("BlockingMethodInNonBlockingContext")
     @Synchronized
-    fun reportWSError(context: Context, filesDir: File, wsName: String, wsVersion: String, errorCode: Int, desc: String? = null) {
-        if (getSharedPrefs(context).isOptIn) {
+    fun reportWSError(filesDir: File, wsName: String, wsVersion: String, errorCode: Int, desc: String? = null) {
+        if (sharedPreferences.isOptIn) {
             if (desc?.contains("No address associated with hostname") != true) {
                 CoroutineScope(Dispatchers.IO).launch {
                     val name = "ERR-${wsName.uppercase(Locale.getDefault())}-${wsVersion.uppercase(Locale.getDefault())}-$errorCode"
@@ -311,7 +322,6 @@ object AnalyticsManager : LifecycleObserver {
     }
 
     private fun getAppInfos(
-        context: Context,
         infosProvider: AnalyticsInfosProvider,
         receivedHelloMessagesCount: Int
     ): AppInfos {
@@ -326,20 +336,19 @@ object AnalyticsManager : LifecycleObserver {
             placesCount = infosProvider.getPlacesCount(),
             formsCount = infosProvider.getFormsCount(),
             certificatesCount = infosProvider.getCertificatesCount(),
-            statusSuccessCount = getSharedPrefs(context).statusSuccessCount,
+            statusSuccessCount = sharedPreferences.statusSuccessCount,
             userHasAZipcode = infosProvider.userHaveAZipCode(),
         )
     }
 
     private fun getHealthInfos(
-        context: Context,
         robertManager: AnalyticsRobertManager,
         infosProvider: AnalyticsInfosProvider
     ): HealthInfos {
         return HealthInfos(
             type = 1,
             os = "Android",
-            secondsTracingActivated = getProximityActiveDuration(context) / 1000L,
+            secondsTracingActivated = getProximityActiveDuration() / 1000L,
             riskLevel = robertManager.atRiskStatus?.riskLevel,
             dateSample = infosProvider.getDateSample()?.let { dateFormat.format(Date(it)) },
             dateFirstSymptoms = infosProvider.getDateFirstSymptom()?.let { dateFormat.format(Date(it)) },
@@ -412,5 +421,15 @@ object AnalyticsManager : LifecycleObserver {
     @Synchronized
     private fun <T> executeActionOnAtomicFile(action: () -> T): T {
         return action()
+    }
+
+    companion object {
+        private const val FOLDER_NAME: String = "TacAnalytics"
+        private const val FILE_NAME_APP_EVENTS: String = "app_events"
+        private const val FILE_NAME_APP_ERRORS: String = "app_errors"
+        private const val FILE_NAME_HEALTH_EVENTS: String = "heath_events"
+        private const val SHARED_PREFS_NAME: String = "TacAnalytics"
+        private const val ANALYTICS_REPORT_MIN_DELAY: Long = 500L
+        private const val ANALYTICS_REPORT_MAX_DELAY: Long = 2000L
     }
 }

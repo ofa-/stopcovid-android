@@ -21,16 +21,21 @@ import com.lunabeestudio.stopcovid.coreui.extension.getApplicationLanguage
 import com.lunabeestudio.stopcovid.coreui.extension.saveTo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import okhttp3.OkHttpClient
 import timber.log.Timber
 import java.io.File
 import java.lang.reflect.Type
 import kotlin.math.abs
 
-abstract class ServerManager<T> {
+@Deprecated(
+    "Use com.lunabeestudio.framework.remote.server.ServerManager",
+    ReplaceWith("ServerManager", "com.lunabeestudio.framework.remote.server.ServerManager")
+)
+abstract class ServerManager<T>(private val okHttpClient: OkHttpClient) {
 
     private var gson: Gson = Gson()
 
-    protected abstract val url: String
+    protected abstract fun getUrl(): String
     protected abstract val folderName: String
     protected abstract val prefix: String
     protected abstract val type: Type
@@ -59,7 +64,7 @@ abstract class ServerManager<T> {
         val filename = "$prefix$languageCode$extension"
         val tmpFile = File(context.filesDir, "$filename.bck")
         return try {
-            "$url$filename".saveTo(context, tmpFile)
+            "${getUrl()}$filename".saveTo(okHttpClient, tmpFile)
             if (fileNotCorrupted(tmpFile)) {
                 tmpFile.copyTo(File(context.filesDir, filename), overwrite = true, bufferSize = 4 * 1024)
                 saveLastRefresh(context)

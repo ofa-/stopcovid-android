@@ -24,7 +24,6 @@ import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.extension.getRelativeDateTimeString
 import com.lunabeestudio.stopcovid.extension.startTextIntent
 import com.lunabeestudio.stopcovid.fastitem.infoCenterDetailCardItem
-import com.lunabeestudio.stopcovid.manager.InfoCenterManager
 import com.mikepenz.fastadapter.GenericItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -39,20 +38,20 @@ class InfoCenterFragment : TimeMainFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        InfoCenterManager.infos.observeEventAndConsume(viewLifecycleOwner) {
+        infoCenterManager.infos.observeEventAndConsume(viewLifecycleOwner) {
             refreshScreen()
         }
-        InfoCenterManager.tags.observeEventAndConsume(viewLifecycleOwner) {
+        infoCenterManager.tags.observeEventAndConsume(viewLifecycleOwner) {
             refreshScreen()
         }
-        InfoCenterManager.strings.observeEventAndConsume(viewLifecycleOwner) {
+        infoCenterManager.strings.observeEventAndConsume(viewLifecycleOwner) {
             refreshScreen()
         }
 
         binding?.emptyButton?.setOnClickListener {
             showLoading()
             viewLifecycleOwnerOrNull()?.lifecycleScope?.launch(Dispatchers.IO) {
-                InfoCenterManager.refreshIfNeeded(requireContext())
+                infoCenterManager.refreshIfNeeded(requireContext())
                 withContext(Dispatchers.Main) {
                     refreshScreen()
                 }
@@ -66,7 +65,7 @@ class InfoCenterFragment : TimeMainFragment() {
             putBoolean(Constants.SharedPrefs.HAS_NEWS, false)
         }
         viewLifecycleOwnerOrNull()?.lifecycleScope?.launch {
-            InfoCenterManager.refreshIfNeeded(requireContext())
+            infoCenterManager.refreshIfNeeded(requireContext())
         }
     }
 
@@ -76,9 +75,9 @@ class InfoCenterFragment : TimeMainFragment() {
     override fun getItems(): List<GenericItem> {
         val items = ArrayList<GenericItem>()
 
-        val infoCenterStrings = InfoCenterManager.strings.value?.peekContent()
-        val infos = InfoCenterManager.infos.value?.peekContent() ?: emptyList()
-        val tags = InfoCenterManager.tags.value?.peekContent() ?: emptyList()
+        val infoCenterStrings = infoCenterManager.strings.value?.peekContent()
+        val infos = infoCenterManager.infos.value?.peekContent() ?: emptyList()
+        val tags = infoCenterManager.tags.value?.peekContent() ?: emptyList()
 
         if (infoCenterStrings != null) {
             items += spaceItem {

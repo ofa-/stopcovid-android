@@ -12,6 +12,7 @@ package com.lunabeestudio.stopcovid.manager
 
 import android.content.Context
 import com.google.gson.reflect.TypeToken
+import com.lunabeestudio.framework.remote.server.ServerManager
 import com.lunabeestudio.robert.RobertConstant
 import com.lunabeestudio.stopcovid.coreui.ConfigConstant
 import com.lunabeestudio.stopcovid.model.ContactDateFormat
@@ -19,12 +20,12 @@ import com.lunabeestudio.stopcovid.model.RisksUILevel
 import java.lang.reflect.Type
 import java.util.concurrent.TimeUnit
 
-object RisksLevelManager : RemoteJsonManager<List<RisksUILevel>>() {
+class RisksLevelManager(serverManager: ServerManager) : RemoteJsonManager<List<RisksUILevel>>(serverManager) {
 
     override val type: Type = object : TypeToken<List<RisksUILevel>>() {}.type
-    override val localFileName: String = ConfigConstant.Risks.FILENAME
-    override val remoteFileUrl: String = ConfigConstant.Risks.URL
-    override val assetFilePath: String = ConfigConstant.Risks.ASSET_FILE_PATH
+    override fun getLocalFileName(context: Context): String = ConfigConstant.Risks.FILENAME
+    override fun getRemoteFileUrl(context: Context): String = ConfigConstant.Risks.URL
+    override fun getAssetFilePath(context: Context): String = ConfigConstant.Risks.ASSET_FILE_PATH
 
     var risksLevels: List<RisksUILevel>? = null
 

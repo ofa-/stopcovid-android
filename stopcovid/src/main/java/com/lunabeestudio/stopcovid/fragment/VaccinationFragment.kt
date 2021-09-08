@@ -40,7 +40,6 @@ import com.lunabeestudio.stopcovid.fastitem.bigTitleItem
 import com.lunabeestudio.stopcovid.fastitem.changePostalCodeItem
 import com.lunabeestudio.stopcovid.fastitem.linkCardItem
 import com.lunabeestudio.stopcovid.fastitem.linkItem
-import com.lunabeestudio.stopcovid.manager.VaccinationCenterManager
 import com.mikepenz.fastadapter.GenericItem
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -61,7 +60,7 @@ class VaccinationFragment : MainFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        VaccinationCenterManager.vaccinationCenters.observeEventAndConsume(viewLifecycleOwner) {
+        vaccinationCenterManager.vaccinationCenters.observeEventAndConsume(viewLifecycleOwner) {
             refreshScreen()
         }
     }
@@ -161,7 +160,7 @@ class VaccinationFragment : MainFragment() {
             identifier = items.count().toLong()
         }
 
-        val vaccinationCenters = VaccinationCenterManager.vaccinationCentersToDisplay(robertManager, sharedPrefs)
+        val vaccinationCenters = vaccinationCenterManager.vaccinationCentersToDisplay(robertManager, sharedPrefs)
         if (vaccinationCenters.isNullOrEmpty()) {
             items += titleItem {
                 text = strings["vaccinationController.vaccinationLocation.vaccinationCenterNotFound"]
@@ -175,8 +174,8 @@ class VaccinationFragment : MainFragment() {
                     viewLifecycleOwnerOrNull()?.lifecycleScope?.launch {
                         (activity as? MainActivity)?.showProgress(true)
                         val refreshStart = System.currentTimeMillis()
-                        VaccinationCenterManager.onAppForeground(requireContext(), sharedPrefs)
-                        if (VaccinationCenterManager.vaccinationCentersToDisplay(robertManager, sharedPrefs).isNullOrEmpty()) {
+                        vaccinationCenterManager.onAppForeground(requireContext(), sharedPrefs)
+                        if (vaccinationCenterManager.vaccinationCentersToDisplay(robertManager, sharedPrefs).isNullOrEmpty()) {
                             // Force display of a loading
                             delay(max(0, Constants.Android.FORCE_LOADING_DELAY - (System.currentTimeMillis() - refreshStart)))
                         }
@@ -225,12 +224,13 @@ class VaccinationFragment : MainFragment() {
     private fun showPostalCodeDialog() {
         MaterialAlertDialogBuilder(requireContext()).showPostalCodeDialog(
             layoutInflater,
-            strings
+            strings,
+            keyFiguresManager,
         ) { postalCode ->
             sharedPrefs.chosenPostalCode = postalCode
             viewLifecycleOwnerOrNull()?.lifecycleScope?.launch {
                 (activity as? MainActivity)?.showProgress(true)
-                VaccinationCenterManager.postalCodeDidUpdate(requireContext(), sharedPrefs, postalCode)
+                vaccinationCenterManager.postalCodeDidUpdate(requireContext(), sharedPrefs, postalCode)
                 (activity as? MainActivity)?.showProgress(false)
                 refreshScreen()
             }

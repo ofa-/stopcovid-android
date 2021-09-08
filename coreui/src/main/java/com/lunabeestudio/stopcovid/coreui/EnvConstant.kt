@@ -35,5 +35,4 @@ enum class EnvConstant {
     abstract val serverPublicKey: String
     abstract val dccCertificatesFilename: String
     abstract val conversionBaseUrl: String
-
 }

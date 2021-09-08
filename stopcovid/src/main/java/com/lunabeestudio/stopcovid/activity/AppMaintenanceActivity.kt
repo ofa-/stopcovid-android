@@ -25,11 +25,12 @@ import com.github.razir.progressbutton.showProgress
 import com.google.gson.Gson
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.ConfigConstant
+import com.lunabeestudio.stopcovid.coreui.LocalizedApplication
 import com.lunabeestudio.stopcovid.coreui.extension.isNightMode
 import com.lunabeestudio.stopcovid.coreui.extension.setTextOrHide
 import com.lunabeestudio.stopcovid.coreui.manager.LocalizedStrings
-import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
 import com.lunabeestudio.stopcovid.databinding.ActivityAppMaintenanceBinding
+import com.lunabeestudio.stopcovid.extension.injectionContainer
 import com.lunabeestudio.stopcovid.extension.openInExternalBrowser
 import com.lunabeestudio.stopcovid.manager.AppMaintenanceManager
 import com.lunabeestudio.stopcovid.model.Info
@@ -42,7 +43,7 @@ class AppMaintenanceActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAppMaintenanceBinding
 
-    private var strings: LocalizedStrings = StringsManager.strings
+    private var strings: LocalizedStrings = (application as? LocalizedApplication)?.localizedStrings ?: emptyMap()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -93,6 +94,7 @@ class AppMaintenanceActivity : AppCompatActivity() {
             lifecycleScope.launch {
                 AppMaintenanceManager.updateCheckForMaintenanceUpgrade(
                     this@AppMaintenanceActivity,
+                    injectionContainer.serverManager.okHttpClient,
                     appIsFreeCompletion = {
                         navToApp()
                     },
@@ -108,6 +110,7 @@ class AppMaintenanceActivity : AppCompatActivity() {
             lifecycleScope.launch {
                 AppMaintenanceManager.updateCheckForMaintenanceUpgrade(
                     this@AppMaintenanceActivity,
+                    injectionContainer.serverManager.okHttpClient,
                     appIsFreeCompletion = {
                         navToApp()
                     },

@@ -14,15 +14,16 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.reflect.TypeToken
+import com.lunabeestudio.framework.remote.server.ServerManager
 import com.lunabeestudio.stopcovid.coreui.ConfigConstant
 import java.lang.reflect.Type
 
-object Blacklist2DDOCManager : RemoteJsonManager<List<String>>() {
+class Blacklist2DDOCManager(serverManager: ServerManager) : RemoteJsonManager<List<String>>(serverManager) {
 
     override val type: Type = object : TypeToken<List<String>>() {}.type
-    override val localFileName: String = ConfigConstant.Blacklist2DDOC.FILENAME
-    override val remoteFileUrl: String = ConfigConstant.Blacklist2DDOC.URL
-    override val assetFilePath: String = ConfigConstant.Blacklist2DDOC.ASSET_FILE_PATH
+    override fun getLocalFileName(context: Context): String = ConfigConstant.Blacklist2DDOC.FILENAME
+    override fun getRemoteFileUrl(context: Context): String = ConfigConstant.Blacklist2DDOC.URL
+    override fun getAssetFilePath(context: Context): String = ConfigConstant.Blacklist2DDOC.ASSET_FILE_PATH
 
     private val _blacklisted2DDOCHashes: MutableLiveData<List<String>?> = MutableLiveData(null)
     val blacklisted2DDOCHashes: LiveData<List<String>?>

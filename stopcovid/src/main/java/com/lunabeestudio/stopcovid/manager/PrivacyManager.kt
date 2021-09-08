@@ -14,8 +14,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.coreui.ConfigConstant
+import okhttp3.OkHttpClient
 
-object PrivacyManager : SectionManager() {
+class PrivacyManager(okHttpClient: OkHttpClient) : SectionManager(okHttpClient) {
 
     private val _privacySections: MutableLiveData<Sections> = MutableLiveData()
     val privacySections: LiveData<Sections>
@@ -27,7 +28,7 @@ object PrivacyManager : SectionManager() {
         }
     }
 
-    override val url: String = ConfigConstant.Privacy.URL
+    override fun getUrl(): String = ConfigConstant.Privacy.URL
     override val folderName: String = ConfigConstant.Privacy.FOLDER
     override val prefix: String = ConfigConstant.Privacy.FILE_PREFIX
     override val lastRefreshSharedPrefsKey: String = Constants.SharedPrefs.LAST_PRIVACY_REFRESH

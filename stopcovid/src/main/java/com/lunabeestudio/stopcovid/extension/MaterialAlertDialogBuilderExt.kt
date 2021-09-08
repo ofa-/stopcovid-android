@@ -32,6 +32,7 @@ import java.util.Date
 fun MaterialAlertDialogBuilder.showPostalCodeDialog(
     layoutInflater: LayoutInflater,
     strings: LocalizedStrings,
+    keyFiguresManager: KeyFiguresManager,
     onPositiveButton: (String) -> Unit,
 ) {
     val postalCodeEditTextBinding = DialogPostalCodeEditTextBinding.inflate(layoutInflater)
@@ -65,7 +66,7 @@ fun MaterialAlertDialogBuilder.showPostalCodeDialog(
     positiveButton.setOnClickListener {
         val result = postalCodeEditTextBinding.textInputEditText.text.toString()
 
-        if (result.isPostalCode() && KeyFiguresManager.figures.value?.peekContent()
+        if (result.isPostalCode() && keyFiguresManager.figures.value?.peekContent()
             .postalCodeExists(result)
         ) {
             onPositiveButton(postalCodeEditTextBinding.textInputEditText.text.toString())

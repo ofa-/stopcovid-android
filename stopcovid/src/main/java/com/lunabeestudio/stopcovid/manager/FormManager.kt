@@ -14,6 +14,7 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.reflect.TypeToken
+import com.lunabeestudio.framework.remote.server.ServerManager
 import com.lunabeestudio.robert.utils.Event
 import com.lunabeestudio.stopcovid.coreui.ConfigConstant
 import com.lunabeestudio.stopcovid.model.FormField
@@ -21,12 +22,12 @@ import java.lang.reflect.Type
 
 typealias AttestationForm = List<List<FormField>>
 
-object FormManager : RemoteJsonManager<AttestationForm>() {
+class FormManager(serverManager: ServerManager) : RemoteJsonManager<AttestationForm>(serverManager) {
 
     override val type: Type = object : TypeToken<AttestationForm>() {}.type
-    override val localFileName: String = ConfigConstant.Attestations.FILENAME
-    override val remoteFileUrl: String = ConfigConstant.Attestations.URL
-    override val assetFilePath: String = ConfigConstant.Attestations.ASSET_FILE_PATH
+    override fun getLocalFileName(context: Context): String = ConfigConstant.Attestations.FILENAME
+    override fun getRemoteFileUrl(context: Context): String = ConfigConstant.Attestations.URL
+    override fun getAssetFilePath(context: Context): String = ConfigConstant.Attestations.ASSET_FILE_PATH
 
     private val _form: MutableLiveData<Event<AttestationForm>> = MutableLiveData()
     val form: LiveData<Event<AttestationForm>>

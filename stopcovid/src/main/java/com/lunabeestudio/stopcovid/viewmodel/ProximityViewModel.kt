@@ -26,6 +26,7 @@ import com.lunabeestudio.stopcovid.extension.isExpired
 import com.lunabeestudio.stopcovid.extension.toCovidException
 import com.lunabeestudio.stopcovid.manager.IsolationFormStateEnum
 import com.lunabeestudio.stopcovid.manager.IsolationManager
+import com.lunabeestudio.stopcovid.manager.VaccinationCenterManager
 import com.lunabeestudio.stopcovid.manager.WalletManager
 import com.lunabeestudio.stopcovid.model.CovidException
 import com.lunabeestudio.stopcovid.model.EuropeanCertificate
@@ -37,7 +38,8 @@ class ProximityViewModel(
     private val robertManager: RobertManager,
     isolationManager: IsolationManager,
     keystoreDataSource: SecureKeystoreDataSource,
-) : CommonDataViewModel(keystoreDataSource, robertManager, isolationManager) {
+    vaccinationCenterManager: VaccinationCenterManager,
+) : CommonDataViewModel(keystoreDataSource, robertManager, isolationManager, vaccinationCenterManager) {
 
     val activateProximitySuccess: SingleLiveEvent<Unit> = SingleLiveEvent()
     val covidException: SingleLiveEvent<CovidException?> = SingleLiveEvent()
@@ -113,10 +115,11 @@ class ProximityViewModelFactory(
     private val robertManager: RobertManager,
     private val isolationManager: IsolationManager,
     private val keystoreDataSource: SecureKeystoreDataSource,
+    private val vaccinationCenterManager: VaccinationCenterManager,
 ) :
     ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         @Suppress("UNCHECKED_CAST")
-        return ProximityViewModel(robertManager, isolationManager, keystoreDataSource) as T
+        return ProximityViewModel(robertManager, isolationManager, keystoreDataSource, vaccinationCenterManager) as T
     }
 }

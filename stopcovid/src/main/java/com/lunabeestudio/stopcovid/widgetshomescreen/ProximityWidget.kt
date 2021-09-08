@@ -31,8 +31,9 @@ import com.lunabeestudio.stopcovid.Constants.Url.PROXIMITY_FRAGMENT_URI
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.toDimensSize
 import com.lunabeestudio.stopcovid.coreui.manager.LocalizedStrings
-import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
+import com.lunabeestudio.stopcovid.extension.risksLevelManager
 import com.lunabeestudio.stopcovid.extension.robertManager
+import com.lunabeestudio.stopcovid.extension.stringsManager
 import com.lunabeestudio.stopcovid.manager.ProximityManager
 import com.lunabeestudio.stopcovid.manager.RisksLevelManager
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -48,8 +49,8 @@ class ProximityWidget : AppWidgetProvider() {
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
         // Sometimes strings are not loaded
         GlobalScope.launch(Dispatchers.Main) {
-            if (StringsManager.strings.isNullOrEmpty()) {
-                StringsManager.initialize(context)
+            if (context.stringsManager().strings.isNullOrEmpty()) {
+                context.stringsManager().initialize(context)
             }
             appWidgetIds.forEach { appWidgetId ->
                 updateProximityWidget(context, appWidgetManager, appWidgetId)
@@ -62,7 +63,7 @@ class ProximityWidget : AppWidgetProvider() {
     }
 
     private fun updateProximityWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int) {
-        val strings = StringsManager.strings
+        val strings = context.stringsManager().strings
         val views = RemoteViews(context.packageName, R.layout.proximity_widget)
         val robertManager = context.robertManager()
         setStyleWidgetWithSize(appWidgetManager, views, appWidgetId, context)
@@ -78,7 +79,7 @@ class ProximityWidget : AppWidgetProvider() {
         }
         // Display the risk level if not sick
         else if (robertManager.atRiskStatus?.riskLevel != null) {
-            displayRisk(views, robertManager, strings)
+            displayRisk(views, robertManager, context.risksLevelManager(), strings)
         } else {
             displayNoRisk(views, strings)
         }
@@ -107,8 +108,13 @@ class ProximityWidget : AppWidgetProvider() {
         }
     }
 
-    private fun displayRisk(views: RemoteViews, robertManager: RobertManager, strings: LocalizedStrings) {
-        RisksLevelManager.getCurrentLevel(robertManager.atRiskStatus?.riskLevel)?.let {
+    private fun displayRisk(
+        views: RemoteViews,
+        robertManager: RobertManager,
+        risksLevelManager: RisksLevelManager,
+        strings: LocalizedStrings
+    ) {
+        risksLevelManager.getCurrentLevel(robertManager.atRiskStatus?.riskLevel)?.let {
             views.apply {
                 setTextViewText(R.id.riskTextView, strings[it.labels.homeTitle])
                 setTextViewText(R.id.infoTextView, strings[it.labels.homeSub])

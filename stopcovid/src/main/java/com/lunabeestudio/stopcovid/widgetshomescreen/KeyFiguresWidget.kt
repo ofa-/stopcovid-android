@@ -34,14 +34,14 @@ import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.isNightMode
 import com.lunabeestudio.stopcovid.coreui.extension.toDimensSize
 import com.lunabeestudio.stopcovid.coreui.manager.LocalizedStrings
-import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
 import com.lunabeestudio.stopcovid.extension.colorStringKey
 import com.lunabeestudio.stopcovid.extension.formatNumberIfNeeded
+import com.lunabeestudio.stopcovid.extension.keyFiguresManager
 import com.lunabeestudio.stopcovid.extension.labelShortStringKey
 import com.lunabeestudio.stopcovid.extension.safeParseColor
 import com.lunabeestudio.stopcovid.extension.setupStyleWidget
+import com.lunabeestudio.stopcovid.extension.stringsManager
 import com.lunabeestudio.stopcovid.fastitem.NumbersCardItem
-import com.lunabeestudio.stopcovid.manager.KeyFiguresManager
 import com.lunabeestudio.stopcovid.model.ChartData
 import com.lunabeestudio.stopcovid.model.KeyFigure
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -61,11 +61,11 @@ class KeyFiguresWidget : AppWidgetProvider() {
 
         GlobalScope.launch(Dispatchers.Main) {
             // load strings and figures on startup
-            if (KeyFiguresManager.featuredFigures == null || KeyFiguresManager.highlightedFigures == null) {
-                KeyFiguresManager.initialize(context)
+            if (context.keyFiguresManager().featuredFigures == null || context.keyFiguresManager().highlightedFigures == null) {
+                context.keyFiguresManager().initialize(context)
             }
-            if (StringsManager.strings.isNullOrEmpty()) {
-                StringsManager.initialize(context)
+            if (context.stringsManager().strings.isNullOrEmpty()) {
+                context.stringsManager().initialize(context)
             }
             appWidgetIds.forEach { appWidgetId ->
                 updateFiguresWidget(context, appWidgetManager, appWidgetId)
@@ -79,7 +79,7 @@ class KeyFiguresWidget : AppWidgetProvider() {
         appWidgetId: Int
     ) {
         val views = RemoteViews(context.packageName, R.layout.key_figures_widget)
-        val strings = StringsManager.strings
+        val strings = context.stringsManager().strings
         val numberFormat = NumberFormat.getNumberInstance(Locale.getDefault())
         // Set title widget
         views.setTextViewText(
@@ -103,7 +103,7 @@ class KeyFiguresWidget : AppWidgetProvider() {
         views: RemoteViews,
         numberFormat: NumberFormat,
     ) {
-        KeyFiguresManager.featuredFigures?.let { keyFigures ->
+        context.keyFiguresManager().featuredFigures?.let { keyFigures ->
             val data = NumbersCardItem.Data(
                 strings["common.country.france"],
                 keyFigures.getOrNull(0)?.let { generateFromKeyFigure(it, context, strings, numberFormat) },
@@ -144,7 +144,7 @@ class KeyFiguresWidget : AppWidgetProvider() {
         views: RemoteViews,
         context: Context
     ) {
-        KeyFiguresManager.highlightedFigures?.let { figure ->
+        context.keyFiguresManager().highlightedFigures?.let { figure ->
             val label = "${strings[figure.labelShortStringKey]} (${strings["common.country.france"]})"
             val value = figure.valueGlobalToDisplay.formatNumberIfNeeded(numberFormat)
             val colorFigure = strings[figure.colorStringKey(context.isNightMode())].safeParseColor()
@@ -165,12 +165,12 @@ class KeyFiguresWidget : AppWidgetProvider() {
         figure.series?.takeLast(Constants.HomeScreenWidget.NUMBER_VALUES_GRAPH_FIGURE)
             ?.let { series ->
                 ChartData(
-                    description = StringsManager.strings["common.country.france"],
+                    description = context.stringsManager().strings["common.country.france"],
                     currentValueToDisplay = figure.valueGlobalToDisplay,
                     entries = series
                         .sortedBy { it.date }
                         .map { Entry(it.date.toFloat(), it.value.toFloat()) },
-                    color = StringsManager.strings[figure.colorStringKey(context.isNightMode())].safeParseColor()
+                    color = context.stringsManager().strings[figure.colorStringKey(context.isNightMode())].safeParseColor()
                 )
             }
 

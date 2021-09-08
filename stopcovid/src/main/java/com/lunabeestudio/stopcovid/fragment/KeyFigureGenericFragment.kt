@@ -25,9 +25,7 @@ import com.lunabeestudio.stopcovid.extension.getBitmapForItemKeyFigureCardBindin
 import com.lunabeestudio.stopcovid.extension.getBitmapForItemKeyFigureChartCardBinding
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.showPostalCodeDialog
-import com.lunabeestudio.stopcovid.manager.KeyFiguresManager
 import com.lunabeestudio.stopcovid.manager.ShareManager
-import com.lunabeestudio.stopcovid.manager.VaccinationCenterManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -54,14 +52,14 @@ abstract class KeyFigureGenericFragment : MainFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        KeyFiguresManager.figures.observeEventAndConsume(viewLifecycleOwner) {
+        keyFiguresManager.figures.observeEventAndConsume(viewLifecycleOwner) {
             refreshScreen()
         }
 
         binding?.emptyButton?.setOnClickListener {
             showLoading()
             viewLifecycleOwnerOrNull()?.lifecycleScope?.launch(Dispatchers.IO) {
-                KeyFiguresManager.onAppForeground(requireContext())
+                keyFiguresManager.onAppForeground(requireContext())
                 withContext(Dispatchers.Main) {
                     refreshScreen()
                 }
@@ -98,12 +96,13 @@ abstract class KeyFigureGenericFragment : MainFragment() {
     private fun showPostalCodeDialog() {
         MaterialAlertDialogBuilder(requireContext()).showPostalCodeDialog(
             layoutInflater,
-            strings
+            strings,
+            keyFiguresManager,
         ) { postalCode ->
             sharedPrefs.chosenPostalCode = postalCode
             viewLifecycleOwnerOrNull()?.lifecycleScope?.launch {
                 (activity as? MainActivity)?.showProgress(true)
-                VaccinationCenterManager.postalCodeDidUpdate(requireContext(), sharedPrefs, postalCode)
+                vaccinationCenterManager.postalCodeDidUpdate(requireContext(), sharedPrefs, postalCode)
                 (activity as? MainActivity)?.showProgress(false)
                 refreshScreen()
             }
