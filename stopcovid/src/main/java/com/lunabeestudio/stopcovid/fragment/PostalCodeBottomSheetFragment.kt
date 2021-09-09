@@ -20,13 +20,15 @@ import androidx.preference.PreferenceManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.lunabeestudio.stopcovid.activity.MainActivity
+import com.lunabeestudio.stopcovid.coreui.LocalizedApplication
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.extension.viewLifecycleOwnerOrNull
 import com.lunabeestudio.stopcovid.coreui.manager.LocalizedStrings
-import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
 import com.lunabeestudio.stopcovid.databinding.FragmentPostalCodeBottomSheetBinding
 import com.lunabeestudio.stopcovid.extension.chosenPostalCode
+import com.lunabeestudio.stopcovid.extension.injectionContainer
 import com.lunabeestudio.stopcovid.extension.showPostalCodeDialog
+import com.lunabeestudio.stopcovid.manager.KeyFiguresManager
 import com.lunabeestudio.stopcovid.manager.VaccinationCenterManager
 import kotlinx.coroutines.launch
 
@@ -36,7 +38,15 @@ class PostalCodeBottomSheetFragment : BottomSheetDialogFragment() {
         PreferenceManager.getDefaultSharedPreferences(requireContext())
     }
 
-    private val strings: LocalizedStrings = StringsManager.strings
+    private val strings: LocalizedStrings
+        get() = (activity?.application as? LocalizedApplication)?.localizedStrings ?: emptyMap()
+
+    private val vaccinationCenterManager: VaccinationCenterManager by lazy(LazyThreadSafetyMode.NONE) {
+        injectionContainer.vaccinationCenterManager
+    }
+    private val keyFiguresManager: KeyFiguresManager by lazy(LazyThreadSafetyMode.NONE) {
+        injectionContainer.keyFiguresManager
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val binding = FragmentPostalCodeBottomSheetBinding.inflate(inflater, container, false)
@@ -55,7 +65,7 @@ class PostalCodeBottomSheetFragment : BottomSheetDialogFragment() {
                 viewLifecycleOwnerOrNull()?.lifecycleScope?.launch {
                     context?.let { context ->
                         (activity as? MainActivity)?.showProgress(true)
-                        VaccinationCenterManager.postalCodeDidUpdate(context, sharedPrefs, null)
+                        vaccinationCenterManager.postalCodeDidUpdate(context, sharedPrefs, null)
                         (activity as? MainActivity)?.showProgress(false)
                         dismissDialog(true)
                     }
@@ -76,14 +86,15 @@ class PostalCodeBottomSheetFragment : BottomSheetDialogFragment() {
         context?.let {
             MaterialAlertDialogBuilder(it).showPostalCodeDialog(
                 layoutInflater,
-                strings
+                strings,
+                keyFiguresManager,
             ) { postalCode ->
                 if (sharedPrefs.chosenPostalCode != postalCode) {
                     sharedPrefs.chosenPostalCode = postalCode
                     viewLifecycleOwnerOrNull()?.lifecycleScope?.launch {
                         context?.let { context ->
                             (activity as? MainActivity)?.showProgress(true)
-                            VaccinationCenterManager.postalCodeDidUpdate(context, sharedPrefs, postalCode)
+                            vaccinationCenterManager.postalCodeDidUpdate(context, sharedPrefs, postalCode)
                             (activity as? MainActivity)?.showProgress(false)
                             dismissDialog(true)
                         }

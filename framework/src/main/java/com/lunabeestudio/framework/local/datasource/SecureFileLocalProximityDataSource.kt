@@ -39,7 +39,7 @@ open class SecureFileLocalProximityDataSource(
     protected val daySinceNtp: Long
         get() = System.currentTimeMillis().unixTimeMsToNtpTimeS() / (60 * 60 * 24)
 
-    protected var _encryptedFile: File? = null
+    private var _encryptedFile: File? = null
     protected val encryptedFile: File
         get() {
             if (_encryptedFile == null) {

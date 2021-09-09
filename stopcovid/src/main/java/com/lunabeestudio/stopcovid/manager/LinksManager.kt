@@ -14,8 +14,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.coreui.ConfigConstant
+import okhttp3.OkHttpClient
 
-object LinksManager : SectionManager() {
+class LinksManager(okHttpClient: OkHttpClient) : SectionManager(okHttpClient) {
 
     private val _linksSections: MutableLiveData<Sections> = MutableLiveData()
     val linksSections: LiveData<Sections>
@@ -27,7 +28,8 @@ object LinksManager : SectionManager() {
         }
     }
 
-    override val url: String = ConfigConstant.Links.URL
+    override fun getUrl(): String = ConfigConstant.Links.URL
+
     override val folderName: String = ConfigConstant.Links.FOLDER
     override val prefix: String = ConfigConstant.Links.FILE_PREFIX
     override val lastRefreshSharedPrefsKey: String = Constants.SharedPrefs.LAST_LINKS_REFRESH

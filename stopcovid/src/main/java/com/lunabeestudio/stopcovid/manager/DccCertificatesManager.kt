@@ -12,19 +12,20 @@ package com.lunabeestudio.stopcovid.manager
 
 import android.content.Context
 import com.google.gson.reflect.TypeToken
+import com.lunabeestudio.framework.remote.server.ServerManager
 import com.lunabeestudio.stopcovid.coreui.ConfigConstant
 import com.lunabeestudio.stopcovid.coreui.EnvConstant
 import com.lunabeestudio.stopcovid.model.DccCertificates
 import java.lang.reflect.Type
 
-class DccCertificatesManager : RemoteJsonManager<DccCertificates>() {
+class DccCertificatesManager(
+    serverManager: ServerManager
+) : RemoteJsonManager<DccCertificates>(serverManager) {
 
     override val type: Type = object : TypeToken<DccCertificates>() {}.type
-    override val localFileName: String
-        get() = EnvConstant.Prod.dccCertificatesFilename
-    override val remoteFileUrl: String
-        get() = ConfigConstant.DccCertificates.URL + localFileName
-    override val assetFilePath: String = ConfigConstant.DccCertificates.FOLDER + localFileName
+    override fun getLocalFileName(context: Context): String = EnvConstant.Prod.dccCertificatesFilename
+    override fun getRemoteFileUrl(context: Context): String = ConfigConstant.DccCertificates.URL + getLocalFileName(context)
+    override fun getAssetFilePath(context: Context): String = ConfigConstant.DccCertificates.FOLDER + getLocalFileName(context)
 
     var certificates: DccCertificates = emptyMap()
         private set

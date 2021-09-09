@@ -19,7 +19,7 @@ import androidx.core.app.NotificationCompat
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.lunabeestudio.stopcovid.R
-import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
+import com.lunabeestudio.stopcovid.extension.stringsManager
 
 abstract class NotificationWorker(context: Context, workerParams: WorkerParameters) : CoroutineWorker(context, workerParams) {
 
@@ -34,10 +34,10 @@ abstract class NotificationWorker(context: Context, workerParams: WorkerParamete
     override suspend fun doWork(): Result {
         val notificationManager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        if (StringsManager.strings.isEmpty()) {
-            StringsManager.initialize(applicationContext)
+        if (applicationContext.stringsManager().strings.isEmpty()) {
+            applicationContext.stringsManager().initialize(applicationContext)
         }
-        val strings = StringsManager.strings
+        val strings = applicationContext.stringsManager().strings
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(

@@ -1,7 +1,7 @@
 [
 	{
         "section": "Sources",
-        "description": "Les données sanitaires proviennent des sources suivantes :\n- les données issues de la base SI-DEP,\n- les données remontées par les établissements de santé participant à SI-VIC et au réseau OSCOUR®,\n- les données issues de la base Vaccin Covid.\n\nToutes ces données sont agrégées et analysées par Santé Publique France (SpF) et mises à disposition sur Data.gouv.fr",
+        "description": "Les données sanitaires proviennent des sources suivantes :\n- les données issues de la base SI-DEP,\n- les données remontées par les établissements de santé participant à SI-VIC et au réseau OSCOUR®,\n- les données issues de la base Vaccin Covid.\n- les données de la DREES (Direction de la recherche, des études de l'évaluation et des statistiques).\n\nToutes ces données sont agrégées et analysées par Santé Publique France (SpF) et mises à disposition sur Data.gouv.fr",
         "links": [
 	        {
                 "label": "Sources sur Data.gouv.fr",

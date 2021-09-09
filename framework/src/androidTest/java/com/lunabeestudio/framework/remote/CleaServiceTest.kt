@@ -12,9 +12,12 @@ package com.lunabeestudio.framework.remote
 
 import androidx.test.core.app.ApplicationProvider
 import com.google.common.truth.Truth.assertThat
+import com.lunabeestudio.analytics.manager.AnalyticsManager
 import com.lunabeestudio.framework.remote.datasource.CleaDataSource
 import com.lunabeestudio.framework.testutils.ResourcesHelper
 import com.lunabeestudio.robert.model.RobertResultData
+import io.mockk.MockKAnnotations
+import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.runBlocking
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -27,14 +30,19 @@ class CleaServiceTest {
     private lateinit var dataSource: CleaDataSource
     private lateinit var server: MockWebServer
 
+    @MockK(relaxed = true)
+    private lateinit var analyticsManager: AnalyticsManager
+
     @Before
     fun setUp() {
+        MockKAnnotations.init(this)
         server = MockWebServer()
         server.start()
         dataSource = CleaDataSource(
             ApplicationProvider.getApplicationContext(),
             server.url("/").toString(),
             server.url("/").toString(),
+            analyticsManager,
         )
     }
 

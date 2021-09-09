@@ -23,6 +23,7 @@ import com.lunabeestudio.robert.model.RobertResult
 import com.lunabeestudio.stopcovid.coreui.utils.SingleLiveEvent
 import com.lunabeestudio.stopcovid.extension.toCovidException
 import com.lunabeestudio.stopcovid.manager.IsolationManager
+import com.lunabeestudio.stopcovid.manager.VaccinationCenterManager
 import com.lunabeestudio.stopcovid.model.CovidException
 import com.lunabeestudio.stopcovid.model.NeedRegisterException
 import kotlinx.coroutines.Dispatchers
@@ -32,7 +33,9 @@ class ManageDataViewModel(
     secureKeystoreDataSource: SecureKeystoreDataSource,
     private val robertManager: RobertManager,
     isolationManager: IsolationManager,
-) : CommonDataViewModel(secureKeystoreDataSource, robertManager, isolationManager) {
+    vaccinationCenterManager: VaccinationCenterManager,
+    private val analyticsManager: AnalyticsManager,
+) : CommonDataViewModel(secureKeystoreDataSource, robertManager, isolationManager, vaccinationCenterManager) {
 
     val eraseLocalSuccess: SingleLiveEvent<Unit> = SingleLiveEvent()
     val eraseRemoteSuccess: SingleLiveEvent<Unit> = SingleLiveEvent()
@@ -102,7 +105,7 @@ class ManageDataViewModel(
     fun requestDeleteAnalytics(application: RobertApplication) {
         if (robertManager.isRegistered) {
             if (loadingInProgress.value == false) {
-                AnalyticsManager.requestDeleteAnalytics(application.getAppContext())
+                analyticsManager.requestDeleteAnalytics(application.getAppContext())
                 viewModelScope.launch(Dispatchers.IO) {
                     loadingInProgress.postValue(true)
                     robertManager.updateStatus(application)
@@ -140,10 +143,18 @@ class ManageDataViewModelFactory(
     private val secureKeystoreDataSource: SecureKeystoreDataSource,
     private val robertManager: RobertManager,
     private val isolationManager: IsolationManager,
+    private val vaccinationCenterManager: VaccinationCenterManager,
+    private val analyticsManager: AnalyticsManager,
 ) :
     ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         @Suppress("UNCHECKED_CAST")
-        return ManageDataViewModel(secureKeystoreDataSource, robertManager, isolationManager) as T
+        return ManageDataViewModel(
+            secureKeystoreDataSource,
+            robertManager,
+            isolationManager,
+            vaccinationCenterManager,
+            analyticsManager
+        ) as T
     }
 }

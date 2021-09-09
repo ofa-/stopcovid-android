@@ -14,15 +14,16 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.reflect.TypeToken
+import com.lunabeestudio.framework.remote.server.ServerManager
 import com.lunabeestudio.stopcovid.coreui.ConfigConstant
 import java.lang.reflect.Type
 
-object BlacklistDCCManager : RemoteJsonManager<List<String>>() {
+class BlacklistDCCManager(serverManager: ServerManager) : RemoteJsonManager<List<String>>(serverManager) {
 
     override val type: Type = object : TypeToken<List<String>>() {}.type
-    override val localFileName: String = ConfigConstant.BlacklistDCC.FILENAME
-    override val remoteFileUrl: String = ConfigConstant.BlacklistDCC.URL
-    override val assetFilePath: String = ConfigConstant.BlacklistDCC.ASSET_FILE_PATH
+    override fun getLocalFileName(context: Context): String = ConfigConstant.BlacklistDCC.FILENAME
+    override fun getRemoteFileUrl(context: Context): String = ConfigConstant.BlacklistDCC.URL
+    override fun getAssetFilePath(context: Context): String = ConfigConstant.BlacklistDCC.ASSET_FILE_PATH
 
     private val _blacklistedDCCHashes: MutableLiveData<List<String>?> = MutableLiveData(null)
     val blacklistedDCCHashes: LiveData<List<String>?>

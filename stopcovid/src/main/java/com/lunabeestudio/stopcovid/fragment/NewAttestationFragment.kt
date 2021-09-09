@@ -41,7 +41,6 @@ import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
 import com.lunabeestudio.stopcovid.extension.showSpinnerDatePicker
 import com.lunabeestudio.stopcovid.fastitem.editTextItem
 import com.lunabeestudio.stopcovid.fastitem.pickerEditTextItem
-import com.lunabeestudio.stopcovid.manager.FormManager
 import com.lunabeestudio.stopcovid.model.AttestationMap
 import com.lunabeestudio.stopcovid.model.FormField
 import com.lunabeestudio.stopcovid.viewmodel.NewAttestationViewModel
@@ -57,7 +56,7 @@ class NewAttestationFragment : MainFragment() {
 
     private val gson: Gson = Gson()
     private val viewModel: NewAttestationViewModel by activityViewModels {
-        NewAttestationViewModelFactory(requireContext().secureKeystoreDataSource())
+        NewAttestationViewModelFactory(requireContext().secureKeystoreDataSource(), formManager)
     }
     private val dateFormat: DateFormat = SimpleDateFormat.getDateInstance(DateFormat.LONG)
     private val dateTimeFormat: DateFormat = SimpleDateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.SHORT)
@@ -92,7 +91,7 @@ class NewAttestationFragment : MainFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        FormManager.form.observeEventAndConsume(viewLifecycleOwner) {
+        formManager.form.observeEventAndConsume(viewLifecycleOwner) {
             refreshScreen()
         }
 
@@ -141,7 +140,7 @@ class NewAttestationFragment : MainFragment() {
                 identifier = "newAttestationController.header".hashCode().toLong()
             }
         }
-        FormManager.form.value?.peekContent()?.let { form ->
+        formManager.form.value?.peekContent()?.let { form ->
             form.forEach { section ->
                 section.forEach { formField ->
                     items += itemForFormField(formField, items.count()).apply {

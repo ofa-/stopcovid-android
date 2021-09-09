@@ -20,6 +20,9 @@ import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.view.WindowInsetsControllerCompat
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.fragment.BaseFragment
+import com.lunabeestudio.stopcovid.extension.injectionContainer
+import com.lunabeestudio.stopcovid.manager.Blacklist2DDOCManager
+import com.lunabeestudio.stopcovid.manager.BlacklistDCCManager
 
 abstract class ForceLightFragment(@LayoutRes private val layoutRes: Int) : BaseFragment() {
 
@@ -52,5 +55,12 @@ abstract class ForceLightFragment(@LayoutRes private val layoutRes: Int) : BaseF
             activity.window?.attributes = params // this call make the status bars loose its appearance
             windowInsetsController.isAppearanceLightStatusBars = isAppearanceLightStatusBars
         }
+    }
+
+    protected val blacklistDCCManager: BlacklistDCCManager by lazy(LazyThreadSafetyMode.NONE) {
+        injectionContainer.blacklistDCCManager
+    }
+    protected val blacklist2DDOCManager: Blacklist2DDOCManager by lazy(LazyThreadSafetyMode.NONE) {
+        injectionContainer.blacklist2DDOCManager
     }
 }

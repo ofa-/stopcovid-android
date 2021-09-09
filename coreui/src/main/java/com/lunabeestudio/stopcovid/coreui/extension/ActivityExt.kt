@@ -14,6 +14,11 @@ import android.app.Activity
 import android.content.Context
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import com.lunabeestudio.robert.utils.Event
+import com.lunabeestudio.stopcovid.coreui.LocalizedApplication
+import com.lunabeestudio.stopcovid.coreui.manager.LocalizedStrings
 
 /**
  *  Forcibly show the keyboard in a activity, it will be not be closed until the user explicitly do so.
@@ -40,3 +45,9 @@ fun Activity.hideSoftKeyBoard() {
     }
     imm.hideSoftInputFromWindow(view?.windowToken, 0)
 }
+
+val Activity.strings: LocalizedStrings
+    get() = (application as? LocalizedApplication)?.localizedStrings ?: emptyMap()
+
+val Activity.liveStrings: LiveData<Event<LocalizedStrings>>
+    get() = (application as? LocalizedApplication)?.liveLocalizedStrings ?: MutableLiveData()

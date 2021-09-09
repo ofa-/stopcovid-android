@@ -19,11 +19,12 @@ import com.lunabeestudio.stopcovid.coreui.ConfigConstant
 import com.lunabeestudio.stopcovid.coreui.UiConstants
 import com.lunabeestudio.stopcovid.coreui.extension.fixFormatter
 import com.lunabeestudio.stopcovid.coreui.extension.getApplicationLanguage
+import okhttp3.OkHttpClient
 import java.lang.reflect.Type
 
-typealias LocalizedStrings = HashMap<String, String>
+typealias LocalizedStrings = Map<String, String>
 
-object StringsManager : ServerManager<LocalizedStrings>() {
+class StringsManager(okHttpClient: OkHttpClient) : ServerManager<LocalizedStrings>(okHttpClient) {
 
     var strings: LocalizedStrings = hashMapOf()
         private set(value) {
@@ -46,7 +47,7 @@ object StringsManager : ServerManager<LocalizedStrings>() {
         }
     }
 
-    suspend fun getStrings(context: Context): HashMap<String, String> {
+    suspend fun getStrings(context: Context): Map<String, String> {
            if (strings.isEmpty())
                initialize(context)
            return strings
@@ -71,7 +72,10 @@ object StringsManager : ServerManager<LocalizedStrings>() {
         }
     }
 
-    override val url: String = ConfigConstant.Labels.URL
+    override fun getUrl(): String {
+        return ConfigConstant.Labels.URL
+    }
+
     override val folderName: String = ConfigConstant.Labels.FOLDER
     override val prefix: String = ConfigConstant.Labels.FILE_PREFIX
     override val type: Type = object : TypeToken<LocalizedStrings>() {}.type

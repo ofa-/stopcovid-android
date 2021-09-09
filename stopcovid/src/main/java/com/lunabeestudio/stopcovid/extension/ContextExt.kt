@@ -14,21 +14,28 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.lunabeestudio.analytics.manager.AnalyticsManager
 import com.lunabeestudio.framework.local.datasource.SecureKeystoreDataSource
-import com.lunabeestudio.robert.RobertApplication
 import com.lunabeestudio.robert.RobertManager
+import com.lunabeestudio.stopcovid.InjectionContainer
 import com.lunabeestudio.stopcovid.StopCovid
-import com.lunabeestudio.stopcovid.`interface`.IsolationApplication
+import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
 import com.lunabeestudio.stopcovid.manager.DccCertificatesManager
 import com.lunabeestudio.stopcovid.manager.IsolationManager
+import com.lunabeestudio.stopcovid.manager.KeyFiguresManager
+import com.lunabeestudio.stopcovid.manager.RisksLevelManager
 
-fun Context.robertManager(): RobertManager = (applicationContext as RobertApplication).robertManager
+private val Context.injectionContainer: InjectionContainer
+    get() = (applicationContext as StopCovid).injectionContainer
 
-fun Context.isolationManager(): IsolationManager = (applicationContext as IsolationApplication).isolationManager
-
-fun Context.secureKeystoreDataSource(): SecureKeystoreDataSource = (applicationContext as StopCovid).secureKeystoreDataSource
-
-fun Context.dccCertificatesManager(): DccCertificatesManager = (applicationContext as StopCovid).dccCertificatesManager
+fun Context.robertManager(): RobertManager = injectionContainer.robertManager
+fun Context.stringsManager(): StringsManager = injectionContainer.stringsManager
+fun Context.isolationManager(): IsolationManager = injectionContainer.isolationManager
+fun Context.keyFiguresManager(): KeyFiguresManager = injectionContainer.keyFiguresManager
+fun Context.secureKeystoreDataSource(): SecureKeystoreDataSource = injectionContainer.secureKeystoreDataSource
+fun Context.dccCertificatesManager(): DccCertificatesManager = injectionContainer.dccCertificatesManager
+fun Context.risksLevelManager(): RisksLevelManager = injectionContainer.risksLevelManager
+fun Context.analyticsManager(): AnalyticsManager = injectionContainer.analyticsManager
 
 fun Context.showExpiredCodeAlert(strings: Map<String, String>, listener: DialogInterface.OnDismissListener?) {
     MaterialAlertDialogBuilder(this)

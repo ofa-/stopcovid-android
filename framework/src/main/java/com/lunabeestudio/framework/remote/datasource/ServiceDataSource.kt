@@ -11,7 +11,9 @@
 package com.lunabeestudio.framework.remote.datasource
 
 import android.content.Context
+import com.lunabeestudio.analytics.manager.AnalyticsManager
 import com.lunabeestudio.analytics.model.AnalyticsServiceName
+import com.lunabeestudio.domain.model.CaptchaType
 import com.lunabeestudio.domain.model.LocalProximity
 import com.lunabeestudio.domain.model.RegisterReport
 import com.lunabeestudio.domain.model.ReportResponse
@@ -26,39 +28,40 @@ import com.lunabeestudio.framework.remote.model.ApiStatusRQ
 import com.lunabeestudio.framework.remote.model.ApiUnregisterRQ
 import com.lunabeestudio.framework.remote.model.CaptchaRQ
 import com.lunabeestudio.framework.remote.model.toDomain
+import com.lunabeestudio.framework.remote.server.ServerManager.Companion.getDefaultConnectionPool
 import com.lunabeestudio.framework.remote.server.StopCovidApi
 import com.lunabeestudio.framework.utils.RequestHelper
 import com.lunabeestudio.robert.datasource.RemoteServiceDataSource
 import com.lunabeestudio.robert.model.RobertResult
 import com.lunabeestudio.robert.model.RobertResultData
+import okhttp3.ConnectionPool
 import java.io.File
 
 class ServiceDataSource(
-    private val context: Context,
+    context: Context,
     baseUrl: String,
+    private val analyticsManager: AnalyticsManager,
 ) : RemoteServiceDataSource {
 
-    private val filesDir = context.filesDir
-    private val api: StopCovidApi = RetrofitClient.getService(context, baseUrl, StopCovidApi::class.java, null)
+    private val connectionPool: ConnectionPool = getDefaultConnectionPool()
     private var reportProgressUpdate: ((Float) -> Unit)? = null
-    private val reportApi: StopCovidApi = RetrofitClient.getService(
-        context,
-        baseUrl,
-        StopCovidApi::class.java,
-        null,
-    ) {
+    private val okHttpClient = RetrofitClient.getDefaultOKHttpClient(context, null, connectionPool = connectionPool)
+    private val reportOkHttpClient = RetrofitClient.getDefaultOKHttpClient(context, null, connectionPool) {
         reportProgressUpdate?.invoke(it)
     }
-    private var fileApi: StopCovidApi = RetrofitClient.getFileService(context, baseUrl, StopCovidApi::class.java)
+    private val api: StopCovidApi = RetrofitClient.getService(baseUrl, StopCovidApi::class.java, okHttpClient)
+    private val reportApi: StopCovidApi = RetrofitClient.getService(baseUrl, StopCovidApi::class.java, reportOkHttpClient)
 
-    override suspend fun generateCaptcha(apiVersion: String, type: String, language: String): RobertResultData<String> {
+    private val filesDir = context.filesDir
+
+    override suspend fun generateCaptcha(apiVersion: String, type: CaptchaType, language: String): RobertResultData<String> {
         val result = RequestHelper.tryCatchRequestData(
-            context,
             filesDir,
             apiVersion,
-            AnalyticsServiceName.CAPTCHA_TYPE.format(type)
+            AnalyticsServiceName.CAPTCHA_TYPE.format(type),
+            analyticsManager,
         ) {
-            api.captcha(apiVersion, CaptchaRQ(type = type, locale = language))
+            api.captcha(apiVersion, CaptchaRQ(type = type.name, locale = language))
         }
         return when (result) {
             is RobertResultData.Success -> RobertResultData.Success(result.data.id)
@@ -66,10 +69,10 @@ class ServiceDataSource(
         }
     }
 
-    override suspend fun getCaptcha(apiVersion: String, captchaId: String, type: String, path: String): RobertResult {
+    override suspend fun getCaptcha(apiVersion: String, captchaId: String, type: CaptchaType, path: String): RobertResult {
 
-        val result = RequestHelper.tryCatchRequestData(context, filesDir, apiVersion, AnalyticsServiceName.CAPTCHA) {
-            fileApi.getCaptcha(apiVersion, captchaId, type)
+        val result = RequestHelper.tryCatchRequestData(filesDir, apiVersion, AnalyticsServiceName.CAPTCHA, analyticsManager) {
+            api.getCaptcha(type.header, apiVersion, captchaId, type.path)
         }
         return when (result) {
             is RobertResultData.Success -> {
@@ -95,8 +98,11 @@ class ServiceDataSource(
         clientPublicECDHKey: String,
     ): RobertResultData<RegisterReport> {
 
-        val result = RequestHelper.tryCatchRequestData(context, filesDir, apiVersion, AnalyticsServiceName.REGISTER) {
-            api.registerV2(apiVersion, ApiRegisterV2RQ(captcha = captcha, captchaId = captchaId, clientPublicECDHKey = clientPublicECDHKey))
+        val result = RequestHelper.tryCatchRequestData(filesDir, apiVersion, AnalyticsServiceName.REGISTER, analyticsManager) {
+            api.registerV2(
+                apiVersion,
+                ApiRegisterV2RQ(captcha = captcha, captchaId = captchaId, clientPublicECDHKey = clientPublicECDHKey)
+            )
         }
         return when (result) {
             is RobertResultData.Success -> RobertResultData.Success(result.data.toDomain())
@@ -105,13 +111,13 @@ class ServiceDataSource(
     }
 
     override suspend fun unregister(apiVersion: String, ssu: ServerStatusUpdate): RobertResult {
-        return RequestHelper.tryCatchRequest(context, filesDir, apiVersion, AnalyticsServiceName.UNREGISTER) {
+        return RequestHelper.tryCatchRequest(filesDir, apiVersion, AnalyticsServiceName.UNREGISTER, analyticsManager) {
             api.unregister(apiVersion, ApiUnregisterRQ(ebid = ssu.ebid, epochId = ssu.epochId, time = ssu.time, mac = ssu.mac))
         }
     }
 
     override suspend fun status(apiVersion: String, ssu: ServerStatusUpdate): RobertResultData<StatusReport> {
-        val result = RequestHelper.tryCatchRequestData(context, filesDir, apiVersion, AnalyticsServiceName.STATUS) {
+        val result = RequestHelper.tryCatchRequestData(filesDir, apiVersion, AnalyticsServiceName.STATUS, analyticsManager) {
             api.status(
                 apiVersion,
                 ApiStatusRQ(
@@ -135,7 +141,7 @@ class ServiceDataSource(
         onProgressUpdate: ((Float) -> Unit)?,
     ): RobertResultData<ReportResponse> {
 
-        val result = RequestHelper.tryCatchRequestData(context, filesDir, apiVersion, AnalyticsServiceName.REPORT) {
+        val result = RequestHelper.tryCatchRequestData(filesDir, apiVersion, AnalyticsServiceName.REPORT, analyticsManager) {
             reportProgressUpdate = onProgressUpdate
             reportApi.report(apiVersion, ApiReportRQ.fromLocalProximityList(token, localProximityList))
         }
@@ -147,7 +153,7 @@ class ServiceDataSource(
     }
 
     override suspend fun deleteExposureHistory(apiVersion: String, ssu: ServerStatusUpdate): RobertResult {
-        return RequestHelper.tryCatchRequest(context, filesDir, apiVersion, AnalyticsServiceName.DELETE_EXPOSURE_HISTORY) {
+        return RequestHelper.tryCatchRequest(filesDir, apiVersion, AnalyticsServiceName.DELETE_EXPOSURE_HISTORY, analyticsManager) {
             api.deleteExposureHistory(
                 apiVersion,
                 ApiDeleteExposureHistoryRQ(ebid = ssu.ebid, epochId = ssu.epochId, time = ssu.time, mac = ssu.mac)

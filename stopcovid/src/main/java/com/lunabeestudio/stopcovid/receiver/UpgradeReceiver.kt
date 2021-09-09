@@ -13,8 +13,8 @@ package com.lunabeestudio.stopcovid.receiver
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
 import com.lunabeestudio.stopcovid.extension.robertManager
+import com.lunabeestudio.stopcovid.extension.stringsManager
 import com.lunabeestudio.stopcovid.service.ProximityService
 import com.lunabeestudio.stopcovid.widgetshomescreen.AttestationWidget
 import com.lunabeestudio.stopcovid.widgetshomescreen.DccWidget
@@ -33,7 +33,7 @@ class UpgradeReceiver : BroadcastReceiver() {
         try {
             if (intent.action == Intent.ACTION_MY_PACKAGE_REPLACED && context.robertManager().isProximityActive) {
                 GlobalScope.launch(Dispatchers.Main) {
-                    StringsManager.initialize(context)
+                    context.stringsManager().initialize(context)
                     ProximityService.start(context)
                 }
             }

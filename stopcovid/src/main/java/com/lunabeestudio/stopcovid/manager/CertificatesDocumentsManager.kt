@@ -2,18 +2,22 @@ package com.lunabeestudio.stopcovid.manager
 
 import android.content.Context
 import android.graphics.drawable.Drawable
+import com.lunabeestudio.framework.remote.server.ServerManager
 import com.lunabeestudio.stopcovid.coreui.ConfigConstant
 import com.lunabeestudio.stopcovid.coreui.extension.getApplicationLanguage
 import kotlinx.coroutines.sync.Mutex
 import timber.log.Timber
 import java.io.File
 
-abstract class RemoteImageDocumentManager(private val context: Context) : RemoteFileManager() {
+abstract class RemoteImageDocumentManager(serverManager: ServerManager) : RemoteFileManager(serverManager) {
     abstract val remoteFileUrlTemplate: String
+    override val mimeType: String = "image/png"
 
-    final override val remoteFileUrl: String
-        get() = remoteFileUrlTemplate.format(context.getApplicationLanguage())
-    final override val assetFilePath: String? = null
+    override fun getRemoteFileUrl(context: Context): String {
+        return remoteFileUrlTemplate.format(context.getApplicationLanguage())
+    }
+
+    final override fun getAssetFilePath(context: Context): String? = null
 
     final override suspend fun fileNotCorrupted(file: File): Boolean {
         return try {
@@ -29,57 +33,57 @@ abstract class RemoteImageDocumentManager(private val context: Context) : Remote
     }
 }
 
-class CertificatesDocumentsManager(context: Context) {
+class CertificatesDocumentsManager(serverManager: ServerManager) {
 
     private val fetchMtx: Mutex = Mutex()
 
-    private val certificateDocumentRemoteFileManager = object : RemoteImageDocumentManager(context) {
-        override val localFileName: String = ConfigConstant.Wallet.TEST_CERTIFICATE_THUMBNAIL_FILE
+    private val certificateDocumentRemoteFileManager = object : RemoteImageDocumentManager(serverManager) {
+        override fun getLocalFileName(context: Context): String = ConfigConstant.Wallet.TEST_CERTIFICATE_THUMBNAIL_FILE
         override val remoteFileUrlTemplate: String = ConfigConstant.Wallet.TEST_CERTIFICATE_THUMBNAIL_TEMPLATE_URL
     }
 
-    private val fullCertificateDocumentRemoteFileManager = object : RemoteImageDocumentManager(context) {
-        override val localFileName: String = ConfigConstant.Wallet.TEST_CERTIFICATE_FULL_FILE
+    private val fullCertificateDocumentRemoteFileManager = object : RemoteImageDocumentManager(serverManager) {
+        override fun getLocalFileName(context: Context): String = ConfigConstant.Wallet.TEST_CERTIFICATE_FULL_FILE
         override val remoteFileUrlTemplate: String = ConfigConstant.Wallet.TEST_CERTIFICATE_FULL_TEMPLATE_URL
     }
 
-    private val vaccinDocumentRemoteFileManager = object : RemoteImageDocumentManager(context) {
-        override val localFileName: String = ConfigConstant.Wallet.VACCIN_CERTIFICATE_THUMBNAIL_FILE
+    private val vaccinDocumentRemoteFileManager = object : RemoteImageDocumentManager(serverManager) {
+        override fun getLocalFileName(context: Context): String = ConfigConstant.Wallet.VACCIN_CERTIFICATE_THUMBNAIL_FILE
         override val remoteFileUrlTemplate: String = ConfigConstant.Wallet.VACCIN_CERTIFICATE_THUMBNAIL_TEMPLATE_URL
     }
 
-    private val fullVaccinDocumentRemoteFileManager = object : RemoteImageDocumentManager(context) {
-        override val localFileName: String = ConfigConstant.Wallet.VACCIN_CERTIFICATE_FULL_FILE
+    private val fullVaccinDocumentRemoteFileManager = object : RemoteImageDocumentManager(serverManager) {
+        override fun getLocalFileName(context: Context): String = ConfigConstant.Wallet.VACCIN_CERTIFICATE_FULL_FILE
         override val remoteFileUrlTemplate: String = ConfigConstant.Wallet.VACCIN_CERTIFICATE_FULL_TEMPLATE_URL
     }
 
-    private val vaccinEuropeDocumentRemoteFileManager = object : RemoteImageDocumentManager(context) {
-        override val localFileName: String = ConfigConstant.Wallet.VACCIN_EUROPE_CERTIFICATE_THUMBNAIL_FILE
+    private val vaccinEuropeDocumentRemoteFileManager = object : RemoteImageDocumentManager(serverManager) {
+        override fun getLocalFileName(context: Context): String = ConfigConstant.Wallet.VACCIN_EUROPE_CERTIFICATE_THUMBNAIL_FILE
         override val remoteFileUrlTemplate: String = ConfigConstant.Wallet.VACCIN_EUROPE_CERTIFICATE_THUMBNAIL_TEMPLATE_URL
     }
 
-    private val fullVaccinEuropeDocumentRemoteFileManager = object : RemoteImageDocumentManager(context) {
-        override val localFileName: String = ConfigConstant.Wallet.VACCIN_EUROPE_CERTIFICATE_FULL_FILE
+    private val fullVaccinEuropeDocumentRemoteFileManager = object : RemoteImageDocumentManager(serverManager) {
+        override fun getLocalFileName(context: Context): String = ConfigConstant.Wallet.VACCIN_EUROPE_CERTIFICATE_FULL_FILE
         override val remoteFileUrlTemplate: String = ConfigConstant.Wallet.VACCIN_EUROPE_CERTIFICATE_FULL_TEMPLATE_URL
     }
 
-    private val certificateEuropeDocumentRemoteFileManager = object : RemoteImageDocumentManager(context) {
-        override val localFileName: String = ConfigConstant.Wallet.TEST_EUROPE_CERTIFICATE_THUMBNAIL_FILE
+    private val certificateEuropeDocumentRemoteFileManager = object : RemoteImageDocumentManager(serverManager) {
+        override fun getLocalFileName(context: Context): String = ConfigConstant.Wallet.TEST_EUROPE_CERTIFICATE_THUMBNAIL_FILE
         override val remoteFileUrlTemplate: String = ConfigConstant.Wallet.TEST_EUROPE_CERTIFICATE_THUMBNAIL_TEMPLATE_URL
     }
 
-    private val fullCertificateEuropeDocumentRemoteFileManager = object : RemoteImageDocumentManager(context) {
-        override val localFileName: String = ConfigConstant.Wallet.TEST_EUROPE_CERTIFICATE_FULL_FILE
+    private val fullCertificateEuropeDocumentRemoteFileManager = object : RemoteImageDocumentManager(serverManager) {
+        override fun getLocalFileName(context: Context): String = ConfigConstant.Wallet.TEST_EUROPE_CERTIFICATE_FULL_FILE
         override val remoteFileUrlTemplate: String = ConfigConstant.Wallet.TEST_EUROPE_CERTIFICATE_FULL_TEMPLATE_URL
     }
 
-    private val recoveryEuropeDocumentRemoteFileManager = object : RemoteImageDocumentManager(context) {
-        override val localFileName: String = ConfigConstant.Wallet.RECOVERY_EUROPE_CERTIFICATE_THUMBNAIL_FILE
+    private val recoveryEuropeDocumentRemoteFileManager = object : RemoteImageDocumentManager(serverManager) {
+        override fun getLocalFileName(context: Context): String = ConfigConstant.Wallet.RECOVERY_EUROPE_CERTIFICATE_THUMBNAIL_FILE
         override val remoteFileUrlTemplate: String = ConfigConstant.Wallet.RECOVERY_EUROPE_CERTIFICATE_THUMBNAIL_TEMPLATE_URL
     }
 
-    private val fullRecoveryEuropeDocumentRemoteFileManager = object : RemoteImageDocumentManager(context) {
-        override val localFileName: String = ConfigConstant.Wallet.RECOVERY_EUROPE_CERTIFICATE_FULL_FILE
+    private val fullRecoveryEuropeDocumentRemoteFileManager = object : RemoteImageDocumentManager(serverManager) {
+        override fun getLocalFileName(context: Context): String = ConfigConstant.Wallet.RECOVERY_EUROPE_CERTIFICATE_FULL_FILE
         override val remoteFileUrlTemplate: String = ConfigConstant.Wallet.RECOVERY_EUROPE_CERTIFICATE_FULL_TEMPLATE_URL
     }
 

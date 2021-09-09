@@ -12,7 +12,6 @@ package com.lunabeestudio.stopcovid.fragment
 
 import android.view.View
 import androidx.lifecycle.lifecycleScope
-import com.lunabeestudio.analytics.manager.AnalyticsManager
 import com.lunabeestudio.analytics.model.AppEventName
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
@@ -24,7 +23,6 @@ import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.fastitem.KeyFigureCardItem
 import com.lunabeestudio.stopcovid.fastitem.bigTitleItem
 import com.lunabeestudio.stopcovid.fastitem.linkItem
-import com.lunabeestudio.stopcovid.manager.KeyFiguresManager
 import com.lunabeestudio.stopcovid.manager.ShareManager
 import com.lunabeestudio.stopcovid.model.KeyFigure
 import com.lunabeestudio.stopcovid.model.KeyFigureCategory
@@ -43,7 +41,7 @@ class KeyFiguresFragment : KeyFigureGenericFragment() {
     override fun getItems(): List<GenericItem> {
         val items = ArrayList<GenericItem>()
 
-        KeyFiguresManager.figures.value?.peekContent()?.let { keyFigures ->
+        keyFiguresManager.figures.value?.peekContent()?.let { keyFigures ->
             if (keyFigures.isNotEmpty()) {
                 items += spaceItem {
                     spaceRes = R.dimen.spacing_large
@@ -113,7 +111,7 @@ class KeyFiguresFragment : KeyFigureGenericFragment() {
                 }
             }
             onClickListener = View.OnClickListener {
-                AnalyticsManager.reportAppEvent(requireContext(), AppEventName.e9, null)
+                analyticsManager.reportAppEvent(requireContext(), AppEventName.e9, null)
                 findNavControllerOrNull()?.safeNavigate(
                     KeyFiguresFragmentDirections.actionKeyFiguresFragmentToKeyFigureDetailsFragment(
                         figure.labelKey

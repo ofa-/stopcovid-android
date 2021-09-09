@@ -23,6 +23,7 @@ import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.lunabeestudio.stopcovid.R
+import com.lunabeestudio.stopcovid.StopCovid
 import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.extension.findParentFragmentByType
@@ -54,7 +55,13 @@ class WalletPagerFragment : BaseFragment() {
             findParentFragmentByType<WalletContainerFragment>() ?: requireParentFragment()
         },
         {
-            WalletViewModelFactory(robertManager, keystoreDataSource)
+            val app = requireActivity().application as StopCovid
+            WalletViewModelFactory(
+                robertManager,
+                keystoreDataSource,
+                app.injectionContainer.blacklistDCCManager,
+                app.injectionContainer.blacklist2DDOCManager,
+            )
         }
     )
 

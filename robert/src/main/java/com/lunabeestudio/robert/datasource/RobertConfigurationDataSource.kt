@@ -14,7 +14,7 @@ import android.content.Context
 import com.lunabeestudio.domain.model.Configuration
 import com.lunabeestudio.robert.model.RobertResultData
 
-interface ConfigurationDataSource {
+interface RobertConfigurationDataSource {
     suspend fun fetchOrLoadConfig(context: Context): RobertResultData<Configuration>
 
     fun loadConfig(context: Context): Configuration

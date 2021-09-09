@@ -12,6 +12,8 @@ package com.lunabeestudio.framework.remote
 
 import androidx.test.core.app.ApplicationProvider
 import com.google.common.truth.Truth.assertThat
+import com.lunabeestudio.analytics.manager.AnalyticsManager
+import com.lunabeestudio.domain.model.CaptchaType
 import com.lunabeestudio.domain.model.ServerStatusUpdate
 import com.lunabeestudio.framework.remote.datasource.ServiceDataSource
 import com.lunabeestudio.framework.testutils.ResourcesHelper
@@ -20,6 +22,8 @@ import com.lunabeestudio.robert.model.ErrorCode
 import com.lunabeestudio.robert.model.RobertResult
 import com.lunabeestudio.robert.model.RobertResultData
 import com.lunabeestudio.robert.model.UnauthorizedException
+import io.mockk.MockKAnnotations
+import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.runBlocking
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -32,13 +36,18 @@ class RobertServiceTest {
     private lateinit var server: MockWebServer
     private lateinit var dataSource: ServiceDataSource
 
+    @MockK(relaxed = true)
+    private lateinit var analyticsManager: AnalyticsManager
+
     @Before
     fun setUp() {
+        MockKAnnotations.init(this)
         server = MockWebServer()
         server.start()
         dataSource = ServiceDataSource(
             ApplicationProvider.getApplicationContext(),
             server.url("/api/v1.0/").toString(),
+            analyticsManager,
         )
     }
 
@@ -49,14 +58,14 @@ class RobertServiceTest {
                 .setBody(ResourcesHelper.readTestFileAsString("captchaSuccess"))
         )
         val result = runBlocking {
-            dataSource.generateCaptcha("", "", "")
+            dataSource.generateCaptcha("", CaptchaType.IMAGE, "")
         }
         assertThat(result).isInstanceOf(RobertResultData.Success::class.java)
         result as RobertResultData.Success
         assertThat(result.data).isEqualTo("228482eb770547059425e58ca6652c8a")
 
         testDataErrors {
-            dataSource.generateCaptcha("", "", "")
+            dataSource.generateCaptcha("", CaptchaType.IMAGE, "")
         }
     }
 

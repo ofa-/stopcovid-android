@@ -105,7 +105,7 @@ class WalletCertificateFragment : MainFragment() {
             findParentFragmentByType<WalletContainerFragment>() ?: requireParentFragment()
         },
         {
-            WalletViewModelFactory(robertManager, keystoreDataSource)
+            WalletViewModelFactory(robertManager, keystoreDataSource, blacklistDCCManager, blacklist2DDOCManager)
         }
     )
 
@@ -378,7 +378,7 @@ class WalletCertificateFragment : MainFragment() {
     private fun requestCertificateConversion(certificate: WalletCertificate) {
         lifecycleScope.launch {
             showLoading(strings["walletController.convertCertificate.loading"])
-            val result = (activity?.application as? StopCovid)?.certificateRepository?.convertCertificate(
+            val result = (activity?.application as? StopCovid)?.injectionContainer?.certificateRepository?.convertCertificate(
                 robertManager,
                 certificate.raw,
                 WalletCertificateType.Format.WALLET_DCC

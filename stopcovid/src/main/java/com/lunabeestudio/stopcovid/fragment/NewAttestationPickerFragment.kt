@@ -20,7 +20,6 @@ import com.lunabeestudio.stopcovid.extension.attestationLongLabelFromKey
 import com.lunabeestudio.stopcovid.extension.attestationShortLabelFromKey
 import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
 import com.lunabeestudio.stopcovid.fastitem.selectionItem
-import com.lunabeestudio.stopcovid.manager.FormManager
 import com.lunabeestudio.stopcovid.viewmodel.NewAttestationViewModel
 import com.lunabeestudio.stopcovid.viewmodel.NewAttestationViewModelFactory
 import com.mikepenz.fastadapter.GenericItem
@@ -28,7 +27,7 @@ import com.mikepenz.fastadapter.GenericItem
 class NewAttestationPickerFragment : MainFragment() {
 
     private val viewModel: NewAttestationViewModel by activityViewModels {
-        NewAttestationViewModelFactory(requireContext().secureKeystoreDataSource())
+        NewAttestationViewModelFactory(requireContext().secureKeystoreDataSource(), formManager)
     }
 
     private val args: NewAttestationPickerFragmentArgs by navArgs()
@@ -46,7 +45,7 @@ class NewAttestationPickerFragment : MainFragment() {
             }
         }
 
-        FormManager.form.value?.peekContent()?.let { form ->
+        formManager.form.value?.peekContent()?.let { form ->
             form.forEach { section ->
                 val formEntry = section.firstOrNull { formEntry ->
                     formEntry.key == args.key

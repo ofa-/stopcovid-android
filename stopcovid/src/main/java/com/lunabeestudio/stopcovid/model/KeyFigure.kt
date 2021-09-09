@@ -13,7 +13,6 @@ package com.lunabeestudio.stopcovid.model
 import androidx.annotation.DrawableRes
 import com.google.gson.annotations.SerializedName
 import com.lunabeestudio.stopcovid.R
-import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
 
 data class KeyFigure(
     val category: KeyFigureCategory = KeyFigureCategory.UNKNOWN,
@@ -48,10 +47,10 @@ data class KeyFigureSeriesItem(
     val value: Number
 )
 
-enum class Trend(@DrawableRes val imageRes: Int, val hint: String?) {
-    UP(R.drawable.ic_up, StringsManager.strings["accessibility.hint.keyFigure.valueUp"]),
-    STEADY(R.drawable.ic_steady, StringsManager.strings["accessibility.hint.keyFigure.valueSteady"]),
-    DOWN(R.drawable.ic_down, StringsManager.strings["accessibility.hint.keyFigure.valueDown"]),
+sealed class Trend(@DrawableRes val imageRes: Int, val hint: String?) {
+    class Up(hint: String?) : Trend(R.drawable.ic_up, hint)
+    class Steady(hint: String?) : Trend(R.drawable.ic_steady, hint)
+    class Down(hint: String?) : Trend(R.drawable.ic_down, hint)
 }
 
 enum class KeyFigureCategory {

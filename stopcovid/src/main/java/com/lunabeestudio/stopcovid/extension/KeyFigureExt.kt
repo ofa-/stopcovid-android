@@ -101,18 +101,18 @@ fun KeyFigure.itemForFigure(
                 leftLocation = departmentKeyFigure.dptLabel
                 leftValue = departmentKeyFigure.valueToDisplay?.formatNumberIfNeeded(numberFormat)
                 rightValue = valueGlobalToDisplay.formatNumberIfNeeded(numberFormat)
-                rightTrend = trend?.getTrend()
-                leftTrend = departmentKeyFigure.trend?.getTrend()
+                rightTrend = trend?.getTrend(strings)
+                leftTrend = departmentKeyFigure.trend?.getTrend(strings)
                 extractDate = departmentKeyFigure.extractDate
             } else {
                 leftLocation = strings["common.country.france"]
                 leftValue = valueGlobalToDisplay.formatNumberIfNeeded(numberFormat)
-                leftTrend = trend?.getTrend()
+                leftTrend = trend?.getTrend(strings)
                 extractDate = this@itemForFigure.extractDate
             }
         } else {
             leftValue = valueGlobalToDisplay.formatNumberIfNeeded(numberFormat)
-            leftTrend = trend?.getTrend()
+            leftTrend = trend?.getTrend(strings)
             extractDate = this@itemForFigure.extractDate
         }
         updatedAt = strings.stringsFormat(

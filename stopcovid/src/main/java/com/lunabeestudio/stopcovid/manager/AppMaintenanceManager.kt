@@ -22,6 +22,7 @@ import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.StopCovid
 import com.lunabeestudio.stopcovid.model.Info
 import com.lunabeestudio.stopcovid.network.LBMaintenanceHttpClient
+import okhttp3.OkHttpClient
 import org.json.JSONObject
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
@@ -85,11 +86,12 @@ object AppMaintenanceManager {
     /**
      * Call this to check if the app needs to be blocked or not
      */
-    suspend fun checkForMaintenanceUpgrade(context: Context) {
+    suspend fun checkForMaintenanceUpgrade(context: Context, okHttpClient: OkHttpClient) {
         when {
             shouldRefresh(context) -> {
                 updateCheckForMaintenanceUpgrade(
                     context,
+                    okHttpClient,
                     null,
                     null
                 )
@@ -109,11 +111,14 @@ object AppMaintenanceManager {
      */
     internal suspend fun updateCheckForMaintenanceUpgrade(
         context: Context,
+        okHttpClient: OkHttpClient,
         appIsFreeCompletion: (() -> Unit)?,
         appIsBlockedCompletion: ((info: Info) -> Unit)?
     ) {
         LBMaintenanceHttpClient.get(
-            context, jsonUrl!!,
+            context,
+            jsonUrl!!,
+            okHttpClient,
             { result ->
                 try {
                     val info = Info(JSONObject(result))

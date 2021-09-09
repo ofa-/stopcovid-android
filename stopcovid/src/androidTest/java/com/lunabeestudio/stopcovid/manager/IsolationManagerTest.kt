@@ -3,8 +3,10 @@ package com.lunabeestudio.stopcovid.manager
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import com.lunabeestudio.domain.extension.unixTimeMsToNtpTimeS
-import com.lunabeestudio.framework.local.datasource.SecureKeystoreDataSource
 import com.lunabeestudio.domain.model.AtRiskStatus
+import com.lunabeestudio.framework.local.datasource.SecureKeystoreDataSource
+import com.lunabeestudio.robert.RobertApplication
+import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.stopcovid.StopCovid
 import com.lunabeestudio.stopcovid.model.IsolationRecommendationStateEnum
 import org.junit.After
@@ -16,11 +18,11 @@ import kotlin.time.ExperimentalTime
 
 class IsolationManagerTest {
 
-    private val context: StopCovid = ApplicationProvider.getApplicationContext() as StopCovid
-    private val isolationManager: IsolationManager = context.isolationManager
-    private val secureKeystoreDataSource: SecureKeystoreDataSource by lazy {
-        context.secureKeystoreDataSource
-    }
+    private fun Context.robertManager(): RobertManager = (applicationContext as RobertApplication).robertManager
+
+    private val app: StopCovid = ApplicationProvider.getApplicationContext() as StopCovid
+    private val secureKeystoreDataSource: SecureKeystoreDataSource = app.injectionContainer.secureKeystoreDataSource
+    private val isolationManager: IsolationManager = IsolationManager(app, app.robertManager(), secureKeystoreDataSource)
 
     @Before
     fun createDataSource() {
@@ -28,8 +30,8 @@ class IsolationManagerTest {
         keystore.load(null)
         keystore.deleteEntry("aes_local_protection")
         keystore.deleteEntry("rsa_wrap_local_protection")
-        context.getSharedPreferences("robert_prefs", Context.MODE_PRIVATE).edit().clear().commit()
-        context.getSharedPreferences("crypto_prefs", Context.MODE_PRIVATE).edit().clear().commit()
+        app.getSharedPreferences("robert_prefs", Context.MODE_PRIVATE).edit().clear().commit()
+        app.getSharedPreferences("crypto_prefs", Context.MODE_PRIVATE).edit().clear().commit()
         isolationManager.resetData()
     }
 
@@ -39,8 +41,8 @@ class IsolationManagerTest {
         keystore.load(null)
         keystore.deleteEntry("aes_local_protection")
         keystore.deleteEntry("rsa_wrap_local_protection")
-        context.getSharedPreferences("robert_prefs", Context.MODE_PRIVATE).edit().clear().commit()
-        context.getSharedPreferences("crypto_prefs", Context.MODE_PRIVATE).edit().clear().commit()
+        app.getSharedPreferences("robert_prefs", Context.MODE_PRIVATE).edit().clear().commit()
+        app.getSharedPreferences("crypto_prefs", Context.MODE_PRIVATE).edit().clear().commit()
         isolationManager.resetData()
     }
 

@@ -20,11 +20,11 @@ import androidx.core.app.ShareCompat
 import androidx.core.view.isGone
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.lunabeestudio.stopcovid.coreui.LocalizedApplication
 import com.lunabeestudio.stopcovid.coreui.extension.callPhone
 import com.lunabeestudio.stopcovid.coreui.extension.setTextOrHide
 import com.lunabeestudio.stopcovid.coreui.extension.stringsFormat
 import com.lunabeestudio.stopcovid.coreui.manager.LocalizedStrings
-import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
 import com.lunabeestudio.stopcovid.databinding.FragmentVaccinationActionsBottomSheetBinding
 import com.lunabeestudio.stopcovid.extension.location
 import com.lunabeestudio.stopcovid.extension.openInExternalBrowser
@@ -33,7 +33,8 @@ class VaccinationActionsBottomSheetFragment : BottomSheetDialogFragment() {
 
     val args: VaccinationActionsBottomSheetFragmentArgs by navArgs()
 
-    private val strings: LocalizedStrings = StringsManager.strings
+    private val strings: LocalizedStrings
+        get() = (activity?.application as? LocalizedApplication)?.localizedStrings ?: emptyMap()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val binding = FragmentVaccinationActionsBottomSheetBinding.inflate(inflater, container, false)

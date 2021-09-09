@@ -18,7 +18,6 @@ import androidx.fragment.app.viewModels
 import androidx.preference.PreferenceManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.lunabeestudio.analytics.extension.sendAnalytics
-import com.lunabeestudio.analytics.manager.AnalyticsManager
 import com.lunabeestudio.robert.RobertApplication
 import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.R
@@ -72,7 +71,9 @@ class ManageDataFragment : MainFragment() {
         ManageDataViewModelFactory(
             requireContext().secureKeystoreDataSource(),
             robertManager,
-            isolationManager
+            isolationManager,
+            vaccinationCenterManager,
+            analyticsManager,
         )
     }
 
@@ -461,7 +462,7 @@ class ManageDataFragment : MainFragment() {
             text = strings["manageDataController.analytics.subtitle"]
             identifier = items.count().toLong()
         }
-        val isOptIn = context?.let(AnalyticsManager::isOptIn) ?: false
+        val isOptIn = analyticsManager.isOptIn()
         items += switchItem {
             title = strings[
                 if (isOptIn) {
@@ -472,10 +473,8 @@ class ManageDataFragment : MainFragment() {
             ]
             isChecked = isOptIn
             onCheckChange = { isChecked ->
-                context?.let {
-                    AnalyticsManager.setIsOptIn(it, isChecked)
-                    refreshScreen()
-                }
+                analyticsManager.setIsOptIn(isChecked)
+                refreshScreen()
             }
             identifier = items.count().toLong()
         }

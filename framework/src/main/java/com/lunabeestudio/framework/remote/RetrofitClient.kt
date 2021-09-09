@@ -14,7 +14,9 @@ import android.content.Context
 import android.os.Build
 import com.lunabeestudio.domain.model.CacheConfig
 import com.lunabeestudio.framework.BuildConfig
+import com.lunabeestudio.framework.remote.server.ServerManager
 import okhttp3.Cache
+import okhttp3.ConnectionPool
 import okhttp3.ConnectionSpec
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.Interceptor
@@ -29,32 +31,24 @@ import java.security.cert.CertificateFactory
 import java.security.cert.X509Certificate
 import java.util.concurrent.TimeUnit
 
-object RetrofitClient {
+internal object RetrofitClient {
 
-    internal fun <T> getService(
-        context: Context,
+    fun <T> getService(
         baseUrl: String,
         clazz: Class<T>,
-        cacheConfig: CacheConfig?,
-        onProgressUpdate: ((Float) -> Unit)? = null,
+        okhttpClient: OkHttpClient,
     ): T {
         return Retrofit.Builder()
             .baseUrl(baseUrl.toHttpUrl())
             .addConverterFactory(MoshiConverterFactory.create())
-            .client(getDefaultOKHttpClient(context, cacheConfig, onProgressUpdate))
-            .build().create(clazz)
-    }
-
-    internal fun <T> getFileService(context: Context, baseUrl: String, clazz: Class<T>): T {
-        return Retrofit.Builder()
-            .baseUrl(baseUrl.toHttpUrl())
-            .client(getFileOKHttpClient(context))
+            .client(okhttpClient)
             .build().create(clazz)
     }
 
     fun getDefaultOKHttpClient(
         context: Context,
         cacheConfig: CacheConfig?,
+        connectionPool: ConnectionPool? = null,
         onProgressUpdate: ((Float) -> Unit)? = null,
     ): OkHttpClient {
         val requireTls12 = ConnectionSpec.Builder(ConnectionSpec.RESTRICTED_TLS)
@@ -72,38 +66,16 @@ object RetrofitClient {
                     .build()
                 sslSocketFactory(certificates.sslSocketFactory(), certificates.trustManager)
             }
-            addInterceptor(getDefaultHeaderInterceptor())
             addInterceptor(getLogInterceptor())
             addNetworkInterceptor(getProgressInterceptor(onProgressUpdate))
             callTimeout(1L, TimeUnit.MINUTES)
             connectTimeout(1L, TimeUnit.MINUTES)
             readTimeout(1L, TimeUnit.MINUTES)
             writeTimeout(1L, TimeUnit.MINUTES)
+            connectionPool(connectionPool ?: ServerManager.getDefaultConnectionPool())
             if (cacheConfig != null) {
                 cache(Cache(cacheConfig.cacheDir, cacheConfig.cacheSize))
             }
-        }.build()
-    }
-
-    private fun getFileOKHttpClient(context: Context): OkHttpClient {
-        val requireTls12 = ConnectionSpec.Builder(ConnectionSpec.RESTRICTED_TLS)
-            .tlsVersions(TlsVersion.TLS_1_2)
-            .build()
-        return OkHttpClient.Builder().apply {
-            if (!BuildConfig.DEBUG) {
-                connectionSpecs(listOf(requireTls12))
-            }
-            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N) {
-                val certificates: HandshakeCertificates = HandshakeCertificates.Builder()
-                    .addTrustedCertificate(certificateFromString(context, "certigna_services"))
-                    .build()
-                sslSocketFactory(certificates.sslSocketFactory(), certificates.trustManager)
-            }
-            addInterceptor(getFileHeaderInterceptor())
-            callTimeout(30L, TimeUnit.SECONDS)
-            connectTimeout(30L, TimeUnit.SECONDS)
-            readTimeout(30L, TimeUnit.SECONDS)
-            writeTimeout(30L, TimeUnit.SECONDS)
         }.build()
     }
 
@@ -116,23 +88,6 @@ object RetrofitClient {
                 )
             )
         ) as X509Certificate
-    }
-
-    private fun getDefaultHeaderInterceptor(): Interceptor = Interceptor { chain ->
-        val request = chain.request()
-            .newBuilder().apply {
-                addHeader("Accept", "application/json")
-                addHeader("Content-Type", "application/json")
-            }.build()
-        chain.proceed(request)
-    }
-
-    private fun getFileHeaderInterceptor(): Interceptor = Interceptor { chain ->
-        val request = chain.request()
-            .newBuilder().apply {
-                addHeader("Content-Type", "application/json")
-            }.build()
-        chain.proceed(request)
     }
 
     private fun getLogInterceptor(): HttpLoggingInterceptor = HttpLoggingInterceptor { message -> Timber.v(message) }.apply {

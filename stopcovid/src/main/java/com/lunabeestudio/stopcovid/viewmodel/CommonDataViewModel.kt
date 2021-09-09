@@ -32,6 +32,7 @@ abstract class CommonDataViewModel(
     private val secureKeystoreDataSource: SecureKeystoreDataSource,
     private val robertManager: RobertManager,
     private val isolationManager: IsolationManager,
+    private val vaccinationCenterManager: VaccinationCenterManager,
 ) : ViewModel() {
 
     @CallSuper
@@ -69,7 +70,7 @@ abstract class CommonDataViewModel(
         (application.getAppContext() as StopCovid).cancelActivateReminder()
         eraseIsolation()
         eraseCertificates()
-        VaccinationCenterManager.clearAllData(application.getAppContext())
+        vaccinationCenterManager.clearAllData(application.getAppContext())
     }
 
     protected fun clearNotifications(application: RobertApplication) {

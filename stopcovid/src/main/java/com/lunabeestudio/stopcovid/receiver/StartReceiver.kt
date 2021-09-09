@@ -13,8 +13,8 @@ package com.lunabeestudio.stopcovid.receiver
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
 import com.lunabeestudio.stopcovid.extension.robertManager
+import com.lunabeestudio.stopcovid.extension.stringsManager
 import com.lunabeestudio.stopcovid.service.ProximityService
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
@@ -29,7 +29,7 @@ class StartReceiver : BroadcastReceiver() {
         try {
             if (intent.action == Intent.ACTION_BOOT_COMPLETED && context.robertManager().isProximityActive) {
                 GlobalScope.launch(Dispatchers.Main) {
-                    StringsManager.initialize(context)
+                    context.stringsManager().initialize(context)
                     ProximityService.start(context)
                 }
             }

@@ -1,6 +1,5 @@
 package com.lunabeestudio.framework.utils
 
-import android.content.Context
 import com.lunabeestudio.analytics.manager.AnalyticsManager
 import com.lunabeestudio.framework.remote.datasource.ServiceDataSource
 import com.lunabeestudio.framework.remote.extension.remoteToRobertException
@@ -18,8 +17,11 @@ internal object RequestHelper {
 
     @Suppress("BlockingMethodInNonBlockingContext")
     suspend fun tryCatchRequest(
-        context: Context, filesDir: File, apiVersion: String,
-        analyticsServiceName: String?, doRequest: suspend () -> Response<ApiCommonRS>
+        filesDir: File,
+        apiVersion: String,
+        analyticsServiceName: String?,
+        analyticsManager: AnalyticsManager,
+        doRequest: suspend () -> Response<ApiCommonRS>,
     ): RobertResult {
         return try {
             val result = doRequest()
@@ -27,7 +29,7 @@ internal object RequestHelper {
                 if (result.body()?.success == true) {
                     RobertResult.Success()
                 } else {
-                    analyticsServiceName?.let { AnalyticsManager.reportWSError(context, filesDir, it, apiVersion, result.code()) }
+                    analyticsServiceName?.let { analyticsManager.reportWSError(filesDir, it, apiVersion, result.code()) }
                     RobertResult.Failure(
                         BackendException(
                             result.body()?.message!!
@@ -35,7 +37,7 @@ internal object RequestHelper {
                     )
                 }
             } else {
-                analyticsServiceName?.let { AnalyticsManager.reportWSError(context, filesDir, it, apiVersion, result.code()) }
+                analyticsServiceName?.let { analyticsManager.reportWSError(filesDir, it, apiVersion, result.code()) }
                 RobertResult.Failure(HttpException(result).remoteToRobertException())
             }
         } catch (e: Exception) {
@@ -43,8 +45,8 @@ internal object RequestHelper {
             val robertException = e.remoteToRobertException()
             if (robertException !is NoInternetException) {
                 analyticsServiceName?.let {
-                    AnalyticsManager.reportWSError(
-                        context, filesDir,
+                    analyticsManager.reportWSError(
+                        filesDir,
                         it,
                         apiVersion,
                         (e as? HttpException)?.code() ?: 0,
@@ -58,15 +60,18 @@ internal object RequestHelper {
 
     @Suppress("BlockingMethodInNonBlockingContext")
     suspend fun <T> tryCatchRequestData(
-        context: Context, filesDir: File, apiVersion: String,
-        analyticsServiceName: String?, doRequest: suspend () -> Response<T>
+        filesDir: File,
+        apiVersion: String,
+        analyticsServiceName: String?,
+        analyticsManager: AnalyticsManager,
+        doRequest: suspend () -> Response<T>,
     ): RobertResultData<T> {
         return try {
             val result = doRequest()
             if (result.isSuccessful) {
                 RobertResultData.Success(result.body()!!)
             } else {
-                analyticsServiceName?.let { AnalyticsManager.reportWSError(context, filesDir, it, apiVersion, result.code()) }
+                analyticsServiceName?.let { analyticsManager.reportWSError(filesDir, it, apiVersion, result.code()) }
                 RobertResultData.Failure(HttpException(result).remoteToRobertException())
             }
         } catch (e: Exception) {
@@ -74,8 +79,8 @@ internal object RequestHelper {
             val robertException = e.remoteToRobertException()
             if (robertException !is NoInternetException) {
                 analyticsServiceName?.let {
-                    AnalyticsManager.reportWSError(
-                        context, filesDir,
+                    analyticsManager.reportWSError(
+                        filesDir,
                         it,
                         apiVersion,
                         (e as? HttpException)?.code() ?: 0,

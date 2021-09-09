@@ -21,6 +21,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.navigation.ui.NavigationUI
 import com.journeyapps.barcodescanner.BarcodeResult
+import com.lunabeestudio.analytics.manager.AnalyticsManager
 import com.lunabeestudio.stopcovid.coreui.extension.appCompatActivity
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.extension.openAppSettings
@@ -28,6 +29,7 @@ import com.lunabeestudio.stopcovid.coreui.extension.setTextOrHide
 import com.lunabeestudio.stopcovid.coreui.extension.showPermissionRationale
 import com.lunabeestudio.stopcovid.coreui.fragment.BaseFragment
 import com.lunabeestudio.stopcovid.databinding.FragmentQrCodeBinding
+import com.lunabeestudio.stopcovid.extension.injectionContainer
 import com.lunabeestudio.stopcovid.extension.openInExternalBrowser
 
 abstract class QRCodeFragment : BaseFragment() {
@@ -157,5 +159,9 @@ abstract class QRCodeFragment : BaseFragment() {
         binding?.title?.setTextOrHide(strings[explanationKey])
         binding?.footer?.setTextOrHide(footerKey?.let(strings::get).takeIf { !it.isNullOrBlank() })
         binding?.footer?.setOnClickListener { onFooterClick() }
+    }
+
+    protected val analyticsManager: AnalyticsManager by lazy(LazyThreadSafetyMode.NONE) {
+        injectionContainer.analyticsManager
     }
 }

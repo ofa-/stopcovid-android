@@ -52,7 +52,6 @@ import com.airbnb.lottie.utils.Utils
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.zxing.BarcodeFormat
 import com.journeyapps.barcodescanner.BarcodeEncoder
-import com.lunabeestudio.analytics.manager.AnalyticsManager
 import com.lunabeestudio.analytics.model.AppEventName
 import com.lunabeestudio.robert.RobertApplication
 import com.lunabeestudio.robert.extension.observeEventAndConsume
@@ -116,11 +115,7 @@ import com.lunabeestudio.stopcovid.fastitem.proximityButtonItem
 import com.lunabeestudio.stopcovid.fastitem.smallQrCodeCardItem
 import com.lunabeestudio.stopcovid.manager.AppMaintenanceManager
 import com.lunabeestudio.stopcovid.manager.DeeplinkManager
-import com.lunabeestudio.stopcovid.manager.InfoCenterManager
-import com.lunabeestudio.stopcovid.manager.KeyFiguresManager
 import com.lunabeestudio.stopcovid.manager.ProximityManager
-import com.lunabeestudio.stopcovid.manager.RisksLevelManager
-import com.lunabeestudio.stopcovid.manager.VaccinationCenterManager
 import com.lunabeestudio.stopcovid.manager.VenuesManager
 import com.lunabeestudio.stopcovid.model.CaptchaNextFragment
 import com.lunabeestudio.stopcovid.model.CovidException
@@ -160,7 +155,7 @@ class ProximityFragment : TimeMainFragment() {
     }
 
     private val viewModel: ProximityViewModel by viewModels {
-        ProximityViewModelFactory(robertManager, isolationManager, requireContext().secureKeystoreDataSource())
+        ProximityViewModelFactory(robertManager, isolationManager, requireContext().secureKeystoreDataSource(), vaccinationCenterManager)
     }
 
     private val sharedPrefs: SharedPreferences by lazy {
@@ -317,7 +312,7 @@ class ProximityFragment : TimeMainFragment() {
         fragmentRecyclerViewFabBinding?.floatingActionButton?.let { fab ->
             fab.text = strings["home.qrScan.button.title"]
             fab.setOnClickListener {
-                AnalyticsManager.reportAppEvent(requireContext(), AppEventName.e18, null)
+                analyticsManager.reportAppEvent(requireContext(), AppEventName.e18, null)
                 findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToUniversalQrScanFragment())
             }
             binding?.recyclerView?.addOnScrollListener(ExtendedFloatingActionButtonScrollListener(fab))
@@ -407,13 +402,13 @@ class ProximityFragment : TimeMainFragment() {
         robertManager.liveUpdatingRiskStatus.observeEventAndConsume(viewLifecycleOwner) {
             refreshScreen()
         }
-        InfoCenterManager.infos.observeEventAndConsume(viewLifecycleOwner) {
+        infoCenterManager.infos.observeEventAndConsume(viewLifecycleOwner) {
             refreshScreen()
         }
-        InfoCenterManager.strings.observeEventAndConsume(viewLifecycleOwner) {
+        infoCenterManager.strings.observeEventAndConsume(viewLifecycleOwner) {
             refreshScreen()
         }
-        KeyFiguresManager.figures.observeEventAndConsume(viewLifecycleOwner) {
+        keyFiguresManager.figures.observeEventAndConsume(viewLifecycleOwner) {
             refreshScreen()
         }
         viewModel.activeAttestationCount.observeEventAndConsume(viewLifecycleOwner) {
@@ -467,7 +462,7 @@ class ProximityFragment : TimeMainFragment() {
         // Health items
         addHealthItems(items, showAsSick)
         if (robertManager.configuration.displayIsolation) {
-            addIsolationItems(items)
+            addIsolationItems(items, analyticsManager)
         }
         if ((deviceSetup != DeviceSetup.NO_BLE || robertManager.configuration.displayRecordVenues) && !showAsSick) {
             addDeclareItems(items)
@@ -613,19 +608,19 @@ class ProximityFragment : TimeMainFragment() {
                     mainImage = R.drawable.health_card
                     mainTitle = strings["home.healthSection.isSick.standaloneTitle"]
                     onCardClick = {
-                        AnalyticsManager.reportAppEvent(requireContext(), AppEventName.e5, null)
+                        analyticsManager.reportAppEvent(requireContext(), AppEventName.e5, null)
                         findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToIsSickFragment())
                     }
                     identifier = R.drawable.health_card.toLong()
                 }
             }
             !sharedPrefs.hideRiskStatus -> {
-                healthItem = RisksLevelManager.getCurrentLevel(robertManager.atRiskStatus?.riskLevel)?.let {
+                healthItem = risksLevelManager.getCurrentLevel(robertManager.atRiskStatus?.riskLevel)?.let {
                     cardWithActionItem(CardTheme.Color) {
                         mainImage = R.drawable.health_card
                         gradientBackground = it.getGradientBackground()
                         onCardClick = {
-                            AnalyticsManager.reportAppEvent(requireContext(), AppEventName.e5, null)
+                            analyticsManager.reportAppEvent(requireContext(), AppEventName.e5, null)
                             findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToHealthFragment())
                         }
                         identifier = R.drawable.health_card.toLong()
@@ -693,7 +688,7 @@ class ProximityFragment : TimeMainFragment() {
     }
 
     private fun startRecordVenue() {
-        AnalyticsManager.reportAppEvent(requireContext(), AppEventName.e12, null)
+        analyticsManager.reportAppEvent(requireContext(), AppEventName.e12, null)
         findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToVenueQrCodeFragment())
     }
 
@@ -719,7 +714,7 @@ class ProximityFragment : TimeMainFragment() {
             identifier = cardTitle.hashCode().toLong()
             mainMaxLines = 3
             onCardClick = {
-                AnalyticsManager.reportAppEvent(requireContext(), AppEventName.e10, null)
+                analyticsManager.reportAppEvent(requireContext(), AppEventName.e10, null)
                 findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToInfoCenterFragment())
             }
 
@@ -728,7 +723,7 @@ class ProximityFragment : TimeMainFragment() {
                     label = strings["home.infoSection.readAll"],
                     showBadge = sharedPrefs.getBoolean(Constants.SharedPrefs.HAS_NEWS, false)
                 ) {
-                    AnalyticsManager.reportAppEvent(requireContext(), AppEventName.e10, null)
+                    analyticsManager.reportAppEvent(requireContext(), AppEventName.e10, null)
                     findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToInfoCenterFragment())
                 }
             )
@@ -747,18 +742,18 @@ class ProximityFragment : TimeMainFragment() {
         val darkMode = requireContext().isNightMode()
 
         val keyFiguresClickListener = View.OnClickListener {
-            AnalyticsManager.reportAppEvent(requireContext(), AppEventName.e8, null)
+            analyticsManager.reportAppEvent(requireContext(), AppEventName.e8, null)
             findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToKeyFiguresFragment())
         }
 
-        KeyFiguresManager.highlightedFigures?.let { figure ->
+        keyFiguresManager.highlightedFigures?.let { figure ->
             strings[figure.labelShortStringKey]?.let { shortTitle ->
                 items += highlightedNumberCardItem {
                     label = "$shortTitle (${strings["common.country.france"]})"
                     updatedAt = strings["keyfigure.dailyUpdates"]
                     value = figure.valueGlobalToDisplay.formatNumberIfNeeded(numberFormat)
                     onClickListener = View.OnClickListener {
-                        AnalyticsManager.reportAppEvent(requireContext(), AppEventName.e9, null)
+                        analyticsManager.reportAppEvent(requireContext(), AppEventName.e9, null)
                         findNavControllerOrNull()?.safeNavigate(
                             ProximityFragmentDirections.actionProximityFragmentToKeyFigureDetailsFragment(
                                 figure.labelKey
@@ -791,7 +786,7 @@ class ProximityFragment : TimeMainFragment() {
             onClickListener = keyFiguresClickListener
             identifier = header.hashCode().toLong()
 
-            KeyFiguresManager.featuredFigures?.let { keyFigures ->
+            keyFiguresManager.featuredFigures?.let { keyFigures ->
                 franceData = NumbersCardItem.Data(
                     strings["common.country.france"],
                     generateFromKeyFigure(keyFigures.getOrNull(0)),
@@ -935,7 +930,7 @@ class ProximityFragment : TimeMainFragment() {
         items += cardWithActionItem {
             mainImage = R.drawable.attestation_card
             onCardClick = {
-                AnalyticsManager.reportAppEvent(requireContext(), AppEventName.e11, null)
+                analyticsManager.reportAppEvent(requireContext(), AppEventName.e11, null)
                 findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToAttestationsFragment())
             }
             mainTitle = strings["home.attestationSection.cell.title"]
@@ -957,12 +952,13 @@ class ProximityFragment : TimeMainFragment() {
     private fun showPostalCodeDialog() {
         MaterialAlertDialogBuilder(requireContext()).showPostalCodeDialog(
             layoutInflater,
-            strings
+            strings,
+            keyFiguresManager,
         ) { postalCode ->
             sharedPrefs.chosenPostalCode = postalCode
             viewLifecycleOwnerOrNull()?.lifecycleScope?.launch {
                 (activity as? MainActivity)?.showProgress(true)
-                VaccinationCenterManager.postalCodeDidUpdate(requireContext(), sharedPrefs, postalCode)
+                vaccinationCenterManager.postalCodeDidUpdate(requireContext(), sharedPrefs, postalCode)
                 (activity as? MainActivity)?.showProgress(false)
                 refreshScreen()
             }
@@ -995,7 +991,7 @@ class ProximityFragment : TimeMainFragment() {
             mainHeader = strings["home.vaccinationSection.cellSubtitle"]
             contentDescription = strings["home.vaccinationSection.cellTitle"]
             onCardClick = {
-                AnalyticsManager.reportAppEvent(requireContext(), AppEventName.e7, null)
+                analyticsManager.reportAppEvent(requireContext(), AppEventName.e7, null)
                 findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToVaccinationFragment())
             }
             identifier = "home.vaccinationSection.cellTitle".hashCode().toLong()
@@ -1117,9 +1113,9 @@ class ProximityFragment : TimeMainFragment() {
             isProximityOn = freshProximityOn
             refreshTopImage(wasProximityDifferent)
 
-            val infoCenterStrings = InfoCenterManager.strings.value?.peekContent() ?: emptyMap()
+            val infoCenterStrings = infoCenterManager.strings.value?.peekContent() ?: emptyMap()
 
-            InfoCenterManager.infos.value?.peekContent()?.firstOrNull()?.let { info ->
+            infoCenterManager.infos.value?.peekContent()?.firstOrNull()?.let { info ->
                 if (::infoCenterCardItem.isInitialized) {
                     infoCenterCardItem.apply {
                         mainHeader = Duration.seconds(info.timestamp).getRelativeDateTimeString(requireContext(), strings["common.justNow"])
@@ -1202,7 +1198,7 @@ class ProximityFragment : TimeMainFragment() {
     @OptIn(ExperimentalTime::class)
     private fun refreshHealthItem(context: Context) {
         healthItem?.apply {
-            RisksLevelManager.getCurrentLevel(robertManager.atRiskStatus?.riskLevel)?.let {
+            risksLevelManager.getCurrentLevel(robertManager.atRiskStatus?.riskLevel)?.let {
                 mainTitle = strings[it.labels.homeTitle]
                 mainBody = strings[it.labels.homeSub]
 
@@ -1225,7 +1221,7 @@ class ProximityFragment : TimeMainFragment() {
                         robertManager.atRiskStatus?.riskLevel ?: 0f
                     )
                 }
-                InfoCenterManager.infos.value?.peekContent()?.firstOrNull()?.let { info ->
+                infoCenterManager.infos.value?.peekContent()?.firstOrNull()?.let { info ->
                     if (::infoCenterCardItem.isInitialized) {
                         infoCenterCardItem.apply {
                             mainHeader = Duration.seconds(info.timestamp)

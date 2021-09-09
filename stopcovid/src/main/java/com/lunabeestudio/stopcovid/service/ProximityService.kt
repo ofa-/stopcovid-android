@@ -21,7 +21,6 @@ import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
-import com.lunabeestudio.analytics.manager.AnalyticsManager
 import com.lunabeestudio.domain.model.EphemeralBluetoothIdentifier
 import com.lunabeestudio.framework.ble.extension.toLocalProximity
 import com.lunabeestudio.framework.ble.service.RobertProximityService
@@ -38,8 +37,9 @@ import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.UiConstants
 import com.lunabeestudio.stopcovid.coreui.manager.LocalizedStrings
-import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
+import com.lunabeestudio.stopcovid.extension.analyticsManager
 import com.lunabeestudio.stopcovid.extension.robertManager
+import com.lunabeestudio.stopcovid.extension.stringsManager
 import com.lunabeestudio.stopcovid.manager.ProximityManager
 import com.orange.proximitynotification.ProximityInfo
 import com.orange.proximitynotification.ble.BleProximityMetadata
@@ -62,7 +62,7 @@ open class ProximityService : RobertProximityService() {
     private val binder = ProximityBinder()
 
     private val strings: LocalizedStrings
-        get() = StringsManager.strings
+        get() = stringsManager().strings
 
     override val robertManager: RobertManager by lazy {
         robertManager()
@@ -133,7 +133,7 @@ open class ProximityService : RobertProximityService() {
 
     override fun buildForegroundServiceNotification(): Notification = runBlocking {
         if (strings.isEmpty()) {
-            StringsManager.initialize(this@ProximityService)
+            stringsManager().initialize(this@ProximityService)
         }
 
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -178,11 +178,11 @@ open class ProximityService : RobertProximityService() {
 
     override fun onCreate() {
         super.onCreate()
-        AnalyticsManager.proximityDidStart(this)
+        analyticsManager().proximityDidStart()
     }
 
     override fun onDestroy() {
-        AnalyticsManager.proximityDidStop(this)
+        analyticsManager().proximityDidStop()
         robertManager.deactivateProximity(applicationContext as RobertApplication)
         super.onDestroy()
     }
@@ -260,7 +260,7 @@ open class ProximityService : RobertProximityService() {
     private fun sendErrorNotification() {
         CoroutineScope(Dispatchers.Main).launch {
             if (strings.isEmpty()) {
-                StringsManager.initialize(this@ProximityService)
+                stringsManager().initialize(this@ProximityService)
             }
             val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
@@ -307,7 +307,7 @@ open class ProximityService : RobertProximityService() {
     override fun sendErrorBluetoothNotification() {
         CoroutineScope(Dispatchers.Main).launch {
             if (strings.isEmpty()) {
-                StringsManager.initialize(this@ProximityService)
+                stringsManager().initialize(this@ProximityService)
             }
             val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 

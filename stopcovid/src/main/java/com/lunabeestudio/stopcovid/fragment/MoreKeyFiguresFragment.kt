@@ -13,7 +13,6 @@ package com.lunabeestudio.stopcovid.fragment
 import android.os.Bundle
 import android.view.View
 import com.lunabeestudio.stopcovid.extension.fillItems
-import com.lunabeestudio.stopcovid.manager.MoreKeyFiguresManager
 import com.mikepenz.fastadapter.GenericItem
 
 class MoreKeyFiguresFragment : MainFragment() {
@@ -23,7 +22,7 @@ class MoreKeyFiguresFragment : MainFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        MoreKeyFiguresManager.moreKeyFiguresSections.observe(viewLifecycleOwner) {
+        moreKeyFiguresManager.moreKeyFiguresSections.observe(viewLifecycleOwner) {
             refreshScreen()
         }
     }
@@ -31,7 +30,7 @@ class MoreKeyFiguresFragment : MainFragment() {
     override fun getItems(): List<GenericItem> {
         val items = arrayListOf<GenericItem>()
 
-        MoreKeyFiguresManager.moreKeyFiguresSections.value?.fillItems(items)
+        moreKeyFiguresManager.moreKeyFiguresSections.value?.fillItems(items)
 
         return items
     }

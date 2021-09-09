@@ -1,7 +1,7 @@
 [
 	{
         "section": "Sources",
-        "description": "Health data comes from the following sources:\n- data from the SI-DEP database,\n- data reported by health centers participating in SI-VIC and the OSCOUR® network,\n- data from the Vaccin Covid database.\n\nAll these data are aggregated and analyzed by Santé publique France (SpF) and made available on Data.gouv.fr",
+        "description": "Health data comes from the following sources:\n- data from the SI-DEP database,\n- data reported by health centers participating in SI-VIC and the OSCOUR® network,\n- data from the Vaccin Covid database.\n- data from the DRESS (Direction de la recherche, des études de l'évaluation et des statistiques).\n\nAll these data are aggregated and analyzed by Santé publique France (SpF) and made available on Data.gouv.fr",
         "links": [
 	        {
                 "label": "Sources on Data.gouv.fr",

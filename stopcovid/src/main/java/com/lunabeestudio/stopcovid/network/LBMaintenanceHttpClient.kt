@@ -11,11 +11,12 @@
 package com.lunabeestudio.stopcovid.network
 
 import android.content.Context
-import com.lunabeestudio.framework.remote.RetrofitClient
 import com.lunabeestudio.stopcovid.StopCovid
 import com.lunabeestudio.stopcovid.manager.TimeCheckManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import okhttp3.CacheControl
+import okhttp3.OkHttpClient
 import okhttp3.Request
 
 /**
@@ -32,25 +33,27 @@ object LBMaintenanceHttpClient {
     suspend fun get(
         context: Context,
         urlString: String,
+        okHttpClient: OkHttpClient,
         onSuccess: suspend (result: String) -> Unit,
         onFailure: suspend (e: Exception) -> Unit
     ) {
         try {
-            val okHttpClient = RetrofitClient.getDefaultOKHttpClient(context, null)
             val request: Request = Request.Builder()
                 .url(urlString)
+                .cacheControl(CacheControl.FORCE_NETWORK)
                 .build()
 
             @Suppress("BlockingMethodInNonBlockingContext")
             val string = withContext(Dispatchers.IO) {
-                val response = okHttpClient.newCall(request).execute()
-                val isClockAligned = TimeCheckManager.isTimeAlignedWithServer(response)
-                if (isClockAligned == false) {
-                    (context.applicationContext as? StopCovid)?.sendClockNotAlignedNotification()
-                } else if (isClockAligned == true) {
-                    (context.applicationContext as? StopCovid)?.cancelClockNotAlignedNotification()
+                okHttpClient.newCall(request).execute().use { response ->
+                    val isClockAligned = TimeCheckManager.isTimeAlignedWithServer(response)
+                    if (isClockAligned == false) {
+                        (context.applicationContext as? StopCovid)?.sendClockNotAlignedNotification()
+                    } else if (isClockAligned == true) {
+                        (context.applicationContext as? StopCovid)?.cancelClockNotAlignedNotification()
+                    }
+                    response.body!!.string()
                 }
-                response.body!!.string()
             }
 
             onSuccess(string)

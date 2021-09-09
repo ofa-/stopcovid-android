@@ -15,11 +15,10 @@ import android.content.Intent
 import android.net.Uri
 import androidx.core.util.AtomicFile
 import androidx.emoji.text.EmojiCompat
-import com.lunabeestudio.domain.model.CacheConfig
-import com.lunabeestudio.stopcovid.coreui.network.OkHttpClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.CacheControl
+import okhttp3.OkHttpClient
 import okhttp3.Request
 import retrofit2.HttpException
 import retrofit2.Response
@@ -27,12 +26,12 @@ import java.io.File
 import java.net.HttpURLConnection
 import java.util.concurrent.TimeUnit
 
+@Deprecated("Use com.lunabeestudio.framework.remote.server.ServerManager.saveTo")
 @Suppress("BlockingMethodInNonBlockingContext")
-suspend fun String.saveTo(context: Context, file: File): Boolean {
+suspend fun String.saveTo(okHttpClient: OkHttpClient, file: File): Boolean {
     return withContext(Dispatchers.IO) {
-        val cacheConfig = CacheConfig(File(context.cacheDir, "http_cache"), 30L * 1024L * 1024L)
-        val okHttpClient = OkHttpClient.getDefaultOKHttpClient(context, cacheConfig)
         val request: Request = Request.Builder().apply {
+            headerAcceptJson()
             cacheControl(CacheControl.Builder().maxAge(10, TimeUnit.MINUTES).build())
             url(this@saveTo)
         }.build()
@@ -54,13 +53,13 @@ suspend fun String.saveTo(context: Context, file: File): Boolean {
     }
 }
 
+@Deprecated("Use com.lunabeestudio.framework.remote.server.ServerManager.saveTo")
 @Suppress("BlockingMethodInNonBlockingContext")
-suspend fun String.saveTo(context: Context, atomicFile: AtomicFile, validData: suspend (data: ByteArray) -> Boolean): Boolean {
+suspend fun String.saveTo(okHttpClient: OkHttpClient, atomicFile: AtomicFile, validData: suspend (data: ByteArray) -> Boolean): Boolean {
     return withContext(Dispatchers.IO) {
-        val cacheConfig = CacheConfig(File(context.cacheDir, "http_cache"), 30L * 1024L * 1024L)
-        val okHttpClient = OkHttpClient.getDefaultOKHttpClient(context, cacheConfig)
         val request: Request = Request.Builder().apply {
             cacheControl(CacheControl.Builder().maxAge(10, TimeUnit.MINUTES).build())
+            headerAcceptJson()
             url(this@saveTo)
         }.build()
 
@@ -90,6 +89,11 @@ suspend fun String.saveTo(context: Context, atomicFile: AtomicFile, validData: s
             throw HttpException(Response.error<Any>(body!!, response))
         }
     }
+}
+
+private fun Request.Builder.headerAcceptJson(): Request.Builder {
+    header("Accept", "application/json")
+    return this
 }
 
 fun String.callPhone(context: Context) {

@@ -19,7 +19,6 @@ import android.view.MenuItem
 import android.view.View
 import androidx.navigation.fragment.navArgs
 import androidx.preference.PreferenceManager
-import com.lunabeestudio.analytics.manager.AnalyticsManager
 import com.lunabeestudio.analytics.model.AppEventName
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
@@ -133,7 +132,7 @@ class VenueQRCodeFragment : QRCodeFragment() {
     }
 
     private fun navigateAfterVenueProcess() {
-        AnalyticsManager.reportAppEvent(requireContext(), AppEventName.e14, null)
+        analyticsManager.reportAppEvent(requireContext(), AppEventName.e14, null)
         findNavControllerOrNull()
             ?.safeNavigate(VenueQRCodeFragmentDirections.actionVenueQrCodeFragmentToVenueConfirmationFragment())
     }

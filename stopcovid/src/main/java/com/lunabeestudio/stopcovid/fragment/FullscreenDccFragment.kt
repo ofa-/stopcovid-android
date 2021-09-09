@@ -52,7 +52,7 @@ class FullscreenDccFragment : ForceLightFragment(R.layout.fragment_fullscreen_dc
             findParentFragmentByType<WalletContainerFragment>() ?: requireParentFragment()
         },
         {
-            WalletViewModelFactory(robertManager, keystoreDataSource)
+            WalletViewModelFactory(robertManager, keystoreDataSource, blacklistDCCManager, blacklist2DDOCManager)
         }
     )
 

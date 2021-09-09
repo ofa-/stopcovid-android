@@ -22,6 +22,7 @@ import com.lunabeestudio.analytics.model.HealthEventName
 import com.lunabeestudio.domain.extension.unixTimeMsToNtpTimeS
 import com.lunabeestudio.domain.model.AtRiskStatus
 import com.lunabeestudio.domain.model.Calibration
+import com.lunabeestudio.domain.model.CaptchaType
 import com.lunabeestudio.domain.model.Cluster
 import com.lunabeestudio.domain.model.ClusterIndex
 import com.lunabeestudio.domain.model.Configuration
@@ -34,13 +35,13 @@ import com.lunabeestudio.domain.model.SSUBuilder
 import com.lunabeestudio.domain.model.SSUSettings
 import com.lunabeestudio.domain.model.ServerStatusUpdate
 import com.lunabeestudio.domain.model.VenueQrCode
-import com.lunabeestudio.robert.datasource.CalibrationDataSource
-import com.lunabeestudio.robert.datasource.ConfigurationDataSource
 import com.lunabeestudio.robert.datasource.LocalEphemeralBluetoothIdentifierDataSource
 import com.lunabeestudio.robert.datasource.LocalKeystoreDataSource
 import com.lunabeestudio.robert.datasource.LocalLocalProximityDataSource
 import com.lunabeestudio.robert.datasource.RemoteCleaDataSource
 import com.lunabeestudio.robert.datasource.RemoteServiceDataSource
+import com.lunabeestudio.robert.datasource.RobertCalibrationDataSource
+import com.lunabeestudio.robert.datasource.RobertConfigurationDataSource
 import com.lunabeestudio.robert.datasource.SharedCryptoDataSource
 import com.lunabeestudio.robert.extension.safeEnumValueOf
 import com.lunabeestudio.robert.extension.use
@@ -89,10 +90,11 @@ class RobertManagerImpl(
     serviceDataSource: RemoteServiceDataSource,
     cleaDataSource: RemoteCleaDataSource,
     sharedCryptoDataSource: SharedCryptoDataSource,
-    configurationDataSource: ConfigurationDataSource,
-    calibrationDataSource: CalibrationDataSource,
+    configurationDataSource: RobertConfigurationDataSource,
+    calibrationDataSource: RobertCalibrationDataSource,
     serverPublicKey: String,
     private val localProximityFilter: LocalProximityFilter,
+    private val analyticsManager: AnalyticsManager,
 ) : RobertManager {
     val disseminatedEbidsFile = File(application.getAppContext().filesDir, "disseminatedEbids.txt")
     val localProximityFile = File(application.getAppContext().filesDir, "localProximity.txt")
@@ -259,7 +261,7 @@ class RobertManagerImpl(
         }
     }
 
-    override suspend fun generateCaptcha(type: String, local: String): RobertResultData<String> =
+    override suspend fun generateCaptcha(type: CaptchaType, local: String): RobertResultData<String> =
         remoteServiceRepository.generateCaptcha(apiVersion, type, local)
 
     override suspend fun getCaptchaImage(
@@ -296,7 +298,7 @@ class RobertManagerImpl(
         activateProximity: Boolean,
     ): RobertResult {
         return try {
-            AnalyticsManager.register(application.getAppContext())
+            analyticsManager.register()
             keystoreRepository.timeStart = registerReport.timeStart
             keystoreRepository.atRiskLastRefresh = System.currentTimeMillis()
             ephemeralBluetoothIdentifierRepository.save(Base64.decode(registerReport.tuples, Base64.NO_WRAP))
@@ -444,7 +446,7 @@ class RobertManagerImpl(
                             else -> "b"
                         }
 
-                        AnalyticsManager.reportAppEvent(
+                        analyticsManager.reportAppEvent(
                             robertApplication.getAppContext(),
                             AppEventName.e15,
                             "$appStatus ${System.currentTimeMillis() - cleaStatusStart}"
@@ -540,16 +542,16 @@ class RobertManagerImpl(
                     keystoreRepository.declarationToken = result.data.declarationToken
                     ephemeralBluetoothIdentifierRepository.save(Base64.decode(result.data.tuples, Base64.NO_WRAP))
                     keystoreRepository.shouldReloadBleSettings = true
-                    AnalyticsManager.statusDidSucceed(robertApplication.getAppContext())
+                    analyticsManager.statusDidSucceed(robertApplication.getAppContext())
                     if (result.data.analyticsToken != null) {
-                        AnalyticsManager.sendAnalytics(
+                        analyticsManager.sendAnalytics(
                             robertApplication.getAppContext(),
                             this,
                             robertApplication,
                             result.data.analyticsToken!!
                         )
                     } else {
-                        AnalyticsManager.reset(robertApplication.getAppContext())
+                        analyticsManager.reset(robertApplication.getAppContext())
                     }
                     RobertResultData.Success(
                         AtRiskStatus(
@@ -709,7 +711,7 @@ class RobertManagerImpl(
         }
         return when (result) {
             is RobertResultData.Success -> {
-                AnalyticsManager.reportHealthEvent(application.getAppContext(), HealthEventName.eh1, null)
+                analyticsManager.reportHealthEvent(application.getAppContext(), HealthEventName.eh1, null)
                 val reportCalendar = Calendar.getInstance()
                 reportCalendar.add(Calendar.DAY_OF_YEAR, -originDayInPast.toInt())
                 keystoreRepository.reportDate = reportCalendar.timeInMillis
@@ -888,7 +890,7 @@ class RobertManagerImpl(
         keystoreRepository.reportToSendStartTime = null
         keystoreRepository.reportToSendEndTime = null
         keystoreRepository.declarationToken = null
-        AnalyticsManager.unregister(application.getAppContext())
+        analyticsManager.unregister(application.getAppContext())
         try {
             keystoreRepository.atRiskModelVersion = AT_RISK_MODEL_VERSION
         } catch (e: Exception) {

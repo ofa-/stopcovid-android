@@ -23,6 +23,7 @@ import androidx.emoji.bundled.BundledEmojiCompatConfig
 import androidx.emoji.text.EmojiCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.preference.PreferenceManager
@@ -35,32 +36,20 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
-import com.lunabeestudio.analytics.manager.AnalyticsManager
 import com.lunabeestudio.analytics.model.AppEventName
 import com.lunabeestudio.analytics.model.HealthEventName
 import com.lunabeestudio.domain.extension.ntpTimeSToUnixTimeMs
 import com.lunabeestudio.domain.model.VenueQrCode
-import com.lunabeestudio.framework.crypto.BouncyCastleCryptoDataSource
-import com.lunabeestudio.framework.local.LocalCryptoManager
-import com.lunabeestudio.framework.local.datasource.SecureFileEphemeralBluetoothIdentifierDataSource
-import com.lunabeestudio.framework.local.datasource.SecureFileLocalProximityDataSource
-import com.lunabeestudio.framework.local.datasource.SecureKeystoreDataSource
-import com.lunabeestudio.framework.manager.LocalProximityFilterImpl
-import com.lunabeestudio.framework.remote.datasource.CleaDataSource
-import com.lunabeestudio.framework.remote.datasource.InGroupeDatasource
-import com.lunabeestudio.framework.remote.datasource.ServiceDataSource
+import com.lunabeestudio.framework.remote.server.ServerManager
 import com.lunabeestudio.robert.RobertApplication
 import com.lunabeestudio.robert.RobertManager
-import com.lunabeestudio.robert.RobertManagerImpl
-import com.lunabeestudio.robert.repository.CertificateRepository
-import com.lunabeestudio.stopcovid.`interface`.IsolationApplication
+import com.lunabeestudio.robert.utils.Event
 import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.ConfigConstant
 import com.lunabeestudio.stopcovid.coreui.EnvConstant
+import com.lunabeestudio.stopcovid.coreui.LocalizedApplication
 import com.lunabeestudio.stopcovid.coreui.UiConstants
-import com.lunabeestudio.stopcovid.coreui.manager.CalibrationManager
-import com.lunabeestudio.stopcovid.coreui.manager.ConfigManager
-import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
+import com.lunabeestudio.stopcovid.coreui.manager.LocalizedStrings
 import com.lunabeestudio.stopcovid.extension.alertRiskLevelChanged
 import com.lunabeestudio.stopcovid.extension.hasChosenPostalCode
 import com.lunabeestudio.stopcovid.extension.hideRiskStatus
@@ -69,22 +58,7 @@ import com.lunabeestudio.stopcovid.extension.lastVersionCode
 import com.lunabeestudio.stopcovid.fragment.AboutFragment
 import com.lunabeestudio.stopcovid.manager.AppMaintenanceManager
 import com.lunabeestudio.stopcovid.manager.AttestationsManager
-import com.lunabeestudio.stopcovid.manager.Blacklist2DDOCManager
-import com.lunabeestudio.stopcovid.manager.BlacklistDCCManager
-import com.lunabeestudio.stopcovid.manager.CalibDataSource
-import com.lunabeestudio.stopcovid.manager.CertificatesDocumentsManager
-import com.lunabeestudio.stopcovid.manager.ConfigDataSource
-import com.lunabeestudio.stopcovid.manager.DccCertificatesManager
-import com.lunabeestudio.stopcovid.manager.FormManager
-import com.lunabeestudio.stopcovid.manager.InfoCenterManager
-import com.lunabeestudio.stopcovid.manager.IsolationManager
-import com.lunabeestudio.stopcovid.manager.KeyFiguresManager
-import com.lunabeestudio.stopcovid.manager.LinksManager
-import com.lunabeestudio.stopcovid.manager.MoreKeyFiguresManager
-import com.lunabeestudio.stopcovid.manager.PrivacyManager
 import com.lunabeestudio.stopcovid.manager.ProximityManager
-import com.lunabeestudio.stopcovid.manager.RisksLevelManager
-import com.lunabeestudio.stopcovid.manager.VaccinationCenterManager
 import com.lunabeestudio.stopcovid.manager.VenuesManager
 import com.lunabeestudio.stopcovid.manager.WalletManager
 import com.lunabeestudio.stopcovid.model.DeviceSetup
@@ -112,19 +86,16 @@ import kotlin.random.Random
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 
-class StopCovid : Application(), LifecycleObserver, RobertApplication, IsolationApplication {
+class StopCovid : Application(), LifecycleObserver, RobertApplication, LocalizedApplication {
 
-    override val isolationManager: IsolationManager by lazy { IsolationManager(this, robertManager, secureKeystoreDataSource) }
+    val injectionContainer: InjectionContainer by lazy { InjectionContainer(this) }
 
-    val certificateRepository: CertificateRepository by lazy {
-        CertificateRepository(
-            InGroupeDatasource(
-                this,
-                cryptoDataSource,
-                EnvConstant.Prod.conversionBaseUrl,
-            )
-        )
-    }
+    override val localizedStrings: LocalizedStrings
+        get() = injectionContainer.stringsManager.strings
+    override val liveLocalizedStrings: LiveData<Event<LocalizedStrings>>
+        get() = injectionContainer.stringsManager.liveStrings
+
+    override suspend fun initializeStrings(): Unit = injectionContainer.stringsManager.initialize(this)
 
     private val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
         Timber.e(throwable)
@@ -138,51 +109,18 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
         PreferenceManager.getDefaultSharedPreferences(this)
     }
 
-    private val cryptoManager: LocalCryptoManager by lazy {
-        LocalCryptoManager(this)
-    }
-
-    val secureKeystoreDataSource: SecureKeystoreDataSource by lazy {
-        SecureKeystoreDataSource(this, cryptoManager)
-    }
-
-    override val robertManager: RobertManager by lazy {
-        RobertManagerImpl(
-            this,
-            SecureFileEphemeralBluetoothIdentifierDataSource(this, cryptoManager),
-            secureKeystoreDataSource,
-            SecureFileLocalProximityDataSource(File(filesDir, LOCAL_PROXIMITY_DIR), cryptoManager),
-            ServiceDataSource(
-                this,
-                EnvConstant.Prod.baseUrl,
-            ),
-            CleaDataSource(
-                this,
-                EnvConstant.Prod.cleaReportBaseUrl,
-                EnvConstant.Prod.cleaStatusBaseUrl,
-            ),
-            BouncyCastleCryptoDataSource(),
-            ConfigDataSource,
-            CalibDataSource,
-            EnvConstant.Prod.serverPublicKey,
-            LocalProximityFilterImpl()
-        )
-    }
-
-    private val certificatesDocumentsManager: CertificatesDocumentsManager = CertificatesDocumentsManager(this)
-    val dccCertificatesManager: DccCertificatesManager by lazy { DccCertificatesManager() }
-
-    private val cryptoDataSource = BouncyCastleCryptoDataSource()
+    override val robertManager: RobertManager
+        get() = injectionContainer.robertManager
 
     private var firstResume = false
 
     private val sharedPreferenceChangeListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
         if (key == UiConstants.SharedPrefs.USER_LANGUAGE) {
             appCoroutineScope.launch {
-                StringsManager.onAppForeground(this@StopCovid)
-                PrivacyManager.onAppForeground(this@StopCovid)
-                LinksManager.onAppForeground(this@StopCovid)
-                MoreKeyFiguresManager.onAppForeground(this@StopCovid)
+                injectionContainer.stringsManager.onAppForeground(this@StopCovid)
+                injectionContainer.privacyManager.onAppForeground(this@StopCovid)
+                injectionContainer.linksManager.onAppForeground(this@StopCovid)
+                injectionContainer.moreKeyFiguresManager.onAppForeground(this@StopCovid)
             }
         }
     }
@@ -196,162 +134,45 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
         firstResume = true
 
-        Timber.plant(WarnTree())
+        setupTimber()
 
         if (sharedPrefs.lastVersionCode < BuildConfig.VERSION_CODE) {
-            MoreKeyFiguresManager.clearLocal(this)
-            LinksManager.clearLocal(this)
-            PrivacyManager.clearLocal(this)
-            StringsManager.clearLocal(this)
-            ConfigManager.clearLocal(this)
-            CalibrationManager.clearLocal(this)
-            FormManager.clearLocal(this)
-            BlacklistDCCManager.clearLocal(this)
-            Blacklist2DDOCManager.clearLocal(this)
-            secureKeystoreDataSource.configuration = secureKeystoreDataSource.configuration?.apply {
-                version = 0
-            }
-            secureKeystoreDataSource.calibration = secureKeystoreDataSource.calibration?.apply {
-                version = 0
-            }
-            val okHttpCacheDir = File(cacheDir, "http_cache")
-            if (okHttpCacheDir.exists()) {
-                try {
-                    Cache(okHttpCacheDir, OKHTTP_MAX_CACHE_SIZE_BYTES).delete()
-                } catch (e: Exception) {
-                    Timber.e(e)
-                }
-            }
+            clearData()
         }
 
-        appCoroutineScope.launch {
-            MoreKeyFiguresManager.initialize(this@StopCovid)
-        }
-        appCoroutineScope.launch {
-            LinksManager.initialize(this@StopCovid)
-        }
-        appCoroutineScope.launch {
-            PrivacyManager.initialize(this@StopCovid)
-        }
-        appCoroutineScope.launch {
-            StringsManager.initialize(this@StopCovid)
-            migrateAttestationsIfNeeded()
-        }
-        appCoroutineScope.launch {
-            InfoCenterManager.initialize(this@StopCovid)
-        }
-        appCoroutineScope.launch {
-            FormManager.initialize(this@StopCovid)
-        }
-        appCoroutineScope.launch {
-            VaccinationCenterManager.initialize(this@StopCovid, sharedPrefs)
-        }
-        appCoroutineScope.launch {
-            KeyFiguresManager.initialize(this@StopCovid)
-        }
-        appCoroutineScope.launch {
-            RisksLevelManager.initialize(this@StopCovid)
-        }
-        appCoroutineScope.launch {
-            BlacklistDCCManager.initialize(this@StopCovid)
-        }
-        appCoroutineScope.launch {
-            Blacklist2DDOCManager.initialize(this@StopCovid)
-        }
-/*
-        appCoroutineScope.launch {
-            AppMaintenanceManager.initialize(
-                this@StopCovid,
-                R.drawable.maintenance,
-                R.drawable.maintenance,
-                ConfigConstant.Maintenance.URL
-            )
-        }
-*/
-
-        runBlocking {
-            dccCertificatesManager.initialize(this@StopCovid)
-        }
-
-        WalletManager.initialize(ProcessLifecycleOwner.get(), secureKeystoreDataSource)
+        initializeData()
 
         val config = BundledEmojiCompatConfig(this)
         EmojiCompat.init(config)
-//      startAppMaintenanceWorker(false)
-        AboutFragment.Downloader(applicationContext).autoDeleteFile()
-        AnalyticsManager.init(this)
+
+        //setupAppMaintenance()
 
         sharedPrefs.registerOnSharedPreferenceChangeListener(sharedPreferenceChangeListener)
 
         sharedPrefs.lastVersionCode = BuildConfig.VERSION_CODE
     }
 
-    private fun migrateAttestationsIfNeeded() {
-        AttestationsManager.migrateAttestationsIfNeeded(robertManager, secureKeystoreDataSource, StringsManager.strings)
+    private fun setupTimber() {
+        Timber.plant(WarnTree())
     }
 
-    @OptIn(ExperimentalTime::class)
+    private fun migrateAttestationsIfNeeded() {
+        AttestationsManager.migrateAttestationsIfNeeded(
+            robertManager,
+            injectionContainer.secureKeystoreDataSource,
+            injectionContainer.stringsManager.strings
+        )
+    }
+
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     fun onAppResume() {
         isAppInForeground = true
-
-/*
-        appCoroutineScope.launch {
-            if (firstResume) {
-                delay(Duration.seconds(1)) // Add some delay to let the main activity start
-            }
-            firstResume = false
-            AppMaintenanceManager.checkForMaintenanceUpgrade(this@StopCovid)
-        }
-*/
-        appCoroutineScope.launch {
-            MoreKeyFiguresManager.onAppForeground(this@StopCovid)
-        }
-        appCoroutineScope.launch {
-            LinksManager.onAppForeground(this@StopCovid)
-        }
-        appCoroutineScope.launch {
-            PrivacyManager.onAppForeground(this@StopCovid)
-        }
-        appCoroutineScope.launch {
-            StringsManager.onAppForeground(this@StopCovid)
-        }
-        appCoroutineScope.launch {
-            InfoCenterManager.refreshIfNeeded(this@StopCovid)
-        }
-        appCoroutineScope.launch {
-            KeyFiguresManager.onAppForeground(this@StopCovid)
-        }
-        appCoroutineScope.launch {
-            RisksLevelManager.onAppForeground(this@StopCovid)
-        }
-        appCoroutineScope.launch {
-            BlacklistDCCManager.onAppForeground(this@StopCovid)
-        }
-        appCoroutineScope.launch {
-            Blacklist2DDOCManager.onAppForeground(this@StopCovid)
-        }
-        appCoroutineScope.launch {
-            FormManager.onAppForeground(this@StopCovid)
-        }
-        appCoroutineScope.launch {
-            VaccinationCenterManager.onAppForeground(this@StopCovid, sharedPrefs)
-        }
-        appCoroutineScope.launch {
-            certificatesDocumentsManager.onAppForeground(this@StopCovid)
-        }
-        appCoroutineScope.launch {
-            dccCertificatesManager.onAppForeground(this@StopCovid)
-        }
-        appCoroutineScope.launch {
-            robertManager.refreshConfig(this@StopCovid)
-        }
-        AnalyticsManager.reportAppEvent(this, AppEventName.e3)
-
+        refreshData()
+        injectionContainer.analyticsManager.reportAppEvent(this, AppEventName.e3)
         refreshProximityService()
         refreshStatusIfNeeded()
         deleteOldAttestations()
-        VenuesManager.clearExpired(robertManager, secureKeystoreDataSource)
+        VenuesManager.clearExpired(robertManager, injectionContainer.secureKeystoreDataSource)
         appCoroutineScope.launch {
             robertManager.cleaReportIfNeeded(this@StopCovid, false)
         }
@@ -360,6 +181,144 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
     @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
     fun onAppPause() {
         isAppInForeground = false
+    }
+
+    private fun clearData() {
+        injectionContainer.moreKeyFiguresManager.clearLocal(this)
+        injectionContainer.linksManager.clearLocal(this)
+        injectionContainer.privacyManager.clearLocal(this)
+        injectionContainer.stringsManager.clearLocal(this)
+        injectionContainer.configManager.clearLocal(this)
+        injectionContainer.calibrationManager.clearLocal(this)
+        injectionContainer.formManager.clearLocal(this)
+        injectionContainer.blacklistDCCManager.clearLocal(this)
+        injectionContainer.blacklist2DDOCManager.clearLocal(this)
+        injectionContainer.secureKeystoreDataSource.configuration = injectionContainer.secureKeystoreDataSource.configuration?.apply {
+            version = 0
+        }
+        injectionContainer.secureKeystoreDataSource.calibration = injectionContainer.secureKeystoreDataSource.calibration?.apply {
+            version = 0
+        }
+        val okHttpCacheDir = File(cacheDir, ServerManager.OKHTTP_CACHE_FILENAME)
+        if (okHttpCacheDir.exists()) {
+            try {
+                Cache(okHttpCacheDir, ServerManager.OKHTTP_MAX_CACHE_SIZE_BYTES).delete()
+            } catch (e: Exception) {
+                Timber.e(e)
+            }
+        }
+    }
+
+    private fun initializeData() {
+        appCoroutineScope.launch {
+            injectionContainer.moreKeyFiguresManager.initialize(this@StopCovid)
+        }
+        appCoroutineScope.launch {
+            injectionContainer.linksManager.initialize(this@StopCovid)
+        }
+        appCoroutineScope.launch {
+            injectionContainer.privacyManager.initialize(this@StopCovid)
+        }
+        appCoroutineScope.launch {
+            injectionContainer.stringsManager.initialize(this@StopCovid)
+            migrateAttestationsIfNeeded()
+        }
+        appCoroutineScope.launch {
+            injectionContainer.infoCenterManager.initialize(this@StopCovid)
+        }
+        appCoroutineScope.launch {
+            injectionContainer.formManager.initialize(this@StopCovid)
+        }
+        appCoroutineScope.launch {
+            injectionContainer.vaccinationCenterManager.initialize(this@StopCovid, sharedPrefs)
+        }
+        appCoroutineScope.launch {
+            injectionContainer.keyFiguresManager.initialize(this@StopCovid)
+        }
+        appCoroutineScope.launch {
+            injectionContainer.risksLevelManager.initialize(this@StopCovid)
+        }
+        appCoroutineScope.launch {
+            injectionContainer.blacklistDCCManager.initialize(this@StopCovid)
+        }
+        appCoroutineScope.launch {
+            injectionContainer.blacklist2DDOCManager.initialize(this@StopCovid)
+        }
+
+        runBlocking {
+            injectionContainer.dccCertificatesManager.initialize(this@StopCovid)
+        }
+
+        WalletManager.initialize(ProcessLifecycleOwner.get(), injectionContainer.secureKeystoreDataSource)
+    }
+
+    private fun setupAppMaintenance() {
+        AppMaintenanceManager.initialize(
+            this@StopCovid,
+            R.drawable.maintenance,
+            R.drawable.maintenance,
+            ConfigConstant.Maintenance.URL
+        )
+        startAppMaintenanceWorker(false)
+    }
+
+    @OptIn(ExperimentalTime::class)
+    private fun refreshData() {
+        appCoroutineScope.launch(Dispatchers.IO) {
+            launch {
+                launch {
+                    if (firstResume) {
+                        delay(Duration.seconds(1)) // Add some delay to let the main activity start
+                    }
+                    AppMaintenanceManager.checkForMaintenanceUpgrade(this@StopCovid, injectionContainer.serverManager.okHttpClient)
+                    firstResume = false
+                }
+                launch {
+                    injectionContainer.moreKeyFiguresManager.onAppForeground(this@StopCovid)
+                }
+                launch {
+                    injectionContainer.linksManager.onAppForeground(this@StopCovid)
+                }
+                launch {
+                    injectionContainer.privacyManager.onAppForeground(this@StopCovid)
+                }
+                launch {
+                    injectionContainer.stringsManager.onAppForeground(this@StopCovid)
+                }
+                launch {
+                    injectionContainer.infoCenterManager.refreshIfNeeded(this@StopCovid)
+                }
+                launch {
+                    injectionContainer.keyFiguresManager.onAppForeground(this@StopCovid)
+                }
+                launch {
+                    injectionContainer.risksLevelManager.onAppForeground(this@StopCovid)
+                }
+                launch {
+                    injectionContainer.blacklistDCCManager.onAppForeground(this@StopCovid)
+                }
+                launch {
+                    injectionContainer.blacklist2DDOCManager.onAppForeground(this@StopCovid)
+                }
+                launch {
+                    injectionContainer.formManager.onAppForeground(this@StopCovid)
+                }
+                launch {
+                    injectionContainer.vaccinationCenterManager.onAppForeground(this@StopCovid, sharedPrefs)
+                }
+                launch {
+                    injectionContainer.certificatesDocumentsManager.onAppForeground(this@StopCovid)
+                }
+                launch {
+                    injectionContainer.dccCertificatesManager.onAppForeground(this@StopCovid)
+                }
+                launch {
+                    robertManager.refreshConfig(this@StopCovid)
+                }
+            }.join()
+
+            injectionContainer.serverManager.okHttpClient.connectionPool.evictAll()
+        }
     }
 
     override fun refreshProximityService() {
@@ -388,8 +347,12 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
     }
 
     override fun notifyAtRiskLevelChange() {
-        RisksLevelManager.getCurrentLevel(robertManager.atRiskStatus?.riskLevel)?.let { riskLevel ->
-            AnalyticsManager.reportHealthEvent(this, HealthEventName.eh2, riskLevel.riskLevel.roundToInt().toString())
+        injectionContainer.risksLevelManager.getCurrentLevel(robertManager.atRiskStatus?.riskLevel)?.let { riskLevel ->
+            injectionContainer.analyticsManager.reportHealthEvent(
+                this,
+                HealthEventName.eh2,
+                riskLevel.riskLevel.roundToInt().toString()
+            )
             val inputData = Data.Builder()
                 .putString(AtRiskNotificationWorker.INPUT_DATA_TITLE_KEY, riskLevel.labels.notifTitle)
                 .putString(AtRiskNotificationWorker.INPUT_DATA_MESSAGE_KEY, riskLevel.labels.notifBody)
@@ -445,7 +408,12 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
 
     override suspend fun sendClockNotAlignedNotification() {
         val notificationManager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        val strings = StringsManager.getStrings(applicationContext)
+
+        if (injectionContainer.stringsManager.strings.isEmpty()) {
+            injectionContainer.stringsManager.initialize(applicationContext)
+        }
+        val strings = injectionContainer.stringsManager.strings
+        //val strings = StringsManager.getStrings(applicationContext)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
@@ -481,18 +449,18 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
 
     override fun refreshInfoCenter() {
         appCoroutineScope.launch {
-            InfoCenterManager.refreshIfNeeded(this@StopCovid)
+            injectionContainer.infoCenterManager.refreshIfNeeded(this@StopCovid)
         }
     }
 
     override fun getVenueQrCodeList(startTime: Long?, endTime: Long?): List<VenueQrCode>? = VenuesManager.getVenuesQrCode(
-        secureKeystoreDataSource,
+        injectionContainer.secureKeystoreDataSource,
         startTime,
         endTime,
     )
 
     override fun clearVenueQrCodeList() {
-        VenuesManager.clearAllData(sharedPrefs, secureKeystoreDataSource)
+        VenuesManager.clearAllData(sharedPrefs, injectionContainer.secureKeystoreDataSource)
     }
 
     fun cancelClockNotAlignedNotification() {
@@ -549,7 +517,12 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
 
     suspend fun sendUpgradeNotification() {
         val notificationManager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        val strings = StringsManager.getStrings(applicationContext)
+
+        if (injectionContainer.stringsManager.strings.isEmpty()) {
+            injectionContainer.stringsManager.initialize(applicationContext)
+        }
+        val strings = injectionContainer.stringsManager.strings
+        //val strings = StringsManager.getStrings(applicationContext)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
@@ -607,9 +580,10 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
 
     @OptIn(ExperimentalTime::class)
     private fun deleteOldAttestations() {
-        secureKeystoreDataSource.attestations = secureKeystoreDataSource.attestations?.filter { attestation ->
-            !attestation.isObsolete(robertManager.configuration)
-        }
+        injectionContainer.secureKeystoreDataSource.attestations =
+            injectionContainer.secureKeystoreDataSource.attestations?.filter { attestation ->
+                !attestation.isObsolete(robertManager.configuration)
+            }
     }
 
     @OptIn(ExperimentalTime::class)
@@ -625,11 +599,6 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
 
     override fun getAppContext(): Context = this
 
-    companion object {
-        private const val LOCAL_PROXIMITY_DIR = "local_proximity"
-        private const val OKHTTP_MAX_CACHE_SIZE_BYTES: Long = 30 * 1024 * 1024
-    }
-
     override fun getBaseUrl(): String {
         return EnvConstant.Prod.analyticsBaseUrl
     }
@@ -642,11 +611,11 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Isolation
 
     override fun getAppBuild(): Int = BuildConfig.VERSION_CODE
 
-    override fun getPlacesCount(): Int = secureKeystoreDataSource.venuesQrCode?.size ?: 0
+    override fun getPlacesCount(): Int = injectionContainer.secureKeystoreDataSource.venuesQrCode?.size ?: 0
 
-    override fun getFormsCount(): Int = secureKeystoreDataSource.attestations?.size ?: 0
+    override fun getFormsCount(): Int = injectionContainer.secureKeystoreDataSource.attestations?.size ?: 0
 
-    override fun getCertificatesCount(): Int = secureKeystoreDataSource.rawWalletCertificates?.size ?: 0
+    override fun getCertificatesCount(): Int = injectionContainer.secureKeystoreDataSource.rawWalletCertificates?.size ?: 0
 
     override fun userHaveAZipCode(): Boolean = sharedPrefs.hasChosenPostalCode
 

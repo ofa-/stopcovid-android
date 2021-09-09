@@ -41,7 +41,6 @@ import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.extension.safeParseColor
 import com.lunabeestudio.stopcovid.fastitem.bigTitleItem
 import com.lunabeestudio.stopcovid.fastitem.keyFigureCardChartItem
-import com.lunabeestudio.stopcovid.manager.KeyFiguresManager
 import com.lunabeestudio.stopcovid.manager.ShareManager
 import com.lunabeestudio.stopcovid.model.ChartData
 import com.lunabeestudio.stopcovid.model.KeyFigure
@@ -66,7 +65,7 @@ class KeyFigureDetailsFragment : KeyFigureGenericFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        KeyFiguresManager.figures.observe(viewLifecycleOwner) {
+        keyFiguresManager.figures.observe(viewLifecycleOwner) {
             keyFigure = it.peekContent().first { figure ->
                 figure.labelKey == args.labelKey
             }

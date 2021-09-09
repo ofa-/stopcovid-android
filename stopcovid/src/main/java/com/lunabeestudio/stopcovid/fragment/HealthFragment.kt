@@ -36,7 +36,6 @@ import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.fastitem.healthCardItem
 import com.lunabeestudio.stopcovid.fastitem.logoItem
-import com.lunabeestudio.stopcovid.manager.RisksLevelManager
 import com.lunabeestudio.stopcovid.manager.ShareManager
 import com.lunabeestudio.stopcovid.model.ContactDateFormat
 import com.lunabeestudio.stopcovid.model.LinkType
@@ -94,7 +93,7 @@ class HealthFragment : TimeMainFragment() {
     }
 
     override fun getItems(): List<GenericItem> {
-        return RisksLevelManager.getCurrentLevel(robertManager.atRiskStatus?.riskLevel)?.let {
+        return risksLevelManager.getCurrentLevel(robertManager.atRiskStatus?.riskLevel)?.let {
             registeredItems()
         } ?: notRegisteredItems()
     }
@@ -130,7 +129,7 @@ class HealthFragment : TimeMainFragment() {
             identifier = items.count().toLong()
         }
 
-        RisksLevelManager.getCurrentLevel(robertManager.atRiskStatus?.riskLevel)?.let {
+        risksLevelManager.getCurrentLevel(robertManager.atRiskStatus?.riskLevel)?.let {
             if (!sharedPreferences.hideRiskStatus) {
                 items += healthCardItem(R.layout.item_health_card) {
                     header = getStatusLastUpdateToDisplay(requireContext(), robertManager.atRiskLastRefresh, it.riskLevel)
@@ -244,11 +243,11 @@ class HealthFragment : TimeMainFragment() {
 
     private fun dateValue(): String? {
         return robertManager.atRiskStatus?.ntpLastContactS?.ntpTimeSToUnixTimeMs()?.let { lastContactDate ->
-            when (RisksLevelManager.getCurrentLevel(robertManager.atRiskStatus?.riskLevel)?.contactDateFormat) {
+            when (risksLevelManager.getCurrentLevel(robertManager.atRiskStatus?.riskLevel)?.contactDateFormat) {
                 ContactDateFormat.DATE -> longDateFormat.format(Date(lastContactDate))
                 ContactDateFormat.RANGE -> {
-                    RisksLevelManager.getLastContactDateFrom(robertManager.atRiskStatus?.riskLevel, lastContactDate)?.let { dateFrom ->
-                        RisksLevelManager.getLastContactDateTo(robertManager.atRiskStatus?.riskLevel, lastContactDate)?.let { dateTo ->
+                    risksLevelManager.getLastContactDateFrom(robertManager.atRiskStatus?.riskLevel, lastContactDate)?.let { dateFrom ->
+                        risksLevelManager.getLastContactDateTo(robertManager.atRiskStatus?.riskLevel, lastContactDate)?.let { dateTo ->
                             stringsFormat(
                                 "myHealthStateHeaderCell.exposureDate.range",
                                 fromDateFormat.format(Date(dateFrom)),

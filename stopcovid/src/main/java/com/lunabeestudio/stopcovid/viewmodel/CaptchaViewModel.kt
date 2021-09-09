@@ -14,6 +14,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.lunabeestudio.domain.model.CaptchaType
 import com.lunabeestudio.robert.RobertApplication
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.robert.model.RobertResult
@@ -43,7 +44,10 @@ class CaptchaViewModel(private val robertManager: RobertManager) : ViewModel() {
         if (loadingInProgress.value == false) {
             viewModelScope.launch(Dispatchers.IO) {
                 loadingInProgress.postValue(true)
-                val result = robertManager.generateCaptcha(if (isImage) "IMAGE" else "AUDIO", Locale.getDefault().language)
+                val result = robertManager.generateCaptcha(
+                    if (isImage) CaptchaType.IMAGE else CaptchaType.AUDIO,
+                    Locale.getDefault().language
+                )
                 when (result) {
                     is RobertResultData.Success -> {
                         captchaId = result.data

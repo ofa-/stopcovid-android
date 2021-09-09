@@ -22,11 +22,12 @@ import com.lunabeestudio.stopcovid.coreui.model.toDomain
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import okhttp3.OkHttpClient
 import org.json.JSONObject
 import timber.log.Timber
 import java.io.File
 
-object ConfigManager {
+class ConfigManager(private val okHttpClient: OkHttpClient) {
 
     private val gson = Gson()
 
@@ -34,7 +35,7 @@ object ConfigManager {
         val file = File(context.filesDir, ConfigConstant.Config.LOCAL_FILENAME)
         Timber.v("Fetching remote config at ${getUrl()}")
         try {
-            getUrl().saveTo(context, file)
+            getUrl().saveTo(okHttpClient, file)
         } catch (e: Exception) {
             Timber.e(e)
         }

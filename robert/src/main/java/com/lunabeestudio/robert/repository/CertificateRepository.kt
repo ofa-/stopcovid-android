@@ -18,7 +18,7 @@ import com.lunabeestudio.robert.model.RobertResultData
 import timber.log.Timber
 
 class CertificateRepository(
-    var remoteDataSource: RemoteCertificateDataSource,
+    val remoteDataSource: RemoteCertificateDataSource,
 ) {
     suspend fun convertCertificate(
         robertManager: RobertManager,

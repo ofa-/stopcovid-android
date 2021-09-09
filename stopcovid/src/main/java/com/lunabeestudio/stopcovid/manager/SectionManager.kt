@@ -15,11 +15,12 @@ import com.google.gson.reflect.TypeToken
 import com.lunabeestudio.stopcovid.coreui.extension.getApplicationLanguage
 import com.lunabeestudio.stopcovid.coreui.manager.ServerManager
 import com.lunabeestudio.stopcovid.model.Section
+import okhttp3.OkHttpClient
 import java.lang.reflect.Type
 
 typealias Sections = List<Section>
 
-abstract class SectionManager : ServerManager<Sections>() {
+abstract class SectionManager(okHttpClient: OkHttpClient) : ServerManager<Sections>(okHttpClient) {
 
     private var prevLanguage: String? = null
 

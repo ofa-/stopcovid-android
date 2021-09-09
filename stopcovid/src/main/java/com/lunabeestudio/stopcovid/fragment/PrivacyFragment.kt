@@ -13,7 +13,6 @@ package com.lunabeestudio.stopcovid.fragment
 import android.os.Bundle
 import android.view.View
 import com.lunabeestudio.stopcovid.extension.fillItems
-import com.lunabeestudio.stopcovid.manager.PrivacyManager
 import com.mikepenz.fastadapter.GenericItem
 
 class PrivacyFragment : MainFragment() {
@@ -23,7 +22,7 @@ class PrivacyFragment : MainFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        PrivacyManager.privacySections.observe(viewLifecycleOwner) {
+        privacyManager.privacySections.observe(viewLifecycleOwner) {
             refreshScreen()
         }
     }
@@ -31,7 +30,7 @@ class PrivacyFragment : MainFragment() {
     override fun getItems(): List<GenericItem> {
         val items = arrayListOf<GenericItem>()
 
-        PrivacyManager.privacySections.value?.fillItems(items)
+        privacyManager.privacySections.value?.fillItems(items)
 
         return items
     }

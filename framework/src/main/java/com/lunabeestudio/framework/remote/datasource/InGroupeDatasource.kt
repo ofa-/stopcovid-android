@@ -32,15 +32,19 @@ import com.lunabeestudio.robert.model.RobertResultData
 import com.lunabeestudio.robert.model.UnknownException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import okhttp3.OkHttpClient
 import timber.log.Timber
 
 class InGroupeDatasource(
     private val context: Context,
     private val sharedCryptoDataSource: SharedCryptoDataSource,
     baseUrl: String,
+    private val analyticsManager: AnalyticsManager,
 ) : RemoteCertificateDataSource {
 
-    private val api: InGroupeApi = RetrofitClient.getService(context, baseUrl, InGroupeApi::class.java, null)
+    private val okHttpClient: OkHttpClient = RetrofitClient.getDefaultOKHttpClient(context, null)
+
+    private val api: InGroupeApi = RetrofitClient.getService(baseUrl, InGroupeApi::class.java, okHttpClient)
     private val gson = Gson()
 
     override suspend fun convertCertificateV1(
@@ -68,8 +72,7 @@ class InGroupeDatasource(
                     } catch (e: JsonSyntaxException) {
                         RobertResultData.Failure(BackendException("Unable to parse body result: $bodyRs"))
                     } finally {
-                        AnalyticsManager.reportWSError(
-                            context,
+                        analyticsManager.reportWSError(
                             context.filesDir,
                             AnalyticsServiceName.CERTIFICATE_CONVERSION,
                             "0",
@@ -81,8 +84,7 @@ class InGroupeDatasource(
             } catch (e: Exception) {
                 val robertException = e.remoteToRobertException()
                 if (robertException !is NoInternetException) {
-                    AnalyticsManager.reportWSError(
-                        context,
+                    analyticsManager.reportWSError(
                         context.filesDir,
                         AnalyticsServiceName.CERTIFICATE_CONVERSION,
                         "0",
@@ -153,8 +155,7 @@ class InGroupeDatasource(
                     } catch (e: JsonSyntaxException) {
                         RobertResultData.Failure(BackendException("Unable to parse body error: $bodyError"))
                     } finally {
-                        AnalyticsManager.reportWSError(
-                            context,
+                        analyticsManager.reportWSError(
                             context.filesDir,
                             AnalyticsServiceName.CERTIFICATE_CONVERSION,
                             "0",
@@ -166,8 +167,7 @@ class InGroupeDatasource(
             } catch (e: Exception) {
                 val robertException = e.remoteToRobertException()
                 if (robertException !is NoInternetException) {
-                    AnalyticsManager.reportWSError(
-                        context,
+                    analyticsManager.reportWSError(
                         context.filesDir,
                         AnalyticsServiceName.CERTIFICATE_CONVERSION,
                         "0",
@@ -176,6 +176,8 @@ class InGroupeDatasource(
                     )
                 }
                 RobertResultData.Failure(robertException)
+            } finally {
+                okHttpClient.connectionPool.evictAll()
             }
         }
     }

@@ -15,27 +15,27 @@
     },
     {
         "section": "What data are shared and why",
-        "description": "The data shared between two phones over their Bluetooth connections are temporary pseudo-identifiers.\nPseudo-identifiers are renewed automatically every 15 minutes. They can be a string of numbers, letters and symbols that cannot be used on their own to identify a person.\n\nThe application shares these data with the server managed by the Ministry for Solidarity and Health, only if you have been diagnosed as a COVID-19 case and only if you give your consent. If you do, then other users’ apps can connect to the server to find out if they have been close to your phone. If they have, the users will receive an alert that they have been exposed to a contamination risk and they will be encouraged to contact their doctors.\n\nThe users receiving the alert will have no information about the phone that triggered the alert or about the owner of the phone.\n\n The app does not take account of special circumstances, such as situations where specific protection measures are in place, including the use of personal protection equipment by healthcare personnel, or separation by a pane of glass. Users can deactivate the app temporarily at any time."
+        "description": "The data shared between two phones over their Bluetooth connections are temporary pseudo-identifiers.\nPseudo-identifiers are renewed automatically every 15 minutes. They can be a string of numbers, letters and symbols that cannot be used on their own to identify a person.\n\nThe application shares these data with the server managed by the Ministry for Solidarity and Health, only if you have been diagnosed as a COVID-19 case and only if you give your consent. If you do, then other users’ apps can connect to the server to find out if they have been close to your phone. If they have, the users will receive an alert that they have been exposed to a contamination risk and they will be encouraged to contact their doctors.\n\nThe users receiving the alert will have no information about the phone that triggered the alert or about the owner of the phone.\n\nThe app does not take account of special circumstances, such as situations where specific protection measures are in place, including the use of personal protection equipment by healthcare personnel, or separation by a pane of glass. Users can deactivate the app temporarily at any time.\n\nData from TousAntiCovid is also used for the compilation of anonymous statistics in order to adapt the measures necessary to face the pandemic and to improve the performance of the application and the user experience.\nThe categories of data used for the compilation of statistics are as follows:\n- Technical information on the smartphone and on the TousAntiCovid application\n- TousAntiCovid sections consulted, type of information and documents generated or added by the user\n- User's Covid status and associated events\n- An application identifier specific to statistics"
     },
     {
         "section": "Where the data are stored",
-        "description": "The data are stored on your mobile phone. If you test positive and if you give your consent, you can protect the people closest to you and people you have met by sharing the history of your close contacts through the server managed by the Ministry for Solidarity and Health."
+        "description": "The data are stored on your mobile phone. If you test positive and if you give your consent, you can protect the people closest to you and people you have met by sharing the history of your close contacts through the server managed by the Ministry for Solidarity and Health.\n\nThe data used for the anonymous statistics are stored on the central server."
     },
     {
-        "section": "Data storage times",
-        "description": "The data stored on your phone and on the server are automatically deleted after 14 days."
+        "section": "How much time",
+        "description": "The data stored on your phone and on the server are automatically deleted after 14 days.\n\nThe data used for the compilation of anonymous statistics and older than 3 months are deleted."
     },
     {
         "section": "Control of your data",
-        "description": "In compliance with the General Data Protection Regulation (GDPR), you can delete the data stored on your phone, the data stored on the server and the data relating to your registration, and you can cancel your registration."
+        "description": "In compliance with the General Data Protection Regulation (GDPR), you can delete the data stored on your phone, the data stored on the server and the data relating to your registration, and you can cancel your registration.\n\nIn accordance with the General Data Protection Regulation, you can also deactivate the sending of this data for the preparation of anonymous statistics in the settings section of TousAntiCovid."
     },
     {
         "section": "Minors under the age of 15 years",
         "description": "If you are a minor under the age of 15 years, talk to your parents or your guardians about the appropriateness of installing the app."
     },
     {
-        "section": "TousAntiCovid developers",
-        "description": "This app was developed by the TousAntiCovid team under the supervision of the Ministry for Solidarity and Health and the Ministry of State for Digital Affairs.\nTousAntiCovid team: Inria, ANSSI, Capgemini, Dassault Systèmes, Inserm, Lunabee Studio, Ministry for Solidarity and Health, Orange, Santé Publique France and Withings.\nThe app is entirely open source and the source code is accessible at the following address."
+        "section": "The team behind TousAntiCovid",
+        "description": "This app was developed by the TousAntiCovid team under the supervision of the Ministry for Solidarity and Health and the Ministry of State for Digital Affairs.\nTousAntiCovid team: Inria, ANSSI, Dassault Systèmes, Inserm, Lunabee Studio, Ministry for Solidarity and Health, Orange, Santé Publique France and Withings.\nThe app is entirely open source and the source code is accessible at the address below."
     },
     {
         "section": "Further information",
