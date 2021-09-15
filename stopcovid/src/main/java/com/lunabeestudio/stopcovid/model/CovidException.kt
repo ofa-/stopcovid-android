@@ -37,7 +37,8 @@ enum class ErrorCode {
     WALLET_CERTIFICATE_INVALID_SIGNATURE,
     WALLET_CERTIFICATE_UNKNOWN_ERROR,
     VENUE_INVALID_FORMAT_EXCEPTION,
-    VENUE_EXPIRED_EXCEPTION
+    VENUE_EXPIRED_EXCEPTION,
+    KEY_FIGURES_NOT_AVAILABLE,
 }
 
 class UnknownException(message: String = "Unknown error occurred") :
@@ -115,5 +116,8 @@ class VenueInvalidFormatException(message: String = "Invalid venue format") :
 class VenueExpiredException(message: String = "Venue expired") :
     CovidException(ErrorCode.VENUE_EXPIRED_EXCEPTION, message)
 
-class WalletCertificateNoKeyError(message: String = "No key to verify the certificate authenticity") :
+class WalletCertificateNoKeyException(message: String = "No key to verify the certificate authenticity") :
     CovidException(ErrorCode.WALLET_CERTIFICATE_UNKNOWN_ERROR, message)
+
+class KeyFiguresNotAvailableException(message: String = "Failed to load key figures") :
+    CovidException(ErrorCode.KEY_FIGURES_NOT_AVAILABLE, message)

@@ -10,333 +10,258 @@
 
 package com.lunabeestudio.stopcovid.fragment
 
+import android.content.SharedPreferences
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
+import android.view.ViewGroup
+import androidx.core.view.MenuItemCompat
+import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
-import com.github.mikephil.charting.data.Entry
-import com.lunabeestudio.stopcovid.Constants
+import androidx.preference.PreferenceManager
+import androidx.viewpager2.adapter.FragmentStateAdapter
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.tabs.TabLayoutMediator
 import com.lunabeestudio.stopcovid.R
+import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.extension.appCompatActivity
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
-import com.lunabeestudio.stopcovid.coreui.extension.isNightMode
+import com.lunabeestudio.stopcovid.coreui.extension.setTextOrHide
 import com.lunabeestudio.stopcovid.coreui.extension.viewLifecycleOwnerOrNull
-import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.cardWithActionItem
-import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
-import com.lunabeestudio.stopcovid.databinding.ItemKeyFigureChartCardBinding
-import com.lunabeestudio.stopcovid.extension.brighterColor
+import com.lunabeestudio.stopcovid.coreui.fragment.BaseFragment
+import com.lunabeestudio.stopcovid.databinding.FragmentKeyfigureDetailsBinding
 import com.lunabeestudio.stopcovid.extension.chosenPostalCode
-import com.lunabeestudio.stopcovid.extension.colorStringKey
-import com.lunabeestudio.stopcovid.extension.formatNumberIfNeeded
 import com.lunabeestudio.stopcovid.extension.getKeyFigureForPostalCode
-import com.lunabeestudio.stopcovid.extension.getRelativeDateShortString
-import com.lunabeestudio.stopcovid.extension.hasAverageChart
+import com.lunabeestudio.stopcovid.extension.getString
+import com.lunabeestudio.stopcovid.extension.injectionContainer
 import com.lunabeestudio.stopcovid.extension.itemForFigure
 import com.lunabeestudio.stopcovid.extension.labelShortStringKey
 import com.lunabeestudio.stopcovid.extension.labelStringKey
 import com.lunabeestudio.stopcovid.extension.learnMoreStringKey
-import com.lunabeestudio.stopcovid.extension.limitLineStringKey
 import com.lunabeestudio.stopcovid.extension.safeNavigate
-import com.lunabeestudio.stopcovid.extension.safeParseColor
-import com.lunabeestudio.stopcovid.fastitem.bigTitleItem
-import com.lunabeestudio.stopcovid.fastitem.keyFigureCardChartItem
+import com.lunabeestudio.stopcovid.extension.showPostalCodeDialog
+import com.lunabeestudio.stopcovid.manager.KeyFiguresManager
 import com.lunabeestudio.stopcovid.manager.ShareManager
-import com.lunabeestudio.stopcovid.model.ChartData
+import com.lunabeestudio.stopcovid.manager.VaccinationCenterManager
 import com.lunabeestudio.stopcovid.model.KeyFigure
-import com.lunabeestudio.stopcovid.model.KeyFigureChartType
-import com.lunabeestudio.stopcovid.model.LimitLineData
-import com.mikepenz.fastadapter.GenericItem
+import com.lunabeestudio.stopcovid.model.KeyFiguresNotAvailableException
+import com.lunabeestudio.stopcovid.model.TacResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlin.time.Duration
-import kotlin.time.ExperimentalTime
+import timber.log.Timber
+import java.text.NumberFormat
+import java.util.Locale
 
-class KeyFigureDetailsFragment : KeyFigureGenericFragment() {
+class KeyFigureDetailsFragment : BaseFragment() {
+
+    private lateinit var binding: FragmentKeyfigureDetailsBinding
 
     private val args: KeyFigureDetailsFragmentArgs by navArgs()
-    private var keyFigure: KeyFigure? = null
 
-    override fun getTitleKey(): String {
-        return keyFigure?.labelShortStringKey?.takeIf { !strings[it].isNullOrBlank() } ?: keyFigure?.labelStringKey ?: ""
+    private val sharedPrefs: SharedPreferences by lazy {
+        PreferenceManager.getDefaultSharedPreferences(requireContext())
+    }
+
+    private val keyFiguresManager: KeyFiguresManager by lazy(LazyThreadSafetyMode.NONE) {
+        injectionContainer.keyFiguresManager
+    }
+    private val vaccinationCenterManager: VaccinationCenterManager by lazy(LazyThreadSafetyMode.NONE) {
+        injectionContainer.vaccinationCenterManager
+    }
+
+    private var keyFigure: KeyFigure? = null
+    private val numberFormat: NumberFormat = NumberFormat.getNumberInstance(Locale.getDefault())
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        return FragmentKeyfigureDetailsBinding.inflate(inflater, container, false).also { detailsBinding ->
+            binding = detailsBinding
+            binding.detailsEvolutionTitle.textView.text = strings["keyFigureDetailController.section.evolution.title"]
+        }.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        keyFiguresManager.figures.observe(viewLifecycleOwner) {
-            keyFigure = it.peekContent().first { figure ->
+        keyFiguresManager.figures.observe(viewLifecycleOwner) { figureEvent ->
+            keyFigure = figureEvent.peekContent().data?.firstOrNull { figure ->
                 figure.labelKey == args.labelKey
             }
+
+            binding.emptyLayout.emptyButton.setOnClickListener {
+                (activity as? MainActivity)?.showProgress(true)
+                lifecycleScope.launch(Dispatchers.IO) {
+                    keyFiguresManager.onAppForeground(requireContext())
+                    withContext(Dispatchers.Main) {
+                        (activity as? MainActivity)?.showProgress(false)
+                        refreshScreen()
+                    }
+                }
+            }
+
+            appCompatActivity?.supportActionBar?.title = strings[keyFigure?.labelShortStringKey] ?: keyFigure?.labelStringKey ?: ""
             refreshScreen()
+            setupPager()
+
+            binding.emptyLayout.root.isVisible = keyFigure == null
+            binding.contentLayout.isVisible = keyFigure != null
         }
     }
 
-    override fun getItems(): List<GenericItem> {
-        if (keyFigure == null) {
-            return emptyList()
-        }
-        if (keyFigure?.series?.isEmpty() == true) {
-            return getNoDataItems()
+    override fun refreshScreen() {
+        binding.emptyLayout.emptyTitleTextView.text = strings["infoCenterController.noInternet.title"]
+        binding.emptyLayout.emptyDescriptionTextView.text = strings["infoCenterController.noInternet.subtitle"]
+        binding.emptyLayout.emptyButton.text = strings["common.retry"]
+
+        val error = (keyFiguresManager.figures.value?.peekContent() as? TacResult.Failure)?.throwable
+        binding.errorExplanationCard.root.isVisible = error is KeyFiguresNotAvailableException
+        if (error is KeyFiguresNotAvailableException) {
+            binding.errorExplanationCard.explanationTextView.setTextOrHide(error.getString(strings))
+            binding.errorExplanationCard.bottomActionTextView.setTextOrHide(strings["keyFiguresController.fetchError.button"])
+            binding.errorExplanationCard.bottomActionTextView.setOnClickListener {
+                viewLifecycleOwnerOrNull()?.lifecycleScope?.launch {
+                    (activity as? MainActivity)?.showProgress(true)
+                    keyFiguresManager.onAppForeground(requireContext())
+                    vaccinationCenterManager.postalCodeDidUpdate(
+                        requireContext(),
+                        sharedPrefs,
+                        sharedPrefs.chosenPostalCode,
+                    )
+                    (activity as? MainActivity)?.showProgress(false)
+                    refreshScreen()
+                }
+            }
         }
 
-        val items = ArrayList<GenericItem>()
-
-        items += spaceItem {
-            spaceRes = R.dimen.spacing_large
-            identifier = items.count().toLong()
-        }
-        keyFigure?.let { figure ->
-            figure.itemForFigure(
-                context = requireContext(),
-                sharedPrefs = sharedPrefs,
-                numberFormat = numberFormat,
-                strings = strings,
-                useDateTime = false
-            ) {
-                shareContentDescription = strings["accessibility.hint.keyFigure.share"]
-                onShareCard = { binding ->
-                    viewLifecycleOwnerOrNull()?.lifecycleScope?.launch {
-                        val uri = getShareCaptureUri(binding, "$label")
-                        withContext(Dispatchers.Main) {
-                            val shareString = if (rightLocation == null) {
-                                stringsFormat("keyFigure.sharing.national", label, leftValue)
-                            } else {
-                                stringsFormat("keyFigure.sharing.department", label, leftLocation, leftValue, label, rightValue)
-                            }
-                            ShareManager.shareImageAndText(requireContext(), uri, shareString) {
-                                strings["common.error.unknown"]?.let { showErrorSnackBar(it) }
-                            }
+        keyFigure?.itemForFigure(
+            requireContext(),
+            sharedPrefs,
+            keyFigure?.getKeyFigureForPostalCode(sharedPrefs.chosenPostalCode),
+            numberFormat,
+            strings,
+        ) {
+            shareContentDescription = strings["accessibility.hint.keyFigure.share"]
+            onShareCard = { binding ->
+                viewLifecycleOwnerOrNull()?.lifecycleScope?.launch {
+                    val uri = ShareManager.getShareCaptureUri(binding, "$label")
+                    withContext(Dispatchers.Main) {
+                        val shareString = if (rightLocation == null) {
+                            stringsFormat("keyFigure.sharing.national", label, leftValue)
+                        } else {
+                            stringsFormat("keyFigure.sharing.department", label, leftLocation, leftValue, label, rightValue)
+                        }
+                        ShareManager.shareImageAndText(requireContext(), uri, shareString) {
+                            strings["common.error.unknown"]?.let { showErrorSnackBar(it) }
                         }
                     }
                 }
-            }?.let {
-                items += it
             }
+            this.bindView(binding.keyfigureCard, emptyList())
+        }
 
-            items += spaceItem {
-                spaceRes = R.dimen.spacing_large
-                identifier = "after_card_space".hashCode().toLong()
-            }
+        val showLearnMore = strings[keyFigure?.learnMoreStringKey] != null
+        binding.learnMoreTitle.root.isVisible = showLearnMore
+        binding.learnMoreCard.root.isVisible = showLearnMore
 
-            items += bigTitleItem {
-                text = strings["keyFigureDetailController.section.evolution.title"]
-                identifier = "evolution_title".hashCode().toLong()
-            }
+        if (showLearnMore) {
+            binding.learnMoreTitle.textView.text = strings["keyFigureDetailController.section.learnmore.title"]
+            cardWithActionItem {
+                mainBody = strings[keyFigure?.learnMoreStringKey]
+            }.bindView(binding.learnMoreCard, emptyList())
+        }
+    }
 
-            items += spaceItem {
-                spaceRes = R.dimen.spacing_large
-                identifier = "after_evolution_title_space".hashCode().toLong()
-            }
+    private fun setupPager() {
+        val keyFigure = keyFigure ?: return
+        val serieSize = keyFigure.series?.size ?: 0
 
-            val departmentKeyFigure = figure.getKeyFigureForPostalCode(sharedPrefs.chosenPostalCode)
-            if (figure.displayOnSameChart) {
-                items += keyFigureCardChartItem {
-                    chartData = arrayOf(
-                        localData(figure),
-                        globalData(figure, departmentKeyFigure != null)
-                    ).filterNotNull().toTypedArray()
-                    chartType = KeyFigureChartType.LINES
-                    limitLineData = limitLineData(figure)
-                    chartExplanationLabel = chartExplanationLabel(figure, chartData)
-                    shareContentDescription = strings["accessibility.hint.keyFigure.chart.share"]
-                    onShareCard = { binding ->
-                        shareChart(binding)
-                    }
-                }
+        val itemCount = when (serieSize) {
+            in Int.MIN_VALUE..PAGER_FIRST_TAB_THRESHOLD -> 1
+            in PAGER_FIRST_TAB_THRESHOLD..PAGER_SECOND_TAB_THRESHOLD -> 2
+            else -> 3
+        }
+
+        val showTab = itemCount > 1
+        binding.detailsTabLayout.isVisible = showTab
+        binding.detailsViewPager.adapter = KeyFigureDetailsPagerAdapter(itemCount, keyFigure.labelKey)
+        if (showTab) {
+            TabLayoutMediator(binding.detailsTabLayout, binding.detailsViewPager) { tab, position ->
+                val tabTitleKey = getChartRange(position, itemCount)?.labelKey
+                tab.text = strings[tabTitleKey]
+            }.attach()
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.postal_code_menu, menu)
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu) {
+        super.onPrepareOptionsMenu(menu)
+        MenuItemCompat.setContentDescription(menu.findItem(R.id.item_map), strings["home.infoSection.newPostalCode.button"])
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return if (item.itemId == R.id.item_map) {
+            if (sharedPrefs.chosenPostalCode == null) {
+                MaterialAlertDialogBuilder(requireContext()).showPostalCodeDialog(
+                    layoutInflater = layoutInflater,
+                    strings = strings,
+                    baseFragment = this,
+                    sharedPrefs = sharedPrefs,
+                )
             } else {
-                if (departmentKeyFigure != null) {
-                    items += keyFigureCardChartItem {
-                        chartData = arrayOf(
-                            localData(figure)
-                        ).filterNotNull().toTypedArray()
-                        chartExplanationLabel = chartExplanationLabel(
-                            figure,
-                            chartData.plus(listOfNotNull(globalData(figure, true)))
-                        )
-                        shareContentDescription = strings["accessibility.hint.keyFigure.chart.share"]
-                        onShareCard = { binding ->
-                            shareChart(binding)
-                        }
-                        chartType = figure.chartType
-                        limitLineData = limitLineData(figure)
-                    }
-                    items += spaceItem {
-                        spaceRes = R.dimen.spacing_medium
-                        identifier = "after_evolution_title_space".hashCode().toLong()
-                    }
-                }
-                items += keyFigureCardChartItem {
-                    chartData = arrayOf(
-                        globalData(figure, false)
-                    ).filterNotNull().toTypedArray()
-                    chartExplanationLabel = chartExplanationLabel(figure, chartData)
-                    shareContentDescription = strings["accessibility.hint.keyFigure.chart.share"]
-                    onShareCard = { binding ->
-                        shareChart(binding)
-                    }
-                    chartType = figure.chartType
-                    limitLineData = limitLineData(figure)
-                }
-            }
-
-            if (figure.hasAverageChart()) {
-                items += keyFigureCardChartItem {
-                    chartData = arrayOf(
-                        avgGlobalData(figure)
-                    )
-                    chartExplanationLabel = stringsFormat(
-                        "keyFigureDetailController.section.evolutionAvg.subtitle",
-                        strings["${figure.labelKey}.label"]
-                    )
-                    shareContentDescription = strings["accessibility.hint.keyFigure.chart.share"]
-                    onShareCard = { binding ->
-                        shareChart(binding)
-                    }
-                    limitLineData = limitLineData(figure)
-                    chartType = KeyFigureChartType.LINES
-                }
-            }
-
-            items += spaceItem {
-                spaceRes = R.dimen.spacing_large
-                identifier = "after_chart_space".hashCode().toLong()
-            }
-
-            if (strings[figure.learnMoreStringKey] != null) {
-                items += bigTitleItem {
-                    text = strings["keyFigureDetailController.section.learnmore.title"]
-                    identifier = "learnmore_title".hashCode().toLong()
-                }
-                items += spaceItem {
-                    spaceRes = R.dimen.spacing_large
-                    identifier = "after_learnmore_title_space".hashCode().toLong()
-                }
-                items += cardWithActionItem {
-                    mainBody = strings[figure.learnMoreStringKey]
-                }
-                items += spaceItem {
-                    spaceRes = R.dimen.spacing_large
-                    identifier = "after_learnmore_space".hashCode().toLong()
-                }
-            }
-        }
-
-        return items
-    }
-
-    private fun getNoDataItems(): List<GenericItem> {
-        val items = ArrayList<GenericItem>()
-
-        items += spaceItem {
-            spaceRes = R.dimen.spacing_large
-            identifier = items.count().toLong()
-        }
-        items += captionItem {
-            text = stringsFormat("keyFigureDetailController.nodata", strings[keyFigure?.labelStringKey])
-            identifier = text.hashCode().toLong()
-        }
-
-        return items
-    }
-
-    private fun shareChart(binding: ItemKeyFigureChartCardBinding) {
-        viewLifecycleOwnerOrNull()?.lifecycleScope?.launch {
-            val uri = getShareCaptureUri(binding, Constants.Chart.SHARE_CHART_FILENAME)
-            withContext(Dispatchers.Main) {
-                ShareManager.shareImageAndText(requireContext(), uri, null) {
-                    strings["common.error.unknown"]?.let { showErrorSnackBar(it) }
-                }
-            }
-        }
-    }
-
-    @OptIn(ExperimentalTime::class)
-    private fun chartExplanationLabel(figure: KeyFigure, chartData: Array<ChartData>): String? {
-        return when {
-            chartData.isNotEmpty() && chartData[0].entries.isEmpty() -> stringsFormat(
-                "keyFigureDetailController.section.evolution.subtitle.nodata",
-                strings["${figure.labelKey}.label"]
-            )
-            chartData.size > 1 -> stringsFormat(
-                "keyFigureDetailController.section.evolution.subtitle2Charts",
-                strings["${figure.labelKey}.label"],
-                chartData[0].entries.lastOrNull()?.x?.toLong()?.let { Duration.seconds(it) }?.getRelativeDateShortString(requireContext())
-                    ?: "",
-                chartData[0].currentValueToDisplay?.formatNumberIfNeeded(numberFormat),
-                chartData[1].currentValueToDisplay?.formatNumberIfNeeded(numberFormat)
-            )
-            chartData.isNotEmpty() -> stringsFormat(
-                "keyFigureDetailController.section.evolution.subtitle",
-                strings["${figure.labelKey}.label"],
-                chartData[0].entries.lastOrNull()?.x?.toLong()?.let { Duration.seconds(it) }?.getRelativeDateShortString(requireContext())
-                    ?: "",
-                chartData[0].currentValueToDisplay?.formatNumberIfNeeded(numberFormat)
-            )
-            else -> null
-        }
-    }
-
-    private fun localData(figure: KeyFigure): ChartData? {
-        val departmentKeyFigure = figure.getKeyFigureForPostalCode(sharedPrefs.chosenPostalCode)
-
-        return departmentKeyFigure?.let {
-            departmentKeyFigure.series?.let { series ->
-                ChartData(
-                    description = figure.getKeyFigureForPostalCode(sharedPrefs.chosenPostalCode)?.dptLabel,
-                    currentValueToDisplay = departmentKeyFigure.valueToDisplay,
-                    entries = series
-                        .sortedBy { it.date }
-                        .map { Entry(it.date.toFloat(), it.value.toFloat()) },
-                    color = strings[figure.colorStringKey(requireContext().isNightMode())].safeParseColor()
+                findNavControllerOrNull()?.safeNavigate(
+                    KeyFigureDetailsFragmentDirections.actionKeyFigureDetailsFragmentToPostalCodeBottomSheetFragment()
                 )
             }
+            true
+        } else {
+            super.onOptionsItemSelected(item)
         }
     }
 
-    private fun globalData(figure: KeyFigure, isSecondary: Boolean) = figure.series?.let { series ->
-        ChartData(
-            description = strings["common.country.france"],
-            currentValueToDisplay = figure.valueGlobalToDisplay,
-            entries = series
-                .sortedBy { it.date }
-                .map { Entry(it.date.toFloat(), it.value.toFloat()) },
-            color = if (isSecondary) {
-                strings[figure.colorStringKey(requireContext().isNightMode())].safeParseColor().brighterColor()
-            } else {
-                strings[figure.colorStringKey(requireContext().isNightMode())].safeParseColor()
-            }
-        )
-    }
-
-    private fun avgGlobalData(figure: KeyFigure) = ChartData(
-        description = stringsFormat("keyFigureDetailController.section.evolutionAvg.legendWithLocation", strings["common.country.france"]),
-        currentValueToDisplay = figure.valueGlobalToDisplay,
-        entries = figure.avgSeries
-            ?.sortedBy { it.date }
-            ?.map { Entry(it.date.toFloat(), it.value.toFloat()) }
-            ?: emptyList(),
-        color = strings[figure.colorStringKey(requireContext().isNightMode())].safeParseColor()
-    )
-
-    private fun limitLineData(figure: KeyFigure): LimitLineData? {
-        return figure.limitLine?.let {
-            LimitLineData(
-                it.toFloat(),
-                strings[figure.limitLineStringKey],
-                strings[figure.colorStringKey(requireContext().isNightMode())].safeParseColor()
-            )
+    private inner class KeyFigureDetailsPagerAdapter(private val itemCount: Int, private val labelKey: String) : FragmentStateAdapter(
+        childFragmentManager,
+        lifecycle
+    ) {
+        override fun getItemCount(): Int = itemCount
+        override fun createFragment(position: Int): Fragment {
+            return KeyFigureChartsFragment.newInstance(labelKey, getChartRange(position, itemCount))
         }
     }
 
-    fun setTitle(title: String) {
-        appCompatActivity?.supportActionBar?.title = title
+    private fun getChartRange(position: Int, itemCount: Int) = when {
+        position == 0 && itemCount == 1 -> KeyFigureChartsFragment.ChartRange.ALL
+        position == 0 && itemCount == 2 -> KeyFigureChartsFragment.ChartRange.NINETY
+        position == 1 && itemCount == 2 -> KeyFigureChartsFragment.ChartRange.THIRTY
+        position == 0 && itemCount == 3 -> KeyFigureChartsFragment.ChartRange.ALL
+        position == 1 && itemCount == 3 -> KeyFigureChartsFragment.ChartRange.NINETY
+        position == 2 && itemCount == 3 -> KeyFigureChartsFragment.ChartRange.THIRTY
+        else -> {
+            Timber.e("Unexpected range at $position with $itemCount items")
+            null
+        }
     }
 
-    override fun showPostalCodeBottomSheet() {
-        findNavControllerOrNull()?.safeNavigate(
-            KeyFigureDetailsFragmentDirections.actionKeyFigureDetailsFragmentToPostalCodeBottomSheetFragment()
-        )
+    private fun showErrorSnackBar(message: String) {
+        (activity as? MainActivity)?.showErrorSnackBar(message)
+    }
+
+    companion object {
+        private const val PAGER_FIRST_TAB_THRESHOLD = 31
+        private const val PAGER_SECOND_TAB_THRESHOLD = 91
     }
 }

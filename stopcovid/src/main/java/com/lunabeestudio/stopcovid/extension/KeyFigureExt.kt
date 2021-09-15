@@ -13,6 +13,7 @@ package com.lunabeestudio.stopcovid.extension
 import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.Color
+import com.lunabeestudio.robert.extension.safeEnumValueOf
 import com.lunabeestudio.stopcovid.coreui.extension.isNightMode
 import com.lunabeestudio.stopcovid.coreui.extension.stringsFormat
 import com.lunabeestudio.stopcovid.coreui.manager.LocalizedStrings
@@ -20,16 +21,13 @@ import com.lunabeestudio.stopcovid.fastitem.KeyFigureCardItem
 import com.lunabeestudio.stopcovid.fastitem.keyFigureCardItem
 import com.lunabeestudio.stopcovid.model.DepartmentKeyFigure
 import com.lunabeestudio.stopcovid.model.KeyFigure
+import com.lunabeestudio.stopcovid.model.KeyFigureCategory
+import com.lunabeestudio.stopcovid.model.KeyFigureChartType
+import com.lunabeestudio.stopcovid.model.KeyFigureSeriesItem
+import keynumbers.Keynumbers
 import java.text.NumberFormat
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
-
-private const val CORSICA_KEY: String = "20"
-private const val CORSE_DU_SUD_KEY: String = "2A"
-private const val HAUTE_CORSE_KEY: String = "2B"
-
-private val CORSE_DU_SUD: Array<String> = arrayOf("200", "201")
-private val OVERSEAS_FRANCE: Array<String> = arrayOf("97", "98")
 
 val KeyFigure.labelStringKey: String
     get() = "$labelKey.label"
@@ -55,14 +53,7 @@ fun KeyFigure.colorStringKey(dark: Boolean?): String = if (dark == true) {
 fun KeyFigure.hasAverageChart(): Boolean = !avgSeries.isNullOrEmpty()
 
 fun KeyFigure.getKeyFigureForPostalCode(postalCode: String?): DepartmentKeyFigure? {
-    var key = postalCode?.take(2)
-
-    if (key == CORSICA_KEY) { // Corsica case
-        key = if (postalCode?.take(3) in CORSE_DU_SUD) CORSE_DU_SUD_KEY else HAUTE_CORSE_KEY
-    } else if (key in OVERSEAS_FRANCE) { // Overseas France case
-        key = postalCode?.take(3)
-    }
-
+    val key = postalCode?.let { KeyFigure.getDepartmentKeyFromPostalCode(it) }
     return valuesDepartments?.firstOrNull { it.dptNb == key }
 }
 
@@ -86,42 +77,29 @@ fun List<KeyFigure>?.getDepartmentLabel(postalCode: String?): String? {
 fun KeyFigure.itemForFigure(
     context: Context,
     sharedPrefs: SharedPreferences,
+    departmentKeyFigure: DepartmentKeyFigure?,
     numberFormat: NumberFormat,
     strings: LocalizedStrings,
-    useDateTime: Boolean,
     block: (KeyFigureCardItem.() -> Unit)
 ): KeyFigureCardItem? {
     return keyFigureCardItem {
         val extractDate: Long
-        if (sharedPrefs.hasChosenPostalCode) {
-            val departmentKeyFigure = getKeyFigureForPostalCode(sharedPrefs.chosenPostalCode)
-
-            if (departmentKeyFigure != null) {
-                rightLocation = strings["common.country.france"]
-                leftLocation = departmentKeyFigure.dptLabel
-                leftValue = departmentKeyFigure.valueToDisplay?.formatNumberIfNeeded(numberFormat)
-                rightValue = valueGlobalToDisplay.formatNumberIfNeeded(numberFormat)
-                rightTrend = trend?.getTrend(strings)
-                leftTrend = departmentKeyFigure.trend?.getTrend(strings)
-                extractDate = departmentKeyFigure.extractDate
-            } else {
-                leftLocation = strings["common.country.france"]
-                leftValue = valueGlobalToDisplay.formatNumberIfNeeded(numberFormat)
-                leftTrend = trend?.getTrend(strings)
-                extractDate = this@itemForFigure.extractDate
-            }
+        if (departmentKeyFigure != null) {
+            rightLocation = strings["common.country.france"]
+            leftLocation = departmentKeyFigure.dptLabel
+            leftValue = departmentKeyFigure.valueToDisplay?.formatNumberIfNeeded(numberFormat)
+            rightValue = valueGlobalToDisplay.formatNumberIfNeeded(numberFormat)
+            extractDate = departmentKeyFigure.extractDate
         } else {
+            if (sharedPrefs.hasChosenPostalCode) {
+                leftLocation = strings["common.country.france"]
+            }
             leftValue = valueGlobalToDisplay.formatNumberIfNeeded(numberFormat)
-            leftTrend = trend?.getTrend(strings)
             extractDate = this@itemForFigure.extractDate
         }
         updatedAt = strings.stringsFormat(
             "keyFigures.update",
-            if (useDateTime) {
-                Duration.seconds(extractDate).getRelativeDateTimeString(context, strings["common.justNow"])
-            } else {
-                Duration.seconds(extractDate).getRelativeDateString()
-            }
+            Duration.seconds(extractDate).getRelativeDateTimeString(context, strings["common.justNow"])
         )
 
         label = strings[labelStringKey]
@@ -137,3 +115,43 @@ fun KeyFigure.itemForFigure(
             it.label != null
         }
 }
+
+fun Keynumbers.KeyNumbersMessage.toKeyFigures(): List<KeyFigure> = keyfigureListList.map {
+    it.toKeyFigure()
+}
+
+fun Keynumbers.KeyNumbersMessage.KeyfigureMessage.toKeyFigure(): KeyFigure = KeyFigure(
+    safeEnumValueOf<KeyFigureCategory>(this.category) ?: KeyFigureCategory.UNKNOWN,
+    this.labelKey,
+    this.valueGlobalToDisplay,
+    this.valueGlobal,
+    this.isFeatured,
+    this.isHighlighted,
+    this.extractDate.toLong(),
+    this.valuesDepartmentsList.map { departmentValuesMessage ->
+        DepartmentKeyFigure(
+            departmentValuesMessage.dptNb,
+            departmentValuesMessage.dptLabel,
+            departmentValuesMessage.extractDate.toLong(),
+            departmentValuesMessage.value,
+            departmentValuesMessage.valueToDisplay,
+            departmentValuesMessage.seriesList.map { message ->
+                message.toKeyFigureSeriesItem()
+            },
+        )
+    },
+    this.displayOnSameChart,
+    this.limitLine,
+    this.chartType?.takeIf { it.isNotEmpty() }?.let { safeEnumValueOf<KeyFigureChartType>(it) } ?: KeyFigureChartType.LINES,
+    this.seriesList.map { message ->
+        message.toKeyFigureSeriesItem()
+    },
+    this.avgSeriesList.map { message ->
+        message.toKeyFigureSeriesItem()
+    },
+)
+
+private fun Keynumbers.KeyNumbersMessage.ElementSerieMessage.toKeyFigureSeriesItem() = KeyFigureSeriesItem(
+    this.date.toLong(),
+    this.value
+)

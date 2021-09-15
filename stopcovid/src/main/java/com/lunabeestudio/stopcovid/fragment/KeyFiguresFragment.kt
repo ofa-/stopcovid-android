@@ -10,94 +10,171 @@
 
 package com.lunabeestudio.stopcovid.fragment
 
+import android.content.SharedPreferences
+import android.os.Bundle
 import android.view.View
+import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
+import androidx.preference.PreferenceManager
 import com.lunabeestudio.analytics.model.AppEventName
+import com.lunabeestudio.robert.extension.observeEventAndConsume
 import com.lunabeestudio.stopcovid.R
+import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.extension.viewLifecycleOwnerOrNull
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
+import com.lunabeestudio.stopcovid.extension.chosenPostalCode
+import com.lunabeestudio.stopcovid.extension.getKeyFigureForPostalCode
+import com.lunabeestudio.stopcovid.extension.getString
 import com.lunabeestudio.stopcovid.extension.itemForFigure
 import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.fastitem.KeyFigureCardItem
-import com.lunabeestudio.stopcovid.fastitem.bigTitleItem
+import com.lunabeestudio.stopcovid.fastitem.explanationActionCardItem
 import com.lunabeestudio.stopcovid.fastitem.linkItem
 import com.lunabeestudio.stopcovid.manager.ShareManager
+import com.lunabeestudio.stopcovid.model.DepartmentKeyFigure
 import com.lunabeestudio.stopcovid.model.KeyFigure
 import com.lunabeestudio.stopcovid.model.KeyFigureCategory
+import com.lunabeestudio.stopcovid.model.KeyFiguresNotAvailableException
+import com.lunabeestudio.stopcovid.model.TacResult
 import com.mikepenz.fastadapter.GenericItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.text.NumberFormat
+import java.util.Locale
 import kotlin.time.ExperimentalTime
 
-class KeyFiguresFragment : KeyFigureGenericFragment() {
+class KeyFiguresFragment : MainFragment() {
 
-    override fun showPostalCodeBottomSheet() {
-        findNavControllerOrNull()?.safeNavigate(KeyFiguresFragmentDirections.actionKeyFiguresFragmentToPostalCodeBottomSheetFragment())
+    private var category: KeyFigureCategory = KeyFigureCategory.UNKNOWN
+
+    private val numberFormat: NumberFormat = NumberFormat.getNumberInstance(Locale.getDefault())
+
+    private val sharedPrefs: SharedPreferences by lazy {
+        PreferenceManager.getDefaultSharedPreferences(requireContext())
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        category = (arguments?.getSerializable(CATEGORY_ARG_KEY) as? KeyFigureCategory) ?: category
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        keyFiguresManager.figures.observeEventAndConsume(viewLifecycleOwner) {
+            refreshScreen()
+        }
+    }
+
+    override fun refreshScreen() {
+        super.refreshScreen()
+        (activity as? MainActivity)?.binding?.tabLayout?.isVisible = true
     }
 
     override fun getItems(): List<GenericItem> {
-        val items = ArrayList<GenericItem>()
-
-        keyFiguresManager.figures.value?.peekContent()?.let { keyFigures ->
-            if (keyFigures.isNotEmpty()) {
-                items += spaceItem {
-                    spaceRes = R.dimen.spacing_large
-                    identifier = items.count().toLong()
-                }
-                items += bigTitleItem {
-                    text = strings["keyFiguresController.section.health"]
-                    identifier = items.count().toLong()
-                }
-                items += captionItem {
-                    text = strings["keyFiguresController.section.health.subtitle"]
-                    identifier = text.hashCode().toLong()
-                }
-                items += linkItem {
-                    text = strings["keyFiguresController.section.health.button"]
-                    onClickListener = View.OnClickListener {
-                        findNavControllerOrNull()
-                            ?.safeNavigate(KeyFiguresFragmentDirections.actionKeyFiguresFragmentToMoreKeyFigureFragment())
-                    }
-                    identifier = text.hashCode().toLong()
-                }
-                keyFigures
-                    .filter { it.category == KeyFigureCategory.HEALTH }
-                    .mapNotNullTo(items) { itemForFigure(it, true) }
-
-                items += spaceItem {
-                    spaceRes = R.dimen.spacing_large
-                    identifier = items.count().toLong()
-                }
-
-                items += bigTitleItem {
-                    text = strings["keyFiguresController.section.app"]
-                    identifier = items.count().toLong()
-                }
-                keyFigures
-                    .filter { it.category == KeyFigureCategory.APP }
-                    .mapNotNullTo(items) { itemForFigure(it, true) }
-            }
-        }
-
+        val items = mutableListOf<GenericItem>()
+        addFetchErrorItemIfNeeded(items)
+        addExplanationItemIfNeeded(items)
+        addKeyFiguresItems(items)
         return items
     }
 
+    private fun addFetchErrorItemIfNeeded(items: MutableList<GenericItem>) {
+        keyFiguresManager.figures.value?.peekContent()?.let { keyFiguresResult ->
+            val error = (keyFiguresResult as? TacResult.Failure)?.throwable
+            if (error is KeyFiguresNotAvailableException) {
+                items += spaceItem {
+                    spaceRes = R.dimen.spacing_large
+                    identifier = items.count().toLong()
+                }
+
+                items += explanationActionCardItem {
+                    explanation = error.getString(strings)
+                    bottomText = strings["keyFiguresController.fetchError.button"]
+                    onClick = {
+                        viewLifecycleOwnerOrNull()?.lifecycleScope?.launch {
+                            (activity as? MainActivity)?.showProgress(true)
+                            keyFiguresManager.onAppForeground(requireContext())
+                            vaccinationCenterManager.postalCodeDidUpdate(
+                                requireContext(),
+                                sharedPrefs,
+                                sharedPrefs.chosenPostalCode,
+                            )
+                            (activity as? MainActivity)?.showProgress(false)
+                            refreshScreen()
+                        }
+                    }
+                    identifier = "keyFiguresController.fetchError.button".hashCode().toLong()
+                }
+            }
+        }
+    }
+
+    private fun addExplanationItemIfNeeded(items: MutableList<GenericItem>) {
+        val explanations = strings["keyFiguresController.explanations.${category.stringCode}"]
+        if (!explanations.isNullOrEmpty()) {
+            items += spaceItem {
+                spaceRes = R.dimen.spacing_large
+                identifier = items.count().toLong()
+            }
+
+            items += captionItem {
+                text = explanations
+                identifier = text.hashCode().toLong()
+            }
+            items += linkItem {
+                text = strings["keyFiguresController.section.health.button"]
+                onClickListener = View.OnClickListener {
+                    findNavControllerOrNull()
+                        ?.safeNavigate(KeyFiguresPagerFragmentDirections.actionKeyFiguresPagerFragmentToMoreKeyFigureFragment())
+                }
+                identifier = text.hashCode().toLong()
+            }
+        }
+    }
+
+    private fun addKeyFiguresItems(items: MutableList<GenericItem>) {
+        keyFiguresManager.figures.value?.peekContent()?.let { keyFiguresResult ->
+            if (keyFiguresResult.data?.isNotEmpty() == true) {
+                items += spaceItem {
+                    spaceRes = R.dimen.spacing_large
+                    identifier = items.count().toLong()
+                }
+
+                keyFiguresResult.data
+                    ?.filter { it.category == category }
+                    ?.mapNotNullTo(items) {
+                        val departmentKeyFigure = if (keyFiguresResult is TacResult.Success) {
+                            it.getKeyFigureForPostalCode(sharedPrefs.chosenPostalCode)
+                        } else {
+                            it.getKeyFigureForPostalCode(null)
+                        }
+                        itemForFigure(it, departmentKeyFigure)
+                    }
+
+                items += spaceItem {
+                    spaceRes = R.dimen.spacing_large
+                    identifier = items.count().toLong()
+                }
+            }
+        }
+    }
+
     @OptIn(ExperimentalTime::class)
-    private fun itemForFigure(figure: KeyFigure, useDateTime: Boolean): KeyFigureCardItem? {
+    private fun itemForFigure(figure: KeyFigure, departmentKeyFigure: DepartmentKeyFigure?): KeyFigureCardItem? {
         return figure.itemForFigure(
-            requireContext(),
-            sharedPrefs,
-            numberFormat,
-            strings,
-            useDateTime
+            context = requireContext(),
+            sharedPrefs = sharedPrefs,
+            departmentKeyFigure = departmentKeyFigure,
+            numberFormat = numberFormat,
+            strings = strings,
         ) {
             shareContentDescription = strings["accessibility.hint.keyFigure.share"]
             onShareCard = { binding ->
                 viewLifecycleOwnerOrNull()?.lifecycleScope?.launch {
-                    val uri = getShareCaptureUri(binding, "$label")
+                    val uri = ShareManager.getShareCaptureUri(binding, "$label")
                     withContext(Dispatchers.Main) {
                         val shareString = if (rightLocation == null) {
                             stringsFormat("keyFigure.sharing.national", label, leftValue)
@@ -112,8 +189,8 @@ class KeyFiguresFragment : KeyFigureGenericFragment() {
             }
             onClickListener = View.OnClickListener {
                 analyticsManager.reportAppEvent(requireContext(), AppEventName.e9, null)
-                findNavControllerOrNull()?.safeNavigate(
-                    KeyFiguresFragmentDirections.actionKeyFiguresFragmentToKeyFigureDetailsFragment(
+                parentFragment?.findNavControllerOrNull()?.safeNavigate(
+                    KeyFiguresPagerFragmentDirections.actionKeyFiguresPagerFragmentToKeyFigureDetailsFragment(
                         figure.labelKey
                     )
                 )
@@ -123,4 +200,16 @@ class KeyFiguresFragment : KeyFigureGenericFragment() {
     }
 
     override fun getTitleKey(): String = "keyFiguresController.title"
+
+    companion object {
+        const val CATEGORY_ARG_KEY: String = "CATEGORY_ARG_KEY"
+
+        fun newInstance(category: KeyFigureCategory): KeyFiguresFragment {
+            val fragment = KeyFiguresFragment()
+            fragment.arguments = Bundle().apply {
+                putSerializable(CATEGORY_ARG_KEY, category)
+            }
+            return fragment
+        }
+    }
 }

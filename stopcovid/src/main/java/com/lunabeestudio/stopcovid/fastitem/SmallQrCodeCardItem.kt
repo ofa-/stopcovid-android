@@ -10,7 +10,7 @@ import com.mikepenz.fastadapter.binding.AbstractBindingItem
 
 class SmallQrCodeCardItem : AbstractBindingItem<ItemSmallQrCodeCardBinding>() {
 
-    override val type: Int = R.id.item_small_qr_code_card_item
+    override val type: Int = R.id.item_small_qr_code_card
 
     var generateBarcode: (() -> Bitmap)? = null
     var title: String? = null

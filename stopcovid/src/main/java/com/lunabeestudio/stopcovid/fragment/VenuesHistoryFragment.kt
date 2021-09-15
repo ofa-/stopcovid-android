@@ -46,9 +46,9 @@ class VenuesHistoryFragment : MainFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding?.emptyImageView?.setImageResourceOrHide(R.drawable.signal)
-        binding?.emptyTitleTextView?.isVisible = false
-        binding?.emptyButton?.isVisible = false
+        binding?.emptyLayout?.emptyImageView?.setImageResourceOrHide(R.drawable.signal)
+        binding?.emptyLayout?.emptyTitleTextView?.isVisible = false
+        binding?.emptyLayout?.emptyButton?.isVisible = false
     }
 
     override fun getItems(): List<GenericItem> {
@@ -99,9 +99,9 @@ class VenuesHistoryFragment : MainFragment() {
     override fun refreshScreen() {
         super.refreshScreen()
         if (robertManager.isImmune) {
-            binding?.emptyDescriptionTextView?.text = strings["venuesHistoryController.noVenuesEmptyView.isSick.title"]
+            binding?.emptyLayout?.emptyDescriptionTextView?.text = strings["venuesHistoryController.noVenuesEmptyView.isSick.title"]
         } else {
-            binding?.emptyDescriptionTextView?.text = strings["venuesHistoryController.noVenuesEmptyView.title"]
+            binding?.emptyLayout?.emptyDescriptionTextView?.text = strings["venuesHistoryController.noVenuesEmptyView.title"]
         }
     }
 }

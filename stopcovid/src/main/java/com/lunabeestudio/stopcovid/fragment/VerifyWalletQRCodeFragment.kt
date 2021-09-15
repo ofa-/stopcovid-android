@@ -23,7 +23,7 @@ import com.lunabeestudio.stopcovid.extension.showUnknownErrorAlert
 import com.lunabeestudio.stopcovid.manager.WalletManager
 import com.lunabeestudio.stopcovid.model.WalletCertificateInvalidSignatureException
 import com.lunabeestudio.stopcovid.model.WalletCertificateMalformedException
-import com.lunabeestudio.stopcovid.model.WalletCertificateNoKeyError
+import com.lunabeestudio.stopcovid.model.WalletCertificateNoKeyException
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -75,7 +75,7 @@ class VerifyWalletQRCodeFragment : QRCodeFragment() {
         when (e) {
             is WalletCertificateInvalidSignatureException -> showInvalidCertificateSignatureAlert(listener)
             is WalletCertificateMalformedException -> showMalformedCertificateAlert(listener)
-            is WalletCertificateNoKeyError -> showInvalidCertificateSignatureAlert(listener)
+            is WalletCertificateNoKeyException -> showInvalidCertificateSignatureAlert(listener)
             else -> showUnknownErrorAlert(listener)
         }
     }

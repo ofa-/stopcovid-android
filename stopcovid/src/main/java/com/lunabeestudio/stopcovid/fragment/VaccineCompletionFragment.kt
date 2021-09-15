@@ -11,7 +11,6 @@
 package com.lunabeestudio.stopcovid.fragment
 
 import android.annotation.SuppressLint
-import android.graphics.Color
 import android.os.Bundle
 import android.view.Gravity
 import android.view.HapticFeedbackConstants
@@ -34,8 +33,11 @@ import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.fastitem.buttonItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.cardWithActionItem
 import com.lunabeestudio.stopcovid.databinding.FragmentRecyclerViewKonfettiBinding
+import com.lunabeestudio.stopcovid.extension.emitDefaultKonfetti
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.vaccineDate
+import com.lunabeestudio.stopcovid.extension.vaccineDose
+import com.lunabeestudio.stopcovid.extension.vaccineMedicinalProduct
 import com.lunabeestudio.stopcovid.fastitem.logoItem
 import com.lunabeestudio.stopcovid.model.EuropeanCertificate
 import com.lunabeestudio.stopcovid.viewmodel.VaccineCompletionViewModel
@@ -43,8 +45,6 @@ import com.lunabeestudio.stopcovid.viewmodel.VaccineCompletionViewModelFactory
 import com.lunabeestudio.stopcovid.worker.VaccineCompletedNotificationWorker
 import com.mikepenz.fastadapter.GenericItem
 import nl.dionsegijn.konfetti.ParticleSystem
-import nl.dionsegijn.konfetti.models.Shape
-import nl.dionsegijn.konfetti.models.Size
 import timber.log.Timber
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -136,28 +136,35 @@ class VaccineCompletionFragment : MainFragment() {
             HapticFeedbackConstants.FLAG_IGNORE_VIEW_SETTING
         )
         konfettis?.stop()
-        konfettis = fragmentRecyclerViewKonfettiBinding?.konfettiView?.let { konfettiView ->
-            konfettiView.build()
-                .addColors(Color.BLUE, Color.WHITE, Color.RED)
-                .setDirection(0.0, 359.0)
-                .setSpeed(1f, 5f)
-                .setFadeOutEnabled(true)
-                .setTimeToLive(2000L)
-                .addShapes(Shape.Square, Shape.Circle)
-                .addSizes(Size(12))
-                .setPosition(-50f, (binding?.root?.width ?: 0) + 50f, -50f, -50f)
-                .also {
-                    it.streamFor(300, 5000L)
-                }
-        }
+        konfettis = fragmentRecyclerViewKonfettiBinding?.konfettiView?.emitDefaultKonfetti(binding)
     }
 
     override fun getTitleKey(): String = ""
 
     override fun getItems(): List<GenericItem> {
         val greenCertificate = (viewModel.certificate.value as? EuropeanCertificate)?.greenCertificate
-        val vaccineMedicinalProduct: String? = null // greenCertificate?.vaccineMedicinalProduct
         val vaccineDate = greenCertificate?.vaccineDate ?: return emptyList()
+        val vaccineMedicinalProduct: String? = greenCertificate.vaccineMedicinalProduct
+        val vaccineDoseNumber = greenCertificate.vaccineDose?.first ?: 0
+        val noWaitDoses: Boolean = (
+            configuration.noWaitDoses[vaccineMedicinalProduct]
+                ?: configuration.noWaitDoses[DEFAULT_KEY]
+            )
+            ?.let { vaccineDoseNumber >= it }
+            ?: false
+        val daysAfterCompletion = try {
+            configuration.daysAfterCompletion[vaccineMedicinalProduct]
+                ?: configuration.daysAfterCompletion[DEFAULT_KEY]
+                ?: return emptyList()
+        } catch (e: NullPointerException) {
+            Timber.e(e)
+            return emptyList()
+        }
+        val completedDate = Calendar.getInstance().apply {
+            time = vaccineDate
+            add(Calendar.DAY_OF_YEAR, daysAfterCompletion)
+        }.time
+        val isVaccineCompleted = noWaitDoses || completedDate <= Date()
 
         val items = mutableListOf<GenericItem>()
 
@@ -170,21 +177,6 @@ class VaccineCompletionFragment : MainFragment() {
             identifier = R.drawable.ic_thumbsup.toLong()
         }
 
-        val daysAfterCompletion = try {
-            configuration.daysAfterCompletion[vaccineMedicinalProduct]
-                ?: configuration.daysAfterCompletion[DEFAULT_KEY]
-                ?: return emptyList()
-        } catch (e: NullPointerException) {
-            Timber.e(e)
-            return emptyList()
-        }
-
-        val completedDate = Calendar.getInstance().apply {
-            time = vaccineDate
-            add(Calendar.DAY_OF_YEAR, daysAfterCompletion)
-        }.time
-
-        val isVaccineCompleted = completedDate <= Date()
         val stringStateKey = if (isVaccineCompleted) {
             COMPLETED_STRING_KEY
         } else {
@@ -198,9 +190,12 @@ class VaccineCompletionFragment : MainFragment() {
 
         items += cardWithActionItem {
             val formattedDate = longDateFormat.format(completedDate)
-
+            val explanations = listOfNotNull(
+                stringsFormat("vaccineCompletionController.noWait.explanation.body", vaccineDoseNumber - 1).takeIf { noWaitDoses },
+                stringsFormat("vaccineCompletionController.$stringStateKey.explanation.body", formattedDate),
+            )
             mainTitle = stringsFormat("vaccineCompletionController.$stringStateKey.explanation.title", formattedDate)
-            mainBody = stringsFormat("vaccineCompletionController.$stringStateKey.explanation.body", formattedDate)
+            mainBody = explanations.joinToString("\n\n")
             mainGravity = Gravity.CENTER
             identifier = "vaccineCompletionController.$stringStateKey.explanation.title".hashCode().toLong()
         }

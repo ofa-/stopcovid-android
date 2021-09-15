@@ -24,6 +24,9 @@
 -keep public class com.lunabeestudio.** { *; }
 -keep public class dgca.verifier.app.decoder.model.** { *; }
 
+# Protobuf https://github.com/protocolbuffers/protobuf/issues/6463#issuecomment-632884075
+-keep class * extends com.google.protobuf.GeneratedMessageLite { *; }
+
 # Bouncy Castle -- Keep ECDH
 -keep class org.bouncycastle.jcajce.provider.asymmetric.EC$* { *; }
 -keep class org.bouncycastle.jcajce.provider.asymmetric.ec.KeyPairGeneratorSpi$ECDH { *; }

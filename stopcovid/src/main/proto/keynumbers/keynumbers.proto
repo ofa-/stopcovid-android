@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package keynumbers;
+
+message KeyNumbersMessage {
+
+    message ElementSerieMessage {
+        optional uint32 date = 1;
+        optional double value = 2;
+    }
+
+    message DepartmentValuesMessage {
+        string dptNb = 1;
+        string dptLabel = 2;
+        uint32 extractDate = 3;
+        double value = 4;
+        repeated ElementSerieMessage series = 5;
+        string valueToDisplay = 6;
+    }
+
+    message KeyfigureMessage {
+        string category = 1;
+        optional bool isFeatured = 2;
+        optional bool displayOnSameChart = 3;
+        bool isHighlighted = 4;
+        optional string chartType = 5;
+        optional double limitLine = 6;
+        string labelKey = 7;
+        string valueGlobalToDisplay = 8;
+        double valueGlobal = 9;
+        uint32 lastUpdate = 10;
+        uint32 extractDate = 11;
+        repeated ElementSerieMessage series = 12;
+        repeated ElementSerieMessage avgSeries = 13;
+        string version = 14;
+        repeated DepartmentValuesMessage valuesDepartments = 15;
+    }
+
+    repeated KeyfigureMessage keyfigureList = 1;
+}

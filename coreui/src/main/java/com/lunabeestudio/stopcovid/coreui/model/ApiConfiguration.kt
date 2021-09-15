@@ -141,6 +141,8 @@ internal class ApiConfiguration(
     val conversionApiVersion: Int,
     @SerializedName("app.wallet.maxCertBeforeWarning")
     val maxCertBeforeWarning: Int,
+    @SerializedName("app.wallet.vaccin.noWaitDoses")
+    val noWaitDoses: String,
 )
 
 internal fun ApiConfiguration.toDomain(gson: Gson) = Configuration(
@@ -212,18 +214,23 @@ internal fun ApiConfiguration.toDomain(gson: Gson) = Configuration(
         cleaUrls,
         object : TypeToken<List<String>?>() {}.type
     ),
-
     covidPlusWarning = covidPlusWarning,
     covidPlusNoTracing = covidPlusNoTracing,
     displayCertificateConversion = displayCertificateConversion,
     daysAfterCompletion = (
         gson.fromJson(
             daysAfterCompletion,
-            object : TypeToken<List<ApiDaysAfterCompletionEntry>>() {}.type
-        ) as List<ApiDaysAfterCompletionEntry>
+            object : TypeToken<List<ApiCodeValueEntry>>() {}.type
+        ) as List<ApiCodeValueEntry>
         ).associate { Pair(it.code, it.value) },
     certificateConversionSidepOnlyCode = gson.fromJson(certificateConversionSidepOnlyCode, object : TypeToken<List<String>>() {}.type),
     conversionPublicKey = gson.fromJson(conversionPublicKey, object : TypeToken<Map<String, String>>() {}.type),
     conversionApiVersion = conversionApiVersion,
     maxCertBeforeWarning = maxCertBeforeWarning,
+    noWaitDoses = (
+        gson.fromJson(
+            noWaitDoses,
+            object : TypeToken<List<ApiCodeValueEntry>>() {}.type
+        ) as List<ApiCodeValueEntry>
+        ).associate { Pair(it.code, it.value) },
 )

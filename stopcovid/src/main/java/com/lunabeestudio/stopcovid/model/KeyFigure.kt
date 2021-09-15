@@ -10,10 +10,6 @@
 
 package com.lunabeestudio.stopcovid.model
 
-import androidx.annotation.DrawableRes
-import com.google.gson.annotations.SerializedName
-import com.lunabeestudio.stopcovid.R
-
 data class KeyFigure(
     val category: KeyFigureCategory = KeyFigureCategory.UNKNOWN,
     val labelKey: String,
@@ -23,13 +19,32 @@ data class KeyFigure(
     val isHighlighted: Boolean?,
     val extractDate: Long,
     val valuesDepartments: List<DepartmentKeyFigure>?,
-    val trend: Int?,
     val displayOnSameChart: Boolean,
-    val limitLine: Number?,
+    val limitLine: Double?,
     val chartType: KeyFigureChartType = KeyFigureChartType.LINES,
     val series: List<KeyFigureSeriesItem>?,
-    val avgSeries: List<KeyFigureSeriesItem>?
-)
+    val avgSeries: List<KeyFigureSeriesItem>?,
+) {
+    companion object {
+        private const val CORSICA_KEY: String = "20"
+        private const val CORSE_DU_SUD_KEY: String = "2A"
+        private const val HAUTE_CORSE_KEY: String = "2B"
+
+        private val CORSE_DU_SUD: Array<String> = arrayOf("200", "201")
+        private val OVERSEAS_FRANCE: Array<String> = arrayOf("97", "98")
+
+        fun getDepartmentKeyFromPostalCode(postalCode: String): String {
+            var key = postalCode.take(2)
+
+            if (key == CORSICA_KEY) { // Corsica case
+                key = if (postalCode.take(3) in CORSE_DU_SUD) CORSE_DU_SUD_KEY else HAUTE_CORSE_KEY
+            } else if (key in OVERSEAS_FRANCE) { // Overseas France case
+                key = postalCode.take(3)
+            }
+            return key
+        }
+    }
+}
 
 data class DepartmentKeyFigure(
     val dptNb: String,
@@ -37,8 +52,6 @@ data class DepartmentKeyFigure(
     val extractDate: Long,
     val value: Number,
     val valueToDisplay: String?,
-    val color: String,
-    val trend: Int?,
     val series: List<KeyFigureSeriesItem>?
 )
 
@@ -47,24 +60,14 @@ data class KeyFigureSeriesItem(
     val value: Number
 )
 
-sealed class Trend(@DrawableRes val imageRes: Int, val hint: String?) {
-    class Up(hint: String?) : Trend(R.drawable.ic_up, hint)
-    class Steady(hint: String?) : Trend(R.drawable.ic_steady, hint)
-    class Down(hint: String?) : Trend(R.drawable.ic_down, hint)
-}
-
-enum class KeyFigureCategory {
-    @SerializedName("health")
-    HEALTH,
-
-    @SerializedName("app")
-    APP,
-
-    UNKNOWN
+enum class KeyFigureCategory(val stringCode: String) {
+    HEALTH("health"),
+    APP("app"),
+    VACCINE("vaccine"),
+    UNKNOWN("unknown")
 }
 
 enum class KeyFigureChartType {
-    @SerializedName("bars")
     BARS,
     LINES
 }

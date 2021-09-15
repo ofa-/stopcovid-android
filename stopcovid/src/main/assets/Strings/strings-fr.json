@@ -1182,6 +1182,7 @@
 
     "wallet.autotest.warning": "⚠️ Les autotests supervisés ne sont valables que sur le territoire français dans le cadre du \"pass activité\".",
     "wallet.expired.pillTitle": "Expiré",
-    "keyFigureChartController.zoomOut": "Dézoomer"
+    "keyFigureChartController.zoomOut": "Dézoomer",
+    "vaccineCompletionController.noWait.explanation.body": "⚠️ En cas de problème pendant la vérification, veuillez présenter le certificat %@ doses."
 
 }
