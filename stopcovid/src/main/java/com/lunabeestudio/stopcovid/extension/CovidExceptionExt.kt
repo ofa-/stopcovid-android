@@ -41,4 +41,5 @@ fun CovidException.getString(strings: Map<String, String>): String = when (this.
     ErrorCode.WALLET_CERTIFICATE_UNKNOWN_ERROR -> message
     ErrorCode.VENUE_INVALID_FORMAT_EXCEPTION -> strings["enterCodeController.alert.invalidCode.message"] ?: message
     ErrorCode.VENUE_EXPIRED_EXCEPTION -> strings["enterCodeController.alert.expiredCode.message"] ?: message
+    ErrorCode.KEY_FIGURES_NOT_AVAILABLE -> strings["keyFiguresController.fetchError.message"] ?: message
 }

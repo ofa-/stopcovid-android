@@ -74,7 +74,7 @@
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
         <action
             android:id="@+id/action_proximityFragment_to_keyFiguresFragment"
-            app:destination="@id/keyFiguresFragment"
+            app:destination="@id/keyFiguresPagerFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
@@ -354,34 +354,26 @@
         android:name="com.lunabeestudio.stopcovid.fragment.InfoCenterFragment"
         tools:layout="@layout/fragment_recycler_view" />
     <fragment
-        android:id="@+id/keyFiguresFragment"
-        android:name="com.lunabeestudio.stopcovid.fragment.KeyFiguresFragment"
-        tools:layout="@layout/fragment_recycler_view">
+        android:id="@+id/keyFiguresPagerFragment"
+        android:name="com.lunabeestudio.stopcovid.fragment.KeyFiguresPagerFragment">
         <deepLink app:uri="tousanticovid://allFigures" />
         <action
-            android:id="@+id/action_keyFiguresFragment_to_postalCodeBottomSheetFragment"
+            android:id="@+id/action_keyFiguresPagerFragment_to_postalCodeBottomSheetFragment"
             app:destination="@id/postalCodeBottomSheetFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
         <action
-            android:id="@+id/action_KeyFiguresFragment_to_KeyFigureDetailsFragment"
+            android:id="@+id/action_keyFiguresPagerFragment_to_KeyFigureDetailsFragment"
             app:destination="@id/keyFigureDetailsFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
         <action
-            android:id="@+id/action_KeyFiguresFragment_toMoreKeyFigureFragment"
+            android:id="@+id/action_keyFiguresPagerFragment_toMoreKeyFigureFragment"
             app:destination="@id/moreKeyFiguresFragment"
-            app:enterAnim="@anim/nav_default_enter_anim"
-            app:exitAnim="@anim/nav_default_exit_anim"
-            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
-            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
-        <action
-            android:id="@+id/action_informationFragment_to_gestureFragment"
-            app:destination="@id/gestureFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"

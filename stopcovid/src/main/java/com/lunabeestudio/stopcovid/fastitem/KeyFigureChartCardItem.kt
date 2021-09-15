@@ -124,16 +124,13 @@ class KeyFigureChartCardItem : AbstractBindingItem<ItemKeyFigureChartCardBinding
         }
     }
 
-    override fun unbindView(binding: ItemKeyFigureChartCardBinding) {
-        super.unbindView(binding)
-        binding.keyFigureLineChart.isVisible = false
-        binding.keyFigureBarChart.isVisible = false
-    }
-
     @OptIn(ExperimentalTime::class)
     private fun setupXAxis(binding: ItemKeyFigureChartCardBinding, xAxis: XAxis) {
         xAxis.apply {
             setupStyle()
+            val chartEntries = chartData.getOrNull(0)?.entries
+            chartEntries?.firstOrNull()?.x?.let { axisMinimum = it }
+            chartEntries?.lastOrNull()?.x?.let { axisMaximum = it }
             valueFormatter = object : ValueFormatter() {
                 override fun getFormattedValue(value: Float): String {
                     return Duration.seconds(value.toLong()).getRelativeDateShortString(binding.root.context)
@@ -145,7 +142,7 @@ class KeyFigureChartCardItem : AbstractBindingItem<ItemKeyFigureChartCardBinding
     private fun setupYAxis(yAxis: YAxis) {
         yAxis.apply {
             setupStyle()
-            removeAllLimitLines()
+            axisMinimum = axisMinimum.coerceAtLeast(0f)
             valueFormatter = object : ValueFormatter() {
                 override fun getFormattedValue(value: Float): String {
                     return value.formatCompact()
@@ -158,6 +155,29 @@ class KeyFigureChartCardItem : AbstractBindingItem<ItemKeyFigureChartCardBinding
                 addLimitLine(limitLine)
             }
         }
+    }
+
+    override fun unbindView(binding: ItemKeyFigureChartCardBinding) {
+        super.unbindView(binding)
+        binding.keyFigureLineChart.isVisible = false
+        binding.keyFigureBarChart.isVisible = false
+
+        unbindYAxis(binding)
+        unbindXAxis(binding)
+    }
+
+    private fun unbindYAxis(binding: ItemKeyFigureChartCardBinding) {
+        binding.keyFigureLineChart.axisLeft.resetAxisMinimum()
+        binding.keyFigureBarChart.axisLeft.resetAxisMinimum()
+    }
+
+    private fun unbindXAxis(binding: ItemKeyFigureChartCardBinding) {
+        binding.keyFigureLineChart.xAxis.removeAllLimitLines()
+        binding.keyFigureBarChart.xAxis.removeAllLimitLines()
+        binding.keyFigureLineChart.xAxis.resetAxisMinimum()
+        binding.keyFigureBarChart.xAxis.resetAxisMinimum()
+        binding.keyFigureLineChart.xAxis.resetAxisMaximum()
+        binding.keyFigureBarChart.xAxis.resetAxisMaximum()
     }
 }
 

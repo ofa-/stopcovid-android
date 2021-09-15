@@ -15,7 +15,13 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
 import androidx.core.content.FileProvider
+import androidx.viewbinding.ViewBinding
 import com.lunabeestudio.stopcovid.BuildConfig
+import com.lunabeestudio.stopcovid.databinding.ItemKeyFigureCardBinding
+import com.lunabeestudio.stopcovid.databinding.ItemKeyFigureChartCardBinding
+import com.lunabeestudio.stopcovid.extension.getBitmapForItem
+import com.lunabeestudio.stopcovid.extension.getBitmapForItemKeyFigureCardBinding
+import com.lunabeestudio.stopcovid.extension.getBitmapForItemKeyFigureChartCardBinding
 import com.lunabeestudio.stopcovid.extension.startTextIntent
 import timber.log.Timber
 import java.io.File
@@ -56,6 +62,15 @@ object ShareManager {
                 onError.invoke()
             }
         }
+    }
+
+    suspend fun getShareCaptureUri(binding: ViewBinding, filenameWithoutExt: String): Uri {
+        val bitmap = when (binding) {
+            is ItemKeyFigureCardBinding -> binding.getBitmapForItemKeyFigureCardBinding()
+            is ItemKeyFigureChartCardBinding -> binding.getBitmapForItemKeyFigureChartCardBinding()
+            else -> binding.getBitmapForItem()
+        }
+        return getShareCaptureUriFromBitmap(binding.root.context, bitmap, filenameWithoutExt)
     }
 
     private const val ANDROID_PACKAGE = "android"

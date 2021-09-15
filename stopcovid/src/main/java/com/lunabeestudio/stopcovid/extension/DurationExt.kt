@@ -2,6 +2,7 @@ package com.lunabeestudio.stopcovid.extension
 
 import android.content.Context
 import android.text.format.DateUtils
+import java.util.Calendar
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 
@@ -44,9 +45,22 @@ fun Duration.getRelativeDateString(): String {
 
 @OptIn(ExperimentalTime::class)
 fun Duration.getRelativeDateShortString(context: Context): String {
+    val calendar = Calendar.getInstance()
+    val currentYear = calendar.get(Calendar.YEAR)
+
+    val dataDateMs = this@getRelativeDateShortString.inWholeMilliseconds
+    calendar.timeInMillis = dataDateMs
+    val dataYear = calendar.get(Calendar.YEAR)
+
+    val formatYear = if (currentYear == dataYear) {
+        DateUtils.FORMAT_NO_YEAR
+    } else {
+        DateUtils.FORMAT_SHOW_YEAR
+    }
+
     return DateUtils.formatDateTime(
         context,
-        this.inWholeMilliseconds,
-        DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_NO_YEAR or DateUtils.FORMAT_ABBREV_MONTH
+        dataDateMs,
+        DateUtils.FORMAT_SHOW_DATE or formatYear or DateUtils.FORMAT_ABBREV_MONTH
     )
 }

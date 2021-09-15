@@ -18,7 +18,7 @@ import com.lunabeestudio.stopcovid.model.EuropeanCertificate
 import com.lunabeestudio.stopcovid.model.FrenchCertificate
 import com.lunabeestudio.stopcovid.model.WalletCertificate
 import com.lunabeestudio.stopcovid.model.WalletCertificateMalformedException
-import com.lunabeestudio.stopcovid.model.WalletCertificateNoKeyError
+import com.lunabeestudio.stopcovid.model.WalletCertificateNoKeyException
 import com.lunabeestudio.stopcovid.model.getForKeyId
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -128,7 +128,7 @@ object WalletManager {
             || walletCertificate !is EuropeanCertificate
         ) {
             // Only check French certificates
-            throw WalletCertificateNoKeyError()
+            throw WalletCertificateNoKeyException()
         }
 
         return walletCertificate

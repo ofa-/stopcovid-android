@@ -17,6 +17,13 @@ abstract class RemoteFileManager(private val serverManager: ServerManager) {
 
     protected suspend fun loadLocalBytes(context: Context): ByteArray? {
         val localFile = File(context.filesDir, getLocalFileName(context))
+        return loadLocalBytes(localFile, context)
+    }
+
+    protected suspend fun loadLocalBytes(
+        localFile: File,
+        context: Context
+    ): ByteArray? {
         return when {
             localFile.exists() -> {
                 withContext(Dispatchers.IO) {

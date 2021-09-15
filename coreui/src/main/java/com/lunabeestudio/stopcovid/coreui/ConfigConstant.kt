@@ -33,8 +33,12 @@ object ConfigConstant {
     }
 
     object KeyFigures {
-        const val MASTER_URL: String = BASE_URL + "infos/key-figures.json"
-        const val MASTER_LOCAL_FILENAME: String = "key-figures.json"
+        const val NATIONAL_SUFFIX: String = "nat"
+        const val LOCAL_FILENAME_TEMPLATE: String = "key-figures-%s.pb.gz"
+        const val URL: String = BASE_URL + "infos/v2%s/$LOCAL_FILENAME_TEMPLATE"
+    }
+
+    object MoreKeyFigures {
         const val FOLDER: String = "MoreKeyFigures/"
         const val URL: String = VERSIONED_SERVER_URL + FOLDER
         const val FILE_PREFIX: String = "morekeyfigures-"
@@ -161,6 +165,7 @@ object ConfigConstant {
     object Store {
         const val GOOGLE: String = "market://details?id=fr.gouv.android.stopcovid"
         const val HUAWEI: String = "appmarket://details?id=fr.gouv.android.stopcovid"
-        const val WEBSITE: String = "https://bonjour.tousanticovid.gouv.fr"
+        const val TAC_WEBSITE: String = "https://bonjour.tousanticovid.gouv.fr"
+        const val STOPCOVID_WEBSITE: String = "https://bonjour.stopcovid.gouv.fr"
     }
 }

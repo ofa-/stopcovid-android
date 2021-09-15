@@ -135,7 +135,7 @@ class AppMaintenanceActivity : AppCompatActivity() {
     private fun startOpenInStore() {
         if (!ConfigConstant.Store.GOOGLE.openInExternalBrowser(this, false)) {
             if (!ConfigConstant.Store.HUAWEI.openInExternalBrowser(this, false)) {
-                ConfigConstant.Store.WEBSITE.openInExternalBrowser(this)
+                ConfigConstant.Store.TAC_WEBSITE.openInExternalBrowser(this)
             }
         }
     }

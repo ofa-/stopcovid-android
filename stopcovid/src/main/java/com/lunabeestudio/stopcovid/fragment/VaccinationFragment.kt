@@ -225,15 +225,8 @@ class VaccinationFragment : MainFragment() {
         MaterialAlertDialogBuilder(requireContext()).showPostalCodeDialog(
             layoutInflater,
             strings,
-            keyFiguresManager,
-        ) { postalCode ->
-            sharedPrefs.chosenPostalCode = postalCode
-            viewLifecycleOwnerOrNull()?.lifecycleScope?.launch {
-                (activity as? MainActivity)?.showProgress(true)
-                vaccinationCenterManager.postalCodeDidUpdate(requireContext(), sharedPrefs, postalCode)
-                (activity as? MainActivity)?.showProgress(false)
-                refreshScreen()
-            }
-        }
+            this,
+            sharedPrefs,
+        )
     }
 }

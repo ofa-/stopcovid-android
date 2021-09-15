@@ -19,7 +19,6 @@ import androidx.core.view.isInvisible
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.setTextOrHide
 import com.lunabeestudio.stopcovid.databinding.ItemKeyFigureCardBinding
-import com.lunabeestudio.stopcovid.model.Trend
 import com.mikepenz.fastadapter.binding.AbstractBindingItem
 
 class KeyFigureCardItem : AbstractBindingItem<ItemKeyFigureCardBinding>() {
@@ -28,8 +27,6 @@ class KeyFigureCardItem : AbstractBindingItem<ItemKeyFigureCardBinding>() {
     var rightLocation: String? = null
     var leftValue: String? = null
     var rightValue: String? = null
-    var leftTrend: Trend? = null
-    var rightTrend: Trend? = null
     var label: String? = null
     var description: String? = null
     var descriptionMaxLines: Int = Int.MAX_VALUE
@@ -51,16 +48,6 @@ class KeyFigureCardItem : AbstractBindingItem<ItemKeyFigureCardBinding>() {
 
         binding.leftLocationTextView.setTextOrHide(leftLocation)
         binding.rightLocationTextView.setTextOrHide(rightLocation)
-
-        leftTrend?.let {
-            binding.leftTrend.setImageResource(it.imageRes)
-            binding.leftTrend.contentDescription = it.hint
-        } ?: binding.leftTrend.setImageDrawable(null)
-
-        rightTrend?.let {
-            binding.rightTrend.setImageResource(it.imageRes)
-            binding.rightTrend.contentDescription = it.hint
-        } ?: binding.rightTrend.setImageDrawable(null)
 
         binding.leftValueTextView.setTextOrHide(leftValue)
         binding.rightValueTextView.setTextOrHide(rightValue)
@@ -104,8 +91,6 @@ class KeyFigureCardItem : AbstractBindingItem<ItemKeyFigureCardBinding>() {
         binding.labelTextView.setTextColor(Color.BLACK)
         binding.leftValueTextView.setTextColor(Color.BLACK)
         binding.rightValueTextView.setTextColor(Color.BLACK)
-        binding.leftTrend.setImageDrawable(null)
-        binding.rightTrend.setImageDrawable(null)
     }
 }
 

@@ -48,7 +48,7 @@ class InfoCenterFragment : TimeMainFragment() {
             refreshScreen()
         }
 
-        binding?.emptyButton?.setOnClickListener {
+        binding?.emptyLayout?.emptyButton?.setOnClickListener {
             showLoading()
             viewLifecycleOwnerOrNull()?.lifecycleScope?.launch(Dispatchers.IO) {
                 infoCenterManager.refreshIfNeeded(requireContext())
@@ -125,9 +125,9 @@ class InfoCenterFragment : TimeMainFragment() {
     override fun refreshScreen() {
         super.refreshScreen()
 
-        binding?.emptyTitleTextView?.text = strings["infoCenterController.noInternet.title"]
-        binding?.emptyDescriptionTextView?.text = strings["infoCenterController.noInternet.subtitle"]
-        binding?.emptyButton?.text = strings["common.retry"]
+        binding?.emptyLayout?.emptyTitleTextView?.text = strings["infoCenterController.noInternet.title"]
+        binding?.emptyLayout?.emptyDescriptionTextView?.text = strings["infoCenterController.noInternet.subtitle"]
+        binding?.emptyLayout?.emptyButton?.text = strings["common.retry"]
     }
 
     override fun timeRefresh() {

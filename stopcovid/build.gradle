@@ -13,6 +13,7 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-parcelize'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'androidx.navigation.safeargs.kotlin'
+apply plugin: 'com.google.protobuf'
 
 android {
     compileSdkVersion 30
@@ -45,8 +46,8 @@ android {
         applicationId "fr.gouv.android.stopcovid"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 344
-        versionName "3.7.4"
+        versionCode 358
+        versionName "3.7.5"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -56,6 +57,24 @@ android {
     }
 
     buildFeatures.viewBinding = true
+
+    def props = new Properties()
+    file("../versions.properties").withInputStream { props.load(it) }
+
+    protobuf {
+        protoc {
+            artifact = "com.google.protobuf:protoc:${props.getProperty("version.com.google.protobuf..protobuf-javalite")}"
+        }
+        generateProtoTasks {
+            all().each { task ->
+                task.builtins {
+                    java {
+                        option "lite"
+                    }
+                }
+            }
+        }
+    }
 }
 
 dependencies {
@@ -78,6 +97,8 @@ dependencies {
     implementation "com.github.chrisbanes:photoview:_"
 
     implementation "nl.dionsegijn:konfetti:_"
+
+    implementation 'com.google.protobuf:protobuf-javalite:_'
 
     implementation project(path: ':analytics')
     implementation project(path: ':coreui')

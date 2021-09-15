@@ -72,4 +72,5 @@ class Configuration(
     var conversionPublicKey: Map<String, String>,
     var conversionApiVersion: Int,
     var maxCertBeforeWarning: Int,
+    var noWaitDoses: Map<String, Int>,
 )

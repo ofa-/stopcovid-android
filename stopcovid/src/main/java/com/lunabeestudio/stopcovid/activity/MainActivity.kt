@@ -201,44 +201,55 @@ class MainActivity : BaseActivity() {
     }
 
     private fun refreshAppBarLayout(destination: NavDestination) {
-        listOf(
+        val noAppBarFragments = listOf(
             R.id.reportQrCodeFragment,
             R.id.venueQrCodeFragment,
             R.id.walletQRCodeFragment,
             R.id.universalQrScanFragment,
             R.id.vaccineCompletionFragment,
             R.id.walletQuantityWarningFragment,
-        ).contains(destination.id).let { noAppBarFragment ->
-            lifecycleScope.launchWhenResumed {
-                val windowInsetsController = WindowInsetsControllerCompat(window, window.decorView)
-                windowInsetsController.isAppearanceLightStatusBars =
-                    if (!noAppBarFragment || destination.id == R.id.vaccineCompletionFragment) {
-                        !isNightMode()
-                    } else {
-                        false
-                    }
-                if (noAppBarFragment) {
-                    // wait for default fragment switch animation time
-                    delay(200L)
+        )
 
-                    binding.appBarLayout.isVisible = false
+        val forceLightStatusIconFragments = listOf(
+            R.id.reportQrCodeFragment,
+            R.id.venueQrCodeFragment,
+            R.id.walletQRCodeFragment,
+            R.id.universalQrScanFragment,
+            R.id.walletQuantityWarningFragment,
+        )
 
-                    // Fix issue where appBarLayout take space even when gone
-                    val params = binding.navHostFragment.layoutParams as CoordinatorLayout.LayoutParams
-                    params.behavior = null
-                    binding.navHostFragment.requestLayout()
+        val isNoAppBarFragment = noAppBarFragments.contains(destination.id)
+        val shouldForceLightStatusIcon = forceLightStatusIconFragments.contains(destination.id)
+
+        lifecycleScope.launchWhenResumed {
+            val windowInsetsController = WindowInsetsControllerCompat(window, window.decorView)
+            windowInsetsController.isAppearanceLightStatusBars =
+                if (shouldForceLightStatusIcon) {
+                    false
                 } else {
-                    setSupportActionBar(binding.toolbar)
-                    setupActionBarWithNavController(this@MainActivity, navController)
-                    // wait for default fragment switch animation time
-                    delay(200L)
-
-                    binding.appBarLayout.isVisible = true
-
-                    // Fix issue where appBarLayout take space even when gone
-                    val params = binding.navHostFragment.layoutParams as CoordinatorLayout.LayoutParams
-                    params.behavior = AppBarLayout.ScrollingViewBehavior()
+                    !isNightMode()
                 }
+            if (isNoAppBarFragment) {
+                // wait for default fragment switch animation time
+                delay(200L)
+
+                binding.appBarLayout.isVisible = false
+
+                // Fix issue where appBarLayout take space even when gone
+                val params = binding.navHostFragment.layoutParams as CoordinatorLayout.LayoutParams
+                params.behavior = null
+                binding.navHostFragment.requestLayout()
+            } else {
+                setSupportActionBar(binding.toolbar)
+                setupActionBarWithNavController(this@MainActivity, navController)
+                // wait for default fragment switch animation time
+                delay(200L)
+
+                binding.appBarLayout.isVisible = true
+
+                // Fix issue where appBarLayout take space even when gone
+                val params = binding.navHostFragment.layoutParams as CoordinatorLayout.LayoutParams
+                params.behavior = AppBarLayout.ScrollingViewBehavior()
             }
         }
     }

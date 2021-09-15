@@ -74,20 +74,20 @@ abstract class FastAdapterFragment : BaseFragment() {
 
     protected fun showLoading(loadingText: String? = null) {
         binding?.recyclerView?.isVisible = false
-        binding?.emptyLayout?.isVisible = false
+        binding?.emptyLayout?.root?.isVisible = false
         binding?.loadingLayout?.isVisible = true
         binding?.loadingDescriptionTextView?.setTextOrHide(loadingText)
     }
 
     protected fun showEmpty() {
         binding?.recyclerView?.isVisible = false
-        binding?.emptyLayout?.isVisible = true
+        binding?.emptyLayout?.root?.isVisible = true
         binding?.loadingLayout?.isVisible = false
     }
 
     protected fun showData() {
         binding?.recyclerView?.isVisible = true
-        binding?.emptyLayout?.isVisible = false
+        binding?.emptyLayout?.root?.isVisible = false
         binding?.loadingLayout?.isVisible = false
     }
 

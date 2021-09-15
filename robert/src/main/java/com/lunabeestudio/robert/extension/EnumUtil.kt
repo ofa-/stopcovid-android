@@ -12,9 +12,14 @@ package com.lunabeestudio.robert.extension
 
 import timber.log.Timber
 
-inline fun <reified T : Enum<T>> safeEnumValueOf(name: String?): T? {
+inline fun <reified T : Enum<T>> safeEnumValueOf(name: String?, uppercase: Boolean = true): T? {
     return try {
-        enumValueOf<T>(name!!)
+        val fixedName = if (uppercase) {
+            name!!.uppercase()
+        } else {
+            name!!
+        }
+        enumValueOf<T>(fixedName)
     } catch (e: IllegalArgumentException) {
         Timber.e("Failed to get enum ${T::class.java.simpleName} for string \"$name\"")
         null

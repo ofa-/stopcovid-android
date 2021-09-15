@@ -16,7 +16,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="@dimen/spacing_large"
-    android:layout_marginBottom="@dimen/spacing_medium"
+    android:layout_marginVertical="@dimen/spacing_medium"
     android:theme="@style/ShapeAppearance.StopCovid.MediumComponent">
 
     <androidx.constraintlayout.widget.ConstraintLayout

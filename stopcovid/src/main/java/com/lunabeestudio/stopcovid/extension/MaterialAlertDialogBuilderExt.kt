@@ -18,12 +18,16 @@ import android.widget.DatePicker
 import android.widget.NumberPicker
 import androidx.appcompat.app.AlertDialog
 import androidx.core.widget.doOnTextChanged
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.lunabeestudio.stopcovid.R
+import com.lunabeestudio.stopcovid.activity.MainActivity
+import com.lunabeestudio.stopcovid.coreui.extension.viewLifecycleOwnerOrNull
+import com.lunabeestudio.stopcovid.coreui.fragment.BaseFragment
 import com.lunabeestudio.stopcovid.coreui.manager.LocalizedStrings
 import com.lunabeestudio.stopcovid.databinding.DialogPostalCodeEditTextBinding
-import com.lunabeestudio.stopcovid.manager.KeyFiguresManager
 import com.lunabeestudio.stopcovid.model.RisksUILevel
+import kotlinx.coroutines.launch
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -32,7 +36,6 @@ import java.util.Date
 fun MaterialAlertDialogBuilder.showPostalCodeDialog(
     layoutInflater: LayoutInflater,
     strings: LocalizedStrings,
-    keyFiguresManager: KeyFiguresManager,
     onPositiveButton: (String) -> Unit,
 ) {
     val postalCodeEditTextBinding = DialogPostalCodeEditTextBinding.inflate(layoutInflater)
@@ -66,13 +69,35 @@ fun MaterialAlertDialogBuilder.showPostalCodeDialog(
     positiveButton.setOnClickListener {
         val result = postalCodeEditTextBinding.textInputEditText.text.toString()
 
-        if (result.isPostalCode() && keyFiguresManager.figures.value?.peekContent()
-            .postalCodeExists(result)
-        ) {
+        if (result.isPostalCode()) {
             onPositiveButton(postalCodeEditTextBinding.textInputEditText.text.toString())
             dialog.dismiss()
         } else {
             postalCodeEditTextBinding.textInputLayout.error = strings["home.infoSection.newPostalCode.alert.wrongPostalCode"]
+        }
+    }
+}
+
+fun MaterialAlertDialogBuilder.showPostalCodeDialog(
+    layoutInflater: LayoutInflater,
+    strings: LocalizedStrings,
+    baseFragment: BaseFragment,
+    sharedPrefs: SharedPreferences,
+) {
+    showPostalCodeDialog(layoutInflater, strings) { postalCode ->
+        if (sharedPrefs.chosenPostalCode != postalCode) {
+            sharedPrefs.chosenPostalCode = postalCode
+            baseFragment.viewLifecycleOwnerOrNull()?.lifecycleScope?.launch {
+                (baseFragment.activity as? MainActivity)?.showProgress(true)
+                baseFragment.injectionContainer.keyFiguresManager.onAppForeground(baseFragment.requireContext())
+                baseFragment.injectionContainer.vaccinationCenterManager.postalCodeDidUpdate(
+                    baseFragment.requireContext(),
+                    sharedPrefs,
+                    postalCode
+                )
+                (baseFragment.activity as? MainActivity)?.showProgress(false)
+                baseFragment.refreshScreen()
+            }
         }
     }
 }

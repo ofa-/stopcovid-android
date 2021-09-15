@@ -28,8 +28,11 @@ class MoreKeyFiguresManager(okHttpClient: OkHttpClient) : SectionManager(okHttpC
         }
     }
 
-    override fun getUrl(): String = ConfigConstant.KeyFigures.URL
-    override val folderName: String = ConfigConstant.KeyFigures.FOLDER
-    override val prefix: String = ConfigConstant.KeyFigures.FILE_PREFIX
+    override fun getUrl(): String {
+        return ConfigConstant.MoreKeyFigures.URL
+    }
+
+    override val folderName: String = ConfigConstant.MoreKeyFigures.FOLDER
+    override val prefix: String = ConfigConstant.MoreKeyFigures.FILE_PREFIX
     override val lastRefreshSharedPrefsKey: String = Constants.SharedPrefs.LAST_MORE_KEY_FIGURES_REFRESH
 }

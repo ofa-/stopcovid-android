@@ -54,6 +54,7 @@
             android:layout_marginTop="@dimen/spacing_large"
             app:constraint_referenced_ids="leftConstraintLayout,rightConstraintLayout"
             app:flow_horizontalBias="0"
+            app:flow_horizontalGap="@dimen/spacing_large"
             app:flow_horizontalStyle="packed"
             app:flow_maxElementsWrap="2"
             app:flow_verticalAlign="bottom"
@@ -90,7 +91,7 @@
                 android:layout_height="wrap_content"
                 android:textAppearance="@style/TextAppearance.StopCovid.Title.KeyFigure"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/leftTrend"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0"
                 app:layout_constraintHorizontal_chainStyle="packed"
                 app:layout_constraintStart_toStartOf="parent"
@@ -98,19 +99,6 @@
                 app:layout_goneMarginEnd="@dimen/spacing_large"
                 tools:text="@tools:sample/lorem[0]" />
 
-            <ImageView
-                android:id="@+id/leftTrend"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/spacing_medium"
-                android:layout_marginEnd="@dimen/spacing_large"
-                android:baselineAlignBottom="true"
-                android:importantForAccessibility="no"
-                app:layout_constraintBaseline_toBaselineOf="@+id/leftValueTextView"
-                app:layout_constraintBottom_toBottomOf="@id/leftValueTextView"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/leftValueTextView"
-                tools:src="@drawable/ic_up" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -121,7 +109,7 @@
 
             <TextView
                 android:id="@+id/rightLocationTextView"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:visibility="gone"
                 app:layout_constraintBottom_toTopOf="@id/rightValueTextView"
@@ -131,7 +119,7 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_bias="1"
                 app:layout_constraintVertical_chainStyle="packed"
-                tools:text="@tools:sample/lorem[0]"
+                tools:text="@tools:sample/lorem[1]"
                 tools:visibility="visible" />
 
             <TextView
@@ -142,7 +130,7 @@
                 android:textAppearance="@style/TextAppearance.StopCovid.Title.KeyFigure"
                 android:visibility="invisible"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/rightTrend"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
 
             <TextView
@@ -154,7 +142,7 @@
                 android:visibility="gone"
                 app:layout_constraintBaseline_toBaselineOf="@id/fakeLeftValueTextView"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/rightTrend"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0"
                 app:layout_constraintHorizontal_chainStyle="packed"
                 app:layout_constraintStart_toStartOf="parent"
@@ -162,18 +150,6 @@
                 tools:text="@tools:sample/lorem[0]"
                 tools:visibility="visible" />
 
-            <ImageView
-                android:id="@+id/rightTrend"
-                android:layout_width="@dimen/icon_small_size"
-                android:layout_height="@dimen/icon_small_size"
-                android:layout_marginStart="@dimen/spacing_medium"
-                android:baselineAlignBottom="true"
-                android:importantForAccessibility="no"
-                app:layout_constraintBaseline_toBaselineOf="@+id/rightValueTextView"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/rightValueTextView"
-                app:layout_constraintTop_toTopOf="@id/rightValueTextView"
-                tools:src="@drawable/ic_down" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <TextView

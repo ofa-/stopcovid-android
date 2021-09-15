@@ -14,7 +14,7 @@ import java.lang.reflect.Type
 
 abstract class RemoteJsonManager<T>(serverManager: ServerManager) : RemoteFileManager(serverManager) {
 
-    private var gson: Gson = Gson()
+    protected val gson: Gson = Gson()
 
     protected abstract val type: Type
     override val mimeType: String = "application/json"

@@ -10,7 +10,7 @@
 
 package com.lunabeestudio.stopcovid.coreui.model
 
-class ApiDaysAfterCompletionEntry(
+class ApiCodeValueEntry(
     val code: String,
     val value: Int,
 )

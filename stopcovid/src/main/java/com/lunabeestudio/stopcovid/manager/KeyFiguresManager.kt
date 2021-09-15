@@ -13,43 +13,130 @@ package com.lunabeestudio.stopcovid.manager
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.google.gson.reflect.TypeToken
+import androidx.preference.PreferenceManager
 import com.lunabeestudio.framework.remote.server.ServerManager
 import com.lunabeestudio.robert.utils.Event
 import com.lunabeestudio.stopcovid.coreui.ConfigConstant
+import com.lunabeestudio.stopcovid.extension.chosenPostalCode
+import com.lunabeestudio.stopcovid.extension.toKeyFigures
 import com.lunabeestudio.stopcovid.model.KeyFigure
+import com.lunabeestudio.stopcovid.model.KeyFiguresNotAvailableException
+import com.lunabeestudio.stopcovid.model.TacResult
 import com.lunabeestudio.stopcovid.widgetshomescreen.KeyFiguresWidget
-import java.lang.reflect.Type
+import keynumbers.Keynumbers
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import timber.log.Timber
+import java.io.File
+import java.io.FileNotFoundException
+import java.util.zip.GZIPInputStream
 
-class KeyFiguresManager(serverManager: ServerManager) : RemoteJsonManager<List<KeyFigure>>(serverManager) {
+class KeyFiguresManager(serverManager: ServerManager) : RemoteFileManager(serverManager) {
 
-    override val type: Type = object : TypeToken<List<KeyFigure>>() {}.type
-    override fun getLocalFileName(context: Context): String = ConfigConstant.KeyFigures.MASTER_LOCAL_FILENAME
-    override fun getRemoteFileUrl(context: Context): String = ConfigConstant.KeyFigures.MASTER_URL
+    override fun getLocalFileName(context: Context): String {
+        val preferences = PreferenceManager.getDefaultSharedPreferences(context)
+        val key = preferences.chosenPostalCode?.let { KeyFigure.getDepartmentKeyFromPostalCode(it) }
+        val suffix = key ?: ConfigConstant.KeyFigures.NATIONAL_SUFFIX
+        return ConfigConstant.KeyFigures.LOCAL_FILENAME_TEMPLATE.format(suffix)
+    }
+
+    override fun getRemoteFileUrl(context: Context): String {
+        val preferences = PreferenceManager.getDefaultSharedPreferences(context)
+        val key = preferences.chosenPostalCode?.let { KeyFigure.getDepartmentKeyFromPostalCode(it) }
+        val codePath = if (key != null) "/$key" else ""
+        val suffix = key ?: ConfigConstant.KeyFigures.NATIONAL_SUFFIX
+        return ConfigConstant.KeyFigures.URL.format(codePath, suffix)
+    }
+
     override fun getAssetFilePath(context: Context): String? = null
+    override val mimeType: String = "application/x-gzip"
 
-    private val _figures: MutableLiveData<Event<List<KeyFigure>>> = MutableLiveData()
-    val figures: LiveData<Event<List<KeyFigure>>>
+    override suspend fun fileNotCorrupted(file: File): Boolean {
+        @Suppress("BlockingMethodInNonBlockingContext")
+        return withContext(Dispatchers.IO) {
+            try {
+                file.inputStream().use { fileInputStream ->
+                    GZIPInputStream(fileInputStream).use { gzipInputStream ->
+                        Keynumbers.KeyNumbersMessage.parseFrom(gzipInputStream)
+                    }
+                }
+                true
+            } catch (e: Exception) {
+                Timber.e(e)
+                false
+            }
+        }
+    }
+
+    private val _figures: MutableLiveData<Event<TacResult<List<KeyFigure>>>> = MutableLiveData()
+    val figures: LiveData<Event<TacResult<List<KeyFigure>>>>
         get() = _figures
 
     val highlightedFigures: KeyFigure?
-        get() = _figures.value?.peekContent()?.firstOrNull { it.isFeatured && (it.isHighlighted == true) }
+        get() = _figures.value?.peekContent()?.data?.firstOrNull { it.isFeatured && (it.isHighlighted == true) }
 
     val featuredFigures: List<KeyFigure>?
-        get() = _figures.value?.peekContent()?.filter { it.isFeatured && (it.isHighlighted != true) }?.take(3)
+        get() = _figures.value?.peekContent()?.data?.filter { it.isFeatured && (it.isHighlighted != true) }?.take(3)
 
     suspend fun initialize(context: Context) {
-        loadLocal(context)?.let { figures ->
-            if (_figures.value?.peekContent() != figures) {
-                _figures.postValue(Event(figures))
-            }
+        val figuresResult = loadLocalResult(context)
+        if (_figures.value?.peekContent() != figuresResult) {
+            _figures.postValue(Event(figuresResult))
         }
         KeyFiguresWidget.updateWidget(context)
     }
 
     suspend fun onAppForeground(context: Context) {
-        if (fetchLast(context)) {
-            initialize(context)
+        fetchLast(context)
+        initialize(context) // call initialize even on error to load local data if available (on postal code change for example)
+    }
+
+    suspend fun loadLocalResult(context: Context): TacResult<List<KeyFigure>> {
+        val localFile = File(context.filesDir, getLocalFileName(context))
+
+        @Suppress("BlockingMethodInNonBlockingContext")
+        val keyFigures = withContext(Dispatchers.IO) {
+            try {
+                localFile.inputStream().use { fileInputStream ->
+                    GZIPInputStream(fileInputStream).use { gzipInputStream ->
+                        Keynumbers.KeyNumbersMessage.parseFrom(gzipInputStream)
+                    }
+                }.toKeyFigures()
+            } catch (e: FileNotFoundException) {
+                Timber.w("${localFile.name} not found, falling back to national key figures")
+                null
+            }
+        }
+
+        if (keyFigures == null) {
+            // Try to fallback to national key figures
+            val preferences = PreferenceManager.getDefaultSharedPreferences(context)
+            val key = preferences.chosenPostalCode?.let { KeyFigure.getDepartmentKeyFromPostalCode(it) }
+            val suffix = key ?: ConfigConstant.KeyFigures.NATIONAL_SUFFIX
+
+            if (suffix != ConfigConstant.KeyFigures.NATIONAL_SUFFIX) {
+                val fallbackFilePath = ConfigConstant.KeyFigures.LOCAL_FILENAME_TEMPLATE.format(ConfigConstant.KeyFigures.NATIONAL_SUFFIX)
+                val fallbackFile = File(context.filesDir, fallbackFilePath)
+
+                @Suppress("BlockingMethodInNonBlockingContext")
+                val natKeyFigures = withContext(Dispatchers.IO) {
+                    try {
+                        fallbackFile.inputStream().use { fileInputStream ->
+                            GZIPInputStream(fileInputStream).use { gzipInputStream ->
+                                Keynumbers.KeyNumbersMessage.parseFrom(gzipInputStream)
+                            }
+                        }.toKeyFigures()
+                    } catch (e: FileNotFoundException) {
+                        Timber.e(e)
+                        null
+                    }
+                }
+                return TacResult.Failure(throwable = KeyFiguresNotAvailableException(), failureData = natKeyFigures)
+            }
+
+            return TacResult.Failure(throwable = KeyFiguresNotAvailableException(), failureData = null)
+        } else {
+            return TacResult.Success(successData = keyFigures)
         }
     }
 }

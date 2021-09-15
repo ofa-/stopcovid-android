@@ -20,7 +20,7 @@ import com.lunabeestudio.robert.model.UnauthorizedException
 import com.lunabeestudio.robert.model.UnknownException
 import com.lunabeestudio.stopcovid.model.WalletCertificateInvalidSignatureException
 import com.lunabeestudio.stopcovid.model.WalletCertificateMalformedException
-import com.lunabeestudio.stopcovid.model.WalletCertificateNoKeyError
+import com.lunabeestudio.stopcovid.model.WalletCertificateNoKeyException
 import retrofit2.HttpException
 import timber.log.Timber
 import java.io.IOException
@@ -48,7 +48,7 @@ internal fun Exception.walletCertificateError(): WalletCertificateError? {
     return when (this) {
         is WalletCertificateInvalidSignatureException -> WalletCertificateError.INVALID_CERTIFICATE_SIGNATURE
         is WalletCertificateMalformedException -> WalletCertificateError.MALFORMED_CERTIFICATE
-        is WalletCertificateNoKeyError -> WalletCertificateError.INVALID_CERTIFICATE_SIGNATURE
+        is WalletCertificateNoKeyException -> WalletCertificateError.INVALID_CERTIFICATE_SIGNATURE
         else -> null
     }
 }

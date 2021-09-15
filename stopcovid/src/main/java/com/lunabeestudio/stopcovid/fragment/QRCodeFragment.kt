@@ -22,6 +22,7 @@ import androidx.core.content.ContextCompat
 import androidx.navigation.ui.NavigationUI
 import com.journeyapps.barcodescanner.BarcodeResult
 import com.lunabeestudio.analytics.manager.AnalyticsManager
+import com.lunabeestudio.stopcovid.coreui.ConfigConstant
 import com.lunabeestudio.stopcovid.coreui.extension.appCompatActivity
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.extension.openAppSettings
@@ -29,6 +30,7 @@ import com.lunabeestudio.stopcovid.coreui.extension.setTextOrHide
 import com.lunabeestudio.stopcovid.coreui.extension.showPermissionRationale
 import com.lunabeestudio.stopcovid.coreui.fragment.BaseFragment
 import com.lunabeestudio.stopcovid.databinding.FragmentQrCodeBinding
+import com.lunabeestudio.stopcovid.extension.emitDefaultKonfetti
 import com.lunabeestudio.stopcovid.extension.injectionContainer
 import com.lunabeestudio.stopcovid.extension.openInExternalBrowser
 
@@ -142,9 +144,15 @@ abstract class QRCodeFragment : BaseFragment() {
     fun resumeQrCodeReader() {
         binding?.qrCodeReaderView?.resume()
         binding?.qrCodeReaderView?.decodeContinuous { result: BarcodeResult? ->
-            binding?.qrCodeReaderView?.stopDecoding()
             result?.text?.let { code ->
-                onCodeScanned(code)
+                if (code == ConfigConstant.Store.TAC_WEBSITE || code == ConfigConstant.Store.STOPCOVID_WEBSITE) {
+                    if (binding?.konfettiView?.isActive() == false) {
+                        binding?.konfettiView?.emitDefaultKonfetti(binding)
+                    }
+                } else {
+                    binding?.qrCodeReaderView?.stopDecoding()
+                    onCodeScanned(code)
+                }
             }
         }
     }

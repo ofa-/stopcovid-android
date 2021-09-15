@@ -44,6 +44,7 @@ class PostalCodeBottomSheetFragment : BottomSheetDialogFragment() {
     private val vaccinationCenterManager: VaccinationCenterManager by lazy(LazyThreadSafetyMode.NONE) {
         injectionContainer.vaccinationCenterManager
     }
+
     private val keyFiguresManager: KeyFiguresManager by lazy(LazyThreadSafetyMode.NONE) {
         injectionContainer.keyFiguresManager
     }
@@ -65,6 +66,7 @@ class PostalCodeBottomSheetFragment : BottomSheetDialogFragment() {
                 viewLifecycleOwnerOrNull()?.lifecycleScope?.launch {
                     context?.let { context ->
                         (activity as? MainActivity)?.showProgress(true)
+                        keyFiguresManager.onAppForeground(context)
                         vaccinationCenterManager.postalCodeDidUpdate(context, sharedPrefs, null)
                         (activity as? MainActivity)?.showProgress(false)
                         dismissDialog(true)
@@ -87,13 +89,13 @@ class PostalCodeBottomSheetFragment : BottomSheetDialogFragment() {
             MaterialAlertDialogBuilder(it).showPostalCodeDialog(
                 layoutInflater,
                 strings,
-                keyFiguresManager,
             ) { postalCode ->
                 if (sharedPrefs.chosenPostalCode != postalCode) {
                     sharedPrefs.chosenPostalCode = postalCode
                     viewLifecycleOwnerOrNull()?.lifecycleScope?.launch {
                         context?.let { context ->
                             (activity as? MainActivity)?.showProgress(true)
+                            keyFiguresManager.onAppForeground(context)
                             vaccinationCenterManager.postalCodeDidUpdate(context, sharedPrefs, postalCode)
                             (activity as? MainActivity)?.showProgress(false)
                             dismissDialog(true)

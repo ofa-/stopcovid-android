@@ -71,6 +71,7 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -264,7 +265,7 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Localized
     @OptIn(ExperimentalTime::class)
     private fun refreshData() {
         appCoroutineScope.launch(Dispatchers.IO) {
-            launch {
+            coroutineScope {
                 launch {
                     if (firstResume) {
                         delay(Duration.seconds(1)) // Add some delay to let the main activity start
@@ -314,7 +315,7 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Localized
                 launch {
                     robertManager.refreshConfig(this@StopCovid)
                 }
-            }.join()
+            }
 
             injectionContainer.serverManager.okHttpClient.connectionPool.evictAll()
         }

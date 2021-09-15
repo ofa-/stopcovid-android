@@ -99,6 +99,7 @@ import com.lunabeestudio.stopcovid.fastitem.ProximityButtonItem
 import com.lunabeestudio.stopcovid.fastitem.State
 import com.lunabeestudio.stopcovid.fastitem.bigTitleItem
 import com.lunabeestudio.stopcovid.fastitem.changePostalCodeItem
+import com.lunabeestudio.stopcovid.fastitem.explanationActionCardItem
 import com.lunabeestudio.stopcovid.fastitem.highlightedNumberCardItem
 import com.lunabeestudio.stopcovid.fastitem.logoItem
 import com.lunabeestudio.stopcovid.fastitem.numbersCardItem
@@ -113,7 +114,9 @@ import com.lunabeestudio.stopcovid.model.CaptchaNextFragment
 import com.lunabeestudio.stopcovid.model.CovidException
 import com.lunabeestudio.stopcovid.model.DeviceSetup
 import com.lunabeestudio.stopcovid.model.KeyFigure
+import com.lunabeestudio.stopcovid.model.KeyFiguresNotAvailableException
 import com.lunabeestudio.stopcovid.model.NoEphemeralBluetoothIdentifierFound
+import com.lunabeestudio.stopcovid.model.TacResult
 import com.lunabeestudio.stopcovid.service.ProximityService
 import com.lunabeestudio.stopcovid.utils.ExtendedFloatingActionButtonScrollListener
 import com.lunabeestudio.stopcovid.viewmodel.ProximityViewModel
@@ -517,7 +520,7 @@ class ProximityFragment : TimeMainFragment() {
             onCardClick = {
                 if (!ConfigConstant.Store.GOOGLE.openInExternalBrowser(requireContext(), false)) {
                     if (!ConfigConstant.Store.HUAWEI.openInExternalBrowser(requireContext(), false)) {
-                        ConfigConstant.Store.WEBSITE.openInExternalBrowser(requireContext())
+                        ConfigConstant.Store.TAC_WEBSITE.openInExternalBrowser(requireContext())
                     }
                 }
             }
@@ -738,6 +741,33 @@ class ProximityFragment : TimeMainFragment() {
             findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToKeyFiguresFragment())
         }
 
+        val localKeyFiguresFetchError = (keyFiguresManager.figures.value?.peekContent() as? TacResult.Failure)?.throwable
+        if (localKeyFiguresFetchError is KeyFiguresNotAvailableException) {
+            items += explanationActionCardItem {
+                explanation = localKeyFiguresFetchError.getString(strings)
+                bottomText = strings["keyFiguresController.fetchError.button"]
+                onClick = {
+                    viewLifecycleOwnerOrNull()?.lifecycleScope?.launch {
+                        (activity as? MainActivity)?.showProgress(true)
+                        keyFiguresManager.onAppForeground(requireContext())
+                        vaccinationCenterManager.postalCodeDidUpdate(
+                            requireContext(),
+                            sharedPrefs,
+                            sharedPrefs.chosenPostalCode,
+                        )
+                        (activity as? MainActivity)?.showProgress(false)
+                        refreshScreen()
+                    }
+                }
+                identifier = "keyFiguresController.fetchError.button".hashCode().toLong()
+            }
+
+            items += spaceItem {
+                spaceRes = R.dimen.spacing_medium
+                identifier = items.count().toLong()
+            }
+        }
+
         keyFiguresManager.highlightedFigures?.let { figure ->
             strings[figure.labelShortStringKey]?.let { shortTitle ->
                 items += highlightedNumberCardItem {
@@ -765,20 +795,20 @@ class ProximityFragment : TimeMainFragment() {
             }
         }
 
-        items += numbersCardItem {
-            if (isHighlighted) {
-                subheader = null
-                header = strings["home.infoSection.otherKeyFigures"]
-            } else {
-                subheader = strings["keyfigure.dailyUpdates"]
-                header = strings["home.infoSection.keyFigures"]
-            }
-            link = strings["home.infoSection.seeAll"]
-            contentDescription = strings["home.infoSection.seeAll"]
-            onClickListener = keyFiguresClickListener
-            identifier = header.hashCode().toLong()
+        keyFiguresManager.featuredFigures?.let { keyFigures ->
+            items += numbersCardItem {
+                if (isHighlighted) {
+                    subheader = null
+                    header = strings["home.infoSection.otherKeyFigures"]
+                } else {
+                    subheader = strings["keyfigure.dailyUpdates"]
+                    header = strings["home.infoSection.keyFigures"]
+                }
+                link = strings["home.infoSection.seeAll"]
+                contentDescription = strings["home.infoSection.seeAll"]
+                onClickListener = keyFiguresClickListener
+                identifier = header.hashCode().toLong()
 
-            keyFiguresManager.featuredFigures?.let { keyFigures ->
                 franceData = NumbersCardItem.Data(
                     strings["common.country.france"],
                     generateFromKeyFigure(keyFigures.getOrNull(0)),
@@ -786,7 +816,7 @@ class ProximityFragment : TimeMainFragment() {
                     generateFromKeyFigure(keyFigures.getOrNull(2))
                 )
 
-                localData = if (sharedPrefs.hasChosenPostalCode) {
+                localData = if (sharedPrefs.hasChosenPostalCode && localKeyFiguresFetchError !is KeyFiguresNotAvailableException) {
                     NumbersCardItem.Data(
                         keyFigures.getDepartmentLabel(sharedPrefs.chosenPostalCode),
                         generateFromKeyFigure(keyFigures.getOrNull(0), true),
@@ -945,16 +975,9 @@ class ProximityFragment : TimeMainFragment() {
         MaterialAlertDialogBuilder(requireContext()).showPostalCodeDialog(
             layoutInflater,
             strings,
-            keyFiguresManager,
-        ) { postalCode ->
-            sharedPrefs.chosenPostalCode = postalCode
-            viewLifecycleOwnerOrNull()?.lifecycleScope?.launch {
-                (activity as? MainActivity)?.showProgress(true)
-                vaccinationCenterManager.postalCodeDidUpdate(requireContext(), sharedPrefs, postalCode)
-                (activity as? MainActivity)?.showProgress(false)
-                refreshScreen()
-            }
-        }
+            this,
+            sharedPrefs
+        )
     }
 
     private fun addDeclareItems(items: ArrayList<GenericItem>) {
