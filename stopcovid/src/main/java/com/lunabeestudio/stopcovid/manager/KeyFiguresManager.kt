@@ -29,6 +29,7 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.File
 import java.io.FileNotFoundException
+import java.io.IOException
 import java.util.zip.GZIPInputStream
 
 class KeyFiguresManager(serverManager: ServerManager) : RemoteFileManager(serverManager) {
@@ -102,7 +103,7 @@ class KeyFiguresManager(serverManager: ServerManager) : RemoteFileManager(server
                         Keynumbers.KeyNumbersMessage.parseFrom(gzipInputStream)
                     }
                 }.toKeyFigures()
-            } catch (e: FileNotFoundException) {
+            } catch (e: IOException) {
                 Timber.w("${localFile.name} not found, falling back to national key figures")
                 null
             }

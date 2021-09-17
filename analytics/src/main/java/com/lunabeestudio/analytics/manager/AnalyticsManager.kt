@@ -314,10 +314,14 @@ class AnalyticsManager(okHttpClient: OkHttpClient, context: Context) : Lifecycle
 
     private fun writeTimestampedEventProtoToFile(file: File, timestampedEventProtoList: ProtoStorage.TimestampedEventProtoList) {
         executeActionOnAtomicFile {
-            val atomicFile = AtomicFile(file)
-            val fileOutputStream = atomicFile.startWrite()
-            timestampedEventProtoList.writeTo(fileOutputStream)
-            atomicFile.finishWrite(fileOutputStream)
+            try {
+                val atomicFile = AtomicFile(file)
+                val fileOutputStream = atomicFile.startWrite()
+                timestampedEventProtoList.writeTo(fileOutputStream)
+                atomicFile.finishWrite(fileOutputStream)
+            } catch (e: Exception) {
+                Timber.e(e)
+            }
         }
     }
 

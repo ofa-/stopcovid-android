@@ -77,7 +77,8 @@ class MainActivity : BaseActivity() {
         PreferenceManager.getDefaultSharedPreferences(this)
     }
 
-    private var strings: LocalizedStrings = (application as? LocalizedApplication)?.localizedStrings ?: emptyMap()
+    private val strings: LocalizedStrings
+        get() = (application as? LocalizedApplication)?.localizedStrings ?: emptyMap()
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
@@ -182,8 +183,7 @@ class MainActivity : BaseActivity() {
     }
 
     private fun initStringsObserver() {
-        (application as? LocalizedApplication)?.liveLocalizedStrings?.observeEventAndConsume(this) { strings ->
-            this.strings = strings
+        (application as? LocalizedApplication)?.liveLocalizedStrings?.observeEventAndConsume(this) {
             invalidateOptionsMenu()
         }
     }
