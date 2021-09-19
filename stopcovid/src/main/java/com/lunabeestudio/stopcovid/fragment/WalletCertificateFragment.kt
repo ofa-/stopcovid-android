@@ -253,9 +253,7 @@ class WalletCertificateFragment : MainFragment() {
         }
         val conversionLambda = when (certificate) {
             is FrenchCertificate -> { ->
-                if (robertManager.configuration.displayCertificateConversion && !viewModel.isBlacklisted(certificate)) {
                         showConversionConfirmationAlert(certificate)
-                }
             }
             is EuropeanCertificate -> null
         }
