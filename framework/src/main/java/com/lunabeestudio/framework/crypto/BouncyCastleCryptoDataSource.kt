@@ -36,7 +36,7 @@ class BouncyCastleCryptoDataSource : SharedCryptoDataSource {
     override fun createECDHKeyPair(): KeyPair {
         val ecSpec: ECParameterSpec = ECNamedCurveTable.getParameterSpec(NAMED_CURVE_SPEC)
         val bouncyCastleProvider = BouncyCastleProvider()
-        val keyPairGenerator = KeyPairGenerator.getInstance(ALGORITHM_ECDH, bouncyCastleProvider)
+        val keyPairGenerator = KeyPairGenerator.getInstance(ALGORITHM_EC, bouncyCastleProvider)
         keyPairGenerator.initialize(ecSpec, SecureRandom())
         return keyPairGenerator.generateKeyPair()
     }
@@ -47,7 +47,7 @@ class BouncyCastleCryptoDataSource : SharedCryptoDataSource {
         derivationDataArray: List<ByteArray>,
     ): List<ByteArray> {
         val bouncyCastleProvider = BouncyCastleProvider()
-        val keyFactory = KeyFactory.getInstance(ALGORITHM_ECDH, bouncyCastleProvider)
+        val keyFactory = KeyFactory.getInstance(ALGORITHM_EC, bouncyCastleProvider)
         val serverPublicKey = keyFactory.generatePublic(X509EncodedKeySpec(rawServerPublicKey))
         val localPrivateKey = keyFactory.generatePrivate(PKCS8EncodedKeySpec(rawLocalPrivateKey))
 
@@ -107,6 +107,7 @@ class BouncyCastleCryptoDataSource : SharedCryptoDataSource {
     companion object {
         private const val HASH_HMACSHA256 = "HmacSHA256"
         private const val NAMED_CURVE_SPEC = "secp256r1"
+        private const val ALGORITHM_EC = "EC"
         private const val ALGORITHM_ECDH = "ECDH"
         private const val ALGORITHM_AES = "AES"
 

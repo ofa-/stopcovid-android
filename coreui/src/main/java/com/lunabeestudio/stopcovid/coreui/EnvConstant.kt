@@ -12,7 +12,6 @@ package com.lunabeestudio.stopcovid.coreui
 
 enum class EnvConstant {
     Prod {
-        override val captchaApiKey: String = "6LettPsUAAAAAHYaFdRBOilHUgmTMSIPKNZN4D7l"
         override val baseUrl: String = "https://api.tousanticovid.gouv.fr"
         override val cleaStatusBaseUrl: String = "https://s3.fr-par.scw.cloud/clea-batch/"
         override val cleaReportBaseUrl: String = "https://signal-api.tousanticovid.gouv.fr/"
@@ -25,7 +24,6 @@ enum class EnvConstant {
         override val conversionBaseUrl: String = "https://portail.tacv.myservices-ingroupe.com"
     };
 
-    abstract val captchaApiKey: String
     abstract val baseUrl: String
     abstract val cleaStatusBaseUrl: String
     abstract val cleaReportBaseUrl: String

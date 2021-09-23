@@ -71,7 +71,6 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -265,56 +264,30 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Localized
     @OptIn(ExperimentalTime::class)
     private fun refreshData() {
         appCoroutineScope.launch(Dispatchers.IO) {
-            coroutineScope {
-                launch {
-                    if (firstResume) {
-                        delay(Duration.seconds(1)) // Add some delay to let the main activity start
-                    }
-                    AppMaintenanceManager.checkForMaintenanceUpgrade(this@StopCovid, injectionContainer.serverManager.okHttpClient)
-                    firstResume = false
-                }
-                launch {
-                    injectionContainer.moreKeyFiguresManager.onAppForeground(this@StopCovid)
-                }
-                launch {
-                    injectionContainer.linksManager.onAppForeground(this@StopCovid)
-                }
-                launch {
-                    injectionContainer.privacyManager.onAppForeground(this@StopCovid)
-                }
-                launch {
-                    injectionContainer.stringsManager.onAppForeground(this@StopCovid)
-                }
-                launch {
-                    injectionContainer.infoCenterManager.refreshIfNeeded(this@StopCovid)
-                }
-                launch {
-                    injectionContainer.keyFiguresManager.onAppForeground(this@StopCovid)
-                }
-                launch {
-                    injectionContainer.risksLevelManager.onAppForeground(this@StopCovid)
-                }
-                launch {
-                    injectionContainer.blacklistDCCManager.onAppForeground(this@StopCovid)
-                }
-                launch {
-                    injectionContainer.blacklist2DDOCManager.onAppForeground(this@StopCovid)
-                }
-                launch {
-                    injectionContainer.formManager.onAppForeground(this@StopCovid)
-                }
-                launch {
-                    injectionContainer.vaccinationCenterManager.onAppForeground(this@StopCovid, sharedPrefs)
-                }
-                launch {
-                    injectionContainer.certificatesDocumentsManager.onAppForeground(this@StopCovid)
-                }
-                launch {
-                    injectionContainer.dccCertificatesManager.onAppForeground(this@StopCovid)
-                }
-                launch {
-                    robertManager.refreshConfig(this@StopCovid)
-                }
+            if (firstResume) {
+                delay(Duration.seconds(1)) // Add some delay to let the main activity start
+            }
+            firstResume = false
+
+            AppMaintenanceManager.checkForMaintenanceUpgrade(this@StopCovid, injectionContainer.serverManager.okHttpClient)
+            injectionContainer.moreKeyFiguresManager.onAppForeground(this@StopCovid)
+            injectionContainer.linksManager.onAppForeground(this@StopCovid)
+            injectionContainer.privacyManager.onAppForeground(this@StopCovid)
+            injectionContainer.stringsManager.onAppForeground(this@StopCovid)
+            injectionContainer.infoCenterManager.refreshIfNeeded(this@StopCovid)
+            injectionContainer.keyFiguresManager.onAppForeground(this@StopCovid)
+            injectionContainer.risksLevelManager.onAppForeground(this@StopCovid)
+            injectionContainer.blacklistDCCManager.onAppForeground(this@StopCovid)
+            injectionContainer.blacklist2DDOCManager.onAppForeground(this@StopCovid)
+            injectionContainer.formManager.onAppForeground(this@StopCovid)
+            injectionContainer.vaccinationCenterManager.onAppForeground(this@StopCovid, sharedPrefs)
+            injectionContainer.certificatesDocumentsManager.onAppForeground(this@StopCovid)
+            injectionContainer.dccCertificatesManager.onAppForeground(this@StopCovid)
+
+            try {
+                robertManager.refreshConfig(this@StopCovid)
+            } catch (e: Exception) {
+                Timber.e(e)
             }
 
             injectionContainer.serverManager.okHttpClient.connectionPool.evictAll()

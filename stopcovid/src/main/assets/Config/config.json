@@ -121,8 +121,20 @@
          "value":false
       },
       {
-         "name":"app.activityPass.minRemainingHoursToRegenerate",
-         "value":4.0
+          "name": "app.activtyPass.autoRenewable",
+          "value": false
+      },
+      {
+          "name": "app.activityPass.skipNegTestHours",
+          "value": 48
+      },
+      {
+          "name": "app.activityPass.generationServerPublicKey",
+          "value": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEbW1CsREnlCkmZIzpX/D3jBB5ok5shbIYSHCpE/1Q0QqY2JmfpS2qlPLYJcu7Ouc7YNRXT+c3uTtv1Drokzf+oA=="
+      },
+      {
+          "name": "app.activityPass.renewThreshold",
+          "value": 3
       },
       {
          "name":"app.wallet.maxCertBeforeWarning",
