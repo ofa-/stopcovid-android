@@ -36,6 +36,7 @@ import com.lunabeestudio.stopcovid.extension.flaggedCountry
 import com.lunabeestudio.stopcovid.extension.getString
 import com.lunabeestudio.stopcovid.extension.hideRiskStatus
 import com.lunabeestudio.stopcovid.extension.isolationManager
+import com.lunabeestudio.stopcovid.extension.listLogFiles
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
@@ -43,7 +44,6 @@ import com.lunabeestudio.stopcovid.extension.venuesFeaturedWasActivatedAtLeastOn
 import com.lunabeestudio.stopcovid.fastitem.dangerButtonItem
 import com.lunabeestudio.stopcovid.fastitem.selectionItem
 import com.lunabeestudio.stopcovid.manager.ProximityManager
-import com.lunabeestudio.stopcovid.manager.VenuesManager
 import com.lunabeestudio.stopcovid.model.DeviceSetup
 import com.lunabeestudio.stopcovid.viewmodel.ManageDataViewModel
 import com.lunabeestudio.stopcovid.viewmodel.ManageDataViewModelFactory
@@ -69,7 +69,10 @@ class ManageDataFragment : MainFragment() {
             robertManager,
             isolationManager,
             vaccinationCenterManager,
+            venueRepository,
+            walletRepository,
             analyticsManager,
+            debugManager,
         )
     }
 
@@ -104,6 +107,9 @@ class ManageDataFragment : MainFragment() {
             findNavControllerOrNull()?.safeNavigate(ManageDataFragmentDirections.actionGlobalOnBoardingActivity())
             activity?.finishAndRemoveTask()
         }
+        viewModel.venuesQrCodeLiveData.observe(viewLifecycleOwner) {
+            refreshScreen()
+        }
     }
 
     override fun getItems(): List<GenericItem> {
@@ -125,9 +131,7 @@ class ManageDataFragment : MainFragment() {
         }
         if (sharedPreferences.venuesFeaturedWasActivatedAtLeastOneTime
             || robertManager.configuration.displayRecordVenues
-            || !VenuesManager.getVenuesQrCode(
-                    requireContext().secureKeystoreDataSource(),
-                ).isNullOrEmpty()
+            || !viewModel.venuesQrCodeLiveData.value.isNullOrEmpty()
         ) {
             eraseVenuesItems(items)
             spaceDividerItems(items)
@@ -146,6 +150,9 @@ class ManageDataFragment : MainFragment() {
             optOutAnalyticsItems(items)
             spaceDividerItems(items)
         }
+
+        logsItems(items)
+        spaceDividerItems(items)
 
         if (deviceSetup != DeviceSetup.NO_BLE || robertManager.isRegistered) {
             quitStopCovidItems(items)
@@ -441,6 +448,56 @@ class ManageDataFragment : MainFragment() {
                     .show()
             }
             identifier = "manageDataController.analytics.button".hashCode().toLong()
+        }
+    }
+
+    private fun logsItems(items: MutableList<GenericItem>) {
+        items += titleItem {
+            text = strings["manageDataController.logFiles.title"]
+            identifier = "manageDataController.logFiles.title".hashCode().toLong()
+        }
+        items += spaceItem {
+            spaceRes = R.dimen.spacing_medium
+        }
+        items += captionItem {
+            text = strings["manageDataController.logFiles.subtitle"]
+            identifier = "manageDataController.logFiles.subtitle".hashCode().toLong()
+        }
+        if (!debugManager.logsDir.listLogFiles().isNullOrEmpty()) {
+            items += captionItem {
+                text = stringsFormat("manageDataController.logFiles.logsFilesCount", debugManager.logsDir.listLogFiles()?.count() ?: 0)
+                identifier = "manageDataController.logFiles.noLogs".hashCode().toLong()
+            }
+            items += lightButtonItem {
+                text = strings["manageDataController.logFiles.share.button"]
+                onClickListener = View.OnClickListener {
+                    viewModel.exportLogs(requireContext(), strings)
+                }
+                identifier = "manageDataController.logs.button".hashCode().toLong()
+            }
+            items += lightButtonItem {
+                text = strings["manageDataController.logFiles.delete.button"]
+                onClickListener = View.OnClickListener {
+                    MaterialAlertDialogBuilder(requireContext())
+                        .setTitle(strings["manageDataController.logFiles.delete.confirmationDialog.title"])
+                        .setMessage(strings["manageDataController.logFiles.delete.confirmationDialog.message"])
+                        .setNegativeButton(strings["common.cancel"], null)
+                        .setPositiveButton(strings["common.confirm"]) { _, _ ->
+                            context?.let {
+                                debugManager.logsDir.deleteRecursively()
+                                debugManager.logsDir.mkdir()
+                                refreshScreen()
+                            }
+                        }
+                        .show()
+                }
+                identifier = "manageDataController.logFiles.delete.button".hashCode().toLong()
+            }
+        } else {
+            items += captionItem {
+                text = strings["manageDataController.logFiles.noLogs"]
+                identifier = "manageDataController.logFiles.noLogs".hashCode().toLong()
+            }
         }
     }
 

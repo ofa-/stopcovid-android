@@ -309,9 +309,9 @@ class LocalCryptoManager(private val appContext: Context) {
     }
 
     companion object {
-        private const val SHARED_PREF_NAME = "crypto_prefs"
+        const val SHARED_PREF_NAME: String = "crypto_prefs"
 
-        private const val ANDROID_KEY_STORE_PROVIDER = "AndroidKeyStore"
+        const val ANDROID_KEY_STORE_PROVIDER: String = "AndroidKeyStore"
         private const val AES_GCM_CIPHER_TYPE = "AES/GCM/NoPadding"
         private const val AES_GCM_KEY_SIZE_IN_BITS = 128
         private const val AES_GCM_IV_LENGTH = 12

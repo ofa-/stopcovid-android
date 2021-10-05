@@ -5,7 +5,7 @@
  *
  * Authors
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Created by Lunabee Studio / Date - 2021/31/8 - for the TOUS-ANTI-COVID project
+ * Created by Lunabee Studio / Date - 2021/26/8 - for the TOUS-ANTI-COVID project
  */
 
 package com.lunabeestudio.stopcovid.extension

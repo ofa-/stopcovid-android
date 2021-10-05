@@ -14,4 +14,8 @@
     <string name="splashScreenErrorDialog.positiveButton">Réessayer</string>
     <string name="splashScreenErrorDialog.negativeButton">Quitter</string>
     <string name="attestation_widget_create_attestation">Nouvelle attestation</string>
+    <string name="attestation_widget_name">Attestations</string>
+    <string name="figures_widget_name">Chiffres clés</string>
+    <string name="proximity_widget_name">Status</string>
+    <string name="dcc_widget_name">Certificat favori</string>
 </resources>

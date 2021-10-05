@@ -73,4 +73,5 @@ class Configuration(
     var conversionApiVersion: Int,
     var maxCertBeforeWarning: Int,
     var noWaitDoses: Map<String, Int>,
+    var ratingsKeyFiguresOpeningThreshold: Int,
 )

@@ -11,6 +11,7 @@
 package com.lunabeestudio.stopcovid.fragment
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.os.Bundle
 import android.view.Gravity
 import android.view.HapticFeedbackConstants
@@ -31,10 +32,13 @@ import com.lunabeestudio.stopcovid.coreui.extension.appCompatActivity
 import com.lunabeestudio.stopcovid.coreui.extension.fetchSystemColor
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.fastitem.buttonItem
+import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.cardWithActionItem
+import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.databinding.FragmentRecyclerViewKonfettiBinding
 import com.lunabeestudio.stopcovid.extension.emitDefaultKonfetti
 import com.lunabeestudio.stopcovid.extension.robertManager
+import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
 import com.lunabeestudio.stopcovid.extension.vaccineDate
 import com.lunabeestudio.stopcovid.extension.vaccineDose
 import com.lunabeestudio.stopcovid.extension.vaccineMedicinalProduct
@@ -68,8 +72,16 @@ class VaccineCompletionFragment : MainFragment() {
         requireContext().robertManager().configuration
     }
 
+    private val keystoreDataSource by lazy {
+        requireContext().secureKeystoreDataSource()
+    }
+
     private val viewModel: VaccineCompletionViewModel by viewModels {
-        VaccineCompletionViewModelFactory(args.certificateValue)
+        VaccineCompletionViewModelFactory(
+            args.certificateId,
+            keystoreDataSource,
+            walletRepository,
+        )
     }
 
     private val longDateFormat = SimpleDateFormat.getDateInstance(DateFormat.LONG)
@@ -107,6 +119,9 @@ class VaccineCompletionFragment : MainFragment() {
             } else {
                 showLoading()
             }
+        }
+        viewModel.showWalletEvent.observe(viewLifecycleOwner) {
+            findNavControllerOrNull()?.popBackStack()
         }
     }
 
@@ -147,9 +162,9 @@ class VaccineCompletionFragment : MainFragment() {
         val vaccineMedicinalProduct: String? = greenCertificate.vaccineMedicinalProduct
         val vaccineDoseNumber = greenCertificate.vaccineDose?.first ?: 0
         val noWaitDoses: Boolean = (
-            configuration.noWaitDoses[vaccineMedicinalProduct]
-                ?: configuration.noWaitDoses[DEFAULT_KEY]
-            )
+                configuration.noWaitDoses[vaccineMedicinalProduct]
+                    ?: configuration.noWaitDoses[DEFAULT_KEY]
+                )
             ?.let { vaccineDoseNumber >= it }
             ?: false
         val daysAfterCompletion = try {
@@ -164,7 +179,7 @@ class VaccineCompletionFragment : MainFragment() {
             time = vaccineDate
             add(Calendar.DAY_OF_YEAR, daysAfterCompletion)
         }.time
-        val isVaccineCompleted = noWaitDoses || completedDate <= Date()
+        val isVaccineCompleted = (noWaitDoses || completedDate <= Date())
 
         val items = mutableListOf<GenericItem>()
 
@@ -201,34 +216,112 @@ class VaccineCompletionFragment : MainFragment() {
         }
 
         if (!isVaccineCompleted && !reminderSet) {
-            items += buttonItem {
-                text = stringsFormat(
-                    "vaccineCompletionController.$stringStateKey.button.notifyMe.title",
-                    noYearDateFormat.format(completedDate)
-                )
-                width = ViewGroup.LayoutParams.MATCH_PARENT
-                onClickListener = View.OnClickListener {
-                    val context = context ?: return@OnClickListener
+            items.addNotifyItems(completedDate, stringStateKey)
+        }
 
-                    val reminderWorker = OneTimeWorkRequestBuilder<VaccineCompletedNotificationWorker>()
-                        .setInitialDelay(completedDate.time - System.currentTimeMillis(), TimeUnit.MILLISECONDS)
-                        .build()
-                    WorkManager.getInstance(context)
-                        .enqueueUniqueWork(Constants.WorkerNames.VACCINATION_COMPLETED_REMINDER, ExistingWorkPolicy.REPLACE, reminderWorker)
-
-                    strings["vaccineCompletionController.pending.button.notifyMe.feedback"]?.let { message ->
-                        (activity as? MainActivity)?.showSnackBar(message)
-                    }
-
-                    reminderSet = true
-                    refreshScreen()
-                }
-
-                identifier = "vaccineCompletionController.$stringStateKey.button.notifyMe.title".hashCode().toLong()
-            }
+        if (isVaccineCompleted || reminderSet) {
+            items.addFavoriteItems()
+        } else {
+            items.addNotifyAndFavoriteItems(completedDate)
+        }
+        items += spaceItem {
+            spaceRes = R.dimen.spacing_large
         }
 
         return items
+    }
+
+    private fun MutableList<GenericItem>.addNotifyItems(completedDate: Date, stringStateKey: String) {
+        this += spaceItem {
+            spaceRes = R.dimen.spacing_large
+        }
+        this += buttonItem {
+            text = stringsFormat(
+                "vaccineCompletionController.$stringStateKey.button.notifyMe.title",
+                noYearDateFormat.format(completedDate)
+            )
+            width = ViewGroup.LayoutParams.MATCH_PARENT
+            bottomMarginRes = null
+            onClickListener = View.OnClickListener {
+                context?.let {
+                    if (!reminderSet) {
+                        notifyMe(it, completedDate)
+                    }
+                }
+            }
+            identifier = "vaccineCompletionController.$stringStateKey.button.notifyMe.title".hashCode().toLong()
+        }
+        this += captionItem {
+            text = stringsFormat(
+                "vaccineCompletionController.footer.notify",
+                noYearDateFormat.format(completedDate)
+            )
+            textAppearance = R.style.TextAppearance_StopCovid_Caption_Small_Grey
+            identifier = "vaccineCompletionController.footer.notify".hashCode().toLong()
+        }
+    }
+
+    private fun MutableList<GenericItem>.addNotifyAndFavoriteItems(completedDate: Date) {
+        this += spaceItem {
+            spaceRes = R.dimen.spacing_large
+        }
+        this += buttonItem {
+            text = strings["vaccineCompletionController.button.notifyAndFavorite.title"]
+            width = ViewGroup.LayoutParams.MATCH_PARENT
+            bottomMarginRes = null
+            onClickListener = View.OnClickListener {
+                context?.let {
+                    if (!reminderSet) {
+                        notifyMe(it, completedDate)
+                    }
+                }
+                viewModel.addCertificateInFavorite()
+            }
+            identifier = "vaccineCompletionController.button.notifyAndFavorite.title".hashCode().toLong()
+        }
+        this += captionItem {
+            text = stringsFormat(
+                "vaccineCompletionController.footer.notifyAndFavorite",
+                noYearDateFormat.format(completedDate)
+            )
+            textAppearance = R.style.TextAppearance_StopCovid_Caption_Small_Grey
+            identifier = "vaccineCompletionController.footer.notifyAndFavorite".hashCode().toLong()
+        }
+    }
+
+    private fun MutableList<GenericItem>.addFavoriteItems() {
+        this += spaceItem {
+            spaceRes = R.dimen.spacing_large
+        }
+        this += buttonItem {
+            text = strings["vaccineCompletionController.button.favorite.title"]
+            width = ViewGroup.LayoutParams.MATCH_PARENT
+            bottomMarginRes = null
+            onClickListener = View.OnClickListener {
+                viewModel.addCertificateInFavorite()
+            }
+            identifier = "vaccineCompletionController.button.favorite.title".hashCode().toLong()
+        }
+        this += captionItem {
+            text = strings["vaccineCompletionController.footer.favorite"]
+            textAppearance = R.style.TextAppearance_StopCovid_Caption_Small_Grey
+            identifier = "vaccineCompletionController.footer.favorite".hashCode().toLong()
+        }
+    }
+
+    private fun notifyMe(context: Context, completedDate: Date) {
+        val reminderWorker = OneTimeWorkRequestBuilder<VaccineCompletedNotificationWorker>()
+            .setInitialDelay(completedDate.time - System.currentTimeMillis(), TimeUnit.MILLISECONDS)
+            .build()
+        WorkManager.getInstance(context)
+            .enqueueUniqueWork(Constants.WorkerNames.VACCINATION_COMPLETED_REMINDER, ExistingWorkPolicy.REPLACE, reminderWorker)
+
+        strings["vaccineCompletionController.pending.button.notifyMe.feedback"]?.let { message ->
+            (activity as? MainActivity)?.showSnackBar(message)
+        }
+
+        reminderSet = true
+        refreshScreen()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

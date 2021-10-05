@@ -17,11 +17,13 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import androidx.preference.PreferenceManager
 import com.lunabeestudio.analytics.model.AppEventName
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
+import com.lunabeestudio.stopcovid.extension.injectionContainer
 import com.lunabeestudio.stopcovid.extension.isVenueOnBoardingDone
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
@@ -30,10 +32,11 @@ import com.lunabeestudio.stopcovid.extension.showExpiredCodeAlert
 import com.lunabeestudio.stopcovid.extension.showInvalidCodeAlert
 import com.lunabeestudio.stopcovid.extension.showUnknownErrorAlert
 import com.lunabeestudio.stopcovid.manager.DeeplinkManager
-import com.lunabeestudio.stopcovid.manager.VenuesManager
 import com.lunabeestudio.stopcovid.model.CaptchaNextFragment
 import com.lunabeestudio.stopcovid.model.VenueExpiredException
 import com.lunabeestudio.stopcovid.model.VenueInvalidFormatException
+import com.lunabeestudio.stopcovid.viewmodel.VenueQrCodeViewModel
+import com.lunabeestudio.stopcovid.viewmodel.VenueQrCodeViewModelFactory
 import timber.log.Timber
 
 class VenueQRCodeFragment : QRCodeFragment() {
@@ -53,8 +56,14 @@ class VenueQRCodeFragment : QRCodeFragment() {
         requireContext().robertManager()
     }
 
+    private val viewModel: VenueQrCodeViewModel by viewModels {
+        VenueQrCodeViewModelFactory(robertManager, requireContext().secureKeystoreDataSource(), injectionContainer.venueRepository)
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        initViewModelObserver()
 
         isReadyToStartScanFlow = false
 
@@ -71,14 +80,7 @@ class VenueQRCodeFragment : QRCodeFragment() {
                 )
             )
             venueContent != null && venueVersion != null && origin == DeeplinkManager.Origin.UNIVERSAL -> {
-                VenuesManager.processVenue(
-                    robertManager = robertManager,
-                    secureKeystoreDataSource = requireContext().secureKeystoreDataSource(),
-                    base64URLCode = venueContent,
-                    version = venueVersion.toInt(),
-                    unixTimeInSeconds = venueTime?.toLongOrNull(),
-                )
-                navigateAfterVenueProcess()
+                viewModel.processVenue(venueContent, venueVersion, venueTime)
             }
             venueContent != null && venueVersion != null -> findNavControllerOrNull()?.safeNavigate(
                 VenueQRCodeFragmentDirections.actionVenueQrCodeFragmentToConfirmVenueQrCodeFragment(
@@ -93,6 +95,17 @@ class VenueQRCodeFragment : QRCodeFragment() {
             else -> isReadyToStartScanFlow = true
         }
         setHasOptionsMenu(true)
+    }
+
+    private fun initViewModelObserver() {
+        viewModel.venueProcessed.observe(viewLifecycleOwner) {
+            navigateAfterVenueProcess()
+        }
+        viewModel.exception.observe(viewLifecycleOwner) { e ->
+            catchVenueException(e) {
+                resumeQrCodeReader()
+            }
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -117,18 +130,7 @@ class VenueQRCodeFragment : QRCodeFragment() {
     }
 
     override fun onCodeScanned(code: String) {
-        try {
-            VenuesManager.processVenueUrl(
-                robertManager = robertManager,
-                secureKeystoreDataSource = requireContext().secureKeystoreDataSource(),
-                code
-            )
-            navigateAfterVenueProcess()
-        } catch (e: Exception) {
-            catchVenueException(e) {
-                resumeQrCodeReader()
-            }
-        }
+        viewModel.processVenueUrl(code)
     }
 
     private fun navigateAfterVenueProcess() {

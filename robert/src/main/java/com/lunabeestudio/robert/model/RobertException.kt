@@ -34,7 +34,9 @@ enum class ErrorCode {
     BLE_PROXIMITY_NOTIFICATION,
     TIME_NOT_ALIGNED,
     REPORT_DELAY,
-    SECRET_KEY_ALREADY_GENERATED
+    SECRET_KEY_ALREADY_GENERATED,
+    ROBERT_RESET_INACTIVITY,
+    ROBERT_NOT_REGISTERED,
 }
 
 class UnknownException(message: String = "Unknown error occurred") :
@@ -46,7 +48,7 @@ class UnauthorizedException(message: String = "Not authorized to call this endpo
 class ForbiddenException(message: String = "Forbidden to call this endpoint") :
     RobertException(ErrorCode.FORBIDDEN, message)
 
-class BackendException(message: String = "An error occurs. Our team is working to fix it!") :
+class BackendException(message: String = "An error occurs. Our team is working to fix it!", val httpCode: Int?) :
     RobertException(ErrorCode.BACKEND, message)
 
 class NoInternetException(message: String = "No internet") :
@@ -96,3 +98,9 @@ class ReportDelayException(message: String = "You need to wait before you can us
 
 class SecretKeyAlreadyGeneratedException(message: String = "Secret key was already generated but can't be found in the KeyStore") :
     RobertException(ErrorCode.SECRET_KEY_ALREADY_GENERATED, message)
+
+class RequireRobertResetException(message: String = "Robert needs to be reset due to inactivity") :
+    RobertException(ErrorCode.ROBERT_RESET_INACTIVITY, message)
+
+class RequireRobertRegisterException(message: String = "Robert needs to register") :
+    RobertException(ErrorCode.ROBERT_NOT_REGISTERED, message)

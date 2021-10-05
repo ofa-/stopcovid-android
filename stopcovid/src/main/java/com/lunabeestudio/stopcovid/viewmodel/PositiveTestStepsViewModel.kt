@@ -14,24 +14,29 @@ import androidx.lifecycle.AbstractSavedStateViewModelFactory
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.savedstate.SavedStateRegistryOwner
 import com.lunabeestudio.robert.datasource.LocalKeystoreDataSource
-import com.lunabeestudio.stopcovid.manager.WalletManager
 import com.lunabeestudio.stopcovid.model.WalletCertificate
+import com.lunabeestudio.stopcovid.repository.WalletRepository
+import kotlinx.coroutines.launch
 
 class PositiveTestStepsViewModel(
     private val handle: SavedStateHandle,
     private val keystoreDataSource: LocalKeystoreDataSource,
+    private val walletRepository: WalletRepository,
 ) : ViewModel() {
 
     val currentStep: LiveData<Int> = handle.getLiveData(CURRENT_STEP_KEY, 0)
 
     fun saveCertificate(walletCertificate: WalletCertificate) {
-        WalletManager.saveCertificate(
-            keystoreDataSource,
-            walletCertificate,
-        )
-        handle.set(CURRENT_STEP_KEY, (currentStep.value ?: 0) + 1)
+        viewModelScope.launch {
+            walletRepository.saveCertificate(
+                keystoreDataSource,
+                walletCertificate,
+            )
+            handle.set(CURRENT_STEP_KEY, (currentStep.value ?: 0) + 1)
+        }
     }
 
     fun skipCertificate() {
@@ -41,14 +46,15 @@ class PositiveTestStepsViewModel(
     companion object {
         private const val CURRENT_STEP_KEY: String = "CURRENT_STEP_KEY"
     }
+}
 
-    class PositiveTestStepsViewModelFactory(
-        owner: SavedStateRegistryOwner,
-        private val keystoreDataSource: LocalKeystoreDataSource,
-    ) : AbstractSavedStateViewModelFactory(owner, null) {
-        override fun <T : ViewModel?> create(key: String, modelClass: Class<T>, handle: SavedStateHandle): T {
-            @Suppress("UNCHECKED_CAST")
-            return PositiveTestStepsViewModel(handle, keystoreDataSource) as T
-        }
+class PositiveTestStepsViewModelFactory(
+    owner: SavedStateRegistryOwner,
+    private val keystoreDataSource: LocalKeystoreDataSource,
+    private val walletRepository: WalletRepository,
+) : AbstractSavedStateViewModelFactory(owner, null) {
+    override fun <T : ViewModel?> create(key: String, modelClass: Class<T>, handle: SavedStateHandle): T {
+        @Suppress("UNCHECKED_CAST")
+        return PositiveTestStepsViewModel(handle, keystoreDataSource, walletRepository) as T
     }
 }

@@ -162,7 +162,7 @@ class VaccinationCenterManager(private val serverManager: ServerManager) {
     }
 
     private suspend fun fetchLastAndRefresh(context: Context, sharedPreferences: SharedPreferences) {
-        if (sharedPreferences.hasChosenPostalCode) {
+        if (sharedPreferences.hasChosenPostalCode && sharedPreferences.currentVaccinationReferenceDepartmentCode != null) {
             if (fetchLast(context, sharedPreferences)) {
                 loadLocalAndRefresh(context, sharedPreferences)
             }

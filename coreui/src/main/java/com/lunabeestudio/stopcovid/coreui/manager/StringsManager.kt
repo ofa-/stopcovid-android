@@ -53,6 +53,7 @@ class StringsManager(okHttpClient: OkHttpClient) : ServerManager<LocalizedString
 
         if (languageHasChanged) {
             loadLocal(context)?.let {
+                prevLanguage = newLanguage
                 strings = it
             }
         }

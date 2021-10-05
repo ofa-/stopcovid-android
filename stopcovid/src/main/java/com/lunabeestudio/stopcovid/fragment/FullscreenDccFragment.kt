@@ -26,6 +26,7 @@ import com.lunabeestudio.stopcovid.coreui.extension.toDimensSize
 import com.lunabeestudio.stopcovid.databinding.FragmentFullscreenDccBinding
 import com.lunabeestudio.stopcovid.extension.formatDccText
 import com.lunabeestudio.stopcovid.extension.fullName
+import com.lunabeestudio.stopcovid.extension.injectionContainer
 import com.lunabeestudio.stopcovid.extension.isFrench
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
@@ -52,7 +53,13 @@ class FullscreenDccFragment : ForceLightFragment(R.layout.fragment_fullscreen_dc
             findParentFragmentByType<WalletContainerFragment>() ?: requireParentFragment()
         },
         {
-            WalletViewModelFactory(robertManager, keystoreDataSource, blacklistDCCManager, blacklist2DDOCManager)
+            WalletViewModelFactory(
+                robertManager,
+                keystoreDataSource,
+                blacklistDCCManager,
+                blacklist2DDOCManager,
+                injectionContainer.walletRepository
+            )
         }
     )
 

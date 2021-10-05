@@ -16,10 +16,13 @@ import androidx.core.view.doOnNextLayout
 import androidx.core.view.isVisible
 import com.google.android.material.appbar.AppBarLayout
 import com.lunabeestudio.analytics.manager.AnalyticsManager
+import com.lunabeestudio.framework.manager.DebugManager
 import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.extension.appCompatActivity
 import com.lunabeestudio.stopcovid.coreui.extension.registerToAppBarLayoutForLiftOnScroll
 import com.lunabeestudio.stopcovid.coreui.fragment.FastAdapterFragment
+import com.lunabeestudio.stopcovid.coreui.manager.CalibrationManager
+import com.lunabeestudio.stopcovid.coreui.manager.ConfigManager
 import com.lunabeestudio.stopcovid.databinding.ActivityMainBinding
 import com.lunabeestudio.stopcovid.extension.injectionContainer
 import com.lunabeestudio.stopcovid.manager.Blacklist2DDOCManager
@@ -32,6 +35,9 @@ import com.lunabeestudio.stopcovid.manager.MoreKeyFiguresManager
 import com.lunabeestudio.stopcovid.manager.PrivacyManager
 import com.lunabeestudio.stopcovid.manager.RisksLevelManager
 import com.lunabeestudio.stopcovid.manager.VaccinationCenterManager
+import com.lunabeestudio.stopcovid.repository.AttestationRepository
+import com.lunabeestudio.stopcovid.repository.VenueRepository
+import com.lunabeestudio.stopcovid.repository.WalletRepository
 
 abstract class MainFragment : FastAdapterFragment() {
     abstract fun getTitleKey(): String
@@ -103,5 +109,23 @@ abstract class MainFragment : FastAdapterFragment() {
     }
     protected val analyticsManager: AnalyticsManager by lazy(LazyThreadSafetyMode.NONE) {
         injectionContainer.analyticsManager
+    }
+    protected val attestationRepository: AttestationRepository by lazy(LazyThreadSafetyMode.NONE) {
+        injectionContainer.attestationRepository
+    }
+    protected val venueRepository: VenueRepository by lazy(LazyThreadSafetyMode.NONE) {
+        injectionContainer.venueRepository
+    }
+    protected val walletRepository: WalletRepository by lazy(LazyThreadSafetyMode.NONE) {
+        injectionContainer.walletRepository
+    }
+    protected val debugManager: DebugManager by lazy(LazyThreadSafetyMode.NONE) {
+        injectionContainer.debugManager
+    }
+    protected val configManager: ConfigManager by lazy(LazyThreadSafetyMode.NONE) {
+        injectionContainer.configManager
+    }
+    protected val calibrationManager: CalibrationManager by lazy(LazyThreadSafetyMode.NONE) {
+        injectionContainer.calibrationManager
     }
 }

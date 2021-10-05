@@ -19,6 +19,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.view.accessibility.AccessibilityEvent
+import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
@@ -36,9 +37,13 @@ import androidx.work.WorkManager
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.play.core.review.ReviewManager
+import com.google.android.play.core.review.ReviewManagerFactory
+import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.robert.extension.observeEventAndConsume
 import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.R
+import com.lunabeestudio.stopcovid.coreui.ConfigConstant
 import com.lunabeestudio.stopcovid.coreui.LocalizedApplication
 import com.lunabeestudio.stopcovid.coreui.UiConstants
 import com.lunabeestudio.stopcovid.coreui.databinding.ItemDividerBinding
@@ -54,20 +59,33 @@ import com.lunabeestudio.stopcovid.databinding.DialogUserLanguageBinding
 import com.lunabeestudio.stopcovid.databinding.ItemSelectionBinding
 import com.lunabeestudio.stopcovid.extension.alertRiskLevelChanged
 import com.lunabeestudio.stopcovid.extension.flaggedCountry
+import com.lunabeestudio.stopcovid.extension.googleReviewShown
 import com.lunabeestudio.stopcovid.extension.injectionContainer
 import com.lunabeestudio.stopcovid.extension.isLaunchedFromHistory
+import com.lunabeestudio.stopcovid.extension.openInExternalBrowser
+import com.lunabeestudio.stopcovid.extension.ratingPopInShown
+import com.lunabeestudio.stopcovid.extension.ratingsKeyFiguresOpening
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.showAlertRiskLevelChanged
+import com.lunabeestudio.stopcovid.extension.showRatingDialog
+import com.lunabeestudio.stopcovid.extension.walletRepository
 import com.lunabeestudio.stopcovid.manager.DeeplinkManager
-import com.lunabeestudio.stopcovid.manager.WalletManager
 import com.lunabeestudio.stopcovid.model.EuropeanCertificate
-import com.lunabeestudio.stopcovid.widgetshomescreen.DccWidget
+import com.lunabeestudio.stopcovid.viewmodel.MainViewModel
+import com.lunabeestudio.stopcovid.viewmodel.MainViewModelFactory
 import kotlinx.coroutines.delay
+import timber.log.Timber
 import java.util.Locale
 
 class MainActivity : BaseActivity() {
 
     lateinit var binding: ActivityMainBinding
+
+    private val viewModel: MainViewModel by viewModels {
+        MainViewModelFactory(
+            walletRepository(),
+        )
+    }
 
     private val navController: NavController by lazy {
         supportFragmentManager.findFragmentById(R.id.navHostFragment)!!.findNavController()
@@ -76,6 +94,10 @@ class MainActivity : BaseActivity() {
     private val sharedPrefs: SharedPreferences by lazy {
         PreferenceManager.getDefaultSharedPreferences(this)
     }
+
+    private val robertManager: RobertManager by lazy { robertManager() }
+
+    private val reviewManager: ReviewManager by lazy { ReviewManagerFactory.create(this) }
 
     private val strings: LocalizedStrings
         get() = (application as? LocalizedApplication)?.localizedStrings ?: emptyMap()
@@ -113,11 +135,10 @@ class MainActivity : BaseActivity() {
             setupAppShortcuts()
         }
 
-        WalletManager.walletCertificateLiveData.observe(this) {
+        viewModel.walletCertificateLiveData.observe(this) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
                 setupAppShortcuts()
             }
-            DccWidget.updateWidget(applicationContext)
         }
     }
 
@@ -132,6 +153,7 @@ class MainActivity : BaseActivity() {
                 injectionContainer.risksLevelManager.getCurrentLevel(robertManager().atRiskStatus?.riskLevel),
             )
         }
+        showRatingDialogIfNeeded()
     }
 
     private fun handleIntent(intent: Intent?) {
@@ -257,7 +279,12 @@ class MainActivity : BaseActivity() {
     @RequiresApi(Build.VERSION_CODES.N_MR1)
     private fun setupAppShortcuts() {
         ContextCompat.getSystemService(this, ShortcutManager::class.java)?.let { shortcutManager ->
-            val curfewCertificateShortcut = createCurfewCertificateShortcut()
+            val curfewCertificateShortcut = try {
+                createCurfewCertificateShortcut()
+            } catch (e: Exception) {
+                Timber.e(e)
+                null
+            }
             val universalQrCodeShortcut = createUniversalQrCodeShortcut()
             val favDccShortcut = createFavDccShortcut()
 
@@ -290,9 +317,9 @@ class MainActivity : BaseActivity() {
 
     @RequiresApi(Build.VERSION_CODES.N_MR1)
     private fun createFavDccShortcut(): ShortcutInfo? {
-        val favCertificate = WalletManager.walletCertificateLiveData.value?.filter {
+        val favCertificate = viewModel.walletCertificateLiveData.value?.firstOrNull {
             (it as? EuropeanCertificate)?.isFavorite == true
-        }?.firstOrNull() ?: return null
+        } ?: return null
 
         val builder = ShortcutInfo.Builder(this, FAV_DCC_SHORTCUT_ID)
 
@@ -396,6 +423,34 @@ class MainActivity : BaseActivity() {
                 }
                 .setCancelable(false)
                 .show()
+        }
+    }
+
+    private fun showRatingDialogIfNeeded() {
+        val keyFiguresOpeningThreshold = robertManager.configuration.ratingsKeyFiguresOpeningThreshold.toLong()
+        if (!sharedPrefs.googleReviewShown && sharedPrefs.ratingsKeyFiguresOpening >= keyFiguresOpeningThreshold) {
+            val request = reviewManager.requestReviewFlow()
+            request.addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    val reviewInfo = task.result
+                    val flow = reviewManager.launchReviewFlow(this, reviewInfo)
+                    flow.addOnSuccessListener {
+                        sharedPrefs.googleReviewShown = true
+                    }
+                    flow.addOnFailureListener { e ->
+                        Timber.e(e)
+                    }
+                } else if (!sharedPrefs.ratingPopInShown) {
+                    MaterialAlertDialogBuilder(this).showRatingDialog(strings) {
+                        if (!ConfigConstant.Store.GOOGLE.openInExternalBrowser(this, false)) {
+                            if (!ConfigConstant.Store.HUAWEI.openInExternalBrowser(this, false)) {
+                                ConfigConstant.Store.TAC_WEBSITE.openInExternalBrowser(this)
+                            }
+                        }
+                    }
+                    sharedPrefs.ratingPopInShown = true
+                }
+            }
         }
     }
 

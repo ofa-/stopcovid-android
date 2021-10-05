@@ -13,11 +13,11 @@ package com.lunabeestudio.stopcovid.receiver
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import com.lunabeestudio.stopcovid.StopCovid
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.stringsManager
 import com.lunabeestudio.stopcovid.service.ProximityService
 import com.lunabeestudio.stopcovid.widgetshomescreen.AttestationWidget
-import com.lunabeestudio.stopcovid.widgetshomescreen.DccWidget
 import com.lunabeestudio.stopcovid.widgetshomescreen.KeyFiguresWidget
 import com.lunabeestudio.stopcovid.widgetshomescreen.ProximityWidget
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -41,7 +41,9 @@ class UpgradeReceiver : BroadcastReceiver() {
                 ProximityWidget.updateWidget(context)
                 AttestationWidget.updateWidget(context)
                 KeyFiguresWidget.updateWidget(context)
-                DccWidget.updateWidget(context)
+                // Init certificate migration on upgrade
+                (context.applicationContext as StopCovid).initializeInjectionContainer()
+                (context.applicationContext as StopCovid).injectionContainer.walletRepository
             }
         } catch (t: Throwable) {
             // Keychain may not be fully initialized

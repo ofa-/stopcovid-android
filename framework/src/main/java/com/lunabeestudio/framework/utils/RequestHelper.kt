@@ -25,19 +25,16 @@ internal object RequestHelper {
     ): RobertResult {
         return try {
             val result = doRequest()
+            val httpCode = result.code()
             if (result.isSuccessful) {
                 if (result.body()?.success == true) {
                     RobertResult.Success()
                 } else {
-                    analyticsServiceName?.let { analyticsManager.reportWSError(filesDir, it, apiVersion, result.code()) }
-                    RobertResult.Failure(
-                        BackendException(
-                            result.body()?.message!!
-                        )
-                    )
+                    analyticsServiceName?.let { analyticsManager.reportWSError(filesDir, it, apiVersion, httpCode) }
+                    RobertResult.Failure(BackendException(result.body()?.message!!, httpCode))
                 }
             } else {
-                analyticsServiceName?.let { analyticsManager.reportWSError(filesDir, it, apiVersion, result.code()) }
+                analyticsServiceName?.let { analyticsManager.reportWSError(filesDir, it, apiVersion, httpCode) }
                 RobertResult.Failure(HttpException(result).remoteToRobertException())
             }
         } catch (e: Exception) {

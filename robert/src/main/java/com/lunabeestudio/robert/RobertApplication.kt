@@ -23,6 +23,6 @@ interface RobertApplication : AnalyticsInfosProvider {
     fun alertAtRiskLevelChange()
     suspend fun sendClockNotAlignedNotification()
     fun refreshInfoCenter()
-    fun getVenueQrCodeList(startTime: Long?, endTime: Long?): List<VenueQrCode>?
+    suspend fun getVenueQrCodeList(startTime: Long?, endTime: Long?): List<VenueQrCode>?
     fun clearVenueQrCodeList()
 }

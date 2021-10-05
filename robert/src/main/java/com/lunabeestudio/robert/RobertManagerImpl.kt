@@ -50,6 +50,8 @@ import com.lunabeestudio.robert.model.NoEphemeralBluetoothIdentifierFound
 import com.lunabeestudio.robert.model.NoEphemeralBluetoothIdentifierFoundForEpoch
 import com.lunabeestudio.robert.model.NoKeyException
 import com.lunabeestudio.robert.model.ReportDelayException
+import com.lunabeestudio.robert.model.RequireRobertRegisterException
+import com.lunabeestudio.robert.model.RequireRobertResetException
 import com.lunabeestudio.robert.model.RobertException
 import com.lunabeestudio.robert.model.RobertResult
 import com.lunabeestudio.robert.model.RobertResultData
@@ -62,11 +64,13 @@ import com.lunabeestudio.robert.repository.LocalProximityRepository
 import com.lunabeestudio.robert.repository.RemoteServiceRepository
 import com.lunabeestudio.robert.utils.Event
 import com.lunabeestudio.robert.worker.StatusWorker
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
-import kotlinx.coroutines.sync.Semaphore
-import kotlinx.coroutines.sync.withPermit
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.util.Calendar
@@ -91,8 +95,9 @@ class RobertManagerImpl(
     serverPublicKey: String,
     private val localProximityFilter: LocalProximityFilter,
     private val analyticsManager: AnalyticsManager,
+    coroutineScope: CoroutineScope,
 ) : RobertManager {
-    private val statusSemaphore: Semaphore = Semaphore(1)
+    private val statusMtx: Mutex = Mutex()
     private val ephemeralBluetoothIdentifierRepository: EphemeralBluetoothIdentifierRepository =
         EphemeralBluetoothIdentifierRepository(localEphemeralBluetoothIdentifierDataSource, sharedCryptoDataSource, localKeystoreDataSource)
     private val keystoreRepository: KeystoreRepository =
@@ -176,9 +181,21 @@ class RobertManagerImpl(
         get() = keystoreRepository.declarationToken
 
     init {
+        val isRegistered = try {
+            isRegistered
+        } catch (e: Exception) {
+            Timber.e(e)
+            false
+        }
         if (isRegistered) {
             startStatusWorker(application.getAppContext())
             migrateOldIsAtRisk()
+        } else {
+            coroutineScope.launch {
+                if (!localKeystoreDataSource.venuesQrCode().isNullOrEmpty()) {
+                    startStatusWorker(application.getAppContext())
+                }
+            }
         }
     }
 
@@ -364,7 +381,7 @@ class RobertManagerImpl(
         updatingRiskStatus.postValue(Event(true))
         val result = withContext(Dispatchers.IO) {
             refreshConfig(robertApplication)
-            statusSemaphore.withPermit {
+            statusMtx.withLock {
                 val checkStatusFrequencyHourMs = Duration.convert(
                     configuration.checkStatusFrequencyHour.toDouble(),
                     DurationUnit.HOURS,
@@ -387,14 +404,18 @@ class RobertManagerImpl(
                             cleaStatus(robertApplication)
                         }
                         val statusResult = async {
-                            Timber.v("Start ROBERT status")
-                            val ssu = getSSU(RobertConstant.PREFIX.C2)
-                            if (ssu is RobertResultData.Success) {
-                                status(robertApplication, ssu)
+                            if (isRegistered) {
+                                Timber.v("Start ROBERT status")
+                                val ssu = getSSU(RobertConstant.PREFIX.C2)
+                                if (ssu is RobertResultData.Success) {
+                                    status(robertApplication, ssu)
+                                } else {
+                                    val error = ssu as RobertResultData.Failure
+                                    Timber.e("hello or timeStart not found (${error.error?.message})")
+                                    RobertResultData.Failure(error.error ?: UnknownException())
+                                }
                             } else {
-                                val error = ssu as RobertResultData.Failure
-                                Timber.e("hello or timeStart not found (${error.error?.message})")
-                                RobertResultData.Failure(error.error ?: UnknownException())
+                                RobertResultData.Failure(RequireRobertRegisterException())
                             }
                         }
                         try {
@@ -415,7 +436,12 @@ class RobertManagerImpl(
     }
 
     suspend fun cleaStatus(robertApplication: RobertApplication): RobertResultData<AtRiskStatus> {
-        val venueQrCodeList: List<VenueQrCode>? = robertApplication.getVenueQrCodeList(null, null)
+        val venueQrCodeList: List<VenueQrCode>? = try {
+            robertApplication.getVenueQrCodeList(null, null)
+        } catch (e: Exception) {
+            Timber.e(e)
+            return RobertResultData.Failure((e as? RobertException) ?: UnknownException())
+        }
         if (!venueQrCodeList.isNullOrEmpty()) {
             val cleaStatusStart = System.currentTimeMillis()
 
@@ -566,7 +592,7 @@ class RobertManagerImpl(
         }
     }
 
-    fun processStatusResults(
+    suspend fun processStatusResults(
         robertApplication: RobertApplication,
         statusResult: RobertResultData<AtRiskStatus>,
         wStatusResult: RobertResultData<AtRiskStatus>
@@ -582,7 +608,10 @@ class RobertManagerImpl(
             ) {
                 keystoreRepository.currentRobertAtRiskStatus = statusResult.data
             }
+        } else if ((statusResult as? RobertResultData.Failure)?.error is RequireRobertResetException) {
+            clearRobert(robertApplication)
         }
+
         if (wStatusResult is RobertResultData.Success) {
             if (wStatusResult.data.ntpLastRiskScoringS == null
                 || (wStatusResult.data.ntpLastRiskScoringS ?: 0) > (
@@ -603,10 +632,13 @@ class RobertManagerImpl(
                 .coerceAtMost(System.currentTimeMillis().unixTimeMsToNtpTimeS() - RobertConstant.LAST_CONTACT_DELTA_S)
         }
 
-        return if (statusResult is RobertResultData.Success &&
-            wStatusResult is RobertResultData.Success ||
-            newAtRiskStatus.riskLevel > prevAtRiskStatus?.riskLevel ?: 0f
-        ) {
+        // Edge case: robert status might failed because user has been unregistered after 18 days of failing status
+        // In this case, only consider clea risk & continue to trigger status update
+        val isRobertStatusOk = statusResult is RobertResultData.Success || !isRegistered
+        val isCleaStatusOk = wStatusResult is RobertResultData.Success
+        val isRiskRaised = newAtRiskStatus.riskLevel > prevAtRiskStatus?.riskLevel ?: 0f
+
+        return if (isRobertStatusOk && isCleaStatusOk || isRiskRaised) {
             keystoreRepository.atRiskLastRefresh = System.currentTimeMillis()
             keystoreRepository.atRiskStatus = newAtRiskStatus
             if (!isImmune) {
@@ -849,6 +881,22 @@ class RobertManagerImpl(
     }
 
     override suspend fun clearLocalData(application: RobertApplication) {
+        clearRobert(application)
+        keystoreRepository.configuration = configuration.apply { version = 0 }
+        keystoreRepository.calibration = calibration.apply { version = 0 }
+        analyticsManager.unregister(application.getAppContext())
+        try {
+            keystoreRepository.atRiskModelVersion = AT_RISK_MODEL_VERSION
+        } catch (e: Exception) {
+            Timber.e(e)
+        }
+        keystoreRepository.cleaLastStatusIteration = null
+        keystoreRepository.currentWarningAtRiskStatus = null
+        keystoreRepository.reportPositiveTestDate = null
+        keystoreRepository.reportSymptomsStartDate = null
+    }
+
+    private suspend fun clearRobert(application: RobertApplication) {
         stopStatusWorker(application.getAppContext())
         deactivateProximity(application)
         ephemeralBluetoothIdentifierRepository.removeAll()
@@ -862,28 +910,17 @@ class RobertManagerImpl(
         keystoreRepository.kEA = null
         keystoreRepository.timeStart = null
         keystoreRepository.atRiskLastRefresh = null
+        keystoreRepository.atRiskLastError = null
         keystoreRepository.atRiskStatus = null
         keystoreRepository.currentRobertAtRiskStatus = null
-        keystoreRepository.currentWarningAtRiskStatus = null
         keystoreRepository.deprecatedLastRiskReceivedDate = null
         keystoreRepository.deprecatedLastExposureTimeframe = null
         keystoreRepository.proximityActive = null
         keystoreRepository.reportDate = null
-        keystoreRepository.configuration = configuration.apply { version = 0 }
-        keystoreRepository.calibration = calibration.apply { version = 0 }
-        keystoreRepository.reportPositiveTestDate = null
-        keystoreRepository.reportSymptomsStartDate = null
         keystoreRepository.reportValidationToken = null
         keystoreRepository.reportToSendStartTime = null
         keystoreRepository.reportToSendEndTime = null
         keystoreRepository.declarationToken = null
-        analyticsManager.unregister(application.getAppContext())
-        try {
-            keystoreRepository.atRiskModelVersion = AT_RISK_MODEL_VERSION
-        } catch (e: Exception) {
-            Timber.e(e)
-        }
-        keystoreRepository.cleaLastStatusIteration = null
     }
 
     private fun startStatusWorker(context: Context) {

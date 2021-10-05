@@ -54,6 +54,8 @@ fun RobertException?.toCovidException(): CovidException = if (this != null) {
         ErrorCode.TIME_NOT_ALIGNED -> TimeNotAlignedException(message)
         ErrorCode.REPORT_DELAY -> ReportDelayException(message)
         ErrorCode.SECRET_KEY_ALREADY_GENERATED -> SecretKeyAlreadyGeneratedException(message)
+        ErrorCode.ROBERT_RESET_INACTIVITY,
+        ErrorCode.ROBERT_NOT_REGISTERED -> UnknownException(message)
     }
 } else {
     UnknownException()

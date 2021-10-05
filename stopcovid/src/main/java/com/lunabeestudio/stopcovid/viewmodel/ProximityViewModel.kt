@@ -14,8 +14,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.map
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import com.lunabeestudio.domain.model.VenueQrCode
 import com.lunabeestudio.framework.local.datasource.SecureKeystoreDataSource
 import com.lunabeestudio.robert.RobertApplication
 import com.lunabeestudio.robert.RobertManager
@@ -27,10 +28,12 @@ import com.lunabeestudio.stopcovid.extension.toCovidException
 import com.lunabeestudio.stopcovid.manager.IsolationFormStateEnum
 import com.lunabeestudio.stopcovid.manager.IsolationManager
 import com.lunabeestudio.stopcovid.manager.VaccinationCenterManager
-import com.lunabeestudio.stopcovid.manager.WalletManager
 import com.lunabeestudio.stopcovid.model.CovidException
 import com.lunabeestudio.stopcovid.model.EuropeanCertificate
+import com.lunabeestudio.stopcovid.repository.VenueRepository
+import com.lunabeestudio.stopcovid.repository.WalletRepository
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlin.time.ExperimentalTime
 
@@ -39,7 +42,9 @@ class ProximityViewModel(
     isolationManager: IsolationManager,
     keystoreDataSource: SecureKeystoreDataSource,
     vaccinationCenterManager: VaccinationCenterManager,
-) : CommonDataViewModel(keystoreDataSource, robertManager, isolationManager, vaccinationCenterManager) {
+    venueRepository: VenueRepository,
+    walletRepository: WalletRepository,
+) : CommonDataViewModel(keystoreDataSource, robertManager, isolationManager, vaccinationCenterManager, venueRepository, walletRepository) {
 
     val activateProximitySuccess: SingleLiveEvent<Unit> = SingleLiveEvent()
     val covidException: SingleLiveEvent<CovidException?> = SingleLiveEvent()
@@ -49,27 +54,25 @@ class ProximityViewModel(
     val clearDataSuccess: SingleLiveEvent<Unit> = SingleLiveEvent()
 
     @OptIn(ExperimentalTime::class)
-    val activeAttestationCount: LiveData<Event<Int>> = keystoreDataSource.attestationsLiveData.map {
+    val activeAttestationCount: LiveData<Event<Int>> = keystoreDataSource.attestationsFlow.map {
         Event(
-            it?.filter { attestation ->
+            it.filter { attestation ->
                 !attestation.isExpired(robertManager.configuration)
-            }?.count() ?: 0
+            }.count()
         )
-    }
+    }.asLiveData(timeoutInMs = 0L)
 
-    val favoriteDcc: LiveData<Event<EuropeanCertificate?>> = WalletManager.walletCertificateLiveData.map { list ->
+    val venuesQrCodeLiveData: LiveData<List<VenueQrCode>> = venueRepository.venuesQrCodeFlow.asLiveData(timeoutInMs = 0)
+
+    val favoriteDcc: LiveData<Event<EuropeanCertificate?>> = walletRepository.walletCertificateFlow.map { list ->
         Event(
             list
-                ?.filterIsInstance<EuropeanCertificate>()
-                ?.firstOrNull { certificate ->
+                .filterIsInstance<EuropeanCertificate>()
+                .firstOrNull { certificate ->
                     (certificate as? EuropeanCertificate)?.isFavorite == true
                 }
         )
-    }
-
-    init {
-        WalletManager.refreshWalletIfNeeded(keystoreDataSource)
-    }
+    }.asLiveData(timeoutInMs = 0)
 
     suspend fun refreshConfig(application: RobertApplication): Boolean {
         loadingInProgress.postValue(true)
@@ -116,10 +119,19 @@ class ProximityViewModelFactory(
     private val isolationManager: IsolationManager,
     private val keystoreDataSource: SecureKeystoreDataSource,
     private val vaccinationCenterManager: VaccinationCenterManager,
+    private val venueRepository: VenueRepository,
+    private val walletRepository: WalletRepository,
 ) :
     ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         @Suppress("UNCHECKED_CAST")
-        return ProximityViewModel(robertManager, isolationManager, keystoreDataSource, vaccinationCenterManager) as T
+        return ProximityViewModel(
+            robertManager,
+            isolationManager,
+            keystoreDataSource,
+            vaccinationCenterManager,
+            venueRepository,
+            walletRepository
+        ) as T
     }
 }

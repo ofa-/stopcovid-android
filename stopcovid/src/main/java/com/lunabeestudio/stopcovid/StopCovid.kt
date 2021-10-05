@@ -18,6 +18,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Build
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.emoji.bundled.BundledEmojiCompatConfig
 import androidx.emoji.text.EmojiCompat
@@ -51,15 +52,16 @@ import com.lunabeestudio.stopcovid.coreui.LocalizedApplication
 import com.lunabeestudio.stopcovid.coreui.UiConstants
 import com.lunabeestudio.stopcovid.coreui.manager.LocalizedStrings
 import com.lunabeestudio.stopcovid.extension.alertRiskLevelChanged
+import com.lunabeestudio.stopcovid.extension.googleReviewShown
 import com.lunabeestudio.stopcovid.extension.hasChosenPostalCode
 import com.lunabeestudio.stopcovid.extension.hideRiskStatus
 import com.lunabeestudio.stopcovid.extension.isObsolete
 import com.lunabeestudio.stopcovid.extension.lastVersionCode
+import com.lunabeestudio.stopcovid.extension.lastVersionName
+import com.lunabeestudio.stopcovid.extension.ratingPopInShown
+import com.lunabeestudio.stopcovid.extension.ratingsKeyFiguresOpening
 import com.lunabeestudio.stopcovid.manager.AppMaintenanceManager
-import com.lunabeestudio.stopcovid.manager.AttestationsManager
 import com.lunabeestudio.stopcovid.manager.ProximityManager
-import com.lunabeestudio.stopcovid.manager.VenuesManager
-import com.lunabeestudio.stopcovid.manager.WalletManager
 import com.lunabeestudio.stopcovid.model.DeviceSetup
 import com.lunabeestudio.stopcovid.service.ProximityService
 import com.lunabeestudio.stopcovid.widgetshomescreen.ProximityWidget
@@ -67,6 +69,7 @@ import com.lunabeestudio.stopcovid.worker.ActivateReminderNotificationWorker
 import com.lunabeestudio.stopcovid.worker.AtRiskNotificationWorker
 import com.lunabeestudio.stopcovid.worker.IsolationReminderNotificationWorker
 import com.lunabeestudio.stopcovid.worker.MaintenanceWorker
+import fr.bipi.tressence.file.FileLoggerTree
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -87,7 +90,12 @@ import kotlin.time.ExperimentalTime
 
 class StopCovid : Application(), LifecycleObserver, RobertApplication, LocalizedApplication {
 
-    val injectionContainer: InjectionContainer by lazy { InjectionContainer(this) }
+    private val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
+        Timber.e(throwable)
+    }
+    private val appCoroutineScope by lazy { CoroutineScope(Dispatchers.Main + SupervisorJob() + coroutineExceptionHandler) }
+
+    lateinit var injectionContainer: InjectionContainer
 
     override val localizedStrings: LocalizedStrings
         get() = injectionContainer.stringsManager.strings
@@ -95,12 +103,6 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Localized
         get() = injectionContainer.stringsManager.liveStrings
 
     override suspend fun initializeStrings(): Unit = injectionContainer.stringsManager.initialize(this)
-
-    private val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
-        Timber.e(throwable)
-    }
-
-    private val appCoroutineScope = CoroutineScope(Dispatchers.Main + SupervisorJob() + coroutineExceptionHandler)
 
     override var isAppInForeground: Boolean = false
 
@@ -130,6 +132,8 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Localized
 
     override fun onCreate() {
         super.onCreate()
+        initializeInjectionContainer()
+
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
         firstResume = true
 
@@ -137,6 +141,13 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Localized
 
         if (sharedPrefs.lastVersionCode < BuildConfig.VERSION_CODE) {
             clearData()
+        }
+        if (sharedPrefs.lastVersionName != BuildConfig.VERSION_NAME) {
+            sharedPrefs.ratingsKeyFiguresOpening = 0
+            sharedPrefs.googleReviewShown = false
+        }
+        if (!isSameMajorRelease()) {
+            sharedPrefs.ratingPopInShown = false
         }
 
         initializeData()
@@ -149,14 +160,40 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Localized
         sharedPrefs.registerOnSharedPreferenceChangeListener(sharedPreferenceChangeListener)
 
         sharedPrefs.lastVersionCode = BuildConfig.VERSION_CODE
+        sharedPrefs.lastVersionName = BuildConfig.VERSION_NAME
+    }
+
+    fun initializeInjectionContainer() {
+        injectionContainer = InjectionContainer(this, appCoroutineScope)
     }
 
     private fun setupTimber() {
         Timber.plant(WarnTree())
+        injectionContainer.logsDir.mkdir()
+        Timber.plant(
+            FileLoggerTree.Builder()
+                .withFileName("logs_%g.log")
+                .withDir(injectionContainer.logsDir)
+                .withSizeLimit(1024 * 1024 * 2)
+                .withFileLimit(2)
+                .withMinPriority(Log.VERBOSE)
+                .appendToFile(true)
+                .build()
+        )
+        Timber.plant(
+            FileLoggerTree.Builder()
+                .withFileName("error_logs_%g.log")
+                .withDir(injectionContainer.logsDir)
+                .withSizeLimit(1024 * 1024 * 2)
+                .withFileLimit(2)
+                .withMinPriority(Log.WARN)
+                .appendToFile(true)
+                .build()
+        )
     }
 
-    private fun migrateAttestationsIfNeeded() {
-        AttestationsManager.migrateAttestationsIfNeeded(
+    private suspend fun migrateAttestationsIfNeeded() {
+        injectionContainer.attestationRepository.migrateAttestationsIfNeeded(
             robertManager,
             injectionContainer.secureKeystoreDataSource,
             injectionContainer.stringsManager.strings
@@ -169,9 +206,15 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Localized
         refreshData()
         injectionContainer.analyticsManager.reportAppEvent(this, AppEventName.e3)
         refreshProximityService()
-        refreshStatusIfNeeded()
+        try {
+            refreshStatusIfNeeded()
+        } catch (e: Exception) {
+            Timber.e(e)
+        }
         deleteOldAttestations()
-        VenuesManager.clearExpired(robertManager, injectionContainer.secureKeystoreDataSource)
+        appCoroutineScope.launch {
+            injectionContainer.venueRepository.clearExpired(robertManager, injectionContainer.secureKeystoreDataSource)
+        }
         appCoroutineScope.launch {
             robertManager.cleaReportIfNeeded(this@StopCovid, false)
         }
@@ -247,8 +290,6 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Localized
         runBlocking {
             injectionContainer.dccCertificatesManager.initialize(this@StopCovid)
         }
-
-        WalletManager.initialize(ProcessLifecycleOwner.get(), injectionContainer.secureKeystoreDataSource)
     }
 
     private fun setupAppMaintenance() {
@@ -264,6 +305,7 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Localized
     @OptIn(ExperimentalTime::class)
     private fun refreshData() {
         appCoroutineScope.launch(Dispatchers.IO) {
+
             if (firstResume) {
                 delay(Duration.seconds(1)) // Add some delay to let the main activity start
             }
@@ -415,14 +457,19 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Localized
         }
     }
 
-    override fun getVenueQrCodeList(startTime: Long?, endTime: Long?): List<VenueQrCode>? = VenuesManager.getVenuesQrCode(
+    override suspend fun getVenueQrCodeList(
+        startTime: Long?,
+        endTime: Long?
+    ): List<VenueQrCode> = injectionContainer.venueRepository.getVenuesQrCode(
         injectionContainer.secureKeystoreDataSource,
         startTime,
         endTime,
     )
 
     override fun clearVenueQrCodeList() {
-        VenuesManager.clearAllData(sharedPrefs, injectionContainer.secureKeystoreDataSource)
+        appCoroutineScope.launch {
+            injectionContainer.venueRepository.clearAllData(sharedPrefs, injectionContainer.secureKeystoreDataSource)
+        }
     }
 
     fun cancelClockNotAlignedNotification() {
@@ -539,12 +586,14 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Localized
             .enqueueUniquePeriodicWork(Constants.WorkerNames.TIME_CHANGED, policy, timeChangedWorkRequest)
     }
 
-    @OptIn(ExperimentalTime::class)
     private fun deleteOldAttestations() {
-        injectionContainer.secureKeystoreDataSource.attestations =
-            injectionContainer.secureKeystoreDataSource.attestations?.filter { attestation ->
-                !attestation.isObsolete(robertManager.configuration)
+        appCoroutineScope.launch {
+            injectionContainer.secureKeystoreDataSource.attestations().filter { attestation ->
+                attestation.isObsolete(robertManager.configuration)
+            }.forEach { attestation ->
+                injectionContainer.secureKeystoreDataSource.deleteAttestation(attestation.id)
             }
+        }
     }
 
     @OptIn(ExperimentalTime::class)
@@ -560,6 +609,18 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Localized
 
     override fun getAppContext(): Context = this
 
+    private fun isSameMajorRelease(): Boolean {
+        val lastImportantRelease = sharedPrefs.lastVersionName
+            ?.split(".")
+            ?.slice(0 until Constants.Build.NB_DIGIT_MAJOR_RELEASE)
+            ?.joinToString(".")
+        val currentImportantRelease = BuildConfig.VERSION_NAME
+            .split(".")
+            .slice(0 until Constants.Build.NB_DIGIT_MAJOR_RELEASE)
+            .joinToString(".")
+        return lastImportantRelease == currentImportantRelease
+    }
+
     override fun getBaseUrl(): String {
         return EnvConstant.Prod.analyticsBaseUrl
     }
@@ -572,11 +633,26 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Localized
 
     override fun getAppBuild(): Int = BuildConfig.VERSION_CODE
 
-    override fun getPlacesCount(): Int = injectionContainer.secureKeystoreDataSource.venuesQrCode?.size ?: 0
+    override suspend fun getPlacesCount(): Int = try {
+        injectionContainer.secureKeystoreDataSource.venuesQrCode().size
+    } catch (e: Exception) {
+        Timber.e(e)
+        0
+    }
 
-    override fun getFormsCount(): Int = injectionContainer.secureKeystoreDataSource.attestations?.size ?: 0
+    override suspend fun getFormsCount(): Int = try {
+        injectionContainer.secureKeystoreDataSource.attestations().size
+    } catch (e: Exception) {
+        Timber.e(e)
+        0
+    }
 
-    override fun getCertificatesCount(): Int = injectionContainer.secureKeystoreDataSource.rawWalletCertificates?.size ?: 0
+    override suspend fun getCertificatesCount(): Int = try {
+        injectionContainer.secureKeystoreDataSource.rawWalletCertificates().size
+    } catch (e: Exception) {
+        Timber.e(e)
+        0
+    }
 
     override fun userHaveAZipCode(): Boolean = sharedPrefs.hasChosenPostalCode
 

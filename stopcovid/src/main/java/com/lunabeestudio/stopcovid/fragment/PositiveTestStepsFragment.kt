@@ -23,15 +23,16 @@ import com.lunabeestudio.stopcovid.coreui.fastitem.dividerItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
 import com.lunabeestudio.stopcovid.extension.dccCertificatesManager
+import com.lunabeestudio.stopcovid.extension.raw
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
 import com.lunabeestudio.stopcovid.extension.showUnknownErrorAlert
 import com.lunabeestudio.stopcovid.extension.walletCertificateError
 import com.lunabeestudio.stopcovid.fastitem.selectionItem
-import com.lunabeestudio.stopcovid.manager.WalletManager
 import com.lunabeestudio.stopcovid.model.WalletCertificate
 import com.lunabeestudio.stopcovid.viewmodel.PositiveTestStepsViewModel
+import com.lunabeestudio.stopcovid.viewmodel.PositiveTestStepsViewModelFactory
 import com.mikepenz.fastadapter.GenericItem
 import kotlinx.coroutines.launch
 
@@ -44,7 +45,7 @@ class PositiveTestStepsFragment : BottomSheetMainFragment() {
     }
 
     val viewModel: PositiveTestStepsViewModel by viewModels {
-        PositiveTestStepsViewModel.PositiveTestStepsViewModelFactory(this, keystoreDataSource)
+        PositiveTestStepsViewModelFactory(this, keystoreDataSource, walletRepository)
     }
 
     private val robertManager by lazy {
@@ -140,7 +141,7 @@ class PositiveTestStepsFragment : BottomSheetMainFragment() {
 
     private suspend fun addCertificate() {
         try {
-            val certificate = WalletManager.verifyAndGetCertificateCodeValue(
+            val certificate = walletRepository.verifyAndGetCertificateCodeValue(
                 robertManager.configuration,
                 args.positiveTestDccValue,
                 dccCertificatesManager.certificates,
@@ -148,6 +149,7 @@ class PositiveTestStepsFragment : BottomSheetMainFragment() {
             )
 
             viewModel.saveCertificate(certificate)
+            debugManager.logSaveCertificates(certificate.raw, "from positive test steps")
         } catch (e: Exception) {
             handleCertificateError(e, args.positiveTestDccValue)
             viewModel.skipCertificate()

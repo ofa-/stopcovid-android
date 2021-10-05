@@ -35,6 +35,7 @@ import com.lunabeestudio.stopcovid.coreui.fastitem.switchItem
 import com.lunabeestudio.stopcovid.extension.attestationLabel
 import com.lunabeestudio.stopcovid.extension.attestationPlaceholder
 import com.lunabeestudio.stopcovid.extension.attestationShortLabelFromKey
+import com.lunabeestudio.stopcovid.extension.getString
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
@@ -45,7 +46,6 @@ import com.lunabeestudio.stopcovid.model.AttestationMap
 import com.lunabeestudio.stopcovid.model.FormField
 import com.lunabeestudio.stopcovid.viewmodel.NewAttestationViewModel
 import com.lunabeestudio.stopcovid.viewmodel.NewAttestationViewModelFactory
-import com.lunabeestudio.stopcovid.widgetshomescreen.AttestationWidget
 import com.mikepenz.fastadapter.GenericItem
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -56,7 +56,7 @@ class NewAttestationFragment : MainFragment() {
 
     private val gson: Gson = Gson()
     private val viewModel: NewAttestationViewModel by activityViewModels {
-        NewAttestationViewModelFactory(requireContext().secureKeystoreDataSource(), formManager)
+        NewAttestationViewModelFactory(requireContext().secureKeystoreDataSource(), attestationRepository, formManager)
     }
     private val dateFormat: DateFormat = SimpleDateFormat.getDateInstance(DateFormat.LONG)
     private val dateTimeFormat: DateFormat = SimpleDateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.SHORT)
@@ -94,6 +94,12 @@ class NewAttestationFragment : MainFragment() {
         formManager.form.observeEventAndConsume(viewLifecycleOwner) {
             refreshScreen()
         }
+        viewModel.attestationGeneratedSuccess.observe(viewLifecycleOwner) {
+            findNavControllerOrNull()?.navigateUp()
+        }
+        viewModel.covidException.observe(viewLifecycleOwner) { covidException ->
+            showErrorSnackBar(covidException.getString(strings))
+        }
 
         findNavControllerOrNull()?.addOnDestinationChangedListener(onDestinationChangedListener)
     }
@@ -114,9 +120,7 @@ class NewAttestationFragment : MainFragment() {
                     .setTitle(strings["newAttestationController.generate.alert.title"])
                     .setMessage(strings["newAttestationController.generate.alert.message"])
                     .setPositiveButton(strings["newAttestationController.generate.alert.validate"]) { _, _ ->
-                        context?.let { AttestationWidget.updateWidget(it, true, viewModel.infos) }
-                        viewModel.generateQrCode(robertManager, strings)
-                        findNavControllerOrNull()?.navigateUp()
+                        viewModel.generateQrCode(robertManager, strings, context)
                     }
                     .setNegativeButton(strings["common.cancel"], null)
                     .show()

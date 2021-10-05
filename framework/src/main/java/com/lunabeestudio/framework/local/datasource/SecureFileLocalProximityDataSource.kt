@@ -56,7 +56,11 @@ open class SecureFileLocalProximityDataSource(
 
     private var dumpJob: Job? = null
 
-    override fun getBetweenTime(ntpStartTimeS: Long, ntpEndTimeS: Long, onProgressUpdate: ((Float) -> Unit)?): List<LocalProximity> {
+    override fun getBetweenTime(
+        ntpStartTimeS: Long,
+        ntpEndTimeS: Long,
+        onProgressUpdate: ((Float) -> Unit)?
+    ): List<LocalProximity> {
         val filesList = storageDir.listFiles { file ->
             file.isDirectory && file.name.toIntOrNull() != null
         }?.mapNotNull { file ->

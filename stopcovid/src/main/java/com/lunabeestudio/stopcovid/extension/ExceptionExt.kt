@@ -28,16 +28,17 @@ import java.net.SocketTimeoutException
 import javax.net.ssl.SSLException
 
 internal fun Exception.remoteToRobertException(): RobertException = when (this) {
-    is MalformedJsonException -> BackendException()
-    is SSLException -> BackendException()
+    is MalformedJsonException -> BackendException(httpCode = null)
+    is SSLException -> BackendException(httpCode = null)
     is SocketTimeoutException,
     is IOException,
     -> NoInternetException()
     is HttpException -> {
-        when (code()) {
+        val httpCode = code()
+        when (httpCode) {
             401 -> UnauthorizedException()
             403 -> ForbiddenException()
-            else -> BackendException()
+            else -> BackendException(httpCode = httpCode)
         }
     }
     else -> UnknownException()

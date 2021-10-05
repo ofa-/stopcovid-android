@@ -49,6 +49,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.zxing.BarcodeFormat
 import com.journeyapps.barcodescanner.BarcodeEncoder
 import com.lunabeestudio.analytics.model.AppEventName
+import com.lunabeestudio.domain.model.VenueQrCode
 import com.lunabeestudio.robert.RobertApplication
 import com.lunabeestudio.robert.extension.observeEventAndConsume
 import com.lunabeestudio.robert.model.RobertException
@@ -109,7 +110,6 @@ import com.lunabeestudio.stopcovid.fastitem.smallQrCodeCardItem
 import com.lunabeestudio.stopcovid.manager.AppMaintenanceManager
 import com.lunabeestudio.stopcovid.manager.DeeplinkManager
 import com.lunabeestudio.stopcovid.manager.ProximityManager
-import com.lunabeestudio.stopcovid.manager.VenuesManager
 import com.lunabeestudio.stopcovid.model.CaptchaNextFragment
 import com.lunabeestudio.stopcovid.model.CovidException
 import com.lunabeestudio.stopcovid.model.DeviceSetup
@@ -149,7 +149,14 @@ class ProximityFragment : TimeMainFragment() {
     }
 
     private val viewModel: ProximityViewModel by viewModels {
-        ProximityViewModelFactory(robertManager, isolationManager, requireContext().secureKeystoreDataSource(), vaccinationCenterManager)
+        ProximityViewModelFactory(
+            robertManager,
+            isolationManager,
+            requireContext().secureKeystoreDataSource(),
+            vaccinationCenterManager,
+            venueRepository,
+            walletRepository
+        )
     }
 
     private val sharedPrefs: SharedPreferences by lazy {
@@ -195,6 +202,7 @@ class ProximityFragment : TimeMainFragment() {
     private var boundedService: ProximityService? = null
     private var showErrorLayoutAnimationInProgress: Boolean = false
     private var hideErrorLayoutAnimationInProgress: Boolean = false
+    private var hasShownRegisterAlert: Boolean = false
 
     private val proximityServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
@@ -240,6 +248,9 @@ class ProximityFragment : TimeMainFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        hasShownRegisterAlert = savedInstanceState?.getBoolean(SAVE_INSTANCE_HAS_SHOWN_REGISTER_ALERT) ?: hasShownRegisterAlert
+
         setFragmentResultListener(UniversalQrScanFragment.SCANNED_CODE_RESULT_KEY) { _, bundle ->
             val scannedData = bundle.getString(UniversalQrScanFragment.SCANNED_CODE_BUNDLE_KEY)
             if (scannedData?.isValidUUID() == true) {
@@ -408,6 +419,33 @@ class ProximityFragment : TimeMainFragment() {
         }
         viewModel.favoriteDcc.observeEventAndConsume(viewLifecycleOwner) {
             refreshScreen()
+        }
+        viewModel.venuesQrCodeLiveData.observe(viewLifecycleOwner) { venues ->
+            refreshScreen()
+            showRegisterRequiredIfNeeded(venues)
+        }
+    }
+
+    private fun showRegisterRequiredIfNeeded(venues: List<VenueQrCode>) {
+        if (!hasShownRegisterAlert && !robertManager.isRegistered && venues.isNotEmpty()) {
+            context?.let {
+                MaterialAlertDialogBuilder(it)
+                    .setTitle(strings["robertStatus.error.alert.title"])
+                    .setMessage(strings["robertStatus.error.alert.message"])
+                    .setPositiveButton(strings["robertStatus.error.alert.action"]) { _, _ ->
+                        findNavControllerOrNull()
+                            ?.safeNavigate(
+                                ProximityFragmentDirections.actionProximityFragmentToCaptchaFragment(
+                                    CaptchaNextFragment.Back,
+                                    null,
+                                )
+                            )
+                    }
+                    .setNegativeButton(strings["robertStatus.error.alert.later"], null)
+                    .setCancelable(false)
+                    .show()
+                hasShownRegisterAlert = true
+            }
         }
     }
 
@@ -1040,9 +1078,8 @@ class ProximityFragment : TimeMainFragment() {
                 Action(R.drawable.ic_history, strings["home.moreSection.venuesHistory"]) {
                     findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToVenuesHistoryFragment())
                 }.takeIf {
-                    robertManager.configuration.displayRecordVenues || !VenuesManager.getVenuesQrCode(
-                        requireContext().secureKeystoreDataSource(),
-                    ).isNullOrEmpty()
+                    robertManager.configuration.displayRecordVenues
+                        || !viewModel.venuesQrCodeLiveData.value.isNullOrEmpty()
                 },
                 Action(R.drawable.ic_settings, strings["common.settings"]) {
                     findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToManageDataFragment())
@@ -1338,6 +1375,11 @@ class ProximityFragment : TimeMainFragment() {
         }
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBoolean(SAVE_INSTANCE_HAS_SHOWN_REGISTER_ALERT, hasShownRegisterAlert)
+    }
+
     override fun onDestroyView() {
         sharedPrefs.unregisterOnSharedPreferenceChangeListener(sharedPreferenceChangeListener)
         activity?.unregisterReceiver(receiver)
@@ -1349,5 +1391,7 @@ class ProximityFragment : TimeMainFragment() {
         private const val PROXIMITY_BUTTON_DELAY: Long = 2000L
         const val START_PROXIMITY_ARG_KEY: String = "START_PROXIMITY_ARG_KEY"
         private const val REPORT_UUID_DEEPLINK: String = "https://bonjour.tousanticovid.gouv.fr/app/code/"
+
+        private const val SAVE_INSTANCE_HAS_SHOWN_REGISTER_ALERT: String = "SAVED_STATE_HAS_SHOWN_REGISTER_ALERT_KEY"
     }
 }

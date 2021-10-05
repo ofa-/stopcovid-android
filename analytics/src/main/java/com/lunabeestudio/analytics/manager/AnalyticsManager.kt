@@ -27,6 +27,7 @@ import com.lunabeestudio.analytics.model.AnalyticsResult
 import com.lunabeestudio.analytics.model.AnalyticsServiceName
 import com.lunabeestudio.analytics.model.AppEventName
 import com.lunabeestudio.analytics.model.AppInfos
+import com.lunabeestudio.analytics.model.ErrorEventName
 import com.lunabeestudio.analytics.model.HealthEventName
 import com.lunabeestudio.analytics.model.HealthInfos
 import com.lunabeestudio.analytics.model.TimestampedEvent
@@ -48,17 +49,17 @@ import java.io.File
 import java.io.IOException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
-import java.text.DateFormat
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Date
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 import java.util.Locale
 import java.util.UUID
 import kotlin.random.Random
 
 class AnalyticsManager(okHttpClient: OkHttpClient, context: Context) : LifecycleObserver {
 
-    private val dateFormat: DateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.FRANCE)
+    private val dateFormat: DateTimeFormatter = DateTimeFormatter.ISO_INSTANT
     private val analyticsServerManager = AnalyticsServerManager(okHttpClient)
 
     private val sharedPreferences = context.getSharedPreferences(SHARED_PREFS_NAME, Context.MODE_PRIVATE)
@@ -276,7 +277,8 @@ class AnalyticsManager(okHttpClient: OkHttpClient, context: Context) : Lifecycle
         if (sharedPreferences.isOptIn) {
             CoroutineScope(Dispatchers.IO).launch {
                 val timestampedEventList = getAppEvents(context).toMutableList()
-                timestampedEventList += TimestampedEvent(eventName.name, dateFormat.format(roundedHourDate()), desc ?: "")
+                val timestamp = dateFormat.format(currentRoundedHourInstant())
+                timestampedEventList += TimestampedEvent(eventName.name, timestamp, desc ?: "")
                 val file = File(File(context.filesDir, FOLDER_NAME), FILE_NAME_APP_EVENTS)
                 writeTimestampedEventProtoToFile(file, timestampedEventList.toProto())
             }
@@ -289,26 +291,35 @@ class AnalyticsManager(okHttpClient: OkHttpClient, context: Context) : Lifecycle
         if (sharedPreferences.isOptIn) {
             CoroutineScope(Dispatchers.IO).launch {
                 val timestampedEventList = getHealthEvents(context).toMutableList()
-                timestampedEventList += TimestampedEvent(eventName.name, dateFormat.format(roundedHourDate()), desc ?: "")
+                timestampedEventList += TimestampedEvent(eventName.name, dateFormat.format(currentRoundedHourInstant()), desc ?: "")
                 val file = File(File(context.filesDir, FOLDER_NAME), FILE_NAME_HEALTH_EVENTS)
                 writeTimestampedEventProtoToFile(file, timestampedEventList.toProto())
             }
         }
     }
 
-    @Suppress("BlockingMethodInNonBlockingContext")
-    @Synchronized
     fun reportWSError(filesDir: File, wsName: String, wsVersion: String, errorCode: Int, desc: String? = null) {
         if (sharedPreferences.isOptIn) {
             if (desc?.contains("No address associated with hostname") != true) {
-                CoroutineScope(Dispatchers.IO).launch {
-                    val name = "ERR-${wsName.uppercase(Locale.getDefault())}-${wsVersion.uppercase(Locale.getDefault())}-$errorCode"
-                    val timestampedEventList = getErrors(filesDir).toMutableList()
-                    timestampedEventList += TimestampedEvent(name, dateFormat.format(roundedHourDate()), "")
-                    val file = File(File(filesDir, FOLDER_NAME), FILE_NAME_APP_ERRORS)
-                    writeTimestampedEventProtoToFile(file, timestampedEventList.toProto())
-                }
+                val name = "ERR-${wsName.uppercase(Locale.getDefault())}-${wsVersion.uppercase(Locale.getDefault())}-$errorCode"
+                reportError(filesDir, name)
             }
+        }
+    }
+
+    fun reportErrorEvent(filesDir: File, errorEventName: ErrorEventName) {
+        if (sharedPreferences.isOptIn) {
+            reportError(filesDir, errorEventName.name)
+        }
+    }
+
+    @Synchronized
+    private fun reportError(filesDir: File, errorName: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            val timestampedEventList = getErrors(filesDir).toMutableList()
+            timestampedEventList += TimestampedEvent(errorName, dateFormat.format(currentRoundedHourInstant()), "")
+            val file = File(File(filesDir, FOLDER_NAME), FILE_NAME_APP_ERRORS)
+            writeTimestampedEventProtoToFile(file, timestampedEventList.toProto())
         }
     }
 
@@ -325,7 +336,7 @@ class AnalyticsManager(okHttpClient: OkHttpClient, context: Context) : Lifecycle
         }
     }
 
-    private fun getAppInfos(
+    private suspend fun getAppInfos(
         infosProvider: AnalyticsInfosProvider,
         receivedHelloMessagesCount: Int
     ): AppInfos {
@@ -354,11 +365,13 @@ class AnalyticsManager(okHttpClient: OkHttpClient, context: Context) : Lifecycle
             os = "Android",
             secondsTracingActivated = getProximityActiveDuration() / 1000L,
             riskLevel = robertManager.atRiskStatus?.riskLevel,
-            dateSample = infosProvider.getDateSample()?.let { dateFormat.format(Date(it)) },
-            dateFirstSymptoms = infosProvider.getDateFirstSymptom()?.let { dateFormat.format(Date(it)) },
-            dateLastContactNotification = infosProvider.getDateLastContactNotification()?.let { dateFormat.format(Date(it)) }
+            dateSample = infosProvider.getDateSample()?.formatEpoch(),
+            dateFirstSymptoms = infosProvider.getDateFirstSymptom()?.formatEpoch(),
+            dateLastContactNotification = infosProvider.getDateLastContactNotification()?.formatEpoch(),
         )
     }
+
+    private fun Long.formatEpoch() = dateFormat.format(Instant.ofEpochMilli(this))
 
     private suspend fun getAppEvents(context: Context): List<TimestampedEvent> {
         val file = File(File(context.filesDir, FOLDER_NAME), FILE_NAME_APP_EVENTS)
@@ -414,12 +427,12 @@ class AnalyticsManager(okHttpClient: OkHttpClient, context: Context) : Lifecycle
         }
     }
 
-    private fun roundedHourDate(): Date {
-        return Calendar.getInstance().apply {
-            set(Calendar.MINUTE, 0)
-            set(Calendar.SECOND, 0)
-            set(Calendar.MILLISECOND, 0)
-        }.time
+    private fun currentRoundedHourInstant(): Instant {
+        return LocalDateTime.now()
+            .withMinute(0)
+            .withSecond(0)
+            .withNano(0)
+            .toInstant(ZoneOffset.UTC)
     }
 
     @Synchronized

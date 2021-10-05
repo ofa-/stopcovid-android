@@ -652,6 +652,9 @@
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_keyFigureDetailsFragment_to_chartFullScreenActivity"
+            app:destination="@id/chartFullScreenActivity" />
     </fragment>
     <fragment
         android:id="@+id/vaccinationFragment"
@@ -878,7 +881,7 @@
         android:id="@+id/vaccineCompletionFragment"
         android:name="com.lunabeestudio.stopcovid.fragment.VaccineCompletionFragment">
         <argument
-            android:name="certificateValue"
+            android:name="certificateId"
             app:argType="string" />
     </fragment>
     <fragment
@@ -912,4 +915,18 @@
     <fragment
         android:id="@+id/walletQuantityWarningFragment"
         android:name="com.lunabeestudio.stopcovid.fragment.WalletQuantityWarningFragment" />
+    <activity
+        android:id="@+id/chartFullScreenActivity"
+        android:name="com.lunabeestudio.stopcovid.activity.ChartFullScreenActivity"
+        android:label="ChartFullScreenActivity" >
+        <argument
+            android:name="keyFiguresKey"
+            app:argType="string" />
+        <argument
+            android:name="chartDataType"
+            app:argType="com.lunabeestudio.stopcovid.fragment.ChartDataType" />
+        <argument
+            android:name="minDate"
+            app:argType="long" />
+    </activity>
 </navigation>

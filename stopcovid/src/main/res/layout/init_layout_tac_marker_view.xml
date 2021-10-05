@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ This Source Code Form is subject to the terms of the Mozilla Public
+  ~ License, v. 2.0. If a copy of the MPL was not distributed with this
+  ~ file, You can obtain one at https://mozilla.org/MPL/2.0/.
+  ~
+  ~ Authors
+  ~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ Created by Lunabee Studio / Date - 2021/09/13 - for the TOUS-ANTI-COVID project
+  -->
+
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/contentLayout"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    tools:ignore="Overdraw">
+
+
+
+    <ImageView
+        android:id="@+id/arrowTopImageView"
+        android:layout_width="@dimen/marker_view_arrow_width"
+        android:layout_height="@dimen/marker_view_arrow_height"
+        android:scaleType="fitXY"
+        android:src="@drawable/ic_arrow_up"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/markerTextView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="visible"/>
+
+    <TextView
+        android:id="@+id/markerTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:minWidth="@dimen/marker_view_min_width"
+        android:textAppearance="@style/TextAppearance.StopCovid.Caption.Small.OnPrimary"
+        android:background="@drawable/bg_tac_marker_view"
+        android:padding="@dimen/spacing_small"
+        app:layout_constraintTop_toBottomOf="@+id/arrowTopImageView"
+        app:layout_constraintBottom_toTopOf="@+id/arrowBottomImageView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:text="6782\n21/05"/>
+
+    <ImageView
+        android:id="@+id/arrowBottomImageView"
+        android:layout_width="@dimen/marker_view_arrow_width"
+        android:layout_height="@dimen/marker_view_arrow_height"
+        android:scaleType="fitXY"
+        android:src="@drawable/ic_arrow_down"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/markerTextView" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

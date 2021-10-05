@@ -13,7 +13,10 @@ package com.lunabeestudio.stopcovid.fragment
 import android.os.Bundle
 import android.view.View
 import androidx.core.view.isVisible
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.lunabeestudio.analytics.model.ErrorEventName
 import com.lunabeestudio.domain.extension.ntpTimeSToUnixTimeMs
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.setImageResourceOrHide
@@ -21,9 +24,13 @@ import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
+import com.lunabeestudio.stopcovid.extension.showDbFailure
+import com.lunabeestudio.stopcovid.extension.showMigrationFailed
 import com.lunabeestudio.stopcovid.fastitem.deleteCardItem
-import com.lunabeestudio.stopcovid.manager.VenuesManager
+import com.lunabeestudio.stopcovid.viewmodel.VenuesHistoryViewModel
+import com.lunabeestudio.stopcovid.viewmodel.VenuesHistoryViewModelFactory
 import com.mikepenz.fastadapter.GenericItem
+import kotlinx.coroutines.launch
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -33,6 +40,10 @@ class VenuesHistoryFragment : MainFragment() {
 
     private val robertManager by lazy {
         requireContext().robertManager()
+    }
+
+    private val viewModel: VenuesHistoryViewModel by viewModels {
+        VenuesHistoryViewModelFactory(requireContext().secureKeystoreDataSource(), venueRepository)
     }
 
     override fun getTitleKey(): String = "venuesHistoryController.title"
@@ -46,16 +57,28 @@ class VenuesHistoryFragment : MainFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        initViewModelObserver()
+
         binding?.emptyLayout?.emptyImageView?.setImageResourceOrHide(R.drawable.signal)
         binding?.emptyLayout?.emptyTitleTextView?.isVisible = false
         binding?.emptyLayout?.emptyButton?.isVisible = false
+
+        showMigrationFailedIfNeeded()
+        showDbFailureIfNeeded()
+    }
+
+    private fun initViewModelObserver() {
+        viewModel.venuesQrCodeLiveData.observe(viewLifecycleOwner) {
+            refreshScreen()
+        }
     }
 
     override fun getItems(): List<GenericItem> {
         val items = arrayListOf<GenericItem>()
 
         items.addAll(
-            VenuesManager.getVenuesQrCode(requireContext().secureKeystoreDataSource())
+            viewModel.venuesQrCodeLiveData
+                .value
                 ?.reversed()
                 ?.map { venueQrCode ->
                     val venueType = strings["venueType.default"] ?: ""
@@ -69,8 +92,7 @@ class VenuesHistoryFragment : MainFragment() {
                                 .setTitle(strings["venuesHistoryController.delete.alert.title"])
                                 .setMessage(strings["venuesHistoryController.delete.alert.message"])
                                 .setPositiveButton(strings["common.delete"]) { _, _ ->
-                                    VenuesManager.removeVenue(requireContext().secureKeystoreDataSource(), venueQrCode.id)
-                                    refreshScreen()
+                                    viewModel.removeVenue(venueQrCode.id)
                                 }
                                 .setNegativeButton(strings["common.cancel"], null)
                                 .show()
@@ -102,6 +124,28 @@ class VenuesHistoryFragment : MainFragment() {
             binding?.emptyLayout?.emptyDescriptionTextView?.text = strings["venuesHistoryController.noVenuesEmptyView.isSick.title"]
         } else {
             binding?.emptyLayout?.emptyDescriptionTextView?.text = strings["venuesHistoryController.noVenuesEmptyView.title"]
+        }
+    }
+
+    private fun showMigrationFailedIfNeeded() {
+        if (debugManager.oldVenuesInSharedPrefs()) {
+            context?.let {
+                analyticsManager.reportErrorEvent(it.filesDir, ErrorEventName.ERR_VENUES_MIG)
+                MaterialAlertDialogBuilder(it).showMigrationFailed(strings)
+            }
+        }
+    }
+
+    private fun showDbFailureIfNeeded() {
+        lifecycleScope.launch {
+            try {
+                context?.secureKeystoreDataSource()?.venuesQrCode()
+            } catch (e: Exception) {
+                context?.let {
+                    analyticsManager.reportErrorEvent(it.filesDir, ErrorEventName.ERR_VENUES_DB)
+                    MaterialAlertDialogBuilder(it).showDbFailure(strings)
+                }
+            }
         }
     }
 }

@@ -10,7 +10,8 @@
 
 package com.lunabeestudio.domain.model
 
-class Attestation(
+data class Attestation(
+    val id: String,
     val qrCode: String,
     val footer: String,
     val qrCodeString: String,

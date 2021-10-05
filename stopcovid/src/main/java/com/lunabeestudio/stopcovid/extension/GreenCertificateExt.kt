@@ -11,6 +11,7 @@
 package com.lunabeestudio.stopcovid.extension
 
 import com.lunabeestudio.domain.model.WalletCertificateType
+import com.lunabeestudio.stopcovid.Constants
 import dgca.verifier.app.decoder.model.GreenCertificate
 import dgca.verifier.app.decoder.model.RecoveryStatement
 import dgca.verifier.app.decoder.model.Test
@@ -75,5 +76,15 @@ val GreenCertificate.testDateTimeOfCollection: Date?
 
 val GreenCertificate.recoveryDateOfFirstPositiveTest: Date?
     get() = recoveryStatements?.lastOrNull()?.dateOfFirstPositiveTest?.let(yearMonthDayUsParser()::parseOrNull)
+
+val GreenCertificate.manufacturer: String?
+    get() = when {
+        vaccinations?.lastOrNull() != null -> vaccinations?.lastOrNull()?.manufacturer
+        tests?.lastOrNull() != null -> tests?.lastOrNull()?.testNameAndManufacturer
+        else -> null
+    }
+
+val GreenCertificate.isAutoTest: Boolean
+    get() = manufacturer == Constants.Certificate.MANUFACTURER_AUTOTEST
 
 private fun yearMonthDayUsParser() = SimpleDateFormat("yyyy-MM-dd", Locale.US)

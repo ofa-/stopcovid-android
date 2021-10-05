@@ -13,8 +13,7 @@ package com.lunabeestudio.framework.local.datasource
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import androidx.room.Room
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.lunabeestudio.domain.model.AtRiskStatus
@@ -24,15 +23,32 @@ import com.lunabeestudio.domain.model.Configuration
 import com.lunabeestudio.domain.model.FormEntry
 import com.lunabeestudio.domain.model.RawWalletCertificate
 import com.lunabeestudio.domain.model.VenueQrCode
+import com.lunabeestudio.framework.extension.setOrRemove
+import com.lunabeestudio.framework.local.AppDatabase
 import com.lunabeestudio.framework.local.LocalCryptoManager
+import com.lunabeestudio.framework.local.model.AttestationRoom
+import com.lunabeestudio.framework.local.model.CertificateRoom
+import com.lunabeestudio.framework.local.model.VenueRoom
 import com.lunabeestudio.robert.datasource.LocalKeystoreDataSource
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
+import timber.log.Timber
 import java.lang.reflect.Type
+import java.util.UUID
 
-class SecureKeystoreDataSource(context: Context, private val cryptoManager: LocalCryptoManager) : LocalKeystoreDataSource {
+class SecureKeystoreDataSource(
+    context: Context,
+    private val cryptoManager: LocalCryptoManager,
+    private val cache: MutableMap<String, Any>?,
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
+) : LocalKeystoreDataSource {
 
-    private var cache: HashMap<String, Any?> = hashMapOf()
     private val gson: Gson = Gson()
     private val sharedPreferences: SharedPreferences = context.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE)
+    val db: AppDatabase = Room.databaseBuilder(context, AppDatabase::class.java, DB_NAME).build()
 
     override var configuration: Configuration?
         get() = getValue(SHARED_PREF_KEY_CONFIGURATION, Configuration::class.java)
@@ -116,34 +132,150 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
         get() = getEncryptedValue(SHARED_PREF_KEY_SAVED_ATTESTATION_DATA, object : TypeToken<Map<String, FormEntry>>() {}.type)
         set(value) = setEncryptedValue(SHARED_PREF_KEY_SAVED_ATTESTATION_DATA, value)
 
-    private val _attestationsLiveData: MutableLiveData<List<Attestation>?> = MutableLiveData(attestations)
-    override val attestationsLiveData: LiveData<List<Attestation>?>
-        get() = _attestationsLiveData
-
-    override var attestations: List<Attestation>?
-        get() = getEncryptedValue(SHARED_PREF_KEY_ATTESTATIONS, object : TypeToken<List<Attestation>>() {}.type)
-        set(value) {
-            setEncryptedValue(SHARED_PREF_KEY_ATTESTATIONS, value)
-            _attestationsLiveData.postValue(value)
+    override val attestationsFlow: Flow<List<Attestation>>
+        get() = db.attestationRoomDao().getAllFlow().map { attestationsRoom ->
+            attestationsRoom.mapNotNull { attestationRoom ->
+                kotlin.runCatching {
+                    val decryptedString = cryptoManager.decryptToString(attestationRoom.encryptedValue)
+                    gson.fromJson(decryptedString, Attestation::class.java)
+                }.getOrNull()
+            }
         }
 
-    override var rawWalletCertificates: List<RawWalletCertificate>?
+    override suspend fun attestations(): List<Attestation> {
+        return withContext(Dispatchers.IO) {
+            migrateAttestations()
+            db.attestationRoomDao().getAll().map { attestationRoom ->
+                val decryptedString = cryptoManager.decryptToString(attestationRoom.encryptedValue)
+                gson.fromJson(decryptedString, Attestation::class.java)
+            }
+        }
+    }
+
+    override suspend fun insertAllAttestations(vararg attestations: Attestation) {
+        withContext(ioDispatcher) {
+            db.attestationRoomDao().insertAll(
+                *attestations.map { attestation ->
+                    val encryptedString = cryptoManager.encryptToString(gson.toJson(attestation))
+                    AttestationRoom(attestation.id, encryptedString)
+                }.toTypedArray()
+            )
+        }
+    }
+
+    override suspend fun deleteAttestation(attestationId: String) {
+        withContext(ioDispatcher) {
+            db.attestationRoomDao().delete(attestationId)
+        }
+    }
+
+    override suspend fun deleteAllAttestations() {
+        withContext(ioDispatcher) {
+            db.attestationRoomDao().deleteAll()
+        }
+    }
+
+    @Suppress("DEPRECATION")
+    // id migration (null due to reflection)
+    private suspend fun migrateAttestations() {
+        if (sharedPreferences.contains(SHARED_PREF_KEY_ATTESTATIONS_V2)) {
+            deprecatedAttestations2?.map {
+                it.copy(id = it.id ?: UUID.randomUUID().toString())
+            }?.toTypedArray()?.let { deprecatedAttestations ->
+                insertAllAttestations(*deprecatedAttestations)
+                deprecatedAttestations2 = null
+            }
+        }
+    }
+
+    @Suppress("DEPRECATION")
+    @Deprecated(message = "Old storage", replaceWith = ReplaceWith("attestations()"), level = DeprecationLevel.WARNING)
+    private var deprecatedAttestations2: List<Attestation>?
+        get() = getEncryptedValue(SHARED_PREF_KEY_ATTESTATIONS_V2, object : TypeToken<List<Attestation>>() {}.type)
+        set(value) {
+            setEncryptedValue(SHARED_PREF_KEY_ATTESTATIONS_V2, value)
+        }
+
+    override suspend fun rawWalletCertificates(): List<RawWalletCertificate> {
+        return withContext(ioDispatcher) {
+            db.certificateRoomDao().getAll().map { certificateRoom ->
+                val decryptedString = cryptoManager.decryptToString(certificateRoom.encryptedValue)
+                gson.fromJson(decryptedString, RawWalletCertificate::class.java)
+            }
+        }
+    }
+
+    override fun getCertificateById(id: String): Flow<RawWalletCertificate?> {
+        return db.certificateRoomDao().getById(id).map { certificateRoom ->
+            certificateRoom?.let {
+                val decryptedString = cryptoManager.decryptToString(certificateRoom.encryptedValue)
+                gson.fromJson(decryptedString, RawWalletCertificate::class.java)
+            }
+        }
+    }
+
+    override val rawWalletCertificatesFlow: Flow<List<RawWalletCertificate>>
+        get() = db.certificateRoomDao().getAllFlow().map { certificatesRoom ->
+            certificatesRoom.mapNotNull { certificateRoom ->
+                kotlin.runCatching {
+                    val decryptedString = cryptoManager.decryptToString(certificateRoom.encryptedValue)
+                    gson.fromJson(decryptedString, RawWalletCertificate::class.java)
+                }.getOrNull()
+            }
+        }
+
+    override suspend fun insertAllRawWalletCertificates(vararg certificates: RawWalletCertificate) {
+        withContext(ioDispatcher) {
+            val certificatesRoom = certificates.map { certificate ->
+                val encryptedString = cryptoManager.encryptToString(gson.toJson(certificate))
+                CertificateRoom(certificate.id, encryptedString)
+            }
+            db.certificateRoomDao().insertAll(*certificatesRoom.toTypedArray())
+        }
+    }
+
+    override suspend fun deleteRawWalletCertificate(certificateId: String) {
+        withContext(ioDispatcher) {
+            db.certificateRoomDao().delete(certificateId)
+        }
+    }
+
+    override suspend fun deleteAllRawWalletCertificates() {
+        withContext(ioDispatcher) {
+            db.certificateRoomDao().deleteAll()
+        }
+    }
+
+    @Suppress("DEPRECATION")
+    @Deprecated(message = "Old storage", replaceWith = ReplaceWith("rawWalletCertificates()"), level = DeprecationLevel.WARNING)
+    private var deprecatedRawWalletCertificates: List<RawWalletCertificate>?
         get() = getEncryptedValue(SHARED_PREF_KEY_WALLET_CERTIFICATES, object : TypeToken<List<RawWalletCertificate>>() {}.type)
         set(value) {
             setEncryptedValue(SHARED_PREF_KEY_WALLET_CERTIFICATES, value)
-            _rawWalletCertificatesLiveData.postValue(value)
         }
-    private val _rawWalletCertificatesLiveData: MutableLiveData<List<RawWalletCertificate>?> by lazy {
-        MutableLiveData(rawWalletCertificates)
-    }
-    override val rawWalletCertificatesLiveData: LiveData<List<RawWalletCertificate>?>
-        get() = _rawWalletCertificatesLiveData
 
+    @Suppress("DEPRECATION")
+    // id + isFavorite migration (null due to reflection)
+    override suspend fun migrateCertificates(): List<RawWalletCertificate> {
+        var migratedCertificates = emptyList<RawWalletCertificate>()
+        if (sharedPreferences.contains(SHARED_PREF_KEY_WALLET_CERTIFICATES)) {
+            deprecatedRawWalletCertificates?.map {
+                it.copy(id = it.id ?: UUID.randomUUID().toString(), isFavorite = it.isFavorite ?: false)
+            }?.toTypedArray()?.let { deprecatedCertificates ->
+                migratedCertificates = deprecatedCertificates.toList()
+                insertAllRawWalletCertificates(*deprecatedCertificates)
+                deprecatedRawWalletCertificates = null
+            }
+        }
+        return migratedCertificates
+    }
+
+    @Suppress("DEPRECATION")
     @Deprecated(message = "Old model", replaceWith = ReplaceWith("attestations"), level = DeprecationLevel.WARNING)
     override var deprecatedAttestations: List<Map<String, FormEntry>>?
-        get() = getEncryptedValue(SHARED_PREF_KEY_DEPRECTATED_ATTESTATIONS, object : TypeToken<List<Map<String, FormEntry>>>() {}.type)
+        get() = getEncryptedValue(SHARED_PREF_KEY_ATTESTATIONS, object : TypeToken<List<Map<String, FormEntry>>>() {}.type)
         set(value) {
-            setEncryptedValue(SHARED_PREF_KEY_DEPRECTATED_ATTESTATIONS, value)
+            setEncryptedValue(SHARED_PREF_KEY_ATTESTATIONS, value)
         }
 
     override var reportDate: Long?
@@ -154,9 +286,76 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
         get() = getEncryptedValue(SHARED_PREF_KEY_REPORT_VALIDATION_TOKEN, String::class.java)
         set(value) = setEncryptedValue(SHARED_PREF_KEY_REPORT_VALIDATION_TOKEN, value)
 
-    override var venuesQrCode: List<VenueQrCode>?
-        get() = getEncryptedValue(SHARED_PREF_KEY_SAVE_DATA_VENUES_QR_CODE, object : TypeToken<List<VenueQrCode>>() {}.type)
-        set(value) = setEncryptedValue(SHARED_PREF_KEY_SAVE_DATA_VENUES_QR_CODE, value)
+    override suspend fun venuesQrCode(): List<VenueQrCode> {
+        return withContext(ioDispatcher) {
+            migrateVenuesQrCode()
+            db.venueRoomDao().getAll().map { venueRoom ->
+                val decryptedString = cryptoManager.decryptToString(venueRoom.encryptedValue)
+                gson.fromJson(decryptedString, VenueQrCode::class.java)
+            }
+        }
+    }
+
+    override val venuesQrCodeFlow: Flow<List<VenueQrCode>>
+        get() = db.venueRoomDao().getAllFlow().map { venuesRoom ->
+            venuesRoom.mapNotNull { venueRoom ->
+                kotlin.runCatching {
+                    val decryptedString = cryptoManager.decryptToString(venueRoom.encryptedValue)
+                    gson.fromJson(decryptedString, VenueQrCode::class.java)
+                }.getOrNull()
+            }
+        }
+
+    override suspend fun insertAllVenuesQrCode(vararg venuesQrCode: VenueQrCode) {
+        withContext(ioDispatcher) {
+            db.venueRoomDao().insertAll(
+                *venuesQrCode.map { venue ->
+                    val encryptedString = cryptoManager.encryptToString(gson.toJson(venue))
+                    VenueRoom(venue.id, encryptedString)
+                }.toTypedArray()
+            )
+        }
+    }
+
+    override suspend fun deleteVenueQrCode(venueQrCodeId: String) {
+        withContext(ioDispatcher) {
+            db.venueRoomDao().delete(venueQrCodeId)
+        }
+    }
+
+    override suspend fun deleteAllVenuesQrCode() {
+        withContext(ioDispatcher) {
+            db.venueRoomDao().deleteAll()
+        }
+    }
+
+    override suspend fun getCertificateCount(): Int {
+        return withContext(ioDispatcher) {
+            db.certificateRoomDao().getAllCount()
+        }
+    }
+
+    override val certificateCountFlow: Flow<Int>
+        get() = db.certificateRoomDao().getAllCountFlow()
+
+    @Suppress("DEPRECATION")
+    @Deprecated(message = "Old storage", replaceWith = ReplaceWith("venuesQrCode()"), level = DeprecationLevel.WARNING)
+    private var deprecatedVenuesQrCode: List<VenueQrCode>?
+        get() = getEncryptedValue(SHARED_PREF_KEY_VENUES_QR_CODE, object : TypeToken<List<VenueQrCode>>() {}.type)
+        set(value) = setEncryptedValue(SHARED_PREF_KEY_VENUES_QR_CODE, value)
+
+    @Suppress("DEPRECATION")
+    // id migration (null due to reflection)
+    private suspend fun migrateVenuesQrCode() {
+        if (sharedPreferences.contains(SHARED_PREF_KEY_VENUES_QR_CODE)) {
+            deprecatedVenuesQrCode?.map {
+                it.copy(id = it.id ?: UUID.randomUUID().toString())
+            }?.toTypedArray()?.let { deprecatedVenues ->
+                insertAllVenuesQrCode(*deprecatedVenues)
+                deprecatedVenuesQrCode = null
+            }
+        }
+    }
 
     override var reportToSendStartTime: Long?
         get() = getEncryptedValue(SHARED_PREF_KEY_REPORT_TO_SEND_START_TIME, Long::class.java)
@@ -231,11 +430,13 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
     private fun <T> getEncryptedValue(key: String, type: Type, useCache: Boolean = true): T? {
         @Suppress("UNCHECKED_CAST")
         val cachedValue = if (useCache) {
-            cache[key] as? T?
+            cache?.get(key) as? T?
         } else {
             null
         }
-        return cachedValue ?: run {
+        return if (cachedValue != null) {
+            cachedValue
+        } else {
             val encryptedText = sharedPreferences.getString(key, null)
             return if (encryptedText != null) {
                 val result = kotlin.runCatching {
@@ -248,7 +449,10 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
                     }
                 }
                 if (useCache && result.isSuccess) {
-                    cache[key] = result.getOrNull()
+                    cache?.setOrRemove(key, result.getOrNull())
+                }
+                if (result.isFailure) {
+                    Timber.e(result.exceptionOrNull(), "Fail to get encrypted $key")
                 }
                 result.getOrNull()
             } else {
@@ -259,15 +463,16 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
 
     private fun setEncryptedValue(key: String, value: Any?, useCache: Boolean = true) {
         if (useCache) {
-            cache[key] = when (value) {
+            val typedValue = when (value) {
                 is List<*> -> value.toList()
                 is Map<*, *> -> value.toMap()
                 else -> value
             }
+            cache?.setOrRemove(key, typedValue)
         }
         if (value != null) {
-            sharedPreferences.edit()
-                .putString(
+            sharedPreferences.edit {
+                putString(
                     key,
                     if (value is ByteArray) {
                         cryptoManager.encryptToString(value)
@@ -275,7 +480,7 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
                         cryptoManager.encryptToString(gson.toJson(value))
                     }
                 )
-                .apply()
+            }
         } else {
             sharedPreferences.edit().remove(key).apply()
         }
@@ -283,14 +488,14 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
 
     private fun <T> getValue(@Suppress("SameParameterValue") key: String, type: Type): T? {
         @Suppress("UNCHECKED_CAST")
-        return (cache[key] as? T?) ?: run {
+        return (cache?.get(key) as? T?) ?: run {
             val text = sharedPreferences.getString(key, null)
             return if (text != null) {
                 val result = kotlin.runCatching {
                     gson.fromJson<T>(text, type)
                 }
                 if (result.isSuccess) {
-                    cache[key] = result.getOrNull()
+                    cache?.setOrRemove(key, result.getOrNull())
                 }
                 result.getOrNull()
             } else {
@@ -300,11 +505,12 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
     }
 
     private fun setValue(@Suppress("SameParameterValue") key: String, value: Any?) {
-        cache[key] = when (value) {
+        val typedValue = when (value) {
             is List<*> -> value.toList()
             is Map<*, *> -> value.toMap()
             else -> value
         }
+        cache?.setOrRemove(key, typedValue)
         if (value != null) {
             sharedPreferences.edit()
                 .putString(
@@ -329,7 +535,8 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
     }
 
     companion object {
-        private const val SHARED_PREF_NAME = "robert_prefs"
+        private const val DB_NAME = "robert_db"
+        const val SHARED_PREF_NAME: String = "robert_prefs"
         private const val SHARED_PREF_KEY_CONFIGURATION = "shared.pref.configuration"
         private const val SHARED_PREF_KEY_CALIBRATION = "shared.pref.calibration"
         private const val SHARED_PREF_KEY_SHOULD_RELOAD_BLE_SETTINGS = "shared.pref.should_reload_ble_settings"
@@ -349,16 +556,24 @@ class SecureKeystoreDataSource(context: Context, private val cryptoManager: Loca
         private const val SHARED_PREF_KEY_PROXIMITY_ACTIVE = "shared.pref.proximity_active"
         private const val SHARED_PREF_KEY_SAVE_ATTESTATION_DATA = "shared.pref.save_attestation_data"
         private const val SHARED_PREF_KEY_SAVED_ATTESTATION_DATA = "shared.pref.saved_attestation_data"
-        private const val SHARED_PREF_KEY_ATTESTATIONS = "shared.pref.attestations_v2"
-        private const val SHARED_PREF_KEY_DEPRECTATED_ATTESTATIONS = "shared.pref.attestations"
+
+        @Deprecated(message = "Use attestations in Room instead")
+        internal const val SHARED_PREF_KEY_ATTESTATIONS_V2 = "shared.pref.attestations_v2"
+
+        @Deprecated(message = "Use attestations in Room instead")
+        private const val SHARED_PREF_KEY_ATTESTATIONS = "shared.pref.attestations"
         private const val SHARED_PREF_KEY_REPORT_DATE = "shared.pref.report_date"
         private const val SHARED_PREF_KEY_REPORT_DATE_ENCRYPTED = "shared.pref.report_date_encrypted"
-        private const val SHARED_PREF_KEY_SAVE_DATA_VENUES_QR_CODE = "shared.pref.venues_qr_code"
+
+        @Deprecated(message = "Use venues in Room instead")
+        internal const val SHARED_PREF_KEY_VENUES_QR_CODE = "shared.pref.venues_qr_code"
         private const val SHARED_PREF_KEY_REPORT_VALIDATION_TOKEN = "shared.pref.report_validation_token"
         private const val SHARED_PREF_KEY_REPORT_TO_SEND_START_TIME = "shared.pref.report_to_send_start_time"
         private const val SHARED_PREF_KEY_REPORT_TO_SEND_END_TIME = "shared.pref.report_to_send_end_time"
         private const val SHARED_PREF_KEY_DECLARATION_TOKEN = "shared.pref.declaration_token"
-        private const val SHARED_PREF_KEY_WALLET_CERTIFICATES = "shared.pref.wallet_certificates"
+
+        @Deprecated(message = "Use wallets in Room instead")
+        internal const val SHARED_PREF_KEY_WALLET_CERTIFICATES = "shared.pref.wallet_certificates"
 
         // Clea
         private const val SHARED_PREF_KEY_CLEA_LAST_STATUS_ITERATION = "shared.pref.clea_last_status_iteration"

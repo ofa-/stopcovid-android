@@ -8,7 +8,7 @@
  * Created by Lunabee Studio / Date - 2021/22/03 - for the TOUS-ANTI-COVID project
  */
 
-package com.lunabeestudio.stopcovid.manager
+package com.lunabeestudio.stopcovid.repository
 
 import com.lunabeestudio.domain.model.Attestation
 import com.lunabeestudio.robert.RobertManager
@@ -18,34 +18,39 @@ import com.lunabeestudio.stopcovid.coreui.manager.LocalizedStrings
 import com.lunabeestudio.stopcovid.extension.attestationLongLabelFromKey
 import com.lunabeestudio.stopcovid.extension.attestationShortLabelFromKey
 import com.lunabeestudio.stopcovid.model.AttestationMap
+import kotlinx.coroutines.flow.Flow
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.TimeZone
+import java.util.UUID
 
-object AttestationsManager {
+class AttestationRepository(
+    private val localKeystoreDataSource: LocalKeystoreDataSource,
+) {
     private val dateFormat: DateFormat = SimpleDateFormat.getDateInstance(DateFormat.SHORT)
     private val timeFormat: DateFormat = SimpleDateFormat.getTimeInstance(DateFormat.SHORT)
 
-    fun addAttestation(
+    val attestationsFlow: Flow<List<Attestation>>
+        get() = localKeystoreDataSource.attestationsFlow
+
+    suspend fun addAttestation(
         robertManager: RobertManager,
         keystoreDataSource: LocalKeystoreDataSource,
         strings: LocalizedStrings,
-        attestation: AttestationMap
+        attestationMap: AttestationMap
     ) {
-        val attestations = keystoreDataSource.attestations?.toMutableList() ?: mutableListOf()
-        attestations.add(
-            Attestation(
-                qrCode = attestationToFormattedString(robertManager, strings, attestation),
-                footer = attestationToFooterString(robertManager, strings, attestation),
-                qrCodeString = attestationToFormattedStringDisplayed(robertManager, strings, attestation),
-                timestamp = attestation[Constants.Attestation.KEY_DATE_TIME]?.value?.toLongOrNull() ?: 0L,
-                reason = attestation[Constants.Attestation.DATA_KEY_REASON]?.value ?: "",
-                widgetString = strings[attestation[Constants.Attestation.DATA_KEY_REASON]?.value?.attestationShortLabelFromKey()]
-                    ?: strings["qrCode.infoNotAvailable"] ?: ""
-            )
+        val attestation = Attestation(
+            id = UUID.randomUUID().toString(),
+            qrCode = attestationToFormattedString(robertManager, strings, attestationMap),
+            footer = attestationToFooterString(robertManager, strings, attestationMap),
+            qrCodeString = attestationToFormattedStringDisplayed(robertManager, strings, attestationMap),
+            timestamp = attestationMap[Constants.Attestation.KEY_DATE_TIME]?.value?.toLongOrNull() ?: 0L,
+            reason = attestationMap[Constants.Attestation.DATA_KEY_REASON]?.value ?: "",
+            widgetString = strings[attestationMap[Constants.Attestation.DATA_KEY_REASON]?.value?.attestationShortLabelFromKey()]
+                ?: strings["qrCode.infoNotAvailable"] ?: ""
         )
-        keystoreDataSource.attestations = attestations
+        keystoreDataSource.insertAllAttestations(attestation)
     }
 
     private fun attestationToFormattedString(robertManager: RobertManager, strings: LocalizedStrings, attestation: AttestationMap): String {
@@ -124,7 +129,11 @@ object AttestationsManager {
     )
 
     @Suppress("DEPRECATION")
-    fun migrateAttestationsIfNeeded(robertManager: RobertManager, keystoreDataSource: LocalKeystoreDataSource, strings: LocalizedStrings) {
+    suspend fun migrateAttestationsIfNeeded(
+        robertManager: RobertManager,
+        keystoreDataSource: LocalKeystoreDataSource,
+        strings: LocalizedStrings
+    ) {
         keystoreDataSource.deprecatedAttestations?.forEach { deprecatedAttestation ->
             addAttestation(robertManager, keystoreDataSource, strings, deprecatedAttestation)
         }

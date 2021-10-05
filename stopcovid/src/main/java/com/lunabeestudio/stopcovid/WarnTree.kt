@@ -15,7 +15,7 @@ import timber.log.Timber
 
 class WarnTree : Timber.DebugTree() {
 
-    override fun isLoggable(priority: Int): Boolean {
+    override fun isLoggable(tag: String?, priority: Int): Boolean {
         return priority >= Log.WARN
     }
 }

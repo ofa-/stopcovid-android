@@ -1,4 +1,14 @@
-package com.lunabeestudio.stopcovid.manager
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * Authors
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * Created by Lunabee Studio / Date - 2021/22/03 - for the TOUS-ANTI-COVID project
+ */
+
+package com.lunabeestudio.stopcovid.repository
 
 import android.content.SharedPreferences
 import android.net.Uri
@@ -10,11 +20,14 @@ import com.lunabeestudio.domain.model.VenueQrCode
 import com.lunabeestudio.framework.extension.fromBase64URL
 import com.lunabeestudio.framework.local.datasource.SecureKeystoreDataSource
 import com.lunabeestudio.robert.RobertManager
+import com.lunabeestudio.robert.datasource.LocalKeystoreDataSource
 import com.lunabeestudio.stopcovid.extension.isValidUUID
 import com.lunabeestudio.stopcovid.extension.isVenueOnBoardingDone
 import com.lunabeestudio.stopcovid.extension.venuesFeaturedWasActivatedAtLeastOneTime
+import com.lunabeestudio.stopcovid.manager.DeeplinkManager
 import com.lunabeestudio.stopcovid.model.VenueExpiredException
 import com.lunabeestudio.stopcovid.model.VenueInvalidFormatException
+import kotlinx.coroutines.flow.Flow
 import timber.log.Timber
 import java.nio.ByteBuffer
 import java.util.Arrays.copyOfRange
@@ -22,9 +35,13 @@ import java.util.UUID
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 
-object VenuesManager {
+class VenueRepository(
+    private val localKeystoreDataSource: LocalKeystoreDataSource,
+) {
+    val venuesQrCodeFlow: Flow<List<VenueQrCode>>
+        get() = localKeystoreDataSource.venuesQrCodeFlow
 
-    fun processVenueUrl(
+    suspend fun processVenueUrl(
         robertManager: RobertManager,
         secureKeystoreDataSource: SecureKeystoreDataSource,
         stringUrl: String,
@@ -48,7 +65,7 @@ object VenuesManager {
     }
 
     @OptIn(ExperimentalTime::class)
-    fun processVenue(
+    suspend fun processVenue(
         robertManager: RobertManager,
         secureKeystoreDataSource: SecureKeystoreDataSource,
         base64URLCode: String,
@@ -104,50 +121,38 @@ object VenuesManager {
         unixTimeInMS: Long
     ): Boolean = unixTimeInMS + gracePeriod(robertManager) <= System.currentTimeMillis()
 
-    private fun saveVenue(keystoreDataSource: SecureKeystoreDataSource, venueQrCode: VenueQrCode) {
-        val venuesQrCode = keystoreDataSource.venuesQrCode?.toMutableList() ?: mutableListOf()
-        venueQrCode.takeIf {
-            venuesQrCode.none {
-                venueQrCode.id == it.id
-            }
-        }?.let {
-            venuesQrCode.add(it)
-            venueListHasChanged(keystoreDataSource)
-            keystoreDataSource.venuesQrCode = venuesQrCode
-        }
+    internal suspend fun saveVenue(keystoreDataSource: SecureKeystoreDataSource, venueQrCode: VenueQrCode) {
+        keystoreDataSource.insertAllVenuesQrCode(venueQrCode)
+        venueListHasChanged(keystoreDataSource)
     }
 
-    fun getVenuesQrCode(
+    suspend fun getVenuesQrCode(
         keystoreDataSource: SecureKeystoreDataSource,
         startNtpTimestamp: Long? = null,
         endNtpTimestamp: Long? = null,
-    ): List<VenueQrCode>? = (startNtpTimestamp ?: Long.MIN_VALUE).let { forcedStartNtpTimestamp ->
+    ): List<VenueQrCode> = (startNtpTimestamp ?: Long.MIN_VALUE).let { forcedStartNtpTimestamp ->
         (endNtpTimestamp ?: Long.MAX_VALUE).let { forcedEndNtpTimestamp ->
-            keystoreDataSource.venuesQrCode?.filter {
+            keystoreDataSource.venuesQrCode().filter {
                 it.ntpTimestamp in forcedStartNtpTimestamp..forcedEndNtpTimestamp
             }
         }
     }
 
     @OptIn(ExperimentalTime::class)
-    fun clearExpired(
+    suspend fun clearExpired(
         robertManager: RobertManager,
         keystoreDataSource: SecureKeystoreDataSource,
     ) {
-        if (!keystoreDataSource.venuesQrCode?.filter {
+        val expiredVenuesQrCode = keystoreDataSource.venuesQrCode().filter {
             @Suppress("SENSELESS_COMPARISON")
             isExpired(
-                    robertManager,
-                    it.ntpTimestamp.ntpTimeSToUnixTimeMs()
-                ) || it.ltid == null // This test is added to handle "old" venues that may have null here due to JSON parsing handling
-        }.isNullOrEmpty()
-        ) {
-            keystoreDataSource.venuesQrCode = keystoreDataSource.venuesQrCode?.filter { venueQrCode ->
-                @Suppress("SENSELESS_COMPARISON")
-                !isExpired(
-                    robertManager,
-                    venueQrCode.ntpTimestamp.ntpTimeSToUnixTimeMs()
-                ) && venueQrCode.ltid != null // This test is added to handle "old" venues that may have null here due to JSON parsing handling
+                robertManager,
+                it.ntpTimestamp.ntpTimeSToUnixTimeMs()
+            ) || it.ltid == null // This test is added to handle "old" venues that may have null here due to JSON parsing handling
+        }
+        if (expiredVenuesQrCode.isNotEmpty()) {
+            expiredVenuesQrCode.forEach {
+                keystoreDataSource.deleteVenueQrCode(it.id)
             }
             venueListHasChanged(keystoreDataSource)
         }
@@ -157,17 +162,13 @@ object VenuesManager {
     private fun gracePeriod(robertManager: RobertManager) =
         Duration.days(robertManager.configuration.venuesRetentionPeriod).inWholeMilliseconds
 
-    fun removeVenue(keystoreDataSource: SecureKeystoreDataSource, venueId: String) {
-        val venuesQrCode = keystoreDataSource.venuesQrCode?.toMutableList() ?: mutableListOf()
-        venuesQrCode.firstOrNull { it.id == venueId }?.let {
-            venuesQrCode.remove(it)
-            venueListHasChanged(keystoreDataSource)
-            keystoreDataSource.venuesQrCode = venuesQrCode
-        }
+    suspend fun removeVenue(keystoreDataSource: SecureKeystoreDataSource, venueId: String) {
+        keystoreDataSource.deleteVenueQrCode(venueId)
+        venueListHasChanged(keystoreDataSource)
     }
 
-    fun clearAllData(preferences: SharedPreferences, keystoreDataSource: SecureKeystoreDataSource) {
-        keystoreDataSource.venuesQrCode = null
+    suspend fun clearAllData(preferences: SharedPreferences, keystoreDataSource: SecureKeystoreDataSource) {
+        keystoreDataSource.deleteAllVenuesQrCode()
         preferences.isVenueOnBoardingDone = false
         preferences.venuesFeaturedWasActivatedAtLeastOneTime = false
     }

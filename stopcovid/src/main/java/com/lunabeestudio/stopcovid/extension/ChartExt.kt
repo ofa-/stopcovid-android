@@ -1,17 +1,25 @@
 package com.lunabeestudio.stopcovid.extension
 
+import android.content.Context
 import android.graphics.Color
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.LimitLine
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.components.YAxis
+import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
+import com.github.mikephil.charting.data.BarEntry
+import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.formatter.ValueFormatter
 import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.Constants.Chart.WIDGET_CIRCLE_SIZE
 import com.lunabeestudio.stopcovid.Constants.Chart.WIDGET_LINE_WIDTH
 import com.lunabeestudio.stopcovid.Constants.Chart.WIDGET_MARGIN_SIZE
+import com.lunabeestudio.stopcovid.model.LimitLineData
+import kotlin.time.Duration
+import kotlin.time.ExperimentalTime
 
 // Chart extensions :
 fun LineDataSet.setupStyle(lineColor: Int) {
@@ -61,6 +69,25 @@ fun LineChart.setupStyleWidget() {
     axisLeft.isEnabled = false
 }
 
+fun LineChart.fillWithChartData(
+    context: Context,
+    chartData: Array<com.lunabeestudio.stopcovid.model.ChartData>,
+    limitLineData: LimitLineData?,
+) {
+    val dataSetArray = chartData.map {
+        LineDataSet(it.entries, it.description).apply {
+            setupStyle(it.color)
+        }
+    }.toTypedArray()
+    dataSetArray.forEach { it.setDrawHighlightIndicators(false) }
+
+    data = LineData(*dataSetArray)
+
+    setupXAxis(context, xAxis, chartData)
+    setupYAxis(axisLeft, limitLineData)
+    animateX(Constants.Chart.X_ANIMATION_DURATION_MILLIS)
+}
+
 fun BarChart.setupStyle() {
     legend.isEnabled = false
     description.isEnabled = false
@@ -71,6 +98,70 @@ fun BarChart.setupStyle() {
         isEnabled = false
     }
     setFitBars(true)
+}
+
+fun BarChart.fillWithChartData(
+    context: Context,
+    chartData: Array<com.lunabeestudio.stopcovid.model.ChartData>,
+    limitLineData: LimitLineData?,
+) {
+    val dataSetArray = chartData.map { (description, _, entries, color) ->
+        BarDataSet(
+            entries.mapIndexed { _, entry ->
+                BarEntry(entry.x, entry.y)
+            },
+            description
+        ).apply {
+            setupStyle(color)
+        }
+    }.toTypedArray()
+
+    if (dataSetArray.isNotEmpty()) {
+        data = BarData(*dataSetArray).apply {
+            val xValueDiff = xMax - xMin
+            val spacing = 0.05f
+            val entriesCount = dataSetArray[0].entryCount
+            barWidth = xValueDiff / (entriesCount) - (spacing * xValueDiff / (entriesCount + 1))
+        }
+
+        setupXAxis(context, xAxis, chartData)
+        setupYAxis(axisLeft, limitLineData)
+
+        animateY(Constants.Chart.X_ANIMATION_DURATION_MILLIS)
+    }
+}
+
+private fun setupYAxis(yAxis: YAxis, limitLineData: LimitLineData?) {
+    yAxis.apply {
+        setupStyle()
+        axisMinimum = axisMinimum.coerceAtLeast(0f)
+        valueFormatter = object : ValueFormatter() {
+            override fun getFormattedValue(value: Float): String {
+                return value.formatCompact()
+            }
+        }
+
+        limitLineData?.let {
+            val limitLine = LimitLine(it.limitLine.toFloat(), it.description)
+            limitLine.setupStyle(it.color)
+            addLimitLine(limitLine)
+        }
+    }
+}
+
+@OptIn(ExperimentalTime::class)
+private fun setupXAxis(context: Context, xAxis: XAxis, chartData: Array<com.lunabeestudio.stopcovid.model.ChartData>) {
+    xAxis.apply {
+        setupStyle()
+        val chartEntries = chartData.getOrNull(0)?.entries
+        chartEntries?.firstOrNull()?.x?.let { axisMinimum = it }
+        chartEntries?.lastOrNull()?.x?.let { axisMaximum = it }
+        valueFormatter = object : ValueFormatter() {
+            override fun getFormattedValue(value: Float): String {
+                return Duration.seconds(value.toLong()).getRelativeDateShortString(context)
+            }
+        }
+    }
 }
 
 fun YAxis.setupStyle() {

@@ -23,6 +23,17 @@ fun SecretKey.safeDestroy() {
     }
 }
 
+val SecretKey.safeIsDestroyed: Boolean?
+    get() = try {
+        isDestroyed
+    } catch (e: DestroyFailedException) {
+        // Destroy not implemented
+        null
+    } catch (e: NoSuchMethodError) {
+        // Destroy not implemented
+        null
+    }
+
 fun <T> SecretKey.safeUse(block: (SecretKey) -> T): T {
     try {
         return block(this)

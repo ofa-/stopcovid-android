@@ -10,16 +10,23 @@
 
 package com.lunabeestudio.stopcovid.viewmodel
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import com.lunabeestudio.domain.model.FormEntry
 import com.lunabeestudio.framework.local.datasource.SecureKeystoreDataSource
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.coreui.manager.LocalizedStrings
-import com.lunabeestudio.stopcovid.manager.AttestationsManager
+import com.lunabeestudio.stopcovid.coreui.utils.SingleLiveEvent
 import com.lunabeestudio.stopcovid.manager.FormManager
+import com.lunabeestudio.stopcovid.model.CovidException
 import com.lunabeestudio.stopcovid.model.FormField
+import com.lunabeestudio.stopcovid.model.UnknownException
+import com.lunabeestudio.stopcovid.repository.AttestationRepository
+import com.lunabeestudio.stopcovid.widgetshomescreen.AttestationWidget
+import kotlinx.coroutines.launch
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -27,9 +34,12 @@ import java.util.TimeZone
 
 class NewAttestationViewModel(
     private val secureKeystoreDataSource: SecureKeystoreDataSource,
+    private val attestationRepository: AttestationRepository,
     private val formManager: FormManager
 ) : ViewModel() {
 
+    val attestationGeneratedSuccess: SingleLiveEvent<Unit> = SingleLiveEvent()
+    val covidException: SingleLiveEvent<CovidException> = SingleLiveEvent()
     var shouldSaveInfos: Boolean = secureKeystoreDataSource.saveAttestationData ?: false
     val infos: MutableMap<String, FormEntry> = (secureKeystoreDataSource.savedAttestationData ?: mapOf()).toMutableMap()
     private val dateFormat: DateFormat = SimpleDateFormat.getDateInstance(DateFormat.SHORT)
@@ -39,31 +49,41 @@ class NewAttestationViewModel(
         return infos[formField.dataKeyValue]?.takeIf { it.key == formField.key }
     }
 
-    fun generateQrCode(robertManager: RobertManager, strings: LocalizedStrings) {
-        secureKeystoreDataSource.saveAttestationData = shouldSaveInfos
-        infos.keys.forEach { key ->
-            infos[key] = FormEntry(infos[key]?.value?.trim(), infos[key]!!.type, key)
-        }
-        val infosCopy = infos.toMutableMap()
-        val now = Calendar.getInstance().time
-        timeFormat.apply {
-            timeZone = TimeZone.getDefault()
-        }
-        infosCopy[Constants.Attestation.KEY_CREATION_DATE] = FormEntry(
-            dateFormat.format(now),
-            "text",
-            Constants.Attestation.KEY_CREATION_DATE
-        )
-        infosCopy[Constants.Attestation.KEY_CREATION_HOUR] = FormEntry(
-            timeFormat.format(now),
-            "text",
-            Constants.Attestation.KEY_CREATION_HOUR
-        )
-        AttestationsManager.addAttestation(robertManager, secureKeystoreDataSource, strings, infosCopy)
-        if (shouldSaveInfos) {
-            infos.remove(Constants.Attestation.KEY_DATE_TIME)
-            infos.remove(Constants.Attestation.DATA_KEY_REASON)
-            secureKeystoreDataSource.savedAttestationData = infos
+    fun generateQrCode(robertManager: RobertManager, strings: LocalizedStrings, context: Context?) {
+        viewModelScope.launch {
+            try {
+                secureKeystoreDataSource.saveAttestationData = shouldSaveInfos
+                infos.keys.forEach { key ->
+                    infos[key] = FormEntry(infos[key]?.value?.trim(), infos[key]!!.type, key)
+                }
+                val infosCopy = infos.toMutableMap()
+                val now = Calendar.getInstance().time
+                timeFormat.apply {
+                    timeZone = TimeZone.getDefault()
+                }
+                infosCopy[Constants.Attestation.KEY_CREATION_DATE] = FormEntry(
+                    dateFormat.format(now),
+                    "text",
+                    Constants.Attestation.KEY_CREATION_DATE
+                )
+                infosCopy[Constants.Attestation.KEY_CREATION_HOUR] = FormEntry(
+                    timeFormat.format(now),
+                    "text",
+                    Constants.Attestation.KEY_CREATION_HOUR
+                )
+
+                attestationRepository.addAttestation(robertManager, secureKeystoreDataSource, strings, infosCopy)
+                context?.let { AttestationWidget.updateWidget(it, true, infos) }
+
+                if (shouldSaveInfos) {
+                    infos.remove(Constants.Attestation.KEY_DATE_TIME)
+                    infos.remove(Constants.Attestation.DATA_KEY_REASON)
+                    secureKeystoreDataSource.savedAttestationData = infos
+                }
+                attestationGeneratedSuccess.postValue(null)
+            } catch (e: Exception) {
+                covidException.postValue((e as? CovidException) ?: UnknownException(e.message ?: ""))
+            }
         }
     }
 
@@ -85,10 +105,14 @@ class NewAttestationViewModel(
     }
 }
 
-class NewAttestationViewModelFactory(private val secureKeystoreDataSource: SecureKeystoreDataSource, private val formManager: FormManager) :
+class NewAttestationViewModelFactory(
+    private val secureKeystoreDataSource: SecureKeystoreDataSource,
+    private val attestationRepository: AttestationRepository,
+    private val formManager: FormManager,
+) :
     ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         @Suppress("UNCHECKED_CAST")
-        return NewAttestationViewModel(secureKeystoreDataSource, formManager) as T
+        return NewAttestationViewModel(secureKeystoreDataSource, attestationRepository, formManager) as T
     }
 }

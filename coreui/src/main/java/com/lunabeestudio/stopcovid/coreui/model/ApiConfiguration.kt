@@ -143,6 +143,8 @@ internal class ApiConfiguration(
     val maxCertBeforeWarning: Int,
     @SerializedName("app.wallet.vaccin.noWaitDoses")
     val noWaitDoses: String,
+    @SerializedName("app.ratingsKeyFiguresOpeningThreshold")
+    val ratingsKeyFiguresOpeningThreshold: Int,
 )
 
 internal fun ApiConfiguration.toDomain(gson: Gson) = Configuration(
@@ -233,4 +235,5 @@ internal fun ApiConfiguration.toDomain(gson: Gson) = Configuration(
             object : TypeToken<List<ApiCodeValueEntry>>() {}.type
         ) as List<ApiCodeValueEntry>
         ).associate { Pair(it.code, it.value) },
+    ratingsKeyFiguresOpeningThreshold = ratingsKeyFiguresOpeningThreshold,
 )

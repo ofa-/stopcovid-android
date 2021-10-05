@@ -29,7 +29,6 @@ class SecureFileEphemeralBluetoothIdentifierDataSource(
 ) : LocalEphemeralBluetoothIdentifierDataSource {
 
     private val epochFile = AtomicFile(File(context.filesDir, "epochs"))
-    private val mutex: Mutex = Mutex()
 
     private var cache: List<EphemeralBluetoothIdentifier>? = null
         @Synchronized
@@ -106,5 +105,9 @@ class SecureFileEphemeralBluetoothIdentifierDataSource(
             epochFile.delete()
             cache = null
         }
+    }
+
+    companion object {
+        private val mutex: Mutex = Mutex()
     }
 }
