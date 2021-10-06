@@ -188,7 +188,7 @@ class KeyFiguresFragment : MainFragment() {
                 }
             }
             onClickListener = View.OnClickListener {
-                analyticsManager.reportAppEvent(requireContext(), AppEventName.e9, null)
+                analyticsManager.reportAppEvent(AppEventName.e9, null)
                 parentFragment?.findNavControllerOrNull()?.safeNavigate(
                     KeyFiguresPagerFragmentDirections.actionKeyFiguresPagerFragmentToKeyFigureDetailsFragment(
                         figure.labelKey

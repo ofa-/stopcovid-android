@@ -26,7 +26,6 @@ import com.lunabeestudio.stopcovid.coreui.model.Action
 import com.lunabeestudio.stopcovid.extension.openInExternalBrowser
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
-import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
 import com.lunabeestudio.stopcovid.fastitem.LogoItem
 import com.lunabeestudio.stopcovid.fastitem.logoItem
 import com.lunabeestudio.stopcovid.fastitem.phoneSupportItem
@@ -42,16 +41,12 @@ class WalletInfoFragment : MainFragment() {
         requireContext().robertManager()
     }
 
-    private val keystoreDataSource by lazy {
-        requireContext().secureKeystoreDataSource()
-    }
-
     private val viewModel: WalletViewModel by viewModels(
         {
             findParentFragmentByType<WalletContainerFragment>() ?: requireParentFragment()
         },
         {
-            WalletViewModelFactory(robertManager, keystoreDataSource, blacklistDCCManager, blacklist2DDOCManager, walletRepository)
+            WalletViewModelFactory(robertManager, blacklistDCCManager, blacklist2DDOCManager, walletRepository)
         }
     )
 

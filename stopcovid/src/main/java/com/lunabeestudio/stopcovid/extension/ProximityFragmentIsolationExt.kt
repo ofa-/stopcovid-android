@@ -131,7 +131,7 @@ private fun ProximityFragment.actionsForIsolationState(
 }
 
 private fun ProximityFragment.openIsolationForm(analyticsManager: AnalyticsManager) {
-    analyticsManager.reportAppEvent(requireContext(), AppEventName.e6, null)
+    analyticsManager.reportAppEvent(AppEventName.e6, null)
     findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToIsolationFormFragment())
 }
 

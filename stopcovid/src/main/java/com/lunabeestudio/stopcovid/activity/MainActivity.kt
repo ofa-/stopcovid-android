@@ -37,8 +37,6 @@ import androidx.work.WorkManager
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
-import com.google.android.play.core.review.ReviewManager
-import com.google.android.play.core.review.ReviewManagerFactory
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.robert.extension.observeEventAndConsume
 import com.lunabeestudio.stopcovid.Constants
@@ -96,8 +94,6 @@ class MainActivity : BaseActivity() {
     }
 
     private val robertManager: RobertManager by lazy { robertManager() }
-
-    private val reviewManager: ReviewManager by lazy { ReviewManagerFactory.create(this) }
 
     private val strings: LocalizedStrings
         get() = (application as? LocalizedApplication)?.localizedStrings ?: emptyMap()
@@ -429,27 +425,15 @@ class MainActivity : BaseActivity() {
     private fun showRatingDialogIfNeeded() {
         val keyFiguresOpeningThreshold = robertManager.configuration.ratingsKeyFiguresOpeningThreshold.toLong()
         if (!sharedPrefs.googleReviewShown && sharedPrefs.ratingsKeyFiguresOpening >= keyFiguresOpeningThreshold) {
-            val request = reviewManager.requestReviewFlow()
-            request.addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    val reviewInfo = task.result
-                    val flow = reviewManager.launchReviewFlow(this, reviewInfo)
-                    flow.addOnSuccessListener {
-                        sharedPrefs.googleReviewShown = true
-                    }
-                    flow.addOnFailureListener { e ->
-                        Timber.e(e)
-                    }
-                } else if (!sharedPrefs.ratingPopInShown) {
-                    MaterialAlertDialogBuilder(this).showRatingDialog(strings) {
-                        if (!ConfigConstant.Store.GOOGLE.openInExternalBrowser(this, false)) {
-                            if (!ConfigConstant.Store.HUAWEI.openInExternalBrowser(this, false)) {
-                                ConfigConstant.Store.TAC_WEBSITE.openInExternalBrowser(this)
-                            }
+            if (!sharedPrefs.ratingPopInShown) {
+                MaterialAlertDialogBuilder(this).showRatingDialog(strings) {
+                    if (!ConfigConstant.Store.GOOGLE.openInExternalBrowser(this, false)) {
+                        if (!ConfigConstant.Store.HUAWEI.openInExternalBrowser(this, false)) {
+                            ConfigConstant.Store.TAC_WEBSITE.openInExternalBrowser(this)
                         }
                     }
-                    sharedPrefs.ratingPopInShown = true
                 }
+                sharedPrefs.ratingPopInShown = true
             }
         }
     }

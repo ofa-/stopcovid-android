@@ -34,8 +34,6 @@ class CleaDataSource(
 
     private val okHttpClient: OkHttpClient = RetrofitClient.getDefaultOKHttpClient(context, cacheConfig)
 
-    private var filesDir = context.filesDir
-
     private var cachedApi: Pair<String, CleaStatusApi>? = null
 
     private fun getCleaStatusApi(cleaStatusBaseUrl: String): CleaStatusApi {
@@ -65,13 +63,13 @@ class CleaDataSource(
         pivotDate: Long,
         venueQrCodeList: List<VenueQrCode>,
     ): RobertResult {
-        return RequestHelper.tryCatchRequest(filesDir, cleaApiVersion, AnalyticsServiceName.WREPORT, analyticsManager) {
+        return RequestHelper.tryCatchRequest(cleaApiVersion, AnalyticsServiceName.WREPORT, analyticsManager) {
             cleaReportApi.wreport(cleaApiVersion, "Bearer $token", ApiWReportClea.fromVenueQrCodeList(pivotDate, venueQrCodeList))
         }
     }
 
     override suspend fun cleaClusterIndex(apiVersion: String, cleaStatusBaseUrl: String?): RobertResultData<ClusterIndex> {
-        val result = RequestHelper.tryCatchRequestData(filesDir, apiVersion, null, analyticsManager) {
+        val result = RequestHelper.tryCatchRequestData(apiVersion, null, analyticsManager) {
             getCleaStatusApi(cleaStatusBaseUrl ?: cleaStatusFallbackBaseUrl).getClusterIndex(apiVersion)
         }
         return when (result) {
@@ -86,7 +84,7 @@ class CleaDataSource(
         clusterPrefix: String,
         cleaStatusBaseUrl: String?
     ): RobertResultData<List<Cluster>> {
-        val result = RequestHelper.tryCatchRequestData(filesDir, apiVersion, null, analyticsManager) {
+        val result = RequestHelper.tryCatchRequestData(apiVersion, null, analyticsManager) {
             getCleaStatusApi(cleaStatusBaseUrl ?: cleaStatusFallbackBaseUrl).getClusterList(apiVersion, iteration, clusterPrefix)
         }
         return when (result) {

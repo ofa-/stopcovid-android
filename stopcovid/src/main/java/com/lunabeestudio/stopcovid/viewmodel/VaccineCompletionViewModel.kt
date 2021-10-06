@@ -15,7 +15,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
-import com.lunabeestudio.robert.datasource.LocalKeystoreDataSource
 import com.lunabeestudio.stopcovid.coreui.utils.SingleLiveEvent
 import com.lunabeestudio.stopcovid.model.EuropeanCertificate
 import com.lunabeestudio.stopcovid.model.WalletCertificate
@@ -26,7 +25,6 @@ import kotlinx.coroutines.launch
 
 class VaccineCompletionViewModel(
     certificateId: String,
-    private val keystoreDataSource: LocalKeystoreDataSource,
     private val walletRepository: WalletRepository,
     private val dispatcherIO: CoroutineDispatcher = Dispatchers.IO,
 ) : ViewModel() {
@@ -40,7 +38,6 @@ class VaccineCompletionViewModel(
             (certificate.value as? EuropeanCertificate)?.let {
                 if (!it.isFavorite) {
                     walletRepository.toggleFavorite(
-                        keystoreDataSource,
                         it,
                     )
                 }
@@ -52,7 +49,6 @@ class VaccineCompletionViewModel(
 
 class VaccineCompletionViewModelFactory(
     private val certificateId: String,
-    private val keystoreDataSource: LocalKeystoreDataSource,
     private val walletRepository: WalletRepository,
 ) :
     ViewModelProvider.Factory {
@@ -60,7 +56,6 @@ class VaccineCompletionViewModelFactory(
         @Suppress("UNCHECKED_CAST")
         return VaccineCompletionViewModel(
             certificateId,
-            keystoreDataSource,
             walletRepository,
         ) as T
     }

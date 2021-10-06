@@ -16,6 +16,8 @@ import androidx.core.content.edit
 import androidx.room.Room
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.lunabeestudio.analytics.manager.AnalyticsManager
+import com.lunabeestudio.analytics.model.ErrorEventName
 import com.lunabeestudio.domain.model.AtRiskStatus
 import com.lunabeestudio.domain.model.Attestation
 import com.lunabeestudio.domain.model.Calibration
@@ -176,6 +178,12 @@ class SecureKeystoreDataSource(
     }
 
     @Suppress("DEPRECATION")
+    override fun deleteDeprecatedAttestations() {
+        deprecatedAttestations = null
+        deprecatedAttestations2 = null
+    }
+
+    @Suppress("DEPRECATION")
     // id migration (null due to reflection)
     private suspend fun migrateAttestations() {
         if (sharedPreferences.contains(SHARED_PREF_KEY_ATTESTATIONS_V2)) {
@@ -247,6 +255,11 @@ class SecureKeystoreDataSource(
     }
 
     @Suppress("DEPRECATION")
+    override fun deleteDeprecatedCertificates() {
+        deprecatedRawWalletCertificates = null
+    }
+
+    @Suppress("DEPRECATION")
     @Deprecated(message = "Old storage", replaceWith = ReplaceWith("rawWalletCertificates()"), level = DeprecationLevel.WARNING)
     private var deprecatedRawWalletCertificates: List<RawWalletCertificate>?
         get() = getEncryptedValue(SHARED_PREF_KEY_WALLET_CERTIFICATES, object : TypeToken<List<RawWalletCertificate>>() {}.type)
@@ -256,15 +269,34 @@ class SecureKeystoreDataSource(
 
     @Suppress("DEPRECATION")
     // id + isFavorite migration (null due to reflection)
-    override suspend fun migrateCertificates(): List<RawWalletCertificate> {
+    override suspend fun migrateCertificates(analyticsManager: AnalyticsManager): List<RawWalletCertificate> {
         var migratedCertificates = emptyList<RawWalletCertificate>()
         if (sharedPreferences.contains(SHARED_PREF_KEY_WALLET_CERTIFICATES)) {
-            deprecatedRawWalletCertificates?.map {
-                it.copy(id = it.id ?: UUID.randomUUID().toString(), isFavorite = it.isFavorite ?: false)
-            }?.toTypedArray()?.let { deprecatedCertificates ->
-                migratedCertificates = deprecatedCertificates.toList()
-                insertAllRawWalletCertificates(*deprecatedCertificates)
-                deprecatedRawWalletCertificates = null
+            val encryptedText = sharedPreferences.getString(SHARED_PREF_KEY_WALLET_CERTIFICATES, null) ?: ""
+            try {
+                val decryptedString = cryptoManager.decryptToString(encryptedText)
+                try {
+                    val decryptedDeprecatedRawWalletCertificates =
+                        gson.fromJson<List<RawWalletCertificate>>(decryptedString, object : TypeToken<List<RawWalletCertificate>>() {}.type)
+                    decryptedDeprecatedRawWalletCertificates?.map {
+                        it.copy(id = it.id ?: UUID.randomUUID().toString(), isFavorite = it.isFavorite ?: false)
+                    }?.toTypedArray()?.let { deprecatedCertificates ->
+                        migratedCertificates = deprecatedCertificates.toList()
+                        try {
+                            insertAllRawWalletCertificates(*deprecatedCertificates)
+                            deprecatedRawWalletCertificates = null
+                        } catch (e: Exception) {
+                            Timber.e(e)
+                            analyticsManager.reportErrorEvent(ErrorEventName.ERR_WALLET_INSERT_DB)
+                        }
+                    }
+                } catch (e: Exception) {
+                    Timber.e(e)
+                    analyticsManager.reportErrorEvent(ErrorEventName.ERR_WALLET_MIG_CONVERT)
+                }
+            } catch (e: Exception) {
+                Timber.e(e)
+                analyticsManager.reportErrorEvent(ErrorEventName.ERR_WALLET_MIG_DECRYPT)
             }
         }
         return migratedCertificates
@@ -327,6 +359,11 @@ class SecureKeystoreDataSource(
         withContext(ioDispatcher) {
             db.venueRoomDao().deleteAll()
         }
+    }
+
+    @Suppress("DEPRECATION")
+    override fun deleteDeprecatedVenuesQrCode() {
+        deprecatedVenuesQrCode = null
     }
 
     override suspend fun getCertificateCount(): Int {

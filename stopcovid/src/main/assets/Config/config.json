@@ -2,11 +2,11 @@
    "config":[
       {
          "name":"lastUpdate",
-         "value":"3 Sep 2021"
+         "value":"1 Oct 2021"
       },
       {
          "name":"version",
-         "value":88
+         "value":90
       },
       {
          "name":"versionCalibrationBle",
@@ -55,8 +55,12 @@
          "value":true
       },
       {
+	      "name":"app.displayUrgentDgs",
+		  "value":false
+	  },
+      {
          "name":"app.displayIsolation",
-         "value":true
+         "value":false
       },
       {
          "name":"app.isolationMinRiskLevel",
@@ -121,7 +125,7 @@
          "value":false
       },
       {
-          "name": "app.activtyPass.autoRenewable",
+          "name": "app.activityPass.autoRenewable",
           "value": false
       },
       {

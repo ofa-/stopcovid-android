@@ -128,7 +128,7 @@ class ManageDataViewModel(
     fun requestDeleteAnalytics(application: RobertApplication) {
         if (robertManager.isRegistered) {
             if (loadingInProgress.value == false) {
-                analyticsManager.requestDeleteAnalytics(application.getAppContext())
+                analyticsManager.requestDeleteAnalytics()
                 viewModelScope.launch(Dispatchers.IO) {
                     loadingInProgress.postValue(true)
                     robertManager.updateStatus(application)

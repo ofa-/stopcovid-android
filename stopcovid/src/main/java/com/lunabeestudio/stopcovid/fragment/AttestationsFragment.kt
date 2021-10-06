@@ -217,7 +217,7 @@ class AttestationsFragment : MainFragment() {
                     .setMessage(strings["attestationsController.menu.delete.alert.message"])
                     .setNegativeButton(strings["common.cancel"], null)
                     .setPositiveButton(strings["common.confirm"]) { _, _ ->
-                        viewModel.removeAttestation(attestation, context)
+                        viewModel.deleteAttestation(context, attestation)
                         refreshScreen()
                     }
                     .show()
@@ -240,8 +240,10 @@ class AttestationsFragment : MainFragment() {
     private fun showMigrationFailedIfNeeded() {
         if (debugManager.oldAttestationsInSharedPrefs()) {
             context?.let {
-                analyticsManager.reportErrorEvent(it.filesDir, ErrorEventName.ERR_ATTESTATION_MIG)
-                MaterialAlertDialogBuilder(it).showMigrationFailed(strings)
+                analyticsManager.reportErrorEvent(ErrorEventName.ERR_ATTESTATION_MIG)
+                MaterialAlertDialogBuilder(it).showMigrationFailed(strings) {
+                    viewModel.deleteDeprecatedAttestations()
+                }
             }
         }
     }
@@ -252,7 +254,7 @@ class AttestationsFragment : MainFragment() {
                 context?.secureKeystoreDataSource()?.attestations()
             } catch (e: Exception) {
                 context?.let {
-                    analyticsManager.reportErrorEvent(it.filesDir, ErrorEventName.ERR_ATTESTATION_DB)
+                    analyticsManager.reportErrorEvent(ErrorEventName.ERR_ATTESTATION_DB)
                     MaterialAlertDialogBuilder(it).showDbFailure(strings)
                 }
             }

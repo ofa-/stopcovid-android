@@ -16,31 +16,34 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.lunabeestudio.domain.model.VenueQrCode
-import com.lunabeestudio.framework.local.datasource.SecureKeystoreDataSource
 import com.lunabeestudio.stopcovid.repository.VenueRepository
 import kotlinx.coroutines.launch
 
 class VenuesHistoryViewModel(
-    private val keystoreDataSource: SecureKeystoreDataSource,
     private val venueRepository: VenueRepository,
 ) : ViewModel() {
 
     val venuesQrCodeLiveData: LiveData<List<VenueQrCode>> = venueRepository.venuesQrCodeFlow.asLiveData(timeoutInMs = 0)
 
-    fun removeVenue(venueId: String) {
+    fun deleteVenue(venueId: String) {
         viewModelScope.launch {
-            venueRepository.removeVenue(keystoreDataSource, venueId)
+            venueRepository.deleteVenue(venueId)
+        }
+    }
+
+    fun deleteDeprecatedVenues() {
+        viewModelScope.launch {
+            venueRepository.deleteDeprecatedVenues()
         }
     }
 }
 
 class VenuesHistoryViewModelFactory(
-    private val keystoreDataSource: SecureKeystoreDataSource,
     private val venueRepository: VenueRepository,
 ) :
     ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         @Suppress("UNCHECKED_CAST")
-        return VenuesHistoryViewModel(keystoreDataSource, venueRepository) as T
+        return VenuesHistoryViewModel(venueRepository) as T
     }
 }

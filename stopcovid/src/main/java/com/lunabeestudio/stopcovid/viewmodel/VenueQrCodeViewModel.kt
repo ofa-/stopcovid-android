@@ -13,7 +13,6 @@ package com.lunabeestudio.stopcovid.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.lunabeestudio.framework.local.datasource.SecureKeystoreDataSource
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.stopcovid.coreui.utils.SingleLiveEvent
 import com.lunabeestudio.stopcovid.repository.VenueRepository
@@ -21,7 +20,6 @@ import kotlinx.coroutines.launch
 
 class VenueQrCodeViewModel(
     private val robertManager: RobertManager,
-    private val keystoreDataSource: SecureKeystoreDataSource,
     private val venueRepository: VenueRepository,
 ) : ViewModel() {
     val venueProcessed: SingleLiveEvent<Unit> = SingleLiveEvent()
@@ -32,7 +30,6 @@ class VenueQrCodeViewModel(
             try {
                 venueRepository.processVenue(
                     robertManager = robertManager,
-                    secureKeystoreDataSource = keystoreDataSource,
                     base64URLCode = venueContent,
                     version = venueVersion.toInt(),
                     unixTimeInSeconds = venueTime?.toLongOrNull(),
@@ -49,7 +46,6 @@ class VenueQrCodeViewModel(
             try {
                 venueRepository.processVenueUrl(
                     robertManager = robertManager,
-                    secureKeystoreDataSource = keystoreDataSource,
                     code
                 )
                 venueProcessed.postValue(null)
@@ -62,12 +58,11 @@ class VenueQrCodeViewModel(
 
 class VenueQrCodeViewModelFactory(
     private val robertManager: RobertManager,
-    private val keystoreDataSource: SecureKeystoreDataSource,
     private val venueRepository: VenueRepository,
 ) :
     ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         @Suppress("UNCHECKED_CAST")
-        return VenueQrCodeViewModel(robertManager, keystoreDataSource, venueRepository) as T
+        return VenueQrCodeViewModel(robertManager, venueRepository) as T
     }
 }
