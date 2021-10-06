@@ -15,4 +15,8 @@
     <string name="splashScreenErrorDialog.positiveButton">Retry</string>
     <string name="splashScreenErrorDialog.negativeButton">Quit</string>
     <string name="attestation_widget_create_attestation">New certificate</string>
+    <string name="attestation_widget_name">Certificates</string>
+    <string name="figures_widget_name">Key Figures</string>
+    <string name="proximity_widget_name">Status</string>
+    <string name="dcc_widget_name">Favorite certificate</string>
 </resources>

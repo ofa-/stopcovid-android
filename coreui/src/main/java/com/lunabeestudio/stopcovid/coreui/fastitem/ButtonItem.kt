@@ -14,6 +14,7 @@ import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import androidx.annotation.DimenRes
 import androidx.annotation.IdRes
 import androidx.annotation.LayoutRes
 import androidx.core.view.updateLayoutParams
@@ -21,6 +22,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
 import com.lunabeestudio.stopcovid.coreui.R
 import com.lunabeestudio.stopcovid.coreui.extension.safeEmojiSpanify
+import com.lunabeestudio.stopcovid.coreui.extension.toDimensSize
 
 open class ButtonItem(
     @LayoutRes layout: Int = R.layout.item_button,
@@ -34,16 +36,26 @@ open class ButtonItem(
     var width: Int = ViewGroup.LayoutParams.WRAP_CONTENT
     var getMaterialButton: ((MaterialButton) -> Unit)? = null
 
+    @DimenRes
+    var topMarginRes: Int? = R.dimen.spacing_medium
+
+    @DimenRes
+    var bottomMarginRes: Int? = R.dimen.spacing_medium
+
     override fun bindView(holder: ViewHolder, payloads: List<Any>) {
         super.bindView(holder, payloads)
-        holder.button.text = text.safeEmojiSpanify()
-        holder.button.setOnClickListener(onClickListener)
-        holder.button.isEnabled = isButtonEnabled
-        holder.button.updateLayoutParams<FrameLayout.LayoutParams> {
-            this.gravity = this@ButtonItem.gravity
-            this.width = this@ButtonItem.width
+        holder.button.apply {
+            text = this@ButtonItem.text.safeEmojiSpanify()
+            setOnClickListener(onClickListener)
+            isEnabled = isButtonEnabled
+            updateLayoutParams<FrameLayout.LayoutParams> {
+                this.gravity = this@ButtonItem.gravity
+                this.width = this@ButtonItem.width
+                this.topMargin = topMarginRes?.toDimensSize(context)?.toInt() ?: 0
+                this.bottomMargin = bottomMarginRes?.toDimensSize(context)?.toInt() ?: 0
+            }
+            getMaterialButton?.invoke(this)
         }
-        getMaterialButton?.invoke(holder.button)
     }
 
     class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {

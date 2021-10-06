@@ -64,6 +64,10 @@
         <item name="android:textColor">@color/color_gray</item>
     </style>
 
+    <style name="TextAppearance.StopCovid.Caption.Small.OnPrimary">
+        <item name="android:textColor">?colorOnPrimary</item>
+    </style>
+
     <style name="TextAppearance.StopCovid.Title.Circle">
         <item name="android:textSize">@dimen/circle_font_size</item>
         <item name="android:textColor">?attr/colorOnPrimary</item>

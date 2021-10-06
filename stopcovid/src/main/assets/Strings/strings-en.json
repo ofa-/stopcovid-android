@@ -1221,13 +1221,13 @@
     "activityPass.fullscreen.notAvailable.message": "Your Pass Activité for this certificate will be available from %@",
     "activityPass.fullscreen.notAvailable.footer.notify": "By taping this button, you will receive a notification on %@",
     "activityPass.fullscreen.notAvailable.button.notify.title": "Notify me",
-    "android.db.error": "Unable to decrypt the content of the database. Please restart your phone.\n\nIf the problem persists, you can help the technical team to fix the problem by contacting the support team through the app settings.",
+    "android.db.error": "Unable to load the content of the database. Please restart your phone.\n\nIf the problem persists, you can help the technical team to fix the problem by contacting the support team through the app settings.",
     "android.migration.error": "Migration of old data could not be completed.\n\nIf the problem persists, you can help the technical team to fix the problem by contacting the support team through the app settings.",
-    "manageDataController.logs.subject": "Partage des fichiers de logs TAC",
-    "manageDataController.logs.clip": "Fichiers de logs",
+    "manageDataController.logs.subject": "Sharing log files",
+    "manageDataController.logs.clip": "Log files",
     "manageDataController.logs.email": "contact@tousanticovid.gouv.fr",
     "widget.dcc.full.activityPass":"Tap to generate your Pass Activité",
-    "widget.dcc.upToDate":"Widget up to date!",
+    "widget.dcc.upToDate":"Up to date widget!",
     "activityPassParametersController.cguUrl": "https://bonjour.tousanticovid.gouv.fr/privacy.html#activitypass",
     
     "robertStatus.error.alert.title": "Please read",
@@ -1238,6 +1238,23 @@
     "activityPass.fullscreen.serverUnavailable.message": "Your internet connection or the Pass Activité generation service are not available.\n\nThe generation will be done automatically when the service is available, or you can try again now.\n\n👉 You can use the certificate in the \"Border\" section for pass verification.",
     "activityPass.fullscreen.alreadyGenerating.alert.title": "On-going",
     "activityPass.fullscreen.alreadyGenerating.alert.message": "The generation of your Pass Activité is already on-going. Thanks for your patience.",
-    "activityPass.notification.title": "Pass Activité is now available",
-    "activityPass.notification.message": "Your Pass Activité is now available in TousAntiCovid!"
+    "activityPass.notification.title": "Your Pass Activité",
+    "activityPass.notification.message": "Your Pass Activité is now available in TousAntiCovid!",
+
+    "europeanCertificate.fullscreen.englishDescription.exemption": "Certificat COVID\n\n<FULL_NAME>\nné(e) le <BIRTHDATE>\n\nValide du <FROM_DATE> au <TO_DATE>",
+    "wallet.proof.europe.exemption.description": "Certificat COVID\n\n<FULL_NAME>\nné(e) le <BIRTHDATE>\n\nValide du <FROM_DATE> au <TO_DATE>",
+    "enum.HCertType.exemption":"Exemption",
+    "europeanCertificate.fullscreen.exemption.border.warning": "⚠️ Please note that this certificate can't be used to cross borders. You can use it only on the French territory.",
+
+    "walletCertificateErrorController.explanations.invalidSignature.exemptionEurope.title":"⚠️ Import error",
+    "walletCertificateErrorController.explanations.invalidSignature.exemptionEurope.subtitle":"This certificate can't be imported.\n\nMake sure you scan the QR Code of the right document 👇",
+    "walletCertificateErrorController.explanations.invalidFormat.exemptionEurope.title":"⚠️ Wrong format",
+    "walletCertificateErrorController.explanations.invalidFormat.exemptionEurope.subtitle":"This certificate's format is not correct.\n\nPlease try to scan it with more light, and moving slowy. And make sure you scan the QR Code of the right document 👇",
+    "walletCertificateErrorController.checkDocument.exemptionEurope.title":"Check your document",
+    "walletCertificateErrorController.checkDocument.exemptionEurope.subtitle":"Here is an example of the document you should have to import your certificate in TousAntiCovid.",
+
+    "walletController.info.fraud.url":"https://bonjour.tousanticovid.gouv.fr/pass.html",
+    "walletController.info.fraud.button":"Continue",
+    "walletController.info.fraud.title":"Fraudulent use",
+    "walletController.info.fraud.explanation":"If you suspect fraudulent use of your QR Code, you are invited to report it to the following e-mail address revocation-pass-sanitaire@sante.gouv.fr and to generate a new health pass on the attestation-vaccin.ameli.fr website for vaccination certificates, and sidep.gouv.fr for test certificates.\n\nAfter instruction by the Direction Générale de la Santé, the health pass will be deactivated."
 }

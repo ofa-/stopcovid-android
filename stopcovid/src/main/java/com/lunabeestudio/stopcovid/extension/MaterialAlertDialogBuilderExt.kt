@@ -243,3 +243,34 @@ fun MaterialAlertDialogBuilder.showAlertSickVenue(
     setCancelable(false)
     show()
 }
+
+fun MaterialAlertDialogBuilder.showMigrationFailed(
+    strings: LocalizedStrings,
+) {
+    setTitle(strings["common.warning"])
+    setMessage(strings["android.migration.error"])
+    setPositiveButton(strings["common.ok"], null)
+    show()
+}
+
+fun MaterialAlertDialogBuilder.showDbFailure(
+    strings: LocalizedStrings,
+) {
+    setTitle(strings["common.warning"])
+    setMessage(strings["android.db.error"])
+    setPositiveButton(strings["common.ok"], null)
+    show()
+}
+
+fun MaterialAlertDialogBuilder.showRatingDialog(
+    strings: LocalizedStrings,
+    onConfirmation: (() -> Unit)?,
+) {
+    setTitle(strings["rating.alert.title"])
+    setMessage(strings["rating.alert.message"])
+    setPositiveButton(strings["common.ok"]) { _, _ ->
+        onConfirmation?.invoke()
+    }
+    setNegativeButton(strings["common.cancel"], null)
+    show()
+}

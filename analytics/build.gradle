@@ -43,9 +43,15 @@ android {
     lintOptions {
         disable "GradleDependency"
     }
+
+    compileOptions {
+        coreLibraryDesugaringEnabled = true
+    }
 }
 
 dependencies {
+    coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:_"
+
     implementation 'androidx.core:core-ktx:_'
 
     implementation 'com.google.protobuf:protobuf-javalite:_'

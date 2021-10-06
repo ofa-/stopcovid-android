@@ -32,6 +32,8 @@ import com.lunabeestudio.framework.remote.server.ServerManager.Companion.getDefa
 import com.lunabeestudio.framework.remote.server.StopCovidApi
 import com.lunabeestudio.framework.utils.RequestHelper
 import com.lunabeestudio.robert.datasource.RemoteServiceDataSource
+import com.lunabeestudio.robert.model.BackendException
+import com.lunabeestudio.robert.model.RequireRobertResetException
 import com.lunabeestudio.robert.model.RobertResult
 import com.lunabeestudio.robert.model.RobertResultData
 import okhttp3.ConnectionPool
@@ -130,7 +132,13 @@ class ServiceDataSource(
         }
         return when (result) {
             is RobertResultData.Success -> RobertResultData.Success(result.data.toDomain())
-            is RobertResultData.Failure -> RobertResultData.Failure(result.error)
+            is RobertResultData.Failure -> {
+                if ((result.error as? BackendException)?.httpCode == STATUS_CLEAR_ROBERT_HTTP_CODE) {
+                    RobertResultData.Failure(RequireRobertResetException())
+                } else {
+                    RobertResultData.Failure(result.error)
+                }
+            }
         }
     }
 
@@ -159,5 +167,9 @@ class ServiceDataSource(
                 ApiDeleteExposureHistoryRQ(ebid = ssu.ebid, epochId = ssu.epochId, time = ssu.time, mac = ssu.mac)
             )
         }
+    }
+
+    companion object {
+        private const val STATUS_CLEAR_ROBERT_HTTP_CODE: Int = 430
     }
 }

@@ -16,6 +16,7 @@ import com.lunabeestudio.framework.local.LocalCryptoManager
 import com.lunabeestudio.framework.local.datasource.SecureFileEphemeralBluetoothIdentifierDataSource
 import com.lunabeestudio.framework.local.datasource.SecureFileLocalProximityDataSource
 import com.lunabeestudio.framework.local.datasource.SecureKeystoreDataSource
+import com.lunabeestudio.framework.manager.DebugManager
 import com.lunabeestudio.framework.manager.LocalProximityFilterImpl
 import com.lunabeestudio.framework.remote.datasource.CleaDataSource
 import com.lunabeestudio.framework.remote.datasource.InGroupeDatasource
@@ -25,7 +26,6 @@ import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.robert.RobertManagerImpl
 import com.lunabeestudio.robert.datasource.RobertCalibrationDataSource
 import com.lunabeestudio.robert.datasource.RobertConfigurationDataSource
-import com.lunabeestudio.robert.repository.CertificateRepository
 import com.lunabeestudio.stopcovid.coreui.EnvConstant
 import com.lunabeestudio.stopcovid.coreui.manager.CalibrationManager
 import com.lunabeestudio.stopcovid.coreui.manager.ConfigManager
@@ -45,9 +45,15 @@ import com.lunabeestudio.stopcovid.manager.RisksLevelManager
 import com.lunabeestudio.stopcovid.manager.TacCalibrationDataSource
 import com.lunabeestudio.stopcovid.manager.TacConfigurationDataSource
 import com.lunabeestudio.stopcovid.manager.VaccinationCenterManager
+import com.lunabeestudio.stopcovid.repository.AttestationRepository
+import com.lunabeestudio.stopcovid.repository.VenueRepository
+import com.lunabeestudio.stopcovid.repository.WalletRepository
+import kotlinx.coroutines.CoroutineScope
 import java.io.File
+import java.util.concurrent.ConcurrentHashMap
 
-class InjectionContainer(private val context: StopCovid) {
+class InjectionContainer(private val context: StopCovid, val coroutineScope: CoroutineScope) {
+
     val serverManager: ServerManager by lazy { ServerManager(context) }
     val stringsManager: StringsManager by lazy { StringsManager(serverManager.okHttpClient) }
     val privacyManager: PrivacyManager by lazy { PrivacyManager(serverManager.okHttpClient) }
@@ -69,66 +75,55 @@ class InjectionContainer(private val context: StopCovid) {
     val calibrationDataSource: RobertCalibrationDataSource by lazy { TacCalibrationDataSource(calibrationManager) }
     val configurationDataSource: RobertConfigurationDataSource by lazy { TacConfigurationDataSource(configManager) }
     val cryptoDataSource: BouncyCastleCryptoDataSource = BouncyCastleCryptoDataSource()
-    val secureKeystoreDataSource: SecureKeystoreDataSource by lazy { SecureKeystoreDataSource(context, cryptoManager) }
-
-    lateinit var cleaDataSource: CleaDataSource
-    lateinit var inGroupeDatasource: InGroupeDatasource
-    lateinit var serviceDataSource: ServiceDataSource
-    lateinit var isolationManager: IsolationManager
-    lateinit var certificateRepository: CertificateRepository
-
-    private var cachedRobertManager: RobertManager? = null
-    val robertManager: RobertManager
-        get() {
-            if (cachedRobertManager == null) {
-                refreshCachedRobertManager()
-            }
-            return cachedRobertManager!!
-        }
-
-    fun refreshCachedRobertManager() {
-        cleaDataSource = CleaDataSource(
+    val secureKeystoreDataSource: SecureKeystoreDataSource by lazy { SecureKeystoreDataSource(context, cryptoManager, ConcurrentHashMap()) }
+    val logsDir: File by lazy { File(context.filesDir, Constants.Logs.DIR_NAME) }
+    val debugManager: DebugManager by lazy { DebugManager(context, secureKeystoreDataSource, logsDir, cryptoManager) }
+    val attestationRepository: AttestationRepository by lazy { AttestationRepository(secureKeystoreDataSource) }
+    val venueRepository: VenueRepository by lazy { VenueRepository(secureKeystoreDataSource) }
+    val walletRepository: WalletRepository by lazy {
+        WalletRepository(
             context,
-            EnvConstant.Prod.cleaReportBaseUrl,
-            EnvConstant.Prod.cleaStatusBaseUrl,
-            analyticsManager,
+            secureKeystoreDataSource,
+            debugManager,
+            inGroupeDatasource,
+            coroutineScope,
         )
-
-        serviceDataSource = ServiceDataSource(
-            context,
-            EnvConstant.Prod.baseUrl,
-            analyticsManager,
-        )
-
-        inGroupeDatasource = InGroupeDatasource(
-            context,
-            cryptoDataSource,
-            EnvConstant.Prod.conversionBaseUrl,
-            analyticsManager,
-        )
-
-        certificateRepository = CertificateRepository(
-            inGroupeDatasource
-        )
-
-        cachedRobertManager =
-            RobertManagerImpl(
-                context,
-                SecureFileEphemeralBluetoothIdentifierDataSource(context, cryptoManager),
-                secureKeystoreDataSource,
-                SecureFileLocalProximityDataSource(File(context.filesDir, LOCAL_PROXIMITY_DIR), cryptoManager),
-                serviceDataSource,
-                cleaDataSource,
-                cryptoDataSource,
-                configurationDataSource,
-                calibrationDataSource,
-                EnvConstant.Prod.serverPublicKey,
-                LocalProximityFilterImpl(),
-                analyticsManager
-            ).also {
-                isolationManager = IsolationManager(context, it, secureKeystoreDataSource)
-            }
     }
+    val isolationManager: IsolationManager by lazy { IsolationManager(context, robertManager, secureKeystoreDataSource) }
+
+    val cleaDataSource: CleaDataSource = CleaDataSource(
+        context,
+        EnvConstant.Prod.cleaReportBaseUrl,
+        EnvConstant.Prod.cleaStatusBaseUrl,
+        analyticsManager,
+    )
+    val inGroupeDatasource: InGroupeDatasource = InGroupeDatasource(
+        context,
+        cryptoDataSource,
+        EnvConstant.Prod.conversionBaseUrl,
+        analyticsManager,
+    )
+    val serviceDataSource: ServiceDataSource = ServiceDataSource(
+        context,
+        EnvConstant.Prod.baseUrl,
+        analyticsManager,
+    )
+
+    val robertManager: RobertManager = RobertManagerImpl(
+        context,
+        SecureFileEphemeralBluetoothIdentifierDataSource(context, cryptoManager),
+        secureKeystoreDataSource,
+        SecureFileLocalProximityDataSource(File(context.filesDir, LOCAL_PROXIMITY_DIR), cryptoManager),
+        serviceDataSource,
+        cleaDataSource,
+        cryptoDataSource,
+        configurationDataSource,
+        calibrationDataSource,
+        EnvConstant.Prod.serverPublicKey,
+        LocalProximityFilterImpl(),
+        analyticsManager,
+        coroutineScope = coroutineScope,
+    )
 
     companion object {
         private const val LOCAL_PROXIMITY_DIR = "local_proximity"

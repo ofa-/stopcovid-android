@@ -36,7 +36,7 @@ import okhttp3.OkHttpClient
 import timber.log.Timber
 
 class InGroupeDatasource(
-    private val context: Context,
+    context: Context,
     private val sharedCryptoDataSource: SharedCryptoDataSource,
     baseUrl: String,
     private val analyticsManager: AnalyticsManager,
@@ -46,6 +46,7 @@ class InGroupeDatasource(
 
     private val api: InGroupeApi = RetrofitClient.getService(baseUrl, InGroupeApi::class.java, okHttpClient)
     private val gson = Gson()
+    private val filesDir = context.filesDir
 
     override suspend fun convertCertificateV1(
         encodedCertificate: String,
@@ -65,18 +66,19 @@ class InGroupeDatasource(
                     RobertResultData.Success(bodyRs)
                 } else {
                     var analyticsErrorDesc: String? = null
+                    val httpCode = response.code()
                     try {
                         val error = gson.fromJson(bodyRs, ApiConversionErrorRS::class.java)
                         analyticsErrorDesc = "${error.msgError} (${error.codeError})"
-                        RobertResultData.Failure(BackendException("${error.msgError} (${error.codeError})"))
+                        RobertResultData.Failure(BackendException("${error.msgError} (${error.codeError})", httpCode))
                     } catch (e: JsonSyntaxException) {
-                        RobertResultData.Failure(BackendException("Unable to parse body result: $bodyRs"))
+                        RobertResultData.Failure(BackendException("Unable to parse body result: $bodyRs", httpCode))
                     } finally {
                         analyticsManager.reportWSError(
-                            context.filesDir,
+                            filesDir,
                             AnalyticsServiceName.CERTIFICATE_CONVERSION,
                             "0",
-                            response.code(),
+                            httpCode,
                             analyticsErrorDesc,
                         )
                     }
@@ -85,7 +87,7 @@ class InGroupeDatasource(
                 val robertException = e.remoteToRobertException()
                 if (robertException !is NoInternetException) {
                     analyticsManager.reportWSError(
-                        context.filesDir,
+                        filesDir,
                         AnalyticsServiceName.CERTIFICATE_CONVERSION,
                         "0",
                         0,
@@ -148,18 +150,19 @@ class InGroupeDatasource(
                 } else {
                     var analyticsErrorDesc: String? = null
                     val bodyError = response.errorBody()?.string()
+                    val httpCode = response.code()
                     try {
                         val error = gson.fromJson(bodyError, ApiConversionErrorRS::class.java)
                         analyticsErrorDesc = "${error.msgError} (${error.codeError})"
-                        RobertResultData.Failure(BackendException("${error.msgError} (${error.codeError})"))
+                        RobertResultData.Failure(BackendException("${error.msgError} (${error.codeError})", httpCode))
                     } catch (e: JsonSyntaxException) {
-                        RobertResultData.Failure(BackendException("Unable to parse body error: $bodyError"))
+                        RobertResultData.Failure(BackendException("Unable to parse body error: $bodyError", httpCode))
                     } finally {
                         analyticsManager.reportWSError(
-                            context.filesDir,
+                            filesDir,
                             AnalyticsServiceName.CERTIFICATE_CONVERSION,
                             "0",
-                            response.code(),
+                            httpCode,
                             analyticsErrorDesc,
                         )
                     }
@@ -168,7 +171,7 @@ class InGroupeDatasource(
                 val robertException = e.remoteToRobertException()
                 if (robertException !is NoInternetException) {
                     analyticsManager.reportWSError(
-                        context.filesDir,
+                        filesDir,
                         AnalyticsServiceName.CERTIFICATE_CONVERSION,
                         "0",
                         0,

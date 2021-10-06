@@ -99,7 +99,7 @@ class ServerManager(context: Context) {
                 }
                 true
             } else if (response.networkResponse?.code == HttpURLConnection.HTTP_NOT_MODIFIED) {
-                true
+                false
             } else {
                 throw HttpException(Response.error<Any>(body!!, response))
             }

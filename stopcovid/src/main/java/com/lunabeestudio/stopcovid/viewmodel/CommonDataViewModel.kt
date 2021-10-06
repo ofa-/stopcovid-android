@@ -14,6 +14,7 @@ import android.app.NotificationManager
 import android.content.Context
 import androidx.annotation.CallSuper
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.preference.PreferenceManager
 import androidx.work.WorkManager
 import com.lunabeestudio.framework.local.datasource.SecureKeystoreDataSource
@@ -24,30 +25,40 @@ import com.lunabeestudio.stopcovid.StopCovid
 import com.lunabeestudio.stopcovid.coreui.UiConstants
 import com.lunabeestudio.stopcovid.manager.IsolationManager
 import com.lunabeestudio.stopcovid.manager.VaccinationCenterManager
-import com.lunabeestudio.stopcovid.manager.VenuesManager
-import com.lunabeestudio.stopcovid.manager.WalletManager
+import com.lunabeestudio.stopcovid.repository.VenueRepository
+import com.lunabeestudio.stopcovid.repository.WalletRepository
 import com.lunabeestudio.stopcovid.widgetshomescreen.AttestationWidget
+import kotlinx.coroutines.launch
 
 abstract class CommonDataViewModel(
     private val secureKeystoreDataSource: SecureKeystoreDataSource,
     private val robertManager: RobertManager,
     private val isolationManager: IsolationManager,
     private val vaccinationCenterManager: VaccinationCenterManager,
+    private val venueRepository: VenueRepository,
+    private val walletRepository: WalletRepository,
 ) : ViewModel() {
 
     @CallSuper
     open fun eraseVenues(application: RobertApplication) {
-        VenuesManager.clearAllData(PreferenceManager.getDefaultSharedPreferences(application.getAppContext()), secureKeystoreDataSource)
+        viewModelScope.launch {
+            venueRepository.clearAllData(
+                PreferenceManager.getDefaultSharedPreferences(application.getAppContext()),
+                secureKeystoreDataSource
+            )
+        }
     }
 
     @CallSuper
     open fun eraseAttestations(context: Context) {
-        secureKeystoreDataSource.savedAttestationData = null
-        secureKeystoreDataSource.saveAttestationData = null
-        secureKeystoreDataSource.attestations = null
-        @Suppress("DEPRECATION")
-        secureKeystoreDataSource.deprecatedAttestations = null
-        AttestationWidget.updateWidget(context)
+        viewModelScope.launch {
+            secureKeystoreDataSource.savedAttestationData = null
+            secureKeystoreDataSource.saveAttestationData = null
+            secureKeystoreDataSource.deleteAllAttestations()
+            @Suppress("DEPRECATION")
+            secureKeystoreDataSource.deprecatedAttestations = null
+            AttestationWidget.updateWidget(context)
+        }
     }
 
     @CallSuper
@@ -57,7 +68,9 @@ abstract class CommonDataViewModel(
 
     @CallSuper
     open fun eraseCertificates() {
-        WalletManager.deleteAllCertificates(secureKeystoreDataSource)
+        viewModelScope.launch {
+            walletRepository.deleteAllCertificates(secureKeystoreDataSource)
+        }
     }
 
     protected suspend fun clearLocalData(application: RobertApplication) {

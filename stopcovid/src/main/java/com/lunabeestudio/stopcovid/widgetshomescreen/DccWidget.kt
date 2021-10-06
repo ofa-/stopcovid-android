@@ -31,11 +31,11 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class DccWidget : AppWidgetProvider() {
     @OptIn(DelicateCoroutinesApi::class)
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
-
         GlobalScope.launch(Dispatchers.Main) {
             // load strings and on startup
             if (context.stringsManager().strings.isNullOrEmpty()) {
@@ -50,10 +50,15 @@ class DccWidget : AppWidgetProvider() {
     /**
      * Function updating the widget
      */
-    private fun updateDccWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int) {
+    private suspend fun updateDccWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int) {
         val views: RemoteViews?
         val cryptoManager = LocalCryptoManager(context)
-        val favCertificate = SecureKeystoreDataSource(context, cryptoManager).rawWalletCertificates?.firstOrNull { it.isFavorite }
+        val favCertificate = try {
+            SecureKeystoreDataSource(context, cryptoManager, null).rawWalletCertificates().firstOrNull { it.isFavorite }
+        } catch (e: Exception) {
+            Timber.e(e)
+            null
+        }
 
         if (favCertificate != null) {
             views = RemoteViews(context.packageName, R.layout.dcc_widget)

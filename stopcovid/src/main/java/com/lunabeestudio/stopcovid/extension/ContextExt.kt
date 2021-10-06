@@ -24,6 +24,9 @@ import com.lunabeestudio.stopcovid.manager.DccCertificatesManager
 import com.lunabeestudio.stopcovid.manager.IsolationManager
 import com.lunabeestudio.stopcovid.manager.KeyFiguresManager
 import com.lunabeestudio.stopcovid.manager.RisksLevelManager
+import com.lunabeestudio.stopcovid.repository.AttestationRepository
+import com.lunabeestudio.stopcovid.repository.VenueRepository
+import com.lunabeestudio.stopcovid.repository.WalletRepository
 
 private val Context.injectionContainer: InjectionContainer
     get() = (applicationContext as StopCovid).injectionContainer
@@ -36,6 +39,9 @@ fun Context.secureKeystoreDataSource(): SecureKeystoreDataSource = injectionCont
 fun Context.dccCertificatesManager(): DccCertificatesManager = injectionContainer.dccCertificatesManager
 fun Context.risksLevelManager(): RisksLevelManager = injectionContainer.risksLevelManager
 fun Context.analyticsManager(): AnalyticsManager = injectionContainer.analyticsManager
+fun Context.attestationRepository(): AttestationRepository = injectionContainer.attestationRepository
+fun Context.venueRepository(): VenueRepository = injectionContainer.venueRepository
+fun Context.walletRepository(): WalletRepository = injectionContainer.walletRepository
 
 fun Context.showExpiredCodeAlert(strings: Map<String, String>, listener: DialogInterface.OnDismissListener?) {
     MaterialAlertDialogBuilder(this)

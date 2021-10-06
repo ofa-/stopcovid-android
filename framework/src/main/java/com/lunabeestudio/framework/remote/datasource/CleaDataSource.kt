@@ -21,7 +21,7 @@ import okhttp3.OkHttpClient
 import java.io.File
 
 class CleaDataSource(
-    val context: Context,
+    context: Context,
     cleaReportBaseUrl: String,
     private val cleaStatusFallbackBaseUrl: String,
     private val analyticsManager: AnalyticsManager,

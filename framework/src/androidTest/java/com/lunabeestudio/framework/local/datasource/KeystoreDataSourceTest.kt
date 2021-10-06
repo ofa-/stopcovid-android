@@ -11,6 +11,7 @@
 package com.lunabeestudio.framework.local.datasource
 
 import android.content.Context
+import androidx.core.content.edit
 import androidx.test.core.app.ApplicationProvider
 import com.google.common.truth.Truth.assertThat
 import com.lunabeestudio.framework.local.LocalCryptoManager
@@ -27,31 +28,39 @@ class KeystoreDataSourceTest {
     fun createDataSource() {
         val context = ApplicationProvider.getApplicationContext<Context>()
 
-        val keystore = KeyStore.getInstance("AndroidKeyStore")
+        val keystore = KeyStore.getInstance(LocalCryptoManager.ANDROID_KEY_STORE_PROVIDER)
         keystore.load(null)
         keystore.deleteEntry("aes_local_protection")
         keystore.deleteEntry("rsa_wrap_local_protection")
-        context.getSharedPreferences("robert_prefs", Context.MODE_PRIVATE).edit().remove("shared.pref.shared_key").commit()
-        context.getSharedPreferences("robert_prefs", Context.MODE_PRIVATE).edit().remove("shared.pref.time_start").commit()
-        context.getSharedPreferences("robert_prefs", Context.MODE_PRIVATE).edit().remove("shared.pref.db_key").commit()
-        context.getSharedPreferences("crypto_prefs", Context.MODE_PRIVATE).edit().remove("aes_wrapped_local_protection").commit()
-        context.getSharedPreferences("crypto_prefs", Context.MODE_PRIVATE).edit().remove("secret_key_generated").commit()
+        context.getSharedPreferences(SecureKeystoreDataSource.SHARED_PREF_NAME, Context.MODE_PRIVATE).edit {
+            remove("shared.pref.shared_key")
+            remove("shared.pref.time_start")
+            remove("shared.pref.db_key")
+        }
+        context.getSharedPreferences(LocalCryptoManager.SHARED_PREF_NAME, Context.MODE_PRIVATE).edit {
+            remove("aes_wrapped_local_protection")
+            remove("secret_key_generated")
+        }
 
-        keystoreDataSource = SecureKeystoreDataSource(context, LocalCryptoManager(context))
+        keystoreDataSource = SecureKeystoreDataSource(context, LocalCryptoManager(context), hashMapOf())
     }
 
     @After
     fun clear() {
         val context = ApplicationProvider.getApplicationContext<Context>()
-        val keystore = KeyStore.getInstance("AndroidKeyStore")
+        val keystore = KeyStore.getInstance(LocalCryptoManager.ANDROID_KEY_STORE_PROVIDER)
         keystore.load(null)
         keystore.deleteEntry("aes_local_protection")
         keystore.deleteEntry("rsa_wrap_local_protection")
-        context.getSharedPreferences("robert_prefs", Context.MODE_PRIVATE).edit().remove("shared.pref.shared_key").commit()
-        context.getSharedPreferences("robert_prefs", Context.MODE_PRIVATE).edit().remove("shared.pref.time_start").commit()
-        context.getSharedPreferences("robert_prefs", Context.MODE_PRIVATE).edit().remove("shared.pref.db_key").commit()
-        context.getSharedPreferences("crypto_prefs", Context.MODE_PRIVATE).edit().remove("aes_wrapped_local_protection").commit()
-        context.getSharedPreferences("crypto_prefs", Context.MODE_PRIVATE).edit().remove("secret_key_generated").commit()
+        context.getSharedPreferences(SecureKeystoreDataSource.SHARED_PREF_NAME, Context.MODE_PRIVATE).edit {
+            remove("shared.pref.shared_key")
+            remove("shared.pref.time_start")
+            remove("shared.pref.db_key")
+        }
+        context.getSharedPreferences(LocalCryptoManager.SHARED_PREF_NAME, Context.MODE_PRIVATE).edit {
+            remove("aes_wrapped_local_protection")
+            remove("secret_key_generated")
+        }
     }
 
     @Test
@@ -60,7 +69,7 @@ class KeystoreDataSourceTest {
         keystoreDataSource.kA = key.copyOf()
 
         val storedString = ApplicationProvider.getApplicationContext<Context>()
-            .getSharedPreferences("robert_prefs", Context.MODE_PRIVATE)
+            .getSharedPreferences(SecureKeystoreDataSource.SHARED_PREF_NAME, Context.MODE_PRIVATE)
             .getString("shared.pref.ka", null)
 
         assertThat(storedString).isNotNull()
@@ -78,7 +87,7 @@ class KeystoreDataSourceTest {
         keystoreDataSource.kA = key.copyOf()
 
         val storedString = ApplicationProvider.getApplicationContext<Context>()
-            .getSharedPreferences("robert_prefs", Context.MODE_PRIVATE)
+            .getSharedPreferences(SecureKeystoreDataSource.SHARED_PREF_NAME, Context.MODE_PRIVATE)
             .getString("shared.pref.ka", null)
 
         assertThat(storedString).isNotNull()
@@ -96,7 +105,7 @@ class KeystoreDataSourceTest {
         keystoreDataSource.kA = key
 
         var storedString = ApplicationProvider.getApplicationContext<Context>()
-            .getSharedPreferences("robert_prefs", Context.MODE_PRIVATE)
+            .getSharedPreferences(SecureKeystoreDataSource.SHARED_PREF_NAME, Context.MODE_PRIVATE)
             .getString("shared.pref.ka", null)
 
         assertThat(storedString).isNotNull()
@@ -104,7 +113,7 @@ class KeystoreDataSourceTest {
         keystoreDataSource.kA = null
 
         storedString = ApplicationProvider.getApplicationContext<Context>()
-            .getSharedPreferences("robert_prefs", Context.MODE_PRIVATE)
+            .getSharedPreferences(SecureKeystoreDataSource.SHARED_PREF_NAME, Context.MODE_PRIVATE)
             .getString("shared.pref.ka", null)
 
         assertThat(storedString).isNull()

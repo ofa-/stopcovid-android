@@ -1,0 +1,29 @@
+<!--
+  ~ This Source Code Form is subject to the terms of the Mozilla Public
+  ~ License, v. 2.0. If a copy of the MPL was not distributed with this
+  ~ file, You can obtain one at https://mozilla.org/MPL/2.0/.
+  ~
+  ~ Authors
+  ~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ Created by Lunabee Studio / Date - 2020/09/13 - for the TOUS-ANTI-COVID project
+  -->
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph_full_screen"
+    app:startDestination="@id/chartsFullScreenFragment">
+
+    <fragment
+        android:id="@+id/chartsFullScreenFragment"
+        android:name="com.lunabeestudio.stopcovid.fragment.ChartFullScreenFragment"
+        android:label="ChartsFullScreenFragment" >
+        <argument
+            android:name="keyFigureKey"
+            app:argType="string" />
+        <argument
+            android:name="chartDataType"
+            app:argType="com.lunabeestudio.stopcovid.fragment.ChartDataType" />
+        <argument
+            android:name="minDate"
+            app:argType="long" />
+    </fragment>
+</navigation>

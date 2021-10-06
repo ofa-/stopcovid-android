@@ -14,7 +14,7 @@ import com.lunabeestudio.stopcovid.extension.dccCertificatesManager
 import com.lunabeestudio.stopcovid.extension.fullDescription
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
-import com.lunabeestudio.stopcovid.manager.WalletManager
+import com.lunabeestudio.stopcovid.extension.walletRepository
 import com.lunabeestudio.stopcovid.model.WalletCertificate
 import kotlinx.coroutines.launch
 
@@ -30,6 +30,10 @@ class VerifyWalletResultFragment : BaseFragment() {
 
     private val dccCertificatesManager by lazy {
         requireContext().dccCertificatesManager()
+    }
+
+    private val WalletManager by lazy {
+        requireContext().walletRepository()
     }
 
     override fun onCreateView(

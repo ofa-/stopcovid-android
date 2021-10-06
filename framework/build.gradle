@@ -16,12 +16,6 @@ apply plugin: 'com.google.protobuf'
 android {
     defaultConfig {
 
-        buildConfigField 'String', 'BASE_URL', '"https://api.stopcovid.gouv.fr"'
-        buildConfigField 'String', 'WARNING_BASE_URL', '"https://tacw.tousanticovid.gouv.fr"'
-        buildConfigField 'String', 'CERTIFICATE_SHA256', '"sha256/Up+TDyVDu8vKvd22TeAnXYxQqfPd2oNOU9Y04JahHpQ="'
-        buildConfigField 'String', 'WARNING_CERTIFICATE_SHA256', '"sha256/b7w+uqyD+XILNIlRc3XVmEROwFCVTv5yOchb2i5FJbo="'
-        buildConfigField 'String', 'URL_PATH', '"api/v1"'
-
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -57,7 +51,11 @@ android {
 
 dependencies {
     implementation "androidx.annotation:annotation:_"
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:_"
     implementation 'androidx.preference:preference-ktx:_'
+    implementation "androidx.room:room-ktx:_"
+    kapt "androidx.room:room-compiler:_"
+
 
     implementation "com.squareup.okhttp3:logging-interceptor:_"
     implementation "com.squareup.okhttp3:okhttp-tls:_"

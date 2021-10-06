@@ -14,43 +14,50 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.map
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
 import com.lunabeestudio.framework.local.datasource.SecureKeystoreDataSource
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.robert.datasource.LocalKeystoreDataSource
 import com.lunabeestudio.robert.utils.Event
+import com.lunabeestudio.stopcovid.coreui.utils.SingleLiveEvent
 import com.lunabeestudio.stopcovid.extension.isOld
 import com.lunabeestudio.stopcovid.extension.isRecent
 import com.lunabeestudio.stopcovid.manager.Blacklist2DDOCManager
 import com.lunabeestudio.stopcovid.manager.BlacklistDCCManager
-import com.lunabeestudio.stopcovid.manager.WalletManager
 import com.lunabeestudio.stopcovid.model.EuropeanCertificate
 import com.lunabeestudio.stopcovid.model.FrenchCertificate
 import com.lunabeestudio.stopcovid.model.WalletCertificate
+import com.lunabeestudio.stopcovid.repository.WalletRepository
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 
 class WalletViewModel constructor(
     private val robertManager: RobertManager,
     private val keystoreDataSource: LocalKeystoreDataSource,
     private val blacklistDCCManager: BlacklistDCCManager,
     private val blacklist2DDOCManager: Blacklist2DDOCManager,
+    private val walletRepository: WalletRepository,
 ) : ViewModel() {
+
+    val error: SingleLiveEvent<Exception> = SingleLiveEvent()
 
     private val _scrollEvent: MutableLiveData<Event<WalletCertificate>> = MutableLiveData()
     val scrollEvent: LiveData<Event<WalletCertificate>>
         get() = _scrollEvent
 
     private var previousCertificatesId = emptyList<String>()
-    val certificates: LiveData<List<WalletCertificate>?>
-        get() = WalletManager.walletCertificateLiveData
-            .map { certificates ->
-                if (previousCertificatesId.isNotEmpty()) {
-                    certificates
-                        ?.find { it.id !in previousCertificatesId }
-                        ?.let { _scrollEvent.value = Event(it) }
-                }
-                previousCertificatesId = certificates?.map { it.id }.orEmpty()
+    val certificates: LiveData<List<WalletCertificate>?> = walletRepository.walletCertificateFlow
+        .map { certificates ->
+            if (previousCertificatesId.isNotEmpty()) {
                 certificates
+                    .find { it.id !in previousCertificatesId }
+                    ?.let { _scrollEvent.value = Event(it) }
             }
+            previousCertificatesId = certificates.map { it.id }
+            certificates
+        }
+        .asLiveData(timeoutInMs = 0)
 
     val blacklistDCC: LiveData<List<String>?>
         get() = blacklistDCCManager.blacklistedDCCHashes
@@ -58,39 +65,39 @@ class WalletViewModel constructor(
     val blacklist2DDOC: LiveData<List<String>?>
         get() = blacklist2DDOCManager.blacklisted2DDOCHashes
 
-    val certificatesCount: LiveData<Int> = WalletManager.walletCertificateLiveData.map { it?.size ?: 0 }
+    val certificatesCount: LiveData<Int?> = walletRepository.certificateCountFlow.asLiveData()
+
+    val migrationInProgress: LiveData<Boolean> = walletRepository.migrationInProgress
 
     val recentCertificates: List<WalletCertificate>?
-        get() = WalletManager.walletCertificateLiveData.value?.filter {
+        get() = certificates.value?.filter {
             it.isRecent(robertManager.configuration) &&
                 (it as? EuropeanCertificate)?.isFavorite != true
         }?.sortedByDescending { it.timestamp }
 
     val olderCertificates: List<WalletCertificate>?
-        get() = WalletManager.walletCertificateLiveData.value?.filter {
+        get() = certificates.value?.filter {
             it.isOld(robertManager.configuration) &&
                 (it as? EuropeanCertificate)?.isFavorite != true
         }?.sortedByDescending { it.timestamp }
 
     val favoriteCertificates: List<WalletCertificate>?
-        get() = WalletManager.walletCertificateLiveData.value?.filter {
+        get() = certificates.value?.filter {
             (it as? EuropeanCertificate)?.isFavorite == true
         }?.sortedByDescending { it.timestamp }
 
-    init {
-        WalletManager.refreshWalletIfNeeded(keystoreDataSource)
-    }
-
     fun removeCertificate(certificate: WalletCertificate) {
-        WalletManager.deleteCertificate(keystoreDataSource, certificate)
+        viewModelScope.launch {
+            walletRepository.deleteCertificate(keystoreDataSource, certificate)
+        }
     }
 
     fun isEmpty(): Boolean {
-        return WalletManager.walletCertificateLiveData.value.isNullOrEmpty()
+        return certificates.value.isNullOrEmpty()
     }
 
-    fun saveCertificate(walletCertificate: WalletCertificate) {
-        WalletManager.saveCertificate(
+    suspend fun saveCertificate(walletCertificate: WalletCertificate) {
+        walletRepository.saveCertificate(
             keystoreDataSource,
             walletCertificate,
         )
@@ -99,10 +106,20 @@ class WalletViewModel constructor(
     fun toggleFavorite(
         walletCertificate: EuropeanCertificate
     ) {
-        WalletManager.toggleFavorite(
-            keystoreDataSource,
-            walletCertificate
-        )
+        viewModelScope.launch {
+            try {
+                walletRepository.toggleFavorite(
+                    keystoreDataSource,
+                    walletCertificate
+                )
+            } catch (e: Exception) {
+                error.postValue(e)
+            }
+        }
+    }
+
+    fun isDuplicated(certificate: WalletCertificate): Boolean {
+        return walletRepository.certificateExists(certificate)
     }
 
     fun isBlacklisted(certificate: WalletCertificate): Boolean {
@@ -111,6 +128,10 @@ class WalletViewModel constructor(
             is EuropeanCertificate -> blacklistDCC.value?.contains(certificate.sha256) == true
         }
     }
+
+    suspend fun getCertificatesCount(): Int {
+        return walletRepository.getCertificateCount()
+    }
 }
 
 class WalletViewModelFactory(
@@ -118,10 +139,11 @@ class WalletViewModelFactory(
     private val secureKeystoreDataSource: SecureKeystoreDataSource,
     private val blacklistDCCManager: BlacklistDCCManager,
     private val blacklist2DDOCManager: Blacklist2DDOCManager,
+    private val walletRepository: WalletRepository,
 ) :
     ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         @Suppress("UNCHECKED_CAST")
-        return WalletViewModel(robertManager, secureKeystoreDataSource, blacklistDCCManager, blacklist2DDOCManager) as T
+        return WalletViewModel(robertManager, secureKeystoreDataSource, blacklistDCCManager, blacklist2DDOCManager, walletRepository) as T
     }
 }

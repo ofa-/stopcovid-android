@@ -15,9 +15,9 @@ interface AnalyticsInfosProvider {
     fun getApiVersion(): String
     fun getAppVersion(): String
     fun getAppBuild(): Int
-    fun getPlacesCount(): Int
-    fun getFormsCount(): Int
-    fun getCertificatesCount(): Int
+    suspend fun getPlacesCount(): Int
+    suspend fun getFormsCount(): Int
+    suspend fun getCertificatesCount(): Int
     fun userHaveAZipCode(): Boolean
     fun getDateSample(): Long?
     fun getDateFirstSymptom(): Long?

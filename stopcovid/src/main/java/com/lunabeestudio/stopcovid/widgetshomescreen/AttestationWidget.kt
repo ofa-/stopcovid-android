@@ -33,6 +33,10 @@ import com.lunabeestudio.stopcovid.extension.isExpired
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
 import com.lunabeestudio.stopcovid.extension.stringsManager
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.concurrent.TimeUnit
@@ -40,26 +44,29 @@ import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 
 class AttestationWidget : AppWidgetProvider() {
+    @OptIn(DelicateCoroutinesApi::class)
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
-        appWidgetIds.forEach { appWidgetId ->
-            updateAttestationWidget(context, appWidgetManager, appWidgetId)
+        GlobalScope.launch(Dispatchers.Main) {
+            appWidgetIds.forEach { appWidgetId ->
+                updateAttestationWidget(context, appWidgetManager, appWidgetId)
+            }
         }
     }
 
     /**
      * Function updating the widget
      */
-    private fun updateAttestationWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int) {
+    private suspend fun updateAttestationWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int) {
         val barcodeEncoder = BarcodeEncoder()
         val bitmapHelper = BitmapHelper()
         val uriIntent: String
         val views: RemoteViews?
 
         // get the valid attestations list
-        val attestations = context.secureKeystoreDataSource().attestations
+        val attestations = context.secureKeystoreDataSource().attestations()
         val validAttestations =
-            attestations?.filter { !it.isExpired(context.robertManager().configuration) }
-                ?.sortedBy { attestation -> attestation.timestamp }
+            attestations.filter { !it.isExpired(context.robertManager().configuration) }
+                .sortedBy { attestation -> attestation.timestamp }
         if (!context.robertManager().configuration.displayAttestation) {
             views = RemoteViews(context.packageName, R.layout.attestation_widget_no_attestation)
             uriIntent = Constants.Url.PROXIMITY_FRAGMENT_URI
@@ -124,12 +131,13 @@ class AttestationWidget : AppWidgetProvider() {
 
     companion object {
         /**
-         * Is used for asking the widget to update himself
-         * @param newCertificate true if you call after creating a certificate, setup a work manager to update the widget once the certificate is no more valid
-         * called in NewAttestationFragment & AttestationsFragment
+         * Request widget update
+         *
+         * @param isNewCertificate true if you call after creating a certificate, setup a work manager to update the widget once the
+         * certificate is no more valid.
          */
         @OptIn(ExperimentalTime::class)
-        fun updateWidget(context: Context, newCertificate: Boolean = false, info: MutableMap<String, FormEntry>? = null) {
+        fun updateWidget(context: Context, isNewCertificate: Boolean = false, info: MutableMap<String, FormEntry>? = null) {
             val intent = Intent(context, AttestationWidget::class.java)
             intent.action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
             val ids = AppWidgetManager.getInstance(context)
@@ -142,8 +150,8 @@ class AttestationWidget : AppWidgetProvider() {
             intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids)
             context.sendBroadcast(intent)
 
-            // Launch worker for updating when certif no more valid
-            if (newCertificate) {
+            // Launch worker for updating when certificate no more valid
+            if (isNewCertificate) {
                 // if the certificate is set up with in the past
                 val timestampAttestation = info?.get(Constants.Attestation.KEY_DATE_TIME)?.value?.toLongOrNull()
                     ?.let(Duration::milliseconds)

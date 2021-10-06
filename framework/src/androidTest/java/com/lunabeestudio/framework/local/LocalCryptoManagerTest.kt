@@ -11,6 +11,7 @@
 package com.lunabeestudio.framework.local
 
 import android.content.Context
+import androidx.core.content.edit
 import androidx.test.core.app.ApplicationProvider
 import com.google.common.truth.Truth.assertThat
 import org.junit.After
@@ -27,13 +28,17 @@ class LocalCryptoManagerTest {
         val context = ApplicationProvider.getApplicationContext<Context>()
         localCryptoManager = LocalCryptoManager(context)
 
-        context.getSharedPreferences("crypto_prefs", Context.MODE_PRIVATE).edit().remove("secret_key_generated").commit()
+        context.getSharedPreferences(LocalCryptoManager.SHARED_PREF_NAME, Context.MODE_PRIVATE).edit {
+            remove("secret_key_generated")
+        }
     }
 
     @After
     fun deInit() {
         val context = ApplicationProvider.getApplicationContext<Context>()
-        context.getSharedPreferences("crypto_prefs", Context.MODE_PRIVATE).edit().remove("secret_key_generated").commit()
+        context.getSharedPreferences(LocalCryptoManager.SHARED_PREF_NAME, Context.MODE_PRIVATE).edit {
+            remove("secret_key_generated")
+        }
     }
 
     @Test

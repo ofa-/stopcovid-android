@@ -61,6 +61,7 @@ class WalletPagerFragment : BaseFragment() {
                 keystoreDataSource,
                 app.injectionContainer.blacklistDCCManager,
                 app.injectionContainer.blacklist2DDOCManager,
+                app.injectionContainer.walletRepository
             )
         }
     )
@@ -75,12 +76,12 @@ class WalletPagerFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
         (activity as? MainActivity)?.binding?.tabLayout?.isVisible = true
         setupViewPager()
-        viewModel.certificatesCount.observe(viewLifecycleOwner) { certificateCount ->
-            if (certificateCount == 0) {
+        viewModel.certificatesCount.observe(viewLifecycleOwner) { certificatesCount ->
+            if (certificatesCount == 0) {
                 findNavControllerOrNull()?.safeNavigate(WalletPagerFragmentDirections.actionWalletPagerFragmentToWalletInfoFragment())
-            } else {
+            } else if (certificatesCount != null) {
                 (activity as? MainActivity)?.binding?.tabLayout?.getTabAt(WALLET_CERTIFICATE_FRAGMENT_POSITION)?.text =
-                    stringsFormat("walletController.mode.myCertificates", certificateCount)
+                    stringsFormat("walletController.mode.myCertificates", certificatesCount)
             }
         }
     }

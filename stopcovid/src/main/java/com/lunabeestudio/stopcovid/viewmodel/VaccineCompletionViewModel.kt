@@ -13,27 +13,55 @@ package com.lunabeestudio.stopcovid.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.map
-import com.lunabeestudio.stopcovid.manager.WalletManager
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
+import com.lunabeestudio.robert.datasource.LocalKeystoreDataSource
+import com.lunabeestudio.stopcovid.coreui.utils.SingleLiveEvent
+import com.lunabeestudio.stopcovid.model.EuropeanCertificate
 import com.lunabeestudio.stopcovid.model.WalletCertificate
+import com.lunabeestudio.stopcovid.repository.WalletRepository
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class VaccineCompletionViewModel(
-    private val certificateValue: String,
+    certificateId: String,
+    private val keystoreDataSource: LocalKeystoreDataSource,
+    private val walletRepository: WalletRepository,
+    private val dispatcherIO: CoroutineDispatcher = Dispatchers.IO,
 ) : ViewModel() {
 
-    val certificate: LiveData<WalletCertificate?> = WalletManager.walletCertificateLiveData.map { certificates ->
-        certificates?.firstOrNull { walletCertificate ->
-            walletCertificate.value == certificateValue
+    val certificate: LiveData<WalletCertificate?> = walletRepository.getById(certificateId).asLiveData(timeoutInMs = 0)
+
+    val showWalletEvent: SingleLiveEvent<Unit> = SingleLiveEvent()
+
+    fun addCertificateInFavorite() {
+        viewModelScope.launch(dispatcherIO) {
+            (certificate.value as? EuropeanCertificate)?.let {
+                if (!it.isFavorite) {
+                    walletRepository.toggleFavorite(
+                        keystoreDataSource,
+                        it,
+                    )
+                }
+            }
+            showWalletEvent.postValue(null)
         }
     }
 }
 
 class VaccineCompletionViewModelFactory(
-    private val certificateValue: String,
+    private val certificateId: String,
+    private val keystoreDataSource: LocalKeystoreDataSource,
+    private val walletRepository: WalletRepository,
 ) :
     ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         @Suppress("UNCHECKED_CAST")
-        return VaccineCompletionViewModel(certificateValue) as T
+        return VaccineCompletionViewModel(
+            certificateId,
+            keystoreDataSource,
+            walletRepository,
+        ) as T
     }
 }

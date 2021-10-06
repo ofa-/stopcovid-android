@@ -20,7 +20,7 @@ import com.lunabeestudio.stopcovid.extension.dccCertificatesManager
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.extension.showUnknownErrorAlert
-import com.lunabeestudio.stopcovid.manager.WalletManager
+import com.lunabeestudio.stopcovid.extension.walletRepository
 import com.lunabeestudio.stopcovid.model.WalletCertificateInvalidSignatureException
 import com.lunabeestudio.stopcovid.model.WalletCertificateMalformedException
 import com.lunabeestudio.stopcovid.model.WalletCertificateNoKeyException
@@ -35,6 +35,10 @@ class VerifyWalletQRCodeFragment : QRCodeFragment() {
 
     private val dccCertificatesManager by lazy {
         requireContext().dccCertificatesManager()
+    }
+
+    private val WalletManager by lazy {
+        requireContext().walletRepository()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

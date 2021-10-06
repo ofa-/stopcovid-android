@@ -16,11 +16,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import androidx.annotation.DimenRes
 import androidx.core.os.bundleOf
 import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
-import com.github.mikephil.charting.data.Entry
 import com.lunabeestudio.robert.extension.observeEventAndConsume
 import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.R
@@ -28,41 +28,27 @@ import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.databinding.ItemCaptionBinding
 import com.lunabeestudio.stopcovid.coreui.extension.appCompatActivity
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
-import com.lunabeestudio.stopcovid.coreui.extension.isNightMode
+import com.lunabeestudio.stopcovid.coreui.extension.findParentFragmentByType
 import com.lunabeestudio.stopcovid.coreui.extension.safeEmojiSpanify
 import com.lunabeestudio.stopcovid.coreui.extension.viewLifecycleOwnerOrNull
 import com.lunabeestudio.stopcovid.coreui.fragment.BaseFragment
 import com.lunabeestudio.stopcovid.databinding.ItemKeyFigureChartCardBinding
-import com.lunabeestudio.stopcovid.extension.brighterColor
 import com.lunabeestudio.stopcovid.extension.chosenPostalCode
-import com.lunabeestudio.stopcovid.extension.colorStringKey
-import com.lunabeestudio.stopcovid.extension.formatNumberIfNeeded
 import com.lunabeestudio.stopcovid.extension.getKeyFigureForPostalCode
-import com.lunabeestudio.stopcovid.extension.getRelativeDateShortString
 import com.lunabeestudio.stopcovid.extension.hasAverageChart
 import com.lunabeestudio.stopcovid.extension.injectionContainer
 import com.lunabeestudio.stopcovid.extension.labelStringKey
-import com.lunabeestudio.stopcovid.extension.limitLineStringKey
-import com.lunabeestudio.stopcovid.extension.safeParseColor
+import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.fastitem.keyFigureCardChartItem
 import com.lunabeestudio.stopcovid.manager.KeyFiguresManager
 import com.lunabeestudio.stopcovid.manager.ShareManager
-import com.lunabeestudio.stopcovid.model.ChartData
+import com.lunabeestudio.stopcovid.model.ChartInformation
 import com.lunabeestudio.stopcovid.model.KeyFigure
-import com.lunabeestudio.stopcovid.model.KeyFigureChartType
-import com.lunabeestudio.stopcovid.model.KeyFigureSeriesItem
-import com.lunabeestudio.stopcovid.model.LimitLineData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.text.NumberFormat
-import java.util.Locale
-import kotlin.time.Duration
-import kotlin.time.ExperimentalTime
 
 class KeyFigureChartsFragment : BaseFragment() {
-
-    private val numberFormat: NumberFormat = NumberFormat.getNumberInstance(Locale.getDefault())
 
     private val sharedPrefs: SharedPreferences by lazy {
         PreferenceManager.getDefaultSharedPreferences(requireContext())
@@ -135,105 +121,66 @@ class KeyFigureChartsFragment : BaseFragment() {
             }.root
         } else {
 
-            keyFigure?.let { figure ->
-                val departmentKeyFigure = figure.getKeyFigureForPostalCode(sharedPrefs.chosenPostalCode)
+            context?.let { safeContext ->
+                keyFigure?.let { figure ->
+                    val departmentKeyFigure = figure.getKeyFigureForPostalCode(sharedPrefs.chosenPostalCode)
+                    val chartsToDisplay = getChartTypesToDisplay(figure)
 
-                if (figure.displayOnSameChart) {
-                    views += ItemKeyFigureChartCardBinding.inflate(layoutInflater, rootLayout, false).apply {
-                        this.root.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-                            topMargin += resources.getDimensionPixelSize(R.dimen.spacing_medium)
-                            bottomMargin += resources.getDimensionPixelSize(R.dimen.spacing_large)
-                        }
-                        keyFigureCardChartItem {
-                            chartData = arrayOf(
-                                localData(figure),
-                                globalData(figure, departmentKeyFigure != null)
-                            ).filterNotNull().toTypedArray()
-                            chartType = KeyFigureChartType.LINES
-                            limitLineData = limitLineData(figure)
-                            chartExplanationLabel = chartExplanationLabel(figure, chartData)
-                            shareContentDescription = strings["accessibility.hint.keyFigure.chart.share"]
-                            onShareCard = { binding ->
-                                shareChart(binding)
-                            }
-                        }.bindView(this, emptyList())
-                    }.root
-                } else {
-                    if (departmentKeyFigure != null) {
-                        views += ItemKeyFigureChartCardBinding.inflate(layoutInflater, rootLayout, false).apply {
+                    views += chartsToDisplay.mapIndexed { index, chartDataType ->
+                        @DimenRes val marginTopRes: Int? = if (index == 0) R.dimen.spacing_medium else null
+                        @DimenRes val marginBottomRes: Int =
+                            if (index < chartsToDisplay.count() - 1) R.dimen.spacing_medium
+                            else R.dimen.spacing_large
+                        val chartInfo = ChartInformation(
+                            context = safeContext,
+                            strings = strings,
+                            keyFigure = figure,
+                            chartDataType = chartDataType,
+                            departmentKeyFigure = departmentKeyFigure,
+                            minDate = minDate,
+                        )
+
+                        ItemKeyFigureChartCardBinding.inflate(layoutInflater, rootLayout, false).apply {
                             this.root.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-                                topMargin += resources.getDimensionPixelSize(R.dimen.spacing_medium)
-                                bottomMargin += resources.getDimensionPixelSize(R.dimen.spacing_medium)
+                                marginTopRes?.let { topMargin += resources.getDimensionPixelSize(marginTopRes) }
+                                bottomMargin += resources.getDimensionPixelSize(marginBottomRes)
                             }
                             keyFigureCardChartItem {
-                                chartData = arrayOf(
-                                    localData(figure)
-                                ).filterNotNull().toTypedArray()
-                                chartExplanationLabel = chartExplanationLabel(
-                                    figure,
-                                    chartData.plus(listOfNotNull(globalData(figure, true)))
-                                )
+                                chartData = chartInfo.chartData
+                                chartType = chartInfo.chartType
+                                limitLineData = chartInfo.limitLineData
+                                chartExplanationLabel = chartInfo.chartExplanationLabel
                                 shareContentDescription = strings["accessibility.hint.keyFigure.chart.share"]
                                 onShareCard = { binding ->
                                     shareChart(binding)
                                 }
-                                chartType = figure.chartType
-                                limitLineData = limitLineData(figure)
+                                onClickListener = getChartOnClickListener(figure.labelKey, chartDataType)
                             }.bindView(this, emptyList())
                         }.root
                     }
-                    views += ItemKeyFigureChartCardBinding.inflate(layoutInflater, rootLayout, false).apply {
-                        this.root.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-                            if (departmentKeyFigure == null) {
-                                topMargin += resources.getDimensionPixelSize(R.dimen.spacing_medium)
-                            }
-                            bottomMargin += if (figure.hasAverageChart()) {
-                                resources.getDimensionPixelSize(R.dimen.spacing_medium)
-                            } else {
-                                resources.getDimensionPixelSize(R.dimen.spacing_large)
-                            }
-                        }
-                        keyFigureCardChartItem {
-                            chartData = arrayOf(
-                                globalData(figure, false)
-                            ).filterNotNull().toTypedArray()
-                            chartExplanationLabel = chartExplanationLabel(figure, chartData)
-                            shareContentDescription = strings["accessibility.hint.keyFigure.chart.share"]
-                            onShareCard = { binding ->
-                                shareChart(binding)
-                            }
-                            chartType = figure.chartType
-                            limitLineData = limitLineData(figure)
-                        }.bindView(this, emptyList())
-                    }.root
-                }
-
-                if (figure.hasAverageChart()) {
-                    views += ItemKeyFigureChartCardBinding.inflate(layoutInflater, rootLayout, false).apply {
-                        this.root.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-                            bottomMargin += resources.getDimensionPixelSize(R.dimen.spacing_large)
-                        }
-                        keyFigureCardChartItem {
-                            chartData = arrayOf(
-                                avgGlobalData(figure)
-                            )
-                            chartExplanationLabel = stringsFormat(
-                                "keyFigureDetailController.section.evolutionAvg.subtitle",
-                                strings["${figure.labelKey}.label"]
-                            )
-                            shareContentDescription = strings["accessibility.hint.keyFigure.chart.share"]
-                            onShareCard = { binding ->
-                                shareChart(binding)
-                            }
-                            limitLineData = limitLineData(figure)
-                            chartType = KeyFigureChartType.LINES
-                        }.bindView(this, emptyList())
-                    }.root
                 }
             }
         }
 
         return views
+    }
+
+    private fun getChartTypesToDisplay(figure: KeyFigure): List<ChartDataType> {
+        val departmentKeyFigure = figure.getKeyFigureForPostalCode(sharedPrefs.chosenPostalCode)
+        val chartsToDisplay: MutableList<ChartDataType> = mutableListOf()
+
+        if (figure.displayOnSameChart) {
+            chartsToDisplay += ChartDataType.MULTI
+        } else {
+            if (departmentKeyFigure != null) {
+                chartsToDisplay += ChartDataType.LOCAL
+            }
+            chartsToDisplay += ChartDataType.GLOBAL
+        }
+        if (figure.hasAverageChart()) {
+            chartsToDisplay += ChartDataType.AVERAGE
+        }
+        return chartsToDisplay
     }
 
     private fun shareChart(binding: ItemKeyFigureChartCardBinding) {
@@ -247,92 +194,22 @@ class KeyFigureChartsFragment : BaseFragment() {
         }
     }
 
-    @OptIn(ExperimentalTime::class)
-    private fun chartExplanationLabel(figure: KeyFigure, chartData: Array<ChartData>): String? {
-        return when {
-            chartData.isNotEmpty() && chartData[0].entries.isEmpty() -> stringsFormat(
-                "keyFigureDetailController.section.evolution.subtitle.nodata",
-                strings["${figure.labelKey}.label"]
-            )
-            chartData.size > 1 -> stringsFormat(
-                "keyFigureDetailController.section.evolution.subtitle2Charts",
-                strings["${figure.labelKey}.label"],
-                chartData[0].entries.lastOrNull()?.x?.toLong()?.let { Duration.seconds(it) }?.getRelativeDateShortString(requireContext())
-                    ?: "",
-                chartData[0].currentValueToDisplay?.formatNumberIfNeeded(numberFormat),
-                chartData[1].currentValueToDisplay?.formatNumberIfNeeded(numberFormat)
-            )
-            chartData.isNotEmpty() -> stringsFormat(
-                "keyFigureDetailController.section.evolution.subtitle",
-                strings["${figure.labelKey}.label"],
-                chartData[0].entries.lastOrNull()?.x?.toLong()?.let { Duration.seconds(it) }?.getRelativeDateShortString(requireContext())
-                    ?: "",
-                chartData[0].currentValueToDisplay?.formatNumberIfNeeded(numberFormat)
-            )
-            else -> null
-        }
-    }
-
-    private fun localData(figure: KeyFigure): ChartData? {
-        val departmentKeyFigure = figure.getKeyFigureForPostalCode(sharedPrefs.chosenPostalCode)
-        return departmentKeyFigure?.let {
-            departmentKeyFigure.series?.let { series ->
-                ChartData(
-                    description = figure.getKeyFigureForPostalCode(sharedPrefs.chosenPostalCode)?.dptLabel,
-                    currentValueToDisplay = departmentKeyFigure.valueToDisplay,
-                    entries = prepareSerie(series),
-                    color = strings[figure.colorStringKey(requireContext().isNightMode())].safeParseColor()
-                )
-            }
-        }
-    }
-
-    private fun globalData(figure: KeyFigure, isSecondary: Boolean) = figure.series?.let { series ->
-        ChartData(
-            description = strings["common.country.france"],
-            currentValueToDisplay = figure.valueGlobalToDisplay,
-            entries = prepareSerie(series),
-            color = if (isSecondary) {
-                strings[figure.colorStringKey(requireContext().isNightMode())].safeParseColor().brighterColor()
-            } else {
-                strings[figure.colorStringKey(requireContext().isNightMode())].safeParseColor()
-            }
-        )
-    }
-
-    private fun avgGlobalData(figure: KeyFigure): ChartData {
-        return ChartData(
-            description = stringsFormat(
-                "keyFigureDetailController.section.evolutionAvg.legendWithLocation",
-                strings["common.country.france"]
-            ),
-            currentValueToDisplay = figure.valueGlobalToDisplay,
-            entries = prepareSerie(figure.avgSeries ?: emptyList()),
-            color = strings[figure.colorStringKey(requireContext().isNightMode())].safeParseColor()
-        )
-    }
-
-    private fun prepareSerie(series: List<KeyFigureSeriesItem>) = series
-        .filter { it.date > minDate }
-        .sortedBy { it.date }
-        .map { Entry(it.date.toFloat(), it.value.toFloat()) }
-
-    private fun limitLineData(figure: KeyFigure): LimitLineData? {
-        return figure.limitLine?.takeIf { it > 0.0 }?.let {
-            LimitLineData(
-                it.toFloat(),
-                strings[figure.limitLineStringKey],
-                strings[figure.colorStringKey(requireContext().isNightMode())].safeParseColor()
-            )
-        }
-    }
-
     fun setTitle(title: String) {
         appCompatActivity?.supportActionBar?.title = title
     }
 
     private fun showErrorSnackBar(message: String) {
         (activity as? MainActivity)?.showErrorSnackBar(message)
+    }
+
+    private fun getChartOnClickListener(labelKey: String, chartDataType: ChartDataType): View.OnClickListener = View.OnClickListener {
+        findParentFragmentByType<KeyFigureDetailsFragment>()?.findNavControllerOrNull()?.safeNavigate(
+            KeyFigureDetailsFragmentDirections.actionKeyFigureDetailsFragmentToChartFullScreenActivity(
+                keyFiguresKey = labelKey,
+                chartDataType = chartDataType,
+                minDate = minDate,
+            )
+        )
     }
 
     enum class ChartRange(val labelKey: String, val rangeMs: Long) {

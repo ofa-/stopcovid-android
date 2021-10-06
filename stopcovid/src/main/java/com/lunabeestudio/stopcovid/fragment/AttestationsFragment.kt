@@ -13,9 +13,11 @@ package com.lunabeestudio.stopcovid.fragment
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.zxing.BarcodeFormat
 import com.journeyapps.barcodescanner.BarcodeEncoder
+import com.lunabeestudio.analytics.model.ErrorEventName
 import com.lunabeestudio.domain.model.Attestation
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.stopcovid.Constants
@@ -29,6 +31,8 @@ import com.lunabeestudio.stopcovid.extension.openInExternalBrowser
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
+import com.lunabeestudio.stopcovid.extension.showDbFailure
+import com.lunabeestudio.stopcovid.extension.showMigrationFailed
 import com.lunabeestudio.stopcovid.fastitem.QrCodeCardItem
 import com.lunabeestudio.stopcovid.fastitem.bigTitleItem
 import com.lunabeestudio.stopcovid.fastitem.linkCardItem
@@ -37,8 +41,8 @@ import com.lunabeestudio.stopcovid.fastitem.qrCodeCardItem
 import com.lunabeestudio.stopcovid.manager.ShareManager
 import com.lunabeestudio.stopcovid.viewmodel.AttestationsViewModel
 import com.lunabeestudio.stopcovid.viewmodel.AttestationsViewModelFactory
-import com.lunabeestudio.stopcovid.widgetshomescreen.AttestationWidget
 import com.mikepenz.fastadapter.GenericItem
+import kotlinx.coroutines.launch
 import kotlin.time.ExperimentalTime
 
 import com.lunabeestudio.stopcovid.viewmodel.NewAttestationViewModel
@@ -58,7 +62,12 @@ class AttestationsFragment : MainFragment() {
         requireContext().robertManager()
     }
 
-    private val viewModel: AttestationsViewModel by viewModels { AttestationsViewModelFactory(requireContext().secureKeystoreDataSource()) }
+    private val viewModel: AttestationsViewModel by viewModels {
+        AttestationsViewModelFactory(
+            requireContext().secureKeystoreDataSource(),
+            attestationRepository
+        )
+    }
 
     override fun getTitleKey(): String = "attestationsController.title"
 
@@ -67,6 +76,8 @@ class AttestationsFragment : MainFragment() {
         viewModel.attestations.observe(viewLifecycleOwner) {
             refreshScreen()
         }
+        showMigrationFailedIfNeeded()
+        showDbFailureIfNeeded()
     }
 
     val reasonMap = mapOf(
@@ -84,11 +95,11 @@ class AttestationsFragment : MainFragment() {
 
     private fun generateNewAttestation(typ: Int) {
         val navm: NewAttestationViewModel by activityViewModels {
-            NewAttestationViewModelFactory(requireContext().secureKeystoreDataSource(), formManager)
+            NewAttestationViewModelFactory(requireContext().secureKeystoreDataSource(), attestationRepository, formManager)
         }
         navm.infos.put("datetime", FormEntry(System.currentTimeMillis().toString(), "datetime", Constants.Attestation.KEY_DATE_TIME))
         navm.infos.put("reason", FormEntry(reasonMap[typ], "list", Constants.Attestation.DATA_KEY_REASON))
-        navm.generateQrCode(robertManager, strings)
+        navm.generateQrCode(robertManager, strings, context)
         refreshScreen()
     }
 
@@ -226,8 +237,7 @@ class AttestationsFragment : MainFragment() {
                     .setMessage(strings["attestationsController.menu.delete.alert.message"])
                     .setNegativeButton(strings["common.cancel"], null)
                     .setPositiveButton(strings["common.confirm"]) { _, _ ->
-                        viewModel.removeAttestation(attestation)
-                        context?.let { AttestationWidget.updateWidget(it, false) }
+                        viewModel.removeAttestation(attestation, context)
                         refreshScreen()
                     }
                     .show()
@@ -243,6 +253,28 @@ class AttestationsFragment : MainFragment() {
             }
             actionContentDescription = strings["accessibility.hint.otherActions"]
             identifier = mainDescription.hashCode().toLong()
+        }
+    }
+
+    private fun showMigrationFailedIfNeeded() {
+        if (debugManager.oldAttestationsInSharedPrefs()) {
+            context?.let {
+                analyticsManager.reportErrorEvent(it.filesDir, ErrorEventName.ERR_ATTESTATION_MIG)
+                MaterialAlertDialogBuilder(it).showMigrationFailed(strings)
+            }
+        }
+    }
+
+    private fun showDbFailureIfNeeded() {
+        lifecycleScope.launch {
+            try {
+                context?.secureKeystoreDataSource()?.attestations()
+            } catch (e: Exception) {
+                context?.let {
+                    analyticsManager.reportErrorEvent(it.filesDir, ErrorEventName.ERR_ATTESTATION_DB)
+                    MaterialAlertDialogBuilder(it).showDbFailure(strings)
+                }
+            }
         }
     }
 }

@@ -26,6 +26,7 @@ object Constants {
         const val CHOSEN_POSTAL_CODE: String = "Chosen.Postal.Code"
         const val ARE_INFO_NOTIFICATIONS_ENABLED: String = "Are.Info.Notifications.Enabled"
         const val LAST_VERSION_CODE: String = "Last.Version.Code"
+        const val LAST_VERSION_NAME: String = "Last.Version.Name"
         const val ZIP_GEOLOC_VERSION: String = "Zip.Geoloc.Version"
         const val PRIVATE_EVENT_QR_CODE: String = "Private.Event.QR.Code"
         const val PRIVATE_EVENT_QR_CODE_GENERATION_DATE: String = "Private.Event.QR.Code.Generation.Date"
@@ -43,6 +44,9 @@ object Constants {
         const val SHOW_ERROR_PANEL: String = "showErrorPanel"
         const val SHOW_ACTIVATION_REMINDER: String = "showActivationReminder"
         const val HAS_USED_UNIVERSAL_QR_SCAN: String = "hasUsedUniversalQrScan"
+        const val RATINGS_KEY_FIGURES_OPENING: String = "ratingsKeyFiguresOpening"
+        const val RATINGS_SHOWN: String = "ratingsShown"
+        const val GOOGLE_REVIEW_SHOWN: String = "Google.Review.Shown"
     }
 
     object Notification {
@@ -97,20 +101,35 @@ object Constants {
         const val CIRCLE_LINE_RATIO: Float = 2f
         const val Y_AXIS_LABEL_COUNT: Int = 3
         const val X_AXIS_LABEL_COUNT: Int = 2
+        const val X_ANIMATION_DURATION_MILLIS: Int = 1000
         const val AXIS_LABEL_TEXT_SIZE: Float = 15f
         const val EXTRA_BOTTOM_OFFSET: Float = 16f
         const val WIDGET_CIRCLE_SIZE: Float = 2f
         const val WIDGET_LINE_WIDTH: Float = 1f
         const val WIDGET_MARGIN_SIZE: Float = 6f
+        const val ZOOM_MIN_THRESHOLD: Float = 1.25f
+        const val SIGNIFICANT_DIGIT_MAX: Int = 3
     }
 
     object QrCode {
         const val FORMAT_2D_DOC: String = "2D-DOC"
     }
 
+    object Certificate {
+        const val MANUFACTURER_AUTOTEST: String = "AUTOTEST"
+    }
+
     object HomeScreenWidget {
         const val NUMBER_VALUES_GRAPH_FIGURE: Int = 8
         const val WORKER_UPDATE_FIGURES_NAME: String = "updateFiguresWorker"
         const val WORKER_UPDATE_FIGURES_PERIODIC_REFRESH_HOURS: Long = 5
+    }
+
+    object Logs {
+        const val DIR_NAME: String = "logs"
+    }
+
+    object Build {
+        const val NB_DIGIT_MAJOR_RELEASE: Int = 2
     }
 }

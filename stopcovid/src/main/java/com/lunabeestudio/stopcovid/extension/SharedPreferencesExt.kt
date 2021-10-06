@@ -43,6 +43,10 @@ var SharedPreferences.lastVersionCode: Int
     get() = getInt(Constants.SharedPrefs.LAST_VERSION_CODE, 0)
     set(value) = edit { putInt(Constants.SharedPrefs.LAST_VERSION_CODE, value) }
 
+var SharedPreferences.lastVersionName: String?
+    get() = getString(Constants.SharedPrefs.LAST_VERSION_NAME, null)
+    set(value) = edit { putString(Constants.SharedPrefs.LAST_VERSION_NAME, value) }
+
 var SharedPreferences.venuesFeaturedWasActivatedAtLeastOneTime: Boolean
     get() = getBoolean(Constants.SharedPrefs.VENUES_FEATURED_ACTIVATED, false)
     set(value) = edit { putBoolean(Constants.SharedPrefs.VENUES_FEATURED_ACTIVATED, value) }
@@ -124,3 +128,15 @@ var SharedPreferences.showActivationReminderDialog: Boolean
 var SharedPreferences.hasUsedUniversalQrScan: Boolean
     get() = getBoolean(Constants.SharedPrefs.HAS_USED_UNIVERSAL_QR_SCAN, false)
     set(value) = edit { putBoolean(Constants.SharedPrefs.HAS_USED_UNIVERSAL_QR_SCAN, value) }
+
+var SharedPreferences.ratingsKeyFiguresOpening: Long
+    get() = getLong(Constants.SharedPrefs.RATINGS_KEY_FIGURES_OPENING, 0L)
+    set(value) = edit { putLong(Constants.SharedPrefs.RATINGS_KEY_FIGURES_OPENING, value) }
+
+var SharedPreferences.ratingPopInShown: Boolean
+    get() = getBoolean(Constants.SharedPrefs.RATINGS_SHOWN, false)
+    set(value) = edit { putBoolean(Constants.SharedPrefs.RATINGS_SHOWN, value) }
+
+var SharedPreferences.googleReviewShown: Boolean
+    get() = getBoolean(Constants.SharedPrefs.GOOGLE_REVIEW_SHOWN, false)
+    set(value) = edit { putBoolean(Constants.SharedPrefs.GOOGLE_REVIEW_SHOWN, value) }

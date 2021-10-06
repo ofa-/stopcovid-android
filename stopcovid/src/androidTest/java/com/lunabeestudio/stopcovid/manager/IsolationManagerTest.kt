@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import com.lunabeestudio.domain.extension.unixTimeMsToNtpTimeS
 import com.lunabeestudio.domain.model.AtRiskStatus
+import com.lunabeestudio.framework.local.LocalCryptoManager
 import com.lunabeestudio.framework.local.datasource.SecureKeystoreDataSource
 import com.lunabeestudio.robert.RobertApplication
 import com.lunabeestudio.robert.RobertManager
@@ -26,23 +27,23 @@ class IsolationManagerTest {
 
     @Before
     fun createDataSource() {
-        val keystore = KeyStore.getInstance("AndroidKeyStore")
+        val keystore = KeyStore.getInstance(LocalCryptoManager.ANDROID_KEY_STORE_PROVIDER)
         keystore.load(null)
         keystore.deleteEntry("aes_local_protection")
         keystore.deleteEntry("rsa_wrap_local_protection")
-        app.getSharedPreferences("robert_prefs", Context.MODE_PRIVATE).edit().clear().commit()
-        app.getSharedPreferences("crypto_prefs", Context.MODE_PRIVATE).edit().clear().commit()
+        app.getSharedPreferences(SecureKeystoreDataSource.SHARED_PREF_NAME, Context.MODE_PRIVATE).edit().clear().commit()
+        app.getSharedPreferences(LocalCryptoManager.SHARED_PREF_NAME, Context.MODE_PRIVATE).edit().clear().commit()
         isolationManager.resetData()
     }
 
     @After
     fun clear() {
-        val keystore = KeyStore.getInstance("AndroidKeyStore")
+        val keystore = KeyStore.getInstance(LocalCryptoManager.ANDROID_KEY_STORE_PROVIDER)
         keystore.load(null)
         keystore.deleteEntry("aes_local_protection")
         keystore.deleteEntry("rsa_wrap_local_protection")
-        app.getSharedPreferences("robert_prefs", Context.MODE_PRIVATE).edit().clear().commit()
-        app.getSharedPreferences("crypto_prefs", Context.MODE_PRIVATE).edit().clear().commit()
+        app.getSharedPreferences(SecureKeystoreDataSource.SHARED_PREF_NAME, Context.MODE_PRIVATE).edit().clear().commit()
+        app.getSharedPreferences(LocalCryptoManager.SHARED_PREF_NAME, Context.MODE_PRIVATE).edit().clear().commit()
         isolationManager.resetData()
     }
 

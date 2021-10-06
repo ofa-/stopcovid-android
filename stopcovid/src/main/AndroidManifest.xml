@@ -89,6 +89,11 @@
             android:exported="false"
             android:screenOrientation="portrait"
             android:taskAffinity="" />
+        <activity
+            android:name=".activity.ChartFullScreenActivity"
+            android:exported="false"
+            android:screenOrientation="sensorLandscape"
+            android:taskAffinity="" />
 
         <service
             android:name=".service.ProximityService"
@@ -151,6 +156,7 @@
 
         <receiver
             android:name="com.lunabeestudio.stopcovid.widgetshomescreen.DccWidget"
+            android:label="@string/dcc_widget_name"
             android:enabled="true"
             android:exported="false">
             <intent-filter>
@@ -164,6 +170,7 @@
 
         <receiver
             android:name="com.lunabeestudio.stopcovid.widgetshomescreen.KeyFiguresWidget"
+            android:label="@string/figures_widget_name"
             android:enabled="true"
             android:exported="false">
             <intent-filter>
@@ -177,6 +184,7 @@
 
         <receiver
             android:name="com.lunabeestudio.stopcovid.widgetshomescreen.AttestationWidget"
+            android:label="@string/attestation_widget_name"
             android:enabled="true"
             android:exported="false">
             <intent-filter>
@@ -190,6 +198,7 @@
 
         <receiver
             android:name="com.lunabeestudio.stopcovid.widgetshomescreen.ProximityWidget"
+            android:label="@string/proximity_widget_name"
             android:enabled="true"
             android:exported="false">
             <intent-filter>

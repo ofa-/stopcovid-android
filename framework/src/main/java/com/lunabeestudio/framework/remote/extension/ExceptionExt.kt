@@ -26,27 +26,28 @@ import java.net.UnknownHostException
 import javax.net.ssl.SSLException
 
 internal fun Exception.remoteToRobertException(): RobertException = when (this) {
-    is MalformedJsonException -> BackendException()
-    is SSLException -> BackendException()
+    is MalformedJsonException -> BackendException(httpCode = null)
+    is SSLException -> BackendException(httpCode = null)
     is SocketTimeoutException,
     is IOException,
     is UnknownHostException,
     -> NoInternetException()
     is HttpException -> {
+        val httpCode = code()
         try {
-            when (code()) {
+            when (httpCode) {
                 401 -> UnauthorizedException()
                 403 -> ForbiddenException()
                 else -> {
                     val robertServerError =
                         Gson().fromJson(this.response()?.errorBody()?.string() ?: "", ServerException::class.java)
                     robertServerError?.message?.let { message ->
-                        BackendException(message)
-                    } ?: BackendException()
+                        BackendException(message, httpCode)
+                    } ?: BackendException(httpCode = httpCode)
                 }
             }
         } catch (e: Exception) {
-            BackendException()
+            BackendException(httpCode = httpCode)
         }
     }
     else -> UnknownException()

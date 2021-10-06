@@ -30,7 +30,6 @@ import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
 import com.lunabeestudio.stopcovid.fastitem.privateVenueQrCodeItem
 import com.lunabeestudio.stopcovid.manager.ShareManager
-import com.lunabeestudio.stopcovid.manager.VenuesManager
 import com.mikepenz.fastadapter.GenericItem
 
 class VenuesPrivateEventFragment : MainFragment() {
@@ -49,7 +48,7 @@ class VenuesPrivateEventFragment : MainFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        VenuesManager.generateNewQRCodeIfNeeded(sharedPrefs, requireContext().robertManager(), requireContext().secureKeystoreDataSource())
+        venueRepository.generateNewQRCodeIfNeeded(sharedPrefs, requireContext().robertManager(), requireContext().secureKeystoreDataSource())
         bitmap = barcodeEncoder.encodeBitmap(
             sharedPrefs.privateEventQrCode,
             BarcodeFormat.QR_CODE,

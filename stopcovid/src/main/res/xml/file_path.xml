@@ -11,4 +11,7 @@
     <cache-path
         name="*"
         path="shared_images" />
+    <cache-path
+        name="cache"
+        path="." />
 </paths>

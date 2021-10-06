@@ -10,7 +10,6 @@
 
 package com.lunabeestudio.robert.datasource
 
-import androidx.lifecycle.LiveData
 import com.lunabeestudio.domain.model.AtRiskStatus
 import com.lunabeestudio.domain.model.Attestation
 import com.lunabeestudio.domain.model.Calibration
@@ -18,6 +17,7 @@ import com.lunabeestudio.domain.model.Configuration
 import com.lunabeestudio.domain.model.FormEntry
 import com.lunabeestudio.domain.model.RawWalletCertificate
 import com.lunabeestudio.domain.model.VenueQrCode
+import kotlinx.coroutines.flow.Flow
 
 interface LocalKeystoreDataSource {
     var configuration: Configuration?
@@ -37,10 +37,20 @@ interface LocalKeystoreDataSource {
     var atRiskModelVersion: Int?
     var deprecatedLastRiskReceivedDate: Long?
     var deprecatedLastExposureTimeframe: Int?
-    val attestationsLiveData: LiveData<List<Attestation>?>
-    var attestations: List<Attestation>?
-    var rawWalletCertificates: List<RawWalletCertificate>?
-    val rawWalletCertificatesLiveData: LiveData<List<RawWalletCertificate>?>
+
+    suspend fun attestations(): List<Attestation>
+    val attestationsFlow: Flow<List<Attestation>>
+    suspend fun insertAllAttestations(vararg attestations: Attestation)
+    suspend fun deleteAttestation(attestationId: String)
+    suspend fun deleteAllAttestations()
+
+    suspend fun rawWalletCertificates(): List<RawWalletCertificate>
+    val rawWalletCertificatesFlow: Flow<List<RawWalletCertificate>>
+    suspend fun insertAllRawWalletCertificates(vararg certificates: RawWalletCertificate)
+    suspend fun deleteRawWalletCertificate(certificateId: String)
+    suspend fun deleteAllRawWalletCertificates()
+    suspend fun migrateCertificates(): List<RawWalletCertificate>
+
     var deprecatedAttestations: List<Map<String, FormEntry>>?
     var savedAttestationData: Map<String, FormEntry>?
     var saveAttestationData: Boolean?
@@ -48,9 +58,17 @@ interface LocalKeystoreDataSource {
     var reportValidationToken: String?
     var reportToSendStartTime: Long?
     var reportToSendEndTime: Long?
-    var venuesQrCode: List<VenueQrCode>?
-    var declarationToken: String?
 
+    suspend fun venuesQrCode(): List<VenueQrCode>
+    val venuesQrCodeFlow: Flow<List<VenueQrCode>>
+    suspend fun insertAllVenuesQrCode(vararg venuesQrCode: VenueQrCode)
+    suspend fun deleteVenueQrCode(venueQrCodeId: String)
+    suspend fun deleteAllVenuesQrCode()
+    suspend fun getCertificateCount(): Int
+    val certificateCountFlow: Flow<Int>
+    fun getCertificateById(id: String): Flow<RawWalletCertificate?>
+
+    var declarationToken: String?
     var reportPositiveTestDate: Long?
     var reportSymptomsStartDate: Long?
 

@@ -79,4 +79,9 @@
 
     <dimen name="bottom_sheet_top_space_shadow_height">8dp</dimen>
     <dimen name="bottom_sheet_top_shadow_height">16dp</dimen>
+
+    <dimen name="marker_view_min_width">50dp</dimen>
+    <dimen name="marker_view_radius">4dp</dimen>
+    <dimen name="marker_view_arrow_width">8dp</dimen>
+    <dimen name="marker_view_arrow_height">16dp</dimen>
 </resources>

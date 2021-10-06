@@ -51,7 +51,7 @@ class WalletInfoFragment : MainFragment() {
             findParentFragmentByType<WalletContainerFragment>() ?: requireParentFragment()
         },
         {
-            WalletViewModelFactory(robertManager, keystoreDataSource, blacklistDCCManager, blacklist2DDOCManager)
+            WalletViewModelFactory(robertManager, keystoreDataSource, blacklistDCCManager, blacklist2DDOCManager, walletRepository)
         }
     )
 
@@ -60,10 +60,10 @@ class WalletInfoFragment : MainFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel.certificates.observe(viewLifecycleOwner) {
-            if (it.isNullOrEmpty() || parentFragment is WalletPagerFragment) {
+        viewModel.certificatesCount.observe(viewLifecycleOwner) { certificatesCount ->
+            if (certificatesCount == 0 || parentFragment is WalletPagerFragment) {
                 refreshScreen()
-            } else {
+            } else if (certificatesCount != null) {
                 findNavControllerOrNull()?.safeNavigate(WalletInfoFragmentDirections.actionWalletInfoFragmentToWalletPagerFragment())
             }
         }
