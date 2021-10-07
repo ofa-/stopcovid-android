@@ -86,6 +86,7 @@ class InjectionContainer(private val context: StopCovid, val coroutineScope: Cor
             secureKeystoreDataSource,
             debugManager,
             inGroupeDatasource,
+            analyticsManager,
             coroutineScope,
         )
     }

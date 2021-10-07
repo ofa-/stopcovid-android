@@ -16,9 +16,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
-import com.lunabeestudio.framework.local.datasource.SecureKeystoreDataSource
 import com.lunabeestudio.robert.RobertManager
-import com.lunabeestudio.robert.datasource.LocalKeystoreDataSource
 import com.lunabeestudio.robert.utils.Event
 import com.lunabeestudio.stopcovid.coreui.utils.SingleLiveEvent
 import com.lunabeestudio.stopcovid.extension.isOld
@@ -34,7 +32,6 @@ import kotlinx.coroutines.launch
 
 class WalletViewModel constructor(
     private val robertManager: RobertManager,
-    private val keystoreDataSource: LocalKeystoreDataSource,
     private val blacklistDCCManager: BlacklistDCCManager,
     private val blacklist2DDOCManager: Blacklist2DDOCManager,
     private val walletRepository: WalletRepository,
@@ -88,8 +85,12 @@ class WalletViewModel constructor(
 
     fun removeCertificate(certificate: WalletCertificate) {
         viewModelScope.launch {
-            walletRepository.deleteCertificate(keystoreDataSource, certificate)
+            walletRepository.deleteCertificate(certificate)
         }
+    }
+
+    fun deleteDeprecatedCertificates() {
+        walletRepository.deleteDeprecatedCertificated()
     }
 
     fun isEmpty(): Boolean {
@@ -98,7 +99,6 @@ class WalletViewModel constructor(
 
     suspend fun saveCertificate(walletCertificate: WalletCertificate) {
         walletRepository.saveCertificate(
-            keystoreDataSource,
             walletCertificate,
         )
     }
@@ -109,7 +109,6 @@ class WalletViewModel constructor(
         viewModelScope.launch {
             try {
                 walletRepository.toggleFavorite(
-                    keystoreDataSource,
                     walletCertificate
                 )
             } catch (e: Exception) {
@@ -136,7 +135,6 @@ class WalletViewModel constructor(
 
 class WalletViewModelFactory(
     private val robertManager: RobertManager,
-    private val secureKeystoreDataSource: SecureKeystoreDataSource,
     private val blacklistDCCManager: BlacklistDCCManager,
     private val blacklist2DDOCManager: Blacklist2DDOCManager,
     private val walletRepository: WalletRepository,
@@ -144,6 +142,6 @@ class WalletViewModelFactory(
     ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         @Suppress("UNCHECKED_CAST")
-        return WalletViewModel(robertManager, secureKeystoreDataSource, blacklistDCCManager, blacklist2DDOCManager, walletRepository) as T
+        return WalletViewModel(robertManager, blacklistDCCManager, blacklist2DDOCManager, walletRepository) as T
     }
 }

@@ -27,7 +27,6 @@ import com.lunabeestudio.stopcovid.extension.injectionContainer
 import com.lunabeestudio.stopcovid.extension.isVenueOnBoardingDone
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
-import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
 import com.lunabeestudio.stopcovid.extension.showExpiredCodeAlert
 import com.lunabeestudio.stopcovid.extension.showInvalidCodeAlert
 import com.lunabeestudio.stopcovid.extension.showUnknownErrorAlert
@@ -57,7 +56,7 @@ class VenueQRCodeFragment : QRCodeFragment() {
     }
 
     private val viewModel: VenueQrCodeViewModel by viewModels {
-        VenueQrCodeViewModelFactory(robertManager, requireContext().secureKeystoreDataSource(), injectionContainer.venueRepository)
+        VenueQrCodeViewModelFactory(robertManager, injectionContainer.venueRepository)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -134,7 +133,7 @@ class VenueQRCodeFragment : QRCodeFragment() {
     }
 
     private fun navigateAfterVenueProcess() {
-        analyticsManager.reportAppEvent(requireContext(), AppEventName.e14, null)
+        analyticsManager.reportAppEvent(AppEventName.e14, null)
         findNavControllerOrNull()
             ?.safeNavigate(VenueQRCodeFragmentDirections.actionVenueQrCodeFragmentToVenueConfirmationFragment())
     }

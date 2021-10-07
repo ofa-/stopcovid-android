@@ -30,11 +30,15 @@ class AttestationsViewModel(
 
     val attestations: LiveData<List<Attestation>> = attestationRepository.attestationsFlow.asLiveData(timeoutInMs = 0)
 
-    fun removeAttestation(attestation: Attestation, context: Context?) {
+    fun deleteAttestation(context: Context?, attestation: Attestation) {
         viewModelScope.launch {
             keystoreDataSource.deleteAttestation(attestation.id)
             context?.let { AttestationWidget.updateWidget(it, false) }
         }
+    }
+
+    fun deleteDeprecatedAttestations() {
+        keystoreDataSource.deleteDeprecatedAttestations()
     }
 }
 

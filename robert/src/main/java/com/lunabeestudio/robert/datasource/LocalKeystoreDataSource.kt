@@ -10,6 +10,7 @@
 
 package com.lunabeestudio.robert.datasource
 
+import com.lunabeestudio.analytics.manager.AnalyticsManager
 import com.lunabeestudio.domain.model.AtRiskStatus
 import com.lunabeestudio.domain.model.Attestation
 import com.lunabeestudio.domain.model.Calibration
@@ -43,13 +44,15 @@ interface LocalKeystoreDataSource {
     suspend fun insertAllAttestations(vararg attestations: Attestation)
     suspend fun deleteAttestation(attestationId: String)
     suspend fun deleteAllAttestations()
+    fun deleteDeprecatedAttestations()
 
     suspend fun rawWalletCertificates(): List<RawWalletCertificate>
     val rawWalletCertificatesFlow: Flow<List<RawWalletCertificate>>
     suspend fun insertAllRawWalletCertificates(vararg certificates: RawWalletCertificate)
     suspend fun deleteRawWalletCertificate(certificateId: String)
     suspend fun deleteAllRawWalletCertificates()
-    suspend fun migrateCertificates(): List<RawWalletCertificate>
+    fun deleteDeprecatedCertificates()
+    suspend fun migrateCertificates(analyticsManager: AnalyticsManager): List<RawWalletCertificate>
 
     var deprecatedAttestations: List<Map<String, FormEntry>>?
     var savedAttestationData: Map<String, FormEntry>?
@@ -64,6 +67,7 @@ interface LocalKeystoreDataSource {
     suspend fun insertAllVenuesQrCode(vararg venuesQrCode: VenueQrCode)
     suspend fun deleteVenueQrCode(venueQrCodeId: String)
     suspend fun deleteAllVenuesQrCode()
+    fun deleteDeprecatedVenuesQrCode()
     suspend fun getCertificateCount(): Int
     val certificateCountFlow: Flow<Int>
     fun getCertificateById(id: String): Flow<RawWalletCertificate?>

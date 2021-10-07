@@ -16,6 +16,9 @@ import android.net.UrlQuerySanitizer
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asLiveData
+import com.lunabeestudio.analytics.manager.AnalyticsManager
+import com.lunabeestudio.analytics.model.AppEventName
+import com.lunabeestudio.analytics.model.ErrorEventName
 import com.lunabeestudio.domain.extension.walletPublicKey
 import com.lunabeestudio.domain.model.Configuration
 import com.lunabeestudio.domain.model.RawWalletCertificate
@@ -49,6 +52,7 @@ class WalletRepository(
     private val localKeystoreDataSource: LocalKeystoreDataSource,
     private val debugManager: DebugManager,
     private val remoteDataSource: RemoteCertificateDataSource,
+    private val analyticsManager: AnalyticsManager,
     coroutineScope: CoroutineScope,
 ) {
     val walletCertificateFlow: StateFlow<List<WalletCertificate>>
@@ -69,10 +73,17 @@ class WalletRepository(
             DccWidget.updateWidget(context)
         }
 
-        coroutineScope.launch {
-            _migrationInProgress.postValue(true)
-            debugManager.logCertificateMigrated(localKeystoreDataSource.migrateCertificates())
-            _migrationInProgress.postValue(false)
+        if (debugManager.oldCertificateInSharedPrefs()) {
+            coroutineScope.launch {
+                _migrationInProgress.postValue(true)
+                debugManager.logCertificateMigrated(localKeystoreDataSource.migrateCertificates(analyticsManager))
+                if (debugManager.oldCertificateInSharedPrefs()) {
+                    analyticsManager.reportErrorEvent(ErrorEventName.ERR_WALLET_MIG)
+                } else {
+                    analyticsManager.reportAppEvent(AppEventName.e22)
+                }
+                _migrationInProgress.postValue(false)
+            }
         }
     }
 
@@ -127,11 +138,16 @@ class WalletRepository(
         return walletCertificate
     }
 
-    suspend fun saveCertificate(localKeystoreDataSource: LocalKeystoreDataSource, walletCertificate: WalletCertificate) {
-        localKeystoreDataSource.insertAllRawWalletCertificates(walletCertificate.raw)
+    suspend fun saveCertificate(walletCertificate: WalletCertificate) {
+        try {
+            localKeystoreDataSource.insertAllRawWalletCertificates(walletCertificate.raw)
+        } catch (e: Exception) {
+            analyticsManager.reportErrorEvent(ErrorEventName.ERR_WALLET_INSERT_DB)
+            throw e
+        }
     }
 
-    suspend fun toggleFavorite(localKeystoreDataSource: LocalKeystoreDataSource, walletCertificate: EuropeanCertificate) {
+    suspend fun toggleFavorite(walletCertificate: EuropeanCertificate) {
         val walletCertificates = localKeystoreDataSource.rawWalletCertificates()
         var currentFavorite: RawWalletCertificate? = null
         val rawWalletCertificate: RawWalletCertificate? = walletCertificates.firstOrNull { it.id == walletCertificate.id }
@@ -155,12 +171,16 @@ class WalletRepository(
         return WalletCertificate.createCertificateFromValue(value)
     }
 
-    suspend fun deleteCertificate(localKeystoreDataSource: LocalKeystoreDataSource, walletCertificate: WalletCertificate) {
+    suspend fun deleteCertificate(walletCertificate: WalletCertificate) {
         localKeystoreDataSource.deleteRawWalletCertificate(walletCertificate.id)
     }
 
-    suspend fun deleteAllCertificates(localKeystoreDataSource: LocalKeystoreDataSource) {
+    suspend fun deleteAllCertificates() {
         localKeystoreDataSource.deleteAllRawWalletCertificates()
+    }
+
+    fun deleteDeprecatedCertificated() {
+        localKeystoreDataSource.deleteDeprecatedCertificates()
     }
 
     suspend fun convertCertificate(

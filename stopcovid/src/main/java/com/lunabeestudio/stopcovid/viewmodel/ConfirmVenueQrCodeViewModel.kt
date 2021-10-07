@@ -16,14 +16,12 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.lunabeestudio.analytics.manager.AnalyticsManager
 import com.lunabeestudio.analytics.model.AppEventName
-import com.lunabeestudio.framework.local.datasource.SecureKeystoreDataSource
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.stopcovid.coreui.utils.SingleLiveEvent
 import com.lunabeestudio.stopcovid.repository.VenueRepository
 import kotlinx.coroutines.launch
 
 class ConfirmVenueQrCodeViewModel(
-    private val secureKeystoreDataSource: SecureKeystoreDataSource,
     private val robertManager: RobertManager,
     private val analyticsManager: AnalyticsManager,
     private val venueRepository: VenueRepository,
@@ -36,12 +34,11 @@ class ConfirmVenueQrCodeViewModel(
             try {
                 venueRepository.processVenue(
                     robertManager = robertManager,
-                    secureKeystoreDataSource = secureKeystoreDataSource,
                     venueContent,
                     venueVersion,
                     venueTime?.toLong()
                 )
-                analyticsManager.reportAppEvent(context, AppEventName.e14, null)
+                analyticsManager.reportAppEvent(AppEventName.e14, null)
                 venueProcessed.postValue(null)
             } catch (e: Exception) {
                 exception.postValue(e)
@@ -51,7 +48,6 @@ class ConfirmVenueQrCodeViewModel(
 }
 
 class ConfirmVenueQrCodeViewModelFactory(
-    private val secureKeystoreDataSource: SecureKeystoreDataSource,
     private val robertManager: RobertManager,
     private val analyticsManager: AnalyticsManager,
     private val venueRepository: VenueRepository,
@@ -60,7 +56,6 @@ class ConfirmVenueQrCodeViewModelFactory(
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         @Suppress("UNCHECKED_CAST")
         return ConfirmVenueQrCodeViewModel(
-            secureKeystoreDataSource,
             robertManager,
             analyticsManager,
             venueRepository,

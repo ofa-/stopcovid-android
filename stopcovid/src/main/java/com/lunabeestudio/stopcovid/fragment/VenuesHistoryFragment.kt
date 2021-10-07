@@ -43,7 +43,7 @@ class VenuesHistoryFragment : MainFragment() {
     }
 
     private val viewModel: VenuesHistoryViewModel by viewModels {
-        VenuesHistoryViewModelFactory(requireContext().secureKeystoreDataSource(), venueRepository)
+        VenuesHistoryViewModelFactory(venueRepository)
     }
 
     override fun getTitleKey(): String = "venuesHistoryController.title"
@@ -92,7 +92,7 @@ class VenuesHistoryFragment : MainFragment() {
                                 .setTitle(strings["venuesHistoryController.delete.alert.title"])
                                 .setMessage(strings["venuesHistoryController.delete.alert.message"])
                                 .setPositiveButton(strings["common.delete"]) { _, _ ->
-                                    viewModel.removeVenue(venueQrCode.id)
+                                    viewModel.deleteVenue(venueQrCode.id)
                                 }
                                 .setNegativeButton(strings["common.cancel"], null)
                                 .show()
@@ -130,8 +130,10 @@ class VenuesHistoryFragment : MainFragment() {
     private fun showMigrationFailedIfNeeded() {
         if (debugManager.oldVenuesInSharedPrefs()) {
             context?.let {
-                analyticsManager.reportErrorEvent(it.filesDir, ErrorEventName.ERR_VENUES_MIG)
-                MaterialAlertDialogBuilder(it).showMigrationFailed(strings)
+                analyticsManager.reportErrorEvent(ErrorEventName.ERR_VENUES_MIG)
+                MaterialAlertDialogBuilder(it).showMigrationFailed(strings) {
+                    viewModel.deleteDeprecatedVenues()
+                }
             }
         }
     }
@@ -142,7 +144,7 @@ class VenuesHistoryFragment : MainFragment() {
                 context?.secureKeystoreDataSource()?.venuesQrCode()
             } catch (e: Exception) {
                 context?.let {
-                    analyticsManager.reportErrorEvent(it.filesDir, ErrorEventName.ERR_VENUES_DB)
+                    analyticsManager.reportErrorEvent(ErrorEventName.ERR_VENUES_DB)
                     MaterialAlertDialogBuilder(it).showDbFailure(strings)
                 }
             }

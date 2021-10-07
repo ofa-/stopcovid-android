@@ -326,7 +326,7 @@ class ProximityFragment : TimeMainFragment() {
         fragmentRecyclerViewFabBinding?.floatingActionButton?.let { fab ->
             fab.text = strings["home.qrScan.button.title"]
             fab.setOnClickListener {
-                analyticsManager.reportAppEvent(requireContext(), AppEventName.e18, null)
+                analyticsManager.reportAppEvent(AppEventName.e18, null)
                 findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToUniversalQrScanFragment())
             }
             binding?.recyclerView?.addOnScrollListener(ExtendedFloatingActionButtonScrollListener(fab))
@@ -666,7 +666,7 @@ class ProximityFragment : TimeMainFragment() {
                     mainImage = R.drawable.health_card
                     mainTitle = strings["home.healthSection.isSick.standaloneTitle"]
                     onCardClick = {
-                        analyticsManager.reportAppEvent(requireContext(), AppEventName.e5, null)
+                        analyticsManager.reportAppEvent(AppEventName.e5, null)
                         findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToIsSickFragment())
                     }
                     identifier = R.drawable.health_card.toLong()
@@ -678,7 +678,7 @@ class ProximityFragment : TimeMainFragment() {
                         mainImage = R.drawable.health_card
                         gradientBackground = it.getGradientBackground()
                         onCardClick = {
-                            analyticsManager.reportAppEvent(requireContext(), AppEventName.e5, null)
+                            analyticsManager.reportAppEvent(AppEventName.e5, null)
                             findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToHealthFragment())
                         }
                         identifier = R.drawable.health_card.toLong()
@@ -746,7 +746,7 @@ class ProximityFragment : TimeMainFragment() {
     }
 
     private fun startRecordVenue() {
-        analyticsManager.reportAppEvent(requireContext(), AppEventName.e12, null)
+        analyticsManager.reportAppEvent(AppEventName.e12, null)
         findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToVenueQrCodeFragment())
     }
 
@@ -772,7 +772,7 @@ class ProximityFragment : TimeMainFragment() {
             identifier = cardTitle.hashCode().toLong()
             mainMaxLines = 3
             onCardClick = {
-                analyticsManager.reportAppEvent(requireContext(), AppEventName.e10, null)
+                analyticsManager.reportAppEvent(AppEventName.e10, null)
                 findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToInfoCenterFragment())
             }
 
@@ -781,7 +781,7 @@ class ProximityFragment : TimeMainFragment() {
                     label = strings["home.infoSection.readAll"],
                     showBadge = sharedPrefs.getBoolean(Constants.SharedPrefs.HAS_NEWS, false)
                 ) {
-                    analyticsManager.reportAppEvent(requireContext(), AppEventName.e10, null)
+                    analyticsManager.reportAppEvent(AppEventName.e10, null)
                     findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToInfoCenterFragment())
                 }
             )
@@ -800,7 +800,7 @@ class ProximityFragment : TimeMainFragment() {
         val darkMode = requireContext().isNightMode()
 
         val keyFiguresClickListener = View.OnClickListener {
-            analyticsManager.reportAppEvent(requireContext(), AppEventName.e8, null)
+            analyticsManager.reportAppEvent(AppEventName.e8, null)
             findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToKeyFiguresFragment())
         }
 
@@ -838,7 +838,7 @@ class ProximityFragment : TimeMainFragment() {
                     updatedAt = strings["keyfigure.dailyUpdates"]
                     value = figure.valueGlobalToDisplay.formatNumberIfNeeded(numberFormat)
                     onClickListener = View.OnClickListener {
-                        analyticsManager.reportAppEvent(requireContext(), AppEventName.e9, null)
+                        analyticsManager.reportAppEvent(AppEventName.e9, null)
                         findNavControllerOrNull()?.safeNavigate(
                             ProximityFragmentDirections.actionProximityFragmentToKeyFigureDetailsFragment(
                                 figure.labelKey
@@ -1015,7 +1015,7 @@ class ProximityFragment : TimeMainFragment() {
         items += cardWithActionItem {
             mainImage = R.drawable.attestation_card
             onCardClick = {
-                analyticsManager.reportAppEvent(requireContext(), AppEventName.e11, null)
+                analyticsManager.reportAppEvent(AppEventName.e11, null)
                 findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToAttestationsFragment())
             }
             mainTitle = strings["home.attestationSection.cell.title"]
@@ -1069,7 +1069,7 @@ class ProximityFragment : TimeMainFragment() {
             mainHeader = strings["home.vaccinationSection.cellSubtitle"]
             contentDescription = strings["home.vaccinationSection.cellTitle"]
             onCardClick = {
-                analyticsManager.reportAppEvent(requireContext(), AppEventName.e7, null)
+                analyticsManager.reportAppEvent(AppEventName.e7, null)
                 findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToVaccinationFragment())
             }
             identifier = "home.vaccinationSection.cellTitle".hashCode().toLong()

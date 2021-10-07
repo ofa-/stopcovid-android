@@ -24,7 +24,6 @@ import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
 import com.lunabeestudio.stopcovid.extension.robertManager
-import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
 import com.lunabeestudio.stopcovid.extension.showAlertSickVenue
 import com.lunabeestudio.stopcovid.extension.showExpiredCodeAlert
 import com.lunabeestudio.stopcovid.extension.showInvalidCodeAlert
@@ -47,7 +46,6 @@ class ConfirmVenueQrCodeFragment : MainFragment() {
 
     private val viewModel: ConfirmVenueQrCodeViewModel by viewModels {
         ConfirmVenueQrCodeViewModelFactory(
-            requireContext().secureKeystoreDataSource(),
             robertManager,
             analyticsManager,
             venueRepository,

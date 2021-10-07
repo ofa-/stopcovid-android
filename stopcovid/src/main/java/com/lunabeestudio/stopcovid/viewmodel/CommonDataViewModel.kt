@@ -44,7 +44,6 @@ abstract class CommonDataViewModel(
         viewModelScope.launch {
             venueRepository.clearAllData(
                 PreferenceManager.getDefaultSharedPreferences(application.getAppContext()),
-                secureKeystoreDataSource
             )
         }
     }
@@ -69,7 +68,7 @@ abstract class CommonDataViewModel(
     @CallSuper
     open fun eraseCertificates() {
         viewModelScope.launch {
-            walletRepository.deleteAllCertificates(secureKeystoreDataSource)
+            walletRepository.deleteAllCertificates()
         }
     }
 

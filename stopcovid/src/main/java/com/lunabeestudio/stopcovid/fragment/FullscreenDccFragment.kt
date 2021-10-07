@@ -29,7 +29,6 @@ import com.lunabeestudio.stopcovid.extension.fullName
 import com.lunabeestudio.stopcovid.extension.injectionContainer
 import com.lunabeestudio.stopcovid.extension.isFrench
 import com.lunabeestudio.stopcovid.extension.robertManager
-import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
 import com.lunabeestudio.stopcovid.model.EuropeanCertificate
 import com.lunabeestudio.stopcovid.viewmodel.WalletViewModel
 import com.lunabeestudio.stopcovid.viewmodel.WalletViewModelFactory
@@ -44,10 +43,6 @@ class FullscreenDccFragment : ForceLightFragment(R.layout.fragment_fullscreen_dc
         requireContext().robertManager()
     }
 
-    private val keystoreDataSource by lazy {
-        requireContext().secureKeystoreDataSource()
-    }
-
     private val viewModel: WalletViewModel by viewModels(
         {
             findParentFragmentByType<WalletContainerFragment>() ?: requireParentFragment()
@@ -55,7 +50,6 @@ class FullscreenDccFragment : ForceLightFragment(R.layout.fragment_fullscreen_dc
         {
             WalletViewModelFactory(
                 robertManager,
-                keystoreDataSource,
                 blacklistDCCManager,
                 blacklist2DDOCManager,
                 injectionContainer.walletRepository

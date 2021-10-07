@@ -18,7 +18,6 @@ import com.lunabeestudio.domain.extension.ntpTimeSToUnixTimeMs
 import com.lunabeestudio.domain.extension.unixTimeMsToNtpTimeS
 import com.lunabeestudio.domain.model.VenueQrCode
 import com.lunabeestudio.framework.extension.fromBase64URL
-import com.lunabeestudio.framework.local.datasource.SecureKeystoreDataSource
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.robert.datasource.LocalKeystoreDataSource
 import com.lunabeestudio.stopcovid.extension.isValidUUID
@@ -48,7 +47,6 @@ class VenueRepository(
 
     suspend fun processVenueUrl(
         robertManager: RobertManager,
-        secureKeystoreDataSource: SecureKeystoreDataSource,
         stringUrl: String,
     ) {
         try {
@@ -62,7 +60,7 @@ class VenueRepository(
             val version: Int = sanitizer.getValue("v")?.toInt() ?: throw VenueInvalidFormatException()
             val time: Long? = sanitizer.getValue("t")?.toLong() // Time is optional, if null, will be set to System.currentTime
 
-            processVenue(robertManager, secureKeystoreDataSource, base64URLCode, version, time)
+            processVenue(robertManager, base64URLCode, version, time)
         } catch (e: Exception) {
             Timber.e(e)
             throw e
@@ -72,7 +70,6 @@ class VenueRepository(
     @OptIn(ExperimentalTime::class)
     suspend fun processVenue(
         robertManager: RobertManager,
-        secureKeystoreDataSource: SecureKeystoreDataSource,
         base64URLCode: String,
         version: Int,
         unixTimeInSeconds: Long?
@@ -101,7 +98,7 @@ class VenueRepository(
                 base64URL = base64URLCode,
                 version = version
             )
-            saveVenue(secureKeystoreDataSource, venueQrCode)
+            saveVenue(venueQrCode)
         } catch (e: Exception) {
             Timber.e(e, "Fail to process venue with code: $base64URLCode")
             throw e
@@ -126,18 +123,17 @@ class VenueRepository(
         unixTimeInMS: Long
     ): Boolean = unixTimeInMS + gracePeriod(robertManager) <= System.currentTimeMillis()
 
-    internal suspend fun saveVenue(keystoreDataSource: SecureKeystoreDataSource, venueQrCode: VenueQrCode) {
-        keystoreDataSource.insertAllVenuesQrCode(venueQrCode)
-        venueListHasChanged(keystoreDataSource)
+    internal suspend fun saveVenue(venueQrCode: VenueQrCode) {
+        localKeystoreDataSource.insertAllVenuesQrCode(venueQrCode)
+        venueListHasChanged()
     }
 
     suspend fun getVenuesQrCode(
-        keystoreDataSource: SecureKeystoreDataSource,
         startNtpTimestamp: Long? = null,
         endNtpTimestamp: Long? = null,
     ): List<VenueQrCode> = (startNtpTimestamp ?: Long.MIN_VALUE).let { forcedStartNtpTimestamp ->
         (endNtpTimestamp ?: Long.MAX_VALUE).let { forcedEndNtpTimestamp ->
-            keystoreDataSource.venuesQrCode().filter {
+            localKeystoreDataSource.venuesQrCode().filter {
                 it.ntpTimestamp in forcedStartNtpTimestamp..forcedEndNtpTimestamp
             }
         }
@@ -146,9 +142,8 @@ class VenueRepository(
     @OptIn(ExperimentalTime::class)
     suspend fun clearExpired(
         robertManager: RobertManager,
-        keystoreDataSource: SecureKeystoreDataSource,
     ) {
-        val expiredVenuesQrCode = keystoreDataSource.venuesQrCode().filter {
+        val expiredVenuesQrCode = localKeystoreDataSource.venuesQrCode().filter {
             @Suppress("SENSELESS_COMPARISON")
             isExpired(
                 robertManager,
@@ -157,9 +152,9 @@ class VenueRepository(
         }
         if (expiredVenuesQrCode.isNotEmpty()) {
             expiredVenuesQrCode.forEach {
-                keystoreDataSource.deleteVenueQrCode(it.id)
+                localKeystoreDataSource.deleteVenueQrCode(it.id)
             }
-            venueListHasChanged(keystoreDataSource)
+            venueListHasChanged()
         }
     }
 
@@ -167,26 +162,29 @@ class VenueRepository(
     private fun gracePeriod(robertManager: RobertManager) =
         Duration.days(robertManager.configuration.venuesRetentionPeriod).inWholeMilliseconds
 
-    suspend fun removeVenue(keystoreDataSource: SecureKeystoreDataSource, venueId: String) {
-        keystoreDataSource.deleteVenueQrCode(venueId)
-        venueListHasChanged(keystoreDataSource)
+    suspend fun deleteVenue(venueId: String) {
+        localKeystoreDataSource.deleteVenueQrCode(venueId)
+        venueListHasChanged()
     }
 
-    suspend fun clearAllData(preferences: SharedPreferences, keystoreDataSource: SecureKeystoreDataSource) {
-        keystoreDataSource.deleteAllVenuesQrCode()
+    fun deleteDeprecatedVenues() {
+        localKeystoreDataSource.deleteDeprecatedVenuesQrCode()
+    }
+
+    suspend fun clearAllData(preferences: SharedPreferences) {
+        localKeystoreDataSource.deleteAllVenuesQrCode()
         preferences.isVenueOnBoardingDone = false
         preferences.venuesFeaturedWasActivatedAtLeastOneTime = false
     }
 
-    private fun venueListHasChanged(keystoreDataSource: SecureKeystoreDataSource) {
+    private fun venueListHasChanged() {
         // We reset Clea scoring iteration because we changed the venues
-        keystoreDataSource.cleaLastStatusIteration = null
+        localKeystoreDataSource.cleaLastStatusIteration = null
     }
 
     fun generateNewQRCodeIfNeeded(
         sharedPreferences: SharedPreferences,
         robertManager: RobertManager,
-        keystoreDataSource: SecureKeystoreDataSource,
     ) {
         val nowCalendar = Calendar.getInstance()
         val lastGenerationCalendar = Calendar.getInstance().apply {
@@ -197,7 +195,7 @@ class VenueRepository(
             val venueUrl = "${Constants.Url.VENUE_ROOT_URL}?code=${UUID.randomUUID()}&v=0"
             sharedPreferences.privateEventQrCode = venueUrl
             runBlocking {
-            processVenueUrl(robertManager, keystoreDataSource, venueUrl)
+            processVenueUrl(robertManager, venueUrl)
             }
             sharedPreferences.privateEventQrCodeGenerationDate = System.currentTimeMillis()
         }

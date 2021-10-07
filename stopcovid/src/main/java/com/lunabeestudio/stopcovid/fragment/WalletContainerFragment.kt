@@ -62,10 +62,6 @@ class WalletContainerFragment : BaseFragment() {
         requireContext().robertManager()
     }
 
-    private val keystoreDataSource by lazy {
-        requireContext().secureKeystoreDataSource()
-    }
-
     private val dccCertificatesManager by lazy {
         requireContext().dccCertificatesManager()
     }
@@ -78,7 +74,6 @@ class WalletContainerFragment : BaseFragment() {
         val app = requireActivity().application as StopCovid
         WalletViewModelFactory(
             robertManager,
-            keystoreDataSource,
             app.injectionContainer.blacklistDCCManager,
             app.injectionContainer.blacklist2DDOCManager,
             app.injectionContainer.walletRepository,
@@ -374,8 +369,9 @@ class WalletContainerFragment : BaseFragment() {
     private fun showMigrationFailedIfNeeded() {
         if (viewModel.migrationInProgress.value == false && injectionContainer.debugManager.oldCertificateInSharedPrefs()) {
             context?.let {
-                analyticsManager.reportErrorEvent(it.filesDir, ErrorEventName.ERR_WALLET_MIG)
-                MaterialAlertDialogBuilder(it).showMigrationFailed(strings)
+                MaterialAlertDialogBuilder(it).showMigrationFailed(strings) {
+                    viewModel.deleteDeprecatedCertificates()
+                }
             }
         }
     }
@@ -386,7 +382,7 @@ class WalletContainerFragment : BaseFragment() {
                 context?.secureKeystoreDataSource()?.rawWalletCertificates()
             } catch (e: Exception) {
                 context?.let {
-                    analyticsManager.reportErrorEvent(it.filesDir, ErrorEventName.ERR_WALLET_DB)
+                    analyticsManager.reportErrorEvent(ErrorEventName.ERR_WALLET_DB)
                     MaterialAlertDialogBuilder(it).showDbFailure(strings)
                 }
             }

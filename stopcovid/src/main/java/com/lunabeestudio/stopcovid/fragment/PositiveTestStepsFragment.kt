@@ -26,7 +26,6 @@ import com.lunabeestudio.stopcovid.extension.dccCertificatesManager
 import com.lunabeestudio.stopcovid.extension.raw
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
-import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
 import com.lunabeestudio.stopcovid.extension.showUnknownErrorAlert
 import com.lunabeestudio.stopcovid.extension.walletCertificateError
 import com.lunabeestudio.stopcovid.fastitem.selectionItem
@@ -40,12 +39,8 @@ class PositiveTestStepsFragment : BottomSheetMainFragment() {
 
     val args: PositiveTestStepsFragmentArgs by navArgs()
 
-    private val keystoreDataSource by lazy {
-        requireContext().secureKeystoreDataSource()
-    }
-
     val viewModel: PositiveTestStepsViewModel by viewModels {
-        PositiveTestStepsViewModelFactory(this, keystoreDataSource, walletRepository)
+        PositiveTestStepsViewModelFactory(this, walletRepository)
     }
 
     private val robertManager by lazy {

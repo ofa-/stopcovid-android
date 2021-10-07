@@ -38,7 +38,6 @@ import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.databinding.FragmentRecyclerViewKonfettiBinding
 import com.lunabeestudio.stopcovid.extension.emitDefaultKonfetti
 import com.lunabeestudio.stopcovid.extension.robertManager
-import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
 import com.lunabeestudio.stopcovid.extension.vaccineDate
 import com.lunabeestudio.stopcovid.extension.vaccineDose
 import com.lunabeestudio.stopcovid.extension.vaccineMedicinalProduct
@@ -72,14 +71,9 @@ class VaccineCompletionFragment : MainFragment() {
         requireContext().robertManager().configuration
     }
 
-    private val keystoreDataSource by lazy {
-        requireContext().secureKeystoreDataSource()
-    }
-
     private val viewModel: VaccineCompletionViewModel by viewModels {
         VaccineCompletionViewModelFactory(
             args.certificateId,
-            keystoreDataSource,
             walletRepository,
         )
     }

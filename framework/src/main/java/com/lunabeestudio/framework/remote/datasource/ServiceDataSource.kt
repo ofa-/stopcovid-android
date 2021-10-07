@@ -58,7 +58,6 @@ class ServiceDataSource(
 
     override suspend fun generateCaptcha(apiVersion: String, type: CaptchaType, language: String): RobertResultData<String> {
         val result = RequestHelper.tryCatchRequestData(
-            filesDir,
             apiVersion,
             AnalyticsServiceName.CAPTCHA_TYPE.format(type),
             analyticsManager,
@@ -73,7 +72,7 @@ class ServiceDataSource(
 
     override suspend fun getCaptcha(apiVersion: String, captchaId: String, type: CaptchaType, path: String): RobertResult {
 
-        val result = RequestHelper.tryCatchRequestData(filesDir, apiVersion, AnalyticsServiceName.CAPTCHA, analyticsManager) {
+        val result = RequestHelper.tryCatchRequestData(apiVersion, AnalyticsServiceName.CAPTCHA, analyticsManager) {
             api.getCaptcha(type.header, apiVersion, captchaId, type.path)
         }
         return when (result) {
@@ -100,7 +99,7 @@ class ServiceDataSource(
         clientPublicECDHKey: String,
     ): RobertResultData<RegisterReport> {
 
-        val result = RequestHelper.tryCatchRequestData(filesDir, apiVersion, AnalyticsServiceName.REGISTER, analyticsManager) {
+        val result = RequestHelper.tryCatchRequestData(apiVersion, AnalyticsServiceName.REGISTER, analyticsManager) {
             api.registerV2(
                 apiVersion,
                 ApiRegisterV2RQ(captcha = captcha, captchaId = captchaId, clientPublicECDHKey = clientPublicECDHKey)
@@ -113,13 +112,13 @@ class ServiceDataSource(
     }
 
     override suspend fun unregister(apiVersion: String, ssu: ServerStatusUpdate): RobertResult {
-        return RequestHelper.tryCatchRequest(filesDir, apiVersion, AnalyticsServiceName.UNREGISTER, analyticsManager) {
+        return RequestHelper.tryCatchRequest(apiVersion, AnalyticsServiceName.UNREGISTER, analyticsManager) {
             api.unregister(apiVersion, ApiUnregisterRQ(ebid = ssu.ebid, epochId = ssu.epochId, time = ssu.time, mac = ssu.mac))
         }
     }
 
     override suspend fun status(apiVersion: String, ssu: ServerStatusUpdate): RobertResultData<StatusReport> {
-        val result = RequestHelper.tryCatchRequestData(filesDir, apiVersion, AnalyticsServiceName.STATUS, analyticsManager) {
+        val result = RequestHelper.tryCatchRequestData(apiVersion, AnalyticsServiceName.STATUS, analyticsManager) {
             api.status(
                 apiVersion,
                 ApiStatusRQ(
@@ -149,7 +148,7 @@ class ServiceDataSource(
         onProgressUpdate: ((Float) -> Unit)?,
     ): RobertResultData<ReportResponse> {
 
-        val result = RequestHelper.tryCatchRequestData(filesDir, apiVersion, AnalyticsServiceName.REPORT, analyticsManager) {
+        val result = RequestHelper.tryCatchRequestData(apiVersion, AnalyticsServiceName.REPORT, analyticsManager) {
             reportProgressUpdate = onProgressUpdate
             reportApi.report(apiVersion, ApiReportRQ.fromLocalProximityList(token, localProximityList))
         }
@@ -161,7 +160,7 @@ class ServiceDataSource(
     }
 
     override suspend fun deleteExposureHistory(apiVersion: String, ssu: ServerStatusUpdate): RobertResult {
-        return RequestHelper.tryCatchRequest(filesDir, apiVersion, AnalyticsServiceName.DELETE_EXPOSURE_HISTORY, analyticsManager) {
+        return RequestHelper.tryCatchRequest(apiVersion, AnalyticsServiceName.DELETE_EXPOSURE_HISTORY, analyticsManager) {
             api.deleteExposureHistory(
                 apiVersion,
                 ApiDeleteExposureHistoryRQ(ebid = ssu.ebid, epochId = ssu.epochId, time = ssu.time, mac = ssu.mac)

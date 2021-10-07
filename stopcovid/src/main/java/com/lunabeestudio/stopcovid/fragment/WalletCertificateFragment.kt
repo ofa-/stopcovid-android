@@ -52,7 +52,6 @@ import com.lunabeestudio.stopcovid.extension.openInExternalBrowser
 import com.lunabeestudio.stopcovid.extension.raw
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
-import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
 import com.lunabeestudio.stopcovid.extension.shortDescription
 import com.lunabeestudio.stopcovid.extension.showUnknownErrorAlert
 import com.lunabeestudio.stopcovid.extension.statusStringKey
@@ -96,10 +95,6 @@ class WalletCertificateFragment : MainFragment() {
         requireContext().robertManager()
     }
 
-    private val keystoreDataSource by lazy {
-        requireContext().secureKeystoreDataSource()
-    }
-
     private val dccCertificatesManager by lazy {
         requireContext().dccCertificatesManager()
     }
@@ -109,7 +104,7 @@ class WalletCertificateFragment : MainFragment() {
             findParentFragmentByType<WalletContainerFragment>() ?: requireParentFragment()
         },
         {
-            WalletViewModelFactory(robertManager, keystoreDataSource, blacklistDCCManager, blacklist2DDOCManager, walletRepository)
+            WalletViewModelFactory(robertManager, blacklistDCCManager, blacklist2DDOCManager, walletRepository)
         }
     )
 

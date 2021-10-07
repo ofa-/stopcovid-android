@@ -11,13 +11,11 @@ import com.lunabeestudio.robert.model.RobertResultData
 import retrofit2.HttpException
 import retrofit2.Response
 import timber.log.Timber
-import java.io.File
 
 internal object RequestHelper {
 
     @Suppress("BlockingMethodInNonBlockingContext")
     suspend fun tryCatchRequest(
-        filesDir: File,
         apiVersion: String,
         analyticsServiceName: String?,
         analyticsManager: AnalyticsManager,
@@ -30,11 +28,11 @@ internal object RequestHelper {
                 if (result.body()?.success == true) {
                     RobertResult.Success()
                 } else {
-                    analyticsServiceName?.let { analyticsManager.reportWSError(filesDir, it, apiVersion, httpCode) }
+                    analyticsServiceName?.let { analyticsManager.reportWSError(it, apiVersion, httpCode) }
                     RobertResult.Failure(BackendException(result.body()?.message!!, httpCode))
                 }
             } else {
-                analyticsServiceName?.let { analyticsManager.reportWSError(filesDir, it, apiVersion, httpCode) }
+                analyticsServiceName?.let { analyticsManager.reportWSError(it, apiVersion, httpCode) }
                 RobertResult.Failure(HttpException(result).remoteToRobertException())
             }
         } catch (e: Exception) {
@@ -43,7 +41,6 @@ internal object RequestHelper {
             if (robertException !is NoInternetException) {
                 analyticsServiceName?.let {
                     analyticsManager.reportWSError(
-                        filesDir,
                         it,
                         apiVersion,
                         (e as? HttpException)?.code() ?: 0,
@@ -57,7 +54,6 @@ internal object RequestHelper {
 
     @Suppress("BlockingMethodInNonBlockingContext")
     suspend fun <T> tryCatchRequestData(
-        filesDir: File,
         apiVersion: String,
         analyticsServiceName: String?,
         analyticsManager: AnalyticsManager,
@@ -68,7 +64,7 @@ internal object RequestHelper {
             if (result.isSuccessful) {
                 RobertResultData.Success(result.body()!!)
             } else {
-                analyticsServiceName?.let { analyticsManager.reportWSError(filesDir, it, apiVersion, result.code()) }
+                analyticsServiceName?.let { analyticsManager.reportWSError(it, apiVersion, result.code()) }
                 RobertResultData.Failure(HttpException(result).remoteToRobertException())
             }
         } catch (e: Exception) {
@@ -77,7 +73,6 @@ internal object RequestHelper {
             if (robertException !is NoInternetException) {
                 analyticsServiceName?.let {
                     analyticsManager.reportWSError(
-                        filesDir,
                         it,
                         apiVersion,
                         (e as? HttpException)?.code() ?: 0,

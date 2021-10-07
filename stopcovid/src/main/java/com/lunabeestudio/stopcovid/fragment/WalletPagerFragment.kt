@@ -31,7 +31,6 @@ import com.lunabeestudio.stopcovid.coreui.extension.refreshLift
 import com.lunabeestudio.stopcovid.coreui.fragment.BaseFragment
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
-import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
 import com.lunabeestudio.stopcovid.model.UnknownException
 import com.lunabeestudio.stopcovid.viewmodel.WalletViewModel
 import com.lunabeestudio.stopcovid.viewmodel.WalletViewModelFactory
@@ -46,10 +45,6 @@ class WalletPagerFragment : BaseFragment() {
         requireContext().robertManager()
     }
 
-    private val keystoreDataSource by lazy {
-        requireContext().secureKeystoreDataSource()
-    }
-
     private val viewModel: WalletViewModel by viewModels(
         {
             findParentFragmentByType<WalletContainerFragment>() ?: requireParentFragment()
@@ -58,7 +53,6 @@ class WalletPagerFragment : BaseFragment() {
             val app = requireActivity().application as StopCovid
             WalletViewModelFactory(
                 robertManager,
-                keystoreDataSource,
                 app.injectionContainer.blacklistDCCManager,
                 app.injectionContainer.blacklist2DDOCManager,
                 app.injectionContainer.walletRepository

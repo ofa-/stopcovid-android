@@ -18,6 +18,16 @@
                 "description" : "risk0.section1.body"
             },
             {
+                "section": "isolation.recommendation.initialCaseSafe.title",
+                "description" : "isolation.recommendation.initialCaseSafe.body",
+                "link" :
+                    {
+                        "label": "isolation.recommendation.initialCaseAtRiskOrSick.title",
+                        "action": "mcc.isolation.url",
+                        "type": "web"
+                    }
+            },
+            {
                 "section": "risk.section.measures.title",
                 "description" : "risk.section.measures.body",
                 "link":
@@ -72,6 +82,16 @@
 
             },
             {
+                "section": "isolation.recommendation.initialCaseSafe.title",
+                "description" : "isolation.recommendation.initialCaseSafe.body",
+                "link" :
+                    {
+                        "label": "isolation.recommendation.initialCaseAtRiskOrSick.title",
+                        "action": "mcc.isolation.url",
+                        "type": "web"
+                    }
+            },
+            {
                 "section": "risk.section.test.title",
                 "description" : "risk.section.test.body",
                 "link" :
@@ -121,6 +141,16 @@
                 "section": "risk3.section1.title",
                 "description" : "risk3.section1.body"
 
+            },
+            {
+                "section": "isolation.recommendation.initialCaseSafe.title",
+                "description" : "isolation.recommendation.initialCaseSafe.body",
+                "link" :
+                    {
+                        "label": "isolation.recommendation.initialCaseAtRiskOrSick.title",
+                        "action": "mcc.isolation.url",
+                        "type": "web"
+                    }
             },
             {
                 "section": "risk.section.isolate.title",
@@ -178,6 +208,16 @@
             {
                 "section": "risk4.section1.title",
                 "description" : "risk4.section1.body"
+            },
+            {
+                "section": "isolation.recommendation.initialCaseSafe.title",
+                "description" : "isolation.recommendation.initialCaseSafe.body",
+                "link" :
+                    {
+                        "label": "isolation.recommendation.initialCaseAtRiskOrSick.title",
+                        "action": "mcc.isolation.url",
+                        "type": "web"
+                    }
             },
             {
                 "section": "risk.section.isolate.title",

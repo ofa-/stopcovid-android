@@ -48,7 +48,7 @@ class VenuesPrivateEventFragment : MainFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        venueRepository.generateNewQRCodeIfNeeded(sharedPrefs, requireContext().robertManager(), requireContext().secureKeystoreDataSource())
+        venueRepository.generateNewQRCodeIfNeeded(sharedPrefs, requireContext().robertManager())
         bitmap = barcodeEncoder.encodeBitmap(
             sharedPrefs.privateEventQrCode,
             BarcodeFormat.QR_CODE,

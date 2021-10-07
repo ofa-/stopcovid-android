@@ -302,7 +302,7 @@ class VenuesManagerTest {
                 venueRepository.getVenuesQrCode(keystoreDataSource).size
                 } venues created, excpecting ${succesfullQrCodes.size}"
             }
-            venueRepository.removeVenue(keystoreDataSource, venueRepository.getVenuesQrCode(keystoreDataSource)[1].id)
+            venueRepository.deleteVenue(keystoreDataSource, venueRepository.getVenuesQrCode(keystoreDataSource)[1].id)
             assert(venueRepository.getVenuesQrCode(keystoreDataSource).size == succesfullQrCodes.size - 1) {
                 "Should have ${succesfullQrCodes.size - 1} element"
             }
@@ -312,15 +312,15 @@ class VenuesManagerTest {
             assert(venueRepository.getVenuesQrCode(keystoreDataSource)[1].ltid == ltid[2]) {
                 "Third element shouldn't be removed"
             }
-            venueRepository.removeVenue(keystoreDataSource, venueRepository.getVenuesQrCode(keystoreDataSource)[0].id)
+            venueRepository.deleteVenue(keystoreDataSource, venueRepository.getVenuesQrCode(keystoreDataSource)[0].id)
             assert(venueRepository.getVenuesQrCode(keystoreDataSource).size == succesfullQrCodes.size - 2) {
                 "Should have ${succesfullQrCodes.size - 2} element"
             }
             assert(venueRepository.getVenuesQrCode(keystoreDataSource)[0].ltid == ltid[2]) {
                 "Second element shouldn't be removed"
             }
-            venueRepository.removeVenue(keystoreDataSource, venueRepository.getVenuesQrCode(keystoreDataSource)[0].id)
-            venueRepository.removeVenue(keystoreDataSource, venueRepository.getVenuesQrCode(keystoreDataSource)[0].id)
+            venueRepository.deleteVenue(keystoreDataSource, venueRepository.getVenuesQrCode(keystoreDataSource)[0].id)
+            venueRepository.deleteVenue(keystoreDataSource, venueRepository.getVenuesQrCode(keystoreDataSource)[0].id)
             assert(venueRepository.getVenuesQrCode(keystoreDataSource).isEmpty()) {
                 "Should be empty"
             }

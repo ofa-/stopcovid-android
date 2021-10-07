@@ -46,7 +46,6 @@ class InGroupeDatasource(
 
     private val api: InGroupeApi = RetrofitClient.getService(baseUrl, InGroupeApi::class.java, okHttpClient)
     private val gson = Gson()
-    private val filesDir = context.filesDir
 
     override suspend fun convertCertificateV1(
         encodedCertificate: String,
@@ -75,7 +74,6 @@ class InGroupeDatasource(
                         RobertResultData.Failure(BackendException("Unable to parse body result: $bodyRs", httpCode))
                     } finally {
                         analyticsManager.reportWSError(
-                            filesDir,
                             AnalyticsServiceName.CERTIFICATE_CONVERSION,
                             "0",
                             httpCode,
@@ -87,7 +85,6 @@ class InGroupeDatasource(
                 val robertException = e.remoteToRobertException()
                 if (robertException !is NoInternetException) {
                     analyticsManager.reportWSError(
-                        filesDir,
                         AnalyticsServiceName.CERTIFICATE_CONVERSION,
                         "0",
                         0,
@@ -159,7 +156,6 @@ class InGroupeDatasource(
                         RobertResultData.Failure(BackendException("Unable to parse body error: $bodyError", httpCode))
                     } finally {
                         analyticsManager.reportWSError(
-                            filesDir,
                             AnalyticsServiceName.CERTIFICATE_CONVERSION,
                             "0",
                             httpCode,
@@ -171,7 +167,6 @@ class InGroupeDatasource(
                 val robertException = e.remoteToRobertException()
                 if (robertException !is NoInternetException) {
                     analyticsManager.reportWSError(
-                        filesDir,
                         AnalyticsServiceName.CERTIFICATE_CONVERSION,
                         "0",
                         0,

@@ -16,14 +16,12 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.savedstate.SavedStateRegistryOwner
-import com.lunabeestudio.robert.datasource.LocalKeystoreDataSource
 import com.lunabeestudio.stopcovid.model.WalletCertificate
 import com.lunabeestudio.stopcovid.repository.WalletRepository
 import kotlinx.coroutines.launch
 
 class PositiveTestStepsViewModel(
     private val handle: SavedStateHandle,
-    private val keystoreDataSource: LocalKeystoreDataSource,
     private val walletRepository: WalletRepository,
 ) : ViewModel() {
 
@@ -32,7 +30,6 @@ class PositiveTestStepsViewModel(
     fun saveCertificate(walletCertificate: WalletCertificate) {
         viewModelScope.launch {
             walletRepository.saveCertificate(
-                keystoreDataSource,
                 walletCertificate,
             )
             handle.set(CURRENT_STEP_KEY, (currentStep.value ?: 0) + 1)
@@ -50,11 +47,10 @@ class PositiveTestStepsViewModel(
 
 class PositiveTestStepsViewModelFactory(
     owner: SavedStateRegistryOwner,
-    private val keystoreDataSource: LocalKeystoreDataSource,
     private val walletRepository: WalletRepository,
 ) : AbstractSavedStateViewModelFactory(owner, null) {
     override fun <T : ViewModel?> create(key: String, modelClass: Class<T>, handle: SavedStateHandle): T {
         @Suppress("UNCHECKED_CAST")
-        return PositiveTestStepsViewModel(handle, keystoreDataSource, walletRepository) as T
+        return PositiveTestStepsViewModel(handle, walletRepository) as T
     }
 }

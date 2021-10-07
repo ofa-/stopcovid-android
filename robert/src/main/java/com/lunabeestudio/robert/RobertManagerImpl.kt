@@ -473,7 +473,6 @@ class RobertManagerImpl(
                         }
 
                         analyticsManager.reportAppEvent(
-                            robertApplication.getAppContext(),
                             AppEventName.e15,
                             "$appStatus ${System.currentTimeMillis() - cleaStatusStart}"
                         )
@@ -568,16 +567,15 @@ class RobertManagerImpl(
                     keystoreRepository.declarationToken = result.data.declarationToken
                     ephemeralBluetoothIdentifierRepository.save(Base64.decode(result.data.tuples, Base64.NO_WRAP))
                     keystoreRepository.shouldReloadBleSettings = true
-                    analyticsManager.statusDidSucceed(robertApplication.getAppContext())
+                    analyticsManager.statusDidSucceed()
                     if (result.data.analyticsToken != null) {
                         analyticsManager.sendAnalytics(
-                            robertApplication.getAppContext(),
                             this,
                             robertApplication,
                             result.data.analyticsToken!!
                         )
                     } else {
-                        analyticsManager.reset(robertApplication.getAppContext())
+                        analyticsManager.reset()
                     }
                     RobertResultData.Success(
                         AtRiskStatus(
@@ -743,7 +741,7 @@ class RobertManagerImpl(
         }
         return when (result) {
             is RobertResultData.Success -> {
-                analyticsManager.reportHealthEvent(application.getAppContext(), HealthEventName.eh1, null)
+                analyticsManager.reportHealthEvent(HealthEventName.eh1, null)
                 val reportCalendar = Calendar.getInstance()
                 reportCalendar.add(Calendar.DAY_OF_YEAR, -originDayInPast.toInt())
                 keystoreRepository.reportDate = reportCalendar.timeInMillis
@@ -897,7 +895,7 @@ class RobertManagerImpl(
         clearRobert(application)
         keystoreRepository.configuration = configuration.apply { version = 0 }
         keystoreRepository.calibration = calibration.apply { version = 0 }
-        analyticsManager.unregister(application.getAppContext())
+        analyticsManager.unregister()
         try {
             keystoreRepository.atRiskModelVersion = AT_RISK_MODEL_VERSION
         } catch (e: Exception) {

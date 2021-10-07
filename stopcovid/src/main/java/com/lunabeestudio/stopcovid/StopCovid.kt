@@ -205,7 +205,7 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Localized
     fun onAppResume() {
         isAppInForeground = true
         refreshData()
-        injectionContainer.analyticsManager.reportAppEvent(this, AppEventName.e3)
+        injectionContainer.analyticsManager.reportAppEvent(AppEventName.e3)
         refreshProximityService()
         try {
             refreshStatusIfNeeded()
@@ -214,7 +214,7 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Localized
         }
         deleteOldAttestations()
         appCoroutineScope.launch {
-            injectionContainer.venueRepository.clearExpired(robertManager, injectionContainer.secureKeystoreDataSource)
+            injectionContainer.venueRepository.clearExpired(robertManager)
         }
         appCoroutineScope.launch {
             robertManager.cleaReportIfNeeded(this@StopCovid, false)
@@ -365,7 +365,6 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Localized
     override fun notifyAtRiskLevelChange() {
         injectionContainer.risksLevelManager.getCurrentLevel(robertManager.atRiskStatus?.riskLevel)?.let { riskLevel ->
             injectionContainer.analyticsManager.reportHealthEvent(
-                this,
                 HealthEventName.eh2,
                 riskLevel.riskLevel.roundToInt().toString()
             )
@@ -473,14 +472,13 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Localized
         startTime: Long?,
         endTime: Long?
     ): List<VenueQrCode> = injectionContainer.venueRepository.getVenuesQrCode(
-        injectionContainer.secureKeystoreDataSource,
         startTime,
         endTime,
     )
 
     override fun clearVenueQrCodeList() {
         appCoroutineScope.launch {
-            injectionContainer.venueRepository.clearAllData(sharedPrefs, injectionContainer.secureKeystoreDataSource)
+            injectionContainer.venueRepository.clearAllData(sharedPrefs)
         }
     }
 

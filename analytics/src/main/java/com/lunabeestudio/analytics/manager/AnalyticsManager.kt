@@ -52,7 +52,7 @@ import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 import java.time.Instant
 import java.time.LocalDateTime
-import java.time.ZoneOffset
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 import java.util.UUID
@@ -62,6 +62,7 @@ class AnalyticsManager(okHttpClient: OkHttpClient, context: Context) : Lifecycle
 
     private val dateFormat: DateTimeFormatter = DateTimeFormatter.ISO_INSTANT
     private val analyticsServerManager = AnalyticsServerManager(okHttpClient)
+    private val filesDir: File = context.filesDir
 
     private val sharedPreferences = context.getSharedPreferences(SHARED_PREFS_NAME, Context.MODE_PRIVATE)
 
@@ -79,8 +80,8 @@ class AnalyticsManager(okHttpClient: OkHttpClient, context: Context) : Lifecycle
         sharedPreferences.isOptIn = isOptIn
     }
 
-    fun requestDeleteAnalytics(context: Context) {
-        reportAppEvent(context, AppEventName.e17)
+    fun requestDeleteAnalytics() {
+        reportAppEvent(AppEventName.e17)
         sharedPreferences.deleteAnalyticsAfterNextStatus = true
     }
 
@@ -88,14 +89,14 @@ class AnalyticsManager(okHttpClient: OkHttpClient, context: Context) : Lifecycle
         sharedPreferences.installationUUID = UUID.randomUUID().toString()
     }
 
-    fun unregister(context: Context) {
+    fun unregister() {
         sharedPreferences.apply {
             installationUUID = null
             proximityStartTime = null
             proximityActiveDuration = 0L
             statusSuccessCount = 0
         }
-        reset(context)
+        reset()
     }
 
     fun proximityDidStart() {
@@ -109,8 +110,8 @@ class AnalyticsManager(okHttpClient: OkHttpClient, context: Context) : Lifecycle
         }
     }
 
-    fun statusDidSucceed(context: Context) {
-        reportAppEvent(context, AppEventName.e16)
+    fun statusDidSucceed() {
+        reportAppEvent(AppEventName.e16)
         sharedPreferences.apply {
             statusSuccessCount += 1
         }
@@ -123,7 +124,6 @@ class AnalyticsManager(okHttpClient: OkHttpClient, context: Context) : Lifecycle
     }
 
     suspend fun sendAnalytics(
-        context: Context,
         robertManager: AnalyticsRobertManager,
         analyticsInfosProvider: AnalyticsInfosProvider,
         token: String
@@ -131,26 +131,25 @@ class AnalyticsManager(okHttpClient: OkHttpClient, context: Context) : Lifecycle
         robertManager.configuration.isAnalyticsOn = sharedPreferences.sendAnalytics
         if (robertManager.configuration.isAnalyticsOn && sharedPreferences.isOptIn) {
             val receivedHelloMessagesCount = robertManager.getLocalProximityCount()
-            sendAppAnalytics(context, analyticsInfosProvider, token, receivedHelloMessagesCount)
+            sendAppAnalytics(analyticsInfosProvider, token, receivedHelloMessagesCount)
             delay(Random.nextLong(ANALYTICS_REPORT_MIN_DELAY, ANALYTICS_REPORT_MAX_DELAY))
-            sendHealthAnalytics(context, robertManager, analyticsInfosProvider, token)
+            sendHealthAnalytics(robertManager, analyticsInfosProvider, token)
         } else {
-            reset(context)
+            reset()
         }
         if (sharedPreferences.deleteAnalyticsAfterNextStatus) {
-            sendDeleteAnalytics(context, analyticsInfosProvider, token)
+            sendDeleteAnalytics(analyticsInfosProvider, token)
         }
     }
 
     private suspend fun sendAppAnalytics(
-        context: Context,
         analyticsInfosProvider: AnalyticsInfosProvider,
         token: String,
         receivedHelloMessagesCount: Int
     ) {
         val appInfos = getAppInfos(analyticsInfosProvider, receivedHelloMessagesCount)
-        val appEvents = getAppEvents(context)
-        val appErrors = getErrors(context.filesDir)
+        val appEvents = getAppEvents()
+        val appErrors = getErrors()
         val sendAnalyticsRQ = SendAppAnalyticsRQ(
             installationUuid = sharedPreferences.installationUUID ?: UUID.randomUUID().toString(),
             infos = appInfos,
@@ -166,14 +165,14 @@ class AnalyticsManager(okHttpClient: OkHttpClient, context: Context) : Lifecycle
             )
             when (result) {
                 is AnalyticsResult.Success -> {
-                    resetAppEvents(context)
-                    resetErrors(context)
+                    resetAppEvents()
+                    resetErrors()
                 }
                 is AnalyticsResult.Failure -> {
                     Timber.e(result.error)
                     if ((result.error as? HttpException)?.code() == 413) {
-                        resetAppEvents(context)
-                        resetErrors(context)
+                        resetAppEvents()
+                        resetErrors()
                     }
                 }
             }
@@ -181,12 +180,11 @@ class AnalyticsManager(okHttpClient: OkHttpClient, context: Context) : Lifecycle
     }
 
     private suspend fun sendHealthAnalytics(
-        context: Context,
         robertManager: AnalyticsRobertManager,
         analyticsInfosProvider: AnalyticsInfosProvider,
         token: String
     ) {
-        val healthEvents = getHealthEvents(context)
+        val healthEvents = getHealthEvents()
         val healthInfos = getHealthInfos(robertManager, analyticsInfosProvider)
         val sendAnalyticsRQ = SendHealthAnalyticsRQ(
             installationUuid = UUID.randomUUID().toString(),
@@ -204,13 +202,13 @@ class AnalyticsManager(okHttpClient: OkHttpClient, context: Context) : Lifecycle
             when (result) {
                 is AnalyticsResult.Success -> {
                     withContext(Dispatchers.Main) {
-                        resetHealthEvents(context)
+                        resetHealthEvents()
                     }
                 }
                 is AnalyticsResult.Failure -> {
                     Timber.e(result.error)
                     if ((result.error as? HttpException)?.code() == 413) {
-                        resetHealthEvents(context)
+                        resetHealthEvents()
                     }
                 }
             }
@@ -218,7 +216,6 @@ class AnalyticsManager(okHttpClient: OkHttpClient, context: Context) : Lifecycle
     }
 
     private suspend fun sendDeleteAnalytics(
-        context: Context,
         analyticsInfosProvider: AnalyticsInfosProvider,
         token: String
     ) {
@@ -242,7 +239,6 @@ class AnalyticsManager(okHttpClient: OkHttpClient, context: Context) : Lifecycle
                         Timber.e(error)
                         if (error is HttpException) {
                             reportWSError(
-                                context.filesDir,
                                 AnalyticsServiceName.ANALYTICS,
                                 apiVersion,
                                 error.code(),
@@ -250,7 +246,6 @@ class AnalyticsManager(okHttpClient: OkHttpClient, context: Context) : Lifecycle
                             )
                         } else if (error?.isNoInternetException() == false) {
                             reportWSError(
-                                context.filesDir,
                                 AnalyticsServiceName.ANALYTICS,
                                 apiVersion,
                                 (error as? HttpException)?.code() ?: 0,
@@ -267,21 +262,21 @@ class AnalyticsManager(okHttpClient: OkHttpClient, context: Context) : Lifecycle
         || this is IOException
         || this is UnknownHostException
 
-    fun reset(context: Context) {
-        resetAppEvents(context)
-        resetHealthEvents(context)
-        resetErrors(context)
+    fun reset() {
+        resetAppEvents()
+        resetHealthEvents()
+        resetErrors()
     }
 
     @Suppress("BlockingMethodInNonBlockingContext")
     @Synchronized
-    fun reportAppEvent(context: Context, eventName: AppEventName, desc: String? = null) {
+    fun reportAppEvent(eventName: AppEventName, desc: String? = null) {
         if (sharedPreferences.isOptIn) {
             CoroutineScope(Dispatchers.IO).launch {
-                val timestampedEventList = getAppEvents(context).toMutableList()
+                val timestampedEventList = getAppEvents().toMutableList()
                 val timestamp = dateFormat.format(currentRoundedHourInstant())
                 timestampedEventList += TimestampedEvent(eventName.name, timestamp, desc ?: "")
-                val file = File(File(context.filesDir, FOLDER_NAME), FILE_NAME_APP_EVENTS)
+                val file = File(File(filesDir, FOLDER_NAME), FILE_NAME_APP_EVENTS)
                 writeTimestampedEventProtoToFile(file, timestampedEventList.toProto())
             }
         }
@@ -289,36 +284,36 @@ class AnalyticsManager(okHttpClient: OkHttpClient, context: Context) : Lifecycle
 
     @Suppress("BlockingMethodInNonBlockingContext")
     @Synchronized
-    fun reportHealthEvent(context: Context, eventName: HealthEventName, desc: String? = null) {
+    fun reportHealthEvent(eventName: HealthEventName, desc: String? = null) {
         if (sharedPreferences.isOptIn) {
             CoroutineScope(Dispatchers.IO).launch {
-                val timestampedEventList = getHealthEvents(context).toMutableList()
+                val timestampedEventList = getHealthEvents().toMutableList()
                 timestampedEventList += TimestampedEvent(eventName.name, dateFormat.format(currentRoundedHourInstant()), desc ?: "")
-                val file = File(File(context.filesDir, FOLDER_NAME), FILE_NAME_HEALTH_EVENTS)
+                val file = File(File(filesDir, FOLDER_NAME), FILE_NAME_HEALTH_EVENTS)
                 writeTimestampedEventProtoToFile(file, timestampedEventList.toProto())
             }
         }
     }
 
-    fun reportWSError(filesDir: File, wsName: String, wsVersion: String, errorCode: Int, desc: String? = null) {
+    fun reportWSError(wsName: String, wsVersion: String, errorCode: Int, desc: String? = null) {
         if (sharedPreferences.isOptIn) {
             if (desc?.contains("No address associated with hostname") != true) {
                 val name = "ERR-${wsName.uppercase(Locale.getDefault())}-${wsVersion.uppercase(Locale.getDefault())}-$errorCode"
-                reportError(filesDir, name)
+                reportError(name)
             }
         }
     }
 
-    fun reportErrorEvent(filesDir: File, errorEventName: ErrorEventName) {
+    fun reportErrorEvent(errorEventName: ErrorEventName) {
         if (sharedPreferences.isOptIn) {
-            reportError(filesDir, errorEventName.name)
+            reportError(errorEventName.name)
         }
     }
 
     @Synchronized
-    private fun reportError(filesDir: File, errorName: String) {
+    private fun reportError(errorName: String) {
         CoroutineScope(Dispatchers.IO).launch {
-            val timestampedEventList = getErrors(filesDir).toMutableList()
+            val timestampedEventList = getErrors().toMutableList()
             timestampedEventList += TimestampedEvent(errorName, dateFormat.format(currentRoundedHourInstant()), "")
             val file = File(File(filesDir, FOLDER_NAME), FILE_NAME_APP_ERRORS)
             writeTimestampedEventProtoToFile(file, timestampedEventList.toProto())
@@ -375,17 +370,17 @@ class AnalyticsManager(okHttpClient: OkHttpClient, context: Context) : Lifecycle
 
     private fun Long.formatEpoch() = dateFormat.format(Instant.ofEpochMilli(this))
 
-    private suspend fun getAppEvents(context: Context): List<TimestampedEvent> {
-        val file = File(File(context.filesDir, FOLDER_NAME), FILE_NAME_APP_EVENTS)
+    private suspend fun getAppEvents(): List<TimestampedEvent> {
+        val file = File(File(filesDir, FOLDER_NAME), FILE_NAME_APP_EVENTS)
         return getTimestampedEventFromFile(file)
     }
 
-    private suspend fun getHealthEvents(context: Context): List<TimestampedEvent> {
-        val file = File(File(context.filesDir, FOLDER_NAME), FILE_NAME_HEALTH_EVENTS)
+    private suspend fun getHealthEvents(): List<TimestampedEvent> {
+        val file = File(File(filesDir, FOLDER_NAME), FILE_NAME_HEALTH_EVENTS)
         return getTimestampedEventFromFile(file)
     }
 
-    private suspend fun getErrors(filesDir: File): List<TimestampedEvent> {
+    private suspend fun getErrors(): List<TimestampedEvent> {
         val file = File(File(filesDir, FOLDER_NAME), FILE_NAME_APP_ERRORS)
         return getTimestampedEventFromFile(file)
     }
@@ -411,21 +406,21 @@ class AnalyticsManager(okHttpClient: OkHttpClient, context: Context) : Lifecycle
         }
     }
 
-    private fun resetAppEvents(context: Context) {
+    private fun resetAppEvents() {
         executeActionOnAtomicFile {
-            AtomicFile(File(File(context.filesDir, FOLDER_NAME), FILE_NAME_APP_EVENTS)).delete()
+            AtomicFile(File(File(filesDir, FOLDER_NAME), FILE_NAME_APP_EVENTS)).delete()
         }
     }
 
-    private fun resetHealthEvents(context: Context) {
+    private fun resetHealthEvents() {
         executeActionOnAtomicFile {
-            AtomicFile(File(File(context.filesDir, FOLDER_NAME), FILE_NAME_HEALTH_EVENTS)).delete()
+            AtomicFile(File(File(filesDir, FOLDER_NAME), FILE_NAME_HEALTH_EVENTS)).delete()
         }
     }
 
-    private fun resetErrors(context: Context) {
+    private fun resetErrors() {
         executeActionOnAtomicFile {
-            AtomicFile(File(File(context.filesDir, FOLDER_NAME), FILE_NAME_APP_ERRORS)).delete()
+            AtomicFile(File(File(filesDir, FOLDER_NAME), FILE_NAME_APP_ERRORS)).delete()
         }
     }
 
@@ -434,7 +429,7 @@ class AnalyticsManager(okHttpClient: OkHttpClient, context: Context) : Lifecycle
             .withMinute(0)
             .withSecond(0)
             .withNano(0)
-            .toInstant(ZoneOffset.UTC)
+            .toInstant(ZoneId.systemDefault().rules.getOffset(Instant.now()))
     }
 
     @Synchronized

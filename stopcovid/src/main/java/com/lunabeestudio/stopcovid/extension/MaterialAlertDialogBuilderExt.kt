@@ -246,10 +246,14 @@ fun MaterialAlertDialogBuilder.showAlertSickVenue(
 
 fun MaterialAlertDialogBuilder.showMigrationFailed(
     strings: LocalizedStrings,
+    onReset: () -> Unit,
 ) {
     setTitle(strings["common.warning"])
     setMessage(strings["android.migration.error"])
     setPositiveButton(strings["common.ok"], null)
+    setNegativeButton(strings["android.migration.error.erase"]) { _, _ ->
+        onReset()
+    }
     show()
 }
 
