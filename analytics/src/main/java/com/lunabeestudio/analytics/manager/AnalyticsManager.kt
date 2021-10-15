@@ -54,6 +54,7 @@ import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.util.Calendar
 import java.util.Locale
 import java.util.UUID
 import kotlin.random.Random
@@ -273,51 +274,61 @@ class AnalyticsManager(okHttpClient: OkHttpClient, context: Context) : Lifecycle
     fun reportAppEvent(eventName: AppEventName, desc: String? = null) {
         if (sharedPreferences.isOptIn) {
             CoroutineScope(Dispatchers.IO).launch {
-                val timestampedEventList = getAppEvents().toMutableList()
-                val timestamp = dateFormat.format(currentRoundedHourInstant())
-                timestampedEventList += TimestampedEvent(eventName.name, timestamp, desc ?: "")
-                val file = File(File(filesDir, FOLDER_NAME), FILE_NAME_APP_EVENTS)
-                writeTimestampedEventProtoToFile(file, timestampedEventList.toProto())
+                reportSynchronizedAppEvent(eventName, desc)
             }
         }
     }
 
-    @Suppress("BlockingMethodInNonBlockingContext")
     @Synchronized
+    private suspend fun reportSynchronizedAppEvent(eventName: AppEventName, desc: String?) {
+        val timestampedEventList = getAppEvents().toMutableList()
+        val timestamp = dateFormat.format(currentRoundedHourInstant())
+        timestampedEventList += TimestampedEvent(eventName.name, timestamp, desc ?: "")
+        val file = File(File(filesDir, FOLDER_NAME), FILE_NAME_APP_EVENTS)
+        writeTimestampedEventProtoToFile(file, timestampedEventList.toProto())
+    }
+
     fun reportHealthEvent(eventName: HealthEventName, desc: String? = null) {
         if (sharedPreferences.isOptIn) {
             CoroutineScope(Dispatchers.IO).launch {
-                val timestampedEventList = getHealthEvents().toMutableList()
-                timestampedEventList += TimestampedEvent(eventName.name, dateFormat.format(currentRoundedHourInstant()), desc ?: "")
-                val file = File(File(filesDir, FOLDER_NAME), FILE_NAME_HEALTH_EVENTS)
-                writeTimestampedEventProtoToFile(file, timestampedEventList.toProto())
+                reportSynchronizedHealthEvent(eventName, desc)
             }
         }
+    }
+
+    @Synchronized
+    private suspend fun reportSynchronizedHealthEvent(eventName: HealthEventName, desc: String? = null) {
+        val timestampedEventList = getHealthEvents().toMutableList()
+        timestampedEventList += TimestampedEvent(eventName.name, dateFormat.format(currentRoundedHourInstant()), desc ?: "")
+        val file = File(File(filesDir, FOLDER_NAME), FILE_NAME_HEALTH_EVENTS)
+        writeTimestampedEventProtoToFile(file, timestampedEventList.toProto())
     }
 
     fun reportWSError(wsName: String, wsVersion: String, errorCode: Int, desc: String? = null) {
         if (sharedPreferences.isOptIn) {
             if (desc?.contains("No address associated with hostname") != true) {
                 val name = "ERR-${wsName.uppercase(Locale.getDefault())}-${wsVersion.uppercase(Locale.getDefault())}-$errorCode"
-                reportError(name)
+                CoroutineScope(Dispatchers.IO).launch {
+                    reportSynchronizedErrorEvent(name)
+                }
             }
         }
     }
 
     fun reportErrorEvent(errorEventName: ErrorEventName) {
         if (sharedPreferences.isOptIn) {
-            reportError(errorEventName.name)
+            CoroutineScope(Dispatchers.IO).launch {
+                reportSynchronizedErrorEvent(errorEventName.name)
+            }
         }
     }
 
     @Synchronized
-    private fun reportError(errorName: String) {
-        CoroutineScope(Dispatchers.IO).launch {
-            val timestampedEventList = getErrors().toMutableList()
-            timestampedEventList += TimestampedEvent(errorName, dateFormat.format(currentRoundedHourInstant()), "")
-            val file = File(File(filesDir, FOLDER_NAME), FILE_NAME_APP_ERRORS)
-            writeTimestampedEventProtoToFile(file, timestampedEventList.toProto())
-        }
+    private suspend fun reportSynchronizedErrorEvent(errorName: String) {
+        val timestampedEventList = getErrors().toMutableList()
+        timestampedEventList += TimestampedEvent(errorName, dateFormat.format(currentRoundedHourInstant()), "")
+        val file = File(File(filesDir, FOLDER_NAME), FILE_NAME_APP_ERRORS)
+        writeTimestampedEventProtoToFile(file, timestampedEventList.toProto())
     }
 
     private fun writeTimestampedEventProtoToFile(file: File, timestampedEventProtoList: ProtoStorage.TimestampedEventProtoList) {
@@ -353,7 +364,7 @@ class AnalyticsManager(okHttpClient: OkHttpClient, context: Context) : Lifecycle
         )
     }
 
-    private fun getHealthInfos(
+    fun getHealthInfos(
         robertManager: AnalyticsRobertManager,
         infosProvider: AnalyticsInfosProvider
     ): HealthInfos {
@@ -362,13 +373,23 @@ class AnalyticsManager(okHttpClient: OkHttpClient, context: Context) : Lifecycle
             os = "Android",
             secondsTracingActivated = getProximityActiveDuration() / 1000L,
             riskLevel = robertManager.atRiskStatus?.riskLevel,
-            dateSample = infosProvider.getDateSample()?.formatEpoch(),
-            dateFirstSymptoms = infosProvider.getDateFirstSymptom()?.formatEpoch(),
-            dateLastContactNotification = infosProvider.getDateLastContactNotification()?.formatEpoch(),
+            dateSample = infosProvider.getDateSample()?.roundTimeToMidday()?.formatEpoch(),
+            dateFirstSymptoms = infosProvider.getDateFirstSymptom()?.roundTimeToMidday()?.formatEpoch(),
+            dateLastContactNotification = infosProvider.getDateLastContactNotification()?.roundTimeToMidday()?.formatEpoch(),
         )
     }
 
     private fun Long.formatEpoch() = dateFormat.format(Instant.ofEpochMilli(this))
+
+    private fun Long.roundTimeToMidday(): Long {
+        val calendar: Calendar = Calendar.getInstance()
+        calendar.timeInMillis = this
+        calendar.set(Calendar.MILLISECOND, 0)
+        calendar.set(Calendar.SECOND, 0)
+        calendar.set(Calendar.MINUTE, 0)
+        calendar.set(Calendar.HOUR_OF_DAY, 12)
+        return calendar.timeInMillis
+    }
 
     private suspend fun getAppEvents(): List<TimestampedEvent> {
         val file = File(File(filesDir, FOLDER_NAME), FILE_NAME_APP_EVENTS)

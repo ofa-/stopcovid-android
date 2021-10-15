@@ -17,14 +17,13 @@ import androidx.fragment.app.setFragmentResult
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.extension.openInExternalBrowser
 
-class WalletQRCodeFragment : QRCodeFragment() {
+class WalletQRCodeFragment : QRCodeDccFragment() {
     override fun getTitleKey(): String = "flashWalletCodeController.title"
     override val explanationKey: String = "flashWalletCodeController.explanation"
     override val footerKey: String = "flashWalletCodeController.footer.text"
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         isReadyToStartScanFlow = true
     }
 

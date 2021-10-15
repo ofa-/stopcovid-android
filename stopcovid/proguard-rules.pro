@@ -36,3 +36,7 @@
 # json-schema-validator
 -keep class com.github.fge.jsonschema.** { *; }
 -keep class org.mozilla.javascript.** { *; }
+
+# Shockwave
+-keep class com.shockwave.**
+-keepclassmembers class com.shockwave.** { *; }

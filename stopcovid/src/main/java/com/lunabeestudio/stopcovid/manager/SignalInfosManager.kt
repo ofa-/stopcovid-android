@@ -13,12 +13,11 @@ package com.lunabeestudio.stopcovid.manager
 import android.content.Context
 import android.view.Gravity
 import com.lunabeestudio.stopcovid.R
-import com.lunabeestudio.stopcovid.coreui.extension.callPhone
 import com.lunabeestudio.stopcovid.coreui.fastitem.cardWithActionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.manager.LocalizedStrings
+import com.lunabeestudio.stopcovid.fastitem.defaultPhoneSupportItem
 import com.lunabeestudio.stopcovid.fastitem.logoItem
-import com.lunabeestudio.stopcovid.fastitem.phoneSupportItem
 import com.mikepenz.fastadapter.GenericItem
 
 object SignalInfosManager {
@@ -56,14 +55,8 @@ object SignalInfosManager {
         items += spaceItem {
             spaceRes = R.dimen.spacing_large
         }
-        items += phoneSupportItem {
-            title = strings["walletController.phone.title"]
-            subtitle = strings["walletController.phone.subtitle"]
-            onClick = {
-                strings["walletController.phone.number"]?.callPhone(context)
-            }
-            identifier = title.hashCode().toLong()
-        }
+
+        items += defaultPhoneSupportItem(strings, context)
 
         items += spaceItem {
             spaceRes = R.dimen.spacing_large

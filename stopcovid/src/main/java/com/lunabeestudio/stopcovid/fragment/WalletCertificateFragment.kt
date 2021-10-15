@@ -153,7 +153,8 @@ class WalletCertificateFragment : MainFragment() {
 
         val hasErrorCertificate = viewModel.certificates.value?.any { certificate ->
             (certificate as? EuropeanCertificate)?.greenCertificate?.testResultIsNegative == false
-                || viewModel.isBlacklisted(certificate)
+                    || viewModel.isBlacklisted(certificate)
+                    || (certificate as? EuropeanCertificate)?.isExpired == true
         } == true
         if (hasErrorCertificate) {
             items += captionItem {
@@ -295,6 +296,14 @@ class WalletCertificateFragment : MainFragment() {
             this.formatText = formatText
             tag1Text = strings[certificate.tagStringKey()]
             tag2Text = strings[certificate.statusStringKey()]
+
+            when (certificate) {
+                is EuropeanCertificate -> {
+                    if (certificate.isExpired) {
+                        tag2ColorRes = R.color.color_error
+                    }
+                }
+            }
 
             this.allowShare = true
             onShare = { barcodeBitmap ->

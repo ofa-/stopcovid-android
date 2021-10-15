@@ -58,8 +58,10 @@ android {
         applicationId "fr.gouv.android.stopcovid"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 372
-        versionName "3.8.1"
+        versionCode 380
+        versionName "3.8.2"
+
+        vectorDrawables.useSupportLibrary = true
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -106,7 +108,7 @@ dependencies {
 
     implementation "com.github.razir.progressbutton:progressbutton:_"
 
-    implementation 'fr.bipi.treessence:treessence:_'
+    implementation 'com.github.bastienpaulfr:Treessence:_'
 
     implementation "com.github.chrisbanes:photoview:_"
 

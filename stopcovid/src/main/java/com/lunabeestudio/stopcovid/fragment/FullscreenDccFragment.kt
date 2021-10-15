@@ -22,6 +22,7 @@ import com.journeyapps.barcodescanner.BarcodeEncoder
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.appCompatActivity
 import com.lunabeestudio.stopcovid.coreui.extension.findParentFragmentByType
+import com.lunabeestudio.stopcovid.coreui.extension.setTextOrHide
 import com.lunabeestudio.stopcovid.coreui.extension.toDimensSize
 import com.lunabeestudio.stopcovid.databinding.FragmentFullscreenDccBinding
 import com.lunabeestudio.stopcovid.extension.formatDccText
@@ -29,6 +30,7 @@ import com.lunabeestudio.stopcovid.extension.fullName
 import com.lunabeestudio.stopcovid.extension.injectionContainer
 import com.lunabeestudio.stopcovid.extension.isFrench
 import com.lunabeestudio.stopcovid.extension.robertManager
+import com.lunabeestudio.stopcovid.extension.stringKey
 import com.lunabeestudio.stopcovid.model.EuropeanCertificate
 import com.lunabeestudio.stopcovid.viewmodel.WalletViewModel
 import com.lunabeestudio.stopcovid.viewmodel.WalletViewModelFactory
@@ -91,11 +93,6 @@ class FullscreenDccFragment : ForceLightFragment(R.layout.fragment_fullscreen_dc
 
         binding?.apply {
             logosImageView.isVisible = europeanCertificate.greenCertificate.isFrench
-            val minLines = strings["europeanCertificate.fullscreen.englishDescription.${europeanCertificate.type.code}"]
-                ?.count { it == '\n' }
-                ?.plus(1)
-            minLines?.let(detailsTextView1::setMinLines)
-            minLines?.let(detailsTextView2::setMinLines)
             showMoreSwitch.text = strings["europeanCertificate.fullscreen.type.border.switch"]
             showMoreSwitch.setOnCheckedChangeListener { _, isChecked ->
                 refreshDetails(isChecked, europeanCertificate)
@@ -114,23 +111,28 @@ class FullscreenDccFragment : ForceLightFragment(R.layout.fragment_fullscreen_dc
 
     @SuppressLint("SimpleDateFormat")
     private fun FragmentFullscreenDccBinding.refreshDetails(
-        isChecked: Boolean,
+        isBorder: Boolean,
         europeanCertificate: EuropeanCertificate
     ) {
-        detailsTextSwitcher.setText(
-            if (isChecked) {
+        if (isBorder) {
+            detailsTextSwitcher.setCurrentText("")
+            detailsTextSwitcher.setText(
                 europeanCertificate.formatDccText(
                     strings["europeanCertificate.fullscreen.englishDescription.${europeanCertificate.type.code}"],
                     strings,
                     SimpleDateFormat("d MMM yyyy", Locale.ENGLISH),
                     SimpleDateFormat("d MMM yyyy, HH:mm", Locale.ENGLISH),
                 )
-            } else {
-                ""
-            }
-        )
-        explanationTextSwitcher.setText(
-            ""
-        )
+            )
+            explanationTextSwitcher.setCurrentText("")
+            explanationTextSwitcher.setText("")
+            headerTextView.setTextOrHide("")
+        } else {
+            detailsTextSwitcher.setCurrentText("")
+            detailsTextSwitcher.setText("")
+            explanationTextSwitcher.setCurrentText("")
+            explanationTextSwitcher.setText("")
+            headerTextView.isVisible = false
+        }
     }
 }

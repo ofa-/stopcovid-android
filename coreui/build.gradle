@@ -23,6 +23,7 @@ android {
         }
     }
     defaultConfig {
+        vectorDrawables.useSupportLibrary = true
     }
 
     kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"

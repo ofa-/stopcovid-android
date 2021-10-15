@@ -74,4 +74,8 @@ class Configuration(
     var maxCertBeforeWarning: Int,
     var noWaitDoses: Map<String, Int>,
     var ratingsKeyFiguresOpeningThreshold: Int,
-)
+    var displayUrgentDgs: Boolean,
+    var notification: Notification?,
+) {
+    class Notification(val title: String, val subtitle: String, val url: String, val version: Int)
+}

@@ -10,10 +10,13 @@
 
 package com.lunabeestudio.stopcovid.fastitem
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.lunabeestudio.stopcovid.R
+import com.lunabeestudio.stopcovid.coreui.extension.callPhone
 import com.lunabeestudio.stopcovid.coreui.extension.setTextOrHide
+import com.lunabeestudio.stopcovid.coreui.manager.LocalizedStrings
 import com.lunabeestudio.stopcovid.databinding.ItemPhoneSupportBinding
 import com.mikepenz.fastadapter.binding.AbstractBindingItem
 
@@ -42,3 +45,12 @@ class PhoneSupportItem() : AbstractBindingItem<ItemPhoneSupportBinding>() {
 }
 
 fun phoneSupportItem(block: (PhoneSupportItem.() -> Unit)): PhoneSupportItem = PhoneSupportItem().apply(block)
+
+fun defaultPhoneSupportItem(strings: LocalizedStrings, context: Context): PhoneSupportItem = phoneSupportItem {
+    title = strings["walletController.phone.title"]
+    subtitle = strings["walletController.phone.subtitle"]
+    onClick = {
+        strings["walletController.phone.number"]?.callPhone(context)
+    }
+    identifier = "walletController.phone.title".hashCode().toLong()
+}

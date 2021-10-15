@@ -6,6 +6,7 @@ import com.lunabeestudio.domain.model.WalletCertificateType
 import com.lunabeestudio.framework.crypto.BouncyCastleSignatureVerifier
 import com.lunabeestudio.stopcovid.extension.certificateType
 import com.lunabeestudio.stopcovid.extension.countryCode
+import com.lunabeestudio.stopcovid.extension.exemptionCertificateValidFrom
 import com.lunabeestudio.stopcovid.extension.recoveryDateOfFirstPositiveTest
 import com.lunabeestudio.stopcovid.extension.sha256
 import com.lunabeestudio.stopcovid.extension.testDateTimeOfCollection
@@ -26,9 +27,11 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.security.SignatureException
 import java.text.SimpleDateFormat
+import java.time.ZonedDateTime
 import java.util.Date
 import java.util.Locale
 import java.util.UUID
+import kotlin.time.ExperimentalTime
 
 sealed class WalletCertificate(
     val id: String,
@@ -341,7 +344,7 @@ class VaccinationCertificate private constructor(id: String, override val value:
     }
 }
 
-@OptIn(ExperimentalUnsignedTypes::class)
+@OptIn(ExperimentalUnsignedTypes::class, ExperimentalTime::class)
 class EuropeanCertificate private constructor(id: String, value: String, val isFavorite: Boolean) : WalletCertificate(id, value) {
     override val timestamp: Long
     override val type: WalletCertificateType
@@ -349,10 +352,15 @@ class EuropeanCertificate private constructor(id: String, value: String, val isF
     private val cose: ByteArray
     override val sha256: String
     val greenCertificate: GreenCertificate
+    val isExpired: Boolean
 
     init {
         val verificationResult = VerificationResult()
-        val plainInput = DefaultPrefixValidationService().decode(value, verificationResult)
+        var plainInput = DefaultPrefixValidationService().decode(value, verificationResult)
+        if (verificationResult.contextPrefix == null) {
+            // Try exemption pass
+            plainInput = DefaultPrefixValidationService("EX1:").decode(value, verificationResult)
+        }
         val compressedCose = DefaultBase45Service().decode(plainInput, verificationResult)
         cose = checkNotNull(DefaultCompressorService().decode(compressedCose, verificationResult))
         val coseData = checkNotNull(DefaultCoseService().decode(cose, verificationResult))
@@ -361,7 +369,8 @@ class EuropeanCertificate private constructor(id: String, value: String, val isF
             throw WalletCertificateMalformedException()
         }
         kid = checkNotNull(coseData.kid)
-        greenCertificate = checkNotNull(DefaultCborService().decode(coseData.cbor, verificationResult))
+        val greenCertificateData = checkNotNull(DefaultCborService().decodeData(coseData.cbor, verificationResult))
+        greenCertificate = greenCertificateData.greenCertificate
         type = checkNotNull(greenCertificate.certificateType)
         timestamp = when (type) {
             WalletCertificateType.SANITARY,
@@ -369,8 +378,10 @@ class EuropeanCertificate private constructor(id: String, value: String, val isF
             WalletCertificateType.SANITARY_EUROPE -> greenCertificate.testDateTimeOfCollection?.time
             WalletCertificateType.VACCINATION_EUROPE -> greenCertificate.vaccineDate?.time
             WalletCertificateType.RECOVERY_EUROPE -> greenCertificate.recoveryDateOfFirstPositiveTest?.time
+            WalletCertificateType.EXEMPTION -> greenCertificate.exemptionCertificateValidFrom?.time
         } ?: -1
         sha256 = "${greenCertificate.countryCode?.uppercase()}${greenCertificate.getDgci()}".sha256()
+        isExpired = greenCertificateData.expirationTime.isBefore(ZonedDateTime.now())
     }
 
     override fun parse() {

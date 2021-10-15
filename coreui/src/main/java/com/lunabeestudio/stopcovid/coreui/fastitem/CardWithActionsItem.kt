@@ -7,19 +7,21 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.ColorInt
+import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.getColor
 import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
 import androidx.core.widget.TextViewCompat
+import com.lunabeestudio.stopcovid.coreui.R
 import com.lunabeestudio.stopcovid.coreui.databinding.ItemActionBinding
 import com.lunabeestudio.stopcovid.coreui.databinding.ItemCardWithActionsBinding
 import com.lunabeestudio.stopcovid.coreui.extension.safeEmojiSpanify
 import com.lunabeestudio.stopcovid.coreui.extension.setImageResourceOrHide
 import com.lunabeestudio.stopcovid.coreui.extension.setOnClickListenerOrHideRipple
 import com.lunabeestudio.stopcovid.coreui.extension.setTextOrHide
+import com.lunabeestudio.stopcovid.coreui.extension.toDimensSize
 import com.lunabeestudio.stopcovid.coreui.model.Action
 import com.lunabeestudio.stopcovid.coreui.model.CardTheme
 import com.mikepenz.fastadapter.binding.AbstractBindingItem
@@ -33,8 +35,8 @@ class CardWithActionsItem(private val cardTheme: CardTheme) : AbstractBindingIte
     @DrawableRes
     var cardTitleIcon: Int? = null
 
-    @ColorInt
-    var cardTitleColorInt: Int? = null
+    @ColorRes
+    var cardTitleColorRes: Int? = null
 
     // Gradient background, override theme
     var gradientBackground: GradientDrawable? = null
@@ -50,6 +52,7 @@ class CardWithActionsItem(private val cardTheme: CardTheme) : AbstractBindingIte
     var mainImage: Int? = null
 
     var onCardClick: (() -> Unit)? = null
+    var onDismissClick: (() -> Unit)? = null
     var contentDescription: String? = null
 
     var actions: List<Action>? = emptyList()
@@ -62,8 +65,8 @@ class CardWithActionsItem(private val cardTheme: CardTheme) : AbstractBindingIte
 
     override fun bindView(binding: ItemCardWithActionsBinding, payloads: List<Any>) {
         binding.cardTitleTextView.setTextOrHide(cardTitle) {
-            cardTitleColorInt?.let {
-                val color = getColor(context, it)
+            cardTitleColorRes?.let {
+                val color = ContextCompat.getColor(context, it)
                 setTextColor(color)
                 TextViewCompat.setCompoundDrawableTintList(this, ColorStateList.valueOf(color))
             }
@@ -140,12 +143,45 @@ class CardWithActionsItem(private val cardTheme: CardTheme) : AbstractBindingIte
         binding.rootLayout.background = gradientBackground ?: cardTheme.backgroundDrawableRes?.let {
             ContextCompat.getDrawable(binding.rootLayout.context, it)
         }
+
+        binding.dismissImageView.setOnClickListener(
+            onDismissClick?.let { onDismiss ->
+                View.OnClickListener { onDismiss() }
+            }
+        )
+        binding.dismissImageView.isVisible = onDismissClick != null
+
+        if (onDismissClick != null && cardTitle == null) {
+            setDismissButtonMargin(binding)
+        }
+    }
+
+    private fun setDismissButtonMargin(binding: ItemCardWithActionsBinding) {
+        (
+            binding.mainHeaderTextView.takeIf { mainHeader != null }
+                ?: binding.mainTitleTextView.takeIf { mainTitle != null }
+                ?: binding.mainBodyTextView.takeIf { mainBody != null }
+            )?.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+            marginEnd = R.dimen.min_touch_target_size.toDimensSize(binding.rootLayout.context).toInt()
+            topMargin = R.dimen.spacing_medium.toDimensSize(binding.rootLayout.context).toInt()
+        }
     }
 
     override fun unbindView(binding: ItemCardWithActionsBinding) {
         super.unbindView(binding)
         binding.mainBodyTextView.maxLines = Int.MAX_VALUE
         binding.mainBodyTextView.visibility = View.VISIBLE
+
+        listOf(binding.mainHeaderTextView, binding.mainTitleTextView).forEach {
+            it.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                marginEnd = 0
+                topMargin = 0
+            }
+        }
+        binding.mainBodyTextView.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+            marginEnd = 0
+            topMargin = R.dimen.spacing_small.toDimensSize(binding.rootLayout.context).toInt()
+        }
     }
 }
 

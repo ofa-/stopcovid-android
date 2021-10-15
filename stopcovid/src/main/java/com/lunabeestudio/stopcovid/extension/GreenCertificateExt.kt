@@ -12,6 +12,7 @@ package com.lunabeestudio.stopcovid.extension
 
 import com.lunabeestudio.domain.model.WalletCertificateType
 import com.lunabeestudio.stopcovid.Constants
+import dgca.verifier.app.decoder.model.ExemptionStatement
 import dgca.verifier.app.decoder.model.GreenCertificate
 import dgca.verifier.app.decoder.model.RecoveryStatement
 import dgca.verifier.app.decoder.model.Test
@@ -23,11 +24,12 @@ import java.util.Locale
 
 val GreenCertificate.certificateType: WalletCertificateType?
     get() {
-        val dccType = tests?.lastOrNull() ?: recoveryStatements?.lastOrNull() ?: vaccinations?.lastOrNull()
+        val dccType = tests?.lastOrNull() ?: recoveryStatements?.lastOrNull() ?: vaccinations?.lastOrNull() ?: exemptionStatement
         return when (dccType) {
             is Test -> WalletCertificateType.SANITARY_EUROPE
             is RecoveryStatement -> WalletCertificateType.RECOVERY_EUROPE
             is Vaccination -> WalletCertificateType.VACCINATION_EUROPE
+            is ExemptionStatement -> WalletCertificateType.EXEMPTION
             else -> null
         }
     }
@@ -36,11 +38,14 @@ fun GreenCertificate.formattedDateOfBirthDate(dateFormat: DateFormat): String =
     yearMonthDayUsParser().parseOrNull(dateOfBirth)?.let(dateFormat::format) ?: dateOfBirth
 
 val GreenCertificate.countryCode: String?
-    get() = when {
-        vaccinations?.lastOrNull() != null -> vaccinations?.lastOrNull()?.countryOfVaccination
-        tests?.lastOrNull() != null -> tests?.lastOrNull()?.countryOfVaccination
-        recoveryStatements?.lastOrNull() != null -> recoveryStatements?.lastOrNull()?.countryOfVaccination
-        else -> null
+    get() = when (certificateType) {
+        WalletCertificateType.SANITARY,
+        WalletCertificateType.VACCINATION,
+        null -> null
+        WalletCertificateType.SANITARY_EUROPE -> tests?.lastOrNull()?.countryOfVaccination
+        WalletCertificateType.VACCINATION_EUROPE -> vaccinations?.lastOrNull()?.countryOfVaccination
+        WalletCertificateType.RECOVERY_EUROPE -> recoveryStatements?.lastOrNull()?.countryOfVaccination
+        WalletCertificateType.EXEMPTION -> exemptionStatement?.countryOfVaccination
     }
 
 // French Polynesia, New Caledonia, Wallis and Futuna, and Saint Pierre and Miquelon are French territory
@@ -76,6 +81,12 @@ val GreenCertificate.testDateTimeOfCollection: Date?
 
 val GreenCertificate.recoveryDateOfFirstPositiveTest: Date?
     get() = recoveryStatements?.lastOrNull()?.dateOfFirstPositiveTest?.let(yearMonthDayUsParser()::parseOrNull)
+
+val GreenCertificate.exemptionCertificateValidFrom: Date?
+    get() = exemptionStatement?.certificateValidFrom?.let(yearMonthDayUsParser()::parseOrNull)
+
+val GreenCertificate.exemptionCertificateValidUntil: Date?
+    get() = exemptionStatement?.certificateValidUntil?.let(yearMonthDayUsParser()::parseOrNull)
 
 val GreenCertificate.manufacturer: String?
     get() = when {

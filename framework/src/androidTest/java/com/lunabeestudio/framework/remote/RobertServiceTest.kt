@@ -185,7 +185,7 @@ class RobertServiceTest {
         assertThat(backendResult).isInstanceOf(RobertResultData.Failure::class.java)
         assertThat((backendResult as RobertResultData.Failure<*>).error).isInstanceOf(BackendException::class.java)
         assertThat(backendResult.error?.errorCode).isEqualTo(ErrorCode.BACKEND)
-        assertThat(backendResult.error?.message).isEqualTo(BackendException().message)
+        assertThat(backendResult.error?.message).isEqualTo(BackendException(httpCode = null).message)
     }
 
     private fun testErrors(wsCall: suspend () -> Any) {
@@ -204,7 +204,7 @@ class RobertServiceTest {
         assertThat(backendResult).isInstanceOf(RobertResult.Failure::class.java)
         assertThat((backendResult as RobertResult.Failure).error).isInstanceOf(BackendException::class.java)
         assertThat(backendResult.error?.errorCode).isEqualTo(ErrorCode.BACKEND)
-        assertThat(backendResult.error?.message).isEqualTo(BackendException().message)
+        assertThat(backendResult.error?.message).isEqualTo(BackendException(httpCode = null).message)
     }
 
     @After

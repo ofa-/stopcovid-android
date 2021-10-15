@@ -278,7 +278,7 @@ class WalletContainerFragment : BaseFragment() {
             injectionContainer.debugManager.logSaveCertificates(certificate.raw, "from wallet")
 
             val vaccination = (certificate as? EuropeanCertificate)?.greenCertificate?.vaccinations?.lastOrNull()
-            if (vaccination != null && vaccination.doseNumber >= vaccination.totalSeriesOfDoses) {
+            if (vaccination != null && vaccination.doseNumber >= vaccination.totalSeriesOfDoses && !viewModel.isBlacklisted(certificate)) {
                 findNavControllerOrNull()?.safeNavigate(
                     WalletContainerFragmentDirections.actionWalletContainerFragmentToVaccineCompletionFragment(certificate.id)
                 )

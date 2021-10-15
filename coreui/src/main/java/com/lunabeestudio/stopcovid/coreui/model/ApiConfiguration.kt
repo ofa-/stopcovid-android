@@ -145,6 +145,10 @@ internal class ApiConfiguration(
     val noWaitDoses: String,
     @SerializedName("app.ratingsKeyFiguresOpeningThreshold")
     val ratingsKeyFiguresOpeningThreshold: Int,
+    @SerializedName("app.displayUrgentDgs")
+    val displayUrgentDgs: Boolean,
+    @SerializedName("app.notif")
+    val notif: String,
 )
 
 internal fun ApiConfiguration.toDomain(gson: Gson) = Configuration(
@@ -236,4 +240,22 @@ internal fun ApiConfiguration.toDomain(gson: Gson) = Configuration(
         ) as List<ApiCodeValueEntry>
         ).associate { Pair(it.code, it.value) },
     ratingsKeyFiguresOpeningThreshold = ratingsKeyFiguresOpeningThreshold,
+    displayUrgentDgs = displayUrgentDgs,
+    notification = (
+        gson.fromJson(
+            notif,
+            object : TypeToken<Map<String, Any>?>() {}.type
+        ) as Map<String, Any>?
+        )?.let {
+        try {
+            Configuration.Notification(
+                title = (it["t"] as? String)!!,
+                subtitle = (it["s"] as? String)!!,
+                url = (it["u"] as? String)!!,
+                version = (it["v"] as? Number)?.toInt()!!,
+            )
+        } catch (e: NullPointerException) {
+            null
+        }
+    },
 )

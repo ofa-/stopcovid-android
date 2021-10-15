@@ -8,10 +8,5 @@
   ~ Created by Lunabee Studio / Date - 2020/10/29 - for the TOUS-ANTI-COVID project
   -->
 
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="rectangle">
-    <gradient
-        android:angle="135"
-        android:endColor="@color/color_persian_green"
-        android:startColor="@color/color_mountain_meadow" />
-</shape>
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="@color/color_button_learn_more" />

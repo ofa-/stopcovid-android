@@ -21,7 +21,7 @@ import com.lunabeestudio.stopcovid.extension.hasUsedUniversalQrScan
 import com.lunabeestudio.stopcovid.extension.openInExternalBrowser
 import com.lunabeestudio.stopcovid.extension.safeNavigate
 
-class UniversalQrScanFragment : QRCodeFragment() {
+class UniversalQrScanFragment : QRCodeDccFragment() {
 
     override fun getTitleKey(): String = "universalQrScanController.title"
     override val explanationKey: String = "universalQrScanController.explanation"

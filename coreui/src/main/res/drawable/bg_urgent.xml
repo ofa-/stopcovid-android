@@ -12,6 +12,6 @@
     android:shape="rectangle">
     <gradient
         android:angle="135"
-        android:endColor="@color/color_persian_green"
-        android:startColor="@color/color_mountain_meadow" />
+        android:endColor="@color/color_monza"
+        android:startColor="@color/color_monza" />
 </shape>

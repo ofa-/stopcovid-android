@@ -184,6 +184,13 @@
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_proximityFragment_to_urgentInfoFragment"
+            app:destination="@id/urgentInfoFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
     </fragment>
     <fragment
         android:id="@+id/isolationFormFragment"
@@ -990,7 +997,7 @@
     <activity
         android:id="@+id/chartFullScreenActivity"
         android:name="com.lunabeestudio.stopcovid.activity.ChartFullScreenActivity"
-        android:label="ChartFullScreenActivity" >
+        android:label="ChartFullScreenActivity">
         <argument
             android:name="keyFiguresKey"
             app:argType="string" />
@@ -1001,4 +1008,8 @@
             android:name="minDate"
             app:argType="long" />
     </activity>
+    <fragment
+        android:id="@+id/urgentInfoFragment"
+        android:name="com.lunabeestudio.stopcovid.fragment.UrgentInfoFragment" />
+
 </navigation>

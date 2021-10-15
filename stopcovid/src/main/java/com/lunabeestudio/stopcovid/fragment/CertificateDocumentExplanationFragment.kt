@@ -41,9 +41,15 @@ class CertificateDocumentExplanationFragment : BaseFragment() {
         (activity as? MainActivity)?.binding?.tabLayout?.isVisible = false
         appCompatActivity?.supportActionBar?.title = strings["documentExplanationController.${args.certificateType.stringKey}.title"]
         binding.explanationTextView.text = strings["documentExplanationController.${args.certificateType.stringKey}.explanation"]
-        val certificateFull = File(requireContext().filesDir, args.certificateType.certificateFilename)
+        showDocument()
+    }
+
+    private fun showDocument() {
+        val certificateFilename = args.certificateType.certificateFilename ?: return
+        val certificateFull = File(requireContext().filesDir, certificateFilename)
         if (!binding.documentPhotoView.setImageFileIfValid(certificateFull)) {
-            binding.documentPhotoView.setImageResource(args.certificateType.certificateDrawable)
+            val certificateDrawable = args.certificateType.certificateDrawable ?: return
+            binding.documentPhotoView.setImageResource(certificateDrawable)
         }
     }
 }
