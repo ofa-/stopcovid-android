@@ -17,7 +17,6 @@ import androidx.fragment.app.viewModels
 import com.lunabeestudio.domain.model.WalletCertificateType
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.activity.MainActivity
-import com.lunabeestudio.stopcovid.coreui.extension.callPhone
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.extension.findParentFragmentByType
 import com.lunabeestudio.stopcovid.coreui.fastitem.cardWithActionItem
@@ -27,8 +26,8 @@ import com.lunabeestudio.stopcovid.extension.openInExternalBrowser
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.fastitem.LogoItem
+import com.lunabeestudio.stopcovid.fastitem.defaultPhoneSupportItem
 import com.lunabeestudio.stopcovid.fastitem.logoItem
-import com.lunabeestudio.stopcovid.fastitem.phoneSupportItem
 import com.lunabeestudio.stopcovid.fastitem.walletDoubleDocumentCardItem
 import com.lunabeestudio.stopcovid.viewmodel.WalletViewModel
 import com.lunabeestudio.stopcovid.viewmodel.WalletViewModelFactory
@@ -82,7 +81,7 @@ class WalletInfoFragment : MainFragment() {
         items += cardWithActionItem {
             mainTitle = strings["walletController.howDoesItWork.title"]
             mainBody = strings["walletController.howDoesItWork.subtitle"]
-            identifier = mainBody.hashCode().toLong()
+            identifier = "walletController.howDoesItWork.subtitle".hashCode().toLong()
         }
 
         items += spaceItem {
@@ -93,7 +92,7 @@ class WalletInfoFragment : MainFragment() {
         items += walletDoubleDocumentCardItem {
             mainTitle = strings["walletController.documents.title"]
             mainBody = strings["walletController.documents.subtitle"]
-            identifier = mainBody.hashCode().toLong()
+            identifier = "walletController.documents.subtitle".hashCode().toLong()
 
             vaccinCertificateCaption = strings["walletController.documents.vaccin"]
             onVaccinCertificateClick = {
@@ -126,10 +125,12 @@ class WalletInfoFragment : MainFragment() {
             mainBody = strings["walletController.whenToUse.subtitle"]
             actions = listOf(
                 Action(label = strings["walletController.whenToUse.button"]) {
-                    strings["walletController.whenToUse.url"]?.openInExternalBrowser(requireContext())
+                    strings["walletController.whenToUse.url"]?.let { url ->
+                        context?.let(url::openInExternalBrowser)
+                    }
                 }
             )
-            identifier = mainBody.hashCode().toLong()
+            identifier = "walletController.whenToUse.subtitle".hashCode().toLong()
         }
 
         items += spaceItem {
@@ -137,13 +138,25 @@ class WalletInfoFragment : MainFragment() {
             identifier = items.size.toLong()
         }
 
-        items += phoneSupportItem {
-            title = strings["walletController.phone.title"]
-            subtitle = strings["walletController.phone.subtitle"]
-            onClick = {
-                strings["walletController.phone.number"]?.callPhone(requireContext())
-            }
-            identifier = title.hashCode().toLong()
+        items += cardWithActionItem {
+            mainTitle = strings["walletController.info.fraud.title"]
+            mainBody = strings["walletController.info.fraud.explanation"]
+            actions = listOf(
+                Action(label = strings["walletController.info.fraud.button"]) {
+                    strings["walletController.info.fraud.url"]?.let { fraudUrl ->
+                        context?.let(fraudUrl::openInExternalBrowser)
+                    }
+                }
+            )
+            identifier = "walletController.info.fraud.explanation".hashCode().toLong()
+        }
+
+        items += spaceItem {
+            spaceRes = R.dimen.spacing_large
+            identifier = items.size.toLong()
+        }
+        context?.let {
+            items += defaultPhoneSupportItem(strings, it)
         }
 
         items += spaceItem {

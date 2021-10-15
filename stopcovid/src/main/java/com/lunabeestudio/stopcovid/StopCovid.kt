@@ -132,6 +132,7 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Localized
 
     override fun onCreate() {
         super.onCreate()
+
         initializeInjectionContainer()
 
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)

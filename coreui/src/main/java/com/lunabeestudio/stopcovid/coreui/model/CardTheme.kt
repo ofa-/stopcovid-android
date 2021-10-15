@@ -28,6 +28,10 @@ enum class CardTheme {
     Color {
         override val themeId: Int = R.style.ShapeAppearance_StopCovid_MediumComponent_Color
         override val backgroundDrawableRes: Int = R.drawable.bg_no_risk
+    },
+    Urgent {
+        override val themeId: Int = R.style.ShapeAppearance_StopCovid_MediumComponent_Color
+        override val backgroundDrawableRes: Int = R.drawable.bg_urgent
     };
 
     @StyleRes

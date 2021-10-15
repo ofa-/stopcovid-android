@@ -1,0 +1,91 @@
+<!--
+  ~ This Source Code Form is subject to the terms of the Mozilla Public
+  ~ License, v. 2.0. If a copy of the MPL was not distributed with this
+  ~ file, You can obtain one at https://mozilla.org/MPL/2.0/.
+  ~
+  ~ Authors
+  ~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ Created by Lunabee Studio / Date - 2021/11/10 - for the TOUS-ANTI-COVID project
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="110dp"
+    android:height="110dp"
+    android:viewportWidth="100"
+    android:viewportHeight="100">
+    <group>
+        <clip-path android:pathData="M0,0h100v100h-100z" />
+        <path
+            android:fillType="nonZero"
+            android:fillColor="?attr/colorPrimary"
+            android:pathData="M25.598,75m-50.995,20.603a55,55 115.572,1 1,101.99 -41.207a55,55 115.572,1 1,-101.99 41.207"
+            android:strokeWidth="1"
+            android:strokeColor="#00000000" />
+        <path
+            android:fillColor="#CCCCCC"
+            android:fillType="nonZero"
+            android:pathData="M53.454,54.477l-62.15,25.11l22.383,-34.069z"
+            android:strokeWidth="1"
+            android:strokeColor="#00000000" />
+        <path
+            android:fillColor="#B3B3B3"
+            android:fillType="nonZero"
+            android:pathData="M-8.696,79.587l62.15,-25.11l15.131,37.45l-62.15,25.11z"
+            android:strokeWidth="1"
+            android:strokeColor="#00000000" />
+        <path
+            android:fillColor="#FFFFFF"
+            android:fillType="nonZero"
+            android:pathData="M45.285,45.728C44.577,43.975 42.563,43.12 40.81,43.829L-6.998,63.144C-8.75,63.853 -9.605,65.866 -8.897,67.619L5.59,103.475C6.298,105.228 8.312,106.083 10.065,105.375L57.873,86.059C59.626,85.351 60.48,83.337 59.772,81.584L45.285,45.728Z"
+            android:strokeWidth="1"
+            android:strokeColor="#00000000" />
+        <path
+            android:fillColor="#E6E6E6"
+            android:fillType="nonZero"
+            android:pathData="M27.715,87.121l-21.28,29.916l-15.131,-37.45z"
+            android:strokeWidth="1"
+            android:strokeColor="#00000000" />
+        <path
+            android:fillColor="#E6E6E6"
+            android:fillType="nonZero"
+            android:pathData="M32.496,85.189l36.089,6.737l-15.131,-37.45z"
+            android:strokeWidth="1"
+            android:strokeColor="#00000000" />
+        <path
+            android:fillColor="#F5F5F5"
+            android:fillType="nonZero"
+            android:pathData="M68.585,91.926l-62.15,25.11l22.383,-34.069z"
+            android:strokeWidth="1"
+            android:strokeColor="#00000000" />
+        <path
+            android:fillColor="#CCCCCC"
+            android:fillType="nonZero"
+            android:pathData="M1.308,65.35l15.936,-6.439l0.644,1.594l-15.936,6.439z"
+            android:strokeWidth="1"
+            android:strokeColor="#00000000" />
+        <path
+            android:fillColor="#CCCCCC"
+            android:fillType="nonZero"
+            android:pathData="M3.562,70.927l35.059,-14.165l0.644,1.594l-35.059,14.165z"
+            android:strokeWidth="1"
+            android:strokeColor="#00000000" />
+        <path
+            android:fillColor="#CCCCCC"
+            android:fillType="nonZero"
+            android:pathData="M4.85,74.114l35.059,-14.165l0.644,1.594l-35.059,14.165z"
+            android:strokeWidth="1"
+            android:strokeColor="#00000000" />
+        <path
+            android:fillColor="#CCCCCC"
+            android:fillType="nonZero"
+            android:pathData="M6.137,77.302l35.059,-14.165l0.644,1.594l-35.059,14.165z"
+            android:strokeWidth="1"
+            android:strokeColor="#00000000" />
+        <path
+            android:fillColor="#CCCCCC"
+            android:fillType="nonZero"
+            android:pathData="M7.425,80.489l35.059,-14.165l0.644,1.594l-35.059,14.165z"
+            android:strokeWidth="1"
+            android:strokeColor="#00000000" />
+    </group>
+</vector>

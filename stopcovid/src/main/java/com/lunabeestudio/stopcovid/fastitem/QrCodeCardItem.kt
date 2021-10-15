@@ -10,7 +10,6 @@
 
 package com.lunabeestudio.stopcovid.fastitem
 
-import android.content.res.ColorStateList
 import android.graphics.Bitmap
 import android.text.Spannable
 import android.text.method.LinkMovementMethod
@@ -19,12 +18,16 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.AttrRes
+import androidx.annotation.ColorRes
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.view.isVisible
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.fetchSystemColor
+import com.lunabeestudio.stopcovid.coreui.extension.fetchSystemColorStateList
 import com.lunabeestudio.stopcovid.coreui.extension.setTextOrHide
 import com.lunabeestudio.stopcovid.databinding.ItemQrCodeCardBinding
+import com.lunabeestudio.stopcovid.databinding.ItemTagBinding
 import com.mikepenz.fastadapter.binding.AbstractBindingItem
 
 class QrCodeCardItem : AbstractBindingItem<ItemQrCodeCardBinding>() {
@@ -50,18 +53,19 @@ class QrCodeCardItem : AbstractBindingItem<ItemQrCodeCardBinding>() {
     var onFavoriteClick: (() -> Unit)? = null
     var bottomText: String? = null
 
+    @ColorRes
+    var tag1ColorRes: Int? = null
+
+    @ColorRes
+    var tag2ColorRes: Int? = null
+
+    @AttrRes
+    private val tagDefaultColor = R.attr.colorPrimary
+
     override val type: Int = R.id.item_attestation_qr_code
 
     override fun createBinding(inflater: LayoutInflater, parent: ViewGroup?): ItemQrCodeCardBinding {
-        val binding = ItemQrCodeCardBinding.inflate(inflater, parent, false)
-        val tagColor = ColorStateList.valueOf(
-            R.attr.colorPrimary.fetchSystemColor(binding.root.context)
-        )
-
-        binding.tag1.chip.chipBackgroundColor = tagColor
-        binding.tag2.chip.chipBackgroundColor = tagColor
-
-        return binding
+        return ItemQrCodeCardBinding.inflate(inflater, parent, false)
     }
 
     override fun bindView(binding: ItemQrCodeCardBinding, payloads: List<Any>) {
@@ -87,25 +91,8 @@ class QrCodeCardItem : AbstractBindingItem<ItemQrCodeCardBinding>() {
         }
         binding.formatTextView.setTextOrHide(formatText)
 
-        binding.tag1.chip.text = tag1Text
-        binding.tag1.chip.setTextColor(R.attr.colorOnPrimary.fetchSystemColor(binding.root.context))
-        binding.tag1.chip.isVisible = !tag1Text.isNullOrEmpty()
-        onTag1Click?.let { onClick ->
-            binding.tag1.chip.isEnabled = true
-            binding.tag1.chip.setOnClickListener {
-                onClick()
-            }
-        }
-
-        binding.tag2.chip.text = tag2Text
-        binding.tag2.chip.setTextColor(R.attr.colorOnPrimary.fetchSystemColor(binding.root.context))
-        binding.tag2.chip.isVisible = !tag2Text.isNullOrEmpty()
-        onTag2Click?.let { onClick ->
-            binding.tag2.chip.isEnabled = true
-            binding.tag2.chip.setOnClickListener {
-                onClick()
-            }
-        }
+        setupTag(binding.tag1, tag1Text, tag1ColorRes, onTag1Click)
+        setupTag(binding.tag2, tag2Text, tag2ColorRes, onTag2Click)
 
         binding.tagLayout.isVisible = !(tag1Text.isNullOrEmpty() && tag2Text.isNullOrEmpty())
 
@@ -125,6 +112,26 @@ class QrCodeCardItem : AbstractBindingItem<ItemQrCodeCardBinding>() {
         }
 
         binding.bottomActionTextView.setTextOrHide(bottomText)
+    }
+
+    private fun setupTag(tagBinding: ItemTagBinding, tagText: String?, tagColorRes: Int?, onTagClick: (() -> Unit)?) {
+        tagBinding.chip.text = tagText
+        tagBinding.chip.setTextColor(R.attr.colorOnPrimary.fetchSystemColor(tagBinding.root.context))
+        tagBinding.chip.isVisible = !tagText.isNullOrEmpty()
+
+        if (tagColorRes != null) {
+            tagBinding.chip.setChipBackgroundColorResource(tagColorRes)
+        } else {
+            tagBinding.chip.chipBackgroundColor = tagDefaultColor.fetchSystemColorStateList(tagBinding.root.context)
+        }
+
+        tagColorRes?.let { tagBinding.chip.setChipBackgroundColorResource(it) }
+        onTagClick?.let { onClick ->
+            tagBinding.chip.isEnabled = true
+            tagBinding.chip.setOnClickListener {
+                onClick()
+            }
+        }
     }
 
     override fun unbindView(binding: ItemQrCodeCardBinding) {

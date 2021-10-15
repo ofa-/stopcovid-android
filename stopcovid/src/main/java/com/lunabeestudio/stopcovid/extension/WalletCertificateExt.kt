@@ -151,6 +151,16 @@ fun EuropeanCertificate.formatDccText(
                 this.greenCertificate.testDateTimeOfCollection?.let(analysisDateFormat::format).orNA()
             )
         }
+        WalletCertificateType.EXEMPTION -> {
+            formattedText = formattedText?.replace(
+                "<FROM_DATE>",
+                this.greenCertificate.exemptionCertificateValidFrom?.let(dateFormat::format).orNA()
+            )
+            formattedText = formattedText?.replace(
+                "<TO_DATE>",
+                this.greenCertificate.exemptionCertificateValidUntil?.let(dateFormat::format).orNA()
+            )
+        }
     }
     return formattedText.orEmpty()
 }

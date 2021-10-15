@@ -395,7 +395,7 @@ class ManageDataFragment : MainFragment() {
         }
         UiConstants.SUPPORTED_LOCALES.mapTo(items) { locale ->
             selectionItem {
-                title = locale.flaggedCountry
+                caption = locale.flaggedCountry
                 showSelection = requireContext().getApplicationLanguage().equals(locale.language, false)
                 onClick = {
                     sharedPreferences.userLanguage = locale.language

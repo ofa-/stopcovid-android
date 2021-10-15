@@ -7,16 +7,6 @@
   ~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   ~ Created by Lunabee Studio / Date - 2020/30/10 - for the STOP-COVID project
   -->
-
-<!--
-  ~ This Source Code Form is subject to the terms of the Mozilla Public
-  ~ License, v. 2.0. If a copy of the MPL was not distributed with this
-  ~ file, You can obtain one at https://mozilla.org/MPL/2.0/.
-  ~
-  ~ Authors
-  ~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  ~ Created by Lunabee Studio / Date - 2020/04/05 - for the TOUS-ANTI-COVID project
-  -->
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -24,18 +14,28 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?colorSurface"
-    tools:ignore="Overdraw">
+    android:fillViewport="true">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="vertical"
-        tools:ignore="UseCompoundDrawables">
+        android:animateLayoutChanges="true"
+        android:padding="@dimen/spacing_large">
 
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="@dimen/spacing_xlarge" />
+        <TextView
+            android:id="@+id/headerTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/spacing_large"
+            android:textAppearance="@style/TextAppearance.StopCovid.Caption"
+            android:textIsSelectable="false"
+            app:layout_constraintBottom_toTopOf="@id/logosImageView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0"
+            app:layout_constraintVertical_chainStyle="packed"
+            tools:text="@tools:sample/lorem[10]" />
 
         <ImageView
             android:id="@+id/logosImageView"
@@ -45,6 +45,10 @@
             android:layout_marginBottom="@dimen/spacing_xlarge"
             android:adjustViewBounds="true"
             android:src="@drawable/logos_passport"
+            app:layout_constraintBottom_toTopOf="@id/barcodeImageView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/headerTextView"
             tools:ignore="ContentDescription" />
 
         <ImageView
@@ -53,6 +57,10 @@
             android:layout_height="@dimen/qr_code_fullscreen_size"
             android:layout_marginHorizontal="@dimen/spacing_large"
             android:adjustViewBounds="true"
+            app:layout_constraintBottom_toTopOf="@id/showMoreSwitch"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/logosImageView"
             tools:ignore="ContentDescription"
             tools:src="@tools:sample/avatars" />
 
@@ -62,13 +70,22 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/spacing_large"
             android:textAppearance="@style/TextAppearance.StopCovid.Caption.Bold"
+            app:layout_constraintBottom_toTopOf="@id/detailsTextSwitcher"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/barcodeImageView"
             app:switchPadding="@dimen/spacing_small"
             tools:text="@tools:sample/lorem[2]" />
 
         <TextSwitcher
             android:id="@+id/detailsTextSwitcher"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/spacing_medium"
+            app:layout_constraintBottom_toTopOf="@id/explanationTextSwitcher"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/showMoreSwitch">
 
             <TextView
                 android:id="@+id/detailsTextView1"
@@ -77,7 +94,6 @@
                 android:gravity="top|center_horizontal"
                 android:textAppearance="@style/TextAppearance.StopCovid.Title"
                 tools:ignore="SelectableText"
-                tools:minLines="5"
                 tools:text="@tools:sample/lorem[3]" />
 
             <TextView
@@ -87,33 +103,37 @@
                 android:gravity="top|center_horizontal"
                 android:textAppearance="@style/TextAppearance.StopCovid.Title"
                 tools:ignore="SelectableText"
-                tools:minLines="5"
                 tools:text="@tools:sample/lorem[3]" />
         </TextSwitcher>
 
         <TextSwitcher
             android:id="@+id/explanationTextSwitcher"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginHorizontal="@dimen/spacing_large"
-            android:layout_marginTop="@dimen/spacing_medium">
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintVertical_bias="1">
 
             <TextView
                 android:id="@+id/explanationTextView1"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:gravity="center_horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:gravity="center"
                 android:textAppearance="@style/TextAppearance.StopCovid.Caption"
                 android:textIsSelectable="true"
                 tools:text="@tools:sample/lorem[40]" />
 
             <TextView
                 android:id="@+id/explanationTextView2"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:gravity="center"
                 android:textAppearance="@style/TextAppearance.StopCovid.Caption"
-                tools:ignore="SelectableText"
+                android:textIsSelectable="true"
                 tools:text="@tools:sample/lorem[40]" />
         </TextSwitcher>
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

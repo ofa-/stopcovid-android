@@ -145,7 +145,8 @@ class WalletCertificateFragment : MainFragment() {
 
         val hasErrorCertificate = viewModel.certificates.value?.any { certificate ->
             (certificate as? EuropeanCertificate)?.greenCertificate?.testResultIsNegative == false
-                || viewModel.isBlacklisted(certificate)
+                    || viewModel.isBlacklisted(certificate)
+                    || (certificate as? EuropeanCertificate)?.isExpired == true
         } == true
         if (hasErrorCertificate) {
             items += captionItem {
@@ -315,16 +316,25 @@ class WalletCertificateFragment : MainFragment() {
             this.formatText = formatText
             tag1Text = strings[certificate.tagStringKey()]
 
-            when {
-                certificate is VaccinationCertificate -> tag2Text = strings[certificate.statusStringKey()]
-                (certificate as? EuropeanCertificate)?.type == WalletCertificateType.VACCINATION_EUROPE ->
-                    certificate.greenCertificate.vaccineDose?.let { (first, second) ->
-                        tag2Text = stringsFormat("wallet.proof.europe.vaccine.doses", first, second)
+            when (certificate) {
+                is FrenchCertificate -> {
+                    tag1Text = strings[certificate.tagStringKey()]
+                    tag2Text = (certificate as? VaccinationCertificate)?.statusStringKey()?.let(strings::get)
+                }
+                is EuropeanCertificate -> {
+                    if (certificate.type == WalletCertificateType.VACCINATION_EUROPE) {
+                        certificate.greenCertificate.vaccineDose?.let { (first, second) ->
+                            tag1Text = stringsFormat("wallet.proof.europe.vaccine.doses", first, second)
+                        }
+                    } else {
+                        tag1Text = strings["enum.HCertType.${certificate.type.code}"]
                     }
-                (certificate as? EuropeanCertificate)?.type == WalletCertificateType.RECOVERY_EUROPE ->
-                    tag2Text = strings["enum.HCertType.recovery"]
-                (certificate as? EuropeanCertificate)?.type == WalletCertificateType.SANITARY_EUROPE ->
-                    tag2Text = strings["enum.HCertType.test"]
+
+                    if (certificate.isExpired) {
+                        tag2Text = strings["wallet.expired.pillTitle"]
+                        tag2ColorRes = R.color.color_error
+                    }
+                }
             }
 
             this.allowShare = true

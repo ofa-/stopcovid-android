@@ -28,6 +28,8 @@ android {
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 30
+
+        vectorDrawables.useSupportLibrary = true
     }
 
     kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"

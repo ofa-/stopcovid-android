@@ -42,6 +42,7 @@ object Constants {
         const val RATINGS_KEY_FIGURES_OPENING: String = "ratingsKeyFiguresOpening"
         const val RATINGS_SHOWN: String = "ratingsShown"
         const val GOOGLE_REVIEW_SHOWN: String = "Google.Review.Shown"
+        const val NOTIFICATION_VERSION_CLOSED: String = "Notification.Version.Closed"
     }
 
     object Notification {

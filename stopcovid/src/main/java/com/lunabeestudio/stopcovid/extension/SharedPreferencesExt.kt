@@ -120,3 +120,7 @@ var SharedPreferences.ratingPopInShown: Boolean
 var SharedPreferences.googleReviewShown: Boolean
     get() = getBoolean(Constants.SharedPrefs.GOOGLE_REVIEW_SHOWN, false)
     set(value) = edit { putBoolean(Constants.SharedPrefs.GOOGLE_REVIEW_SHOWN, value) }
+
+var SharedPreferences.notificationVersionClosed: Int
+    get() = getInt(Constants.SharedPrefs.NOTIFICATION_VERSION_CLOSED, 0)
+    set(value) = edit { putInt(Constants.SharedPrefs.NOTIFICATION_VERSION_CLOSED, value) }

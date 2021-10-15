@@ -72,7 +72,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:textAppearance="@style/TextAppearance.StopCovid.Caption"
-                        tools:text="@tools:sample/lorem[2]" />
+                        tools:text="@tools:sample/lorem[5]" />
 
                     <TextView
                         android:id="@+id/mainTitleTextView"
@@ -101,5 +101,18 @@
             android:layout_height="wrap_content"
             android:orientation="vertical" />
     </LinearLayout>
+
+    <ImageView
+        android:id="@+id/dismissImageView"
+        android:layout_width="@dimen/min_touch_target_size"
+        android:layout_height="@dimen/min_touch_target_size"
+        android:layout_gravity="top|end"
+        android:background="@drawable/ripple_rounded"
+        android:scaleType="center"
+        android:src="@drawable/ic_dismiss"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="visible" />
 
 </com.google.android.material.card.MaterialCardView>
