@@ -313,7 +313,6 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Localized
             }
             firstResume = false
 
-            AppMaintenanceManager.checkForMaintenanceUpgrade(this@StopCovid, injectionContainer.serverManager.okHttpClient)
             injectionContainer.moreKeyFiguresManager.onAppForeground(this@StopCovid)
             injectionContainer.linksManager.onAppForeground(this@StopCovid)
             injectionContainer.privacyManager.onAppForeground(this@StopCovid)
