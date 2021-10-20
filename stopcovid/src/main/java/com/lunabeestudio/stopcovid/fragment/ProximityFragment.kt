@@ -518,6 +518,7 @@ class ProximityFragment : TimeMainFragment() {
         if (robertManager.configuration.displayVaccination) {
             addVaccinationItems(items)
         }
+        addUrgentDgsItems(items)
         addSectionSeparator(items)
 
         // Venue items
@@ -685,12 +686,7 @@ class ProximityFragment : TimeMainFragment() {
         }
     }
 
-    private fun addHealthItems(items: ArrayList<GenericItem>, showAsSick: Boolean) {
-        items += bigTitleItem {
-            text = strings["home.healthSection.title"]
-            identifier = "home.healthSection.title".hashCode().toLong()
-            importantForAccessibility = ViewCompat.IMPORTANT_FOR_ACCESSIBILITY_NO
-        }
+    private fun addUrgentDgsItems(items: ArrayList<GenericItem>) {
         if (robertManager.configuration.displayUrgentDgs) {
             items += cardWithActionItem(CardTheme.Urgent) {
                 onCardClick = {
@@ -707,7 +703,14 @@ class ProximityFragment : TimeMainFragment() {
                 identifier = items.count().toLong()
             }
         }
+    }
 
+    private fun addHealthItems(items: ArrayList<GenericItem>, showAsSick: Boolean) {
+        items += bigTitleItem {
+            text = strings["home.healthSection.title"]
+            identifier = "home.healthSection.title".hashCode().toLong()
+            importantForAccessibility = ViewCompat.IMPORTANT_FOR_ACCESSIBILITY_NO
+        }
         when {
             showAsSick -> {
                 healthItem = null
