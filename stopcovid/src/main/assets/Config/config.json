@@ -6,7 +6,7 @@
       },
       {
          "name":"version",
-         "value":92
+         "value":93
       },
       {
          "name":"versionCalibrationBle",
@@ -127,7 +127,7 @@
 				"t":"notif.title",
 				"s":"notif.subtitle",
 				"u":"notif.url",
-				"v":43
+				"v":44
 			}
 	   },
       {

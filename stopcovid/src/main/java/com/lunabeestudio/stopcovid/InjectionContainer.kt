@@ -19,13 +19,17 @@ import com.lunabeestudio.framework.local.datasource.SecureKeystoreDataSource
 import com.lunabeestudio.framework.manager.DebugManager
 import com.lunabeestudio.framework.manager.LocalProximityFilterImpl
 import com.lunabeestudio.framework.remote.datasource.CleaDataSource
+import com.lunabeestudio.framework.remote.datasource.DccLightDataSource
+import com.lunabeestudio.framework.remote.datasource.DummyDccLightDataSource
 import com.lunabeestudio.framework.remote.datasource.InGroupeDatasource
 import com.lunabeestudio.framework.remote.datasource.ServiceDataSource
 import com.lunabeestudio.framework.remote.server.ServerManager
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.robert.RobertManagerImpl
+import com.lunabeestudio.robert.datasource.RemoteDccLightDataSource
 import com.lunabeestudio.robert.datasource.RobertCalibrationDataSource
 import com.lunabeestudio.robert.datasource.RobertConfigurationDataSource
+import com.lunabeestudio.robert.datasource.SharedCryptoDataSource
 import com.lunabeestudio.stopcovid.coreui.EnvConstant
 import com.lunabeestudio.stopcovid.coreui.manager.CalibrationManager
 import com.lunabeestudio.stopcovid.coreui.manager.ConfigManager
@@ -48,6 +52,10 @@ import com.lunabeestudio.stopcovid.manager.VaccinationCenterManager
 import com.lunabeestudio.stopcovid.repository.AttestationRepository
 import com.lunabeestudio.stopcovid.repository.VenueRepository
 import com.lunabeestudio.stopcovid.repository.WalletRepository
+import com.lunabeestudio.stopcovid.usecase.CleanAndRenewActivityPassUseCase
+import com.lunabeestudio.stopcovid.usecase.GenerateActivityPassUseCase
+import com.lunabeestudio.stopcovid.usecase.VerifyAndGetCertificateCodeValueUseCase
+import com.lunabeestudio.stopcovid.usecase.VerifyCertificateUseCase
 import kotlinx.coroutines.CoroutineScope
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
@@ -74,7 +82,7 @@ class InjectionContainer(private val context: StopCovid, val coroutineScope: Cor
     val dccCertificatesManager: DccCertificatesManager by lazy { DccCertificatesManager(serverManager) }
     val calibrationDataSource: RobertCalibrationDataSource by lazy { TacCalibrationDataSource(calibrationManager) }
     val configurationDataSource: RobertConfigurationDataSource by lazy { TacConfigurationDataSource(configManager) }
-    val cryptoDataSource: BouncyCastleCryptoDataSource = BouncyCastleCryptoDataSource()
+    val sharedCryptoDataSource: SharedCryptoDataSource = BouncyCastleCryptoDataSource()
     val secureKeystoreDataSource: SecureKeystoreDataSource by lazy { SecureKeystoreDataSource(context, cryptoManager, ConcurrentHashMap()) }
     val logsDir: File by lazy { File(context.filesDir, Constants.Logs.DIR_NAME) }
     val debugManager: DebugManager by lazy { DebugManager(context, secureKeystoreDataSource, logsDir, cryptoManager) }
@@ -82,14 +90,25 @@ class InjectionContainer(private val context: StopCovid, val coroutineScope: Cor
     val venueRepository: VenueRepository by lazy { VenueRepository(secureKeystoreDataSource) }
     val walletRepository: WalletRepository by lazy {
         WalletRepository(
-            context,
-            secureKeystoreDataSource,
-            debugManager,
-            inGroupeDatasource,
-            analyticsManager,
-            coroutineScope,
+            context = context,
+            localKeystoreDataSource = secureKeystoreDataSource,
+            debugManager = debugManager,
+            remoteConversionDataSource = inGroupeDatasource,
+            analyticsManager = analyticsManager,
+            coroutineScope = coroutineScope,
+            remoteDccLightDataSource = remoteDccLightDataSource,
+            robertManager = robertManager,
         )
     }
+
+    private val remoteDccLightDataSource: RemoteDccLightDataSource by lazy {
+        if (EnvConstant.Prod.activityPassBaseUrl.isNotBlank()) {
+            DccLightDataSource(sharedCryptoDataSource, EnvConstant.Prod.activityPassBaseUrl, serverManager.okHttpClient, analyticsManager)
+        } else {
+            DummyDccLightDataSource()
+        }
+    }
+
     val isolationManager: IsolationManager by lazy { IsolationManager(context, robertManager, secureKeystoreDataSource) }
 
     val cleaDataSource: CleaDataSource = CleaDataSource(
@@ -100,7 +119,7 @@ class InjectionContainer(private val context: StopCovid, val coroutineScope: Cor
     )
     val inGroupeDatasource: InGroupeDatasource = InGroupeDatasource(
         context,
-        cryptoDataSource,
+        sharedCryptoDataSource,
         EnvConstant.Prod.conversionBaseUrl,
         analyticsManager,
     )
@@ -117,7 +136,7 @@ class InjectionContainer(private val context: StopCovid, val coroutineScope: Cor
         SecureFileLocalProximityDataSource(File(context.filesDir, LOCAL_PROXIMITY_DIR), cryptoManager),
         serviceDataSource,
         cleaDataSource,
-        cryptoDataSource,
+        sharedCryptoDataSource,
         configurationDataSource,
         calibrationDataSource,
         EnvConstant.Prod.serverPublicKey,
@@ -125,6 +144,32 @@ class InjectionContainer(private val context: StopCovid, val coroutineScope: Cor
         analyticsManager,
         coroutineScope = coroutineScope,
     )
+
+    val cleanAndRenewActivityPassUseCase: CleanAndRenewActivityPassUseCase
+        get() = CleanAndRenewActivityPassUseCase(
+            walletRepository = walletRepository,
+            blacklistDCCManager = blacklistDCCManager,
+            dccCertificatesManager = dccCertificatesManager,
+            robertManager = robertManager,
+            generateActivityPassUseCase = generateActivityPassUseCase,
+        )
+
+    val verifyCertificateUseCase: VerifyCertificateUseCase
+        get() = VerifyCertificateUseCase(
+            dccCertificatesManager = dccCertificatesManager,
+            robertManager = robertManager,
+        )
+
+    val generateActivityPassUseCase: GenerateActivityPassUseCase
+        get() = GenerateActivityPassUseCase(
+            walletRepository = walletRepository,
+            verifyCertificateUseCase = verifyCertificateUseCase,
+        )
+
+    val verifyAndGetCertificateCodeValueUseCase: VerifyAndGetCertificateCodeValueUseCase
+        get() = VerifyAndGetCertificateCodeValueUseCase(
+            verifyCertificateUseCase = verifyCertificateUseCase,
+        )
 
     companion object {
         private const val LOCAL_PROXIMITY_DIR = "local_proximity"

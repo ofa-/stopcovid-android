@@ -13,7 +13,6 @@ package com.lunabeestudio.stopcovid.fragment
 import android.os.Bundle
 import android.view.View
 import androidx.core.view.isVisible
-import androidx.fragment.app.viewModels
 import com.lunabeestudio.domain.model.WalletCertificateType
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.activity.MainActivity
@@ -22,6 +21,8 @@ import com.lunabeestudio.stopcovid.coreui.extension.findParentFragmentByType
 import com.lunabeestudio.stopcovid.coreui.fastitem.cardWithActionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.model.Action
+import com.lunabeestudio.stopcovid.extension.injectionContainer
+import com.lunabeestudio.stopcovid.extension.navGraphWalletViewModels
 import com.lunabeestudio.stopcovid.extension.openInExternalBrowser
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
@@ -29,25 +30,21 @@ import com.lunabeestudio.stopcovid.fastitem.LogoItem
 import com.lunabeestudio.stopcovid.fastitem.defaultPhoneSupportItem
 import com.lunabeestudio.stopcovid.fastitem.logoItem
 import com.lunabeestudio.stopcovid.fastitem.walletDoubleDocumentCardItem
-import com.lunabeestudio.stopcovid.viewmodel.WalletViewModel
 import com.lunabeestudio.stopcovid.viewmodel.WalletViewModelFactory
 import com.mikepenz.fastadapter.GenericItem
 import kotlin.time.ExperimentalTime
 
 class WalletInfoFragment : MainFragment() {
 
-    private val robertManager by lazy {
-        requireContext().robertManager()
+    private val viewModel by navGraphWalletViewModels<WalletContainerFragment> {
+        WalletViewModelFactory(
+            requireContext().robertManager(),
+            injectionContainer.blacklistDCCManager,
+            injectionContainer.blacklist2DDOCManager,
+            injectionContainer.walletRepository,
+            injectionContainer.generateActivityPassUseCase,
+        )
     }
-
-    private val viewModel: WalletViewModel by viewModels(
-        {
-            findParentFragmentByType<WalletContainerFragment>() ?: requireParentFragment()
-        },
-        {
-            WalletViewModelFactory(robertManager, blacklistDCCManager, blacklist2DDOCManager, walletRepository)
-        }
-    )
 
     override fun getTitleKey(): String = "walletController.title"
 

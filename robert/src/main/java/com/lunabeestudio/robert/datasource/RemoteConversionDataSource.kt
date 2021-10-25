@@ -11,10 +11,9 @@
 package com.lunabeestudio.robert.datasource
 
 import com.lunabeestudio.domain.model.WalletCertificateType
-import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.robert.model.RobertResultData
 
-interface RemoteCertificateDataSource {
+interface RemoteConversionDataSource {
     suspend fun convertCertificateV1(
         encodedCertificate: String,
         from: WalletCertificateType.Format,
@@ -22,7 +21,7 @@ interface RemoteCertificateDataSource {
     ): RobertResultData<String>
 
     suspend fun convertCertificateV2(
-        robertManager: RobertManager,
+        serverKeyConfig: Pair<String, String>,
         encodedCertificate: String,
         from: WalletCertificateType.Format,
         to: WalletCertificateType.Format

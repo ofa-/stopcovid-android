@@ -14,9 +14,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.isVisible
 import androidx.navigation.fragment.navArgs
-import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.extension.appCompatActivity
 import com.lunabeestudio.stopcovid.coreui.extension.setImageFileIfValid
 import com.lunabeestudio.stopcovid.coreui.fragment.BaseFragment
@@ -38,7 +36,6 @@ class CertificateDocumentExplanationFragment : BaseFragment() {
     }
 
     override fun refreshScreen() {
-        (activity as? MainActivity)?.binding?.tabLayout?.isVisible = false
         appCompatActivity?.supportActionBar?.title = strings["documentExplanationController.${args.certificateType.stringKey}.title"]
         binding.explanationTextView.text = strings["documentExplanationController.${args.certificateType.stringKey}.explanation"]
         showDocument()

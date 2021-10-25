@@ -13,14 +13,14 @@ package com.lunabeestudio.stopcovid.manager
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.google.gson.reflect.TypeToken
+import blacklist.Blacklist
 import com.lunabeestudio.framework.remote.server.ServerManager
 import com.lunabeestudio.stopcovid.coreui.ConfigConstant
-import java.lang.reflect.Type
+import java.util.zip.GZIPInputStream
 
-class Blacklist2DDOCManager(serverManager: ServerManager) : RemoteJsonManager<List<String>>(serverManager) {
+class Blacklist2DDOCManager(serverManager: ServerManager) :
+    RemoteProtoGzipManager<Blacklist.BlackListMessage, List<String>>(serverManager) {
 
-    override val type: Type = object : TypeToken<List<String>>() {}.type
     override fun getLocalFileName(context: Context): String = ConfigConstant.Blacklist2DDOC.FILENAME
     override fun getRemoteFileUrl(context: Context): String = ConfigConstant.Blacklist2DDOC.URL
     override fun getAssetFilePath(context: Context): String = ConfigConstant.Blacklist2DDOC.ASSET_FILE_PATH
@@ -45,5 +45,13 @@ class Blacklist2DDOCManager(serverManager: ServerManager) : RemoteJsonManager<Li
                 }
             }
         }
+    }
+
+    override fun parseProtoGzipStream(gzipInputStream: GZIPInputStream): Blacklist.BlackListMessage {
+        return Blacklist.BlackListMessage.parseFrom(gzipInputStream)
+    }
+
+    override fun Blacklist.BlackListMessage.mapProtoToApp(): List<String> {
+        return this.itemsList
     }
 }

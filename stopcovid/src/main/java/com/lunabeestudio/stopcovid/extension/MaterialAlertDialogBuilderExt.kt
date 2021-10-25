@@ -25,6 +25,7 @@ import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.extension.viewLifecycleOwnerOrNull
 import com.lunabeestudio.stopcovid.coreui.fragment.BaseFragment
 import com.lunabeestudio.stopcovid.coreui.manager.LocalizedStrings
+import com.lunabeestudio.stopcovid.databinding.DialogPasswordEditTextBinding
 import com.lunabeestudio.stopcovid.databinding.DialogPostalCodeEditTextBinding
 import com.lunabeestudio.stopcovid.model.RisksUILevel
 import kotlinx.coroutines.launch
@@ -277,4 +278,42 @@ fun MaterialAlertDialogBuilder.showRatingDialog(
     }
     setNegativeButton(strings["common.cancel"], null)
     show()
+}
+
+fun MaterialAlertDialogBuilder.showPasswordDialog(
+    layoutInflater: LayoutInflater,
+    strings: LocalizedStrings,
+    inError: Boolean,
+    onPositiveButton: (String) -> Unit,
+) {
+    val dialogPasswordEditTextBinding = DialogPasswordEditTextBinding.inflate(layoutInflater)
+
+    dialogPasswordEditTextBinding.textInputEditText.doOnTextChanged { _, _, _, _ ->
+        dialogPasswordEditTextBinding.textInputLayout.error = null
+    }
+
+    dialogPasswordEditTextBinding.textInputLayout.hint = strings["pdfImport.protected.enterPassword.alert.placeholder"]
+    setTitle(strings["pdfImport.protected.enterPassword.alert.title"])
+    setMessage(strings["pdfImport.protected.enterPassword.alert.message"])
+    setView(dialogPasswordEditTextBinding.textInputLayout)
+    setPositiveButton(strings["common.confirm"]) { _, _ ->
+        onPositiveButton(dialogPasswordEditTextBinding.textInputEditText.text.toString())
+    }
+    setCancelable(false)
+    setNegativeButton(strings["common.cancel"], null)
+    val dialog = show()
+
+    val positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+
+    dialogPasswordEditTextBinding.textInputEditText.setOnEditorActionListener { _, actionId, _ ->
+        if (actionId == EditorInfo.IME_ACTION_DONE) {
+            positiveButton.callOnClick()
+            true
+        } else {
+            false
+        }
+    }
+    if (inError) {
+        dialogPasswordEditTextBinding.textInputLayout.error = strings["pdfImport.protected.wrongPassword.alert.message"]
+    }
 }

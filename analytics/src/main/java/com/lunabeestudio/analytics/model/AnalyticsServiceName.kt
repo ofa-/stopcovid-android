@@ -21,4 +21,5 @@ object AnalyticsServiceName {
     const val WREPORT: String = "wreport"
     const val UNREGISTER: String = "unregister"
     const val DELETE_EXPOSURE_HISTORY: String = "deleteExposureHistory"
+    const val DCC_LIGHT: String = "dcclight"
 }

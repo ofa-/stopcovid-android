@@ -12,25 +12,26 @@ package com.lunabeestudio.stopcovid.extension
 
 import com.lunabeestudio.domain.model.WalletCertificateType
 import com.lunabeestudio.stopcovid.Constants
-import dgca.verifier.app.decoder.model.ExemptionStatement
+import dgca.verifier.app.decoder.model.CertificateType
 import dgca.verifier.app.decoder.model.GreenCertificate
-import dgca.verifier.app.decoder.model.RecoveryStatement
-import dgca.verifier.app.decoder.model.Test
-import dgca.verifier.app.decoder.model.Vaccination
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-val GreenCertificate.certificateType: WalletCertificateType?
+val GreenCertificate.certificateType: WalletCertificateType
     get() {
-        val dccType = tests?.lastOrNull() ?: recoveryStatements?.lastOrNull() ?: vaccinations?.lastOrNull() ?: exemptionStatement
-        return when (dccType) {
-            is Test -> WalletCertificateType.SANITARY_EUROPE
-            is RecoveryStatement -> WalletCertificateType.RECOVERY_EUROPE
-            is Vaccination -> WalletCertificateType.VACCINATION_EUROPE
-            is ExemptionStatement -> WalletCertificateType.EXEMPTION
-            else -> null
+        return when (getType()) {
+            CertificateType.VACCINATION -> WalletCertificateType.VACCINATION_EUROPE
+            CertificateType.RECOVERY -> WalletCertificateType.RECOVERY_EUROPE
+            CertificateType.TEST -> WalletCertificateType.SANITARY_EUROPE
+            CertificateType.UNKNOWN -> {
+                if (exemptionStatement != null) {
+                    WalletCertificateType.EXEMPTION
+                } else {
+                    WalletCertificateType.ACTIVITY_PASS
+                }
+            }
         }
     }
 
@@ -40,8 +41,8 @@ fun GreenCertificate.formattedDateOfBirthDate(dateFormat: DateFormat): String =
 val GreenCertificate.countryCode: String?
     get() = when (certificateType) {
         WalletCertificateType.SANITARY,
-        WalletCertificateType.VACCINATION,
-        null -> null
+        WalletCertificateType.VACCINATION -> null
+        WalletCertificateType.ACTIVITY_PASS -> Locale.FRANCE.country
         WalletCertificateType.SANITARY_EUROPE -> tests?.lastOrNull()?.countryOfVaccination
         WalletCertificateType.VACCINATION_EUROPE -> vaccinations?.lastOrNull()?.countryOfVaccination
         WalletCertificateType.RECOVERY_EUROPE -> recoveryStatements?.lastOrNull()?.countryOfVaccination

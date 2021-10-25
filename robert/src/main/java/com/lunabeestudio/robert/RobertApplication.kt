@@ -19,8 +19,8 @@ interface RobertApplication : AnalyticsInfosProvider {
     var isAppInForeground: Boolean
     fun getAppContext(): Context
     fun refreshProximityService()
-    fun notifyAtRiskLevelChange()
-    fun alertAtRiskLevelChange()
+    fun notifyAtRiskLevelChange(prevRiskLevel: Float)
+    fun atRiskLevelChange(prevRiskLevel: Float)
     suspend fun sendClockNotAlignedNotification()
     fun refreshInfoCenter()
     suspend fun getVenueQrCodeList(startTime: Long?, endTime: Long?): List<VenueQrCode>?

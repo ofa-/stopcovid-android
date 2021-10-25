@@ -7,6 +7,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.File
+import java.io.InputStream
 
 abstract class RemoteFileManager(private val serverManager: ServerManager) {
 
@@ -15,30 +16,18 @@ abstract class RemoteFileManager(private val serverManager: ServerManager) {
     protected abstract fun getAssetFilePath(context: Context): String?
     protected abstract val mimeType: String
 
-    protected suspend fun loadLocalBytes(context: Context): ByteArray? {
-        val localFile = File(context.filesDir, getLocalFileName(context))
-        return loadLocalBytes(localFile, context)
-    }
-
-    protected suspend fun loadLocalBytes(
-        localFile: File,
+    protected suspend fun getLocalFileOrAssetStream(
         context: Context
-    ): ByteArray? {
+    ): InputStream? {
+        val localFile = File(context.filesDir, getLocalFileName(context))
         return when {
-            localFile.exists() -> {
-                withContext(Dispatchers.IO) {
-                    try {
-                        Timber.v("Loading $localFile as ByteArray")
-                        localFile.readBytes()
-                    } catch (e: Exception) {
-                        Timber.e(e)
-                        null
-                    }
-                }
+            localFile.exists() -> try {
+                localFile.inputStream()
+            } catch (e: Exception) {
+                Timber.e(e)
+                null
             }
-            getAssetFilePath(context) != null -> {
-                getDefaultAssetFile(context)
-            }
+            getAssetFilePath(context) != null -> getDefaultAssetStream(context)
             else -> {
                 Timber.v("Nothing to load")
                 null
@@ -46,13 +35,11 @@ abstract class RemoteFileManager(private val serverManager: ServerManager) {
         }
     }
 
-    private suspend fun getDefaultAssetFile(context: Context): ByteArray? {
+    private suspend fun getDefaultAssetStream(context: Context): InputStream? {
         return getAssetFilePath(context)?.let { path ->
             withContext(Dispatchers.IO) {
                 @Suppress("BlockingMethodInNonBlockingContext")
-                context.assets.open(path).use { stream ->
-                    stream.readBytes()
-                }
+                context.assets.open(path)
             }
         }
     }

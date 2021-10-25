@@ -21,7 +21,9 @@ abstract class RemoteJsonManager<T>(serverManager: ServerManager) : RemoteFileMa
 
     protected suspend fun loadLocal(context: Context): T? {
         return withContext(Dispatchers.IO) {
-            loadLocalBytes(context)?.toString(Charsets.UTF_8)?.let { fileString ->
+            getLocalFileOrAssetStream(context)?.use {
+                it.readBytes()
+            }?.toString(Charsets.UTF_8)?.let { fileString ->
                 try {
                     gson.fromJson<T>(fileString, type)
                 } catch (e: Exception) {

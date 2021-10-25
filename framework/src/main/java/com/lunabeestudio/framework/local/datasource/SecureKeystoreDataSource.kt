@@ -13,7 +13,6 @@ package com.lunabeestudio.framework.local.datasource
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
-import androidx.room.Room
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.lunabeestudio.analytics.manager.AnalyticsManager
@@ -25,9 +24,11 @@ import com.lunabeestudio.domain.model.Configuration
 import com.lunabeestudio.domain.model.FormEntry
 import com.lunabeestudio.domain.model.RawWalletCertificate
 import com.lunabeestudio.domain.model.VenueQrCode
+import com.lunabeestudio.domain.model.WalletCertificateType
 import com.lunabeestudio.framework.extension.setOrRemove
 import com.lunabeestudio.framework.local.AppDatabase
 import com.lunabeestudio.framework.local.LocalCryptoManager
+import com.lunabeestudio.framework.local.model.ActivityPassRoom
 import com.lunabeestudio.framework.local.model.AttestationRoom
 import com.lunabeestudio.framework.local.model.CertificateRoom
 import com.lunabeestudio.framework.local.model.VenueRoom
@@ -50,7 +51,7 @@ class SecureKeystoreDataSource(
 
     private val gson: Gson = Gson()
     private val sharedPreferences: SharedPreferences = context.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE)
-    val db: AppDatabase = Room.databaseBuilder(context, AppDatabase::class.java, DB_NAME).build()
+    val db: AppDatabase = AppDatabase.build(context, DB_NAME)
 
     override var configuration: Configuration?
         get() = getValue(SHARED_PREF_KEY_CONFIGURATION, Configuration::class.java)
@@ -206,16 +207,25 @@ class SecureKeystoreDataSource(
 
     override suspend fun rawWalletCertificates(): List<RawWalletCertificate> {
         return withContext(ioDispatcher) {
-            db.certificateRoomDao().getAll().map { certificateRoom ->
+            db.certificateRoomDao().getAll().mapNotNull { (_, encryptedValue) ->
+                val decryptedString = cryptoManager.decryptToString(encryptedValue)
+                gson.fromJson(decryptedString, RawWalletCertificate::class.java)
+            }
+        }
+    }
+
+    override fun getCertificateByIdFlow(id: String): Flow<RawWalletCertificate?> {
+        return db.certificateRoomDao().getByIdFlow(id).map { certificateRoom ->
+            certificateRoom?.let {
                 val decryptedString = cryptoManager.decryptToString(certificateRoom.encryptedValue)
                 gson.fromJson(decryptedString, RawWalletCertificate::class.java)
             }
         }
     }
 
-    override fun getCertificateById(id: String): Flow<RawWalletCertificate?> {
-        return db.certificateRoomDao().getById(id).map { certificateRoom ->
-            certificateRoom?.let {
+    override suspend fun getCertificateById(id: String): RawWalletCertificate? {
+        return withContext(ioDispatcher) {
+            db.certificateRoomDao().getById(id)?.let { certificateRoom ->
                 val decryptedString = cryptoManager.decryptToString(certificateRoom.encryptedValue)
                 gson.fromJson(decryptedString, RawWalletCertificate::class.java)
             }
@@ -224,21 +234,67 @@ class SecureKeystoreDataSource(
 
     override val rawWalletCertificatesFlow: Flow<List<RawWalletCertificate>>
         get() = db.certificateRoomDao().getAllFlow().map { certificatesRoom ->
-            certificatesRoom.mapNotNull { certificateRoom ->
+            certificatesRoom.mapNotNull { (_, encryptedValue) ->
                 kotlin.runCatching {
-                    val decryptedString = cryptoManager.decryptToString(certificateRoom.encryptedValue)
+                    val decryptedString = cryptoManager.decryptToString(encryptedValue)
                     gson.fromJson(decryptedString, RawWalletCertificate::class.java)
                 }.getOrNull()
             }
         }
 
+    override suspend fun getRawActivityPassForRootId(id: String, timestamp: Long): RawWalletCertificate? {
+        return withContext(ioDispatcher) {
+            db.activityPassRoomDao().getForRootIdAndTime(id, timestamp)?.let {
+                activityPassRoomToRawWalletCertificate(it)
+            }
+        }
+    }
+
+    private fun activityPassRoomToRawWalletCertificate(activityPassRoom: ActivityPassRoom) = kotlin.runCatching {
+        val decryptedString = cryptoManager.decryptToString(activityPassRoom.encryptedValue)
+        gson.fromJson(decryptedString, RawWalletCertificate::class.java).apply {
+            this.expireAt = activityPassRoom.expireAt
+            this.rootWalletCertificateId = activityPassRoom.rootUid
+        }
+    }.getOrNull()
+
     override suspend fun insertAllRawWalletCertificates(vararg certificates: RawWalletCertificate) {
         withContext(ioDispatcher) {
-            val certificatesRoom = certificates.map { certificate ->
+            val splitCertificates = certificates.groupBy { it.type == WalletCertificateType.ACTIVITY_PASS }
+            splitCertificates[true]?.mapNotNull { certificate ->
+                val encryptedString = cryptoManager.encryptToString(gson.toJson(certificate))
+                val expireAt = certificate.expireAt
+                val rootWalletCertificateId = certificate.rootWalletCertificateId
+                if (expireAt != null && rootWalletCertificateId != null) {
+                    ActivityPassRoom(certificate.id, encryptedString, expireAt, rootWalletCertificateId)
+                } else if (expireAt == null) {
+                    Timber.e("expireAt must not be null for activity pass")
+                    null
+                } else {
+                    Timber.e("rootWalletCertificateId must not be null for activity pass")
+                    null
+                }
+            }?.let {
+                db.activityPassRoomDao().insertAll(*it.toTypedArray())
+            }
+
+            splitCertificates[false]?.map { certificate ->
+                val encryptedString = cryptoManager.encryptToString(gson.toJson(certificate))
+                CertificateRoom(certificate.id, encryptedString)
+            }?.let {
+                db.certificateRoomDao().insertAll(*it.toTypedArray())
+            }
+        }
+    }
+
+    override suspend fun updateNonLightRawWalletCertificate(vararg certificates: RawWalletCertificate) {
+        withContext(ioDispatcher) {
+            val roomCertificates = certificates.filter { it.type != WalletCertificateType.ACTIVITY_PASS }.map { certificate ->
                 val encryptedString = cryptoManager.encryptToString(gson.toJson(certificate))
                 CertificateRoom(certificate.id, encryptedString)
             }
-            db.certificateRoomDao().insertAll(*certificatesRoom.toTypedArray())
+
+            db.certificateRoomDao().updateAll(*roomCertificates.toTypedArray())
         }
     }
 
@@ -251,6 +307,42 @@ class SecureKeystoreDataSource(
     override suspend fun deleteAllRawWalletCertificates() {
         withContext(ioDispatcher) {
             db.certificateRoomDao().deleteAll()
+        }
+    }
+
+    override suspend fun deleteAllActivityPassForCertificate(certificateId: String) {
+        withContext(ioDispatcher) {
+            db.activityPassRoomDao().deleteAllForRootId(certificateId)
+        }
+    }
+
+    override suspend fun deleteAllExpiredActivityPass(timestamp: Long) {
+        withContext(ioDispatcher) {
+            db.activityPassRoomDao().deleteExpired(timestamp)
+        }
+    }
+
+    override suspend fun countValidActivityPassForCertificate(certificateId: String, timestamp: Long): Int {
+        return withContext(ioDispatcher) {
+            db.activityPassRoomDao().countForRootIdAndNotExpired(certificateId, timestamp)
+        }
+    }
+
+    override suspend fun getAllActivityPassDistinctByRootId(): List<RawWalletCertificate> {
+        return withContext(ioDispatcher) {
+            db.activityPassRoomDao().getAllDistinctByRootId().mapNotNull(::activityPassRoomToRawWalletCertificate)
+        }
+    }
+
+    override suspend fun getAllActivityPassForRootId(rootCertificateId: String): List<RawWalletCertificate> {
+        return withContext(ioDispatcher) {
+            db.activityPassRoomDao().getAllActivityPassForRootId(rootCertificateId).mapNotNull(::activityPassRoomToRawWalletCertificate)
+        }
+    }
+
+    override suspend fun deleteActivityPass(vararg activityPassId: String) {
+        withContext(ioDispatcher) {
+            db.activityPassRoomDao().deleteActivityPass(*activityPassId)
         }
     }
 

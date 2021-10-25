@@ -117,13 +117,13 @@ class ManageDataFragment : MainFragment() {
 
         manageNotificationsItems(items)
         spaceDividerItems(items)
-        hideRiskStatusItems(items)
-        spaceDividerItems(items)
         userLanguageItems(items)
         spaceDividerItems(items)
-        eraseAttestationItems(items)
+        manageCertificatesItems(items)
         spaceDividerItems(items)
-        eraseCertificatesItems(items)
+        hideRiskStatusItems(items)
+        spaceDividerItems(items)
+        eraseAttestationItems(items)
         spaceDividerItems(items)
         if (robertManager.configuration.displayIsolation) {
             eraseIsolationItems(items)
@@ -246,7 +246,7 @@ class ManageDataFragment : MainFragment() {
         }
     }
 
-    private fun eraseCertificatesItems(items: MutableList<GenericItem>) {
+    private fun manageCertificatesItems(items: MutableList<GenericItem>) {
         items += titleItem {
             text = strings["manageDataController.walletData.title"]
             identifier = items.count().toLong()

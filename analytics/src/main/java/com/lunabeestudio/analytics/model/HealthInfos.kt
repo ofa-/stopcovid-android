@@ -19,14 +19,4 @@ class HealthInfos(
     val dateSample: String?,
     val dateFirstSymptoms: String?,
     val dateLastContactNotification: String?,
-) : Infos(type, os) {
-    override fun toString(): String {
-        return "HealthInfos(\n" +
-            "\t secondsTracingActivated=$secondsTracingActivated, \n" +
-            "\t riskLevel=$riskLevel, \n" +
-            "\t dateSample=$dateSample, \n" +
-            "\t dateFirstSymptoms=$dateFirstSymptoms, \n" +
-            "\t dateLastContactNotification=$dateLastContactNotification \n" +
-            ")"
-    }
-}
+) : Infos(type, os)

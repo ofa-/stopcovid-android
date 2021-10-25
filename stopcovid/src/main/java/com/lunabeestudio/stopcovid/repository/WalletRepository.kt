@@ -15,30 +15,26 @@ import android.net.Uri
 import android.net.UrlQuerySanitizer
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.asLiveData
 import com.lunabeestudio.analytics.manager.AnalyticsManager
 import com.lunabeestudio.analytics.model.AppEventName
 import com.lunabeestudio.analytics.model.ErrorEventName
-import com.lunabeestudio.domain.extension.walletPublicKey
-import com.lunabeestudio.domain.model.Configuration
+import com.lunabeestudio.domain.model.DccLightData
 import com.lunabeestudio.domain.model.RawWalletCertificate
 import com.lunabeestudio.domain.model.WalletCertificateType
 import com.lunabeestudio.framework.manager.DebugManager
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.robert.datasource.LocalKeystoreDataSource
-import com.lunabeestudio.robert.datasource.RemoteCertificateDataSource
+import com.lunabeestudio.robert.datasource.RemoteConversionDataSource
+import com.lunabeestudio.robert.datasource.RemoteDccLightDataSource
 import com.lunabeestudio.robert.model.RobertResultData
-import com.lunabeestudio.stopcovid.extension.isFrench
+import com.lunabeestudio.robert.model.UnknownException
 import com.lunabeestudio.stopcovid.extension.raw
-import com.lunabeestudio.stopcovid.model.DccCertificates
 import com.lunabeestudio.stopcovid.model.EuropeanCertificate
-import com.lunabeestudio.stopcovid.model.FrenchCertificate
 import com.lunabeestudio.stopcovid.model.WalletCertificate
 import com.lunabeestudio.stopcovid.model.WalletCertificateMalformedException
-import com.lunabeestudio.stopcovid.model.WalletCertificateNoKeyException
-import com.lunabeestudio.stopcovid.model.getForKeyId
 import com.lunabeestudio.stopcovid.widgetshomescreen.DccWidget
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -46,16 +42,19 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import kotlin.time.ExperimentalTime
 
 class WalletRepository(
     context: Context,
     private val localKeystoreDataSource: LocalKeystoreDataSource,
     private val debugManager: DebugManager,
-    private val remoteDataSource: RemoteCertificateDataSource,
+    private val remoteConversionDataSource: RemoteConversionDataSource,
     private val analyticsManager: AnalyticsManager,
     coroutineScope: CoroutineScope,
+    private val remoteDccLightDataSource: RemoteDccLightDataSource,
+    private val robertManager: RobertManager,
 ) {
-    val walletCertificateFlow: StateFlow<List<WalletCertificate>>
+    val walletCertificateFlow: StateFlow<List<WalletCertificate>?>
 
     val certificateCountFlow: Flow<Int>
         get() = localKeystoreDataSource.certificateCountFlow
@@ -68,8 +67,8 @@ class WalletRepository(
         // SharingStarted.Eagerly to use the state flow as cache
         walletCertificateFlow = localKeystoreDataSource.rawWalletCertificatesFlow.map { rawWalletList ->
             rawWalletList.toWalletCertificates()
-        }.stateIn(coroutineScope, SharingStarted.Eagerly, emptyList())
-        walletCertificateFlow.asLiveData(timeoutInMs = 0L).observeForever {
+        }.stateIn(coroutineScope, SharingStarted.Eagerly, null)
+        coroutineScope.launch(Dispatchers.Main) {
             DccWidget.updateWidget(context)
         }
 
@@ -105,39 +104,6 @@ class WalletRepository(
         return (code ?: throw WalletCertificateMalformedException()) to certificateFormat
     }
 
-    suspend fun verifyAndGetCertificateCodeValue(
-        configuration: Configuration,
-        codeValue: String,
-        dccCertificates: DccCertificates,
-        certificateFormat: WalletCertificateType.Format?,
-    ): WalletCertificate {
-        val walletCertificate = getCertificateFromValue(codeValue)
-
-        if (walletCertificate == null ||
-            (certificateFormat != null && walletCertificate.type.format != certificateFormat)
-        ) {
-            throw WalletCertificateMalformedException()
-        }
-
-        walletCertificate.parse()
-
-        val key: String? = when (walletCertificate) {
-            is EuropeanCertificate -> dccCertificates.getForKeyId(walletCertificate.keyCertificateId)
-            is FrenchCertificate -> configuration.walletPublicKey(walletCertificate.keyAuthority, walletCertificate.keyCertificateId)
-        }
-
-        if (key != null) {
-            walletCertificate.verifyKey(key)
-        } else if ((walletCertificate as? EuropeanCertificate)?.greenCertificate?.isFrench == true
-            || walletCertificate !is EuropeanCertificate
-        ) {
-            // Only check French certificates
-            throw WalletCertificateNoKeyException()
-        }
-
-        return walletCertificate
-    }
-
     suspend fun saveCertificate(walletCertificate: WalletCertificate) {
         try {
             localKeystoreDataSource.insertAllRawWalletCertificates(walletCertificate.raw)
@@ -164,11 +130,7 @@ class WalletRepository(
             rawWalletCertificate.isFavorite = !rawWalletCertificate.isFavorite
         }
 
-        localKeystoreDataSource.insertAllRawWalletCertificates(*listOfNotNull(currentFavorite, rawWalletCertificate).toTypedArray())
-    }
-
-    private suspend fun getCertificateFromValue(value: String): WalletCertificate? {
-        return WalletCertificate.createCertificateFromValue(value)
+        localKeystoreDataSource.updateNonLightRawWalletCertificate(*listOfNotNull(currentFavorite, rawWalletCertificate).toTypedArray())
     }
 
     suspend fun deleteCertificate(walletCertificate: WalletCertificate) {
@@ -183,6 +145,10 @@ class WalletRepository(
         localKeystoreDataSource.deleteDeprecatedCertificates()
     }
 
+    suspend fun deleteAllActivityPassForCertificate(certificateId: String) {
+        localKeystoreDataSource.deleteAllActivityPassForCertificate(certificateId)
+    }
+
     suspend fun convertCertificate(
         robertManager: RobertManager,
         certificate: RawWalletCertificate,
@@ -190,14 +156,17 @@ class WalletRepository(
     ): RobertResultData<String> {
 
         val robertResultData = if (robertManager.configuration.conversionApiVersion == 2) {
-            remoteDataSource.convertCertificateV2(
-                robertManager = robertManager,
+            val serverKeyConfig = robertManager.configuration.conversionPublicKey.toList().firstOrNull()
+                ?: return RobertResultData.Failure(UnknownException("No server conversion key found for conversion v2"))
+
+            remoteConversionDataSource.convertCertificateV2(
+                serverKeyConfig = serverKeyConfig,
                 encodedCertificate = certificate.value,
                 from = certificate.type.format,
                 to = to
             )
         } else {
-            remoteDataSource.convertCertificateV1(
+            remoteConversionDataSource.convertCertificateV1(
                 encodedCertificate = certificate.value,
                 from = certificate.type.format,
                 to = to
@@ -216,11 +185,14 @@ class WalletRepository(
     }
 
     fun certificateExists(certificate: WalletCertificate): Boolean {
-        return walletCertificateFlow.value.any { certificate.value == it.value }
+        return walletCertificateFlow.value?.any { certificate.value == it.value } == true
     }
 
-    fun getById(certificateId: String): Flow<WalletCertificate?> =
-        localKeystoreDataSource.getCertificateById(certificateId).map { it?.toWalletCertificate() }
+    fun getCertificateByIdFlow(certificateId: String): Flow<WalletCertificate?> =
+        localKeystoreDataSource.getCertificateByIdFlow(certificateId).map { it?.toWalletCertificate() }
+
+    suspend fun getCertificateById(certificateId: String): WalletCertificate? =
+        localKeystoreDataSource.getCertificateById(certificateId)?.toWalletCertificate()
 
     private suspend fun List<RawWalletCertificate>.toWalletCertificates() =
         mapNotNull { rawWallet ->
@@ -234,5 +206,56 @@ class WalletRepository(
     } catch (e: Exception) {
         Timber.e(e)
         null
+    }
+
+    suspend fun getActivityPass(rootCertificateId: String, timestamp: Long): EuropeanCertificate? {
+        return localKeystoreDataSource.getRawActivityPassForRootId(rootCertificateId, timestamp)
+            ?.toWalletCertificate() as? EuropeanCertificate
+    }
+
+    suspend fun deleteAllExpiredActivityPass(timestamp: Long): Unit =
+        localKeystoreDataSource.deleteAllExpiredActivityPass(timestamp)
+
+    suspend fun countValidActivityPassForCertificate(certificateId: String, timestamp: Long): Int =
+        localKeystoreDataSource.countValidActivityPassForCertificate(certificateId, timestamp)
+
+    suspend fun getAllActivityPassDistinctByRootId(): List<EuropeanCertificate> =
+        localKeystoreDataSource.getAllActivityPassDistinctByRootId().mapNotNull { rawWalletCertificate ->
+            EuropeanCertificate.getCertificate(
+                rawWalletCertificate.value,
+                rawWalletCertificate.id,
+                rawWalletCertificate.isFavorite,
+                rawWalletCertificate.canRenewDccLight,
+            )
+        }
+
+    suspend fun getAllActivityPassForRootId(rootCertificateId: String): List<EuropeanCertificate> =
+        localKeystoreDataSource.getAllActivityPassForRootId(rootCertificateId).mapNotNull { rawWalletCertificate ->
+            EuropeanCertificate.getCertificate(
+                rawWalletCertificate.value,
+                rawWalletCertificate.id,
+                rawWalletCertificate.isFavorite,
+                rawWalletCertificate.canRenewDccLight,
+            )
+        }
+
+    suspend fun deleteActivityPass(vararg activityPassId: String) {
+        localKeystoreDataSource.deleteActivityPass(*activityPassId)
+    }
+
+    suspend fun saveCertificate(vararg arrayOfRawWalletCertificates: RawWalletCertificate) {
+        localKeystoreDataSource.insertAllRawWalletCertificates(*arrayOfRawWalletCertificates)
+    }
+
+    suspend fun updateCertificate(certificate: RawWalletCertificate) {
+        localKeystoreDataSource.updateNonLightRawWalletCertificate(certificate)
+    }
+
+    @OptIn(ExperimentalTime::class)
+    suspend fun generateActivityPass(certificateValue: String): RobertResultData<DccLightData> {
+        return remoteDccLightDataSource.generateActivityPass(
+            robertManager.configuration.generationServerPublicKey,
+            certificateValue,
+        )
     }
 }

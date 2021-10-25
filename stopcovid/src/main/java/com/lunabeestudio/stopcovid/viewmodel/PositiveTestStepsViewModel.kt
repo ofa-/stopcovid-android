@@ -29,9 +29,7 @@ class PositiveTestStepsViewModel(
 
     fun saveCertificate(walletCertificate: WalletCertificate) {
         viewModelScope.launch {
-            walletRepository.saveCertificate(
-                walletCertificate,
-            )
+            walletRepository.saveCertificate(walletCertificate)
             handle.set(CURRENT_STEP_KEY, (currentStep.value ?: 0) + 1)
         }
     }

@@ -23,7 +23,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.text.toSpannable
 import androidx.core.view.doOnNextLayout
 import androidx.core.view.isVisible
-import androidx.fragment.app.viewModels
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.zxing.BarcodeFormat
@@ -34,26 +34,24 @@ import com.lunabeestudio.robert.model.RobertException
 import com.lunabeestudio.robert.model.RobertResultData
 import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.R
-import com.lunabeestudio.stopcovid.StopCovid
 import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.extension.findParentFragmentByType
 import com.lunabeestudio.stopcovid.coreui.extension.toDimensSize
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
-import com.lunabeestudio.stopcovid.extension.barcodeFormat
 import com.lunabeestudio.stopcovid.extension.countryCode
-import com.lunabeestudio.stopcovid.extension.dccCertificatesManager
 import com.lunabeestudio.stopcovid.extension.fullDescription
 import com.lunabeestudio.stopcovid.extension.getString
+import com.lunabeestudio.stopcovid.extension.injectionContainer
 import com.lunabeestudio.stopcovid.extension.isAutoTest
+import com.lunabeestudio.stopcovid.extension.isExpired
 import com.lunabeestudio.stopcovid.extension.isFrench
+import com.lunabeestudio.stopcovid.extension.navGraphWalletViewModels
 import com.lunabeestudio.stopcovid.extension.openInExternalBrowser
 import com.lunabeestudio.stopcovid.extension.raw
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
-import com.lunabeestudio.stopcovid.extension.shortDescription
-import com.lunabeestudio.stopcovid.extension.showUnknownErrorAlert
 import com.lunabeestudio.stopcovid.extension.statusStringKey
 import com.lunabeestudio.stopcovid.extension.tagStringKey
 import com.lunabeestudio.stopcovid.extension.testResultIsNegative
@@ -69,8 +67,8 @@ import com.lunabeestudio.stopcovid.model.SanitaryCertificate
 import com.lunabeestudio.stopcovid.model.UnknownException
 import com.lunabeestudio.stopcovid.model.VaccinationCertificate
 import com.lunabeestudio.stopcovid.model.WalletCertificate
-import com.lunabeestudio.stopcovid.viewmodel.WalletViewModel
 import com.lunabeestudio.stopcovid.viewmodel.WalletViewModelFactory
+import com.lunabeestudio.stopcovid.worker.DccLightGenerationWorker
 import com.mikepenz.fastadapter.GenericItem
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
@@ -87,18 +85,15 @@ class WalletCertificateFragment : MainFragment() {
         requireContext().robertManager()
     }
 
-    private val dccCertificatesManager by lazy {
-        requireContext().dccCertificatesManager()
+    private val viewModel by navGraphWalletViewModels<WalletContainerFragment> {
+        WalletViewModelFactory(
+            robertManager,
+            blacklistDCCManager,
+            blacklist2DDOCManager,
+            injectionContainer.walletRepository,
+            injectionContainer.generateActivityPassUseCase,
+        )
     }
-
-    private val viewModel: WalletViewModel by viewModels(
-        {
-            findParentFragmentByType<WalletContainerFragment>() ?: requireParentFragment()
-        },
-        {
-            WalletViewModelFactory(robertManager, blacklistDCCManager, blacklist2DDOCManager, walletRepository)
-        }
-    )
 
     override fun getTitleKey(): String = "walletController.title"
 
@@ -113,7 +108,7 @@ class WalletCertificateFragment : MainFragment() {
                 }
             )
         }
-        viewModel.certificates.observe(viewLifecycleOwner) {
+        viewModel.certificates.asLiveData(timeoutInMs = 0).observe(viewLifecycleOwner) {
             lifecycleScope.launch {
                 debugManager.logObserveCertificate(it?.map { certificate -> certificate.raw })
             }
@@ -145,8 +140,8 @@ class WalletCertificateFragment : MainFragment() {
 
         val hasErrorCertificate = viewModel.certificates.value?.any { certificate ->
             (certificate as? EuropeanCertificate)?.greenCertificate?.testResultIsNegative == false
-                    || viewModel.isBlacklisted(certificate)
-                    || (certificate as? EuropeanCertificate)?.isExpired == true
+                || viewModel.isBlacklisted(certificate)
+                || (certificate as? EuropeanCertificate)?.isExpired == true
         } == true
         if (hasErrorCertificate) {
             items += captionItem {
@@ -353,31 +348,16 @@ class WalletCertificateFragment : MainFragment() {
                     .setMessage(strings["walletController.menu.delete.alert.message"])
                     .setNegativeButton(strings["common.cancel"], null)
                     .setPositiveButton(strings["common.confirm"]) { _, _ ->
+                        DccLightGenerationWorker.cancel(requireContext(), certificate.id)
                         viewModel.removeCertificate(certificate)
                         lifecycleScope.launch {
                             debugManager.logDeleteCertificates(certificate.raw, "from wallet")
                         }
-                        refreshScreen()
                     }
                     .show()
             }
             onClick = {
-                if (certificate is EuropeanCertificate) {
-                    findParentFragmentByType<WalletContainerFragment>()?.findNavControllerOrNull()?.safeNavigate(
-                        WalletContainerFragmentDirections.actionWalletContainerFragmentToFullscreenDccFragment(
-                            id = certificate.id,
-                        )
-                    )
-                } else {
-                    findParentFragmentByType<WalletContainerFragment>()?.findNavControllerOrNull()?.safeNavigate(
-                        WalletContainerFragmentDirections.actionWalletContainerFragmentToFullscreenQRCodeFragment(
-                            certificate.value,
-                            certificate.type.barcodeFormat,
-                            certificate.shortDescription(),
-                            certificate.sha256,
-                        )
-                    )
-                }
+                findParentFragmentByType<WalletContainerFragment>()?.navigateToFullscreenCertificate(certificate)
             }
             onConvert = conversionLambda
             actionContentDescription = strings["accessibility.hint.otherActions"]
@@ -404,7 +384,7 @@ class WalletCertificateFragment : MainFragment() {
         }
     }
 
-    private fun showConversionConfirmationAlert(certificate: WalletCertificate) {
+    private fun showConversionConfirmationAlert(certificate: FrenchCertificate) {
         if ((certificate as? SanitaryCertificate)?.analysisCode in robertManager.configuration.certificateConversionSidepOnlyCode) {
             MaterialAlertDialogBuilder(requireContext())
                 .setTitle(strings["walletController.convertCertificate.antigenicAlert.title"])
@@ -429,15 +409,10 @@ class WalletCertificateFragment : MainFragment() {
         }
     }
 
-    private fun requestCertificateConversion(certificate: WalletCertificate) {
+    private fun requestCertificateConversion(certificate: FrenchCertificate) {
         lifecycleScope.launch {
             showLoading(strings["walletController.convertCertificate.loading"])
-            val result = (activity?.application as? StopCovid)?.injectionContainer?.walletRepository?.convertCertificate(
-                robertManager,
-                certificate.raw,
-                WalletCertificateType.Format.WALLET_DCC
-            )
-
+            val result = viewModel.convert2ddocToDcc(certificate)
             when (result) {
                 is RobertResultData.Failure -> showConversionFailedAlert()
                 is RobertResultData.Success -> {
@@ -448,7 +423,6 @@ class WalletCertificateFragment : MainFragment() {
                         showConversionFailedAlert()
                     }
                 }
-                null -> showUnknownErrorAlert(null)
             }
 
             showData()
@@ -480,10 +454,8 @@ class WalletCertificateFragment : MainFragment() {
         certificateFormat: WalletCertificateType.Format?,
     ): Boolean {
         return try {
-            val certificate = walletRepository.verifyAndGetCertificateCodeValue(
-                robertManager.configuration,
+            val certificate = injectionContainer.verifyAndGetCertificateCodeValueUseCase(
                 certificateCode,
-                dccCertificatesManager.certificates,
                 certificateFormat,
             )
 

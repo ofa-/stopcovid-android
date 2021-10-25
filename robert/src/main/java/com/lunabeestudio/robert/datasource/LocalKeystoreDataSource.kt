@@ -49,9 +49,13 @@ interface LocalKeystoreDataSource {
     suspend fun rawWalletCertificates(): List<RawWalletCertificate>
     val rawWalletCertificatesFlow: Flow<List<RawWalletCertificate>>
     suspend fun insertAllRawWalletCertificates(vararg certificates: RawWalletCertificate)
+    suspend fun updateNonLightRawWalletCertificate(vararg certificates: RawWalletCertificate)
     suspend fun deleteRawWalletCertificate(certificateId: String)
     suspend fun deleteAllRawWalletCertificates()
     fun deleteDeprecatedCertificates()
+    suspend fun deleteAllActivityPassForCertificate(certificateId: String)
+    suspend fun deleteAllExpiredActivityPass(timestamp: Long)
+    suspend fun countValidActivityPassForCertificate(certificateId: String, timestamp: Long): Int
     suspend fun migrateCertificates(analyticsManager: AnalyticsManager): List<RawWalletCertificate>
 
     var deprecatedAttestations: List<Map<String, FormEntry>>?
@@ -70,7 +74,12 @@ interface LocalKeystoreDataSource {
     fun deleteDeprecatedVenuesQrCode()
     suspend fun getCertificateCount(): Int
     val certificateCountFlow: Flow<Int>
-    fun getCertificateById(id: String): Flow<RawWalletCertificate?>
+    fun getCertificateByIdFlow(id: String): Flow<RawWalletCertificate?>
+    suspend fun getCertificateById(id: String): RawWalletCertificate?
+    suspend fun getRawActivityPassForRootId(id: String, timestamp: Long): RawWalletCertificate?
+    suspend fun getAllActivityPassDistinctByRootId(): List<RawWalletCertificate>
+    suspend fun getAllActivityPassForRootId(rootCertificateId: String): List<RawWalletCertificate>
+    suspend fun deleteActivityPass(vararg activityPassId: String)
 
     var declarationToken: String?
     var reportPositiveTestDate: Long?

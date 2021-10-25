@@ -29,7 +29,7 @@ class VaccineCompletionViewModel(
     private val dispatcherIO: CoroutineDispatcher = Dispatchers.IO,
 ) : ViewModel() {
 
-    val certificate: LiveData<WalletCertificate?> = walletRepository.getById(certificateId).asLiveData(timeoutInMs = 0)
+    val certificate: LiveData<WalletCertificate?> = walletRepository.getCertificateByIdFlow(certificateId).asLiveData(timeoutInMs = 0)
 
     val showWalletEvent: SingleLiveEvent<Unit> = SingleLiveEvent()
 
@@ -37,9 +37,7 @@ class VaccineCompletionViewModel(
         viewModelScope.launch(dispatcherIO) {
             (certificate.value as? EuropeanCertificate)?.let {
                 if (!it.isFavorite) {
-                    walletRepository.toggleFavorite(
-                        it,
-                    )
+                    walletRepository.toggleFavorite(it)
                 }
             }
             showWalletEvent.postValue(null)

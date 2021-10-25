@@ -270,7 +270,7 @@ class ProximityFragment : TimeMainFragment() {
                     lifecycleScope.launch {
                         findNavControllerOrNull()
                             ?.safeNavigate(
-                                ProximityFragmentDirections.actionProximityFragmentToWalletContainerFragment(
+                                ProximityFragmentDirections.actionProximityFragmentToNavWallet(
                                     code = data,
                                     origin = DeeplinkManager.Origin.UNIVERSAL,
                                 )
@@ -317,7 +317,11 @@ class ProximityFragment : TimeMainFragment() {
         fragmentRecyclerViewFabBinding?.floatingActionButton?.let { fab ->
             fab.text = strings["home.qrScan.button.title"]
             fab.setOnClickListener {
-                analyticsManager.reportAppEvent(AppEventName.e18, null)
+                if (fab.isExtended) {
+                    analyticsManager.reportAppEvent(AppEventName.e19, null)
+                } else {
+                    analyticsManager.reportAppEvent(AppEventName.e18, null)
+                }
                 findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToUniversalQrScanFragment())
             }
             binding?.recyclerView?.addOnScrollListener(ExtendedFloatingActionButtonScrollListener(fab))
@@ -1004,7 +1008,9 @@ class ProximityFragment : TimeMainFragment() {
                 }
                 onClick = {
                     findNavControllerOrNull()?.safeNavigate(
-                        ProximityFragmentDirections.actionProximityFragmentToFullscreenDccFragment(favoriteDcc.id)
+                        ProximityFragmentDirections.actionProximityFragmentToNavWallet(
+                            navCertificateId = favoriteDcc.id
+                        )
                     )
                 }
                 identifier = favoriteDcc.id.hashCode().toLong()
@@ -1019,7 +1025,7 @@ class ProximityFragment : TimeMainFragment() {
             mainImage = R.drawable.wallet_card
             mainLayoutDirection = LayoutDirection.RTL
             onCardClick = {
-                findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToWalletContainerFragment())
+                findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToNavWallet())
             }
             mainTitle = strings["home.attestationSection.sanitaryCertificates.cell.title"]
             mainBody = strings["home.attestationSection.sanitaryCertificates.cell.subtitle"]
@@ -1131,7 +1137,7 @@ class ProximityFragment : TimeMainFragment() {
                     findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToVenuesHistoryFragment())
                 }.takeIf {
                     robertManager.configuration.displayRecordVenues
-                            || !viewModel.venuesQrCodeLiveData.value.isNullOrEmpty()
+                        || !viewModel.venuesQrCodeLiveData.value.isNullOrEmpty()
                 },
                 Action(R.drawable.ic_settings, strings["common.settings"]) {
                     findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToManageDataFragment())

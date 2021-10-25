@@ -21,6 +21,12 @@ android {
         minSdkVersion 21
         targetSdkVersion 30
 
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments += ["room.schemaLocation": "$projectDir/schemas".toString()]
+            }
+        }
+
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -51,6 +57,11 @@ android {
     lintOptions {
         disable "GradleDependency",
                 "MissingBackupPin"
+    }
+
+    sourceSets {
+        // Adds exported schema location as test app assets.
+        androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
     }
 }
 
@@ -85,9 +96,10 @@ dependencies {
     androidTestImplementation "androidx.test:runner:_"
     androidTestImplementation "androidx.test:rules:_"
     androidTestImplementation "androidx.test.ext:truth:_"
+    androidTestImplementation "androidx.test.ext:junit:_"
+    androidTestImplementation "androidx.room:room-testing:_"
+
     androidTestImplementation "com.squareup.okhttp3:mockwebserver:_"
     androidTestImplementation "org.apache.commons:commons-text:_"
-    androidTestImplementation "com.squareup.okhttp3:mockwebserver:_"
-    androidTestImplementation "androidx.test.ext:junit:_"
     androidTestImplementation "io.mockk:mockk-android:_"
 }

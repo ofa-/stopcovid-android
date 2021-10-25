@@ -16,23 +16,22 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.lunabeestudio.stopcovid.R
-import com.lunabeestudio.stopcovid.StopCovid
 import com.lunabeestudio.stopcovid.activity.MainActivity
+import com.lunabeestudio.stopcovid.coreui.extension.appCompatActivity
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
-import com.lunabeestudio.stopcovid.coreui.extension.findParentFragmentByType
 import com.lunabeestudio.stopcovid.coreui.extension.refreshLift
 import com.lunabeestudio.stopcovid.coreui.fragment.BaseFragment
+import com.lunabeestudio.stopcovid.extension.injectionContainer
+import com.lunabeestudio.stopcovid.extension.navGraphWalletViewModels
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.model.UnknownException
-import com.lunabeestudio.stopcovid.viewmodel.WalletViewModel
 import com.lunabeestudio.stopcovid.viewmodel.WalletViewModelFactory
 
 class WalletPagerFragment : BaseFragment() {
@@ -41,24 +40,15 @@ class WalletPagerFragment : BaseFragment() {
     private var tabLayoutMediator: TabLayoutMediator? = null
     private var tabSelectedListener: TabLayout.OnTabSelectedListener? = null
 
-    private val robertManager by lazy {
-        requireContext().robertManager()
+    private val viewModel by navGraphWalletViewModels<WalletContainerFragment> {
+        WalletViewModelFactory(
+            requireContext().robertManager(),
+            injectionContainer.blacklistDCCManager,
+            injectionContainer.blacklist2DDOCManager,
+            injectionContainer.walletRepository,
+            injectionContainer.generateActivityPassUseCase,
+        )
     }
-
-    private val viewModel: WalletViewModel by viewModels(
-        {
-            findParentFragmentByType<WalletContainerFragment>() ?: requireParentFragment()
-        },
-        {
-            val app = requireActivity().application as StopCovid
-            WalletViewModelFactory(
-                robertManager,
-                app.injectionContainer.blacklistDCCManager,
-                app.injectionContainer.blacklist2DDOCManager,
-                app.injectionContainer.walletRepository
-            )
-        }
-    )
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         viewPager = ViewPager2(inflater.context)
@@ -68,7 +58,6 @@ class WalletPagerFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        (activity as? MainActivity)?.binding?.tabLayout?.isVisible = true
         setupViewPager()
         viewModel.certificatesCount.observe(viewLifecycleOwner) { certificatesCount ->
             if (certificatesCount == 0) {
@@ -81,6 +70,7 @@ class WalletPagerFragment : BaseFragment() {
     }
 
     override fun refreshScreen() {
+        appCompatActivity?.supportActionBar?.title = strings["walletController.title"]
         (activity as? MainActivity)?.binding?.tabLayout?.isVisible = true
     }
 
@@ -137,9 +127,8 @@ class WalletPagerFragment : BaseFragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         tabLayoutMediator?.detach()
-        (activity as? MainActivity)?.binding?.tabLayout?.apply {
-            isVisible = false
-            tabSelectedListener?.let { removeOnTabSelectedListener(it) }
+        (activity as? MainActivity)?.binding?.tabLayout?.let { tabLayout ->
+            tabSelectedListener?.let { tabLayout.removeOnTabSelectedListener(it) }
         }
     }
 

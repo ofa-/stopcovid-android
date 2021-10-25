@@ -76,6 +76,10 @@ class Configuration(
     var ratingsKeyFiguresOpeningThreshold: Int,
     var displayUrgentDgs: Boolean,
     var notification: Notification?,
+    val generationServerPublicKey: String,
+    val activityPassSkipNegTestHours: Int,
+    val displayActivityPass: Boolean,
+    val renewThreshold: Int,
 ) {
     class Notification(val title: String, val subtitle: String, val url: String, val version: Int)
 }

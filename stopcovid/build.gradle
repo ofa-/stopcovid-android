@@ -46,8 +46,8 @@ android {
         applicationId "fr.gouv.android.stopcovid"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 380
-        versionName "3.8.2"
+        versionCode 394
+        versionName "3.8.3"
 
         vectorDrawables.useSupportLibrary = true
 
@@ -104,12 +104,17 @@ dependencies {
 
     implementation 'com.google.protobuf:protobuf-javalite:_'
 
+    implementation 'com.tom-roush:pdfbox-android:_'
+
     implementation project(path: ':analytics')
     implementation project(path: ':coreui')
     implementation project(path: ':framework')
     implementation project(path: ':robert')
     implementation project(path: ':domain')
     implementation project(path: ':dgca-decoder')
+
+    testImplementation "junit:junit:_"
+    testImplementation "io.mockk:mockk:_"
 
     androidTestImplementation "androidx.test.ext:junit:_"
     androidTestImplementation "androidx.test:runner:_"

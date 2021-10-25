@@ -16,25 +16,36 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import com.lunabeestudio.domain.model.WalletCertificateType
 import com.lunabeestudio.robert.RobertManager
+import com.lunabeestudio.robert.model.RobertResultData
 import com.lunabeestudio.robert.utils.Event
 import com.lunabeestudio.stopcovid.coreui.utils.SingleLiveEvent
 import com.lunabeestudio.stopcovid.extension.isOld
 import com.lunabeestudio.stopcovid.extension.isRecent
+import com.lunabeestudio.stopcovid.extension.raw
 import com.lunabeestudio.stopcovid.manager.Blacklist2DDOCManager
 import com.lunabeestudio.stopcovid.manager.BlacklistDCCManager
 import com.lunabeestudio.stopcovid.model.EuropeanCertificate
 import com.lunabeestudio.stopcovid.model.FrenchCertificate
+import com.lunabeestudio.stopcovid.model.TacResult
 import com.lunabeestudio.stopcovid.model.WalletCertificate
 import com.lunabeestudio.stopcovid.repository.WalletRepository
+import com.lunabeestudio.stopcovid.usecase.GenerateActivityPassState
+import com.lunabeestudio.stopcovid.usecase.GenerateActivityPassUseCase
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class WalletViewModel constructor(
+class WalletViewModel(
     private val robertManager: RobertManager,
     private val blacklistDCCManager: BlacklistDCCManager,
     private val blacklist2DDOCManager: Blacklist2DDOCManager,
     private val walletRepository: WalletRepository,
+    private val generateActivityPassUseCase: GenerateActivityPassUseCase,
 ) : ViewModel() {
 
     val error: SingleLiveEvent<Exception> = SingleLiveEvent()
@@ -44,17 +55,16 @@ class WalletViewModel constructor(
         get() = _scrollEvent
 
     private var previousCertificatesId = emptyList<String>()
-    val certificates: LiveData<List<WalletCertificate>?> = walletRepository.walletCertificateFlow
+    val certificates: StateFlow<List<WalletCertificate>?> = walletRepository.walletCertificateFlow
         .map { certificates ->
             if (previousCertificatesId.isNotEmpty()) {
                 certificates
-                    .find { it.id !in previousCertificatesId }
+                    ?.find { it.id !in previousCertificatesId }
                     ?.let { _scrollEvent.value = Event(it) }
             }
-            previousCertificatesId = certificates.map { it.id }
+            previousCertificatesId = certificates?.map { it.id }.orEmpty()
             certificates
-        }
-        .asLiveData(timeoutInMs = 0)
+        }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
     val blacklistDCC: LiveData<List<String>?>
         get() = blacklistDCCManager.blacklistedDCCHashes
@@ -98,9 +108,7 @@ class WalletViewModel constructor(
     }
 
     suspend fun saveCertificate(walletCertificate: WalletCertificate) {
-        walletRepository.saveCertificate(
-            walletCertificate,
-        )
+        walletRepository.saveCertificate(walletCertificate)
     }
 
     fun toggleFavorite(
@@ -108,9 +116,7 @@ class WalletViewModel constructor(
     ) {
         viewModelScope.launch {
             try {
-                walletRepository.toggleFavorite(
-                    walletCertificate
-                )
+                walletRepository.toggleFavorite(walletCertificate)
             } catch (e: Exception) {
                 error.postValue(e)
             }
@@ -131,6 +137,22 @@ class WalletViewModel constructor(
     suspend fun getCertificatesCount(): Int {
         return walletRepository.getCertificateCount()
     }
+
+    suspend fun convert2ddocToDcc(certificate: FrenchCertificate): RobertResultData<String> {
+        return walletRepository.convertCertificate(
+            robertManager,
+            certificate.raw,
+            WalletCertificateType.Format.WALLET_DCC
+        )
+    }
+
+    suspend fun getNotExpiredActivityPass(rootCertificateId: String): EuropeanCertificate? {
+        return walletRepository.getActivityPass(rootCertificateId, System.currentTimeMillis())
+    }
+
+    fun generateActivityPass(certificate: EuropeanCertificate): Flow<TacResult<GenerateActivityPassState>> {
+        return generateActivityPassUseCase(certificate)
+    }
 }
 
 class WalletViewModelFactory(
@@ -138,10 +160,17 @@ class WalletViewModelFactory(
     private val blacklistDCCManager: BlacklistDCCManager,
     private val blacklist2DDOCManager: Blacklist2DDOCManager,
     private val walletRepository: WalletRepository,
+    private val generateActivityPassUseCase: GenerateActivityPassUseCase,
 ) :
     ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         @Suppress("UNCHECKED_CAST")
-        return WalletViewModel(robertManager, blacklistDCCManager, blacklist2DDOCManager, walletRepository) as T
+        return WalletViewModel(
+            robertManager,
+            blacklistDCCManager,
+            blacklist2DDOCManager,
+            walletRepository,
+            generateActivityPassUseCase,
+        ) as T
     }
 }

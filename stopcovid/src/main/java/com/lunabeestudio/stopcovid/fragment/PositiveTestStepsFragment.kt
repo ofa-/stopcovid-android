@@ -22,9 +22,8 @@ import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.dividerItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
-import com.lunabeestudio.stopcovid.extension.dccCertificatesManager
+import com.lunabeestudio.stopcovid.extension.injectionContainer
 import com.lunabeestudio.stopcovid.extension.raw
-import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.extension.showUnknownErrorAlert
 import com.lunabeestudio.stopcovid.extension.walletCertificateError
@@ -41,14 +40,6 @@ class PositiveTestStepsFragment : BottomSheetMainFragment() {
 
     val viewModel: PositiveTestStepsViewModel by viewModels {
         PositiveTestStepsViewModelFactory(this, walletRepository)
-    }
-
-    private val robertManager by lazy {
-        requireContext().robertManager()
-    }
-
-    private val dccCertificatesManager by lazy {
-        requireContext().dccCertificatesManager()
     }
 
     override fun getTitleKey(): String = "positiveTestStepsController.title"
@@ -136,10 +127,8 @@ class PositiveTestStepsFragment : BottomSheetMainFragment() {
 
     private suspend fun addCertificate() {
         try {
-            val certificate = walletRepository.verifyAndGetCertificateCodeValue(
-                robertManager.configuration,
+            val certificate = injectionContainer.verifyAndGetCertificateCodeValueUseCase(
                 args.positiveTestDccValue,
-                dccCertificatesManager.certificates,
                 WalletCertificateType.Format.WALLET_DCC,
             )
 
