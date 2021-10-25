@@ -50,7 +50,7 @@ class VenuesManagerTest {
         context.getSharedPreferences(SecureKeystoreDataSource.SHARED_PREF_NAME, Context.MODE_PRIVATE).edit().clear().commit()
         context.getSharedPreferences(LocalCryptoManager.SHARED_PREF_NAME, Context.MODE_PRIVATE).edit().clear().commit()
         runBlocking {
-            venueRepository.clearAllData(sharedPrefs, keystoreDataSource)
+            venueRepository.clearAllData(sharedPrefs)
         }
     }
 
@@ -64,7 +64,7 @@ class VenuesManagerTest {
         context.getSharedPreferences(SecureKeystoreDataSource.SHARED_PREF_NAME, Context.MODE_PRIVATE).edit().clear().commit()
         context.getSharedPreferences(LocalCryptoManager.SHARED_PREF_NAME, Context.MODE_PRIVATE).edit().clear().commit()
         runBlocking {
-            venueRepository.clearAllData(sharedPrefs, keystoreDataSource)
+            venueRepository.clearAllData(sharedPrefs)
         }
     }
 
@@ -100,39 +100,36 @@ class VenuesManagerTest {
             version = 0
         )
         runBlocking {
-            venueRepository.clearAllData(sharedPrefs, keystoreDataSource)
-            assert(venueRepository.getVenuesQrCode(keystoreDataSource).count() == 0)
-            venueRepository.saveVenue(keystoreDataSource, venue1)
-            venueRepository.saveVenue(keystoreDataSource, venue2)
-            venueRepository.saveVenue(keystoreDataSource, venue3)
-            venueRepository.saveVenue(keystoreDataSource, venue4)
+            venueRepository.clearAllData(sharedPrefs)
+            assert(venueRepository.getVenuesQrCode().count() == 0)
+            venueRepository.saveVenue(venue1)
+            venueRepository.saveVenue(venue2)
+            venueRepository.saveVenue(venue3)
+            venueRepository.saveVenue(venue4)
             assert(
                 venueRepository.getVenuesQrCode(
-                    keystoreDataSource,
                     endNtpTimestamp = System.currentTimeMillis().unixTimeMsToNtpTimeS(),
                 ).count() == 3
             )
-            assert(venueRepository.getVenuesQrCode(keystoreDataSource)[0] == venue1)
-            assert(venueRepository.getVenuesQrCode(keystoreDataSource)[1] == venue2)
+            assert(venueRepository.getVenuesQrCode()[0] == venue1)
+            assert(venueRepository.getVenuesQrCode()[1] == venue2)
             assert(
                 venueRepository.getVenuesQrCode(
-                    keystoreDataSource,
                     startNtpTimestamp = 0L,
                     endNtpTimestamp = System.currentTimeMillis().unixTimeMsToNtpTimeS(),
                 ).count() == 3
             )
             assert(
                 venueRepository.getVenuesQrCode(
-                    keystoreDataSource,
                     startNtpTimestamp = 2L,
                     endNtpTimestamp = System.currentTimeMillis().unixTimeMsToNtpTimeS(),
                 ).count() == 2
             )
-            assert(venueRepository.getVenuesQrCode(keystoreDataSource).count() == 4)
-            assert(venueRepository.getVenuesQrCode(keystoreDataSource, 2L).count() == 3)
+            assert(venueRepository.getVenuesQrCode().count() == 4)
+            assert(venueRepository.getVenuesQrCode(2L).count() == 3)
 
-            venueRepository.clearAllData(sharedPrefs, keystoreDataSource)
-            assert(venueRepository.getVenuesQrCode(keystoreDataSource).count() == 0)
+            venueRepository.clearAllData(sharedPrefs)
+            assert(venueRepository.getVenuesQrCode().count() == 0)
         }
     }
 
@@ -156,17 +153,17 @@ class VenuesManagerTest {
             version = 0
         )
         runBlocking {
-            venueRepository.clearAllData(sharedPrefs, keystoreDataSource)
-            assert(venueRepository.getVenuesQrCode(keystoreDataSource).count() == 0)
-            venueRepository.saveVenue(keystoreDataSource, venue1)
-            venueRepository.saveVenue(keystoreDataSource, venue2)
-            assert(venueRepository.getVenuesQrCode(keystoreDataSource).count() == 2)
-            venueRepository.clearExpired(context.robertManager(), keystoreDataSource)
-            assert(venueRepository.getVenuesQrCode(keystoreDataSource).count() == 1)
-            assert(venueRepository.getVenuesQrCode(keystoreDataSource)[0] == venue2)
+            venueRepository.clearAllData(sharedPrefs)
+            assert(venueRepository.getVenuesQrCode().count() == 0)
+            venueRepository.saveVenue(venue1)
+            venueRepository.saveVenue(venue2)
+            assert(venueRepository.getVenuesQrCode().count() == 2)
+            venueRepository.clearExpired(context.robertManager())
+            assert(venueRepository.getVenuesQrCode().count() == 1)
+            assert(venueRepository.getVenuesQrCode()[0] == venue2)
 
-            venueRepository.clearAllData(sharedPrefs, keystoreDataSource)
-            assert(venueRepository.getVenuesQrCode(keystoreDataSource).count() == 0)
+            venueRepository.clearAllData(sharedPrefs)
+            assert(venueRepository.getVenuesQrCode().count() == 0)
         }
     }
 
@@ -208,7 +205,6 @@ class VenuesManagerTest {
                     try {
                         venueRepository.processVenueUrl(
                             robertManager = context.robertManager(),
-                            secureKeystoreDataSource = keystoreDataSource,
                             succesfullQrCodes[index]
                         )
                     } catch (e: Exception) {
@@ -218,7 +214,6 @@ class VenuesManagerTest {
                     try {
                         venueRepository.processVenue(
                             robertManager = context.robertManager(),
-                            secureKeystoreDataSource = keystoreDataSource,
                             base64URLs[index],
                             0,
                             timeStampsNTP[index].ntpTimeSToUnixTimeS()
@@ -241,7 +236,6 @@ class VenuesManagerTest {
             runBlocking {
                 venueRepository.processVenue(
                     robertManager = context.robertManager(),
-                    secureKeystoreDataSource = keystoreDataSource,
                     base64URLCode = base64URLs[0],
                     version = 0,
                     unixTimeInSeconds = System.currentTimeMillis() / 1000L - gracePeriod - 10
@@ -267,7 +261,6 @@ class VenuesManagerTest {
                 runBlocking {
                     venueRepository.processVenueUrl(
                         robertManager = context.robertManager(),
-                        secureKeystoreDataSource = keystoreDataSource,
                         it
                     )
                 }
@@ -277,7 +270,7 @@ class VenuesManagerTest {
         populateWithData()
 
         val venueQrCodes = runBlocking {
-            venueRepository.getVenuesQrCode(keystoreDataSource)
+            venueRepository.getVenuesQrCode()
         }
         assert(venueQrCodes.size == succesfullQrCodes.size) {
             "Only ${venueQrCodes.size} venues created, expecting ${succesfullQrCodes.size}"
@@ -297,31 +290,31 @@ class VenuesManagerTest {
         populateWithData()
 
         runBlocking {
-            assert(venueRepository.getVenuesQrCode(keystoreDataSource).size == succesfullQrCodes.size) {
+            assert(venueRepository.getVenuesQrCode().size == succesfullQrCodes.size) {
                 "Only ${
-                venueRepository.getVenuesQrCode(keystoreDataSource).size
+                venueRepository.getVenuesQrCode().size
                 } venues created, excpecting ${succesfullQrCodes.size}"
             }
-            venueRepository.deleteVenue(keystoreDataSource, venueRepository.getVenuesQrCode(keystoreDataSource)[1].id)
-            assert(venueRepository.getVenuesQrCode(keystoreDataSource).size == succesfullQrCodes.size - 1) {
+            venueRepository.deleteVenue(venueRepository.getVenuesQrCode()[1].id)
+            assert(venueRepository.getVenuesQrCode().size == succesfullQrCodes.size - 1) {
                 "Should have ${succesfullQrCodes.size - 1} element"
             }
-            assert(venueRepository.getVenuesQrCode(keystoreDataSource)[0].ltid == ltid[0]) {
+            assert(venueRepository.getVenuesQrCode()[0].ltid == ltid[0]) {
                 "First element shouldn't be removed"
             }
-            assert(venueRepository.getVenuesQrCode(keystoreDataSource)[1].ltid == ltid[2]) {
+            assert(venueRepository.getVenuesQrCode()[1].ltid == ltid[2]) {
                 "Third element shouldn't be removed"
             }
-            venueRepository.deleteVenue(keystoreDataSource, venueRepository.getVenuesQrCode(keystoreDataSource)[0].id)
-            assert(venueRepository.getVenuesQrCode(keystoreDataSource).size == succesfullQrCodes.size - 2) {
+            venueRepository.deleteVenue(venueRepository.getVenuesQrCode()[0].id)
+            assert(venueRepository.getVenuesQrCode().size == succesfullQrCodes.size - 2) {
                 "Should have ${succesfullQrCodes.size - 2} element"
             }
-            assert(venueRepository.getVenuesQrCode(keystoreDataSource)[0].ltid == ltid[2]) {
+            assert(venueRepository.getVenuesQrCode()[0].ltid == ltid[2]) {
                 "Second element shouldn't be removed"
             }
-            venueRepository.deleteVenue(keystoreDataSource, venueRepository.getVenuesQrCode(keystoreDataSource)[0].id)
-            venueRepository.deleteVenue(keystoreDataSource, venueRepository.getVenuesQrCode(keystoreDataSource)[0].id)
-            assert(venueRepository.getVenuesQrCode(keystoreDataSource).isEmpty()) {
+            venueRepository.deleteVenue(venueRepository.getVenuesQrCode()[0].id)
+            venueRepository.deleteVenue(venueRepository.getVenuesQrCode()[0].id)
+            assert(venueRepository.getVenuesQrCode().isEmpty()) {
                 "Should be empty"
             }
         }

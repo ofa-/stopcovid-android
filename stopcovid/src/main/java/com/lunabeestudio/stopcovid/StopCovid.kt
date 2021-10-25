@@ -68,6 +68,7 @@ import com.lunabeestudio.stopcovid.service.ProximityService
 import com.lunabeestudio.stopcovid.widgetshomescreen.ProximityWidget
 import com.lunabeestudio.stopcovid.worker.ActivateReminderNotificationWorker
 import com.lunabeestudio.stopcovid.worker.AtRiskNotificationWorker
+import com.lunabeestudio.stopcovid.worker.DccLightRenewCleanWorker
 import com.lunabeestudio.stopcovid.worker.IsolationReminderNotificationWorker
 import com.lunabeestudio.stopcovid.worker.MaintenanceWorker
 import fr.bipi.tressence.file.FileLoggerTree
@@ -84,7 +85,6 @@ import java.io.File
 import java.util.Calendar
 import java.util.Date
 import java.util.concurrent.TimeUnit
-import kotlin.math.roundToInt
 import kotlin.random.Random
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
@@ -220,6 +220,8 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Localized
         appCoroutineScope.launch {
             robertManager.cleaReportIfNeeded(this@StopCovid, false)
         }
+
+        DccLightRenewCleanWorker.startDccLightCleanAndRenewWorker(this)
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
@@ -362,11 +364,11 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Localized
         this.listener = listener
     }
 
-    override fun notifyAtRiskLevelChange() {
+    override fun notifyAtRiskLevelChange(prevRiskLevel: Float) {
         injectionContainer.risksLevelManager.getCurrentLevel(robertManager.atRiskStatus?.riskLevel)?.let { riskLevel ->
             injectionContainer.analyticsManager.reportHealthEvent(
                 HealthEventName.eh2,
-                riskLevel.riskLevel.roundToInt().toString()
+                "$prevRiskLevel|riskLevel.riskLevel"
             )
             val inputData = Data.Builder()
                 .putString(AtRiskNotificationWorker.INPUT_DATA_TITLE_KEY, riskLevel.labels.notifTitle)
@@ -378,7 +380,10 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Localized
         }
     }
 
-    override fun alertAtRiskLevelChange() {
+    override fun atRiskLevelChange(prevRiskLevel: Float) {
+        injectionContainer.risksLevelManager.getCurrentLevel(robertManager.atRiskStatus?.riskLevel)?.let { riskLevel ->
+            injectionContainer.analyticsManager.reportHealthEvent(HealthEventName.eh3, "$prevRiskLevel|${riskLevel.riskLevel}")
+        }
         sharedPrefs.alertRiskLevelChanged = true
         sharedPrefs.hideRiskStatus = false
         ProximityWidget.updateWidget(applicationContext)

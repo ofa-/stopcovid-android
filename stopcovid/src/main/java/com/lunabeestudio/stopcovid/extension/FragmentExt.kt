@@ -10,8 +10,34 @@
 
 package com.lunabeestudio.stopcovid.extension
 
+import androidx.annotation.MainThread
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.createViewModelLazy
+import androidx.lifecycle.ViewModelStore
+import androidx.navigation.fragment.findNavController
 import com.lunabeestudio.stopcovid.InjectionContainer
+import com.lunabeestudio.stopcovid.R
+import com.lunabeestudio.stopcovid.coreui.extension.findParentFragmentByType
+import com.lunabeestudio.stopcovid.viewmodel.WalletViewModel
+import com.lunabeestudio.stopcovid.viewmodel.WalletViewModelFactory
 
 val Fragment.injectionContainer: InjectionContainer
     get() = requireActivity().injectionContainer
+
+@MainThread
+inline fun <reified T : Fragment> Fragment.navGraphWalletViewModels(
+    noinline factoryProducer: (() -> WalletViewModelFactory)
+): Lazy<WalletViewModel> {
+    val backStackEntry by lazy {
+        findParentFragmentByType<T>()!!.findNavController().getBackStackEntry(R.id.nav_wallet)
+    }
+    val storeProducer: () -> ViewModelStore = {
+        backStackEntry.viewModelStore
+    }
+    return createViewModelLazy(
+        WalletViewModel::class, storeProducer,
+        {
+            factoryProducer()
+        }
+    )
+}

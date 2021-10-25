@@ -14,8 +14,7 @@
 
     <fragment
         android:id="@+id/chartsFullScreenFragment"
-        android:name="com.lunabeestudio.stopcovid.fragment.ChartFullScreenFragment"
-        android:label="ChartsFullScreenFragment" >
+        android:name="com.lunabeestudio.stopcovid.fragment.ChartFullScreenFragment">
         <argument
             android:name="keyFigureKey"
             app:argType="string" />

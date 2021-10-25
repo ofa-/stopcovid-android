@@ -11,20 +11,18 @@
 package com.lunabeestudio.framework.remote.datasource
 
 import android.content.Context
-import android.util.Base64
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import com.lunabeestudio.analytics.manager.AnalyticsManager
 import com.lunabeestudio.analytics.model.AnalyticsServiceName
 import com.lunabeestudio.domain.model.WalletCertificateType
+import com.lunabeestudio.framework.crypto.ServerKeyAgreementHelper
 import com.lunabeestudio.framework.remote.RetrofitClient
 import com.lunabeestudio.framework.remote.extension.remoteToRobertException
 import com.lunabeestudio.framework.remote.model.ApiConversionErrorRS
 import com.lunabeestudio.framework.remote.model.ApiConversionRQ
 import com.lunabeestudio.framework.remote.server.InGroupeApi
-import com.lunabeestudio.robert.RobertConstant
-import com.lunabeestudio.robert.RobertManager
-import com.lunabeestudio.robert.datasource.RemoteCertificateDataSource
+import com.lunabeestudio.robert.datasource.RemoteConversionDataSource
 import com.lunabeestudio.robert.datasource.SharedCryptoDataSource
 import com.lunabeestudio.robert.model.BackendException
 import com.lunabeestudio.robert.model.NoInternetException
@@ -37,12 +35,13 @@ import timber.log.Timber
 
 class InGroupeDatasource(
     context: Context,
-    private val sharedCryptoDataSource: SharedCryptoDataSource,
+    sharedCryptoDataSource: SharedCryptoDataSource,
     baseUrl: String,
     private val analyticsManager: AnalyticsManager,
-) : RemoteCertificateDataSource {
+) : RemoteConversionDataSource {
 
     private val okHttpClient: OkHttpClient = RetrofitClient.getDefaultOKHttpClient(context, null)
+    private val serverKeyAgreementHelper = ServerKeyAgreementHelper(sharedCryptoDataSource)
 
     private val api: InGroupeApi = RetrofitClient.getService(baseUrl, InGroupeApi::class.java, okHttpClient)
     private val gson = Gson()
@@ -97,53 +96,35 @@ class InGroupeDatasource(
     }
 
     override suspend fun convertCertificateV2(
-        robertManager: RobertManager,
+        serverKeyConfig: Pair<String, String>,
         encodedCertificate: String,
         from: WalletCertificateType.Format,
         to: WalletCertificateType.Format
     ): RobertResultData<String> {
 
-        val serverKeyConfig = robertManager.configuration.conversionPublicKey.toList().firstOrNull()
-            ?: return RobertResultData.Failure(UnknownException("No server conversion key found for conversion v2"))
-
-        val publicKey64: String
-        val apiConversionRq: ApiConversionRQ
-        val key: ByteArray
-        try {
-            val rawServerKey = Base64.decode(serverKeyConfig.second, Base64.NO_WRAP)
-
-            val keyPair = sharedCryptoDataSource.createECDHKeyPair()
-            publicKey64 = Base64.encodeToString(keyPair.public.encoded, Base64.NO_WRAP)
-
-            key = sharedCryptoDataSource.getEncryptionKeys(
-                rawServerPublicKey = rawServerKey,
-                rawLocalPrivateKey = keyPair.private.encoded,
-                derivationDataArray = listOf(
-                    RobertConstant.CONVERSION_STRING_INPUT.toByteArray(Charsets.UTF_8),
-                )
-            ).first()
-
-            val rawEncryptedCertificate = sharedCryptoDataSource.encrypt(key, encodedCertificate.toByteArray(Charsets.UTF_8))
-
-            apiConversionRq = ApiConversionRQ(
-                chainEncoded = Base64.encodeToString(rawEncryptedCertificate, Base64.NO_WRAP),
-                destination = to.toApiKey(),
-                source = from.toApiKey(),
-            )
+        val serverKeyAgreementData = try {
+            serverKeyAgreementHelper.encryptRequestData(serverKeyConfig.second, encodedCertificate)
         } catch (e: Exception) {
             Timber.e(e)
             return RobertResultData.Failure(UnknownException("Failed to encrypt certificate for conversion\n${e.message}"))
         }
 
+        val apiConversionRq = ApiConversionRQ(
+            chainEncoded = serverKeyAgreementData.encryptedData,
+            destination = to.toApiKey(),
+            source = from.toApiKey(),
+        )
+
         @Suppress("BlockingMethodInNonBlockingContext")
         return withContext(Dispatchers.IO) {
             try {
-                val response = api.convertV2(publicKey64, serverKeyConfig.first, apiConversionRq)
+                val response = api.convertV2(serverKeyAgreementData.encodedLocalPublicKey, serverKeyConfig.first, apiConversionRq)
 
                 if (response.isSuccessful) {
-                    val data = Base64.decode(response.body()?.string(), Base64.NO_WRAP)
-                    val certificate = sharedCryptoDataSource.decrypt(key, data).toString(Charsets.UTF_8)
-                    RobertResultData.Success(certificate)
+                    response.body()?.string()?.let {
+                        val certificate = serverKeyAgreementHelper.decryptResponse(it)
+                        RobertResultData.Success(certificate)
+                    } ?: RobertResultData.Failure(BackendException("Response successful but body is empty", response.code()))
                 } else {
                     var analyticsErrorDesc: String? = null
                     val bodyError = response.errorBody()?.string()

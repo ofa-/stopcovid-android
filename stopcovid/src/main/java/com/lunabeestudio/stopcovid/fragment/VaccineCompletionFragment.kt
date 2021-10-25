@@ -156,9 +156,9 @@ class VaccineCompletionFragment : MainFragment() {
         val vaccineMedicinalProduct: String? = greenCertificate.vaccineMedicinalProduct
         val vaccineDoseNumber = greenCertificate.vaccineDose?.first ?: 0
         val noWaitDoses: Boolean = (
-                configuration.noWaitDoses[vaccineMedicinalProduct]
-                    ?: configuration.noWaitDoses[DEFAULT_KEY]
-                )
+            configuration.noWaitDoses[vaccineMedicinalProduct]
+                ?: configuration.noWaitDoses[DEFAULT_KEY]
+            )
             ?.let { vaccineDoseNumber >= it }
             ?: false
         val daysAfterCompletion = try {

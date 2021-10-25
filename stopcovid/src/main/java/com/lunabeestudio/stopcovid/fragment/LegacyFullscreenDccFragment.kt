@@ -14,17 +14,17 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.View
 import androidx.core.view.isVisible
-import androidx.fragment.app.viewModels
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.map
 import androidx.navigation.fragment.navArgs
+import androidx.navigation.navGraphViewModels
 import com.google.zxing.BarcodeFormat
 import com.journeyapps.barcodescanner.BarcodeEncoder
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.appCompatActivity
-import com.lunabeestudio.stopcovid.coreui.extension.findParentFragmentByType
 import com.lunabeestudio.stopcovid.coreui.extension.setTextOrHide
 import com.lunabeestudio.stopcovid.coreui.extension.toDimensSize
-import com.lunabeestudio.stopcovid.databinding.FragmentFullscreenDccBinding
+import com.lunabeestudio.stopcovid.databinding.FragmentLegacyFullscreenDccBinding
 import com.lunabeestudio.stopcovid.extension.formatDccText
 import com.lunabeestudio.stopcovid.extension.fullName
 import com.lunabeestudio.stopcovid.extension.injectionContainer
@@ -37,27 +37,19 @@ import com.lunabeestudio.stopcovid.viewmodel.WalletViewModelFactory
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-class FullscreenDccFragment : ForceLightFragment(R.layout.fragment_fullscreen_dcc) {
+class LegacyFullscreenDccFragment : ForceLightFragment(R.layout.fragment_legacy_fullscreen_dcc) {
 
-    private val args: FullscreenDccFragmentArgs by navArgs()
+    private val args: LegacyFullscreenDccFragmentArgs by navArgs()
 
-    private val robertManager by lazy {
-        requireContext().robertManager()
+    private val viewModel: WalletViewModel by navGraphViewModels(R.id.nav_wallet) {
+        WalletViewModelFactory(
+            requireContext().robertManager(),
+            injectionContainer.blacklistDCCManager,
+            injectionContainer.blacklist2DDOCManager,
+            injectionContainer.walletRepository,
+            injectionContainer.generateActivityPassUseCase,
+        )
     }
-
-    private val viewModel: WalletViewModel by viewModels(
-        {
-            findParentFragmentByType<WalletContainerFragment>() ?: requireParentFragment()
-        },
-        {
-            WalletViewModelFactory(
-                robertManager,
-                blacklistDCCManager,
-                blacklist2DDOCManager,
-                injectionContainer.walletRepository
-            )
-        }
-    )
 
     private val barcodeEncoder = BarcodeEncoder()
     private val qrCodeSize by lazy {
@@ -66,18 +58,17 @@ class FullscreenDccFragment : ForceLightFragment(R.layout.fragment_fullscreen_dc
 
     private var europeanCertificate: EuropeanCertificate? = null
 
-    private var binding: FragmentFullscreenDccBinding? = null
+    private var binding: FragmentLegacyFullscreenDccBinding? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         appCompatActivity?.supportActionBar?.title = strings["walletController.title"]
-        binding = FragmentFullscreenDccBinding.bind(view)
-        viewModel.certificates
-            .map { certificates ->
-                certificates
-                    ?.filterIsInstance<EuropeanCertificate>()
-                    ?.firstOrNull { it.id == args.id }
-            }
+        binding = FragmentLegacyFullscreenDccBinding.bind(view)
+        viewModel.certificates.asLiveData(timeoutInMs = 0).map { certificates ->
+            certificates
+                ?.filterIsInstance<EuropeanCertificate>()
+                ?.firstOrNull { it.id == args.id }
+        }
             .observe(viewLifecycleOwner) { europeanCertificate ->
                 this.europeanCertificate = europeanCertificate
                 refreshScreen()
@@ -110,7 +101,7 @@ class FullscreenDccFragment : ForceLightFragment(R.layout.fragment_fullscreen_dc
     }
 
     @SuppressLint("SimpleDateFormat")
-    private fun FragmentFullscreenDccBinding.refreshDetails(
+    private fun FragmentLegacyFullscreenDccBinding.refreshDetails(
         isBorder: Boolean,
         europeanCertificate: EuropeanCertificate
     ) {

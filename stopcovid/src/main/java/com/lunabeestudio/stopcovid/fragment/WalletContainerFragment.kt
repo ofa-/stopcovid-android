@@ -16,27 +16,29 @@ import android.view.View
 import android.view.ViewGroup
 import android.webkit.URLUtil
 import androidx.fragment.app.setFragmentResultListener
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.navArgs
+import androidx.navigation.navGraphViewModels
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.lunabeestudio.analytics.model.ErrorEventName
 import com.lunabeestudio.domain.model.WalletCertificateType
 import com.lunabeestudio.robert.extension.safeEnumValueOf
-import com.lunabeestudio.stopcovid.StopCovid
+import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.extension.appCompatActivity
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.fragment.BaseFragment
 import com.lunabeestudio.stopcovid.databinding.FragmentWalletContainerBinding
 import com.lunabeestudio.stopcovid.extension.analyticsManager
-import com.lunabeestudio.stopcovid.extension.dccCertificatesManager
+import com.lunabeestudio.stopcovid.extension.barcodeFormat
 import com.lunabeestudio.stopcovid.extension.injectionContainer
 import com.lunabeestudio.stopcovid.extension.isFrench
 import com.lunabeestudio.stopcovid.extension.raw
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
+import com.lunabeestudio.stopcovid.extension.shortDescription
 import com.lunabeestudio.stopcovid.extension.showDbFailure
 import com.lunabeestudio.stopcovid.extension.showMigrationFailed
 import com.lunabeestudio.stopcovid.extension.showUnknownErrorAlert
@@ -62,26 +64,26 @@ class WalletContainerFragment : BaseFragment() {
         requireContext().robertManager()
     }
 
-    private val dccCertificatesManager by lazy {
-        requireContext().dccCertificatesManager()
-    }
-
     private val analyticsManager by lazy {
         requireContext().analyticsManager()
     }
 
-    private val viewModel: WalletViewModel by viewModels {
-        val app = requireActivity().application as StopCovid
+    private val viewModel by navGraphViewModels<WalletViewModel>(R.id.nav_wallet) {
         WalletViewModelFactory(
             robertManager,
-            app.injectionContainer.blacklistDCCManager,
-            app.injectionContainer.blacklist2DDOCManager,
-            app.injectionContainer.walletRepository,
+            injectionContainer.blacklistDCCManager,
+            injectionContainer.blacklist2DDOCManager,
+            injectionContainer.walletRepository,
+            injectionContainer.generateActivityPassUseCase,
         )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        args.navCertificateId?.let { id ->
+            navigateToFullscreenEuropeanCertificateId(id, true)
+        }
 
         if (savedInstanceState == null) { // do not replay navigation on config change
             lifecycleScope.launch {
@@ -163,9 +165,7 @@ class WalletContainerFragment : BaseFragment() {
                     }
                 }
                 DeeplinkManager.Origin.UNIVERSAL,
-                null -> {
-                    processCodeValue(certificateCode, certificateFormat)
-                }
+                null -> processCodeValue(certificateCode, certificateFormat)
             }
         }
     }
@@ -246,10 +246,8 @@ class WalletContainerFragment : BaseFragment() {
         certificateFormat: WalletCertificateType.Format?
     ): WalletCertificate? {
         return try {
-            injectionContainer.walletRepository.verifyAndGetCertificateCodeValue(
-                robertManager.configuration,
+            injectionContainer.verifyAndGetCertificateCodeValueUseCase(
                 certificateCode,
-                dccCertificatesManager.certificates,
                 certificateFormat,
             )
         } catch (e: Exception) {
@@ -386,6 +384,45 @@ class WalletContainerFragment : BaseFragment() {
                     MaterialAlertDialogBuilder(it).showDbFailure(strings)
                 }
             }
+        }
+    }
+
+    fun navigateToFullscreenCertificate(certificate: WalletCertificate) {
+        if (certificate is EuropeanCertificate) {
+            navigateToFullscreenEuropeanCertificateId(certificate.id, false)
+        } else {
+            findNavControllerOrNull()?.safeNavigate(
+                WalletContainerFragmentDirections.actionWalletContainerFragmentToFullscreenQRCodeFragment(
+                    certificate.value,
+                    certificate.type.barcodeFormat,
+                    certificate.shortDescription(),
+                    certificate.sha256,
+                )
+            )
+        }
+    }
+
+    private fun navigateToFullscreenEuropeanCertificateId(certificateId: String, popSelf: Boolean) {
+        val navOptions = if (popSelf) {
+            NavOptions.Builder().setPopUpTo(R.id.walletContainerFragment, true).build()
+        } else {
+            null
+        }
+
+        if (robertManager.configuration.displayActivityPass) {
+            findNavControllerOrNull()?.safeNavigate(
+                WalletContainerFragmentDirections.actionWalletContainerFragmentToWalletFullscreenPagerFragment(
+                    id = certificateId,
+                ),
+                navOptions,
+            )
+        } else {
+            findNavControllerOrNull()?.safeNavigate(
+                WalletContainerFragmentDirections.actionWalletContainerFragmentToLegacyFullscreenDccFragment(
+                    id = certificateId,
+                ),
+                navOptions,
+            )
         }
     }
 

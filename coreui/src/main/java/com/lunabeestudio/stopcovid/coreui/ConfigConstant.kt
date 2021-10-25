@@ -149,17 +149,19 @@ object ConfigConstant {
     }
 
     object BlacklistDCC {
-        const val FILENAME: String = "certlist.json"
+        const val FILENAME: String = "certlist.pb.gz"
+        private const val ASSET_FILENAME: String = "certlist.pb_gz"
         const val FOLDER: String = "CertList/"
         const val URL: String = VERSIONED_SERVER_URL + FOLDER + FILENAME
-        const val ASSET_FILE_PATH: String = FOLDER + FILENAME
+        val ASSET_FILE_PATH: String = FOLDER + ASSET_FILENAME
     }
 
     object Blacklist2DDOC {
-        const val FILENAME: String = "2ddoc_list.json"
+        const val FILENAME: String = "2ddoc_list.pb.gz"
+        private const val ASSET_FILENAME: String = "2ddoc_list.pb_gz"
         const val FOLDER: String = "CertList/"
         const val URL: String = VERSIONED_SERVER_URL + FOLDER + FILENAME
-        const val ASSET_FILE_PATH: String = FOLDER + FILENAME
+        val ASSET_FILE_PATH: String = FOLDER + ASSET_FILENAME
     }
 
     object Store {

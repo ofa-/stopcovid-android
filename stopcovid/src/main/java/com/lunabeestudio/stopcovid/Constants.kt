@@ -48,6 +48,7 @@ object Constants {
         const val RATINGS_SHOWN: String = "ratingsShown"
         const val GOOGLE_REVIEW_SHOWN: String = "Google.Review.Shown"
         const val NOTIFICATION_VERSION_CLOSED: String = "Notification.Version.Closed"
+        const val ACTIVITY_PASS_AUTO_RENEW_ENABLED: String = "Activity.Pass.Auto.Renew.Enabled"
     }
 
     object Notification {
@@ -62,6 +63,13 @@ object Constants {
         const val ISOLATION_REMINDER: String = "StopCovid.Isolation.Reminder.Worker"
         const val TIME_CHANGED: String = "StopCovid.TimeChanged.Worker"
         const val VACCINATION_COMPLETED_REMINDER: String = "StopCovid.VaccinationCompleted.Reminder.Worker"
+        const val DCC_LIGHT_GENERATION: String = "StopCovid.DccLightGeneration.Worker"
+        const val DCC_LIGHT_RENEW_CLEAN: String = "StopCovid.DccLightRenewClean.Worker"
+        const val DCC_LIGHT_AVAILABLE: String = "StopCovid.DccLightAvailable.Worker"
+    }
+
+    object WorkerTags {
+        const val DCC_LIGHT: String = "DCC_LIGHT_WORKERS"
     }
 
     object ServerConstant {
@@ -118,6 +126,8 @@ object Constants {
 
     object Certificate {
         const val MANUFACTURER_AUTOTEST: String = "AUTOTEST"
+        const val DCC_LIGHT_PREFIX: String = "HCFR1:"
+        const val DCC_EXEMPTION_PREFIX: String = "EX1:"
     }
 
     object HomeScreenWidget {

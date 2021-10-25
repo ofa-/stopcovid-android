@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+package blacklist;
+
+message BlackListMessage {
+    repeated string items = 1;
+}

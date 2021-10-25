@@ -26,8 +26,8 @@ interface RobertApplication : AnalyticsInfosProvider {
     fun registerListener(listener: Listener?)
     fun notifyListener(notification: Any)
 
-    fun notifyAtRiskLevelChange()
-    fun alertAtRiskLevelChange()
+    fun notifyAtRiskLevelChange(prevRiskLevel: Float)
+    fun atRiskLevelChange(prevRiskLevel: Float)
     suspend fun sendClockNotAlignedNotification()
     fun refreshInfoCenter()
     suspend fun getVenueQrCodeList(startTime: Long?, endTime: Long?): List<VenueQrCode>?

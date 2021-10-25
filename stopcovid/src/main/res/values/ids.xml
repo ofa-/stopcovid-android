@@ -56,4 +56,5 @@
     <item name="keyfigures_pager" type="id" />
     <item name="item_caption_action_card" type="id" />
     <item name="keyfigures_charts_container" type="id" />
+    <item name="item_video_player" type="id" />
 </resources>

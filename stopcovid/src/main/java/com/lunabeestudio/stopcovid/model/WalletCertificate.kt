@@ -4,6 +4,7 @@ import android.util.Base64
 import com.lunabeestudio.domain.model.RawWalletCertificate
 import com.lunabeestudio.domain.model.WalletCertificateType
 import com.lunabeestudio.framework.crypto.BouncyCastleSignatureVerifier
+import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.extension.certificateType
 import com.lunabeestudio.stopcovid.extension.countryCode
 import com.lunabeestudio.stopcovid.extension.exemptionCertificateValidFrom
@@ -27,11 +28,9 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.security.SignatureException
 import java.text.SimpleDateFormat
-import java.time.ZonedDateTime
 import java.util.Date
 import java.util.Locale
 import java.util.UUID
-import kotlin.time.ExperimentalTime
 
 sealed class WalletCertificate(
     val id: String,
@@ -65,9 +64,11 @@ sealed class WalletCertificate(
                 SanitaryCertificate.getCertificate(rawWalletCertificate.value, rawWalletCertificate.id)
                     ?: VaccinationCertificate.getCertificate(rawWalletCertificate.value, rawWalletCertificate.id)
                     ?: EuropeanCertificate.getCertificate(
-                        rawWalletCertificate.value,
-                        rawWalletCertificate.id,
-                        rawWalletCertificate.isFavorite
+                        value = rawWalletCertificate.value,
+                        id = rawWalletCertificate.id,
+                        isFavorite = rawWalletCertificate.isFavorite,
+                        canRenewActivityPass = rawWalletCertificate.canRenewDccLight,
+                        rootWalletCertificateId = rawWalletCertificate.rootWalletCertificateId,
                     )
             }
         }
@@ -344,23 +345,33 @@ class VaccinationCertificate private constructor(id: String, override val value:
     }
 }
 
-@OptIn(ExperimentalUnsignedTypes::class, ExperimentalTime::class)
-class EuropeanCertificate private constructor(id: String, value: String, val isFavorite: Boolean) : WalletCertificate(id, value) {
+@OptIn(ExperimentalUnsignedTypes::class)
+class EuropeanCertificate private constructor(
+    id: String,
+    value: String,
+    val isFavorite: Boolean,
+    val canRenewActivityPass: Boolean?,
+    val rootWalletCertificateId: String?,
+) : WalletCertificate(id, value) {
     override val timestamp: Long
     override val type: WalletCertificateType
     private val kid: ByteArray
     private val cose: ByteArray
     override val sha256: String
     val greenCertificate: GreenCertificate
-    val isExpired: Boolean
+    val expirationTime: Long
 
     init {
         val verificationResult = VerificationResult()
+
         var plainInput = DefaultPrefixValidationService().decode(value, verificationResult)
         if (verificationResult.contextPrefix == null) {
-            // Try exemption pass
-            plainInput = DefaultPrefixValidationService("EX1:").decode(value, verificationResult)
+            plainInput = DefaultPrefixValidationService(Constants.Certificate.DCC_EXEMPTION_PREFIX).decode(value, verificationResult)
         }
+        if (verificationResult.contextPrefix == null) {
+            plainInput = DefaultPrefixValidationService(Constants.Certificate.DCC_LIGHT_PREFIX).decode(value, verificationResult)
+        }
+
         val compressedCose = DefaultBase45Service().decode(plainInput, verificationResult)
         cose = checkNotNull(DefaultCompressorService().decode(compressedCose, verificationResult))
         val coseData = checkNotNull(DefaultCoseService().decode(cose, verificationResult))
@@ -371,7 +382,7 @@ class EuropeanCertificate private constructor(id: String, value: String, val isF
         kid = checkNotNull(coseData.kid)
         val greenCertificateData = checkNotNull(DefaultCborService().decodeData(coseData.cbor, verificationResult))
         greenCertificate = greenCertificateData.greenCertificate
-        type = checkNotNull(greenCertificate.certificateType)
+        type = greenCertificate.certificateType
         timestamp = when (type) {
             WalletCertificateType.SANITARY,
             WalletCertificateType.VACCINATION -> null
@@ -379,9 +390,10 @@ class EuropeanCertificate private constructor(id: String, value: String, val isF
             WalletCertificateType.VACCINATION_EUROPE -> greenCertificate.vaccineDate?.time
             WalletCertificateType.RECOVERY_EUROPE -> greenCertificate.recoveryDateOfFirstPositiveTest?.time
             WalletCertificateType.EXEMPTION -> greenCertificate.exemptionCertificateValidFrom?.time
+            WalletCertificateType.ACTIVITY_PASS -> greenCertificateData.issuedAt.toInstant().toEpochMilli()
         } ?: -1
         sha256 = "${greenCertificate.countryCode?.uppercase()}${greenCertificate.getDgci()}".sha256()
-        isExpired = greenCertificateData.expirationTime.isBefore(ZonedDateTime.now())
+        expirationTime = greenCertificateData.expirationTime.toInstant().toEpochMilli()
     }
 
     override fun parse() {
@@ -405,9 +417,11 @@ class EuropeanCertificate private constructor(id: String, value: String, val isF
             value: String,
             id: String = UUID.randomUUID().toString(),
             isFavorite: Boolean = false,
+            canRenewActivityPass: Boolean? = null,
+            rootWalletCertificateId: String? = null,
         ): EuropeanCertificate? {
             return try {
-                EuropeanCertificate(id, value, isFavorite)
+                EuropeanCertificate(id, value, isFavorite, canRenewActivityPass, rootWalletCertificateId)
             } catch (e: IllegalStateException) {
                 Timber.e(e)
                 null

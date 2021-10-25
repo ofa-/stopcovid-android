@@ -1223,7 +1223,7 @@
    "home.healthSection.dgsUrgent.title":"Important: the vaccine booster",
    "home.healthSection.dgsUrgent.subtitle":"Do you need a booster now?",
    "dgsUrgentController.title":"The boosters",
-   "dgsUrgentController.videoUrl":"https://app-static.tousanticovid.gouv.fr/json/version-35/InfoCenter-Plus/videos-dgs/20211004_dose_rappel.mp4",
+   "dgsUrgentController.videoUrl":"https://app-static.tousanticovid.gouv.fr/json/version-35/InfoCenter-Plus/videos-dgs/20211004_dose_rappel-en.mp4",
    "dgsUrgentController.section.title":"Booster dose and eligibility",
    "dgsUrgentController.section.desc":"After a while, the protection of the vaccine wanes and it is important to get a booster to continue to be protected.\n\n👉 If you have been vaccinated with Janssen vaccine, regardless of your age: do it from 4 weeks after your last injection.\n\n👉 If you have been vaccinated with Pfizer or Moderna vaccine and:\n- you are 65 years old and over, or have serious illness, or you are an eligible healthcare professional: do it from 6 months after your last injection\n- you are immunocompromised or you are on medical advice: do it from 3 months after your last injection\n- you are closed to an immunocompromised person and you are 18 years old and over: do this from 6 months after your last injection.\n\nDo not wait and make an appointment on Sante.fr or with a healthcare professional.",
    "dgsUrgentController.section.labelUrl":"Learn more",
@@ -1236,5 +1236,11 @@
    "dgsUrgentController.phone.subtitle":"Call us 0 800 009 110.",
    "dgsUrgentController.phone.number":"0800009110",
    "notif.title":"Your opinion counts!",
-   "notif.subtitle":"Take the questionnaire on TousAntiCovid."
+   "notif.subtitle":"Take the questionnaire on TousAntiCovid.",
+   "notification.channel.activityPass.title":"Ephemeral pass",
+   "proximityController.error.noNearbyDevicesAccess":"In order for the Bluetooth contact to work, please activate nearby devices detection in settings by tapping here 👉",
+   "common.needNearbyDevicesAccessToScan":"The app needs access to nearby devices detection",
+   "common.share": "Share",
+   "certificateSharingController.title": "Partager une capture d'écran",
+   "certificateSharingController.message": "Attention, si vous souhaitez partager cet écran, votre QR Code peut être utilisé frauduleusement.\nIl est donc recommandé de ne pas le partager sur les réseaux sociaux ou à de tierces personnes."
 }

@@ -14,4 +14,5 @@ package com.lunabeestudio.analytics.model
 enum class HealthEventName {
     eh1,
     eh2,
+    eh3,
 }

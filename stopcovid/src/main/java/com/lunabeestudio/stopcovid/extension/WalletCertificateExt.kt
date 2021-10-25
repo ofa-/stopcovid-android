@@ -7,6 +7,8 @@ import com.lunabeestudio.domain.model.RawWalletCertificate
 import com.lunabeestudio.domain.model.WalletCertificateType
 import com.lunabeestudio.stopcovid.coreui.extension.stringsFormat
 import com.lunabeestudio.stopcovid.coreui.manager.LocalizedStrings
+import com.lunabeestudio.stopcovid.manager.Blacklist2DDOCManager
+import com.lunabeestudio.stopcovid.manager.BlacklistDCCManager
 import com.lunabeestudio.stopcovid.model.EuropeanCertificate
 import com.lunabeestudio.stopcovid.model.FrenchCertificate
 import com.lunabeestudio.stopcovid.model.SanitaryCertificate
@@ -15,6 +17,8 @@ import com.lunabeestudio.stopcovid.model.WalletCertificate
 import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.concurrent.TimeUnit
+import kotlin.time.Duration
+import kotlin.time.ExperimentalTime
 
 fun WalletCertificate.fullName(): String =
     "${firstName.orEmpty()} ${name.orEmpty()}".trim().uppercase()
@@ -161,6 +165,9 @@ fun EuropeanCertificate.formatDccText(
                 this.greenCertificate.exemptionCertificateValidUntil?.let(dateFormat::format).orNA()
             )
         }
+        WalletCertificateType.ACTIVITY_PASS -> {
+            /* no-op */
+        }
     }
     return formattedText.orEmpty()
 }
@@ -226,4 +233,56 @@ fun SanitaryCertificate.validityString(configuration: Configuration, strings: Lo
 }
 
 val WalletCertificate.raw: RawWalletCertificate
-    get() = RawWalletCertificate(id, type, value, timestamp, (this as? EuropeanCertificate)?.isFavorite ?: false)
+    get() = RawWalletCertificate(
+        id = id,
+        type = type,
+        value = value,
+        timestamp = timestamp,
+        isFavorite = (this as? EuropeanCertificate)?.isFavorite ?: false,
+        canRenewDccLight = (this as? EuropeanCertificate)?.canRenewActivityPass,
+        rootWalletCertificateId = (this as? EuropeanCertificate)?.rootWalletCertificateId,
+    )
+
+@OptIn(ExperimentalTime::class)
+fun WalletCertificate.isEligibleForActivityPass(blacklistDCCManager: BlacklistDCCManager, activityPassSkipNegTestHours: Int): Boolean {
+    if (this.type !in arrayOf(
+            WalletCertificateType.SANITARY_EUROPE,
+            WalletCertificateType.RECOVERY_EUROPE,
+            WalletCertificateType.VACCINATION_EUROPE
+        )
+    ) return false
+
+    if ((this as? EuropeanCertificate)?.isExpired == true) {
+        return false
+    }
+
+    if ((this as? EuropeanCertificate)?.canRenewActivityPass == false) {
+        return false
+    }
+
+    if (this.type == WalletCertificateType.SANITARY_EUROPE &&
+        timestamp + Duration.hours(activityPassSkipNegTestHours).inWholeMilliseconds < System.currentTimeMillis()
+    ) {
+        return false
+    }
+
+    if (blacklistDCCManager.blacklistedDCCHashes.value?.contains(sha256) == true) return false
+
+    return true
+}
+
+val EuropeanCertificate.isExpired: Boolean
+    get() = expirationTime < System.currentTimeMillis()
+
+fun EuropeanCertificate.isBlacklisted(blacklistDCCManager: BlacklistDCCManager): Boolean =
+    blacklistDCCManager.blacklistedDCCHashes.value?.contains(sha256) == true
+
+fun FrenchCertificate.isBlacklisted(blacklist2DDOCManager: Blacklist2DDOCManager): Boolean =
+    blacklist2DDOCManager.blacklisted2DDOCHashes.value?.contains(sha256) == true
+
+// Use 1sec of threshold due to sec -> ms rounding
+fun EuropeanCertificate.activityPassValidFuture(): Boolean = if (type == WalletCertificateType.ACTIVITY_PASS) {
+    System.currentTimeMillis() < timestamp - 1_000
+} else {
+    false
+}

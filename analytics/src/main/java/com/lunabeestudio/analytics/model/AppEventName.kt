@@ -12,7 +12,6 @@ package com.lunabeestudio.analytics.model
 
 @Suppress("EnumEntryName")
 enum class AppEventName {
-    e1,
     e3,
     e4,
     e5,

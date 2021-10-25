@@ -19,7 +19,9 @@ fun ByteArray.randomize() {
 }
 
 fun <T> ByteArray.use(block: (ByteArray) -> T): T {
-    val res = block(this)
-    this.randomize()
-    return res
+    return try {
+        block(this)
+    } finally {
+        this.randomize()
+    }
 }

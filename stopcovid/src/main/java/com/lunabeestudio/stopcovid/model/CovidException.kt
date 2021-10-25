@@ -10,7 +10,11 @@
 
 package com.lunabeestudio.stopcovid.model
 
-abstract class CovidException(val errorCode: ErrorCode, override val message: String) : Exception(message)
+abstract class CovidException(
+    val errorCode: ErrorCode,
+    override val message: String,
+    override val cause: Throwable?,
+) : Exception(message, cause)
 
 enum class ErrorCode {
     UNKNOWN,
@@ -39,85 +43,100 @@ enum class ErrorCode {
     VENUE_INVALID_FORMAT_EXCEPTION,
     VENUE_EXPIRED_EXCEPTION,
     KEY_FIGURES_NOT_AVAILABLE,
+    ACTIVITY_PASS_NOT_GENERATED,
 }
 
-class UnknownException(message: String = "Unknown error occurred") :
-    CovidException(ErrorCode.UNKNOWN, message)
+class UnknownException(message: String = "Unknown error occurred", cause: Throwable? = null) :
+    CovidException(ErrorCode.UNKNOWN, message, cause)
 
-class UnauthorizedException(message: String = "Not authorized to call this endpoint") :
-    CovidException(ErrorCode.UNAUTHORIZED, message)
+class UnauthorizedException(message: String = "Not authorized to call this endpoint", cause: Throwable? = null) :
+    CovidException(ErrorCode.UNAUTHORIZED, message, cause)
 
-class ForbiddenException(message: String = "Forbidden to call this endpoint") :
-    CovidException(ErrorCode.FORBIDDEN, message)
+class ForbiddenException(message: String = "Forbidden to call this endpoint", cause: Throwable? = null) :
+    CovidException(ErrorCode.FORBIDDEN, message, cause)
 
-class BackendException(message: String = "An error occurs. Our team is working to fix it!") :
-    CovidException(ErrorCode.BACKEND, message)
+class BackendException(message: String = "An error occurs. Our team is working to fix it!", cause: Throwable? = null) :
+    CovidException(ErrorCode.BACKEND, message, cause)
 
-class NoInternetException(message: String = "No internet") :
-    CovidException(ErrorCode.NO_INTERNET, message)
+class NoInternetException(message: String = "No internet", cause: Throwable? = null) :
+    CovidException(ErrorCode.NO_INTERNET, message, cause)
 
-class NeedRegisterException(message: String = "You need to be registered to execute this action") :
-    CovidException(ErrorCode.NEED_REGISTER, message)
+class NeedRegisterException(message: String = "You need to be registered to execute this action", cause: Throwable? = null) :
+    CovidException(ErrorCode.NEED_REGISTER, message, cause)
 
 class ProximityException(
     val throwable: Throwable? = null,
     message: String = throwable?.localizedMessage ?: "An error occurs in BLE proximity",
+    cause: Throwable? = null
 ) :
-    CovidException(ErrorCode.PROXIMITY_UNKNOWN, message)
+    CovidException(ErrorCode.PROXIMITY_UNKNOWN, message, cause)
 
-class ServerDecryptException(message: String = "Server data decrypt fail") :
-    CovidException(ErrorCode.DECRYPT_FAIL, message)
+class ServerDecryptException(message: String = "Server data decrypt fail", cause: Throwable? = null) :
+    CovidException(ErrorCode.DECRYPT_FAIL, message, cause)
 
-class NoKeyException(message: String = "No key found") :
-    CovidException(ErrorCode.KEYSTORE_NO_KEY, message)
+class NoKeyException(message: String = "No key found", cause: Throwable? = null) :
+    CovidException(ErrorCode.KEYSTORE_NO_KEY, message, cause)
 
-class NoEphemeralBluetoothIdentifierFoundForEpoch(message: String = "No EphemeralBluetoothIdentifier found the requested time") :
-    CovidException(ErrorCode.ROBERT_NO_EBID_FOR_EPOCH, message)
+class NoEphemeralBluetoothIdentifierFoundForEpoch(
+    message: String = "No EphemeralBluetoothIdentifier found the requested time",
+    cause: Throwable? = null
+) :
+    CovidException(ErrorCode.ROBERT_NO_EBID_FOR_EPOCH, message, cause)
 
-class InvalidEphemeralBluetoothIdentifierForEpoch(message: String? = null) :
-    CovidException(ErrorCode.ROBERT_INVALID_EBID_FOR_EPOCH, message ?: "EphemeralBluetoothIdentifier is not valid for the requested time")
+class InvalidEphemeralBluetoothIdentifierForEpoch(message: String? = null, cause: Throwable? = null) :
+    CovidException(
+        ErrorCode.ROBERT_INVALID_EBID_FOR_EPOCH,
+        message ?: "EphemeralBluetoothIdentifier is not valid for the requested time",
+        cause
+    )
 
-class NoEphemeralBluetoothIdentifierFound(message: String? = null) :
-    CovidException(ErrorCode.ROBERT_NO_EBID, message ?: "No EphemeralBluetoothIdentifier found")
+class NoEphemeralBluetoothIdentifierFound(message: String? = null, cause: Throwable? = null) :
+    CovidException(ErrorCode.ROBERT_NO_EBID, message ?: "No EphemeralBluetoothIdentifier found", cause)
 
-class RobertUnknownException(message: String = "Unknown error occurred") :
-    CovidException(ErrorCode.ROBERT_UNKNOWN, message)
+class RobertUnknownException(message: String = "Unknown error occurred", cause: Throwable? = null) :
+    CovidException(ErrorCode.ROBERT_UNKNOWN, message, cause)
 
-class BLEAdvertiserException(message: String = "An error occurs in BLE advertiser") :
-    CovidException(ErrorCode.BLE_ADVERTISER, message)
+class BLEAdvertiserException(message: String = "An error occurs in BLE advertiser", cause: Throwable? = null) :
+    CovidException(ErrorCode.BLE_ADVERTISER, message, cause)
 
-class BLEScannerException(message: String = "An error occurs in BLE scanner") :
-    CovidException(ErrorCode.BLE_SCANNER, message)
+class BLEScannerException(message: String = "An error occurs in BLE scanner", cause: Throwable? = null) :
+    CovidException(ErrorCode.BLE_SCANNER, message, cause)
 
-class BLEGattException(message: String = "An error occurs in BLE GATT") :
-    CovidException(ErrorCode.BLE_GATT, message)
+class BLEGattException(message: String = "An error occurs in BLE GATT", cause: Throwable? = null) :
+    CovidException(ErrorCode.BLE_GATT, message, cause)
 
-class BLEProximityNotificationException(message: String = "An error occurs in BLE Proximity Notification") :
-    CovidException(ErrorCode.BLE_PROXIMITY_NOTIFICATION, message)
+class BLEProximityNotificationException(message: String = "An error occurs in BLE Proximity Notification", cause: Throwable? = null) :
+    CovidException(ErrorCode.BLE_PROXIMITY_NOTIFICATION, message, cause)
 
-class TimeNotAlignedException(message: String = "Phone time not aligned with server time") :
-    CovidException(ErrorCode.TIME_NOT_ALIGNED, message)
+class TimeNotAlignedException(message: String = "Phone time not aligned with server time", cause: Throwable? = null) :
+    CovidException(ErrorCode.TIME_NOT_ALIGNED, message, cause)
 
-class ReportDelayException(message: String = "You need to wait before you can use proximity again") :
-    CovidException(ErrorCode.REPORT_DELAY, message)
+class ReportDelayException(message: String = "You need to wait before you can use proximity again", cause: Throwable? = null) :
+    CovidException(ErrorCode.REPORT_DELAY, message, cause)
 
-class SecretKeyAlreadyGeneratedException(message: String = "Secret key was already generated but can't be found in the KeyStore") :
-    CovidException(ErrorCode.SECRET_KEY_ALREADY_GENERATED, message)
+class SecretKeyAlreadyGeneratedException(
+    message: String = "Secret key was already generated but can't be found in the KeyStore",
+    cause: Throwable? = null
+) :
+    CovidException(ErrorCode.SECRET_KEY_ALREADY_GENERATED, message, cause)
 
-class WalletCertificateMalformedException(message: String = "Invalid certificate code") :
-    CovidException(ErrorCode.WALLET_CERTIFICATE_MALFORMED, message)
+class WalletCertificateMalformedException(message: String = "Invalid certificate code", cause: Throwable? = null) :
+    CovidException(ErrorCode.WALLET_CERTIFICATE_MALFORMED, message, cause)
 
-class WalletCertificateInvalidSignatureException(message: String = "Invalid certificate signature") :
-    CovidException(ErrorCode.WALLET_CERTIFICATE_INVALID_SIGNATURE, message)
+class WalletCertificateInvalidSignatureException(message: String = "Invalid certificate signature", cause: Throwable? = null) :
+    CovidException(ErrorCode.WALLET_CERTIFICATE_INVALID_SIGNATURE, message, cause)
 
-class VenueInvalidFormatException(message: String = "Invalid venue format") :
-    CovidException(ErrorCode.VENUE_INVALID_FORMAT_EXCEPTION, message)
+class VenueInvalidFormatException(message: String = "Invalid venue format", cause: Throwable? = null) :
+    CovidException(ErrorCode.VENUE_INVALID_FORMAT_EXCEPTION, message, cause)
 
-class VenueExpiredException(message: String = "Venue expired") :
-    CovidException(ErrorCode.VENUE_EXPIRED_EXCEPTION, message)
+class VenueExpiredException(message: String = "Venue expired", cause: Throwable? = null) :
+    CovidException(ErrorCode.VENUE_EXPIRED_EXCEPTION, message, cause)
 
-class WalletCertificateNoKeyException(message: String = "No key to verify the certificate authenticity") :
-    CovidException(ErrorCode.WALLET_CERTIFICATE_UNKNOWN_ERROR, message)
+class WalletCertificateNoKeyException(message: String = "No key to verify the certificate authenticity", cause: Throwable? = null) :
+    CovidException(ErrorCode.WALLET_CERTIFICATE_UNKNOWN_ERROR, message, cause)
 
-class KeyFiguresNotAvailableException(message: String = "Failed to load key figures") :
-    CovidException(ErrorCode.KEY_FIGURES_NOT_AVAILABLE, message)
+class KeyFiguresNotAvailableException(message: String = "Failed to load key figures", cause: Throwable? = null) :
+    CovidException(ErrorCode.KEY_FIGURES_NOT_AVAILABLE, message, cause)
+
+class GenerateActivityPassException(message: String = "Failed to generate activity pass", cause: Throwable? = null) :
+    CovidException(ErrorCode.ACTIVITY_PASS_NOT_GENERATED, message, cause)

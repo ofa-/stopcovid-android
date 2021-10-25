@@ -149,6 +149,14 @@ internal class ApiConfiguration(
     val displayUrgentDgs: Boolean,
     @SerializedName("app.notif")
     val notif: String,
+    @SerializedName("app.activityPass.generationServerPublicKey")
+    val generationServerPublicKey: String,
+    @SerializedName("app.activityPass.skipNegTestHours")
+    val activityPassSkipNegTestHours: Int,
+    @SerializedName("app.displayActivityPass")
+    val displayActivityPass: Boolean,
+    @SerializedName("app.activityPass.renewThreshold")
+    val renewThreshold: Int,
 )
 
 internal fun ApiConfiguration.toDomain(gson: Gson) = Configuration(
@@ -258,4 +266,8 @@ internal fun ApiConfiguration.toDomain(gson: Gson) = Configuration(
             null
         }
     },
+    generationServerPublicKey = generationServerPublicKey,
+    activityPassSkipNegTestHours = activityPassSkipNegTestHours,
+    displayActivityPass = displayActivityPass,
+    renewThreshold = renewThreshold,
 )

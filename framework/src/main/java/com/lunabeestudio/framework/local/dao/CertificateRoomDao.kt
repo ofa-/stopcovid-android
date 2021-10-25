@@ -14,6 +14,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
 import com.lunabeestudio.framework.local.model.CertificateRoom
 import kotlinx.coroutines.flow.Flow
 
@@ -27,10 +28,16 @@ interface CertificateRoomDao {
     fun getAll(): List<CertificateRoom>
 
     @Query("SELECT * FROM certificateroom WHERE uid = :id")
-    fun getById(id: String): Flow<CertificateRoom?>
+    fun getByIdFlow(id: String): Flow<CertificateRoom?>
+
+    @Query("SELECT * FROM certificateroom WHERE uid = :id")
+    fun getById(id: String): CertificateRoom?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(vararg certificates: CertificateRoom)
+
+    @Update
+    fun updateAll(vararg certificate: CertificateRoom)
 
     @Query("DELETE FROM certificateroom WHERE uid = :certificateId")
     fun delete(certificateId: String)

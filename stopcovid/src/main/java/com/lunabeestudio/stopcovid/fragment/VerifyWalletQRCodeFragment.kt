@@ -16,8 +16,7 @@ import android.view.View
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
-import com.lunabeestudio.stopcovid.extension.dccCertificatesManager
-import com.lunabeestudio.stopcovid.extension.robertManager
+import com.lunabeestudio.stopcovid.extension.injectionContainer
 import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.extension.showUnknownErrorAlert
 import com.lunabeestudio.stopcovid.extension.walletRepository
@@ -28,18 +27,6 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class VerifyWalletQRCodeFragment : QRCodeFragment() {
-
-    private val robertManager by lazy {
-        requireContext().robertManager()
-    }
-
-    private val dccCertificatesManager by lazy {
-        requireContext().dccCertificatesManager()
-    }
-
-    private val WalletManager by lazy {
-        requireContext().walletRepository()
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -55,10 +42,8 @@ class VerifyWalletQRCodeFragment : QRCodeFragment() {
     override fun onCodeScanned(code: String) {
         lifecycleScope.launch {
             try {
-                WalletManager.verifyAndGetCertificateCodeValue(
-                    robertManager.configuration,
+                injectionContainer.verifyAndGetCertificateCodeValueUseCase(
                     code,
-                    dccCertificatesManager.certificates,
                     null,
                 )
                 findNavControllerOrNull()?.safeNavigate(

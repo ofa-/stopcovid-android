@@ -23,6 +23,7 @@ val WalletCertificateType.stringKey: String
         WalletCertificateType.VACCINATION_EUROPE -> "vaccinationEurope"
         WalletCertificateType.RECOVERY_EUROPE -> "recoveryEurope"
         WalletCertificateType.EXEMPTION -> "exemption"
+        WalletCertificateType.ACTIVITY_PASS -> "activityPass"
     }
 
 val WalletCertificateType.errorStringKey: String
@@ -33,6 +34,7 @@ val WalletCertificateType.errorStringKey: String
         WalletCertificateType.VACCINATION_EUROPE -> "vaccinationEurope"
         WalletCertificateType.RECOVERY_EUROPE -> "recoveryEurope"
         WalletCertificateType.EXEMPTION -> "exemption"
+        WalletCertificateType.ACTIVITY_PASS -> "activityPass"
     }
 
 val WalletCertificateType.certificateFilename: String?
@@ -42,7 +44,8 @@ val WalletCertificateType.certificateFilename: String?
         WalletCertificateType.SANITARY_EUROPE -> ConfigConstant.Wallet.TEST_EUROPE_CERTIFICATE_FULL_FILE
         WalletCertificateType.VACCINATION_EUROPE -> ConfigConstant.Wallet.VACCIN_EUROPE_CERTIFICATE_FULL_FILE
         WalletCertificateType.RECOVERY_EUROPE -> ConfigConstant.Wallet.RECOVERY_EUROPE_CERTIFICATE_FULL_FILE
-        WalletCertificateType.EXEMPTION -> null
+        WalletCertificateType.EXEMPTION,
+        WalletCertificateType.ACTIVITY_PASS -> null
     }
 
 val WalletCertificateType.certificateThumbnailFilename: String?
@@ -52,7 +55,8 @@ val WalletCertificateType.certificateThumbnailFilename: String?
         WalletCertificateType.SANITARY_EUROPE -> ConfigConstant.Wallet.TEST_EUROPE_CERTIFICATE_THUMBNAIL_FILE
         WalletCertificateType.VACCINATION_EUROPE -> ConfigConstant.Wallet.VACCIN_EUROPE_CERTIFICATE_THUMBNAIL_FILE
         WalletCertificateType.RECOVERY_EUROPE -> ConfigConstant.Wallet.RECOVERY_EUROPE_CERTIFICATE_THUMBNAIL_FILE
-        WalletCertificateType.EXEMPTION -> null
+        WalletCertificateType.EXEMPTION,
+        WalletCertificateType.ACTIVITY_PASS -> null
     }
 
 val WalletCertificateType.certificateThumbnailDrawable: Int?
@@ -62,7 +66,8 @@ val WalletCertificateType.certificateThumbnailDrawable: Int?
         WalletCertificateType.SANITARY_EUROPE -> R.drawable.test_europe_certificate
         WalletCertificateType.VACCINATION_EUROPE -> R.drawable.vaccin_europe_certificate
         WalletCertificateType.RECOVERY_EUROPE -> R.drawable.recovery_europe_certificate
-        WalletCertificateType.EXEMPTION -> null
+        WalletCertificateType.EXEMPTION,
+        WalletCertificateType.ACTIVITY_PASS -> null
     }
 
 val WalletCertificateType.certificateDrawable: Int?
@@ -72,7 +77,8 @@ val WalletCertificateType.certificateDrawable: Int?
         WalletCertificateType.SANITARY_EUROPE -> R.drawable.test_europe_certificate_full
         WalletCertificateType.VACCINATION_EUROPE -> R.drawable.vaccin_europe_certificate_full
         WalletCertificateType.RECOVERY_EUROPE -> R.drawable.recovery_europe_certificate_full
-        WalletCertificateType.EXEMPTION -> null
+        WalletCertificateType.EXEMPTION,
+        WalletCertificateType.ACTIVITY_PASS -> null
     }
 
 val WalletCertificateType.barcodeFormat: BarcodeFormat

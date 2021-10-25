@@ -40,9 +40,9 @@ fun NavController.safeNavigate(@IdRes resId: Int, args: Bundle?) {
     )
 }
 
-fun NavController.safeNavigate(directions: NavDirections) {
+fun NavController.safeNavigate(directions: NavDirections, navOptions: NavOptions? = null) {
     try {
-        navigate(directions)
+        navigate(directions, navOptions)
     } catch (e: IllegalArgumentException) {
         // back and button pressed quickly can trigger this exception.
     }

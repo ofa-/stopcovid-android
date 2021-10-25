@@ -39,7 +39,6 @@ class SplashScreenActivity : BaseActivity() {
     @OptIn(ExperimentalTime::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val onBoardingDone = sharedPreferences.isOnBoardingDone
 
         splashScreenBinding = ActivitySplashScreenBinding.inflate(layoutInflater)
 
@@ -60,13 +59,13 @@ class SplashScreenActivity : BaseActivity() {
                 override fun onChanged(strings: Event<LocalizedStrings>?) {
                     if (!strings?.peekContent().isNullOrEmpty()) {
                         liveStrings.removeObserver(this)
-                        startOnBoardingOrMain(onBoardingDone)
+                        startOnBoardingOrMain(sharedPreferences.isOnBoardingDone)
                     }
                 }
             }
             liveStrings.observe(this@SplashScreenActivity, stringsObserver)
         } else {
-            startOnBoardingOrMain(onBoardingDone)
+            startOnBoardingOrMain(sharedPreferences.isOnBoardingDone)
         }
     }
 
@@ -112,29 +111,31 @@ class SplashScreenActivity : BaseActivity() {
 
     private fun showNoStringsErrorDialog() {
         if (!isFinishing) {
-            noStringDialog = MaterialAlertDialogBuilder(this@SplashScreenActivity)
-                .setTitle(getString(R.string.splashScreenErrorDialog_title, getString(R.string.app_name)))
-                .setMessage(R.string.splashScreenErrorDialog_message)
-                .setPositiveButton(R.string.splashScreenErrorDialog_positiveButton) { _, _ ->
-                    splashLoadingJob = lifecycleScope.launch {
-                        splashScreenBinding.progressBar.show()
-                        (application as? StopCovid)?.injectionContainer?.stringsManager?.let { stringsManager ->
-                            stringsManager.initialize(this@SplashScreenActivity)
-                            stringsManager.onAppForeground(this@SplashScreenActivity)
-                        }
-                        splashScreenBinding.progressBar.hide()
-                        if (strings.isEmpty()) {
+            if (strings.isEmpty()) {
+                noStringDialog = MaterialAlertDialogBuilder(this@SplashScreenActivity)
+                    .setTitle(getString(R.string.splashScreenErrorDialog_title, getString(R.string.app_name)))
+                    .setMessage(R.string.splashScreenErrorDialog_message)
+                    .setPositiveButton(R.string.splashScreenErrorDialog_positiveButton) { _, _ ->
+                        splashLoadingJob = lifecycleScope.launch {
+                            splashScreenBinding.progressBar.show()
+                            (application as? StopCovid)?.injectionContainer?.stringsManager?.let { stringsManager ->
+                                stringsManager.initialize(this@SplashScreenActivity)
+                                stringsManager.onAppForeground(this@SplashScreenActivity)
+                            }
+                            splashScreenBinding.progressBar.hide()
                             showNoStringsErrorDialog()
                         }
                     }
-                }
-                .setNegativeButton(R.string.splashScreenErrorDialog_negativeButton) { _, _ ->
-                    exitProcess(0)
-                }
-                .setOnDismissListener {
-                    noStringDialog = null
-                }
-                .show()
+                    .setNegativeButton(R.string.splashScreenErrorDialog_negativeButton) { _, _ ->
+                        exitProcess(0)
+                    }
+                    .setOnDismissListener {
+                        noStringDialog = null
+                    }
+                    .show()
+            } else {
+                startOnBoardingOrMain(sharedPreferences.isOnBoardingDone)
+            }
         }
     }
 }

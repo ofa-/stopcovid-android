@@ -12,31 +12,30 @@ package com.lunabeestudio.stopcovid.fragment
 
 import android.app.Activity
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
-import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import com.google.zxing.BinaryBitmap
-import com.google.zxing.MultiFormatReader
-import com.google.zxing.NotFoundException
-import com.google.zxing.RGBLuminanceSource
-import com.google.zxing.Result
-import com.google.zxing.common.HybridBinarizer
 import com.lunabeestudio.stopcovid.R
+import com.lunabeestudio.stopcovid.activity.ImportQRCodeActivity
 import com.lunabeestudio.stopcovid.activity.MainActivity
-import java.io.FileNotFoundException
-import java.io.InputStream
 
 abstract class QRCodeDccFragment : QRCodeFragment() {
 
-    private val pickerLauncher =
+    protected val pickerLauncher =
         registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
-        ) { activityResult -> onPickerResult(activityResult) }
+        ) { activityResult ->
+            when (activityResult.resultCode) {
+                Activity.RESULT_OK -> activityResult.data?.getStringExtra(ImportQRCodeActivity.EXTRA_CODE_SCANNED)?.let { code ->
+                    onCodeScanned(code)
+                }
+                ImportQRCodeActivity.RESULT_KO -> strings["universalQrScanController.error.noCodeFound"]?.let { str ->
+                    (activity as? MainActivity)?.showErrorSnackBar(str)
+                }
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,70 +54,13 @@ abstract class QRCodeDccFragment : QRCodeFragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return if (item.itemId == R.id.item_import) {
-            openGallery()
+            context?.let { context ->
+                val intent = Intent(context, ImportQRCodeActivity::class.java)
+                pickerLauncher.launch(intent)
+            }
             true
         } else {
             false
-        }
-    }
-
-    private fun openGallery() {
-        val intent = Intent()
-            .setType("image/*")
-            .setAction(Intent.ACTION_GET_CONTENT)
-
-        pickerLauncher.launch(intent)
-    }
-
-    private fun onPickerResult(activityResult: ActivityResult) {
-        if (activityResult.resultCode == Activity.RESULT_OK) {
-            val uri = activityResult.data?.data
-
-            val openInputStream = try {
-                if (uri != null) {
-                    context?.contentResolver?.openInputStream(uri)
-                } else {
-                    return
-                }
-            } catch (e: FileNotFoundException) {
-                return
-            }
-
-            openInputStream?.let {
-                scanImageFile(it)
-            }
-        }
-    }
-
-    fun onScanResult(result: Result?) {
-        if (result != null) {
-            onCodeScanned(result.text)
-        } else {
-            strings["universalQrScanController.error.noCodeFound"]?.let { str ->
-                (activity as MainActivity).showErrorSnackBar(str)
-            }
-        }
-    }
-
-    fun scanImageFile(inputStream: InputStream) {
-        onScanResult(
-            scanBitmap(BitmapFactory.decodeStream(inputStream))
-        )
-    }
-
-    fun scanBitmap(bitmap: Bitmap): Result? {
-        val width: Int = bitmap.width
-        val height: Int = bitmap.height
-        val pixels = IntArray(width * height)
-        bitmap.getPixels(pixels, 0, width, 0, 0, width, height)
-        val source = RGBLuminanceSource(width, height, pixels)
-        val bBitmap = BinaryBitmap(HybridBinarizer(source))
-        val reader = MultiFormatReader()
-        bitmap.recycle()
-        return try {
-            reader.decode(bBitmap)
-        } catch (e: NotFoundException) {
-            null
         }
     }
 }

@@ -10,7 +10,7 @@ import com.lunabeestudio.stopcovid.coreui.extension.appCompatActivity
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.fragment.BaseFragment
 import com.lunabeestudio.stopcovid.databinding.FragmentVerifyWalletResultBinding
-import com.lunabeestudio.stopcovid.extension.dccCertificatesManager
+import com.lunabeestudio.stopcovid.extension.injectionContainer
 import com.lunabeestudio.stopcovid.extension.fullDescription
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
@@ -28,14 +28,6 @@ class VerifyWalletResultFragment : BaseFragment() {
         requireContext().robertManager()
     }
 
-    private val dccCertificatesManager by lazy {
-        requireContext().dccCertificatesManager()
-    }
-
-    private val WalletManager by lazy {
-        requireContext().walletRepository()
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -44,10 +36,8 @@ class VerifyWalletResultFragment : BaseFragment() {
 
         lifecycleScope.launch {
             certificate = try {
-                WalletManager.verifyAndGetCertificateCodeValue(
-                    robertManager.configuration,
+                injectionContainer.verifyAndGetCertificateCodeValueUseCase(
                     args.certificateCode,
-                    dccCertificatesManager.certificates,
                     null,
                 )
             } catch (e: Exception) {

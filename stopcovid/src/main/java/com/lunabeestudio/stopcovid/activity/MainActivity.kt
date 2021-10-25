@@ -227,6 +227,7 @@ class MainActivity : BaseActivity() {
             R.id.verifyWalletQRCodeFragment,
             R.id.vaccineCompletionFragment,
             R.id.walletQuantityWarningFragment,
+            R.id.importQrBottomSheetDialogFragment,
         )
 
         val forceLightStatusIconFragments = listOf(
@@ -235,10 +236,20 @@ class MainActivity : BaseActivity() {
             R.id.walletQRCodeFragment,
             R.id.universalQrScanFragment,
             R.id.walletQuantityWarningFragment,
+            R.id.importQrBottomSheetDialogFragment,
         )
+
+        val tabBehaviorFragments = mapOf(
+            R.id.walletContainerFragment to TabBehavior.IGNORE, // let inner fragment decides
+            R.id.walletPagerFragment to TabBehavior.SHOW,
+            R.id.walletFullscreenPagerFragment to TabBehavior.SHOW,
+            R.id.keyFiguresPagerFragment to TabBehavior.SHOW,
+            R.id.generateActivityPassBottomSheetFragment to TabBehavior.SHOW,
+        ) // default to TAB_BEHAVIOR.HIDE
 
         val isNoAppBarFragment = noAppBarFragments.contains(destination.id)
         val shouldForceLightStatusIcon = forceLightStatusIconFragments.contains(destination.id)
+        val tabBehavior = tabBehaviorFragments[destination.id] ?: TabBehavior.HIDE
 
         lifecycleScope.launchWhenResumed {
             val windowInsetsController = WindowInsetsControllerCompat(window, window.decorView)
@@ -269,6 +280,14 @@ class MainActivity : BaseActivity() {
                 // Fix issue where appBarLayout take space even when gone
                 val params = binding.navHostFragment.layoutParams as CoordinatorLayout.LayoutParams
                 params.behavior = AppBarLayout.ScrollingViewBehavior()
+            }
+
+            when (tabBehavior) {
+                TabBehavior.SHOW -> binding.tabLayout.isVisible = true
+                TabBehavior.HIDE -> binding.tabLayout.isVisible = false
+                TabBehavior.IGNORE -> {
+                    /* no-op */
+                }
             }
         }
     }
@@ -438,6 +457,8 @@ class MainActivity : BaseActivity() {
             }
         }
     }
+
+    private enum class TabBehavior { SHOW, HIDE, IGNORE }
 
     companion object {
         private const val CURFEW_CERTIFICATE_SHORTCUT_ID: String = "curfewCertificateShortcut"

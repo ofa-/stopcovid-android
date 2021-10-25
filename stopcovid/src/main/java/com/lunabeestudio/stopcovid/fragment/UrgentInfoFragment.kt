@@ -1,5 +1,18 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * Authors
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * Created by Lunabee Studio / Date - 2021/10/04 - for the TOUS-ANTI-COVID project
+ */
+
 package com.lunabeestudio.stopcovid.fragment
 
+import android.os.Bundle
+import android.view.View
+import androidx.recyclerview.widget.RecyclerView
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.callPhone
 import com.lunabeestudio.stopcovid.coreui.fastitem.cardWithActionItem
@@ -7,10 +20,25 @@ import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.model.Action
 import com.lunabeestudio.stopcovid.extension.openInExternalBrowser
 import com.lunabeestudio.stopcovid.fastitem.phoneSupportItem
+import com.lunabeestudio.stopcovid.fastitem.videoPlayerItem
 import com.mikepenz.fastadapter.GenericItem
 
 class UrgentInfoFragment : MainFragment() {
     override fun getTitleKey(): String = "dgsUrgentController.title"
+
+    private var hideMediaController: (() -> Unit)? = null
+
+    private var onScrollListener: RecyclerView.OnScrollListener = object : RecyclerView.OnScrollListener() {
+        override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+            hideMediaController?.invoke()
+        }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        // To avoid media controller glitch on scroll
+        binding?.recyclerView?.addOnScrollListener(onScrollListener)
+    }
 
     override fun getItems(): List<GenericItem> {
 
@@ -18,7 +46,20 @@ class UrgentInfoFragment : MainFragment() {
 
         items += spaceItem {
             spaceRes = R.dimen.spacing_large
-            identifier = items.size.toLong()
+        }
+
+        strings["dgsUrgentController.videoUrl"]?.let {
+            items += videoPlayerItem {
+                url = it
+                hideMediaController = this::hideMediaController
+                autoPlay = true
+                retryContentDescription = strings["common.tryAgain"]
+                identifier = "dgsUrgentController.videoUrl".hashCode().toLong()
+            }
+
+            items += spaceItem {
+                spaceRes = R.dimen.spacing_large
+            }
         }
 
         items += cardWithActionItem {
@@ -36,7 +77,6 @@ class UrgentInfoFragment : MainFragment() {
 
         items += spaceItem {
             spaceRes = R.dimen.spacing_large
-            identifier = items.size.toLong()
         }
 
         strings["dgsUrgentController.phone.number"]?.let { number ->
@@ -52,9 +92,13 @@ class UrgentInfoFragment : MainFragment() {
 
         items += spaceItem {
             spaceRes = R.dimen.spacing_large
-            identifier = items.size.toLong()
         }
 
         return items
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        binding?.recyclerView?.removeOnScrollListener(onScrollListener)
     }
 }

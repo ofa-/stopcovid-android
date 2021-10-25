@@ -652,7 +652,7 @@ class RobertManagerImpl(
             keystoreRepository.atRiskStatus = newAtRiskStatus
             if (!isImmune) {
                 if (prevAtRiskStatus?.ntpLastRiskScoringS != newAtRiskStatus.ntpLastRiskScoringS) {
-                    robertApplication.alertAtRiskLevelChange()
+                    robertApplication.atRiskLevelChange(prevAtRiskStatus?.riskLevel ?: 0f)
                 }
                 if (newAtRiskStatus.riskLevel > 0f
                     && (
@@ -663,7 +663,7 @@ class RobertManagerImpl(
                                 )
                         )
                 ) {
-                    robertApplication.notifyAtRiskLevelChange()
+                    robertApplication.notifyAtRiskLevelChange(prevAtRiskStatus?.riskLevel ?: 0f)
                 }
             }
 

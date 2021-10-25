@@ -24,15 +24,14 @@ import com.lunabeestudio.stopcovid.model.KeyFiguresNotAvailableException
 import com.lunabeestudio.stopcovid.model.TacResult
 import com.lunabeestudio.stopcovid.widgetshomescreen.KeyFiguresWidget
 import keynumbers.Keynumbers
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
 import java.util.zip.GZIPInputStream
 
-class KeyFiguresManager(serverManager: ServerManager) : RemoteFileManager(serverManager) {
+class KeyFiguresManager(serverManager: ServerManager) :
+    RemoteProtoGzipManager<Keynumbers.KeyNumbersMessage, List<KeyFigure>>(serverManager) {
 
     override fun getLocalFileName(context: Context): String {
         val preferences = PreferenceManager.getDefaultSharedPreferences(context)
@@ -50,24 +49,6 @@ class KeyFiguresManager(serverManager: ServerManager) : RemoteFileManager(server
     }
 
     override fun getAssetFilePath(context: Context): String? = null
-    override val mimeType: String = "application/x-gzip"
-
-    override suspend fun fileNotCorrupted(file: File): Boolean {
-        @Suppress("BlockingMethodInNonBlockingContext")
-        return withContext(Dispatchers.IO) {
-            try {
-                file.inputStream().use { fileInputStream ->
-                    GZIPInputStream(fileInputStream).use { gzipInputStream ->
-                        Keynumbers.KeyNumbersMessage.parseFrom(gzipInputStream)
-                    }
-                }
-                true
-            } catch (e: Exception) {
-                Timber.e(e)
-                false
-            }
-        }
-    }
 
     private val _figures: MutableLiveData<Event<TacResult<List<KeyFigure>>>> = MutableLiveData()
     val figures: LiveData<Event<TacResult<List<KeyFigure>>>>
@@ -94,19 +75,11 @@ class KeyFiguresManager(serverManager: ServerManager) : RemoteFileManager(server
 
     suspend fun loadLocalResult(context: Context): TacResult<List<KeyFigure>> {
         val localFile = File(context.filesDir, getLocalFileName(context))
-
-        @Suppress("BlockingMethodInNonBlockingContext")
-        val keyFigures = withContext(Dispatchers.IO) {
-            try {
-                localFile.inputStream().use { fileInputStream ->
-                    GZIPInputStream(fileInputStream).use { gzipInputStream ->
-                        Keynumbers.KeyNumbersMessage.parseFrom(gzipInputStream)
-                    }
-                }.toKeyFigures()
-            } catch (e: IOException) {
-                Timber.w("${localFile.name} not found, falling back to national key figures")
-                null
-            }
+        val keyFigures = try {
+            getMappedProtoMessage(localFile)
+        } catch (e: IOException) {
+            Timber.w("${localFile.path} not found, falling back to national key figures")
+            null
         }
 
         if (keyFigures == null) {
@@ -119,18 +92,11 @@ class KeyFiguresManager(serverManager: ServerManager) : RemoteFileManager(server
                 val fallbackFilePath = ConfigConstant.KeyFigures.LOCAL_FILENAME_TEMPLATE.format(ConfigConstant.KeyFigures.NATIONAL_SUFFIX)
                 val fallbackFile = File(context.filesDir, fallbackFilePath)
 
-                @Suppress("BlockingMethodInNonBlockingContext")
-                val natKeyFigures = withContext(Dispatchers.IO) {
-                    try {
-                        fallbackFile.inputStream().use { fileInputStream ->
-                            GZIPInputStream(fileInputStream).use { gzipInputStream ->
-                                Keynumbers.KeyNumbersMessage.parseFrom(gzipInputStream)
-                            }
-                        }.toKeyFigures()
-                    } catch (e: FileNotFoundException) {
-                        Timber.e(e)
-                        null
-                    }
+                val natKeyFigures = try {
+                    getMappedProtoMessage(fallbackFile)
+                } catch (e: FileNotFoundException) {
+                    Timber.e(e)
+                    null
                 }
                 return TacResult.Failure(throwable = KeyFiguresNotAvailableException(), failureData = natKeyFigures)
             }
@@ -139,5 +105,13 @@ class KeyFiguresManager(serverManager: ServerManager) : RemoteFileManager(server
         } else {
             return TacResult.Success(successData = keyFigures)
         }
+    }
+
+    override fun parseProtoGzipStream(gzipInputStream: GZIPInputStream): Keynumbers.KeyNumbersMessage {
+        return Keynumbers.KeyNumbersMessage.parseFrom(gzipInputStream)
+    }
+
+    override fun Keynumbers.KeyNumbersMessage.mapProtoToApp(): List<KeyFigure> {
+        return this.toKeyFigures()
     }
 }
