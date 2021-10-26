@@ -1,4 +1,4 @@
-{
+{  
    "app.name":"TousAntiCovid",
    "onboarding.welcomeController.title":"Welcome",
    "onboarding.welcomeController.mainMessage.title":"Receive alerts and alert others about possible exposure to COVID-19",
@@ -1215,5 +1215,11 @@
    "common.needNearbyDevicesAccessToScan":"The app needs access to nearby devices detection",
    "common.share": "Share",
    "certificateSharingController.title": "Partager une capture d'écran",
-   "certificateSharingController.message": "Attention, si vous souhaitez partager cet écran, votre QR Code peut être utilisé frauduleusement.\nIl est donc recommandé de ne pas le partager sur les réseaux sociaux ou à de tierces personnes."
+   "certificateSharingController.message": "Attention, si vous souhaitez partager cet écran, votre QR Code peut être utilisé frauduleusement.\nIl est donc recommandé de ne pas le partager sur les réseaux sociaux ou à de tierces personnes.",
+   
+   "storageAlertScreen.storageAlert.description":"⚠️ Votre smartphone n’a plus beaucoup d'espace de stockage, le système pourrait supprimer des données à l’occasion de mises à jour d’apps ou du système lui-même.\n\n\n\nOr sur TousAntiCovid, la sauvegarde sur un serveur n’est pas permise pour des raisons de sécurité et de protection de vos données personnelles, qui restent sur votre smartphone. \n\nLes données de TousAntiCovid, dont vos certificats, pourraient être détruites par le système.\n\n\n\nNous vous conseillons de faire plus de place sur votre smartphone pour éviter ce comportement.",
+   "storageAlertScreen.wipedAlert.description":"⚠️ Nous avons détecté une perte de données.\n\n\n\nSi votre smartphone n’a plus beaucoup d'espace de stockage, le système peut supprimer des données.\n\n\n\nOr dans TousAntiCovid, la sauvegarde sur un serveur n’est pas permise pour des raisons de sécurité et de protection de vos donnés personnelles qui restent sur votre smartphone.\n\nDans ce cas de figure, les données sont alors détruites par le système.\n\n\n\nNous vous conseillons de faire plus de place sur votre smartphone pour éviter ce comportement.",
+
+   "myHealthController.riskMoreInfoAlert.title": "Plus d'infos",
+   "myHealthController.riskMoreInfoAlert.message": "Cet écran est à présenter pour bénéficier d'un test Covid gratuit.\n\nCe badge affiche la date et l'heure courante pour que le personnel de santé fasse la vérification."
 }

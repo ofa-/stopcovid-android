@@ -68,6 +68,7 @@
     <dimen name="reason_widget_attestation_font_size">12sp</dimen>
     <dimen name="title_widget_font_size">14sp</dimen>
     <dimen name="title_widget_min_font_size">5sp</dimen>
+    <dimen name="health_chip_font_size">14sp</dimen>
 
     <dimen name="widget_2_row_min_height">35dp</dimen>
     <dimen name="widget_3_row_min_height">180dp</dimen>

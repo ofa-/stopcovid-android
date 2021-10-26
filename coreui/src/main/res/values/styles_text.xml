@@ -92,4 +92,9 @@
     <style name="Theme.StopCovid.Link.Big">
         <item name="android:textAppearance">@style/TextAppearance.StopCovid.Title</item>
     </style>
+
+    <style name="TextAppearance.StopCovid.Chip.Health" parent="TextAppearance.MaterialComponents.Chip">
+        <item name="android:textSize">@dimen/health_chip_font_size</item>
+        <item name="android:fontFamily">@font/marianne_bold</item>
+    </style>
 </resources>
