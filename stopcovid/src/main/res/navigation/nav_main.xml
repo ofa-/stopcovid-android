@@ -391,6 +391,9 @@
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_healthFragment_to_healthDateTimeInfoBottomSheetFragment"
+            app:destination="@id/healthDateTimeInfoBottomSheetFragment" />
     </fragment>
     <fragment
         android:id="@+id/infoCenterFragment"
@@ -895,4 +898,8 @@
         android:name="com.lunabeestudio.stopcovid.fragment.UrgentInfoFragment" />
 
     <include app:graph="@navigation/nav_wallet" />
+    <dialog
+        android:id="@+id/healthDateTimeInfoBottomSheetFragment"
+        android:name="com.lunabeestudio.stopcovid.fragment.HealthDateTimeInfoBottomSheetFragment"
+        tools:layout="@layout/bottom_sheet_fragment_health_date_time_info" />
 </navigation>

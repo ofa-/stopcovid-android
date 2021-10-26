@@ -15,6 +15,7 @@ import android.view.ViewGroup
 import androidx.annotation.RawRes
 import com.airbnb.lottie.LottieCompositionFactory
 import com.lunabeestudio.stopcovid.databinding.ItemLottieBinding
+import com.lunabeestudio.stopcovid.databinding.NestedItemLottieBinding
 import com.mikepenz.fastadapter.binding.AbstractBindingItem
 
 class LottieItem(@RawRes private val rawRes: Int) : AbstractBindingItem<ItemLottieBinding>() {
@@ -22,8 +23,9 @@ class LottieItem(@RawRes private val rawRes: Int) : AbstractBindingItem<ItemLott
 
     override fun createBinding(inflater: LayoutInflater, parent: ViewGroup?): ItemLottieBinding {
         val itemLottieBinding = ItemLottieBinding.inflate(inflater, parent, false)
+        val nestedItemLottieBinding = NestedItemLottieBinding.bind(itemLottieBinding.root)
         LottieCompositionFactory.fromRawRes(inflater.context, rawRes).addListener { composition ->
-            itemLottieBinding.lottieAnimationView.setComposition(composition)
+            nestedItemLottieBinding.lottieAnimationView.setComposition(composition)
         }
         return itemLottieBinding
     }

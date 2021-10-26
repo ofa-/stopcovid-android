@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ This Source Code Form is subject to the terms of the Mozilla Public
+  ~ License, v. 2.0. If a copy of the MPL was not distributed with this
+  ~ file, You can obtain one at https://mozilla.org/MPL/2.0/.
+  ~
+  ~ Authors
+  ~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ Created by Lunabee Studio / Date - 2021/4/10 - for the TOUS-ANTI-COVID project
+  -->
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingHorizontal="@dimen/spacing_large"
+    android:paddingTop="@dimen/spacing_xlarge"
+    android:paddingBottom="@dimen/spacing_large">
+
+    <TextView
+        android:id="@+id/titleTextView"
+        style="@style/TextAppearance.StopCovid.Title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginBottom="@dimen/spacing_xlarge"
+        android:gravity="center"
+        android:textIsSelectable="false"
+        tools:text="@tools:sample/lorem[1]" />
+
+    <TextView
+        android:id="@+id/bodyTextView"
+        style="@style/TextAppearance.StopCovid.Caption"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/spacing_large"
+        android:gravity="center"
+        android:textIsSelectable="false"
+        tools:text="@tools:sample/lorem[60]" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/okButton"
+        style="@style/Widget.StopCovid.Button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:text="@tools:sample/lorem" />
+
+</LinearLayout>

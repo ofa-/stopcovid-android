@@ -36,6 +36,7 @@ import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.fastitem.healthCardItem
 import com.lunabeestudio.stopcovid.fastitem.logoItem
+import com.lunabeestudio.stopcovid.fastitem.lottieBadgeItem
 import com.lunabeestudio.stopcovid.manager.ShareManager
 import com.lunabeestudio.stopcovid.model.ContactDateFormat
 import com.lunabeestudio.stopcovid.model.LinkType
@@ -63,6 +64,7 @@ class HealthFragment : TimeMainFragment() {
 
     private val viewModel: HealthViewModel by viewModels { HealthViewModelFactory(robertManager) }
 
+    private val shortDateTimeFormat by lazy { SimpleDateFormat("dd/MM/yyyy, HH:mm", Locale.getDefault()) }
     private val fromDateFormat: DateFormat = SimpleDateFormat("dd LLL", Locale.getDefault())
     private val toDateFormat: DateFormat = SimpleDateFormat("dd LLL yyyy", Locale.getDefault())
     private val longDateFormat: DateFormat = SimpleDateFormat.getDateInstance(DateFormat.LONG)
@@ -124,12 +126,25 @@ class HealthFragment : TimeMainFragment() {
     private fun registeredItems(): ArrayList<GenericItem> {
         val items = ArrayList<GenericItem>()
 
-        items += logoItem {
-            imageRes = R.drawable.diagnosis
-            identifier = items.count().toLong()
+        val riskLevel = robertManager.atRiskStatus?.riskLevel
+
+        items += if ((riskLevel ?: 0f) > 0f && !sharedPreferences.hideRiskStatus) {
+            lottieBadgeItem(R.raw.health_risk) {
+                chipText = shortDateTimeFormat.format(Date())
+                chipClick = {
+                    findNavControllerOrNull()
+                        ?.safeNavigate(HealthFragmentDirections.actionHealthFragmentToHealthDateTimeInfoBottomSheetFragment())
+                }
+                identifier = R.raw.health_risk.toLong()
+            }
+        } else {
+            logoItem {
+                imageRes = R.drawable.diagnosis
+                identifier = items.count().toLong()
+            }
         }
 
-        risksLevelManager.getCurrentLevel(robertManager.atRiskStatus?.riskLevel)?.let {
+        risksLevelManager.getCurrentLevel(riskLevel)?.let {
             if (!sharedPreferences.hideRiskStatus) {
                 items += healthCardItem(R.layout.item_health_card) {
                     header = getStatusLastUpdateToDisplay(requireContext(), robertManager.atRiskLastRefresh, it.riskLevel)
