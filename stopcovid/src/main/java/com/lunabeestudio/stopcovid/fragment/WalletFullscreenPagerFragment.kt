@@ -187,7 +187,7 @@ class WalletFullscreenPagerFragment : BaseFragment() {
     companion object {
         private const val VIEWPAGER_ITEM_COUNT = 2
 
-        private const val WALLET_FULLSCREEN_ACTIVITY_PASS_POSITION = 0
-        private const val WALLET_FULLSCREEN_BORDER_POSITION = 1
+        private const val WALLET_FULLSCREEN_ACTIVITY_PASS_POSITION = 1
+        private const val WALLET_FULLSCREEN_BORDER_POSITION = 0
     }
 }
