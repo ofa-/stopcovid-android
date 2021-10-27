@@ -409,7 +409,7 @@ class WalletContainerFragment : BaseFragment() {
             null
         }
 
-        if (robertManager.configuration.displayActivityPass) {
+        if (true || robertManager.configuration.displayActivityPass) {
             findNavControllerOrNull()?.safeNavigate(
                 WalletContainerFragmentDirections.actionWalletContainerFragmentToWalletFullscreenPagerFragment(
                     id = certificateId,
