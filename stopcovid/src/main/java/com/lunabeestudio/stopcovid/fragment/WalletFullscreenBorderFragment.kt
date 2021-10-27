@@ -67,6 +67,10 @@ class WalletFullscreenBorderFragment : ForceLightFragment(R.layout.fragment_wall
                 this.europeanCertificate = europeanCertificate
                 refreshScreen()
             }
+        binding.showMoreSwitch
+            .setOnCheckedChangeListener { _, isChecked ->
+                refreshDetails(isChecked)
+            }
     }
 
     override fun refreshScreen() {
@@ -93,6 +97,16 @@ class WalletFullscreenBorderFragment : ForceLightFragment(R.layout.fragment_wall
             )
 
             certificateHashTextView.text = europeanCertificate.sha256
+
+            refreshDetails(showMoreSwitch.isChecked)
+        }
+    }
+
+    private fun refreshDetails(showIt: Boolean) {
+        if (showIt) {
+            binding.certificateDetailsTextView.setVisibility(View.VISIBLE)
+        } else {
+            binding.certificateDetailsTextView.setVisibility(View.GONE)
         }
     }
 
