@@ -105,8 +105,10 @@ class WalletFullscreenBorderFragment : ForceLightFragment(R.layout.fragment_wall
     private fun refreshDetails(showIt: Boolean) {
         if (showIt) {
             binding.certificateDetailsTextView.setVisibility(View.VISIBLE)
+            binding.logosImageView.setVisibility(View.GONE)
         } else {
             binding.certificateDetailsTextView.setVisibility(View.GONE)
+            binding.logosImageView.setVisibility(View.VISIBLE)
         }
     }
 
