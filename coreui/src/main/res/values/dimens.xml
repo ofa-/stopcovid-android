@@ -45,7 +45,7 @@
     <dimen name="qr_code_size">200dp</dimen>
     <dimen name="qr_code_widget_size">80dp</dimen>
     <dimen name="qr_code_widget_dcc_size">200dp</dimen>
-    <dimen name="qr_code_fullscreen_size">240dp</dimen>
+    <dimen name="qr_code_fullscreen_size">290dp</dimen>
 
     <dimen name="loading_elevation">40dp</dimen>
     <dimen name="recycler_tag_padding_start">12dp</dimen>
