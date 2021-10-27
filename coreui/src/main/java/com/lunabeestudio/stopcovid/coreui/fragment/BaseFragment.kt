@@ -17,6 +17,13 @@ import com.lunabeestudio.stopcovid.coreui.LocalizedApplication
 import com.lunabeestudio.stopcovid.coreui.extension.stringsFormat
 import com.lunabeestudio.stopcovid.coreui.manager.LocalizedStrings
 
+import android.view.MotionEvent
+import android.view.ScaleGestureDetector
+import android.view.ScaleGestureDetector.SimpleOnScaleGestureListener
+import kotlin.math.max
+import kotlin.math.min
+
+
 abstract class BaseFragment : Fragment() {
 
     abstract fun refreshScreen()
@@ -33,5 +40,27 @@ abstract class BaseFragment : Fragment() {
 
     protected fun stringsFormat(key: String, vararg args: Any?): String? {
         return strings.stringsFormat(key, *args)
+    }
+
+    protected fun setZoomable(element: View) {
+        scaleGestureDetector = ScaleGestureDetector(requireActivity(), ScaleListener())
+        element.setOnTouchListener(View.OnTouchListener { view, motionEvent ->
+            scaleGestureDetector.onTouchEvent(motionEvent)
+        })
+    }
+
+    open fun onZoom(scaleFactor: Float) {
+    }
+
+    private lateinit var scaleGestureDetector: ScaleGestureDetector
+    private var scaleFactor = 1.0f
+
+    private inner class ScaleListener : SimpleOnScaleGestureListener() {
+       override fun onScale(scaleGestureDetector: ScaleGestureDetector): Boolean {
+          scaleFactor *= scaleGestureDetector.scaleFactor
+          scaleFactor = max(0.1f, min(scaleFactor, 10.0f))
+          onZoom(scaleFactor)
+          return true
+       }
     }
 }

@@ -23,12 +23,6 @@ import com.lunabeestudio.stopcovid.coreui.extension.setTextOrHide
 import com.lunabeestudio.stopcovid.coreui.extension.toDimensSize
 import com.lunabeestudio.stopcovid.databinding.FragmentFullscreenQrcodeBinding
 
-import android.view.MotionEvent
-import android.view.ScaleGestureDetector
-import android.view.ScaleGestureDetector.SimpleOnScaleGestureListener
-import kotlin.math.max
-import kotlin.math.min
-
 class FullscreenQRCodeFragment : ForceLightFragment(R.layout.fragment_fullscreen_qrcode) {
 
     private val args: FullscreenQRCodeFragmentArgs by navArgs()
@@ -38,33 +32,21 @@ class FullscreenQRCodeFragment : ForceLightFragment(R.layout.fragment_fullscreen
         R.dimen.qr_code_fullscreen_size.toDimensSize(requireContext()).toInt()
     }
 
-    private var binding: FragmentFullscreenQrcodeBinding? = null
-
-    private lateinit var scaleGestureDetector: ScaleGestureDetector
-    private var scaleFactor = 1.0f
+    private lateinit var binding: FragmentFullscreenQrcodeBinding
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentFullscreenQrcodeBinding.bind(view)
-
-        scaleGestureDetector = ScaleGestureDetector(requireActivity(), ScaleListener())
-        binding?.root?.setOnTouchListener(View.OnTouchListener { view, motionEvent ->
-            scaleGestureDetector.onTouchEvent(motionEvent)
-        })
+        setZoomable(binding.root)
     }
 
-    private inner class ScaleListener : SimpleOnScaleGestureListener() {
-       override fun onScale(scaleGestureDetector: ScaleGestureDetector): Boolean {
-          scaleFactor *= scaleGestureDetector.scaleFactor
-          scaleFactor = max(0.1f, min(scaleFactor, 10.0f))
-          binding?.imageView?.scaleX = scaleFactor
-          binding?.imageView?.scaleY = scaleFactor
-          return true
-       }
+    override fun onZoom(scaleFactor: Float) {
+        binding.imageView.scaleX = scaleFactor
+        binding.imageView.scaleY = scaleFactor
     }
 
     override fun refreshScreen() {
-        binding?.imageView?.setImageBitmap(
+        binding.imageView.setImageBitmap(
             barcodeEncoder.encodeBitmap(
                 args.qrCodeValue,
                 args.qrCodeFormat,
@@ -72,10 +54,12 @@ class FullscreenQRCodeFragment : ForceLightFragment(R.layout.fragment_fullscreen
                 qrCodeSize
             )
         )
-        binding?.topSpace?.isVisible = args.qrCodeFormat == BarcodeFormat.DATA_MATRIX
-        binding?.formatTextView?.setTextOrHide(formatText())
-        binding?.textView?.text = ""
-        binding?.sha256TextView?.setTextOrHide("")
+        binding.apply {
+            topSpace.isVisible = args.qrCodeFormat == BarcodeFormat.DATA_MATRIX
+            formatTextView.setTextOrHide(formatText())
+            textView.text = ""
+            sha256TextView.setTextOrHide("")
+        }
     }
 
     private fun formatText(): String? {
