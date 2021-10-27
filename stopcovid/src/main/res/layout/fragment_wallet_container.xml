@@ -53,6 +53,7 @@
             android:layout_marginHorizontal="@dimen/spacing_xlarge"
             android:layout_marginVertical="@dimen/spacing_large"
             android:textAllCaps="false"
+            android:visibility="gone"
             tools:text="@tools:sample/lorem[3]" />
     </com.google.android.material.card.MaterialCardView>
 </androidx.constraintlayout.widget.ConstraintLayout>
