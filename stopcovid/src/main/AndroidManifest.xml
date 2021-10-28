@@ -97,7 +97,6 @@
         <activity
             android:name=".activity.ImportQRCodeActivity"
             android:exported="false"
-            android:screenOrientation="portrait"
             android:taskAffinity=""
             android:theme="@style/Theme.StopCovid.Transparent" />
 
