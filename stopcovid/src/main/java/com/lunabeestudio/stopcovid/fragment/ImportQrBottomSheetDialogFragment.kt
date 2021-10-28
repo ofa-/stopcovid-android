@@ -139,8 +139,8 @@ class ImportQrBottomSheetDialogFragment : FastAdapterBottomSheetDialogFragment()
         }
     }
 
-    override fun onDismiss(dialog: DialogInterface) {
-        super.onDismiss(dialog)
+    override fun onCancel(dialog: DialogInterface) {
+        super.onCancel(dialog)
         activity?.setResult(Activity.RESULT_CANCELED)
         activity?.finish()
     }

@@ -250,7 +250,7 @@ class MainActivity : BaseActivity() {
         val shouldForceLightStatusIcon = forceLightStatusIconFragments.contains(destination.id)
         val tabBehavior = tabBehaviorFragments[destination.id] ?: TabBehavior.HIDE
 
-        lifecycleScope.launchWhenResumed {
+        lifecycleScope.launchWhenStarted {
             val windowInsetsController = WindowInsetsControllerCompat(window, window.decorView)
             windowInsetsController.isAppearanceLightStatusBars =
                 if (shouldForceLightStatusIcon) {
