@@ -67,10 +67,16 @@ class WalletFullscreenBorderFragment : ForceLightFragment(R.layout.fragment_wall
                 this.europeanCertificate = europeanCertificate
                 refreshScreen()
             }
-        binding.showMoreSwitch
+        binding.apply {
+            showMoreSwitch
             .setOnCheckedChangeListener { _, isChecked ->
                 refreshDetails(isChecked)
             }
+            certificateBarcodeImageView
+            .setOnClickListener {
+                toggleFullBrightness()
+            }
+        }
     }
 
     override fun refreshScreen() {

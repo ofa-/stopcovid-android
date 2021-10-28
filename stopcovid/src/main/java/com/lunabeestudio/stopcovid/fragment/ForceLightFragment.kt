@@ -37,9 +37,7 @@ abstract class ForceLightFragment(@LayoutRes private val layoutRes: Int) : BaseF
             val windowInsetsController = WindowInsetsControllerCompat(activity.window, activity.window.decorView)
             val isAppearanceLightStatusBars = windowInsetsController.isAppearanceLightStatusBars
             activity.window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-            val params: WindowManager.LayoutParams? = activity.window?.attributes
-            params?.screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_FULL
-            activity.window?.attributes = params // this call make the status bars loose its appearance
+            // setFullBrightness()
             windowInsetsController.isAppearanceLightStatusBars = isAppearanceLightStatusBars
         }
     }
@@ -50,11 +48,26 @@ abstract class ForceLightFragment(@LayoutRes private val layoutRes: Int) : BaseF
             val windowInsetsController = WindowInsetsControllerCompat(activity.window, activity.window.decorView)
             val isAppearanceLightStatusBars = windowInsetsController.isAppearanceLightStatusBars
             activity.window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-            val params: WindowManager.LayoutParams? = activity.window?.attributes
-            params?.screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
-            activity.window?.attributes = params // this call make the status bars loose its appearance
+            setFullBrightness(false)
             windowInsetsController.isAppearanceLightStatusBars = isAppearanceLightStatusBars
         }
+    }
+
+    protected fun setFullBrightness(on: Boolean = true) {
+        val window = activity?.window ?: return
+        val params = window.attributes
+        params.screenBrightness = if (on)
+            WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_FULL
+                else
+            WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
+        window.attributes = params
+    }
+
+    protected fun toggleFullBrightness() {
+        val window = activity?.window ?: return
+        setFullBrightness(
+            window.attributes.screenBrightness ==
+            WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE)
     }
 
     protected val blacklistDCCManager: BlacklistDCCManager by lazy(LazyThreadSafetyMode.NONE) {
