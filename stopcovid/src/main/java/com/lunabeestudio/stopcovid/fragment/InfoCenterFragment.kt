@@ -31,6 +31,9 @@ import kotlinx.coroutines.withContext
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 
+import java.util.Date
+import java.text.SimpleDateFormat
+
 class InfoCenterFragment : TimeMainFragment() {
 
     private val tagRecyclerPool = RecyclerView.RecycledViewPool()
@@ -106,7 +109,9 @@ class InfoCenterFragment : TimeMainFragment() {
                         tagRecyclerViewPool = this@InfoCenterFragment.tagRecyclerPool
                         shareContentDescription = strings["accessibility.hint.info.share"]
                         onShareCard = {
-                            stringsFormat("info.sharing.title", infoTitle)?.let { requireContext().startTextIntent(it) }
+                            val date = Date(Duration.seconds(info.timestamp).inWholeMilliseconds)
+                            val text = infoShareText(infoTitle, infoDescription, date)
+                            requireContext().startTextIntent(text)
                         }
                         identifier = info.titleKey.hashCode().toLong()
                     }
@@ -120,6 +125,12 @@ class InfoCenterFragment : TimeMainFragment() {
         }
 
         return items
+    }
+
+    private fun infoShareText(infoTitle: String?, infoBody: String?, infoDate: Date): String {
+        val dateStr = SimpleDateFormat("EEE dd LLL yyyy | HH:mm").format(infoDate)
+
+        return "${infoTitle}\n[TAC | ${dateStr}]\n\n${infoBody}"
     }
 
     override fun refreshScreen() {
