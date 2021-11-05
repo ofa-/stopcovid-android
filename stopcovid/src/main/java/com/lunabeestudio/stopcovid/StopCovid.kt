@@ -58,6 +58,7 @@ import com.lunabeestudio.stopcovid.extension.hideRiskStatus
 import com.lunabeestudio.stopcovid.extension.isObsolete
 import com.lunabeestudio.stopcovid.extension.lastVersionCode
 import com.lunabeestudio.stopcovid.extension.lastVersionName
+import com.lunabeestudio.stopcovid.extension.lowStorageAlertShown
 import com.lunabeestudio.stopcovid.extension.ratingPopInShown
 import com.lunabeestudio.stopcovid.extension.ratingsKeyFiguresOpening
 import com.lunabeestudio.stopcovid.manager.AppMaintenanceManager
@@ -146,6 +147,7 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Localized
         if (sharedPrefs.lastVersionName != BuildConfig.VERSION_NAME) {
             sharedPrefs.ratingsKeyFiguresOpening = 0
             sharedPrefs.googleReviewShown = false
+            sharedPrefs.lowStorageAlertShown = false
         }
         if (!isSameMajorRelease()) {
             sharedPrefs.ratingPopInShown = false
@@ -220,7 +222,9 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Localized
             robertManager.cleaReportIfNeeded(this@StopCovid, false)
         }
 
-        DccLightRenewCleanWorker.startDccLightCleanAndRenewWorker(this)
+        if (robertManager.configuration.displayActivityPass) {
+            DccLightRenewCleanWorker.startDccLightCleanAndRenewWorker(this)
+        }
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)

@@ -17,6 +17,7 @@ import androidx.core.widget.TextViewCompat
 import com.lunabeestudio.stopcovid.coreui.R
 import com.lunabeestudio.stopcovid.coreui.databinding.ItemActionBinding
 import com.lunabeestudio.stopcovid.coreui.databinding.ItemCardWithActionsBinding
+import com.lunabeestudio.stopcovid.coreui.extension.fetchSystemColor
 import com.lunabeestudio.stopcovid.coreui.extension.safeEmojiSpanify
 import com.lunabeestudio.stopcovid.coreui.extension.setImageResourceOrHide
 import com.lunabeestudio.stopcovid.coreui.extension.setOnClickListenerOrHideRipple
@@ -171,6 +172,11 @@ class CardWithActionsItem(private val cardTheme: CardTheme) : AbstractBindingIte
         super.unbindView(binding)
         binding.mainBodyTextView.maxLines = Int.MAX_VALUE
         binding.mainBodyTextView.visibility = View.VISIBLE
+        binding.cardTitleTextView.apply {
+            val color = R.attr.colorAccent.fetchSystemColor(context)
+            setTextColor(color)
+            TextViewCompat.setCompoundDrawableTintList(this, ColorStateList.valueOf(color))
+        }
 
         listOf(binding.mainHeaderTextView, binding.mainTitleTextView).forEach {
             it.updateLayoutParams<ViewGroup.MarginLayoutParams> {

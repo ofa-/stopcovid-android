@@ -22,71 +22,49 @@
         android:animateLayoutChanges="true"
         android:padding="@dimen/spacing_large">
 
-        <TextView
-            android:id="@+id/headerTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/spacing_large"
-            android:textAppearance="@style/TextAppearance.StopCovid.Caption"
-            android:textIsSelectable="false"
-            app:layout_constraintBottom_toTopOf="@id/logosImageView"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_chainStyle="spread_inside"
-            tools:text="@tools:sample/lorem[10]" />
-
-        <ImageView
-            android:id="@+id/logosImageView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/spacing_large"
-            android:layout_marginBottom="@dimen/spacing_xlarge"
-            android:adjustViewBounds="true"
-            android:src="@drawable/logos_passport"
-            app:layout_constraintBottom_toTopOf="@id/barcodeSecuredView"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/headerTextView"
-            tools:ignore="ContentDescription" />
-
         <com.lunabeestudio.stopcovid.view.SecuredBitmapView
             android:id="@+id/barcodeSecuredView"
             android:layout_width="@dimen/qr_code_fullscreen_size"
             android:layout_height="@dimen/qr_code_fullscreen_size"
             android:layout_marginHorizontal="@dimen/spacing_large"
-            android:layout_marginBottom="@dimen/spacing_large"
-            app:layout_constraintBottom_toTopOf="@id/certificateDetailsTextView"
+            app:layout_constraintBottom_toTopOf="@id/formatTextView"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/logosImageView" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/certificateDetailsTextView"
+            android:id="@+id/formatTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/spacing_large"
+            android:gravity="top|center_horizontal"
+            android:textAppearance="@style/TextAppearance.StopCovid.Title.Bold"
+            app:layout_constraintBottom_toTopOf="@id/detailsTextView"
+            app:layout_constraintTop_toBottomOf="@id/barcodeSecuredView"
+            tools:ignore="SelectableText"
+            tools:text="@tools:sample/lorem[3]" />
+
+        <TextView
+            android:id="@+id/detailsTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:gravity="top|center_horizontal"
             android:textAppearance="@style/TextAppearance.StopCovid.Title"
             app:layout_constraintBottom_toTopOf="@id/shareButton"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/barcodeSecuredView"
+            app:layout_constraintTop_toBottomOf="@id/formatTextView"
             tools:ignore="SelectableText"
-            tools:text="@tools:sample/lorem[30]" />
+            tools:text="@tools:sample/lorem[3]" />
 
         <Button
             android:id="@+id/shareButton"
             style="@style/Widget.StopCovid.Button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/spacing_large"
-            app:layout_constraintBottom_toTopOf="@id/certificateHashTextView"
-            app:layout_constraintTop_toBottomOf="@id/certificateDetailsTextView"
+            app:layout_constraintBottom_toTopOf="@id/sha256TextView"
+            app:layout_constraintTop_toBottomOf="@id/detailsTextView"
             tools:text="@tools:sample/lorem" />
 
         <TextView
-            android:id="@+id/certificateHashTextView"
+            android:id="@+id/sha256TextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
@@ -96,8 +74,8 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/shareButton"
-            tools:text="@tools:sample/lorem[8]" />
+            app:layout_constraintVertical_bias="1"
+            tools:text="@tools:sample/lorem[5]" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

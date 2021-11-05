@@ -3,4 +3,5 @@
     <attr name="dividerColor" format="color" />
     <attr name="widgetBackgroundColor" format="color" />
     <attr name="colorDisabled" format="color" />
+    <attr name="colorLogoBottomSheet" format="color" />
 </resources>

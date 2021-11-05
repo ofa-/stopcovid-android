@@ -17,30 +17,29 @@ import android.view.ViewGroup
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.lunabeestudio.stopcovid.coreui.LocalizedApplication
 import com.lunabeestudio.stopcovid.coreui.manager.LocalizedStrings
-import com.lunabeestudio.stopcovid.databinding.BottomSheetFragmentActionConfirmBinding
+import com.lunabeestudio.stopcovid.databinding.BottomSheetFragmentLowStorageBinding
 
-class HealthDateTimeInfoBottomSheetFragment : BottomSheetDialogFragment() {
+class LowStorageBottomSheetFragment : BottomSheetDialogFragment() {
 
-    private lateinit var binding: BottomSheetFragmentActionConfirmBinding
+    private lateinit var binding: BottomSheetFragmentLowStorageBinding
 
     private val strings: LocalizedStrings
         get() = (activity?.application as? LocalizedApplication)?.localizedStrings ?: emptyMap()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        binding = BottomSheetFragmentActionConfirmBinding.inflate(inflater, container, false)
+        binding = BottomSheetFragmentLowStorageBinding.inflate(inflater, container, false)
         binding.setTexts()
         binding.setClickListeners()
 
         return binding.root
     }
 
-    private fun BottomSheetFragmentActionConfirmBinding.setTexts() {
-        titleTextView.text = strings["myHealthController.riskMoreInfoAlert.title"]
-        bodyTextView.text = strings["myHealthController.riskMoreInfoAlert.message"]
+    private fun BottomSheetFragmentLowStorageBinding.setTexts() {
+        explanationTextView.text = strings["storageAlertScreen.storageAlert.description"]
         okButton.text = strings["common.ok"]
     }
 
-    private fun BottomSheetFragmentActionConfirmBinding.setClickListeners() {
+    private fun BottomSheetFragmentLowStorageBinding.setClickListeners() {
         okButton.setOnClickListener {
             dismiss()
         }

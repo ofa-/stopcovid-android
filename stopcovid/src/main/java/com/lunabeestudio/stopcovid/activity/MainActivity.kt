@@ -29,6 +29,7 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
+import androidx.navigation.fragment.DialogFragmentNavigator
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
 import androidx.navigation.ui.NavigationUI.setupActionBarWithNavController
@@ -243,12 +244,15 @@ class MainActivity : BaseActivity() {
             R.id.walletPagerFragment to TabBehavior.SHOW,
             R.id.walletFullscreenPagerFragment to TabBehavior.SHOW,
             R.id.keyFiguresPagerFragment to TabBehavior.SHOW,
-            R.id.generateActivityPassBottomSheetFragment to TabBehavior.SHOW,
-        ) // default to TAB_BEHAVIOR.HIDE
+        ) // default to TAB_BEHAVIOR.HIDE for fragment or TabBehavior.IGNORE for bottom sheets (dialog)
 
         val isNoAppBarFragment = noAppBarFragments.contains(destination.id)
         val shouldForceLightStatusIcon = forceLightStatusIconFragments.contains(destination.id)
-        val tabBehavior = tabBehaviorFragments[destination.id] ?: TabBehavior.HIDE
+        val tabBehavior = tabBehaviorFragments[destination.id] ?: if (destination is DialogFragmentNavigator.Destination) {
+            TabBehavior.IGNORE
+        } else {
+            TabBehavior.HIDE
+        }
 
         lifecycleScope.launchWhenStarted {
             val windowInsetsController = WindowInsetsControllerCompat(window, window.decorView)

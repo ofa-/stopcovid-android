@@ -310,7 +310,7 @@ class VaccineCompletionFragment : MainFragment() {
         WorkManager.getInstance(context)
             .enqueueUniqueWork(Constants.WorkerNames.VACCINATION_COMPLETED_REMINDER, ExistingWorkPolicy.REPLACE, reminderWorker)
 
-        strings["vaccineCompletionController.pending.button.notifyMe.feedback"]?.let { message ->
+        strings["common.notifyMe.feedback"]?.let { message ->
             (activity as? MainActivity)?.showSnackBar(message)
         }
 

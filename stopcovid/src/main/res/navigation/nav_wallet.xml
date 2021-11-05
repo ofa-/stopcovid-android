@@ -141,6 +141,9 @@
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_walletContainerFragment_to_certificateSharingBottomSheetFragment"
+            app:destination="@id/certificateSharingBottomSheetFragment" />
     </fragment>
     <fragment
         android:id="@+id/confirmAddWalletCertificateFragment"
@@ -163,25 +166,14 @@
     </fragment>
     <fragment
         android:id="@+id/fullscreenQRCodeFragment"
-        android:name="com.lunabeestudio.stopcovid.fragment.FullscreenQRCodeFragment"
-        tools:layout="@layout/fragment_fullscreen_qrcode">
+        android:name="com.lunabeestudio.stopcovid.fragment.WalletFullscreen2DdocFragment"
+        tools:layout="@layout/fragment_wallet_fullscreen_2ddoc">
         <argument
-            android:name="qrCodeValue"
-            app:argType="string"
-            app:nullable="false" />
-        <argument
-            android:name="qrCodeFormat"
-            app:argType="com.google.zxing.BarcodeFormat"
-            app:nullable="false" />
-        <argument
-            android:name="qrCodeValueDisplayed"
-            app:argType="string"
-            app:nullable="false" />
-        <argument
-            android:name="qrCodeSha256"
-            android:defaultValue="@null"
-            app:argType="string"
-            app:nullable="true" />
+            android:name="id"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_fullscreenQRCodeFragment_to_certificateSharingBottomSheetFragment"
+            app:destination="@id/certificateSharingBottomSheetFragment" />
     </fragment>
     <fragment
         android:id="@+id/walletCertificateErrorFragment"
@@ -213,11 +205,14 @@
     </fragment>
     <fragment
         android:id="@+id/legacyFullscreenDccFragment"
-        android:name="com.lunabeestudio.stopcovid.fragment.LegacyFullscreenDccFragment"
-        tools:layout="@layout/fragment_legacy_fullscreen_dcc">
+        android:name="com.lunabeestudio.stopcovid.fragment.WalletFullscreenLegacyDccFragment"
+        tools:layout="@layout/fragment_wallet_fullscreen_legacy_dcc">
         <argument
             android:name="id"
             app:argType="string" />
+        <action
+            android:id="@+id/action_legacyFullscreenDccFragment_to_certificateSharingBottomSheetFragment"
+            app:destination="@id/certificateSharingBottomSheetFragment" />
     </fragment>
     <fragment
         android:id="@+id/positiveTestStepsFragment"
@@ -281,6 +276,9 @@
         <action
             android:id="@+id/action_walletFullscreenPagerFragment_to_generateActivityPassBottomSheetFragment"
             app:destination="@id/generateActivityPassBottomSheetFragment" />
+        <action
+            android:id="@+id/action_walletFullscreenPagerFragment_to_certificateSharingBottomSheetFragment"
+            app:destination="@id/certificateSharingBottomSheetFragment" />
     </fragment>
     <fragment
         android:id="@+id/sendHistoryFragment"
@@ -348,4 +346,8 @@
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
     </fragment>
+    <dialog
+        android:id="@+id/certificateSharingBottomSheetFragment"
+        android:name="com.lunabeestudio.stopcovid.fragment.CertificateSharingBottomSheetFragment"
+        tools:layout="@layout/bottom_sheet_fragment_action_confirm" />
 </navigation>

@@ -108,6 +108,8 @@ class WalletFullscreenActivityPassExplanationFragment : MainFragment() {
         }.also { activityPassState ->
             when (activityPassState) {
                 is ActivityPassState.Future -> {
+                    binding?.root?.removeView(bottomBinding?.coordinatorLayout)
+                    bottomBinding = null
                     lifecycleScope.launch {
                         delay(activityPassState.activityPass.timestamp + 1_000L - System.currentTimeMillis())
                         findParentFragmentByType<WalletFullscreenPagerFragment>()?.refreshPager()
@@ -298,7 +300,7 @@ class WalletFullscreenActivityPassExplanationFragment : MainFragment() {
                                 certificateId,
                                 activityPassState.activityPass.timestamp,
                             )
-                            Toast.makeText(requireContext(), "Notif programmed", Toast.LENGTH_SHORT).show() // TODO feedback
+                            Toast.makeText(requireContext(), strings["common.notifyMe.feedback"], Toast.LENGTH_SHORT).show()
                         }
                     }
                     identifier = "activityPass.fullscreen.notAvailable.button.notify.title".hashCode().toLong()

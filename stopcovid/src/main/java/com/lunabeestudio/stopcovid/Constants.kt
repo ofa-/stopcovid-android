@@ -43,7 +43,7 @@ object Constants {
         const val RATINGS_SHOWN: String = "ratingsShown"
         const val GOOGLE_REVIEW_SHOWN: String = "Google.Review.Shown"
         const val NOTIFICATION_VERSION_CLOSED: String = "Notification.Version.Closed"
-        const val ACTIVITY_PASS_AUTO_RENEW_ENABLED: String = "Activity.Pass.Auto.Renew.Enabled"
+        const val LOW_STORAGE_ALERT_SHOWN: String = "Low.Storage.Alert.Shown"
     }
 
     object Notification {
@@ -93,6 +93,7 @@ object Constants {
     object Android {
         const val ANIMATION_DELAY: Long = 500L
         const val FORCE_LOADING_DELAY: Long = 2000L
+        const val STORAGE_THRESHOLD_MB: Int = 300
     }
 
     object Chart {

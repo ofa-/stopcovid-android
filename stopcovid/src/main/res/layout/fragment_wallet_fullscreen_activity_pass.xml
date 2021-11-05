@@ -22,20 +22,17 @@
         android:animateLayoutChanges="true"
         android:padding="@dimen/spacing_large">
 
-        <ImageView
-            android:id="@+id/certificateBarcodeImageView"
+        <com.lunabeestudio.stopcovid.view.SecuredBitmapView
+            android:id="@+id/barcodeSecuredView"
             android:layout_width="@dimen/qr_code_fullscreen_size"
             android:layout_height="@dimen/qr_code_fullscreen_size"
             android:layout_marginHorizontal="@dimen/spacing_large"
             android:layout_marginBottom="@dimen/spacing_large"
-            android:adjustViewBounds="true"
             app:layout_constraintBottom_toTopOf="@id/certificateDetailsTextView"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_chainStyle="spread"
-            tools:ignore="ContentDescription"
-            tools:src="@tools:sample/avatars" />
+            app:layout_constraintVertical_chainStyle="spread" />
 
         <TextView
             android:id="@+id/certificateDetailsTextView"
@@ -48,7 +45,7 @@
             app:layout_constraintBottom_toTopOf="@id/validityTimeChip"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/certificateBarcodeImageView"
+            app:layout_constraintTop_toBottomOf="@id/barcodeSecuredView"
             tools:text="@tools:sample/lorem[4]" />
 
         <com.google.android.material.chip.Chip
@@ -60,11 +57,21 @@
             android:textAppearance="@style/TextAppearance.StopCovid.Caption.Small"
             android:textColor="@android:color/white"
             app:chipBackgroundColor="?colorPrimary"
-            app:layout_constraintBottom_toTopOf="@id/explanationTextView"
+            app:layout_constraintBottom_toTopOf="@id/shareButton"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/certificateDetailsTextView"
             tools:text="@tools:sample/lorem[2]" />
+
+        <Button
+            android:id="@+id/shareButton"
+            style="@style/Widget.StopCovid.Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/spacing_large"
+            app:layout_constraintBottom_toTopOf="@id/explanationTextView"
+            app:layout_constraintTop_toBottomOf="@id/validityTimeChip"
+            tools:text="@tools:sample/lorem" />
 
         <TextView
             android:id="@+id/explanationTextView"

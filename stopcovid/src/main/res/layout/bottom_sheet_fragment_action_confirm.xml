@@ -46,4 +46,13 @@
         android:layout_height="wrap_content"
         tools:text="@tools:sample/lorem" />
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/cancelButton"
+        style="@style/Widget.StopCovid.Button.Text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        tools:text="@tools:sample/lorem"
+        tools:visibility="visible" />
+
 </LinearLayout>

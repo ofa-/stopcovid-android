@@ -124,3 +124,7 @@ var SharedPreferences.googleReviewShown: Boolean
 var SharedPreferences.notificationVersionClosed: Int
     get() = getInt(Constants.SharedPrefs.NOTIFICATION_VERSION_CLOSED, 0)
     set(value) = edit { putInt(Constants.SharedPrefs.NOTIFICATION_VERSION_CLOSED, value) }
+
+var SharedPreferences.lowStorageAlertShown: Boolean
+    get() = getBoolean(Constants.SharedPrefs.LOW_STORAGE_ALERT_SHOWN, false)
+    set(value) = edit { putBoolean(Constants.SharedPrefs.LOW_STORAGE_ALERT_SHOWN, value) }

@@ -84,9 +84,11 @@ import com.lunabeestudio.stopcovid.extension.getRelativeDateTimeString
 import com.lunabeestudio.stopcovid.extension.getString
 import com.lunabeestudio.stopcovid.extension.hasChosenPostalCode
 import com.lunabeestudio.stopcovid.extension.hideRiskStatus
+import com.lunabeestudio.stopcovid.extension.isLowStorage
 import com.lunabeestudio.stopcovid.extension.isValidUUID
 import com.lunabeestudio.stopcovid.extension.isolationManager
 import com.lunabeestudio.stopcovid.extension.labelShortStringKey
+import com.lunabeestudio.stopcovid.extension.lowStorageAlertShown
 import com.lunabeestudio.stopcovid.extension.notificationVersionClosed
 import com.lunabeestudio.stopcovid.extension.openInExternalBrowser
 import com.lunabeestudio.stopcovid.extension.robertManager
@@ -309,6 +311,17 @@ class ProximityFragment : TimeMainFragment() {
         }
 
         setupExtendedFab()
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            val isLowStorage = context?.isLowStorage() ?: false
+            if (isLowStorage && !sharedPrefs.lowStorageAlertShown) {
+                sharedPrefs.lowStorageAlertShown = true
+                findNavControllerOrNull()
+                    ?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToLowStorageBottomSheetFragment())
+            } else if (!isLowStorage) {
+                sharedPrefs.lowStorageAlertShown = false
+            }
+        }
 
         return view
     }
@@ -817,7 +830,9 @@ class ProximityFragment : TimeMainFragment() {
                 }
             )
         }
-        items += infoCenterCardItem
+        if (infoCenterManager.infos.value?.peekContent()?.isNotEmpty() == true) {
+            items += infoCenterCardItem
+        }
 
         items += spaceItem {
             spaceRes = R.dimen.spacing_medium
