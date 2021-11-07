@@ -244,9 +244,8 @@ class AttestationsFragment : MainFragment() {
             }
             onClick = {
                 findNavControllerOrNull()?.safeNavigate(
-                    AttestationsFragmentDirections.actionAttestationsFragmentToFullscreenQRCodeFragment(
+                    AttestationsFragmentDirections.actionAttestationsFragmentToFullscreenAttestationFragment(
                         attestation.qrCode,
-                        BarcodeFormat.QR_CODE,
                         attestation.qrCodeString,
                     )
                 )

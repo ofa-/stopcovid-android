@@ -31,14 +31,12 @@ import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.fragment.BaseFragment
 import com.lunabeestudio.stopcovid.databinding.FragmentWalletContainerBinding
 import com.lunabeestudio.stopcovid.extension.analyticsManager
-import com.lunabeestudio.stopcovid.extension.barcodeFormat
 import com.lunabeestudio.stopcovid.extension.injectionContainer
 import com.lunabeestudio.stopcovid.extension.isFrench
 import com.lunabeestudio.stopcovid.extension.raw
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
-import com.lunabeestudio.stopcovid.extension.shortDescription
 import com.lunabeestudio.stopcovid.extension.showDbFailure
 import com.lunabeestudio.stopcovid.extension.showMigrationFailed
 import com.lunabeestudio.stopcovid.extension.showUnknownErrorAlert
@@ -392,12 +390,7 @@ class WalletContainerFragment : BaseFragment() {
             navigateToFullscreenEuropeanCertificateId(certificate.id, false)
         } else {
             findNavControllerOrNull()?.safeNavigate(
-                WalletContainerFragmentDirections.actionWalletContainerFragmentToFullscreenQRCodeFragment(
-                    certificate.value,
-                    certificate.type.barcodeFormat,
-                    certificate.shortDescription(),
-                    certificate.sha256,
-                )
+                WalletContainerFragmentDirections.actionWalletContainerFragmentToFullscreenQRCodeFragment(certificate.id)
             )
         }
     }

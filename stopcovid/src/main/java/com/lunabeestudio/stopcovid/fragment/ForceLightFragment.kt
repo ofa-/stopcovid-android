@@ -26,7 +26,7 @@ import com.lunabeestudio.stopcovid.manager.BlacklistDCCManager
 
 abstract class ForceLightFragment(@LayoutRes private val layoutRes: Int) : BaseFragment() {
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return LayoutInflater.from(ContextThemeWrapper(context, R.style.Theme_Base_StopCovid_ForceLight))
             .inflate(layoutRes, container, false)
     }

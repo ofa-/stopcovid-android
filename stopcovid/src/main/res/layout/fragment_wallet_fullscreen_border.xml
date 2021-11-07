@@ -44,25 +44,22 @@
             android:layout_marginBottom="@dimen/spacing_xlarge"
             android:adjustViewBounds="true"
             android:src="@drawable/logos_passport"
-            app:layout_constraintBottom_toTopOf="@id/certificateBarcodeImageView"
+            app:layout_constraintBottom_toTopOf="@id/barcodeSecuredView"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/headerTextView"
             tools:ignore="ContentDescription" />
 
-        <ImageView
-            android:id="@+id/certificateBarcodeImageView"
+        <com.lunabeestudio.stopcovid.view.SecuredBitmapView
+            android:id="@+id/barcodeSecuredView"
             android:layout_width="@dimen/qr_code_fullscreen_size"
             android:layout_height="@dimen/qr_code_fullscreen_size"
             android:layout_marginHorizontal="@dimen/spacing_large"
             android:layout_marginBottom="@dimen/spacing_large"
-            android:adjustViewBounds="true"
             app:layout_constraintBottom_toTopOf="@id/showMoreSwitch"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/logosImageView"
-            tools:ignore="ContentDescription"
-            tools:src="@tools:sample/avatars" />
+            app:layout_constraintTop_toBottomOf="@id/logosImageView" />
 
         <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/showMoreSwitch"
@@ -73,7 +70,7 @@
             app:layout_constraintBottom_toTopOf="@id/certificateDetailsTextView"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/certificateBarcodeImageView"
+            app:layout_constraintTop_toBottomOf="@id/barcodeSecuredView"
             app:switchPadding="@dimen/spacing_small"
             tools:text="@tools:sample/lorem[2]" />
 
@@ -84,12 +81,22 @@
             android:layout_marginBottom="@dimen/spacing_large"
             android:gravity="top|center_horizontal"
             android:textAppearance="@style/TextAppearance.StopCovid.Title"
-            app:layout_constraintBottom_toTopOf="@id/certificateHashTextView"
+            app:layout_constraintBottom_toTopOf="@id/shareButton"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/showMoreSwitch"
             tools:ignore="SelectableText"
             tools:text="@tools:sample/lorem[30]" />
+
+        <Button
+            android:id="@+id/shareButton"
+            style="@style/Widget.StopCovid.Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/spacing_large"
+            app:layout_constraintBottom_toTopOf="@id/certificateHashTextView"
+            app:layout_constraintTop_toBottomOf="@id/certificateDetailsTextView"
+            tools:text="@tools:sample/lorem" />
 
         <TextView
             android:id="@+id/certificateHashTextView"
@@ -103,7 +110,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/certificateDetailsTextView"
+            app:layout_constraintTop_toBottomOf="@id/shareButton"
             tools:text="@tools:sample/lorem[8]" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

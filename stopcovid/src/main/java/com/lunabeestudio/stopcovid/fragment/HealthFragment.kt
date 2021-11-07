@@ -135,6 +135,7 @@ class HealthFragment : TimeMainFragment() {
                     findNavControllerOrNull()
                         ?.safeNavigate(HealthFragmentDirections.actionHealthFragmentToHealthDateTimeInfoBottomSheetFragment())
                 }
+                forceBottomGravity = true
                 identifier = R.raw.health_risk.toLong()
             }
         } else {

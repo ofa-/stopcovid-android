@@ -28,60 +28,31 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginHorizontal="@dimen/spacing_large"
         android:gravity="center"
         android:orientation="vertical"
         tools:ignore="UseCompoundDrawables">
 
-        <Space
-            android:id="@+id/topSpace"
-            android:layout_width="0dp"
-            android:layout_height="@dimen/spacing_xlarge" />
-
         <ImageView
             android:id="@+id/imageView"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/spacing_large"
-            android:layout_marginTop="@dimen/spacing_large"
+            android:layout_width="@dimen/qr_code_fullscreen_size"
+            android:layout_height="@dimen/qr_code_fullscreen_size"
             android:layout_marginBottom="@dimen/spacing_large"
             android:adjustViewBounds="true"
-            android:scaleType="fitXY"
+            android:paddingHorizontal="@dimen/spacing_large"
             tools:ignore="ContentDescription"
             tools:src="@tools:sample/avatars" />
-
-        <TextView
-            android:id="@+id/formatTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/spacing_large"
-            android:layout_marginTop="@dimen/spacing_medium"
-            android:layout_marginBottom="@dimen/spacing_large"
-            android:gravity="center"
-            android:textAppearance="@style/TextAppearance.StopCovid.Title.Bold"
-            tools:ignore="SelectableText"
-            tools:text="@tools:sample/lorem[2]" />
 
         <TextView
             android:id="@+id/textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/spacing_large"
             android:layout_marginTop="@dimen/spacing_medium"
             android:gravity="center"
             android:textAppearance="@style/TextAppearance.StopCovid.Title"
             tools:ignore="SelectableText"
             tools:text="@tools:sample/lorem[12]" />
 
-        <TextView
-            android:id="@+id/sha256TextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/spacing_large"
-            android:layout_marginTop="@dimen/spacing_large"
-            android:gravity="center"
-            android:textAppearance="@style/TextAppearance.StopCovid.Caption"
-            android:textIsSelectable="true"
-            android:visibility="gone"
-            tools:text="@tools:sample/lorem[12]" />
     </LinearLayout>
 </ScrollView>

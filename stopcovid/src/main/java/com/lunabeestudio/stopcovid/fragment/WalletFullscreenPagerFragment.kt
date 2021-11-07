@@ -30,10 +30,14 @@ import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.extension.refreshLift
 import com.lunabeestudio.stopcovid.coreui.fragment.BaseFragment
 import com.lunabeestudio.stopcovid.extension.activityPassValidFuture
+import com.lunabeestudio.stopcovid.extension.fullDescription
 import com.lunabeestudio.stopcovid.extension.injectionContainer
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
+import com.lunabeestudio.stopcovid.manager.ShareManager
 import com.lunabeestudio.stopcovid.model.UnknownException
+import com.lunabeestudio.stopcovid.model.WalletCertificate
+import com.lunabeestudio.stopcovid.view.SecuredBitmapView
 import com.lunabeestudio.stopcovid.viewmodel.WalletViewModel
 import com.lunabeestudio.stopcovid.viewmodel.WalletViewModelFactory
 import kotlinx.coroutines.launch
@@ -155,6 +159,19 @@ class WalletFullscreenPagerFragment : BaseFragment() {
                 setupViewPager(pagerState)
             }
         }
+    }
+
+    fun showCertificateSharingBottomSheet(barcodeSecuredView: SecuredBitmapView, certificate: WalletCertificate?) {
+        val activityBinding = (activity as? MainActivity)?.binding ?: return
+        val text = certificate?.fullDescription(strings, injectionContainer.robertManager.configuration)
+        ShareManager.setupCertificateSharingBottomSheet(this, text) {
+            barcodeSecuredView.runUnsecured {
+                ShareManager.getShareCaptureUri(activityBinding, ShareManager.certificateScreenshotFilename)
+            }
+        }
+        findNavControllerOrNull()?.safeNavigate(
+            WalletFullscreenPagerFragmentDirections.actionWalletFullscreenPagerFragmentToCertificateSharingBottomSheetFragment()
+        )
     }
 
     fun selectBorderTab() {

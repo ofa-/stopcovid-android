@@ -11,6 +11,9 @@
 package com.lunabeestudio.stopcovid.fragment
 
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
@@ -19,6 +22,7 @@ import androidx.lifecycle.map
 import com.google.zxing.BarcodeFormat
 import com.journeyapps.barcodescanner.BarcodeEncoder
 import com.lunabeestudio.stopcovid.R
+import com.lunabeestudio.stopcovid.coreui.extension.findParentFragmentByType
 import com.lunabeestudio.stopcovid.coreui.extension.setTextOrHide
 import com.lunabeestudio.stopcovid.coreui.extension.toDimensSize
 import com.lunabeestudio.stopcovid.databinding.FragmentWalletFullscreenBorderBinding
@@ -53,6 +57,11 @@ class WalletFullscreenBorderFragment : ForceLightFragment(R.layout.fragment_wall
     private lateinit var binding: FragmentWalletFullscreenBorderBinding
     private var europeanCertificate: EuropeanCertificate? = null
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -65,6 +74,15 @@ class WalletFullscreenBorderFragment : ForceLightFragment(R.layout.fragment_wall
             }
             .observe(viewLifecycleOwner) { europeanCertificate ->
                 this.europeanCertificate = europeanCertificate
+                europeanCertificate?.value?.let { dccValue ->
+                    binding.barcodeSecuredView.bitmap = barcodeEncoder.encodeBitmap(
+                        dccValue,
+                        BarcodeFormat.QR_CODE,
+                        qrCodeSize,
+                        qrCodeSize,
+                    )
+                }
+
                 refreshScreen()
             }
         binding.apply {
@@ -72,10 +90,37 @@ class WalletFullscreenBorderFragment : ForceLightFragment(R.layout.fragment_wall
             .setOnCheckedChangeListener { _, isChecked ->
                 refreshDetails(isChecked)
             }
-            certificateBarcodeImageView
+            barcodeSecuredView
             .setOnClickListener {
                 toggleFullBrightness()
             }
+        }
+        binding.shareButton.text = strings["common.share"]
+        binding.shareButton.setOnClickListener {
+            findParentFragmentByType<WalletFullscreenPagerFragment>()?.showCertificateSharingBottomSheet(
+                binding.barcodeSecuredView,
+                europeanCertificate,
+            )
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        if (menu.findItem(R.id.qr_code_menu_share) == null) {
+            inflater.inflate(R.menu.fullscreen_qr_code_menu, menu)
+        }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.qr_code_menu_share -> {
+                findParentFragmentByType<WalletFullscreenPagerFragment>()?.showCertificateSharingBottomSheet(
+                    binding.barcodeSecuredView,
+                    europeanCertificate,
+                )
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
     }
 
@@ -85,15 +130,6 @@ class WalletFullscreenBorderFragment : ForceLightFragment(R.layout.fragment_wall
             headerTextView.setTextOrHide(strings["europeanCertificate.fullscreen.${europeanCertificate.type.stringKey}.border.warning"])
 
             logosImageView.isVisible = europeanCertificate.greenCertificate.isFrench == true
-
-            certificateBarcodeImageView.setImageBitmap(
-                barcodeEncoder.encodeBitmap(
-                    europeanCertificate.value,
-                    BarcodeFormat.QR_CODE,
-                    qrCodeSize,
-                    qrCodeSize
-                )
-            )
 
             certificateDetailsTextView.text = europeanCertificate.formatDccText(
                 strings["europeanCertificate.fullscreen.englishDescription.${europeanCertificate.type.code}"],

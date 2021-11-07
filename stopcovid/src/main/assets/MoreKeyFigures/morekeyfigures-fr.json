@@ -18,5 +18,9 @@
                 "url": "https://www.santepubliquefrance.fr/dossiers/coronavirus-covid-19/coronavirus-chiffres-cles-et-evolution-de-la-covid-19-en-france-et-dans-le-monde#block-266156"
             }
         ]
+    },
+    {
+        "section": "Changements de méthodologie",
+        "description": "Les appariements sont nécessaires pour identifier la part de patients hospitalisés qui sont vaccinés et/ou porteurs d’un variant ou d’une mutation particulière.\n\nDepuis le 29 octobre 2021, des changements méthodologiques ont été apportés :\n\n- Les indicateurs portent sur la population âgée de 20 ans et plus, en raison du faible nombre d’hospitalisations parmi les personnes âgées de moins de 20 ans et l’ouverture plus tardive de la vaccination pour la population jeune.\n\n- Les indicateurs permettent de prendre en compte la notion d’éligibilité à la vaccination. Désormais, si un patient hospitalisé ou testé positif est également présent dans VAC-SI, il sera considéré comme vacciné, s’il est considéré comme « éligible » à la vaccination, il sera considéré comme non vacciné. Si aucune information n’est disponible, les variables âge, département et sexe seront prises en compte pour faire une estimation de son statut vaccinal.\n\nLes effets de ces changements méthodologiques sont une révision à la hausse du nombre d’évènements (tests positifs ou hospitalisations) chez les personnes vaccinées, et une révision à la baisse chez les personnes non vaccinées."
     }
 ]

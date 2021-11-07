@@ -19,6 +19,10 @@
             {
                 "label": "Your test certificate",
                 "url": "https://sidep.gouv.fr/"
+            },
+            {
+                "label": "Vaccination abroad?",
+                "url": "https://www.sante.fr/obtenir-un-passe-sanitaire-en-cas-de-vaccination-letranger"
             }
         ]
     },

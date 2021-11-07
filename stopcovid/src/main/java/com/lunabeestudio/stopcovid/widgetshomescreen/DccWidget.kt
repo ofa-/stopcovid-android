@@ -33,7 +33,6 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-// TODO workmanager to update every minutes to get the correct DCC Light
 class DccWidget : AppWidgetProvider() {
     @OptIn(DelicateCoroutinesApi::class)
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {

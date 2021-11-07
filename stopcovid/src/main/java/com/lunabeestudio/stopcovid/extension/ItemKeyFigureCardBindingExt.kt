@@ -14,19 +14,18 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.view.View
 import androidx.core.view.isVisible
-import androidx.viewbinding.ViewBinding
 import com.lunabeestudio.stopcovid.databinding.ItemKeyFigureCardBinding
 import com.lunabeestudio.stopcovid.databinding.ItemKeyFigureChartCardBinding
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-suspend fun ViewBinding.getBitmapForItem(): Bitmap {
-    val bitmap = Bitmap.createBitmap(root.measuredWidth, root.measuredHeight, Bitmap.Config.ARGB_8888)
+suspend fun View.getBitmapForItem(): Bitmap {
+    val bitmap = Bitmap.createBitmap(measuredWidth, measuredHeight, Bitmap.Config.ARGB_8888)
     val canvas = Canvas(bitmap)
 
     suspendCoroutine<Unit> { continuation ->
-        root.post {
-            root.draw(canvas)
+        post {
+            draw(canvas)
             continuation.resume(Unit)
         }
     }
@@ -44,7 +43,7 @@ suspend fun ItemKeyFigureCardBinding.getBitmapForItemKeyFigureCardBinding(): Bit
         View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
     )
 
-    val bitmap = getBitmapForItem()
+    val bitmap = root.getBitmapForItem()
 
     shareButton.isVisible = savedShareVisibility
     descriptionTextView.isVisible = savedDescriptionVisibility
@@ -64,7 +63,7 @@ suspend fun ItemKeyFigureChartCardBinding.getBitmapForItemKeyFigureChartCardBind
         View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
     )
 
-    val bitmap = getBitmapForItem()
+    val bitmap = root.getBitmapForItem()
 
     shareButton.isVisible = savedShareVisibility
     root.measure(

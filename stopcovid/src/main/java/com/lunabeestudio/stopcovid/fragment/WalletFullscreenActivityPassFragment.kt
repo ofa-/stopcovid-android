@@ -15,6 +15,9 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
@@ -69,6 +72,11 @@ class WalletFullscreenActivityPassFragment : ForceLightFragment(R.layout.fragmen
         }
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+    }
+
     override fun onResume() {
         super.onResume()
         context?.registerReceiver(timeUpdateReceiver, IntentFilter(Intent.ACTION_TIME_TICK))
@@ -82,7 +90,36 @@ class WalletFullscreenActivityPassFragment : ForceLightFragment(R.layout.fragmen
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentWalletFullscreenActivityPassBinding.bind(view)
+
+        binding.shareButton.text = strings["common.share"]
+        binding.shareButton.setOnClickListener {
+            findParentFragmentByType<WalletFullscreenPagerFragment>()?.showCertificateSharingBottomSheet(
+                binding.barcodeSecuredView,
+                activityPass
+            )
+        }
+
         refreshCertificate()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        if (menu.findItem(R.id.qr_code_menu_share) == null) {
+            inflater.inflate(R.menu.fullscreen_qr_code_menu, menu)
+        }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.qr_code_menu_share -> {
+                findParentFragmentByType<WalletFullscreenPagerFragment>()?.showCertificateSharingBottomSheet(
+                    binding.barcodeSecuredView,
+                    activityPass
+                )
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     private fun refreshCertificate() {
@@ -105,14 +142,13 @@ class WalletFullscreenActivityPassFragment : ForceLightFragment(R.layout.fragmen
     override fun refreshScreen() {
         val europeanCertificate = this.activityPass ?: return
         binding.apply {
-            certificateBarcodeImageView.setImageBitmap(
+            barcodeSecuredView.bitmap =
                 barcodeEncoder.encodeBitmap(
                     europeanCertificate.value,
                     BarcodeFormat.QR_CODE,
                     qrCodeSize,
                     qrCodeSize
                 )
-            )
 
             certificateDetailsTextView.text = europeanCertificate.fullName()
             setValidityTime(validityTimeChip, europeanCertificate)

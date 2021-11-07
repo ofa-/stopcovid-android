@@ -27,63 +27,55 @@
             android:layout_width="@dimen/qr_code_fullscreen_size"
             android:layout_height="@dimen/qr_code_fullscreen_size"
             android:layout_marginHorizontal="@dimen/spacing_large"
-            android:layout_marginBottom="@dimen/spacing_large"
-            app:layout_constraintBottom_toTopOf="@id/certificateDetailsTextView"
+            app:layout_constraintBottom_toTopOf="@id/formatTextView"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_chainStyle="spread" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/certificateDetailsTextView"
-            android:layout_width="wrap_content"
+            android:id="@+id/formatTextView"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/spacing_large"
-            android:gravity="center"
-            android:textAppearance="@style/TextAppearance.StopCovid.Title"
-            android:textIsSelectable="false"
-            app:layout_constraintBottom_toTopOf="@id/validityTimeChip"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            android:gravity="top|center_horizontal"
+            android:textAppearance="@style/TextAppearance.StopCovid.Title.Bold"
+            app:layout_constraintBottom_toTopOf="@id/detailsTextView"
             app:layout_constraintTop_toBottomOf="@id/barcodeSecuredView"
-            tools:text="@tools:sample/lorem[4]" />
+            tools:ignore="SelectableText"
+            tools:text="@tools:sample/lorem[3]" />
 
-        <com.google.android.material.chip.Chip
-            android:id="@+id/validityTimeChip"
-            android:layout_width="wrap_content"
+        <TextView
+            android:id="@+id/detailsTextView"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/spacing_large"
-            android:enabled="false"
-            android:textAppearance="@style/TextAppearance.StopCovid.Caption.Small"
-            android:textColor="@android:color/white"
-            app:chipBackgroundColor="?colorPrimary"
+            android:gravity="top|center_horizontal"
+            android:textAppearance="@style/TextAppearance.StopCovid.Title"
             app:layout_constraintBottom_toTopOf="@id/shareButton"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/certificateDetailsTextView"
-            tools:text="@tools:sample/lorem[2]" />
+            app:layout_constraintTop_toBottomOf="@id/formatTextView"
+            tools:ignore="SelectableText"
+            tools:text="@tools:sample/lorem[3]" />
 
         <Button
             android:id="@+id/shareButton"
             style="@style/Widget.StopCovid.Button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/spacing_large"
-            app:layout_constraintBottom_toTopOf="@id/explanationTextView"
-            app:layout_constraintTop_toBottomOf="@id/validityTimeChip"
+            app:layout_constraintBottom_toTopOf="@id/sha256TextView"
+            app:layout_constraintTop_toBottomOf="@id/detailsTextView"
             tools:text="@tools:sample/lorem" />
 
         <TextView
-            android:id="@+id/explanationTextView"
+            android:id="@+id/sha256TextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
             android:gravity="center"
             android:textAppearance="@style/TextAppearance.StopCovid.Caption"
             android:textIsSelectable="true"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            tools:text="@tools:sample/lorem[40]" />
+            app:layout_constraintVertical_bias="1"
+            tools:text="@tools:sample/lorem[5]" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

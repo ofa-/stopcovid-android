@@ -45,24 +45,21 @@
             android:layout_marginBottom="@dimen/spacing_xlarge"
             android:adjustViewBounds="true"
             android:src="@drawable/logos_passport"
-            app:layout_constraintBottom_toTopOf="@id/barcodeImageView"
+            app:layout_constraintBottom_toTopOf="@id/barcodeSecuredView"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/headerTextView"
             tools:ignore="ContentDescription" />
 
-        <ImageView
-            android:id="@+id/barcodeImageView"
+        <com.lunabeestudio.stopcovid.view.SecuredBitmapView
+            android:id="@+id/barcodeSecuredView"
             android:layout_width="@dimen/qr_code_fullscreen_size"
             android:layout_height="@dimen/qr_code_fullscreen_size"
             android:layout_marginHorizontal="@dimen/spacing_large"
-            android:adjustViewBounds="true"
             app:layout_constraintBottom_toTopOf="@id/showMoreSwitch"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/logosImageView"
-            tools:ignore="ContentDescription"
-            tools:src="@tools:sample/avatars" />
+            app:layout_constraintTop_toBottomOf="@id/logosImageView" />
 
         <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/showMoreSwitch"
@@ -73,7 +70,7 @@
             app:layout_constraintBottom_toTopOf="@id/detailsTextSwitcher"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/barcodeImageView"
+            app:layout_constraintTop_toBottomOf="@id/barcodeSecuredView"
             app:switchPadding="@dimen/spacing_small"
             tools:text="@tools:sample/lorem[2]" />
 
@@ -105,6 +102,15 @@
                 tools:ignore="SelectableText"
                 tools:text="@tools:sample/lorem[3]" />
         </TextSwitcher>
+
+        <Button
+            android:id="@+id/shareButton"
+            style="@style/Widget.StopCovid.Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toTopOf="@id/explanationTextSwitcher"
+            app:layout_constraintTop_toBottomOf="@id/detailsTextSwitcher"
+            tools:text="@tools:sample/lorem" />
 
         <TextSwitcher
             android:id="@+id/explanationTextSwitcher"

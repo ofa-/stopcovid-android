@@ -12,60 +12,45 @@ package com.lunabeestudio.stopcovid.fragment
 
 import android.os.Bundle
 import android.view.View
-import androidx.core.view.isVisible
 import androidx.navigation.fragment.navArgs
 import com.google.zxing.BarcodeFormat
 import com.journeyapps.barcodescanner.BarcodeEncoder
-import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.appCompatActivity
-import com.lunabeestudio.stopcovid.coreui.extension.setTextOrHide
 import com.lunabeestudio.stopcovid.coreui.extension.toDimensSize
-import com.lunabeestudio.stopcovid.databinding.FragmentFullscreenQrcodeBinding
+import com.lunabeestudio.stopcovid.databinding.FragmentFullscreenAttestationBinding
 
-class FullscreenQRCodeFragment : ForceLightFragment(R.layout.fragment_fullscreen_qrcode) {
+class FullscreenAttestationFragment : ForceLightFragment(R.layout.fragment_fullscreen_attestation) {
 
-    private val args: FullscreenQRCodeFragmentArgs by navArgs()
+    private val args: FullscreenAttestationFragmentArgs by navArgs()
 
     private val barcodeEncoder = BarcodeEncoder()
     private val qrCodeSize by lazy {
         R.dimen.qr_code_fullscreen_size.toDimensSize(requireContext()).toInt()
     }
 
-    private lateinit var binding: FragmentFullscreenQrcodeBinding
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        binding = FragmentFullscreenQrcodeBinding.bind(view)
-        setZoomable(binding.root)
-    }
+    private lateinit var binding: FragmentFullscreenAttestationBinding
 
     override fun onZoom(scaleFactor: Float) {
         binding.imageView.scaleX = scaleFactor
         binding.imageView.scaleY = scaleFactor
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding = FragmentFullscreenAttestationBinding.bind(view)
+        appCompatActivity?.supportActionBar?.title = strings["attestationsController.title"]
+    }
+
     override fun refreshScreen() {
         binding.imageView.setImageBitmap(
             barcodeEncoder.encodeBitmap(
                 args.qrCodeValue,
-                args.qrCodeFormat,
+                BarcodeFormat.QR_CODE,
                 qrCodeSize,
                 qrCodeSize
             )
         )
-        binding.apply {
-            topSpace.isVisible = args.qrCodeFormat == BarcodeFormat.DATA_MATRIX
-            formatTextView.setTextOrHide(formatText())
-            textView.text = ""
-            sha256TextView.setTextOrHide("")
-        }
-    }
-
-    private fun formatText(): String? {
-        return when (args.qrCodeFormat) {
-            BarcodeFormat.DATA_MATRIX -> Constants.QrCode.FORMAT_2D_DOC
-            else -> null
-        }
+        binding.textView.text = args.qrCodeValueDisplayed
     }
 }

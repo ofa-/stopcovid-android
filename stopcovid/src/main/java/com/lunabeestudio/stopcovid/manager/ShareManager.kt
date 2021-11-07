@@ -15,14 +15,23 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
 import androidx.core.content.FileProvider
+import androidx.fragment.app.setFragmentResultListener
+import androidx.lifecycle.lifecycleScope
 import androidx.viewbinding.ViewBinding
 import com.lunabeestudio.stopcovid.BuildConfig
+import com.lunabeestudio.stopcovid.activity.MainActivity
+import com.lunabeestudio.stopcovid.coreui.extension.viewLifecycleOwnerOrNull
+import com.lunabeestudio.stopcovid.coreui.fragment.BaseFragment
 import com.lunabeestudio.stopcovid.databinding.ItemKeyFigureCardBinding
 import com.lunabeestudio.stopcovid.databinding.ItemKeyFigureChartCardBinding
 import com.lunabeestudio.stopcovid.extension.getBitmapForItem
 import com.lunabeestudio.stopcovid.extension.getBitmapForItemKeyFigureCardBinding
 import com.lunabeestudio.stopcovid.extension.getBitmapForItemKeyFigureChartCardBinding
 import com.lunabeestudio.stopcovid.extension.startTextIntent
+import com.lunabeestudio.stopcovid.fragment.CertificateSharingBottomSheetFragment
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.File
 
@@ -68,11 +77,30 @@ object ShareManager {
         val bitmap = when (binding) {
             is ItemKeyFigureCardBinding -> binding.getBitmapForItemKeyFigureCardBinding()
             is ItemKeyFigureChartCardBinding -> binding.getBitmapForItemKeyFigureChartCardBinding()
-            else -> binding.getBitmapForItem()
+            else -> binding.root.getBitmapForItem()
         }
         return getShareCaptureUriFromBitmap(binding.root.context, bitmap, filenameWithoutExt)
     }
 
+    fun setupCertificateSharingBottomSheet(fragment: BaseFragment, text: String?, getCaptureUri: suspend () -> Uri?) {
+        with(fragment) {
+            setFragmentResultListener(CertificateSharingBottomSheetFragment.CERTIFICATE_SHARING_RESULT_KEY) { _, bundle ->
+                if (bundle.getBoolean(CertificateSharingBottomSheetFragment.CERTIFICATE_SHARING_BUNDLE_KEY_CONFIRM, false)) {
+                    viewLifecycleOwnerOrNull()?.lifecycleScope?.launch {
+                        val uri = getCaptureUri()
+
+                        withContext(Dispatchers.Main) {
+                            shareImageAndText(requireContext(), uri, text) {
+                                strings["common.error.unknown"]?.let { (fragment.activity as? MainActivity)?.showErrorSnackBar(it) }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     private const val ANDROID_PACKAGE = "android"
     private const val MIME_TYPE_JPEG = "image/jpeg"
+    const val certificateScreenshotFilename: String = "certificate_screenshot"
 }

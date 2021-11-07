@@ -206,6 +206,9 @@
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_proximityFragment_to_lowStorageBottomSheetFragment"
+            app:destination="@id/lowStorageBottomSheetFragment" />
     </fragment>
     <fragment
         android:id="@+id/isolationFormFragment"
@@ -259,8 +262,8 @@
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
         <action
-            android:id="@+id/action_attestationsFragment_to_fullscreenQRCodeFragment"
-            app:destination="@id/fullscreenQRCodeFragment"
+            android:id="@+id/action_attestationsFragment_to_FullscreenAttestationFragment"
+            app:destination="@id/fullscreenAttestationFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
@@ -297,26 +300,17 @@
             app:nullable="true" />
     </fragment>
     <fragment
-        android:id="@+id/fullscreenQRCodeFragment"
-        android:name="com.lunabeestudio.stopcovid.fragment.FullscreenQRCodeFragment"
-        tools:layout="@layout/fragment_fullscreen_qrcode">
+        android:id="@+id/fullscreenAttestationFragment"
+        android:name="com.lunabeestudio.stopcovid.fragment.FullscreenAttestationFragment"
+        tools:layout="@layout/fragment_fullscreen_attestation">
         <argument
             android:name="qrCodeValue"
             app:argType="string"
             app:nullable="false" />
         <argument
-            android:name="qrCodeFormat"
-            app:argType="com.google.zxing.BarcodeFormat"
-            app:nullable="false" />
-        <argument
             android:name="qrCodeValueDisplayed"
             app:argType="string"
             app:nullable="false" />
-        <argument
-            android:name="qrCodeSha256"
-            android:defaultValue="@null"
-            app:argType="string"
-            app:nullable="true" />
     </fragment>
     <fragment
         android:id="@+id/captchaFragment"
@@ -794,14 +788,6 @@
             app:nullable="false" />
     </dialog>
     <fragment
-        android:id="@+id/legacyFullscreenDccFragment"
-        android:name="com.lunabeestudio.stopcovid.fragment.LegacyFullscreenDccFragment"
-        tools:layout="@layout/fragment_legacy_fullscreen_dcc">
-        <argument
-            android:name="id"
-            app:argType="string" />
-    </fragment>
-    <fragment
         android:id="@+id/certificateDocumentExplanationFragment"
         android:name="com.lunabeestudio.stopcovid.fragment.CertificateDocumentExplanationFragment">
         <argument
@@ -901,5 +887,9 @@
     <dialog
         android:id="@+id/healthDateTimeInfoBottomSheetFragment"
         android:name="com.lunabeestudio.stopcovid.fragment.HealthDateTimeInfoBottomSheetFragment"
-        tools:layout="@layout/bottom_sheet_fragment_health_date_time_info" />
+        tools:layout="@layout/bottom_sheet_fragment_action_confirm" />
+    <dialog
+        android:id="@+id/lowStorageBottomSheetFragment"
+        android:name="com.lunabeestudio.stopcovid.fragment.LowStorageBottomSheetFragment"
+        tools:layout="@layout/bottom_sheet_fragment_low_storage" />
 </navigation>

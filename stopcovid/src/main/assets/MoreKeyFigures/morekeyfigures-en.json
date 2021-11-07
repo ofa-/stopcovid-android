@@ -18,5 +18,9 @@
                 "url": "https://www.santepubliquefrance.fr/dossiers/coronavirus-covid-19/coronavirus-chiffres-cles-et-evolution-de-la-covid-19-en-france-et-dans-le-monde#block-266156"
             }
         ]
+    },
+    {
+        "section": "Changes in methodology",
+        "description": "The matches are necessary to identify the proportion of hospitalized patients who are vaccinated and / or carry a particular variant or mutation.\n\nSince October 29, 2021, methodological changes have been made:\n\n- The indicators relate to the population aged 20 and over, due to the low number of hospitalizations among people aged under 20 and the later opening of vaccination for the young population.\n\n- The indicators make it possible to take into account the notion of eligibility for vaccination. From now on, if a patient hospitalized or tested positive is also present in VAC-SI, he will be considered vaccinated, if he is considered \"eligible\" for vaccination, he will be considered unvaccinated. If no information is available, the age, department and sex variables will be taken into account to estimate its vaccination status.\n\nThe effects of these methodological changes are an upward revision of the number of events (tests positive or hospitalizations) in vaccinated persons, and a downward revision in unvaccinated persons."
     }
 ]

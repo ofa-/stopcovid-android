@@ -14,12 +14,15 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
+import androidx.fragment.app.setFragmentResult
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.lunabeestudio.stopcovid.coreui.LocalizedApplication
+import com.lunabeestudio.stopcovid.coreui.extension.setTextOrHide
 import com.lunabeestudio.stopcovid.coreui.manager.LocalizedStrings
 import com.lunabeestudio.stopcovid.databinding.BottomSheetFragmentActionConfirmBinding
 
-class HealthDateTimeInfoBottomSheetFragment : BottomSheetDialogFragment() {
+class CertificateSharingBottomSheetFragment : BottomSheetDialogFragment() {
 
     private lateinit var binding: BottomSheetFragmentActionConfirmBinding
 
@@ -35,14 +38,31 @@ class HealthDateTimeInfoBottomSheetFragment : BottomSheetDialogFragment() {
     }
 
     private fun BottomSheetFragmentActionConfirmBinding.setTexts() {
-        titleTextView.text = strings["myHealthController.riskMoreInfoAlert.title"]
-        bodyTextView.text = strings["myHealthController.riskMoreInfoAlert.message"]
-        okButton.text = strings["common.ok"]
+        titleTextView.text = strings["certificateSharingController.title"]
+        bodyTextView.text = strings["certificateSharingController.message"]
+        okButton.setTextOrHide(strings["common.confirm"])
+        cancelButton.setTextOrHide(strings["common.cancel"])
     }
 
     private fun BottomSheetFragmentActionConfirmBinding.setClickListeners() {
         okButton.setOnClickListener {
+            setFragmentResult(
+                CERTIFICATE_SHARING_RESULT_KEY,
+                bundleOf(CERTIFICATE_SHARING_BUNDLE_KEY_CONFIRM to true),
+            )
             dismiss()
         }
+        cancelButton.setOnClickListener {
+            setFragmentResult(
+                CERTIFICATE_SHARING_RESULT_KEY,
+                bundleOf(CERTIFICATE_SHARING_BUNDLE_KEY_CONFIRM to false),
+            )
+            dismiss()
+        }
+    }
+
+    companion object {
+        const val CERTIFICATE_SHARING_RESULT_KEY: String = "CERTIFICATE_SHARING_RESULT_KEY"
+        const val CERTIFICATE_SHARING_BUNDLE_KEY_CONFIRM: String = "CERTIFICATE_SHARING_BUNDLE_KEY_CONFIRM"
     }
 }

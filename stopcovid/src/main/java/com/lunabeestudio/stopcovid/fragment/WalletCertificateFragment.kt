@@ -302,12 +302,17 @@ class WalletCertificateFragment : MainFragment() {
 
             this.allowShare = true
             onShare = { barcodeBitmap ->
-                val uri = barcodeBitmap?.let { bitmap ->
-                    ShareManager.getShareCaptureUriFromBitmap(requireContext(), bitmap, "qrCode")
-                }
-                val text = mainDescription.takeIf { uri != null }
-                ShareManager.shareImageAndText(requireContext(), uri, text) {
-                    strings["common.error.unknown"]?.let { showErrorSnackBar(it) }
+                findParentFragmentByType<WalletContainerFragment>()?.let { containerFragment ->
+                    val uri = barcodeBitmap?.let { bitmap ->
+                        ShareManager.getShareCaptureUriFromBitmap(requireContext(), bitmap, "qrCode")
+                    }
+                    val text = mainDescription.takeIf { uri != null }
+                    ShareManager.setupCertificateSharingBottomSheet(containerFragment, text) {
+                        uri
+                    }
+                    containerFragment.findNavControllerOrNull()?.safeNavigate(
+                        WalletContainerFragmentDirections.actionWalletContainerFragmentToCertificateSharingBottomSheetFragment()
+                    )
                 }
             }
             onDelete = {

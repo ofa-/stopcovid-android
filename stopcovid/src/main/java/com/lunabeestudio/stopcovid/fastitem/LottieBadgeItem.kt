@@ -10,10 +10,13 @@
 
 package com.lunabeestudio.stopcovid.fastitem
 
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import androidx.annotation.RawRes
+import androidx.core.view.updateLayoutParams
 import com.airbnb.lottie.LottieCompositionFactory
 import com.lunabeestudio.stopcovid.coreui.extension.setTextOrHide
 import com.lunabeestudio.stopcovid.databinding.ItemLottieBadgeBinding
@@ -25,12 +28,19 @@ class LottieBadgeItem(@RawRes private val rawRes: Int) : AbstractBindingItem<Ite
 
     var chipText: String? = null
     var chipClick: (() -> Unit)? = null
+    var forceBottomGravity: Boolean = false
 
     override fun createBinding(inflater: LayoutInflater, parent: ViewGroup?): ItemLottieBadgeBinding {
         val itemLottieBinding = ItemLottieBadgeBinding.inflate(inflater, parent, false)
         val nestedItemLottieBadgeBinding = NestedItemLottieBinding.bind(itemLottieBinding.root)
         LottieCompositionFactory.fromRawRes(inflater.context, rawRes).addListener { composition ->
             nestedItemLottieBadgeBinding.lottieAnimationView.setComposition(composition)
+        }
+
+        if (forceBottomGravity) {
+            nestedItemLottieBadgeBinding.lottieAnimationView.updateLayoutParams<FrameLayout.LayoutParams> {
+                gravity = Gravity.BOTTOM
+            }
         }
         return itemLottieBinding
     }
