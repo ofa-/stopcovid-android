@@ -35,7 +35,7 @@ class SecuredBitmapView @JvmOverloads constructor(context: Context, attrs: Attri
 
     init {
         securedView = SurfaceView(context).apply {
-            setSecure(true)
+            //setSecure(true)
             holder.addCallback(object : SurfaceHolder.Callback {
                 override fun surfaceCreated(holder: SurfaceHolder) {
                     /* no-op */
