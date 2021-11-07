@@ -346,7 +346,7 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
         }
     }
 
-    private val isProximityActive get() = ProximityManager.isProximityOn(requireContext(), robertManager)
+    private val isProximityActive get() = robertManager.isProximityActive
 
     private fun copyToClipboard(text: String) {
         val clipboard = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
