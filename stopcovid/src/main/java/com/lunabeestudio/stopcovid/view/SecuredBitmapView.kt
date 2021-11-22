@@ -22,35 +22,49 @@ import androidx.core.view.isVisible
 class SecuredBitmapView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) :
     FrameLayout(context, attrs, defStyleAttr) {
 
-    private var securedView: SurfaceView
+    private val isHuawei: Boolean = android.os.Build.MANUFACTURER.compareTo(HUAWEI_MANUFACTURER, true) == 0 ||
+        android.os.Build.BRAND.compareTo(HUAWEI_MANUFACTURER, true) == 0
+    private var securedView: SurfaceView? = null
     private var imageView: ImageView? = null
 
     var bitmap: Bitmap? = null
         set(value) {
             field = value
             value?.let {
-                drawBitmap(securedView.holder, it)
+                if (isHuawei) {
+                    imageView?.setImageBitmap(bitmap)
+                } else {
+                    securedView?.holder?.let { holder -> drawBitmap(holder, it) }
+                }
             }
         }
 
     init {
-        securedView = SurfaceView(context).apply {
-            //setSecure(true)
-            holder.addCallback(object : SurfaceHolder.Callback {
-                override fun surfaceCreated(holder: SurfaceHolder) {
-                    /* no-op */
-                }
+        if (isHuawei) {
+            imageView = ImageView(context).apply {
+                adjustViewBounds = true
+                setImageBitmap(bitmap)
+            }
+            addView(imageView, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
+        } else {
+            securedView = SurfaceView(context).apply {
+                //setSecure(true)
+                holder.addCallback(object : SurfaceHolder.Callback {
+                    override fun surfaceCreated(holder: SurfaceHolder) {
+                        /* no-op */
+                    }
 
-                override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
-                    bitmap?.let { drawBitmap(holder, it) }
-                }
+                    override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
+                        bitmap?.let { drawBitmap(holder, it) }
+                    }
 
-                override fun surfaceDestroyed(holder: SurfaceHolder) {
-                    /* no-op */
-                }
-            })
+                    override fun surfaceDestroyed(holder: SurfaceHolder) {
+                        /* no-op */
+                    }
+                })
+            }
+            addView(securedView, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
         }
-        addView(securedView, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
     }
 
     suspend fun <T> runUnsecured(block: suspend () -> T): T {
@@ -63,15 +77,17 @@ class SecuredBitmapView @JvmOverloads constructor(context: Context, attrs: Attri
     }
 
     private fun setUnsecure(isUnsecure: Boolean) {
+        if (isHuawei) return
+
         if (isUnsecure) {
             imageView = ImageView(context).apply {
                 adjustViewBounds = true
                 setImageBitmap(bitmap)
             }
             addView(imageView, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
-            securedView.isVisible = false
+            securedView?.isVisible = false
         } else {
-            securedView.isVisible = true
+            securedView?.isVisible = true
             imageView?.let {
                 it.setImageDrawable(null)
                 removeView(imageView)
@@ -85,5 +101,9 @@ class SecuredBitmapView @JvmOverloads constructor(context: Context, attrs: Attri
             canvas.drawBitmap(bitmap, 0f, 0f, null)
             holder.unlockCanvasAndPost(canvas)
         }
+    }
+
+    companion object {
+        private const val HUAWEI_MANUFACTURER = "HUAWEI"
     }
 }
