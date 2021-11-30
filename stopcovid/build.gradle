@@ -46,8 +46,8 @@ android {
         applicationId "fr.gouv.android.stopcovid"
         minSdkVersion 21
         targetSdkVersion 31
-        versionCode 408
-        versionName "3.8.7"
+        versionCode 410
+        versionName "3.8.8"
 
         vectorDrawables.useSupportLibrary = true
 
