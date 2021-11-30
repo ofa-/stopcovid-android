@@ -40,7 +40,7 @@ class UrgentInfoFragment : MainFragment() {
         binding?.recyclerView?.addOnScrollListener(onScrollListener)
     }
 
-    override fun getItems(): List<GenericItem> {
+    override suspend fun getItems(): List<GenericItem> {
 
         val items = ArrayList<GenericItem>()
 

@@ -117,6 +117,7 @@ class InfoCenterDetailCardItemViewHolder(binding: ItemInfoCenterDetailCardBindin
     val tagAdapter: FastItemAdapter<TagItem> = FastItemAdapter()
 
     init {
+        tagAdapter.attachDefaultListeners = false
         tagAdapter.setHasStableIds(true)
     }
 }

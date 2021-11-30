@@ -42,7 +42,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import kotlin.time.ExperimentalTime
 
 class WalletRepository(
     context: Context,
@@ -251,7 +250,6 @@ class WalletRepository(
         localKeystoreDataSource.updateNonLightRawWalletCertificate(certificate)
     }
 
-    @OptIn(ExperimentalTime::class)
     suspend fun generateActivityPass(certificateValue: String): RobertResultData<DccLightData> {
         return remoteDccLightDataSource.generateActivityPass(
             robertManager.configuration.generationServerPublicKey,

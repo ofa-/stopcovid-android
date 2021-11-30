@@ -144,6 +144,9 @@
         <action
             android:id="@+id/action_walletContainerFragment_to_certificateSharingBottomSheetFragment"
             app:destination="@id/certificateSharingBottomSheetFragment" />
+        <action
+            android:id="@+id/action_walletContainerFragment_to_qrCodeMoreActionBottomSheetFragment"
+            app:destination="@id/qrCodeMoreActionBottomSheetFragment" />
     </fragment>
     <fragment
         android:id="@+id/confirmAddWalletCertificateFragment"
@@ -174,6 +177,9 @@
         <action
             android:id="@+id/action_fullscreenQRCodeFragment_to_certificateSharingBottomSheetFragment"
             app:destination="@id/certificateSharingBottomSheetFragment" />
+        <action
+            android:id="@+id/action_fullscreenQRCodeFragment_to_qrCodeMoreActionBottomSheetFragment"
+            app:destination="@id/qrCodeMoreActionBottomSheetFragment" />
     </fragment>
     <fragment
         android:id="@+id/walletCertificateErrorFragment"
@@ -213,6 +219,9 @@
         <action
             android:id="@+id/action_legacyFullscreenDccFragment_to_certificateSharingBottomSheetFragment"
             app:destination="@id/certificateSharingBottomSheetFragment" />
+        <action
+            android:id="@+id/action_legacyFullscreenDccFragment_to_qrCodeMoreActionBottomSheetFragment"
+            app:destination="@id/qrCodeMoreActionBottomSheetFragment" />
     </fragment>
     <fragment
         android:id="@+id/positiveTestStepsFragment"
@@ -279,6 +288,9 @@
         <action
             android:id="@+id/action_walletFullscreenPagerFragment_to_certificateSharingBottomSheetFragment"
             app:destination="@id/certificateSharingBottomSheetFragment" />
+        <action
+            android:id="@+id/action_walletFullscreenPagerFragment_to_qrCodeMoreActionBottomSheetFragment"
+            app:destination="@id/qrCodeMoreActionBottomSheetFragment" />
     </fragment>
     <fragment
         android:id="@+id/sendHistoryFragment"
@@ -350,4 +362,15 @@
         android:id="@+id/certificateSharingBottomSheetFragment"
         android:name="com.lunabeestudio.stopcovid.fragment.CertificateSharingBottomSheetFragment"
         tools:layout="@layout/bottom_sheet_fragment_action_confirm" />
+    <dialog
+        android:id="@+id/qrCodeMoreActionBottomSheetFragment"
+        android:name="com.lunabeestudio.stopcovid.fragment.QrCodeMoreActionBottomSheetFragment"
+        tools:layout="@layout/bottom_sheet_fragment_more_action">
+        <argument
+            android:name="showShare"
+            app:argType="boolean" />
+        <argument
+            android:name="showBrightness"
+            app:argType="boolean" />
+    </dialog>
 </navigation>

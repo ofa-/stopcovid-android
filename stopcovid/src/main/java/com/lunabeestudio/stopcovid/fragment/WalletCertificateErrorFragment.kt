@@ -31,7 +31,7 @@ class WalletCertificateErrorFragment : MainFragment() {
 
     override fun getTitleKey(): String = "walletCertificateErrorController.title"
 
-    override fun getItems(): List<GenericItem> {
+    override suspend fun getItems(): List<GenericItem> {
         val items = mutableListOf<GenericItem>()
 
         items += spaceItem {

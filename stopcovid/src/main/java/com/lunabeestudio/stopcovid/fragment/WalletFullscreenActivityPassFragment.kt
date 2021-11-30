@@ -15,10 +15,12 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
+import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.chip.Chip
@@ -27,20 +29,32 @@ import com.journeyapps.barcodescanner.BarcodeEncoder
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.findParentFragmentByType
 import com.lunabeestudio.stopcovid.coreui.extension.toDimensSize
+import com.lunabeestudio.stopcovid.coreui.fragment.BaseFragment
 import com.lunabeestudio.stopcovid.databinding.FragmentWalletFullscreenActivityPassBinding
 import com.lunabeestudio.stopcovid.extension.fullName
 import com.lunabeestudio.stopcovid.extension.injectionContainer
 import com.lunabeestudio.stopcovid.extension.isExpired
 import com.lunabeestudio.stopcovid.extension.navGraphWalletViewModels
 import com.lunabeestudio.stopcovid.extension.robertManager
+import com.lunabeestudio.stopcovid.manager.Blacklist2DDOCManager
+import com.lunabeestudio.stopcovid.manager.BlacklistDCCManager
 import com.lunabeestudio.stopcovid.model.EuropeanCertificate
 import com.lunabeestudio.stopcovid.viewmodel.WalletViewModelFactory
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import kotlin.time.Duration
-import kotlin.time.ExperimentalTime
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.minutes
 
-class WalletFullscreenActivityPassFragment : ForceLightFragment(R.layout.fragment_wallet_fullscreen_activity_pass) {
+class WalletFullscreenActivityPassFragment : BaseFragment() {
+
+    private val blacklistDCCManager: BlacklistDCCManager by lazy(LazyThreadSafetyMode.NONE) {
+        injectionContainer.blacklistDCCManager
+    }
+
+    private val blacklist2DDOCManager: Blacklist2DDOCManager by lazy(LazyThreadSafetyMode.NONE) {
+        injectionContainer.blacklist2DDOCManager
+    }
 
     private val barcodeEncoder = BarcodeEncoder()
     private val qrCodeSize by lazy {
@@ -77,6 +91,11 @@ class WalletFullscreenActivityPassFragment : ForceLightFragment(R.layout.fragmen
         setHasOptionsMenu(true)
     }
 
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        binding = FragmentWalletFullscreenActivityPassBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
     override fun onResume() {
         super.onResume()
         context?.registerReceiver(timeUpdateReceiver, IntentFilter(Intent.ACTION_TIME_TICK))
@@ -90,15 +109,6 @@ class WalletFullscreenActivityPassFragment : ForceLightFragment(R.layout.fragmen
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentWalletFullscreenActivityPassBinding.bind(view)
-
-        binding.shareButton.text = strings["common.share"]
-        binding.shareButton.setOnClickListener {
-            findParentFragmentByType<WalletFullscreenPagerFragment>()?.showCertificateSharingBottomSheet(
-                binding.barcodeSecuredView,
-                activityPass
-            )
-        }
-
         refreshCertificate()
     }
 
@@ -112,10 +122,11 @@ class WalletFullscreenActivityPassFragment : ForceLightFragment(R.layout.fragmen
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.qr_code_menu_share -> {
-                findParentFragmentByType<WalletFullscreenPagerFragment>()?.showCertificateSharingBottomSheet(
-                    binding.barcodeSecuredView,
-                    activityPass
-                )
+                showCertificateSharingBottomSheet()
+                true
+            }
+            R.id.qr_code_menu_more -> {
+                showQrCodeMoreActionBottomSheet()
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -152,19 +163,17 @@ class WalletFullscreenActivityPassFragment : ForceLightFragment(R.layout.fragmen
 
             certificateDetailsTextView.text = europeanCertificate.fullName()
             setValidityTime(validityTimeChip, europeanCertificate)
-
             explanationTextView.text = strings["europeanCertificate.fullscreen.type.minimum.footer"]
         }
     }
 
-    @OptIn(ExperimentalTime::class)
     private fun setValidityTime(validityChip: Chip, europeanCertificate: EuropeanCertificate) {
-        val now = Duration.milliseconds(System.currentTimeMillis())
-        val expireAt = Duration.milliseconds(europeanCertificate.expirationTime)
+        val now = System.currentTimeMillis().milliseconds
+        val expireAt = europeanCertificate.expirationTime.milliseconds
         val timeSpan = expireAt - now
         val timeString = when {
-            timeSpan < Duration.minutes(1) -> strings["activityPass.fullscreen.validFor.timeFormat.lessThanAMinute"]
-            timeSpan < Duration.hours(1) -> stringsFormat(
+            timeSpan < 1.minutes -> strings["activityPass.fullscreen.validFor.timeFormat.lessThanAMinute"]
+            timeSpan < 1.hours -> stringsFormat(
                 "activityPass.fullscreen.validFor.timeFormat.minutes",
                 timeSpan.inWholeMinutes + 1, // avoid "1min left"
             )
@@ -173,11 +182,24 @@ class WalletFullscreenActivityPassFragment : ForceLightFragment(R.layout.fragmen
                 stringsFormat(
                     "activityPass.fullscreen.validFor.timeFormat.hoursMinutes",
                     hours,
-                    (timeSpan - Duration.hours(hours)).inWholeMinutes,
+                    (timeSpan - hours.hours).inWholeMinutes,
                 )
             }
         }
         validityChip.text = stringsFormat("activityPass.fullscreen.validFor", timeString)
+    }
+
+    private fun showCertificateSharingBottomSheet() {
+        findParentFragmentByType<WalletFullscreenPagerFragment>()?.showCertificateSharingBottomSheet(
+            binding.barcodeSecuredView,
+            activityPass
+        )
+    }
+
+    fun showQrCodeMoreActionBottomSheet() {
+        findParentFragmentByType<WalletFullscreenPagerFragment>()?.showQrCodeMoreActionBottomSheet(
+            ::showCertificateSharingBottomSheet,
+        )
     }
 
     companion object {

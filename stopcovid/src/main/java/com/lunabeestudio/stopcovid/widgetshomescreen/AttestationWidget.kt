@@ -10,7 +10,6 @@
 
 package com.lunabeestudio.stopcovid.widgetshomescreen
 
-import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
@@ -29,6 +28,7 @@ import com.lunabeestudio.stopcovid.Constants.Url.CERTIFICATE_SHORTCUT_URI
 import com.lunabeestudio.stopcovid.Constants.Url.NEW_CERTIFICATE_SHORTCUT_URI
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.toDimensSize
+import com.lunabeestudio.stopcovid.coreui.utils.ImmutablePendingIntentCompat
 import com.lunabeestudio.stopcovid.extension.isExpired
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
@@ -40,8 +40,9 @@ import kotlinx.coroutines.launch
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.concurrent.TimeUnit
-import kotlin.time.Duration
-import kotlin.time.ExperimentalTime
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.minutes
 
 class AttestationWidget : AppWidgetProvider() {
     @OptIn(DelicateCoroutinesApi::class)
@@ -124,8 +125,7 @@ class AttestationWidget : AppWidgetProvider() {
             Intent.ACTION_VIEW,
             Uri.parse(uriIntent)
         )
-        val pendingIntent =
-            PendingIntent.getActivity(context, 0, intent, 0)
+        val pendingIntent = ImmutablePendingIntentCompat.getActivity(context, 0, intent)
         views.setOnClickPendingIntent(R.id.certificateWidgetLayout, pendingIntent)
     }
 
@@ -136,7 +136,6 @@ class AttestationWidget : AppWidgetProvider() {
          * @param isNewCertificate true if you call after creating a certificate, setup a work manager to update the widget once the
          * certificate is no more valid.
          */
-        @OptIn(ExperimentalTime::class)
         fun updateWidget(context: Context, isNewCertificate: Boolean = false, info: MutableMap<String, FormEntry>? = null) {
             val intent = Intent(context, AttestationWidget::class.java)
             intent.action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
@@ -153,13 +152,12 @@ class AttestationWidget : AppWidgetProvider() {
             // Launch worker for updating when certificate no more valid
             if (isNewCertificate) {
                 // if the certificate is set up with in the past
-                val timestampAttestation = info?.get(Constants.Attestation.KEY_DATE_TIME)?.value?.toLongOrNull()
-                    ?.let(Duration::milliseconds)
+                val timestampAttestation = info?.get(Constants.Attestation.KEY_DATE_TIME)?.value?.toLongOrNull()?.milliseconds
                 if (timestampAttestation != null) {
-                    val attestationDuration = Duration.milliseconds(System.currentTimeMillis()) - timestampAttestation
-                    val duration = Duration.hours(context.robertManager().configuration.qrCodeExpiredHours.toDouble())
+                    val attestationDuration = System.currentTimeMillis().milliseconds - timestampAttestation
+                    val duration = context.robertManager().configuration.qrCodeExpiredHours.toDouble().hours
                     // add 5 minutes to the timing delay to be sure updating the widget after the end of validity
-                    val finalDuration = duration + Duration.minutes(5) - attestationDuration
+                    val finalDuration = duration + 5.minutes - attestationDuration
                     val updateAttestationWorker: WorkRequest =
                         OneTimeWorkRequestBuilder<UpdateAttestationWorker>()
                             .setInitialDelay(finalDuration.inWholeMilliseconds, TimeUnit.MILLISECONDS)

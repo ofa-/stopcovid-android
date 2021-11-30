@@ -13,17 +13,15 @@ package com.lunabeestudio.stopcovid.fragment
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.Gravity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.ContextCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.extension.openAppSettings
-import com.lunabeestudio.stopcovid.coreui.extension.showPermissionRationale
+import com.lunabeestudio.stopcovid.coreui.extension.showPermissionSettingsDialog
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
@@ -39,22 +37,24 @@ class OnBoardingProximityFragment : OnBoardingFragment() {
     private val robertManager by lazy {
         requireContext().robertManager()
     }
-    private var permissionResultLauncher: ActivityResultLauncher<String>? = null
+    private var permissionResultLauncher: ActivityResultLauncher<Array<String>>? = null
     private var activityResultLauncher: ActivityResultLauncher<Intent>? = null
 
     override fun getTitleKey(): String = "onboarding.proximityController.title"
     override fun getButtonTitleKey(): String = "onboarding.proximityController.allowProximity"
     override fun getOnButtonClick(): () -> Unit = {
-        if (ContextCompat.checkSelfPermission(requireContext(), ProximityManager.getManifestLocationPermission())
-            != PackageManager.PERMISSION_GRANTED
-        ) {
-            MaterialAlertDialogBuilder(requireContext())
-                .setTitle(strings["common.permissionsNeeded"])
-                .setMessage(strings["onboarding.proximityController.allowProximity.warning"])
-                .setPositiveButton(strings["common.understand"]) { _, _ ->
-                    permissionResultLauncher?.launch(ProximityManager.getManifestLocationPermission())
-                }
-                .show()
+        if (!ProximityManager.isProximityGranted(requireContext())) {
+            if (ProximityManager.isLocationRequired()) {
+                MaterialAlertDialogBuilder(requireContext())
+                    .setTitle(strings["common.permissionsNeeded"])
+                    .setMessage(strings["onboarding.proximityController.allowProximity.warning"])
+                    .setPositiveButton(strings["common.understand"]) { _, _ ->
+                        permissionResultLauncher?.launch(ProximityManager.getManifestProximityPermissions())
+                    }
+                    .show()
+            } else {
+                permissionResultLauncher?.launch(ProximityManager.getManifestProximityPermissions())
+            }
         } else if (ProximityManager.hasFeatureBLE(requireContext(), robertManager) && !ProximityManager.isBluetoothOn(
                 requireContext(),
                 robertManager
@@ -69,8 +69,8 @@ class OnBoardingProximityFragment : OnBoardingFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        permissionResultLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
-            if (isGranted) {
+        permissionResultLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { isGranted ->
+            if (isGranted.all { it.value }) {
                 if (ProximityManager.hasFeatureBLE(requireContext(), robertManager) && !ProximityManager.isBluetoothOn(
                         requireContext(),
                         robertManager
@@ -81,10 +81,12 @@ class OnBoardingProximityFragment : OnBoardingFragment() {
                 } else {
                     startNextController()
                 }
-            } else if (!shouldShowRequestPermissionRationale(ProximityManager.getManifestLocationPermission())) {
-                context?.showPermissionRationale(
+            } else if (ProximityManager.getManifestProximityPermissions()
+                .any { permission -> !shouldShowRequestPermissionRationale(permission) }
+            ) {
+                context?.showPermissionSettingsDialog(
                     strings = strings,
-                    messageKey = "common.needLocalisationAccessToScan",
+                    messageKey = ProximityManager.getProximityPermissionExplanationKey(),
                     positiveKey = "common.settings",
                     neutralKey = "common.readMore",
                     cancelable = true,
@@ -105,7 +107,7 @@ class OnBoardingProximityFragment : OnBoardingFragment() {
         }
     }
 
-    override fun getItems(): List<GenericItem> {
+    override suspend fun getItems(): List<GenericItem> {
         val items = arrayListOf<GenericItem>()
 
         items += logoItem {

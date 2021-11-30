@@ -14,7 +14,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?colorSurface"
-    android:fillViewport="true">
+    android:fillViewport="true"
+    android:theme="@style/Theme.Base.StopCovid.ForceLight">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -57,21 +58,11 @@
             android:textAppearance="@style/TextAppearance.StopCovid.Caption.Small"
             android:textColor="@android:color/white"
             app:chipBackgroundColor="?colorPrimary"
-            app:layout_constraintBottom_toTopOf="@id/shareButton"
+            app:layout_constraintBottom_toTopOf="@id/explanationTextView"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/certificateDetailsTextView"
             tools:text="@tools:sample/lorem[2]" />
-
-        <Button
-            android:id="@+id/shareButton"
-            style="@style/Widget.StopCovid.Button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/spacing_large"
-            app:layout_constraintBottom_toTopOf="@id/explanationTextView"
-            app:layout_constraintTop_toBottomOf="@id/validityTimeChip"
-            tools:text="@tools:sample/lorem" />
 
         <TextView
             android:id="@+id/explanationTextView"

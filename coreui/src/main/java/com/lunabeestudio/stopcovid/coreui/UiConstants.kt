@@ -40,4 +40,6 @@ object UiConstants {
     val SUPPORTED_LOCALES: Array<Locale> = arrayOf(Locale.UK, Locale.FRANCE)
 
     const val DEFAULT_LANGUAGE: String = "en"
+
+    const val DAY_MONTH_DATE_PATTERN: String = "dd MMMM"
 }

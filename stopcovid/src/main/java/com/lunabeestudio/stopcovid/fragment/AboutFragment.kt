@@ -25,7 +25,7 @@ class AboutFragment : MainFragment() {
 
     override fun getTitleKey(): String = "aboutController.title"
 
-    override fun getItems(): List<GenericItem> {
+    override suspend fun getItems(): List<GenericItem> {
         val items = ArrayList<GenericItem>()
 
         items += logoItem {

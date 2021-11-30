@@ -24,8 +24,8 @@
         tools:layout="@layout/fragment_recycler_view">
         <deepLink app:uri="tousanticovid://proximity" />
         <action
-            android:id="@+id/action_proximityFragment_to_manageDataFragment"
-            app:destination="@id/manageDataFragment"
+            android:id="@+id/action_proximityFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
@@ -241,7 +241,7 @@
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
         <action
-            android:id="@+id/action_attestationsFragment_to_FullscreenAttestationFragment"
+            android:id="@+id/action_attestationsFragment_to_fullscreenAttestationFragment"
             app:destination="@id/fullscreenAttestationFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
@@ -290,6 +290,9 @@
             android:name="qrCodeValueDisplayed"
             app:argType="string"
             app:nullable="false" />
+        <action
+            android:id="@+id/action_fullscreenAttestationFragment_to_qrCodeMoreActionBottomSheetFragment"
+            app:destination="@id/qrCodeMoreActionBottomSheetFragment" />
     </fragment>
     <fragment
         android:id="@+id/captchaFragment"
@@ -615,8 +618,8 @@
         android:name="com.lunabeestudio.stopcovid.fragment.PrivacyFragment"
         tools:layout="@layout/fragment_recycler_view" />
     <fragment
-        android:id="@+id/manageDataFragment"
-        android:name="com.lunabeestudio.stopcovid.fragment.ManageDataFragment"
+        android:id="@+id/settingsFragment"
+        android:name="com.lunabeestudio.stopcovid.fragment.SettingsFragment"
         tools:layout="@layout/fragment_recycler_view" />
     <fragment
         android:id="@+id/gestureFragment"
@@ -820,4 +823,15 @@
         android:id="@+id/lowStorageBottomSheetFragment"
         android:name="com.lunabeestudio.stopcovid.fragment.LowStorageBottomSheetFragment"
         tools:layout="@layout/bottom_sheet_fragment_low_storage" />
+    <dialog
+        android:id="@+id/qrCodeMoreActionBottomSheetFragment"
+        android:name="com.lunabeestudio.stopcovid.fragment.QrCodeMoreActionBottomSheetFragment"
+        tools:layout="@layout/bottom_sheet_fragment_more_action">
+        <argument
+            android:name="showShare"
+            app:argType="boolean" />
+        <argument
+            android:name="showBrightness"
+            app:argType="boolean" />
+    </dialog>
 </navigation>

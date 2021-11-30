@@ -14,12 +14,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?colorSurface"
-    android:fillViewport="true">
+    android:fillViewport="true"
+    android:theme="@style/Theme.Base.StopCovid.ForceLight">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:animateLayoutChanges="true"
         android:padding="@dimen/spacing_large">
 
         <TextView
@@ -103,15 +103,6 @@
                 tools:text="@tools:sample/lorem[3]" />
         </TextSwitcher>
 
-        <Button
-            android:id="@+id/shareButton"
-            style="@style/Widget.StopCovid.Button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toTopOf="@id/explanationTextSwitcher"
-            app:layout_constraintTop_toBottomOf="@id/detailsTextSwitcher"
-            tools:text="@tools:sample/lorem" />
-
         <TextSwitcher
             android:id="@+id/explanationTextSwitcher"
             android:layout_width="0dp"
@@ -126,20 +117,22 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
-                android:gravity="center"
+                android:gravity="center|bottom"
+                android:minHeight="@dimen/min_touch_target_size"
                 android:textAppearance="@style/TextAppearance.StopCovid.Caption"
                 android:textIsSelectable="true"
-                tools:text="@tools:sample/lorem[40]" />
+                tools:text="@tools:sample/lorem[3]" />
 
             <TextView
                 android:id="@+id/explanationTextView2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
-                android:gravity="center"
+                android:gravity="center|bottom"
+                android:minHeight="@dimen/min_touch_target_size"
                 android:textAppearance="@style/TextAppearance.StopCovid.Caption"
                 android:textIsSelectable="true"
-                tools:text="@tools:sample/lorem[40]" />
+                tools:text="@tools:sample/lorem[3]" />
         </TextSwitcher>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

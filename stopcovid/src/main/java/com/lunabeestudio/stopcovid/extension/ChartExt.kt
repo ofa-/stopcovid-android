@@ -18,8 +18,7 @@ import com.lunabeestudio.stopcovid.Constants.Chart.WIDGET_CIRCLE_SIZE
 import com.lunabeestudio.stopcovid.Constants.Chart.WIDGET_LINE_WIDTH
 import com.lunabeestudio.stopcovid.Constants.Chart.WIDGET_MARGIN_SIZE
 import com.lunabeestudio.stopcovid.model.LimitLineData
-import kotlin.time.Duration
-import kotlin.time.ExperimentalTime
+import kotlin.time.Duration.Companion.seconds
 
 // Chart extensions :
 fun LineDataSet.setupStyle(lineColor: Int) {
@@ -149,7 +148,6 @@ private fun setupYAxis(yAxis: YAxis, limitLineData: LimitLineData?) {
     }
 }
 
-@OptIn(ExperimentalTime::class)
 private fun setupXAxis(context: Context, xAxis: XAxis, chartData: Array<com.lunabeestudio.stopcovid.model.ChartData>) {
     xAxis.apply {
         setupStyle()
@@ -158,7 +156,7 @@ private fun setupXAxis(context: Context, xAxis: XAxis, chartData: Array<com.luna
         chartEntries?.lastOrNull()?.x?.let { axisMaximum = it }
         valueFormatter = object : ValueFormatter() {
             override fun getFormattedValue(value: Float): String {
-                return Duration.seconds(value.toLong()).getRelativeDateShortString(context)
+                return value.toLong().seconds.getRelativeDateShortString(context)
             }
         }
     }

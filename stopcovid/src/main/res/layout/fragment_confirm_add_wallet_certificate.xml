@@ -26,12 +26,12 @@
             android:layout_height="wrap_content"
             android:adjustViewBounds="true"
             android:contentDescription="@null"
-            android:src="@drawable/wallet"
             app:layout_constraintBottom_toTopOf="@id/walletLogoDivider"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_chainStyle="packed" />
+            app:layout_constraintVertical_chainStyle="packed"
+            app:srcCompat="@drawable/wallet" />
 
         <include
             android:id="@+id/walletLogoDivider"

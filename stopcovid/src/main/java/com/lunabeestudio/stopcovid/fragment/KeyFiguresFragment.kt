@@ -20,7 +20,9 @@ import com.lunabeestudio.analytics.model.AppEventName
 import com.lunabeestudio.robert.extension.observeEventAndConsume
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.activity.MainActivity
+import com.lunabeestudio.stopcovid.coreui.UiConstants
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
+import com.lunabeestudio.stopcovid.coreui.extension.getApplicationLanguage
 import com.lunabeestudio.stopcovid.coreui.extension.viewLifecycleOwnerOrNull
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
@@ -28,6 +30,7 @@ import com.lunabeestudio.stopcovid.extension.chosenPostalCode
 import com.lunabeestudio.stopcovid.extension.getKeyFigureForPostalCode
 import com.lunabeestudio.stopcovid.extension.getString
 import com.lunabeestudio.stopcovid.extension.itemForFigure
+import com.lunabeestudio.stopcovid.extension.labelStringKey
 import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.fastitem.KeyFigureCardItem
 import com.lunabeestudio.stopcovid.fastitem.explanationActionCardItem
@@ -43,14 +46,17 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.NumberFormat
+import java.text.SimpleDateFormat
 import java.util.Locale
-import kotlin.time.ExperimentalTime
 
 class KeyFiguresFragment : MainFragment() {
 
     private var category: KeyFigureCategory = KeyFigureCategory.UNKNOWN
 
     private val numberFormat: NumberFormat = NumberFormat.getNumberInstance(Locale.getDefault())
+    private val dateFormat by lazy {
+        SimpleDateFormat(UiConstants.DAY_MONTH_DATE_PATTERN, Locale(requireContext().getApplicationLanguage()))
+    }
 
     private val sharedPrefs: SharedPreferences by lazy {
         PreferenceManager.getDefaultSharedPreferences(requireContext())
@@ -73,7 +79,7 @@ class KeyFiguresFragment : MainFragment() {
         (activity as? MainActivity)?.binding?.tabLayout?.isVisible = true
     }
 
-    override fun getItems(): List<GenericItem> {
+    override suspend fun getItems(): List<GenericItem> {
         val items = mutableListOf<GenericItem>()
         addFetchErrorItemIfNeeded(items)
         addExplanationItemIfNeeded(items)
@@ -162,16 +168,16 @@ class KeyFiguresFragment : MainFragment() {
         }
     }
 
-    @OptIn(ExperimentalTime::class)
     private fun itemForFigure(figure: KeyFigure, departmentKeyFigure: DepartmentKeyFigure?): KeyFigureCardItem? {
         return figure.itemForFigure(
             context = requireContext(),
             sharedPrefs = sharedPrefs,
             departmentKeyFigure = departmentKeyFigure,
             numberFormat = numberFormat,
+            dateFormat = dateFormat,
             strings = strings,
         ) {
-            shareContentDescription = strings["accessibility.hint.keyFigure.share"]
+            shareContentDescription = stringsFormat("accessibility.hint.keyFigure.share.withLabel", strings[figure.labelStringKey])
             onShareCard = { binding ->
                 viewLifecycleOwnerOrNull()?.lifecycleScope?.launch {
                     val uri = ShareManager.getShareCaptureUri(binding, "$label")

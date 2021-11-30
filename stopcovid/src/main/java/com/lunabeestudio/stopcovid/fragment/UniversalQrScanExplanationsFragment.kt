@@ -26,7 +26,7 @@ class UniversalQrScanExplanationsFragment : MainFragment() {
 
     override fun getTitleKey(): String = "universalQrScanExplanationsController.title"
 
-    override fun getItems(): List<GenericItem> {
+    override suspend fun getItems(): List<GenericItem> {
         val items = mutableListOf<GenericItem>()
 
         items += logoItem {

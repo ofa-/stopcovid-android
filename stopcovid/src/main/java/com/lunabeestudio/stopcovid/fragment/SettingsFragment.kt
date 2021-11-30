@@ -32,6 +32,7 @@ import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.switchItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
 import com.lunabeestudio.stopcovid.extension.areInfoNotificationsEnabled
+import com.lunabeestudio.stopcovid.extension.enableAutoFullscreenBrightness
 import com.lunabeestudio.stopcovid.extension.flaggedCountry
 import com.lunabeestudio.stopcovid.extension.getString
 import com.lunabeestudio.stopcovid.extension.hideRiskStatus
@@ -45,11 +46,11 @@ import com.lunabeestudio.stopcovid.fastitem.dangerButtonItem
 import com.lunabeestudio.stopcovid.fastitem.selectionItem
 import com.lunabeestudio.stopcovid.manager.ProximityManager
 import com.lunabeestudio.stopcovid.model.DeviceSetup
-import com.lunabeestudio.stopcovid.viewmodel.ManageDataViewModel
-import com.lunabeestudio.stopcovid.viewmodel.ManageDataViewModelFactory
+import com.lunabeestudio.stopcovid.viewmodel.SettingsViewModel
+import com.lunabeestudio.stopcovid.viewmodel.SettingsViewModelFactory
 import com.mikepenz.fastadapter.GenericItem
 
-class ManageDataFragment : MainFragment() {
+class SettingsFragment : MainFragment() {
 
     private val sharedPreferences: SharedPreferences by lazy {
         PreferenceManager.getDefaultSharedPreferences(requireContext())
@@ -63,8 +64,8 @@ class ManageDataFragment : MainFragment() {
         requireContext().robertManager()
     }
 
-    private val viewModel: ManageDataViewModel by viewModels {
-        ManageDataViewModelFactory(
+    private val viewModel: SettingsViewModel by viewModels {
+        SettingsViewModelFactory(
             requireContext().secureKeystoreDataSource(),
             robertManager,
             isolationManager,
@@ -104,7 +105,7 @@ class ManageDataFragment : MainFragment() {
             sharedPreferences.edit {
                 remove(Constants.SharedPrefs.ON_BOARDING_DONE)
             }
-            findNavControllerOrNull()?.safeNavigate(ManageDataFragmentDirections.actionGlobalOnBoardingActivity())
+            findNavControllerOrNull()?.safeNavigate(SettingsFragmentDirections.actionGlobalOnBoardingActivity())
             activity?.finishAndRemoveTask()
         }
         viewModel.venuesQrCodeLiveData.observe(viewLifecycleOwner) {
@@ -112,12 +113,14 @@ class ManageDataFragment : MainFragment() {
         }
     }
 
-    override fun getItems(): List<GenericItem> {
+    override suspend fun getItems(): List<GenericItem> {
         val items = ArrayList<GenericItem>()
 
         manageNotificationsItems(items)
         spaceDividerItems(items)
         userLanguageItems(items)
+        spaceDividerItems(items)
+        brightnessItems(items)
         spaceDividerItems(items)
         manageCertificatesItems(items)
         spaceDividerItems(items)
@@ -162,9 +165,12 @@ class ManageDataFragment : MainFragment() {
     }
 
     private fun spaceDividerItems(items: MutableList<GenericItem>) {
-        items += dividerItem {}
+        items += dividerItem {
+            identifier = items.count().toLong()
+        }
         items += spaceItem {
             spaceRes = R.dimen.spacing_medium
+            identifier = items.count().toLong()
         }
     }
 
@@ -402,6 +408,33 @@ class ManageDataFragment : MainFragment() {
                 }
                 identifier = locale.language.hashCode().toLong()
             }
+        }
+    }
+
+    private fun brightnessItems(items: MutableList<GenericItem>) {
+        items += titleItem {
+            text = strings["common.settings.fullBrightnessSwitch.title"]
+            identifier = items.count().toLong()
+        }
+        items += spaceItem {
+            spaceRes = R.dimen.spacing_medium
+        }
+        items += captionItem {
+            text = strings["common.settings.fullBrightnessSwitch.subtitle"]
+            identifier = items.count().toLong()
+        }
+        items += switchItem {
+            isChecked = sharedPreferences.enableAutoFullscreenBrightness
+            title = if (isChecked) {
+                strings["common.settings.fullBrightnessSwitch.switch.on"]
+            } else {
+                strings["common.settings.fullBrightnessSwitch.switch.off"]
+            }
+            onCheckChange = { isChecked ->
+                sharedPreferences.enableAutoFullscreenBrightness = isChecked
+                refreshScreen()
+            }
+            identifier = items.count().toLong()
         }
     }
 

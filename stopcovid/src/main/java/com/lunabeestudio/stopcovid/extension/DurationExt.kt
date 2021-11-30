@@ -4,16 +4,17 @@ import android.content.Context
 import android.text.format.DateUtils
 import java.util.Calendar
 import kotlin.time.Duration
-import kotlin.time.ExperimentalTime
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.minutes
 
-@OptIn(ExperimentalTime::class)
 fun Duration.getRelativeDateTimeString(context: Context, nowString: String?): String? {
-    val now = Duration.milliseconds(System.currentTimeMillis())
+    val now = System.currentTimeMillis().milliseconds
 
     return when {
-        now - this <= Duration.minutes(1) -> nowString
-        now - this <= Duration.days(1) -> DateUtils.getRelativeTimeSpanString(
-            this.coerceAtMost(now - Duration.minutes(1)).inWholeMilliseconds,
+        now - this <= 1.minutes -> nowString
+        now - this <= 1.days -> DateUtils.getRelativeTimeSpanString(
+            this.coerceAtMost(now - 1.minutes).inWholeMilliseconds,
             now.inWholeMilliseconds,
             DateUtils.MINUTE_IN_MILLIS,
             DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_SHOW_YEAR or DateUtils.FORMAT_ABBREV_MONTH,
@@ -32,18 +33,6 @@ fun Duration.getRelativeDateTimeString(context: Context, nowString: String?): St
     }
 }
 
-@OptIn(ExperimentalTime::class)
-fun Duration.getRelativeDateString(): String {
-    return DateUtils.getRelativeTimeSpanString(
-        this.inWholeMilliseconds,
-        System.currentTimeMillis(),
-        DateUtils.DAY_IN_MILLIS,
-        DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_SHOW_YEAR or DateUtils.FORMAT_ABBREV_MONTH
-    )
-        .toString()
-}
-
-@OptIn(ExperimentalTime::class)
 fun Duration.getRelativeDateShortString(context: Context): String {
     val calendar = Calendar.getInstance()
     val currentYear = calendar.get(Calendar.YEAR)

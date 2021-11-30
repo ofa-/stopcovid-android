@@ -21,7 +21,6 @@ import com.lunabeestudio.stopcovid.coreui.databinding.LayoutButtonBottomSheetBin
 import com.lunabeestudio.stopcovid.coreui.extension.applyAndConsumeWindowInsetBottom
 import com.lunabeestudio.stopcovid.coreui.extension.isNightMode
 import com.lunabeestudio.stopcovid.databinding.ActivityOnBoardingBinding
-import kotlin.time.ExperimentalTime
 
 class OnBoardingActivity : BaseActivity() {
 
@@ -33,7 +32,6 @@ class OnBoardingActivity : BaseActivity() {
         supportFragmentManager.findFragmentById(R.id.navHostFragment)!!.findNavController()
     }
 
-    @OptIn(ExperimentalTime::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 

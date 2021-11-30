@@ -10,7 +10,6 @@
 
 package com.lunabeestudio.stopcovid.viewmodel
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -29,7 +28,7 @@ class ConfirmVenueQrCodeViewModel(
     val venueProcessed: SingleLiveEvent<Unit> = SingleLiveEvent()
     val exception: SingleLiveEvent<Exception> = SingleLiveEvent()
 
-    fun processVenue(context: Context, venueContent: String, venueVersion: Int, venueTime: String?) {
+    fun processVenue(venueContent: String, venueVersion: Int, venueTime: String?) {
         viewModelScope.launch {
             try {
                 venueRepository.processVenue(
@@ -53,7 +52,7 @@ class ConfirmVenueQrCodeViewModelFactory(
     private val venueRepository: VenueRepository,
 ) :
     ViewModelProvider.Factory {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
         @Suppress("UNCHECKED_CAST")
         return ConfirmVenueQrCodeViewModel(
             robertManager,

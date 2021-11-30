@@ -24,8 +24,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import kotlin.time.Duration
-import kotlin.time.ExperimentalTime
+import kotlin.time.Duration.Companion.milliseconds
 
 class CodeViewModel(private val robertManager: RobertManager) : ViewModel() {
 
@@ -34,7 +33,7 @@ class CodeViewModel(private val robertManager: RobertManager) : ViewModel() {
     val loadingInProgress: MutableLiveData<Float?> = MutableLiveData(null)
     val code: MutableLiveData<String> = MutableLiveData("")
 
-    @OptIn(DelicateCoroutinesApi::class, ExperimentalTime::class)
+    @OptIn(DelicateCoroutinesApi::class)
     fun verifyCode(code: String, firstSymptoms: Int?, positiveTest: Int?, application: RobertApplication) {
         if (loadingInProgress.value == null) {
             GlobalScope.launch(Dispatchers.IO) {
@@ -43,7 +42,7 @@ class CodeViewModel(private val robertManager: RobertManager) : ViewModel() {
                 val result = robertManager.report(code, firstSymptoms, positiveTest, application) {
                     loadingInProgress.postValue(it)
                 }
-                Timber.d("report total duration = ${Duration.milliseconds(System.currentTimeMillis() - startTime)}")
+                Timber.d("report total duration = ${(System.currentTimeMillis() - startTime).milliseconds}")
                 loadingInProgress.postValue(null)
                 when (result) {
                     is RobertResult.Success -> codeSuccess.postValue(null)
@@ -56,7 +55,7 @@ class CodeViewModel(private val robertManager: RobertManager) : ViewModel() {
 
 class CodeViewModelFactory(private val robertManager: RobertManager) :
     ViewModelProvider.Factory {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
         @Suppress("UNCHECKED_CAST")
         return CodeViewModel(robertManager) as T
     }

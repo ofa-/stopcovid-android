@@ -14,7 +14,7 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.lunabeestudio.stopcovid.Constants
 import kotlin.time.Duration
-import kotlin.time.ExperimentalTime
+import kotlin.time.Duration.Companion.milliseconds
 
 val SharedPreferences.isOnBoardingDone: Boolean
     get() = getBoolean(Constants.SharedPrefs.ON_BOARDING_DONE, false)
@@ -23,9 +23,8 @@ var SharedPreferences.lastInfoCenterRefresh: Long
     get() = getLong(Constants.SharedPrefs.LAST_INFO_CENTER_REFRESH, 0L)
     set(value) = edit { putLong(Constants.SharedPrefs.LAST_INFO_CENTER_REFRESH, value) }
 
-@OptIn(ExperimentalTime::class)
 var SharedPreferences.lastInfoCenterFetch: Duration
-    get() = Duration.milliseconds(getLong(Constants.SharedPrefs.LAST_INFO_CENTER_FETCH, 0L))
+    get() = getLong(Constants.SharedPrefs.LAST_INFO_CENTER_FETCH, 0L).milliseconds
     set(value) = edit { putLong(Constants.SharedPrefs.LAST_INFO_CENTER_FETCH, value.inWholeMilliseconds) }
 
 var SharedPreferences.areInfoNotificationsEnabled: Boolean
@@ -128,3 +127,15 @@ var SharedPreferences.notificationVersionClosed: Int
 var SharedPreferences.lowStorageAlertShown: Boolean
     get() = getBoolean(Constants.SharedPrefs.LOW_STORAGE_ALERT_SHOWN, false)
     set(value) = edit { putBoolean(Constants.SharedPrefs.LOW_STORAGE_ALERT_SHOWN, value) }
+
+var SharedPreferences.blacklistDccIteration: Int
+    get() = getInt(Constants.SharedPrefs.BLACKLIST_DCC_ITERATION, -1)
+    set(value) = edit { putInt(Constants.SharedPrefs.BLACKLIST_DCC_ITERATION, value) }
+
+var SharedPreferences.blacklist2DdocIteration: Int
+    get() = getInt(Constants.SharedPrefs.BLACKLIST_2DDOC_ITERATION, -1)
+    set(value) = edit { putInt(Constants.SharedPrefs.BLACKLIST_2DDOC_ITERATION, value) }
+
+var SharedPreferences.enableAutoFullscreenBrightness: Boolean
+    get() = getBoolean(Constants.SharedPrefs.ENABLE_AUTO_FULLSCREEN_BRIGHTNESS, true)
+    set(value) = edit { putBoolean(Constants.SharedPrefs.ENABLE_AUTO_FULLSCREEN_BRIGHTNESS, value) }

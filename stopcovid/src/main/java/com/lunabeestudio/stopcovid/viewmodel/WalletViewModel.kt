@@ -11,6 +11,7 @@
 package com.lunabeestudio.stopcovid.viewmodel
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -21,11 +22,12 @@ import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.robert.model.RobertResultData
 import com.lunabeestudio.robert.utils.Event
 import com.lunabeestudio.stopcovid.coreui.utils.SingleLiveEvent
+import com.lunabeestudio.stopcovid.extension.isBlacklisted
 import com.lunabeestudio.stopcovid.extension.isOld
 import com.lunabeestudio.stopcovid.extension.isRecent
 import com.lunabeestudio.stopcovid.extension.raw
-import com.lunabeestudio.stopcovid.manager.Blacklist2DDOCManager
 import com.lunabeestudio.stopcovid.manager.BlacklistDCCManager
+import com.lunabeestudio.stopcovid.manager.Blacklist2DDOCManager
 import com.lunabeestudio.stopcovid.model.EuropeanCertificate
 import com.lunabeestudio.stopcovid.model.FrenchCertificate
 import com.lunabeestudio.stopcovid.model.TacResult
@@ -66,11 +68,10 @@ class WalletViewModel(
             certificates
         }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
-    val blacklistDCC: LiveData<List<String>?>
-        get() = blacklistDCCManager.blacklistedDCCHashes
-
-    val blacklist2DDOC: LiveData<List<String>?>
-        get() = blacklist2DDOCManager.blacklisted2DDOCHashes
+    val blacklistUpdateEvent: LiveData<Event<Unit>> = MediatorLiveData<Event<Unit>>().apply {
+        addSource(blacklistDCCManager.blacklistUpdateEvent) { this.value = it }
+        addSource(blacklist2DDOCManager.blacklistUpdateEvent) { this.value = it }
+    }
 
     val certificatesCount: LiveData<Int?> = walletRepository.certificateCountFlow.asLiveData()
 
@@ -127,10 +128,10 @@ class WalletViewModel(
         return walletRepository.certificateExists(certificate)
     }
 
-    fun isBlacklisted(certificate: WalletCertificate): Boolean {
+    suspend fun isBlacklisted(certificate: WalletCertificate): Boolean {
         return when (certificate) {
-            is FrenchCertificate -> blacklist2DDOC.value?.contains(certificate.sha256) == true
-            is EuropeanCertificate -> blacklistDCC.value?.contains(certificate.sha256) == true
+            is FrenchCertificate -> certificate.isBlacklisted(blacklist2DDOCManager)
+            is EuropeanCertificate -> certificate.isBlacklisted(blacklistDCCManager)
         }
     }
 
@@ -163,7 +164,7 @@ class WalletViewModelFactory(
     private val generateActivityPassUseCase: GenerateActivityPassUseCase,
 ) :
     ViewModelProvider.Factory {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
         @Suppress("UNCHECKED_CAST")
         return WalletViewModel(
             robertManager,

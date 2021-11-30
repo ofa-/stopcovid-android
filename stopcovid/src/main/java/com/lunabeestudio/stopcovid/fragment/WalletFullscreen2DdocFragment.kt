@@ -29,6 +29,7 @@ import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.extension.appCompatActivity
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.extension.toDimensSize
+import com.lunabeestudio.stopcovid.coreui.fragment.BaseFragment
 import com.lunabeestudio.stopcovid.databinding.FragmentWalletFullscreen2ddocBinding
 import com.lunabeestudio.stopcovid.extension.fullDescription
 import com.lunabeestudio.stopcovid.extension.injectionContainer
@@ -40,7 +41,7 @@ import com.lunabeestudio.stopcovid.model.FrenchCertificate
 import com.lunabeestudio.stopcovid.viewmodel.WalletViewModel
 import com.lunabeestudio.stopcovid.viewmodel.WalletViewModelFactory
 
-class WalletFullscreen2DdocFragment : ForceLightFragment(R.layout.fragment_wallet_fullscreen_2ddoc) {
+class WalletFullscreen2DdocFragment : BaseFragment() {
 
     private val args: WalletFullscreen2DdocFragmentArgs by navArgs()
 
@@ -69,9 +70,8 @@ class WalletFullscreen2DdocFragment : ForceLightFragment(R.layout.fragment_walle
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        val rootView = super.onCreateView(inflater, container, savedInstanceState)
-        binding = FragmentWalletFullscreen2ddocBinding.bind(rootView)
-        return rootView
+        binding = FragmentWalletFullscreen2ddocBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

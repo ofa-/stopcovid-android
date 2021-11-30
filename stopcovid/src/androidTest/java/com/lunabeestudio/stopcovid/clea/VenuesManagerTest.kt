@@ -24,9 +24,9 @@ import org.junit.Before
 import org.junit.Test
 import timber.log.Timber
 import java.security.KeyStore
-import kotlin.time.Duration
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
-import kotlin.time.ExperimentalTime
 
 class VenuesManagerTest {
 
@@ -133,23 +133,22 @@ class VenuesManagerTest {
         }
     }
 
-    @OptIn(ExperimentalTime::class)
     @Test
     @UiThreadTest
     fun clear_expired() {
-        val gracePeriod = Duration.days(context.robertManager().configuration.venuesRetentionPeriod).inWholeMilliseconds
+        val gracePeriod = context.robertManager().configuration.venuesRetentionPeriod.days.inWholeMilliseconds
         val venue1 = VenueQrCode(
             id = "idtest1",
             ltid = "uuid",
             base64URL = "GA",
-            ntpTimestamp = (System.currentTimeMillis() - gracePeriod - Duration.seconds(10).inWholeMilliseconds).unixTimeMsToNtpTimeS(),
+            ntpTimestamp = (System.currentTimeMillis() - gracePeriod - 10.seconds.inWholeMilliseconds).unixTimeMsToNtpTimeS(),
             version = 0
         )
         val venue2 = VenueQrCode(
             id = "idtest2",
             ltid = "uuid",
             base64URL = "GA",
-            ntpTimestamp = (System.currentTimeMillis() - gracePeriod + Duration.seconds(10).inWholeMilliseconds).unixTimeMsToNtpTimeS(),
+            ntpTimestamp = (System.currentTimeMillis() - gracePeriod + 10.seconds.inWholeMilliseconds).unixTimeMsToNtpTimeS(),
             version = 0
         )
         runBlocking {
@@ -226,11 +225,10 @@ class VenuesManagerTest {
         }
     }
 
-    @ExperimentalTime
     @Test
     @UiThreadTest
     fun venue_expired_test() {
-        val gracePeriod = Duration.days(context.robertManager().configuration.venuesRetentionPeriod).toLong(DurationUnit.SECONDS)
+        val gracePeriod = context.robertManager().configuration.venuesRetentionPeriod.days.toLong(DurationUnit.SECONDS)
 
         assertThrows<VenueExpiredException> {
             runBlocking {

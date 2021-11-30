@@ -13,7 +13,6 @@ package com.lunabeestudio.stopcovid.service
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Binder
@@ -33,6 +32,7 @@ import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.UiConstants
 import com.lunabeestudio.stopcovid.coreui.manager.LocalizedStrings
+import com.lunabeestudio.stopcovid.coreui.utils.ImmutablePendingIntentCompat
 import com.lunabeestudio.stopcovid.extension.analyticsManager
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.stringsManager
@@ -78,9 +78,9 @@ open class ProximityService : RobertProximityService() {
         }
 
         val notificationIntent = Intent(this@ProximityService, MainActivity::class.java)
-        val pendingIntent = PendingIntent.getActivity(
+        val pendingIntent = ImmutablePendingIntentCompat.getActivity(
             this@ProximityService, 0,
-            notificationIntent, 0
+            notificationIntent
         )
         notificationManager.cancel(UiConstants.Notification.BLUETOOTH.notificationId)
         notificationManager.cancel(UiConstants.Notification.ERROR.notificationId)
@@ -179,9 +179,9 @@ open class ProximityService : RobertProximityService() {
             }
 
             val notificationIntent = Intent(this@ProximityService, MainActivity::class.java)
-            val pendingIntent = PendingIntent.getActivity(
+            val pendingIntent = ImmutablePendingIntentCompat.getActivity(
                 this@ProximityService, 0,
-                notificationIntent, 0
+                notificationIntent
             )
             val notification = NotificationCompat.Builder(
                 this@ProximityService,
@@ -226,9 +226,9 @@ open class ProximityService : RobertProximityService() {
             }
 
             val notificationIntent = Intent(this@ProximityService, MainActivity::class.java)
-            val pendingIntent = PendingIntent.getActivity(
+            val pendingIntent = ImmutablePendingIntentCompat.getActivity(
                 this@ProximityService, 0,
-                notificationIntent, 0
+                notificationIntent
             )
             val notification = NotificationCompat.Builder(
                 this@ProximityService,

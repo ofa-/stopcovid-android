@@ -11,16 +11,24 @@
 package com.lunabeestudio.stopcovid.fragment
 
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
+import android.view.ViewGroup
 import androidx.navigation.fragment.navArgs
 import com.google.zxing.BarcodeFormat
 import com.journeyapps.barcodescanner.BarcodeEncoder
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.appCompatActivity
+import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.extension.toDimensSize
+import com.lunabeestudio.stopcovid.coreui.fragment.BaseFragment
 import com.lunabeestudio.stopcovid.databinding.FragmentFullscreenAttestationBinding
+import com.lunabeestudio.stopcovid.extension.safeNavigate
 
-class FullscreenAttestationFragment : ForceLightFragment(R.layout.fragment_fullscreen_attestation) {
+class FullscreenAttestationFragment : BaseFragment() {
 
     private val args: FullscreenAttestationFragmentArgs by navArgs()
 
@@ -29,16 +37,40 @@ class FullscreenAttestationFragment : ForceLightFragment(R.layout.fragment_fulls
         R.dimen.qr_code_fullscreen_size.toDimensSize(requireContext()).toInt()
     }
 
-    private var binding: FragmentFullscreenAttestationBinding? = null
+    lateinit var binding: FragmentFullscreenAttestationBinding
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.fullscreen_attestation_menu, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.qr_code_menu_more -> {
+                showQrCodeMoreActionBottomSheet()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        binding = FragmentFullscreenAttestationBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding = FragmentFullscreenAttestationBinding.bind(view)
         appCompatActivity?.supportActionBar?.title = strings["attestationsController.title"]
     }
 
     override fun refreshScreen() {
-        binding?.imageView?.setImageBitmap(
+        binding.imageView.setImageBitmap(
             barcodeEncoder.encodeBitmap(
                 args.qrCodeValue,
                 BarcodeFormat.QR_CODE,
@@ -46,6 +78,15 @@ class FullscreenAttestationFragment : ForceLightFragment(R.layout.fragment_fulls
                 qrCodeSize
             )
         )
-        binding?.textView?.text = args.qrCodeValueDisplayed
+        binding.textView.text = args.qrCodeValueDisplayed
+    }
+
+    private fun showQrCodeMoreActionBottomSheet() {
+        findNavControllerOrNull()?.safeNavigate(
+            FullscreenAttestationFragmentDirections.actionFullscreenAttestationFragmentToQrCodeMoreActionBottomSheetFragment(
+                showShare = false,
+                showBrightness = true
+            )
+        )
     }
 }

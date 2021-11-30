@@ -46,8 +46,7 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.util.UUID
 import java.util.concurrent.atomic.AtomicInteger
-import kotlin.time.Duration
-import kotlin.time.ExperimentalTime
+import kotlin.time.Duration.Companion.seconds
 
 abstract class RobertProximityService : ProximityNotificationService() {
 
@@ -113,7 +112,6 @@ abstract class RobertProximityService : ProximityNotificationService() {
         }
     }
 
-    @OptIn(ExperimentalTime::class)
     override val bleSettings: BleSettings
         get() {
             Timber.v("Fetch new BLE settings")
@@ -141,7 +139,7 @@ abstract class RobertProximityService : ProximityNotificationService() {
                 txCompensationGain = calibrationEntry.txRSSCorrectionFactor.toInt(),
                 rxCompensationGain = calibrationEntry.rxRSSCorrectionFactor.toInt(),
                 useScannerHardwareBatching = useScannerHardwareBatching,
-                scanReportDelay = Duration.seconds(robertManager.configuration.scanReportDelay).inWholeMilliseconds
+                scanReportDelay = robertManager.configuration.scanReportDelay.seconds.inWholeMilliseconds
             )
 
             robertManager.shouldReloadBleSettings = false

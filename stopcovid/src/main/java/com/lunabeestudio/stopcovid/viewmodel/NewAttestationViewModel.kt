@@ -111,7 +111,7 @@ class NewAttestationViewModelFactory(
     private val formManager: FormManager,
 ) :
     ViewModelProvider.Factory {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
         @Suppress("UNCHECKED_CAST")
         return NewAttestationViewModel(secureKeystoreDataSource, attestationRepository, formManager) as T
     }

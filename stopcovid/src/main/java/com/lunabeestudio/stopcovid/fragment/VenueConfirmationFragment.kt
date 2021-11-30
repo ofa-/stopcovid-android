@@ -29,7 +29,7 @@ class VenueConfirmationFragment : BottomSheetMainFragment() {
         findNavControllerOrNull()?.navigateUp()
     }
 
-    override fun getItems(): List<GenericItem> {
+    override suspend fun getItems(): List<GenericItem> {
         val items = arrayListOf<GenericItem>()
 
         items += lottieItem(R.raw.erp_waving) {

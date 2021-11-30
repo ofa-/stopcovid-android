@@ -11,22 +11,24 @@
 package com.lunabeestudio.stopcovid.fragment
 
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
+import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.map
 import com.google.zxing.BarcodeFormat
 import com.journeyapps.barcodescanner.BarcodeEncoder
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.findParentFragmentByType
 import com.lunabeestudio.stopcovid.coreui.extension.setTextOrHide
 import com.lunabeestudio.stopcovid.coreui.extension.toDimensSize
+import com.lunabeestudio.stopcovid.coreui.fragment.BaseFragment
 import com.lunabeestudio.stopcovid.databinding.FragmentWalletFullscreenBorderBinding
-import com.lunabeestudio.stopcovid.extension.formatDccText
+import com.lunabeestudio.stopcovid.extension.fullScreenBorderDescription
+import com.lunabeestudio.stopcovid.extension.collectWithLifecycle
 import com.lunabeestudio.stopcovid.extension.injectionContainer
 import com.lunabeestudio.stopcovid.extension.isFrench
 import com.lunabeestudio.stopcovid.extension.navGraphWalletViewModels
@@ -34,10 +36,9 @@ import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.stringKey
 import com.lunabeestudio.stopcovid.model.EuropeanCertificate
 import com.lunabeestudio.stopcovid.viewmodel.WalletViewModelFactory
-import java.text.SimpleDateFormat
-import java.util.Locale
+import kotlinx.coroutines.flow.map
 
-class WalletFullscreenBorderFragment : ForceLightFragment(R.layout.fragment_wallet_fullscreen_border) {
+class WalletFullscreenBorderFragment : BaseFragment() {
 
     private val barcodeEncoder = BarcodeEncoder()
     private val qrCodeSize by lazy {
@@ -47,8 +48,8 @@ class WalletFullscreenBorderFragment : ForceLightFragment(R.layout.fragment_wall
     private val viewModel by navGraphWalletViewModels<WalletFullscreenPagerFragment> {
         WalletViewModelFactory(
             requireContext().robertManager(),
-            blacklistDCCManager,
-            blacklist2DDOCManager,
+            injectionContainer.blacklistDCCManager,
+            injectionContainer.blacklist2DDOCManager,
             injectionContainer.walletRepository,
             injectionContainer.generateActivityPassUseCase,
         )
@@ -62,36 +63,30 @@ class WalletFullscreenBorderFragment : ForceLightFragment(R.layout.fragment_wall
         setHasOptionsMenu(true)
     }
 
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        binding = FragmentWalletFullscreenBorderBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding = FragmentWalletFullscreenBorderBinding.bind(view)
-        viewModel.certificates.asLiveData(timeoutInMs = 0)
-            .map { certificates ->
-                certificates
-                    ?.filterIsInstance<EuropeanCertificate>()
-                    ?.firstOrNull { it.id == arguments?.getString(CERTIFICATE_ID_ARG_KEY) }
-            }
-            .observe(viewLifecycleOwner) { europeanCertificate ->
-                this.europeanCertificate = europeanCertificate
-                europeanCertificate?.value?.let { dccValue ->
-                    binding.barcodeSecuredView.bitmap = barcodeEncoder.encodeBitmap(
-                        dccValue,
-                        BarcodeFormat.QR_CODE,
-                        qrCodeSize,
-                        qrCodeSize,
-                    )
-                }
-
-                refreshScreen()
+        viewModel.certificates.map { certificates ->
+            certificates
+                ?.filterIsInstance<EuropeanCertificate>()
+                ?.firstOrNull { it.id == arguments?.getString(CERTIFICATE_ID_ARG_KEY) }
+        }.collectWithLifecycle(viewLifecycleOwner) { europeanCertificate ->
+            this@WalletFullscreenBorderFragment.europeanCertificate = europeanCertificate
+            europeanCertificate?.value?.let { dccValue ->
+                binding.barcodeSecuredView.bitmap = barcodeEncoder.encodeBitmap(
+                    dccValue,
+                    BarcodeFormat.QR_CODE,
+                    qrCodeSize,
+                    qrCodeSize,
+                )
             }
 
-        binding.shareButton.text = strings["common.share"]
-        binding.shareButton.setOnClickListener {
-            findParentFragmentByType<WalletFullscreenPagerFragment>()?.showCertificateSharingBottomSheet(
-                binding.barcodeSecuredView,
-                europeanCertificate,
-            )
+            refreshScreen()
         }
     }
 
@@ -105,10 +100,11 @@ class WalletFullscreenBorderFragment : ForceLightFragment(R.layout.fragment_wall
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.qr_code_menu_share -> {
-                findParentFragmentByType<WalletFullscreenPagerFragment>()?.showCertificateSharingBottomSheet(
-                    binding.barcodeSecuredView,
-                    europeanCertificate,
-                )
+                showCertificateSharingBottomSheet()
+                true
+            }
+            R.id.qr_code_menu_more -> {
+                showQrCodeMoreActionBottomSheet()
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -119,18 +115,26 @@ class WalletFullscreenBorderFragment : ForceLightFragment(R.layout.fragment_wall
         val europeanCertificate = this.europeanCertificate ?: return
         binding.apply {
             headerTextView.setTextOrHide(strings["europeanCertificate.fullscreen.${europeanCertificate.type.stringKey}.border.warning"])
-
             logosImageView.isVisible = europeanCertificate.greenCertificate.isFrench == true
-
-            certificateDetailsTextView.text = europeanCertificate.formatDccText(
-                strings["europeanCertificate.fullscreen.englishDescription.${europeanCertificate.type.code}"],
-                strings,
-                SimpleDateFormat("d MMM yyyy", Locale.ENGLISH),
-                SimpleDateFormat("d MMM yyyy, HH:mm", Locale.ENGLISH),
+            certificateDetailsTextView.text = europeanCertificate.fullScreenBorderDescription(
+                strings = strings,
+                configuration = injectionContainer.robertManager.configuration
             )
-
             certificateHashTextView.text = europeanCertificate.sha256
         }
+    }
+
+    private fun showCertificateSharingBottomSheet() {
+        findParentFragmentByType<WalletFullscreenPagerFragment>()?.showCertificateSharingBottomSheet(
+            binding.barcodeSecuredView,
+            europeanCertificate,
+        )
+    }
+
+    fun showQrCodeMoreActionBottomSheet() {
+        findParentFragmentByType<WalletFullscreenPagerFragment>()?.showQrCodeMoreActionBottomSheet(
+            ::showCertificateSharingBottomSheet,
+        )
     }
 
     companion object {

@@ -31,7 +31,12 @@ import java.util.Date
 @TypeConverters(Converters::class)
 @Database(
     version = 2,
-    entities = [AttestationRoom::class, CertificateRoom::class, VenueRoom::class, ActivityPassRoom::class],
+    entities = [
+        AttestationRoom::class,
+        CertificateRoom::class,
+        VenueRoom::class,
+        ActivityPassRoom::class,
+    ],
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun attestationRoomDao(): AttestationRoomDao

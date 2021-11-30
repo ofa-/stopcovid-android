@@ -18,8 +18,7 @@ import io.mockk.every
 import io.mockk.mockk
 import org.junit.Before
 import org.junit.Test
-import kotlin.time.Duration
-import kotlin.time.ExperimentalTime
+import kotlin.time.Duration.Companion.hours
 
 class WalletCertificateExtTest {
 
@@ -56,13 +55,12 @@ class WalletCertificateExtTest {
         assert(!europeanCertificate.isEligibleForActivityPass(blacklistDCCManager, Int.MAX_VALUE))
     }
 
-    @OptIn(ExperimentalTime::class)
     @Test
     fun isEligibleForActivityPass_expired_sanitary() {
         val europeanCertificate = mockk<EuropeanCertificate>(relaxed = true)
         every { europeanCertificate.sha256 } returns ""
         every { europeanCertificate.type } returns WalletCertificateType.SANITARY_EUROPE
-        every { europeanCertificate.timestamp } returns System.currentTimeMillis() - Duration.hours(2).inWholeMilliseconds
+        every { europeanCertificate.timestamp } returns System.currentTimeMillis() - 2.hours.inWholeMilliseconds
         every { europeanCertificate.expirationTime } returns Long.MAX_VALUE
         every { europeanCertificate.canRenewActivityPass } returns null
 

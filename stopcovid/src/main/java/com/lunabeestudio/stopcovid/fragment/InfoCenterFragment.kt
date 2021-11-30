@@ -28,8 +28,7 @@ import com.mikepenz.fastadapter.GenericItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlin.time.Duration
-import kotlin.time.ExperimentalTime
+import kotlin.time.Duration.Companion.seconds
 
 class InfoCenterFragment : TimeMainFragment() {
 
@@ -71,8 +70,7 @@ class InfoCenterFragment : TimeMainFragment() {
 
     override fun getTitleKey(): String = "infoCenterController.title"
 
-    @OptIn(ExperimentalTime::class)
-    override fun getItems(): List<GenericItem> {
+    override suspend fun getItems(): List<GenericItem> {
         val items = ArrayList<GenericItem>()
 
         val infoCenterStrings = infoCenterManager.strings.value?.peekContent()
@@ -96,7 +94,7 @@ class InfoCenterFragment : TimeMainFragment() {
                     }
 
                     items += infoCenterDetailCardItem {
-                        header = Duration.seconds(info.timestamp).getRelativeDateTimeString(requireContext(), strings["common.justNow"])
+                        header = info.timestamp.seconds.getRelativeDateTimeString(requireContext(), strings["common.justNow"])
                         title = infoTitle
                         body = infoDescription
                         link = infoCenterStrings[info.buttonLabelKey]

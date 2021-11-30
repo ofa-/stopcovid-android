@@ -76,7 +76,7 @@ class IsolationFormFragment : MainFragment() {
         }
     }
 
-    override fun getItems(): List<GenericItem> {
+    override suspend fun getItems(): List<GenericItem> {
         val items = ArrayList<GenericItem>()
 
         val header = strings["isolationFormController.header.title"]

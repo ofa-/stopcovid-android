@@ -13,6 +13,7 @@ package com.lunabeestudio.stopcovid.manager
 import android.Manifest
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -44,11 +45,11 @@ object ProximityManager {
 
     fun getDeviceSetup(context: Context, robertManager: RobertManager): DeviceSetup = when {
         isNotificationOn(context)
-            && isLocalisationGranted(context)
+            && isProximityGranted(context)
             && hasFeatureBLE(context, robertManager)
             && isBluetoothOn(context, robertManager)
             && isBatteryOptimizationOff(context)
-            && isAdvertisingValid(robertManager)
+            && isAdvertisingValid(robertManager, context)
             && !needLocalisationTurnedOn(context) -> DeviceSetup.BLE
         !hasFeatureBLE(context, robertManager) -> DeviceSetup.NO_BLE
         else -> DeviceSetup.NOT_SETUP
@@ -60,29 +61,46 @@ object ProximityManager {
         return isDeviceSupported && hasBLESystemFeature
     }
 
-    fun isAdvertisingValid(robertManager: RobertManager): Boolean {
-        return BluetoothAdapter.getDefaultAdapter()?.bluetoothLeAdvertiser != null
+    fun isAdvertisingValid(robertManager: RobertManager, context: Context): Boolean {
+        return getBluetoothAdapter(context)?.bluetoothLeAdvertiser != null
             || robertManager.configuration.allowNoAdvertisingDevice
     }
 
-    fun hasUnstableBluetooth(): Boolean {
-        return BluetoothAdapter.getDefaultAdapter()?.bluetoothLeAdvertiser == null && Build.VERSION.SDK_INT < Build.VERSION_CODES.N
+    private fun getBluetoothAdapter(context: Context) =
+        (context.getSystemService(Context.BLUETOOTH_SERVICE) as? BluetoothManager)?.adapter
+
+    fun hasUnstableBluetooth(context: Context): Boolean {
+        return getBluetoothAdapter(context)?.bluetoothLeAdvertiser == null && Build.VERSION.SDK_INT < Build.VERSION_CODES.N
     }
 
     private fun isNotificationOn(context: Context): Boolean =
         NotificationManagerCompat.from(context).areNotificationsEnabled()
 
-    private fun isLocalisationGranted(context: Context): Boolean =
-        ContextCompat.checkSelfPermission(context, getManifestLocationPermission()) == PackageManager.PERMISSION_GRANTED
+    fun isProximityGranted(context: Context): Boolean =
+        getManifestProximityPermissions().all { permission ->
+            ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
+        }
 
-    fun getManifestLocationPermission(): String = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-        Manifest.permission.ACCESS_FINE_LOCATION
-    } else {
-        Manifest.permission.ACCESS_COARSE_LOCATION
+    fun getManifestProximityPermissions(): Array<String> = when {
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> arrayOf(
+            Manifest.permission.BLUETOOTH_CONNECT,
+            Manifest.permission.BLUETOOTH_SCAN,
+            Manifest.permission.BLUETOOTH_ADVERTISE
+        )
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
+        else -> arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION)
+    }
+
+    fun isLocationRequired(): Boolean {
+        val manifestProximityPermissions = getManifestProximityPermissions()
+        return manifestProximityPermissions.contains(Manifest.permission.ACCESS_FINE_LOCATION) ||
+            manifestProximityPermissions.contains(Manifest.permission.ACCESS_COARSE_LOCATION)
     }
 
     private fun needLocalisationTurnedOn(context: Context): Boolean {
-        return if (Build.VERSION.SDK_INT == 29 && BluetoothAdapter.getDefaultAdapter()?.isOffloadedScanBatchingSupported != true) {
+        return if (Build.VERSION.SDK_INT == Build.VERSION_CODES.Q &&
+            getBluetoothAdapter(context)?.isOffloadedScanBatchingSupported != true
+        ) {
             !LocationManagerCompat.isLocationEnabled(context.getSystemService(Context.LOCATION_SERVICE) as LocationManager)
         } else {
             false
@@ -92,7 +110,7 @@ object ProximityManager {
     fun isBluetoothOn(context: Context, robertManager: RobertManager): Boolean = hasFeatureBLE(
         context,
         robertManager
-    ) && BluetoothAdapter.getDefaultAdapter()?.isEnabled != false
+    ) && getBluetoothAdapter(context)?.isEnabled != false
 
     fun isBatteryOptimizationOff(context: Context): Boolean {
         val pm = context.getSystemService(Context.POWER_SERVICE) as? PowerManager
@@ -106,12 +124,17 @@ object ProximityManager {
         robertManager: RobertManager,
         activityResultLauncher: ActivityResultLauncher<Intent>?,
         serviceError: CovidException?,
+        nearbyDevicePermissionsResultLauncher: ActivityResultLauncher<Array<String>>?,
         activateProximity: () -> Unit,
         restartProximity: () -> Unit,
     ): View.OnClickListener? = when {
         !hasFeatureBLE(fragment.requireContext(), robertManager) -> null
-        !isNotificationOn(fragment.requireContext()) || !isLocalisationGranted(fragment.requireContext()) -> View.OnClickListener {
-            fragment.openAppSettings()
+        !isNotificationOn(fragment.requireContext()) || !isProximityGranted(fragment.requireContext()) -> View.OnClickListener {
+            if (nearbyDevicePermissionsResultLauncher != null) {
+                nearbyDevicePermissionsResultLauncher.launch(getManifestProximityPermissions())
+            } else {
+                fragment.openAppSettings()
+            }
         }
         hasFeatureBLE(fragment.requireContext(), robertManager) && !isBluetoothOn(
             fragment.requireContext(),
@@ -120,7 +143,7 @@ object ProximityManager {
             val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
             fragment.startActivity(enableBtIntent)
         }
-        !isAdvertisingValid(robertManager) -> null
+        !isAdvertisingValid(robertManager, fragment.requireContext()) -> null
         !isBatteryOptimizationOff(fragment.requireContext()) -> View.OnClickListener {
             requestIgnoreBatteryOptimization(fragment, activityResultLauncher)
         }
@@ -210,24 +233,36 @@ object ProximityManager {
         !hasFeatureBLE(fragment.requireContext(), robertManager) -> strings["proximityController.error.noBLE"]
         !isNotificationOn(fragment.requireContext())
             && !isBluetoothOn(fragment.requireContext(), robertManager)
-            && !isLocalisationGranted(fragment.requireContext()) ->
+            && !isProximityGranted(fragment.requireContext()) ->
             strings["proximityController.error.noNotificationsOrBluetoothOrLocalisation"]
-        !isBluetoothOn(fragment.requireContext(), robertManager) && !isLocalisationGranted(fragment.requireContext()) ->
+        !isBluetoothOn(fragment.requireContext(), robertManager) && !isProximityGranted(fragment.requireContext()) ->
             strings["proximityController.error.noBluetoothOrLocalisation"]
-        !isNotificationOn(fragment.requireContext()) && !isLocalisationGranted(fragment.requireContext()) ->
+        !isNotificationOn(fragment.requireContext()) && !isProximityGranted(fragment.requireContext()) ->
             strings["proximityController.error.noNotificationsOrLocalisation"]
         !isNotificationOn(fragment.requireContext()) && !isBluetoothOn(
             fragment.requireContext(),
             robertManager
         ) -> strings["proximityController.error.noNotificationsOrBluetooth"]
         !isNotificationOn(fragment.requireContext()) -> strings["proximityController.error.noNotifications"]
-        !isLocalisationGranted(fragment.requireContext()) -> strings["proximityController.error.noLocalisation"]
+        !isProximityGranted(fragment.requireContext()) -> if (isLocationRequired()) {
+            strings["proximityController.error.noLocalisation"]
+        } else {
+            strings["proximityController.error.noNearbyDevicesAccess"]
+        }
         !isBluetoothOn(fragment.requireContext(), robertManager) -> strings["proximityController.error.noBluetooth"]
-        !isAdvertisingValid(robertManager) -> strings["proximityController.error.noAdvertising"]
+        !isAdvertisingValid(robertManager, fragment.requireContext()) -> strings["proximityController.error.noAdvertising"]
         !isBatteryOptimizationOff(fragment.requireContext()) -> strings["proximityController.error.noBattery"]
         needLocalisationTurnedOn(fragment.requireContext()) -> strings["proximityController.error.batchLocalisation"]
         !robertManager.isProximityActive -> strings["proximityController.error.activateProximity"]
         serviceError != null -> strings["common.error.bleScanner"]
         else -> null
+    }
+
+    fun getProximityPermissionExplanationKey(): String {
+        return if (isLocationRequired()) {
+            "common.needLocalisationAccessToScan"
+        } else {
+            "common.needNearbyDevicesAccessToScan"
+        }
     }
 }

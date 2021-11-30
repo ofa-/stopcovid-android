@@ -21,5 +21,5 @@ import com.google.android.material.appbar.AppBarLayout
  */
 fun AppBarLayout.refreshLift(scrollingView: View) {
     val shouldLift = (scrollingView.canScrollVertically(-1) || scrollingView.scrollY > 0)
-    setLifted(shouldLift)
+    isLifted = shouldLift
 }

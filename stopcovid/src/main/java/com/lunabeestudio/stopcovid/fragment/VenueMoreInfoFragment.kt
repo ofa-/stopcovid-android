@@ -17,5 +17,5 @@ class VenueMoreInfoFragment : MainFragment() {
 
     override fun getTitleKey(): String = "venuesRecording.onboardingController.title"
 
-    override fun getItems(): List<GenericItem> = SignalInfosManager.getInfosItems(requireContext(), strings)
+    override suspend fun getItems(): List<GenericItem> = SignalInfosManager.getInfosItems(requireContext(), strings)
 }

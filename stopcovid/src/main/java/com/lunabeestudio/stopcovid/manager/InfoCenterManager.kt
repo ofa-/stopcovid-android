@@ -12,7 +12,6 @@ package com.lunabeestudio.stopcovid.manager
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -33,6 +32,7 @@ import com.lunabeestudio.stopcovid.coreui.UiConstants
 import com.lunabeestudio.stopcovid.coreui.extension.fixFormatter
 import com.lunabeestudio.stopcovid.coreui.extension.getApplicationLanguage
 import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
+import com.lunabeestudio.stopcovid.coreui.utils.ImmutablePendingIntentCompat
 import com.lunabeestudio.stopcovid.extension.areInfoNotificationsEnabled
 import com.lunabeestudio.stopcovid.extension.lastInfoCenterFetch
 import com.lunabeestudio.stopcovid.extension.lastInfoCenterRefresh
@@ -46,7 +46,8 @@ import timber.log.Timber
 import java.io.File
 import java.lang.reflect.Type
 import kotlin.time.Duration
-import kotlin.time.ExperimentalTime
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.minutes
 
 class InfoCenterManager(private val serverManager: ServerManager, private val stringsManager: StringsManager) {
 
@@ -59,8 +60,7 @@ class InfoCenterManager(private val serverManager: ServerManager, private val st
     private val typeInfoCenterTag: Type = object : TypeToken<List<InfoCenterTag>>() {}.type
     private val typeInfoCenterStrings: Type = object : TypeToken<Map<String, String>>() {}.type
 
-    @OptIn(ExperimentalTime::class)
-    private val refreshMinDelay: Duration = Duration.minutes(5)
+    private val refreshMinDelay: Duration = 5.minutes
 
     private var lastUpdatedAt: InfoCenterLastUpdatedAt? = null
 
@@ -225,11 +225,10 @@ class InfoCenterManager(private val serverManager: ServerManager, private val st
             ?: 0
         ) > PreferenceManager.getDefaultSharedPreferences(context).lastInfoCenterRefresh
 
-    @OptIn(ExperimentalTime::class)
     private fun shouldRefresh(context: Context): Boolean {
         val isAppInForeground = (context.applicationContext as? StopCovid)?.isAppInForeground == true
         val isMinDelayElapsed =
-            Duration.milliseconds(System.currentTimeMillis()) - refreshMinDelay > PreferenceManager.getDefaultSharedPreferences(
+            System.currentTimeMillis().milliseconds - refreshMinDelay > PreferenceManager.getDefaultSharedPreferences(
                 context
             ).lastInfoCenterFetch
         return lastUpdatedAt == null ||
@@ -237,10 +236,9 @@ class InfoCenterManager(private val serverManager: ServerManager, private val st
             (isAppInForeground && isMinDelayElapsed)
     }
 
-    @OptIn(ExperimentalTime::class)
     private suspend fun saveLastRefresh(context: Context) {
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
-        sharedPreferences.lastInfoCenterFetch = Duration.milliseconds(System.currentTimeMillis())
+        sharedPreferences.lastInfoCenterFetch = System.currentTimeMillis().milliseconds
         val isAppInBackground = (context.applicationContext as? StopCovid)?.isAppInForeground != true
         if (sharedPreferences.areInfoNotificationsEnabled
             && lastUpdatedAt != null
@@ -276,9 +274,9 @@ class InfoCenterManager(private val serverManager: ServerManager, private val st
         }
 
         val notificationIntent = Intent(context, MainActivity::class.java)
-        val pendingIntent = PendingIntent.getActivity(
+        val pendingIntent = ImmutablePendingIntentCompat.getActivity(
             context, 0,
-            notificationIntent, 0
+            notificationIntent
         )
         val notification = NotificationCompat.Builder(
             context,

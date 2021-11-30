@@ -17,7 +17,7 @@ class GestureFragment : MainFragment() {
 
     override fun getTitleKey(): String = "onboarding.gesturesController.title"
 
-    override fun getItems(): List<GenericItem> {
+    override suspend fun getItems(): List<GenericItem> {
         val items = arrayListOf<GenericItem>()
 
         GestureManager.fillItems(items, strings)

@@ -16,7 +16,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavController
+import androidx.navigation.NavDestination
 import androidx.navigation.fragment.navArgs
 import androidx.navigation.navGraphViewModels
 import androidx.recyclerview.widget.RecyclerView
@@ -178,6 +181,29 @@ class WalletFullscreenPagerFragment : BaseFragment() {
         (activity as? MainActivity)?.binding?.tabLayout?.let { tabLayout ->
             tabLayout.getTabAt(WALLET_FULLSCREEN_BORDER_POSITION)?.let(tabLayout::selectTab)
         }
+    }
+
+    fun showQrCodeMoreActionBottomSheet(onShare: () -> Unit) {
+        setFragmentResultListener(QrCodeMoreActionBottomSheetFragment.MORE_ACTION_RESULT_KEY) { _, bundle ->
+            if (bundle.getBoolean(QrCodeMoreActionBottomSheetFragment.MORE_ACTION_BUNDLE_KEY_SHARE_REQUESTED, false)) {
+                findNavControllerOrNull()?.addOnDestinationChangedListener(
+                    object : NavController.OnDestinationChangedListener {
+                        override fun onDestinationChanged(controller: NavController, destination: NavDestination, arguments: Bundle?) {
+                            if (controller.currentDestination?.id == R.id.walletFullscreenPagerFragment) {
+                                onShare()
+                                controller.removeOnDestinationChangedListener(this)
+                            }
+                        }
+                    })
+            }
+        }
+
+        findNavControllerOrNull()?.safeNavigate(
+            WalletFullscreenPagerFragmentDirections.actionWalletFullscreenPagerFragmentToQrCodeMoreActionBottomSheetFragment(
+                showShare = true,
+                showBrightness = true
+            )
+        )
     }
 
     private inner class WalletPagerAdapter(val pagerState: PagerState) : FragmentStateAdapter(childFragmentManager, lifecycle) {

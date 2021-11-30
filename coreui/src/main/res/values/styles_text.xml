@@ -61,7 +61,7 @@
     </style>
 
     <style name="TextAppearance.StopCovid.Caption.Small.Grey">
-        <item name="android:textColor">@color/color_gray</item>
+        <item name="android:textColor">@color/tac_caption_color</item>
     </style>
 
     <style name="TextAppearance.StopCovid.Caption.Small.OnPrimary">

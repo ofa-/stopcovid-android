@@ -32,7 +32,6 @@ import com.lunabeestudio.stopcovid.fastitem.logoItem
 import com.lunabeestudio.stopcovid.fastitem.walletDoubleDocumentCardItem
 import com.lunabeestudio.stopcovid.viewmodel.WalletViewModelFactory
 import com.mikepenz.fastadapter.GenericItem
-import kotlin.time.ExperimentalTime
 
 class WalletInfoFragment : MainFragment() {
 
@@ -65,8 +64,7 @@ class WalletInfoFragment : MainFragment() {
         (activity as? MainActivity)?.binding?.tabLayout?.isVisible = parentFragment is WalletPagerFragment
     }
 
-    @OptIn(ExperimentalTime::class)
-    override fun getItems(): List<GenericItem> {
+    override suspend fun getItems(): List<GenericItem> {
         val items = ArrayList<GenericItem>()
 
         items += logoItem {

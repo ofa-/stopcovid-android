@@ -27,7 +27,6 @@ import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.onStart
 import java.util.UUID
-import kotlin.time.ExperimentalTime
 
 class GenerateActivityPassUseCase(
     private val walletRepository: WalletRepository,
@@ -48,7 +47,6 @@ class GenerateActivityPassUseCase(
         }
     }
 
-    @OptIn(ExperimentalTime::class)
     private fun generateActivityPass(certificate: RawWalletCertificate): Flow<TacResult<GenerateActivityPassState>> {
         return flow {
             val dccResult = walletRepository.generateActivityPass(certificate.value)

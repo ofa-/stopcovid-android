@@ -150,7 +150,7 @@ class VaccineCompletionFragment : MainFragment() {
 
     override fun getTitleKey(): String = ""
 
-    override fun getItems(): List<GenericItem> {
+    override suspend fun getItems(): List<GenericItem> {
         val greenCertificate = (viewModel.certificate.value as? EuropeanCertificate)?.greenCertificate
         val vaccineDate = greenCertificate?.vaccineDate ?: return emptyList()
         val vaccineMedicinalProduct: String? = greenCertificate.vaccineMedicinalProduct

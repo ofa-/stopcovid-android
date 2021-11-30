@@ -36,7 +36,7 @@ class OnBoardingGestureFragment : OnBoardingFragment() {
         activity?.finishAndRemoveTask()
     }
 
-    override fun getItems(): List<GenericItem> {
+    override suspend fun getItems(): List<GenericItem> {
         val items = arrayListOf<GenericItem>()
 
         GestureManager.fillItems(items, strings)

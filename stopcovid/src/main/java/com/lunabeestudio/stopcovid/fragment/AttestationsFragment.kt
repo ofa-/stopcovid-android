@@ -42,7 +42,6 @@ import com.lunabeestudio.stopcovid.viewmodel.AttestationsViewModel
 import com.lunabeestudio.stopcovid.viewmodel.AttestationsViewModelFactory
 import com.mikepenz.fastadapter.GenericItem
 import kotlinx.coroutines.launch
-import kotlin.time.ExperimentalTime
 
 class AttestationsFragment : MainFragment() {
 
@@ -73,8 +72,7 @@ class AttestationsFragment : MainFragment() {
         showDbFailureIfNeeded()
     }
 
-    @OptIn(ExperimentalTime::class)
-    override fun getItems(): List<GenericItem> {
+    override suspend fun getItems(): List<GenericItem> {
         val items = ArrayList<GenericItem>()
 
         items += spaceItem {
