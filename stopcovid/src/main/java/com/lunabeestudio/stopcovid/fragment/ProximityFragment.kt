@@ -554,6 +554,18 @@ class ProximityFragment : TimeMainFragment() {
             addWalletItems(items)
             addSectionSeparator(items)
 
+        // Health items
+        addHealthItems(items, showAsSick)
+        addSectionSeparator(items)
+
+        // Contact tracing items
+        addContactTracingSection(items, showAsSick)
+        if (robertManager.configuration.displayIsolation) {
+            addIsolationItems(items, analyticsManager)
+        }
+        addDeclareItems(items)
+        addSectionSeparator(items)
+
         // Vaccination items
         addVaccinationSectionItems(items)
         if (robertManager.configuration.displayVaccination) {
@@ -565,14 +577,6 @@ class ProximityFragment : TimeMainFragment() {
         // Venue items
             addVenueItems(items, isSick)
             addSectionSeparator(items)
-
-        // Contact tracing items
-        addContactTracingSection(items, showAsSick)
-        if (robertManager.configuration.displayIsolation) {
-            addIsolationItems(items, analyticsManager)
-        }
-            addDeclareItems(items)
-        addSectionSeparator(items)
 
         // Attestation
         if (robertManager.configuration.displayAttestation) {
@@ -820,6 +824,12 @@ class ProximityFragment : TimeMainFragment() {
     }
 
     private fun addVenueItems(items: ArrayList<GenericItem>, isSick: Boolean) {
+        items += bigTitleItem {
+            text = strings["home.venuesSection.title"]
+            identifier = "home.venuesSection.title".hashCode().toLong()
+            importantForAccessibility = ViewCompat.IMPORTANT_FOR_ACCESSIBILITY_NO
+        }
+
         items += cardWithActionItem(CardTheme.Primary) {
             mainImage = R.drawable.signal_card
             onCardClick = {
