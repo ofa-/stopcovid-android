@@ -37,6 +37,8 @@ import com.lunabeestudio.stopcovid.coreui.EnvConstant
 import com.lunabeestudio.stopcovid.coreui.manager.CalibrationManager
 import com.lunabeestudio.stopcovid.coreui.manager.ConfigManager
 import com.lunabeestudio.stopcovid.coreui.manager.StringsManager
+import com.lunabeestudio.stopcovid.manager.Blacklist2DDOCManager
+import com.lunabeestudio.stopcovid.manager.BlacklistDCCManager
 import com.lunabeestudio.stopcovid.manager.CertificatesDocumentsManager
 import com.lunabeestudio.stopcovid.manager.DccCertificatesManager
 import com.lunabeestudio.stopcovid.manager.FormManager
@@ -46,8 +48,6 @@ import com.lunabeestudio.stopcovid.manager.KeyFiguresManager
 import com.lunabeestudio.stopcovid.manager.LinksManager
 import com.lunabeestudio.stopcovid.manager.MoreKeyFiguresManager
 import com.lunabeestudio.stopcovid.manager.PrivacyManager
-import com.lunabeestudio.stopcovid.manager.BlacklistDCCManager
-import com.lunabeestudio.stopcovid.manager.Blacklist2DDOCManager
 import com.lunabeestudio.stopcovid.manager.RisksLevelManager
 import com.lunabeestudio.stopcovid.manager.TacCalibrationDataSource
 import com.lunabeestudio.stopcovid.manager.TacConfigurationDataSource
@@ -57,6 +57,8 @@ import com.lunabeestudio.stopcovid.repository.VenueRepository
 import com.lunabeestudio.stopcovid.repository.WalletRepository
 import com.lunabeestudio.stopcovid.usecase.CleanAndRenewActivityPassUseCase
 import com.lunabeestudio.stopcovid.usecase.GenerateActivityPassUseCase
+import com.lunabeestudio.stopcovid.usecase.GetSmartWalletCertificateUseCase
+import com.lunabeestudio.stopcovid.usecase.SmartWalletNotificationUseCase
 import com.lunabeestudio.stopcovid.usecase.VerifyAndGetCertificateCodeValueUseCase
 import com.lunabeestudio.stopcovid.usecase.VerifyCertificateUseCase
 import kotlinx.coroutines.CoroutineScope
@@ -188,6 +190,20 @@ class InjectionContainer(private val context: StopCovid, val coroutineScope: Cor
     val verifyAndGetCertificateCodeValueUseCase: VerifyAndGetCertificateCodeValueUseCase
         get() = VerifyAndGetCertificateCodeValueUseCase(
             verifyCertificateUseCase = verifyCertificateUseCase,
+        )
+
+    val getSmartWalletCertificateUseCase: GetSmartWalletCertificateUseCase
+        get() = GetSmartWalletCertificateUseCase(
+            walletRepository = walletRepository,
+            blacklistDCCManager = blacklistDCCManager,
+            robertManager = robertManager,
+        )
+
+    val smartWalletNotificationUseCase: SmartWalletNotificationUseCase
+        get() = SmartWalletNotificationUseCase(
+            robertManager = robertManager,
+            sharedPreferences = sharedPrefs,
+            getSmartWalletCertificateUseCase = getSmartWalletCertificateUseCase,
         )
 
     companion object {

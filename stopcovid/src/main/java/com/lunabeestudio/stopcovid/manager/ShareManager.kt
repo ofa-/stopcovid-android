@@ -19,6 +19,7 @@ import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.lifecycleScope
 import androidx.viewbinding.ViewBinding
 import com.lunabeestudio.stopcovid.BuildConfig
+import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.extension.viewLifecycleOwnerOrNull
 import com.lunabeestudio.stopcovid.coreui.fragment.BaseFragment
@@ -27,6 +28,7 @@ import com.lunabeestudio.stopcovid.databinding.ItemKeyFigureChartCardBinding
 import com.lunabeestudio.stopcovid.extension.getBitmapForItem
 import com.lunabeestudio.stopcovid.extension.getBitmapForItemKeyFigureCardBinding
 import com.lunabeestudio.stopcovid.extension.getBitmapForItemKeyFigureChartCardBinding
+import com.lunabeestudio.stopcovid.extension.showErrorSnackBar
 import com.lunabeestudio.stopcovid.extension.startTextIntent
 import com.lunabeestudio.stopcovid.fragment.CertificateSharingBottomSheetFragment
 import kotlinx.coroutines.Dispatchers
@@ -94,6 +96,19 @@ object ShareManager {
                                 strings["common.error.unknown"]?.let { (fragment.activity as? MainActivity)?.showErrorSnackBar(it) }
                             }
                         }
+                    }
+                }
+            }
+        }
+    }
+
+    fun shareChart(fragment: BaseFragment, binding: ItemKeyFigureChartCardBinding) {
+        fragment.viewLifecycleOwnerOrNull()?.lifecycleScope?.launch {
+            val uri = getShareCaptureUri(binding, Constants.Chart.SHARE_CHART_FILENAME)
+            withContext(Dispatchers.Main) {
+                fragment.context?.let { context ->
+                    shareImageAndText(context, uri, null) {
+                        fragment.strings["common.error.unknown"]?.let { fragment.showErrorSnackBar(it) }
                     }
                 }
             }

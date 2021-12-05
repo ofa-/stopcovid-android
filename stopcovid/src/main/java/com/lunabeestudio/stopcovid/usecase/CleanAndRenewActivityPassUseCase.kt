@@ -59,7 +59,7 @@ class CleanAndRenewActivityPassUseCase(
             it.canRenewActivityPass == true &&
                 it.isEligibleForActivityPass(
                     blacklistDCCManager,
-                    robertManager.configuration.activityPassSkipNegTestHours
+                    robertManager.configuration
                 )
         }
 

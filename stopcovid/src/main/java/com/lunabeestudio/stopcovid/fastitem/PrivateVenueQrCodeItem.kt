@@ -21,7 +21,7 @@ class PrivateVenueQrCodeItem : AbstractBindingItem<ItemPrivateVenueQrCodeBinding
     var qrCodeBitmap: Bitmap? = null
     var text: String? = null
 
-    override val type: Int = R.id.item_attestation_qr_code
+    override val type: Int = R.id.item_attestation_card
 
     override fun createBinding(inflater: LayoutInflater, parent: ViewGroup?): ItemPrivateVenueQrCodeBinding {
         return ItemPrivateVenueQrCodeBinding.inflate(inflater, parent, false)

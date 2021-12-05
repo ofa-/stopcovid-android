@@ -80,6 +80,17 @@ class Configuration(
     val activityPassSkipNegTestHours: Int,
     val displayActivityPass: Boolean,
     val renewThreshold: Int,
+    val smartWalletAges: SmartWalletAges?,
+    val smartWalletExp: SmartWalletExp?,
+    val smartWalletElg: SmartWalletElg?,
+    val smartWalletVacc: SmartWalletVacc?,
+    var smartWalletNotif: Boolean,
+    var isSmartWalletOn: Boolean,
+    var colorsCompareKeyFigures: ColorsCompareKeyFigures?,
+    var keyFiguresCombination: List<KeyFigureCombination>?,
 ) {
     class Notification(val title: String, val subtitle: String, val url: String, val version: Int)
+    class ColorsCompareKeyFigures(val colorKeyFigure1: ColorCompareKeyFigures, val colorKeyFigure2: ColorCompareKeyFigures)
+    class ColorCompareKeyFigures(val darkColor: String?, val lightColor: String?)
+    class KeyFigureCombination(val title: String?, val keyFigureLabel1: String?, val keyFigureLabel2: String?)
 }

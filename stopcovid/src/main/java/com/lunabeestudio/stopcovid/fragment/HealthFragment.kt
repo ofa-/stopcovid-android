@@ -34,6 +34,8 @@ import com.lunabeestudio.stopcovid.extension.hideRiskStatus
 import com.lunabeestudio.stopcovid.extension.openInExternalBrowser
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
+import com.lunabeestudio.stopcovid.extension.showErrorSnackBar
+import com.lunabeestudio.stopcovid.fastitem.LogoItem
 import com.lunabeestudio.stopcovid.fastitem.healthCardItem
 import com.lunabeestudio.stopcovid.fastitem.logoItem
 import com.lunabeestudio.stopcovid.fastitem.lottieBadgeItem
@@ -139,6 +141,7 @@ class HealthFragment : TimeMainFragment() {
         } else {
             logoItem {
                 imageRes = R.drawable.diagnosis
+                minLogoHeightRes = LogoItem.NO_MINIMUM_HEIGHT
                 identifier = items.count().toLong()
             }
         }

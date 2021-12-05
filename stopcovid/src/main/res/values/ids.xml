@@ -8,16 +8,20 @@
   ~ Created by Lunabee Studio / Date - 2020/04/05 - for the TOUS-ANTI-COVID project
   -->
 <resources>
+    <item name="item_add_certificate_card" type="id" />
     <item name="item_add_postal_code_card" type="id" />
-    <item name="item_attestation_qr_code" type="id" />
+    <item name="item_attestation_card" type="id" />
     <item name="item_audio" type="id" />
     <item name="item_big_title" type="id" />
     <item name="item_button_card" type="id" />
+    <item name="item_caption_action_card" type="id" />
+    <item name="item_certificate_card" type="id" />
     <item name="item_change_postal_code" type="id" />
     <item name="item_contact" type="id" />
     <item name="item_danger_button" type="id" />
     <item name="item_date" type="id" />
     <item name="item_delete_card" type="id" />
+    <item name="item_documents_card" type="id" />
     <item name="item_double_logo" type="id" />
     <item name="item_double_text" type="id" />
     <item name="item_dynamic_card" type="id" />
@@ -42,19 +46,17 @@
     <item name="item_number" type="id" />
     <item name="item_numbers_card" type="id" />
     <item name="item_on_off_lottie" type="id" />
+    <item name="item_phone_support" type="id" />
     <item name="item_picker_edit_text" type="id" />
     <item name="item_progress_button" type="id" />
     <item name="item_proximity_button" type="id" />
     <item name="item_selection" type="id" />
+    <item name="item_small_qr_code_card" type="id" />
     <item name="item_tag" type="id" />
     <item name="item_vaccination_center_card" type="id" />
-    <item name="item_documents_card" type="id" />
-    <item name="item_phone_support" type="id" />
-    <item name="wallet_pager" type="id" />
-    <item name="item_add_certificate_card" type="id" />
-    <item name="item_small_qr_code_card" type="id" />
-    <item name="keyfigures_pager" type="id" />
-    <item name="item_caption_action_card" type="id" />
-    <item name="keyfigures_charts_container" type="id" />
     <item name="item_video_player" type="id" />
+    <item name="keyfigures_pager" type="id" />
+    <item name="keyfigures_charts_container" type="id" />
+    <item name="wallet_pager" type="id" />
+    <item name="item_compare_key_figure_chart_card" type="id" />
 </resources>

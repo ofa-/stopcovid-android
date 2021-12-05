@@ -24,6 +24,7 @@ data class KeyFigure(
     val chartType: KeyFigureChartType = KeyFigureChartType.LINES,
     val series: List<KeyFigureSeriesItem>?,
     val avgSeries: List<KeyFigureSeriesItem>?,
+    val magnitude: Int
 ) {
     companion object {
         private const val CORSICA_KEY: String = "20"

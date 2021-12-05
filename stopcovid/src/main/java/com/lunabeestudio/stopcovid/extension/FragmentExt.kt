@@ -17,7 +17,9 @@ import androidx.lifecycle.ViewModelStore
 import androidx.navigation.fragment.findNavController
 import com.lunabeestudio.stopcovid.InjectionContainer
 import com.lunabeestudio.stopcovid.R
+import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.extension.findParentFragmentByType
+import com.lunabeestudio.stopcovid.coreui.fragment.BaseFragment
 import com.lunabeestudio.stopcovid.viewmodel.WalletViewModel
 import com.lunabeestudio.stopcovid.viewmodel.WalletViewModelFactory
 
@@ -40,4 +42,8 @@ inline fun <reified T : Fragment> Fragment.navGraphWalletViewModels(
             factoryProducer()
         }
     )
+}
+
+fun BaseFragment.showErrorSnackBar(message: String) {
+    (activity as? MainActivity)?.showErrorSnackBar(message)
 }

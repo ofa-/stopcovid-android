@@ -36,8 +36,14 @@ class CardWithActionsItem(private val cardTheme: CardTheme) : AbstractBindingIte
     @DrawableRes
     var cardTitleIcon: Int? = null
 
+    @DrawableRes
+    var mainTitleIcon: Int? = null
+
     @ColorRes
     var cardTitleColorRes: Int? = null
+
+    @ColorRes
+    var mainTitleColorRes: Int? = null
 
     // Gradient background, override theme
     var gradientBackground: GradientDrawable? = null
@@ -76,7 +82,15 @@ class CardWithActionsItem(private val cardTheme: CardTheme) : AbstractBindingIte
 
         var mainLayoutVisible = false
         binding.mainHeaderTextView.setTextOrHide(mainHeader) { mainLayoutVisible = true }
-        binding.mainTitleTextView.setTextOrHide(mainTitle) { mainLayoutVisible = true }
+        binding.mainTitleTextView.setTextOrHide(mainTitle) {
+            mainLayoutVisible = true
+            mainTitleColorRes?.let {
+                val color = ContextCompat.getColor(context, it)
+                setTextColor(color)
+                TextViewCompat.setCompoundDrawableTintList(this, ColorStateList.valueOf(color))
+            }
+            setCompoundDrawablesWithIntrinsicBounds(mainTitleIcon ?: 0, 0, 0, 0)
+        }
         binding.mainBodyTextView.setTextOrHide(mainBody) {
             mainLayoutVisible = true
             this@CardWithActionsItem.mainMaxLines?.let { maxLines = it }

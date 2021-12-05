@@ -33,11 +33,13 @@ import com.lunabeestudio.stopcovid.model.EuropeanCertificate
 import com.lunabeestudio.stopcovid.model.WalletCertificate
 import com.lunabeestudio.stopcovid.model.WalletCertificateMalformedException
 import com.lunabeestudio.stopcovid.widgetshomescreen.DccWidget
+import com.lunabeestudio.stopcovid.worker.SmartWalletNotificationWorker
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -67,8 +69,11 @@ class WalletRepository(
         walletCertificateFlow = localKeystoreDataSource.rawWalletCertificatesFlow.map { rawWalletList ->
             rawWalletList.toWalletCertificates()
         }.stateIn(coroutineScope, SharingStarted.Eagerly, null)
+
         coroutineScope.launch(Dispatchers.Main) {
-            DccWidget.updateWidget(context)
+            walletCertificateFlow.collect {
+                DccWidget.updateWidget(context)
+            }
         }
 
         if (debugManager.oldCertificateInSharedPrefs()) {
@@ -83,6 +88,8 @@ class WalletRepository(
                 _migrationInProgress.postValue(false)
             }
         }
+
+        SmartWalletNotificationWorker.start(context)
     }
 
     fun extractCertificateDataFromUrl(urlValue: String): Pair<String, WalletCertificateType.Format?> {

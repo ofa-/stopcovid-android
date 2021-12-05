@@ -35,6 +35,7 @@ object UiConstants {
         ISOLATION_REMINDER("reminder", 9),
         CERTIFICATE_REMINDER("reminder", 10),
         ACTIVITY_PASS_REMINDER("reminder", 11),
+        SMART_WALLET("smartWallet", 12),
     }
 
     val SUPPORTED_LOCALES: Array<Locale> = arrayOf(Locale.UK, Locale.FRANCE)

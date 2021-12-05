@@ -41,6 +41,8 @@ import com.lunabeestudio.stopcovid.extension.listLogFiles
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
+import com.lunabeestudio.stopcovid.extension.showSmartWallet
+import com.lunabeestudio.stopcovid.extension.showErrorSnackBar
 import com.lunabeestudio.stopcovid.extension.venuesFeaturedWasActivatedAtLeastOneTime
 import com.lunabeestudio.stopcovid.fastitem.dangerButtonItem
 import com.lunabeestudio.stopcovid.fastitem.selectionItem
@@ -120,6 +122,10 @@ class SettingsFragment : MainFragment() {
         spaceDividerItems(items)
         userLanguageItems(items)
         spaceDividerItems(items)
+        if (robertManager.configuration.displaySanitaryCertificatesWallet && robertManager.configuration.isSmartWalletOn) {
+            smartWalletItems(items)
+            spaceDividerItems(items)
+        }
         brightnessItems(items)
         spaceDividerItems(items)
         manageCertificatesItems(items)
@@ -408,6 +414,33 @@ class SettingsFragment : MainFragment() {
                 }
                 identifier = locale.language.hashCode().toLong()
             }
+        }
+    }
+
+    private fun smartWalletItems(items: MutableList<GenericItem>) {
+        items += titleItem {
+            text = strings["manageDataController.smartWalletActivation.title"]
+            identifier = items.count().toLong()
+        }
+        items += spaceItem {
+            spaceRes = R.dimen.spacing_medium
+        }
+        items += captionItem {
+            text = strings["manageDataController.smartWalletActivation.subtitle"]
+            identifier = items.count().toLong()
+        }
+        items += switchItem {
+            title = if (sharedPreferences.showSmartWallet) {
+                strings["manageDataController.smartWalletActivation.switch.on"]
+            } else {
+                strings["manageDataController.smartWalletActivation.switch.off"]
+            }
+            isChecked = sharedPreferences.showSmartWallet
+            onCheckChange = { isChecked ->
+                sharedPreferences.showSmartWallet = isChecked
+                refreshScreen()
+            }
+            identifier = items.count().toLong()
         }
     }
 

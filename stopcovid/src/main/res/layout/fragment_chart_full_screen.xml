@@ -91,6 +91,13 @@
             android:layout_marginHorizontal="@dimen/spacing_large"
             android:visibility="gone" />
 
+        <com.github.mikephil.charting.charts.CombinedChart
+            android:id="@+id/keyFigureCombinedChart"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/key_figure_chart_height"
+            android:layout_marginHorizontal="@dimen/spacing_large"
+            android:visibility="gone" />
+
         <com.github.mikephil.charting.charts.BarChart
             android:id="@+id/keyFigureBarChart"
             android:layout_width="match_parent"

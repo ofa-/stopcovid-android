@@ -24,5 +24,10 @@
         <argument
             android:name="minDate"
             app:argType="long" />
+        <argument
+            android:name="keyFigureKey2"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="null" />
     </fragment>
 </navigation>

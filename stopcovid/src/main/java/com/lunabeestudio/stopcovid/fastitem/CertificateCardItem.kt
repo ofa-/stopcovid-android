@@ -20,27 +20,32 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorRes
+import androidx.annotation.DrawableRes
 import androidx.appcompat.widget.PopupMenu
+import androidx.core.content.ContextCompat
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.fetchSystemColor
 import com.lunabeestudio.stopcovid.coreui.extension.fetchSystemColorStateList
 import com.lunabeestudio.stopcovid.coreui.extension.setTextOrHide
-import com.lunabeestudio.stopcovid.databinding.ItemQrCodeCardBinding
+import com.lunabeestudio.stopcovid.databinding.ItemCertificateCardBinding
 import com.lunabeestudio.stopcovid.databinding.ItemTagBinding
 import com.mikepenz.fastadapter.binding.AbstractBindingItem
 
-class QrCodeCardItem : AbstractBindingItem<ItemQrCodeCardBinding>() {
+class CertificateCardItem : AbstractBindingItem<ItemCertificateCardBinding>() {
     var generateBarcode: (() -> Bitmap)? = null
-    var mainDescription: String? = null
-    var footerDescription: Spannable? = null
+    var infoText: Spannable? = null
+    var warningText: Spannable? = null
+    var errorText: Spannable? = null
+    var titleText: String? = null
+    var nameText: String? = null
+    var descriptionText: String? = null
     var tag1Text: String? = null
     var tag2Text: String? = null
-    var formatText: String? = null
     var share: String? = null
     var delete: String? = null
     var convertText: String? = null
-    var allowShare: Boolean = false
     var onShare: ((barcodeBitmap: Bitmap?) -> Unit)? = null
     var onDelete: (() -> Unit)? = null
     var onConvert: (() -> Unit)? = null
@@ -62,40 +67,67 @@ class QrCodeCardItem : AbstractBindingItem<ItemQrCodeCardBinding>() {
     @AttrRes
     private val tagDefaultColor = R.attr.colorPrimary
 
-    override val type: Int = R.id.item_attestation_qr_code
+    override val type: Int = R.id.item_certificate_card
 
-    override fun createBinding(inflater: LayoutInflater, parent: ViewGroup?): ItemQrCodeCardBinding {
-        return ItemQrCodeCardBinding.inflate(inflater, parent, false)
+    override fun createBinding(inflater: LayoutInflater, parent: ViewGroup?): ItemCertificateCardBinding {
+        return ItemCertificateCardBinding.inflate(inflater, parent, false)
     }
 
-    override fun bindView(binding: ItemQrCodeCardBinding, payloads: List<Any>) {
+    override fun bindView(binding: ItemCertificateCardBinding, payloads: List<Any>) {
         super.bindView(binding, payloads)
-        binding.mainDescriptionTextView.setTextOrHide(mainDescription)
-        binding.footerDescriptionTextView.setTextOrHide(footerDescription)
-        footerDescription?.let { spannable ->
-            if (spannable.nextSpanTransition(0, spannable.length, URLSpan::class.java) != spannable.length) {
-                binding.footerDescriptionTextView.movementMethod = LinkMovementMethod.getInstance()
-            } else {
-                binding.footerDescriptionTextView.movementMethod = null
-            }
-        }
 
         val bitmap = generateBarcode?.invoke()
-        binding.imageView.setImageBitmap(bitmap)
+
+        setupHeader(binding)
+        setupTitle(binding)
+        setupActions(binding, bitmap)
+        setupQRCode(binding, bitmap)
+        setupName(binding)
+        setupInfos(binding)
+        setupTags(binding)
+        setupBottomAction(binding)
 
         binding.constraintLayout.setOnClickListener {
             onClick?.invoke()
         }
-        binding.actionButton.setOnClickListener {
-            showMenu(it, bitmap)
+    }
+
+    private fun setupHeader(binding: ItemCertificateCardBinding) {
+        val headerMessage = errorText?.takeIf { it.isNotBlank() } ?: warningText?.takeIf { it.isNotBlank() } ?: infoText
+        binding.headerMessageTextView.text = headerMessage
+        headerMessage?.let { spannable ->
+            if (spannable.nextSpanTransition(0, spannable.length, URLSpan::class.java) != spannable.length) {
+                binding.headerMessageTextView.movementMethod = LinkMovementMethod.getInstance()
+            } else {
+                binding.headerMessageTextView.movementMethod = null
+            }
         }
-        binding.formatTextView.setTextOrHide(formatText)
+        val headerState = when {
+            !errorText.isNullOrBlank() -> HeaderState.ERROR
+            !warningText.isNullOrBlank() -> HeaderState.WARNING
+            else -> HeaderState.INFO
+        }
+        binding.headerMessageLayout.setBackgroundColor(
+            ContextCompat.getColor(
+                binding.root.context,
+                headerState.backgroundColor,
+            )
+        )
+        binding.headerMessageTextView.setTextColor(
+            ContextCompat.getColor(
+                binding.root.context,
+                headerState.textColor,
+            )
+        )
+        binding.topMessageImageView.setImageResource(headerState.icon)
+        binding.headerMessageLayout.isGone = headerMessage.isNullOrBlank()
+    }
 
-        setupTag(binding.tag1, tag1Text, tag1ColorRes, onTag1Click)
-        setupTag(binding.tag2, tag2Text, tag2ColorRes, onTag2Click)
+    private fun setupTitle(binding: ItemCertificateCardBinding) {
+        binding.titleTextView.setTextOrHide(titleText)
+    }
 
-        binding.tagLayout.isVisible = !(tag1Text.isNullOrEmpty() && tag2Text.isNullOrEmpty())
-
+    private fun setupActions(binding: ItemCertificateCardBinding, bitmap: Bitmap?) {
         binding.actionButton.contentDescription = actionContentDescription
 
         binding.favoriteButton.isVisible = favoriteState != FavoriteState.HIDDEN
@@ -111,7 +143,27 @@ class QrCodeCardItem : AbstractBindingItem<ItemQrCodeCardBinding>() {
             FavoriteState.CHECKED -> binding.favoriteButton.setImageResource(R.drawable.ic_filled_heart)
         }
 
-        binding.bottomActionTextView.setTextOrHide(bottomText)
+        binding.actionButton.setOnClickListener {
+            showMenu(it, bitmap)
+        }
+    }
+
+    private fun setupQRCode(binding: ItemCertificateCardBinding, bitmap: Bitmap?) {
+        binding.imageView.setImageBitmap(bitmap)
+    }
+
+    private fun setupName(binding: ItemCertificateCardBinding) {
+        binding.nameTextView.setTextOrHide(nameText)
+    }
+
+    private fun setupInfos(binding: ItemCertificateCardBinding) {
+        binding.descriptionTextView.setTextOrHide(descriptionText)
+    }
+
+    private fun setupTags(binding: ItemCertificateCardBinding) {
+        setupTag(binding.tag1, tag1Text, tag1ColorRes, onTag1Click)
+        setupTag(binding.tag2, tag2Text, tag2ColorRes, onTag2Click)
+        binding.tagLayout.isVisible = !(tag1Text.isNullOrEmpty() && tag2Text.isNullOrEmpty())
     }
 
     private fun setupTag(tagBinding: ItemTagBinding, tagText: String?, tagColorRes: Int?, onTagClick: (() -> Unit)?) {
@@ -134,7 +186,11 @@ class QrCodeCardItem : AbstractBindingItem<ItemQrCodeCardBinding>() {
         }
     }
 
-    override fun unbindView(binding: ItemQrCodeCardBinding) {
+    private fun setupBottomAction(binding: ItemCertificateCardBinding) {
+        binding.bottomActionTextView.setTextOrHide(bottomText)
+    }
+
+    override fun unbindView(binding: ItemCertificateCardBinding) {
         super.unbindView(binding)
         binding.imageView.setImageBitmap(null)
         binding.tag1.chip.setOnClickListener(null)
@@ -150,12 +206,11 @@ class QrCodeCardItem : AbstractBindingItem<ItemQrCodeCardBinding>() {
             inflate(R.menu.qr_code_menu)
 
             menu.findItem(R.id.qr_code_menu_share).title = share
-            menu.findItem(R.id.qr_code_menu_share).isVisible = allowShare
 
             menu.findItem(R.id.qr_code_menu_delete).title = delete
 
-            menu.findItem(R.id.qr_code_menu_covert).title = convertText
-            menu.findItem(R.id.qr_code_menu_covert).isVisible = onConvert != null
+            menu.findItem(R.id.qr_code_menu_convert).title = convertText
+            menu.findItem(R.id.qr_code_menu_convert).isVisible = onConvert != null
 
             show()
         }
@@ -171,7 +226,7 @@ class QrCodeCardItem : AbstractBindingItem<ItemQrCodeCardBinding>() {
                 onShare?.invoke(bitmap)
                 true
             }
-            R.id.qr_code_menu_covert -> {
+            R.id.qr_code_menu_convert -> {
                 onConvert?.invoke()
                 true
             }
@@ -182,8 +237,30 @@ class QrCodeCardItem : AbstractBindingItem<ItemQrCodeCardBinding>() {
     enum class FavoriteState {
         HIDDEN, NOT_CHECKED, CHECKED
     }
+
+    enum class HeaderState(
+        @ColorRes val backgroundColor: Int,
+        @ColorRes val textColor: Int,
+        @DrawableRes val icon: Int,
+    ) {
+        INFO(
+            backgroundColor = R.color.color_mountain_meadow,
+            textColor = R.color.color_white_85,
+            icon = R.drawable.ic_info,
+        ),
+        WARNING(
+            backgroundColor = R.color.color_alert,
+            textColor = R.color.color_black_55,
+            icon = R.drawable.ic_warning,
+        ),
+        ERROR(
+            backgroundColor = R.color.color_error,
+            textColor = R.color.color_white_85,
+            icon = R.drawable.ic_warning,
+        )
+    }
 }
 
-fun qrCodeCardItem(block: (QrCodeCardItem.() -> Unit)): QrCodeCardItem = QrCodeCardItem().apply(
+fun certificateCardItem(block: (CertificateCardItem.() -> Unit)): CertificateCardItem = CertificateCardItem().apply(
     block
 )

@@ -14,6 +14,10 @@ import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import com.google.gson.reflect.TypeToken
 import com.lunabeestudio.domain.model.Configuration
+import com.lunabeestudio.domain.model.SmartWalletAges
+import com.lunabeestudio.domain.model.SmartWalletElg
+import com.lunabeestudio.domain.model.SmartWalletExp
+import com.lunabeestudio.domain.model.SmartWalletVacc
 import com.lunabeestudio.domain.model.WalletPublicKey
 
 internal class ApiConfiguration(
@@ -157,12 +161,30 @@ internal class ApiConfiguration(
     val displayActivityPass: Boolean,
     @SerializedName("app.activityPass.renewThreshold")
     val renewThreshold: Int,
+    @SerializedName("app.smartwallet.ages")
+    val smartWalletAges: String,
+    @SerializedName("app.smartwallet.exp")
+    val smartWalletExp: String,
+    @SerializedName("app.smartwallet.elg")
+    val smartWalletElg: String,
+    @SerializedName("app.smartwallet.vacc")
+    val smartWalletVacc: String,
+    @SerializedName("app.smartwallet.notif")
+    val smartWalletNotif: Boolean,
+    @SerializedName("app.isSmartwalletOn")
+    val isSmartWalletOn: Boolean,
+    @SerializedName("app.keyfigures.compareColors")
+    val compareColors: String,
+    @SerializedName("app.keyfigures.compare")
+    val keyFiguresCombination: String,
 )
 
 internal fun ApiConfiguration.toDomain(gson: Gson) = Configuration(
     version = version,
     versionCalibrationBle = versionCalibrationBle,
     apiVersion = apiVersion,
+    cleaReportApiVersion = cleaReportApiVersion,
+    cleaStatusApiVersion = cleaStatusApiVersion,
     displayAttestation = displayAttestation,
     displayVaccination = displayVaccination,
     dataRetentionPeriod = dataRetentionPeriod,
@@ -219,8 +241,6 @@ internal fun ApiConfiguration.toDomain(gson: Gson) = Configuration(
         walletPublicKeys,
         object : TypeToken<List<WalletPublicKey>?>() {}.type
     ),
-    cleaReportApiVersion = cleaReportApiVersion,
-    cleaStatusApiVersion = cleaStatusApiVersion,
     isAnalyticsOn = isAnalyticsOn,
     analyticsApiVersion = analyticsApiVersion,
     testCertificateValidityThresholds = gson.fromJson(testCertificateValidityThresholds, object : TypeToken<List<Int>>() {}.type),
@@ -270,4 +290,45 @@ internal fun ApiConfiguration.toDomain(gson: Gson) = Configuration(
     activityPassSkipNegTestHours = activityPassSkipNegTestHours,
     displayActivityPass = displayActivityPass,
     renewThreshold = renewThreshold,
+    smartWalletAges = gson.fromJson(smartWalletAges, SmartWalletAges::class.java),
+    smartWalletExp = gson.fromJson(smartWalletExp, SmartWalletExp::class.java),
+    smartWalletElg = gson.fromJson(smartWalletElg, SmartWalletElg::class.java),
+    smartWalletVacc = gson.fromJson(smartWalletVacc, SmartWalletVacc::class.java),
+    smartWalletNotif = smartWalletNotif,
+    isSmartWalletOn = isSmartWalletOn,
+    colorsCompareKeyFigures = (
+        gson.fromJson(
+            compareColors,
+            object : TypeToken<List<Map<String, String>>>() {}.type
+        ) as List<Map<String, String>>?
+        )?.let {
+        try {
+            Configuration.ColorsCompareKeyFigures(
+                Configuration.ColorCompareKeyFigures(
+                    it[0]["d"],
+                    it[0]["l"]
+                ),
+                Configuration.ColorCompareKeyFigures(
+                    it[1]["d"],
+                    it[1]["l"]
+                ),
+            )
+        } catch (e: IndexOutOfBoundsException) {
+            null
+        }
+    },
+    keyFiguresCombination = (
+        gson.fromJson(
+            this.keyFiguresCombination,
+            object : TypeToken<List<Map<String, String>>>() {}.type
+        ) as List<Map<String, String>>?
+        )?.let { list ->
+        list.map { map ->
+            Configuration.KeyFigureCombination(
+                map["t"],
+                map["k1"],
+                map["k2"]
+            )
+        }
+    },
 )

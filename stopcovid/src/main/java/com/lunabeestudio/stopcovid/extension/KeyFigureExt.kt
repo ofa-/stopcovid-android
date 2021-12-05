@@ -13,12 +13,20 @@ package com.lunabeestudio.stopcovid.extension
 import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.Color
+import com.github.mikephil.charting.data.BarData
+import com.github.mikephil.charting.data.BarDataSet
+import com.github.mikephil.charting.data.BarEntry
+import com.github.mikephil.charting.data.CombinedData
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.LineDataSet
 import com.lunabeestudio.robert.extension.safeEnumValueOf
 import com.lunabeestudio.stopcovid.coreui.extension.isNightMode
 import com.lunabeestudio.stopcovid.coreui.extension.stringsFormat
 import com.lunabeestudio.stopcovid.coreui.manager.LocalizedStrings
 import com.lunabeestudio.stopcovid.fastitem.KeyFigureCardItem
 import com.lunabeestudio.stopcovid.fastitem.keyFigureCardItem
+import com.lunabeestudio.stopcovid.fragment.ChartDataType
+import com.lunabeestudio.stopcovid.model.ChartInformation
 import com.lunabeestudio.stopcovid.model.DepartmentKeyFigure
 import com.lunabeestudio.stopcovid.model.KeyFigure
 import com.lunabeestudio.stopcovid.model.KeyFigureCategory
@@ -51,6 +59,9 @@ fun KeyFigure.colorStringKey(dark: Boolean?): String = if (dark == true) {
 } else {
     "$labelKey.colorCode.light"
 }
+
+val KeyFigure.unitStringKey: String
+    get() = "$labelKey.unit"
 
 fun KeyFigure.hasAverageChart(): Boolean = !avgSeries.isNullOrEmpty()
 
@@ -158,9 +169,83 @@ fun Keynumbers.KeyNumbersMessage.KeyfigureMessage.toKeyFigure(): KeyFigure = Key
     this.avgSeriesList.map { message ->
         message.toKeyFigureSeriesItem()
     },
+    this.magnitude
 )
 
 private fun Keynumbers.KeyNumbersMessage.ElementSerieMessage.toKeyFigureSeriesItem() = KeyFigureSeriesItem(
     this.date.toLong(),
     this.value
 )
+
+private fun KeyFigure.generateBarData(figureNumber: Int, context: Context, strings: LocalizedStrings, minDate: Long): BarDataSet {
+    val chartInfo = ChartInformation(
+        context = context,
+        strings = strings,
+        keyFigure = this,
+        chartDataType = ChartDataType.GLOBAL,
+        departmentKeyFigure = null,
+        minDate = minDate,
+    )
+    val dataSet = BarDataSet(
+        chartInfo.chartData[0].entries.map {
+            BarEntry(it.x, it.y)
+        },
+        this.getLegend(strings)
+    )
+    getColorFigureFromConfig(context, figureNumber)?.let { dataSet.setupStyle(it) }
+    return dataSet
+}
+
+private fun KeyFigure.generateLineData(figureNumber: Int, context: Context, strings: LocalizedStrings, minDate: Long): LineDataSet {
+    val chartInfo = ChartInformation(
+        context = context,
+        strings = strings,
+        keyFigure = this,
+        chartDataType = ChartDataType.GLOBAL,
+        departmentKeyFigure = null,
+        minDate = minDate,
+    )
+    val dataSet = LineDataSet(chartInfo.chartData[0].entries, this.getLegend(strings))
+    getColorFigureFromConfig(context, figureNumber)?.let { dataSet.setupStyle(it) }
+    return dataSet
+}
+
+fun Pair<KeyFigure, KeyFigure>.generateCombinedData(context: Context, strings: LocalizedStrings, minDate: Long): CombinedData {
+    return CombinedData().apply {
+        val lineData = LineData()
+        val barData = BarData()
+        when (first.chartType) {
+            KeyFigureChartType.LINES -> lineData.addDataSet(first.generateLineData(0, context, strings, minDate))
+            KeyFigureChartType.BARS -> barData.addDataSet(first.generateBarData(0, context, strings, minDate))
+        }
+        when (second.chartType) {
+            KeyFigureChartType.LINES -> lineData.addDataSet(second.generateLineData(1, context, strings, minDate))
+            KeyFigureChartType.BARS -> barData.addDataSet(second.generateBarData(1, context, strings, minDate))
+        }
+        if (barData.dataSets.isNotEmpty()) {
+            barData.apply {
+                val xValueDiff = xMax - xMin
+                val spacing = 0.05f
+                val entriesCount = barData.entryCount / barData.dataSetCount
+                barWidth = xValueDiff / (entriesCount) - (spacing * xValueDiff / (entriesCount + 1))
+            }
+        }
+        setData(lineData)
+        setData(barData)
+    }
+}
+
+private fun KeyFigure.getLegend(strings: LocalizedStrings): String {
+    val unit = strings[this.unitStringKey]?.let { "($it)" } ?: ""
+    return "${strings[this.labelStringKey]} $unit"
+}
+
+private fun getColorFigureFromConfig(context: Context, figureNumber: Int): Int? {
+    val keyFigureColor = if (figureNumber == 1) {
+        context.robertManager().configuration.colorsCompareKeyFigures?.colorKeyFigure1
+    } else {
+        context.robertManager().configuration.colorsCompareKeyFigures?.colorKeyFigure2
+    }
+    val color = if (context.isNightMode()) keyFigureColor?.darkColor else keyFigureColor?.lightColor
+    return color?.safeParseColor()
+}

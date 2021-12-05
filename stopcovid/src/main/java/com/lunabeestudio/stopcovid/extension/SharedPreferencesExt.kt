@@ -104,6 +104,10 @@ var SharedPreferences.hideRiskStatus: Boolean
     get() = getBoolean(Constants.SharedPrefs.HIDE_RISK_STATUS, false)
     set(value) = edit { putBoolean(Constants.SharedPrefs.HIDE_RISK_STATUS, value) }
 
+var SharedPreferences.showSmartWallet: Boolean
+    get() = getBoolean(Constants.SharedPrefs.SHOW_SMART_WALLET, true)
+    set(value) = edit { putBoolean(Constants.SharedPrefs.SHOW_SMART_WALLET, value) }
+
 var SharedPreferences.hasUsedUniversalQrScan: Boolean
     get() = getBoolean(Constants.SharedPrefs.HAS_USED_UNIVERSAL_QR_SCAN, false)
     set(value) = edit { putBoolean(Constants.SharedPrefs.HAS_USED_UNIVERSAL_QR_SCAN, value) }
@@ -139,3 +143,17 @@ var SharedPreferences.blacklist2DdocIteration: Int
 var SharedPreferences.enableAutoFullscreenBrightness: Boolean
     get() = getBoolean(Constants.SharedPrefs.ENABLE_AUTO_FULLSCREEN_BRIGHTNESS, true)
     set(value) = edit { putBoolean(Constants.SharedPrefs.ENABLE_AUTO_FULLSCREEN_BRIGHTNESS, value) }
+
+var SharedPreferences.keyFigureCompare1: String?
+    get() = getString(Constants.SharedPrefs.COMPARE_KEY_FIGURE_LABEL_1, null)
+    set(value) = edit { putString(Constants.SharedPrefs.COMPARE_KEY_FIGURE_LABEL_1, value) }
+
+var SharedPreferences.keyFigureCompare2: String?
+    get() = getString(Constants.SharedPrefs.COMPARE_KEY_FIGURE_LABEL_2, null)
+    set(value) = edit { putString(Constants.SharedPrefs.COMPARE_KEY_FIGURE_LABEL_2, value) }
+
+var SharedPreferences.notificationSent: Set<String>
+    get() = getStringSet(Constants.SharedPrefs.SMART_WALLET_SENT_NOTIFICATIONS, null) ?: emptySet()
+    set(value) = edit {
+        putStringSet(Constants.SharedPrefs.SMART_WALLET_SENT_NOTIFICATIONS, value)
+    }

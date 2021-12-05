@@ -16,7 +16,7 @@
 
     <ImageSwitcher
         android:id="@+id/imageSwitcher"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:importantForAccessibility="no"
@@ -26,21 +26,21 @@
         <ImageView
             android:id="@+id/imageView1"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_horizontal|bottom"
             android:adjustViewBounds="true"
             android:importantForAccessibility="no"
-            android:scaleType="fitCenter"
-            tools:src="@drawable/wallet" />
+            android:scaleType="fitEnd"
+            tools:src="@drawable/declare" />
 
         <ImageView
             android:id="@+id/imageView2"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_horizontal|bottom"
             android:adjustViewBounds="true"
             android:importantForAccessibility="no"
-            android:scaleType="fitCenter"
-            tools:src="@drawable/wallet" />
+            android:scaleType="fitEnd"
+            tools:src="@drawable/declare" />
     </ImageSwitcher>
 </FrameLayout>

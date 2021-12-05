@@ -137,11 +137,13 @@ class SecureKeystoreDataSource(
 
     override val attestationsFlow: Flow<List<Attestation>>
         get() = db.attestationRoomDao().getAllFlow().map { attestationsRoom ->
-            attestationsRoom.mapNotNull { attestationRoom ->
-                kotlin.runCatching {
-                    val decryptedString = cryptoManager.decryptToString(attestationRoom.encryptedValue)
-                    gson.fromJson(decryptedString, Attestation::class.java)
-                }.getOrNull()
+            withContext(ioDispatcher) {
+                attestationsRoom.mapNotNull { attestationRoom ->
+                    kotlin.runCatching {
+                        val decryptedString = cryptoManager.decryptToString(attestationRoom.encryptedValue)
+                        gson.fromJson(decryptedString, Attestation::class.java)
+                    }.getOrNull()
+                }
             }
         }
 
@@ -216,9 +218,11 @@ class SecureKeystoreDataSource(
 
     override fun getCertificateByIdFlow(id: String): Flow<RawWalletCertificate?> {
         return db.certificateRoomDao().getByIdFlow(id).map { certificateRoom ->
-            certificateRoom?.let {
-                val decryptedString = cryptoManager.decryptToString(certificateRoom.encryptedValue)
-                gson.fromJson(decryptedString, RawWalletCertificate::class.java)
+            withContext(ioDispatcher) {
+                certificateRoom?.let {
+                    val decryptedString = cryptoManager.decryptToString(certificateRoom.encryptedValue)
+                    gson.fromJson(decryptedString, RawWalletCertificate::class.java)
+                }
             }
         }
     }
@@ -234,11 +238,13 @@ class SecureKeystoreDataSource(
 
     override val rawWalletCertificatesFlow: Flow<List<RawWalletCertificate>>
         get() = db.certificateRoomDao().getAllFlow().map { certificatesRoom ->
-            certificatesRoom.mapNotNull { (_, encryptedValue) ->
-                kotlin.runCatching {
-                    val decryptedString = cryptoManager.decryptToString(encryptedValue)
-                    gson.fromJson(decryptedString, RawWalletCertificate::class.java)
-                }.getOrNull()
+            withContext(ioDispatcher) {
+                certificatesRoom.mapNotNull { (_, encryptedValue) ->
+                    kotlin.runCatching {
+                        val decryptedString = cryptoManager.decryptToString(encryptedValue)
+                        gson.fromJson(decryptedString, RawWalletCertificate::class.java)
+                    }.getOrNull()
+                }
             }
         }
 
@@ -422,11 +428,13 @@ class SecureKeystoreDataSource(
 
     override val venuesQrCodeFlow: Flow<List<VenueQrCode>>
         get() = db.venueRoomDao().getAllFlow().map { venuesRoom ->
-            venuesRoom.mapNotNull { venueRoom ->
-                kotlin.runCatching {
-                    val decryptedString = cryptoManager.decryptToString(venueRoom.encryptedValue)
-                    gson.fromJson(decryptedString, VenueQrCode::class.java)
-                }.getOrNull()
+            withContext(ioDispatcher) {
+                venuesRoom.mapNotNull { venueRoom ->
+                    kotlin.runCatching {
+                        val decryptedString = cryptoManager.decryptToString(venueRoom.encryptedValue)
+                        gson.fromJson(decryptedString, VenueQrCode::class.java)
+                    }.getOrNull()
+                }
             }
         }
 

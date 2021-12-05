@@ -10,7 +10,6 @@
 
 package com.lunabeestudio.stopcovid.fragment
 
-import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import com.lunabeestudio.stopcovid.R
@@ -18,6 +17,7 @@ import com.lunabeestudio.stopcovid.coreui.extension.fetchSystemColor
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.fastitem.buttonItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.cardWithActionItem
+import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.fastitem.logoItem
 import com.mikepenz.fastadapter.GenericItem
@@ -35,10 +35,13 @@ class UniversalQrScanExplanationsFragment : MainFragment() {
             identifier = R.drawable.ic_qrscan.toLong()
         }
 
+        items += spaceItem {
+            spaceRes = R.dimen.spacing_medium
+        }
+
         items += cardWithActionItem {
             mainTitle = strings["universalQrScanExplanationsController.explanation.title"]
             mainBody = strings["universalQrScanExplanationsController.explanation.android.subtitle"]
-            mainGravity = Gravity.CENTER
             identifier = "universalQrScanExplanationsController.explanation.title".hashCode().toLong()
         }
 

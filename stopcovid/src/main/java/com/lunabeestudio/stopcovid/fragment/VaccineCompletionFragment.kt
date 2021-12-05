@@ -13,7 +13,6 @@ package com.lunabeestudio.stopcovid.fragment
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
-import android.view.Gravity
 import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
 import android.view.View
@@ -186,6 +185,10 @@ class VaccineCompletionFragment : MainFragment() {
             identifier = R.drawable.ic_thumbsup.toLong()
         }
 
+        items += spaceItem {
+            spaceRes = R.dimen.spacing_medium
+        }
+
         val stringStateKey = if (isVaccineCompleted) {
             COMPLETED_STRING_KEY
         } else {
@@ -205,7 +208,6 @@ class VaccineCompletionFragment : MainFragment() {
             )
             mainTitle = stringsFormat("vaccineCompletionController.$stringStateKey.explanation.title", formattedDate)
             mainBody = explanations.joinToString("\n\n")
-            mainGravity = Gravity.CENTER
             identifier = "vaccineCompletionController.$stringStateKey.explanation.title".hashCode().toLong()
         }
 

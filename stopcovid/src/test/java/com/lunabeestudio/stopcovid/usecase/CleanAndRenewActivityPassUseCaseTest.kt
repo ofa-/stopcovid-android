@@ -10,9 +10,7 @@
 
 package com.lunabeestudio.stopcovid.usecase
 
-import android.content.SharedPreferences
-import com.lunabeestudio.domain.model.Configuration
-import com.lunabeestudio.stopcovid.extension.activityPassAutoRenewEnabled
+import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.stopcovid.extension.isBlacklisted
 import com.lunabeestudio.stopcovid.extension.isEligibleForActivityPass
 import com.lunabeestudio.stopcovid.manager.BlacklistDCCManager
@@ -37,8 +35,7 @@ class CleanAndRenewActivityPassUseCaseTest {
     private val walletRepository = mockk<WalletRepository>(relaxed = true)
     private val blacklistDCCManager = mockk<BlacklistDCCManager>(relaxed = true)
     private val dccCertificatesManager = mockk<DccCertificatesManager>(relaxed = true)
-    private val sharedPreferences = mockk<SharedPreferences>(relaxed = true)
-    private val configuration = mockk<Configuration>(relaxed = true)
+    private val robertManager = mockk<RobertManager>(relaxed = true)
     private val generateActivityPassUseCase = mockk<GenerateActivityPassUseCase>(relaxed = true)
 
     @Before
@@ -47,12 +44,11 @@ class CleanAndRenewActivityPassUseCaseTest {
             walletRepository,
             blacklistDCCManager,
             dccCertificatesManager,
-            configuration,
+            robertManager,
             generateActivityPassUseCase,
         )
 
         every { walletRepository.walletCertificateFlow } returns MutableStateFlow(emptyList())
-        every { sharedPreferences.activityPassAutoRenewEnabled } returns true
     }
 
     @Test
@@ -61,11 +57,11 @@ class CleanAndRenewActivityPassUseCaseTest {
 
         val blacklistedDcc = mockk<EuropeanCertificate>(relaxed = true)
         every { blacklistedDcc.id } returns "blacklisted"
-        every { blacklistedDcc.isBlacklisted(any()) } returns true
+        coEvery { blacklistedDcc.isBlacklisted(any()) } returns true
 
         val notBlacklistedDcc = mockk<EuropeanCertificate>(relaxed = true)
         every { notBlacklistedDcc.id } returns "not_blacklisted"
-        every { notBlacklistedDcc.isBlacklisted(any()) } returns false
+        coEvery { notBlacklistedDcc.isBlacklisted(any()) } returns false
 
         every { walletRepository.walletCertificateFlow } returns MutableStateFlow(listOf(blacklistedDcc, notBlacklistedDcc))
 
@@ -116,9 +112,9 @@ class CleanAndRenewActivityPassUseCaseTest {
         val renewableDcc = mockk<EuropeanCertificate>(relaxed = true)
         every { renewableDcc.id } returns "renewable"
         every { renewableDcc.canRenewActivityPass } returns true
-        every { renewableDcc.isEligibleForActivityPass(any(), any()) } returns true
+        coEvery { renewableDcc.isEligibleForActivityPass(any(), any()) } returns true
         coEvery { walletRepository.countValidActivityPassForCertificate("renewable", any()) } returns Int.MIN_VALUE
-        every { renewableDcc.isBlacklisted(any()) } returns false
+        coEvery { renewableDcc.isBlacklisted(any()) } returns false
 
         every { walletRepository.walletCertificateFlow } returns MutableStateFlow(listOf(renewableDcc))
 
@@ -149,9 +145,9 @@ class CleanAndRenewActivityPassUseCaseTest {
         val thresholdNotReachedDcc = mockk<EuropeanCertificate>(relaxed = true)
         every { thresholdNotReachedDcc.id } returns "threshold_not_reached"
         every { thresholdNotReachedDcc.canRenewActivityPass } returns true
-        every { thresholdNotReachedDcc.isEligibleForActivityPass(any(), any()) } returns true
+        coEvery { thresholdNotReachedDcc.isEligibleForActivityPass(any(), any()) } returns true
         coEvery { walletRepository.countValidActivityPassForCertificate("threshold_not_reached", any()) } returns Int.MAX_VALUE
-        every { thresholdNotReachedDcc.isBlacklisted(any()) } returns false
+        coEvery { thresholdNotReachedDcc.isBlacklisted(any()) } returns false
 
         every { walletRepository.walletCertificateFlow } returns MutableStateFlow(listOf(thresholdNotReachedDcc))
 
@@ -176,8 +172,8 @@ class CleanAndRenewActivityPassUseCaseTest {
         val notRenewableDcc = mockk<EuropeanCertificate>(relaxed = true)
         every { notRenewableDcc.id } returns "not_renewable"
         every { notRenewableDcc.canRenewActivityPass } returns false
-        every { notRenewableDcc.isEligibleForActivityPass(any(), any()) } returns true
-        every { notRenewableDcc.isBlacklisted(any()) } returns false
+        coEvery { notRenewableDcc.isEligibleForActivityPass(any(), any()) } returns true
+        coEvery { notRenewableDcc.isBlacklisted(any()) } returns false
 
         every { walletRepository.walletCertificateFlow } returns MutableStateFlow(listOf(notRenewableDcc))
 
@@ -195,8 +191,8 @@ class CleanAndRenewActivityPassUseCaseTest {
         val notEligibleDcc = mockk<EuropeanCertificate>(relaxed = true)
         every { notEligibleDcc.id } returns "not_eligible"
         every { notEligibleDcc.canRenewActivityPass } returns true
-        every { notEligibleDcc.isEligibleForActivityPass(any(), any()) } returns false
-        every { notEligibleDcc.isBlacklisted(any()) } returns false
+        coEvery { notEligibleDcc.isEligibleForActivityPass(any(), any()) } returns false
+        coEvery { notEligibleDcc.isBlacklisted(any()) } returns false
 
         every { walletRepository.walletCertificateFlow } returns MutableStateFlow(listOf(notEligibleDcc))
 

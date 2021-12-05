@@ -15,7 +15,6 @@ import com.lunabeestudio.stopcovid.Constants
 import dgca.verifier.app.decoder.model.CertificateType
 import dgca.verifier.app.decoder.model.GreenCertificate
 import java.text.DateFormat
-import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
@@ -68,6 +67,9 @@ val GreenCertificate.vaccineDose: Pair<Int, Int>?
 val GreenCertificate.testType: String?
     get() = tests?.lastOrNull()?.typeOfTest?.trim()
 
+val GreenCertificate.isRecovery: Boolean
+    get() = (testResultIsNegative == false) || certificateType == WalletCertificateType.RECOVERY_EUROPE
+
 val GreenCertificate.testResultIsNegative: Boolean?
     get() = tests?.lastOrNull()?.isResultNegative()
 
@@ -98,5 +100,3 @@ val GreenCertificate.manufacturer: String?
 
 val GreenCertificate.isAutoTest: Boolean
     get() = manufacturer == Constants.Certificate.MANUFACTURER_AUTOTEST
-
-private fun yearMonthDayUsParser() = SimpleDateFormat("yyyy-MM-dd", Locale.US)

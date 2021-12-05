@@ -12,6 +12,7 @@ package com.lunabeestudio.stopcovid.fragment
 
 import android.os.Bundle
 import android.view.View
+import androidx.core.view.ViewCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -24,19 +25,23 @@ import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.extension.toDimensSize
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
+import com.lunabeestudio.stopcovid.coreui.fastitem.cardWithActionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
+import com.lunabeestudio.stopcovid.coreui.model.Action
+import com.lunabeestudio.stopcovid.databinding.FragmentRecyclerWithBottomActionBinding
 import com.lunabeestudio.stopcovid.extension.isExpired
 import com.lunabeestudio.stopcovid.extension.openInExternalBrowser
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
 import com.lunabeestudio.stopcovid.extension.showDbFailure
+import com.lunabeestudio.stopcovid.extension.showErrorSnackBar
 import com.lunabeestudio.stopcovid.extension.showMigrationFailed
-import com.lunabeestudio.stopcovid.fastitem.QrCodeCardItem
+import com.lunabeestudio.stopcovid.fastitem.AttestationCardItem
+import com.lunabeestudio.stopcovid.fastitem.LogoItem
+import com.lunabeestudio.stopcovid.fastitem.attestationCardItem
 import com.lunabeestudio.stopcovid.fastitem.bigTitleItem
-import com.lunabeestudio.stopcovid.fastitem.linkCardItem
-import com.lunabeestudio.stopcovid.fastitem.linkItem
-import com.lunabeestudio.stopcovid.fastitem.qrCodeCardItem
+import com.lunabeestudio.stopcovid.fastitem.logoItem
 import com.lunabeestudio.stopcovid.manager.ShareManager
 import com.lunabeestudio.stopcovid.viewmodel.AttestationsViewModel
 import com.lunabeestudio.stopcovid.viewmodel.AttestationsViewModelFactory
@@ -45,6 +50,8 @@ import kotlinx.coroutines.launch
 
 class AttestationsFragment : MainFragment() {
 
+    override val layout: Int = R.layout.fragment_recycler_with_bottom_action
+    private var bottomActionBinding: FragmentRecyclerWithBottomActionBinding? = null
     private val barcodeEncoder: BarcodeEncoder = BarcodeEncoder()
     private val qrCodeSize: Int by lazy {
         R.dimen.qr_code_size.toDimensSize(requireContext()).toInt()
@@ -70,23 +77,38 @@ class AttestationsFragment : MainFragment() {
         }
         showMigrationFailedIfNeeded()
         showDbFailureIfNeeded()
+
+        bottomActionBinding = FragmentRecyclerWithBottomActionBinding.bind(view).apply {
+            bottomSheetButton.setOnClickListener {
+                findNavControllerOrNull()?.safeNavigate(
+                    AttestationsFragmentDirections.actionAttestationsFragmentToNewAttestationFragment()
+                )
+            }
+        }
+    }
+
+    override fun refreshScreen() {
+        super.refreshScreen()
+        bottomActionBinding?.bottomSheetButton?.text = strings["attestationsController.newAttestation"]
     }
 
     override suspend fun getItems(): List<GenericItem> {
         val items = ArrayList<GenericItem>()
 
-        items += spaceItem {
-            spaceRes = R.dimen.spacing_large
+        items += logoItem {
+            imageRes = R.drawable.ic_attestation
             identifier = items.size.toLong()
+            minLogoHeightRes = LogoItem.NO_MINIMUM_HEIGHT
         }
 
-        items += linkCardItem {
-            label = strings["attestationsController.newAttestation"]
-            iconRes = R.drawable.ic_add
-            onClickListener = View.OnClickListener {
-                findNavControllerOrNull()?.safeNavigate(AttestationsFragmentDirections.actionAttestationsFragmentToNewAttestationFragment())
-            }
-            identifier = label.hashCode().toLong()
+        items += cardWithActionItem {
+            mainTitle = strings["attestationController.header.title"]
+            mainBody = strings["attestationController.header.subtitle"]
+            identifier = "attestationController.header.title".hashCode().toLong()
+        }
+
+        items += spaceItem {
+            spaceRes = R.dimen.spacing_large
         }
 
         items += spaceItem {
@@ -108,11 +130,11 @@ class AttestationsFragment : MainFragment() {
         if (!validAttestations.isNullOrEmpty()) {
             items += bigTitleItem {
                 text = strings["attestationsController.validAttestationsSection.title"]
-                identifier = text.hashCode().toLong()
+                identifier = "attestationsController.validAttestationsSection.subtitle".hashCode().toLong()
             }
             items += captionItem {
                 text = strings["attestationsController.validAttestationsSection.subtitle"]
-                identifier = text.hashCode().toLong()
+                identifier = "attestationsController.validAttestationsSection.subtitle".hashCode().toLong()
             }
             validAttestations.forEach { attestation ->
                 items += qrCodeItemFromAttestation(attestation, true)
@@ -127,11 +149,11 @@ class AttestationsFragment : MainFragment() {
         if (!expiredAttestations.isNullOrEmpty()) {
             items += bigTitleItem {
                 text = strings["attestationsController.expiredSection.title"]
-                identifier = text.hashCode().toLong()
+                identifier = "attestationsController.expiredSection.title".hashCode().toLong()
             }
             items += captionItem {
                 text = strings["attestationsController.expiredSection.subtitle"]
-                identifier = text.hashCode().toLong()
+                identifier = "attestationsController.expiredSection.subtitle".hashCode().toLong()
             }
             expiredAttestations.forEach { attestation ->
                 items += qrCodeItemFromAttestation(attestation, false)
@@ -143,46 +165,58 @@ class AttestationsFragment : MainFragment() {
             }
         }
 
-        items += linkItem {
-            text = strings["attestationsController.termsOfUse"]
-            forceShowArrow = true
-            onClickListener = View.OnClickListener {
-                MaterialAlertDialogBuilder(requireContext())
-                    .setTitle(strings["attestationsController.termsOfUse.alert.title"])
-                    .setMessage(strings["attestationsController.termsOfUse.alert.message"])
-                    .setPositiveButton(strings["common.readMore"]) { _, _ ->
-                        strings["attestationsController.termsOfUse.url"]?.openInExternalBrowser(requireContext())
-                    }
-                    .setNegativeButton(strings["common.ok"], null)
-                    .show()
-            }
+        addMoreItems(items)
+
+        items += spaceItem {
+            spaceRes = R.dimen.spacing_large
+            identifier = items.count().toLong()
+        }
+        return items
+    }
+
+    private fun addMoreItems(items: ArrayList<GenericItem>) {
+        items += bigTitleItem {
+            text = strings["attestationController.plusSection.title"]
+            identifier = "attestationController.plusSection.title".hashCode().toLong()
+            importantForAccessibility = ViewCompat.IMPORTANT_FOR_ACCESSIBILITY_NO
+        }
+
+        items += cardWithActionItem {
+            actions = listOfNotNull(
+                Action(R.drawable.ic_cgu, strings["attestationsController.termsOfUse"]) {
+                    MaterialAlertDialogBuilder(requireContext())
+                        .setTitle(strings["attestationsController.termsOfUse.alert.title"])
+                        .setMessage(strings["attestationsController.termsOfUse.alert.message"])
+                        .setPositiveButton(strings["common.readMore"]) { _, _ ->
+                            strings["attestationsController.termsOfUse.url"]?.openInExternalBrowser(requireContext())
+                        }
+                        .setNegativeButton(strings["common.ok"], null)
+                        .show()
+                },
+                Action(R.drawable.ic_compass_light, strings["attestationsController.attestationWebSite"]) {
+                    strings["home.moreSection.curfewCertificate.url"]?.openInExternalBrowser(it.context)
+                }
+            )
             identifier = "attestationsController.termsOfUse".hashCode().toLong()
         }
 
         items += spaceItem {
             spaceRes = R.dimen.spacing_small
-            identifier = items.size.toLong()
         }
 
         items += captionItem {
             text = strings["attestationController.footer"]
             textAppearance = R.style.TextAppearance_StopCovid_Caption_Small_Grey
-            identifier = text.hashCode().toLong()
+            identifier = "attestationController.footer".hashCode().toLong()
         }
-        items += linkItem {
-            text = strings["attestationsController.attestationWebSite"]
-            url = strings["home.moreSection.curfewCertificate.url"]
-            identifier = text.hashCode().toLong()
-        }
+
         items += spaceItem {
-            spaceRes = R.dimen.spacing_large
+            spaceRes = R.dimen.spacing_medium
             identifier = items.count().toLong()
         }
-
-        return items
     }
 
-    private fun qrCodeItemFromAttestation(attestation: Attestation, allowShare: Boolean): QrCodeCardItem {
+    private fun qrCodeItemFromAttestation(attestation: Attestation, allowShare: Boolean): AttestationCardItem {
         val generateBarcode = {
             barcodeEncoder.encodeBitmap(
                 attestation.qrCode,
@@ -191,7 +225,7 @@ class AttestationsFragment : MainFragment() {
                 qrCodeSize
             )
         }
-        return qrCodeCardItem {
+        return attestationCardItem {
             this.generateBarcode = generateBarcode
             mainDescription = attestation.footer
             share = strings["attestationsController.menu.share"]

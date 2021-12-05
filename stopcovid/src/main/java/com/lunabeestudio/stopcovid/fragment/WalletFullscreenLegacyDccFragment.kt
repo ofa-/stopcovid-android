@@ -20,7 +20,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.setFragmentResultListener
-import androidx.lifecycle.map
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.fragment.navArgs
@@ -36,7 +35,7 @@ import com.lunabeestudio.stopcovid.coreui.fragment.BaseFragment
 import com.lunabeestudio.stopcovid.databinding.FragmentWalletFullscreenLegacyDccBinding
 import com.lunabeestudio.stopcovid.extension.collectWithLifecycle
 import com.lunabeestudio.stopcovid.extension.fullDescription
-import com.lunabeestudio.stopcovid.extension.fullName
+import com.lunabeestudio.stopcovid.extension.fullNameUppercase
 import com.lunabeestudio.stopcovid.extension.fullScreenBorderDescription
 import com.lunabeestudio.stopcovid.extension.injectionContainer
 import com.lunabeestudio.stopcovid.extension.isFrench
@@ -60,6 +59,7 @@ class WalletFullscreenLegacyDccFragment : BaseFragment() {
             injectionContainer.blacklist2DDOCManager,
             injectionContainer.walletRepository,
             injectionContainer.generateActivityPassUseCase,
+            injectionContainer.getSmartWalletCertificateUseCase,
         )
     }
 
@@ -191,7 +191,7 @@ class WalletFullscreenLegacyDccFragment : BaseFragment() {
             headerTextView.setTextOrHide(strings["europeanCertificate.fullscreen.${europeanCertificate.type.stringKey}.border.warning"])
         } else {
             detailsTextSwitcher.setCurrentText("")
-            detailsTextSwitcher.setText(europeanCertificate.fullName())
+            detailsTextSwitcher.setText(europeanCertificate.fullNameUppercase())
             explanationTextSwitcher.setCurrentText("")
             explanationTextSwitcher.setText(strings["europeanCertificate.fullscreen.type.minimum.footer"])
             headerTextView.isVisible = false

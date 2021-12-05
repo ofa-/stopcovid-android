@@ -32,6 +32,18 @@ enum class CardTheme {
     Urgent {
         override val themeId: Int = R.style.ShapeAppearance_StopCovid_MediumComponent_Color
         override val backgroundDrawableRes: Int = R.drawable.bg_urgent
+    },
+    Eligible {
+        override val themeId: Int = R.style.ShapeAppearance_StopCovid_MediumComponent_Color
+        override val backgroundDrawableRes: Int = R.drawable.bg_eligible
+    },
+    Warning {
+        override val themeId: Int = R.style.ShapeAppearance_StopCovid_MediumComponent_LightColor
+        override val backgroundDrawableRes: Int = R.drawable.bg_warning
+    },
+    Alert {
+        override val themeId: Int = R.style.ShapeAppearance_StopCovid_MediumComponent_Color
+        override val backgroundDrawableRes: Int = R.drawable.bg_alert
     };
 
     @StyleRes

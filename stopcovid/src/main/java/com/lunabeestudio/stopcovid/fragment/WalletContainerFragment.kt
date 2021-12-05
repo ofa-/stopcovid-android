@@ -32,7 +32,9 @@ import com.lunabeestudio.stopcovid.coreui.fragment.BaseFragment
 import com.lunabeestudio.stopcovid.databinding.FragmentWalletContainerBinding
 import com.lunabeestudio.stopcovid.extension.analyticsManager
 import com.lunabeestudio.stopcovid.extension.injectionContainer
+import com.lunabeestudio.stopcovid.extension.isExpired
 import com.lunabeestudio.stopcovid.extension.isFrench
+import com.lunabeestudio.stopcovid.extension.isSignatureExpired
 import com.lunabeestudio.stopcovid.extension.raw
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
@@ -40,10 +42,12 @@ import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
 import com.lunabeestudio.stopcovid.extension.showDbFailure
 import com.lunabeestudio.stopcovid.extension.showMigrationFailed
 import com.lunabeestudio.stopcovid.extension.showUnknownErrorAlert
+import com.lunabeestudio.stopcovid.extension.smartWalletState
 import com.lunabeestudio.stopcovid.extension.splitUrlFragment
 import com.lunabeestudio.stopcovid.extension.walletCertificateError
 import com.lunabeestudio.stopcovid.manager.DeeplinkManager
 import com.lunabeestudio.stopcovid.model.EuropeanCertificate
+import com.lunabeestudio.stopcovid.model.Expired
 import com.lunabeestudio.stopcovid.model.WalletCertificate
 import com.lunabeestudio.stopcovid.model.WalletCertificateMalformedException
 import com.lunabeestudio.stopcovid.viewmodel.WalletViewModel
@@ -73,6 +77,7 @@ class WalletContainerFragment : BaseFragment() {
             injectionContainer.blacklist2DDOCManager,
             injectionContainer.walletRepository,
             injectionContainer.generateActivityPassUseCase,
+            injectionContainer.getSmartWalletCertificateUseCase,
         )
     }
 
@@ -270,11 +275,20 @@ class WalletContainerFragment : BaseFragment() {
 
     private suspend fun processCertificate(certificate: WalletCertificate) {
         try {
+            (activity as? MainActivity)?.showProgress(true)
             viewModel.saveCertificate(certificate)
             injectionContainer.debugManager.logSaveCertificates(certificate.raw, "from wallet")
 
-            val vaccination = (certificate as? EuropeanCertificate)?.greenCertificate?.vaccinations?.lastOrNull()
-            if (vaccination != null && vaccination.doseNumber >= vaccination.totalSeriesOfDoses && !viewModel.isBlacklisted(certificate)) {
+            val europeanCertificate = certificate as? EuropeanCertificate
+            val vaccination = europeanCertificate?.greenCertificate?.vaccinations?.lastOrNull()
+
+            val showVaccineCompletion = vaccination != null
+                && vaccination.doseNumber >= vaccination.totalSeriesOfDoses
+                && !viewModel.isBlacklisted(certificate)
+                && europeanCertificate.smartWalletState(robertManager.configuration) !is Expired
+                && !europeanCertificate.isSignatureExpired
+
+            if (showVaccineCompletion) {
                 findNavControllerOrNull()?.safeNavigate(
                     WalletContainerFragmentDirections.actionWalletContainerFragmentToVaccineCompletionFragment(certificate.id)
                 )
@@ -285,6 +299,8 @@ class WalletContainerFragment : BaseFragment() {
             }
         } catch (e: Exception) {
             handleCertificateError(e, certificate.type.code)
+        } finally {
+            (activity as? MainActivity)?.showProgress(false)
         }
     }
 
