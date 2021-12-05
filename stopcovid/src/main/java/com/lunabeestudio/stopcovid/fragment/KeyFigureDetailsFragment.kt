@@ -29,8 +29,10 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.tabs.TabLayoutMediator
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.activity.MainActivity
+import com.lunabeestudio.stopcovid.coreui.UiConstants
 import com.lunabeestudio.stopcovid.coreui.extension.appCompatActivity
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
+import com.lunabeestudio.stopcovid.coreui.extension.getApplicationLanguage
 import com.lunabeestudio.stopcovid.coreui.extension.setTextOrHide
 import com.lunabeestudio.stopcovid.coreui.extension.viewLifecycleOwnerOrNull
 import com.lunabeestudio.stopcovid.coreui.fastitem.cardWithActionItem
@@ -57,6 +59,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.text.NumberFormat
+import java.text.SimpleDateFormat
 import java.util.Locale
 
 class KeyFigureDetailsFragment : BaseFragment() {
@@ -149,9 +152,10 @@ class KeyFigureDetailsFragment : BaseFragment() {
             sharedPrefs,
             keyFigure?.getKeyFigureForPostalCode(sharedPrefs.chosenPostalCode),
             numberFormat,
-            strings,
+            SimpleDateFormat(UiConstants.DAY_MONTH_DATE_PATTERN, Locale(requireContext().getApplicationLanguage())),
+            strings
         ) {
-            shareContentDescription = strings["accessibility.hint.keyFigure.share"]
+            shareContentDescription = stringsFormat("accessibility.hint.keyFigure.share.withLabel", strings[keyFigure?.labelStringKey])
             onShareCard = { binding ->
                 viewLifecycleOwnerOrNull()?.lifecycleScope?.launch {
                     val uri = ShareManager.getShareCaptureUri(binding, "$label")

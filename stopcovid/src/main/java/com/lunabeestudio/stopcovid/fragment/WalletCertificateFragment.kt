@@ -23,7 +23,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.text.toSpannable
 import androidx.core.view.doOnNextLayout
 import androidx.core.view.isVisible
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.zxing.BarcodeFormat
@@ -40,6 +39,7 @@ import com.lunabeestudio.stopcovid.coreui.extension.findParentFragmentByType
 import com.lunabeestudio.stopcovid.coreui.extension.toDimensSize
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
+import com.lunabeestudio.stopcovid.extension.collectWithLifecycle
 import com.lunabeestudio.stopcovid.extension.countryCode
 import com.lunabeestudio.stopcovid.extension.fullDescription
 import com.lunabeestudio.stopcovid.extension.getString
@@ -72,7 +72,6 @@ import com.lunabeestudio.stopcovid.worker.DccLightGenerationWorker
 import com.mikepenz.fastadapter.GenericItem
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
-import kotlin.time.ExperimentalTime
 
 import android.content.SharedPreferences
 import androidx.preference.PreferenceManager
@@ -116,16 +115,14 @@ class WalletCertificateFragment : MainFragment() {
                 }
             )
         }
-        viewModel.certificates.asLiveData(timeoutInMs = 0).observe(viewLifecycleOwner) {
-            lifecycleScope.launch {
+
+        viewModel.certificates.collectWithLifecycle(viewLifecycleOwner) {
+            refreshScreen()
+            launch {
                 debugManager.logObserveCertificate(it?.map { certificate -> certificate.raw })
             }
-            refreshScreen()
         }
-        viewModel.blacklistDCC.observe(viewLifecycleOwner) {
-            refreshScreen()
-        }
-        viewModel.blacklist2DDOC.observe(viewLifecycleOwner) {
+        viewModel.blacklistUpdateEvent.observeEventAndConsume(viewLifecycleOwner) {
             refreshScreen()
         }
 
@@ -137,8 +134,7 @@ class WalletCertificateFragment : MainFragment() {
         (activity as? MainActivity)?.binding?.tabLayout?.isVisible = true
     }
 
-    @OptIn(ExperimentalTime::class)
-    override fun getItems(): List<GenericItem> {
+    override suspend fun getItems(): List<GenericItem> {
         val items = ArrayList<GenericItem>()
 
         items += spaceItem {
@@ -146,11 +142,12 @@ class WalletCertificateFragment : MainFragment() {
             identifier = items.size.toLong()
         }
 
+        val blacklistedCertificates = viewModel.certificates.value?.filter { viewModel.isBlacklisted(it) } ?: emptyList()
+
         val hasErrorCertificate = viewModel.certificates.value?.any { certificate ->
             (certificate as? EuropeanCertificate)?.greenCertificate?.testResultIsNegative == false
-                || viewModel.isBlacklisted(certificate)
                 || (certificate as? EuropeanCertificate)?.isExpired == true
-        } == true
+        } == true || blacklistedCertificates.isNotEmpty()
         if (hasErrorCertificate) {
             items += captionItem {
                 text = strings["walletController.certificateWarning"]
@@ -168,7 +165,7 @@ class WalletCertificateFragment : MainFragment() {
             identifier = text.hashCode().toLong()
         }
         viewModel.favoriteCertificates?.forEach { certificate ->
-            items += codeItemFromWalletDocument(certificate)
+            items += codeItemFromWalletDocument(certificate, blacklistedCertificates.contains(certificate))
         }
         items += spaceItem {
             spaceRes = R.dimen.spacing_large
@@ -182,7 +179,7 @@ class WalletCertificateFragment : MainFragment() {
                 identifier = text.hashCode().toLong()
             }
             viewModel.recentCertificates?.forEach { certificate ->
-                items += codeItemFromWalletDocument(certificate)
+                items += codeItemFromWalletDocument(certificate, blacklistedCertificates.contains(certificate))
             }
             items += spaceItem {
                 spaceRes = R.dimen.spacing_large
@@ -200,7 +197,7 @@ class WalletCertificateFragment : MainFragment() {
                 identifier = text.hashCode().toLong()
             }
             viewModel.olderCertificates?.forEach { certificate ->
-                items += codeItemFromWalletDocument(certificate)
+                items += codeItemFromWalletDocument(certificate, blacklistedCertificates.contains(certificate))
             }
             items += spaceItem {
                 spaceRes = R.dimen.spacing_large
@@ -242,7 +239,7 @@ class WalletCertificateFragment : MainFragment() {
         }
     }
 
-    private fun codeItemFromWalletDocument(certificate: WalletCertificate): QrCodeCardItem {
+    private fun codeItemFromWalletDocument(certificate: WalletCertificate, isBlacklisted: Boolean): QrCodeCardItem {
         val barcodeFormat = when (certificate) {
             is FrenchCertificate -> BarcodeFormat.DATA_MATRIX
             is EuropeanCertificate -> BarcodeFormat.QR_CODE
@@ -267,24 +264,26 @@ class WalletCertificateFragment : MainFragment() {
            certificate.fullDescription(strings, robertManager.configuration)
         } else { "" }
 
+        val greenCertificate = (certificate as? EuropeanCertificate)?.greenCertificate
+        val footerDescription = when {
+            isBlacklisted -> strings["wallet.blacklist.warning"]?.toSpannable()
+            greenCertificate == null -> null
+            greenCertificate.testResultIsNegative == false -> {
+                // Fix SIDEP has generated positive test instead of recovery
+                strings["wallet.proof.europe.test.positiveSidepError"]?.toSpannable()?.also {
+                    Linkify.addLinks(it, Linkify.WEB_URLS)
+                }
+            }
+            greenCertificate.isAutoTest -> strings["wallet.autotest.warning"]?.toSpannable()
+            !greenCertificate.isFrench ->
+                strings["wallet.proof.europe.foreignCountryWarning.${greenCertificate.countryCode?.lowercase()}"]?.toSpannable()
+            else -> null
+        }
+
         return qrCodeCardItem {
             this.generateBarcode = generateBarcode
             mainDescription = certificateDetails
-            val greenCertificate = (certificate as? EuropeanCertificate)?.greenCertificate
-            footerDescription = when {
-                viewModel.isBlacklisted(certificate) -> strings["wallet.blacklist.warning"]?.toSpannable()
-                greenCertificate == null -> null
-                greenCertificate.testResultIsNegative == false -> {
-                    // Fix SIDEP has generated positive test instead of recovery
-                    strings["wallet.proof.europe.test.positiveSidepError"]?.toSpannable()?.also {
-                        Linkify.addLinks(it, Linkify.WEB_URLS)
-                    }
-                }
-                greenCertificate.isAutoTest -> strings["wallet.autotest.warning"]?.toSpannable()
-                !greenCertificate.isFrench ->
-                    strings["wallet.proof.europe.foreignCountryWarning.${greenCertificate.countryCode?.lowercase()}"]?.toSpannable()
-                else -> null
-            }
+            this.footerDescription = footerDescription
             share = strings["walletController.menu.share"]
             delete = strings["walletController.menu.delete"]
             convertText = strings["walletController.menu.convertToEurope"]

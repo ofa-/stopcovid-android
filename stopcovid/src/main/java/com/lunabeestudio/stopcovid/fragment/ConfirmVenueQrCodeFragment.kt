@@ -79,7 +79,7 @@ class ConfirmVenueQrCodeFragment : MainFragment() {
 
     override fun getTitleKey(): String = "confirmVenueQrCodeController.title"
 
-    override fun getItems(): List<GenericItem> {
+    override suspend fun getItems(): List<GenericItem> {
         val items = arrayListOf<GenericItem>()
 
         items += logoItem {
@@ -109,7 +109,7 @@ class ConfirmVenueQrCodeFragment : MainFragment() {
             gravity = Gravity.CENTER
             width = ViewGroup.LayoutParams.MATCH_PARENT
             onClickListener = View.OnClickListener {
-                viewModel.processVenue(requireContext(), args.venueContent, args.venueVersion, args.venueTime)
+                viewModel.processVenue(args.venueContent, args.venueVersion, args.venueTime)
             }
             identifier = "confirmVenueQrCodeController.confirm".hashCode().toLong()
         }

@@ -13,7 +13,6 @@ package com.lunabeestudio.stopcovid
 import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -22,10 +21,9 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.emoji.bundled.BundledEmojiCompatConfig
 import androidx.emoji.text.EmojiCompat
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.preference.PreferenceManager
 import androidx.work.Constraints
@@ -51,6 +49,7 @@ import com.lunabeestudio.stopcovid.coreui.EnvConstant
 import com.lunabeestudio.stopcovid.coreui.LocalizedApplication
 import com.lunabeestudio.stopcovid.coreui.UiConstants
 import com.lunabeestudio.stopcovid.coreui.manager.LocalizedStrings
+import com.lunabeestudio.stopcovid.coreui.utils.ImmutablePendingIntentCompat
 import com.lunabeestudio.stopcovid.extension.alertRiskLevelChanged
 import com.lunabeestudio.stopcovid.extension.googleReviewShown
 import com.lunabeestudio.stopcovid.extension.hasChosenPostalCode
@@ -69,6 +68,8 @@ import com.lunabeestudio.stopcovid.service.ProximityService
 import com.lunabeestudio.stopcovid.widgetshomescreen.ProximityWidget
 import com.lunabeestudio.stopcovid.worker.ActivateReminderNotificationWorker
 import com.lunabeestudio.stopcovid.worker.AtRiskNotificationWorker
+import com.lunabeestudio.stopcovid.worker.Blacklist2DDOCWorker
+import com.lunabeestudio.stopcovid.worker.BlacklistDCCWorker
 import com.lunabeestudio.stopcovid.worker.DccLightRenewCleanWorker
 import com.lunabeestudio.stopcovid.worker.IsolationReminderNotificationWorker
 import com.lunabeestudio.stopcovid.worker.MaintenanceWorker
@@ -87,10 +88,12 @@ import java.util.Calendar
 import java.util.Date
 import java.util.concurrent.TimeUnit
 import kotlin.random.Random
-import kotlin.time.Duration
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
 
-class StopCovid : Application(), LifecycleObserver, RobertApplication, LocalizedApplication {
+class StopCovid : Application(), RobertApplication, LocalizedApplication {
 
     private val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
         Timber.e(throwable)
@@ -128,6 +131,37 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Localized
         }
     }
 
+    private val appObserver = object : DefaultLifecycleObserver {
+        override fun onResume(owner: LifecycleOwner) {
+            super.onResume(owner)
+            isAppInForeground = true
+            refreshData()
+            injectionContainer.analyticsManager.reportAppEvent(AppEventName.e3)
+            refreshProximityService()
+            try {
+                refreshStatusIfNeeded()
+            } catch (e: Exception) {
+                Timber.e(e)
+            }
+            deleteOldAttestations()
+            appCoroutineScope.launch {
+                injectionContainer.venueRepository.clearExpired(robertManager)
+            }
+            appCoroutineScope.launch {
+                robertManager.cleaReportIfNeeded(this@StopCovid, false)
+            }
+
+            if (robertManager.configuration.displayActivityPass) {
+                DccLightRenewCleanWorker.startDccLightCleanAndRenewWorker(this@StopCovid)
+            }
+        }
+
+        override fun onPause(owner: LifecycleOwner) {
+            super.onPause(owner)
+            isAppInForeground = false
+        }
+    }
+
     init {
         System.setProperty("kotlinx.coroutines.debug", if (BuildConfig.DEBUG) "on" else "off")
     }
@@ -137,11 +171,12 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Localized
 
         initializeInjectionContainer()
 
-        ProcessLifecycleOwner.get().lifecycle.addObserver(this)
+        ProcessLifecycleOwner.get().lifecycle.addObserver(appObserver)
         firstResume = true
 
         setupTimber()
 
+        // Make sure data is cleaned before initializeData
         if (sharedPrefs.lastVersionCode < BuildConfig.VERSION_CODE) {
             clearData()
         }
@@ -204,35 +239,6 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Localized
         )
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
-    fun onAppResume() {
-        isAppInForeground = true
-        refreshData()
-        injectionContainer.analyticsManager.reportAppEvent(AppEventName.e3)
-        refreshProximityService()
-        try {
-            refreshStatusIfNeeded()
-        } catch (e: Exception) {
-            Timber.e(e)
-        }
-        deleteOldAttestations()
-        appCoroutineScope.launch {
-            injectionContainer.venueRepository.clearExpired(robertManager)
-        }
-        appCoroutineScope.launch {
-            robertManager.cleaReportIfNeeded(this@StopCovid, false)
-        }
-
-        if (robertManager.configuration.displayActivityPass) {
-            DccLightRenewCleanWorker.startDccLightCleanAndRenewWorker(this)
-        }
-    }
-
-    @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
-    fun onAppPause() {
-        isAppInForeground = false
-    }
-
     private fun clearData() {
         injectionContainer.moreKeyFiguresManager.clearLocal(this)
         injectionContainer.linksManager.clearLocal(this)
@@ -241,8 +247,6 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Localized
         injectionContainer.configManager.clearLocal(this)
         injectionContainer.calibrationManager.clearLocal(this)
         injectionContainer.formManager.clearLocal(this)
-        injectionContainer.blacklistDCCManager.clearLocal(this)
-        injectionContainer.blacklist2DDOCManager.clearLocal(this)
         injectionContainer.secureKeystoreDataSource.configuration = injectionContainer.secureKeystoreDataSource.configuration?.apply {
             version = 0
         }
@@ -252,6 +256,7 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Localized
         val okHttpCacheDir = File(cacheDir, ServerManager.OKHTTP_CACHE_FILENAME)
         if (okHttpCacheDir.exists()) {
             try {
+                @Suppress("BlockingMethodInNonBlockingContext")
                 Cache(okHttpCacheDir, ServerManager.OKHTTP_MAX_CACHE_SIZE_BYTES).delete()
             } catch (e: Exception) {
                 Timber.e(e)
@@ -288,12 +293,6 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Localized
         appCoroutineScope.launch {
             injectionContainer.risksLevelManager.initialize(this@StopCovid)
         }
-        appCoroutineScope.launch {
-            injectionContainer.blacklistDCCManager.initialize(this@StopCovid)
-        }
-        appCoroutineScope.launch {
-            injectionContainer.blacklist2DDOCManager.initialize(this@StopCovid)
-        }
 
         runBlocking {
             injectionContainer.dccCertificatesManager.initialize(this@StopCovid)
@@ -312,10 +311,14 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Localized
 
     @OptIn(ExperimentalTime::class)
     private fun refreshData() {
-        appCoroutineScope.launch(Dispatchers.IO) {
 
+        // Launch blacklist in parallel independently as it can take a long time (paging + room insertion)
+        BlacklistDCCWorker.start(this)
+        Blacklist2DDOCWorker.start(this)
+
+        appCoroutineScope.launch(Dispatchers.IO) {
             if (firstResume) {
-                delay(Duration.seconds(1)) // Add some delay to let the main activity start
+                delay(1.seconds) // Add some delay to let the main activity start
             }
             firstResume = false
 
@@ -326,8 +329,6 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Localized
             injectionContainer.infoCenterManager.refreshIfNeeded(this@StopCovid)
             injectionContainer.keyFiguresManager.onAppForeground(this@StopCovid)
             injectionContainer.risksLevelManager.onAppForeground(this@StopCovid)
-            injectionContainer.blacklistDCCManager.onAppForeground(this@StopCovid)
-            injectionContainer.blacklist2DDOCManager.onAppForeground(this@StopCovid)
             injectionContainer.formManager.onAppForeground(this@StopCovid)
             injectionContainer.vaccinationCenterManager.onAppForeground(this@StopCovid, sharedPrefs)
             injectionContainer.certificatesDocumentsManager.onAppForeground(this@StopCovid)
@@ -449,9 +450,9 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Localized
         }
 
         val notificationIntent = Intent(this, MainActivity::class.java)
-        val pendingIntent = PendingIntent.getActivity(
+        val pendingIntent = ImmutablePendingIntentCompat.getActivity(
             this, 0,
-            notificationIntent, 0
+            notificationIntent
         )
         val notification = NotificationCompat.Builder(
             this,
@@ -562,9 +563,9 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Localized
         }
 
         val notificationIntent = Intent(this, MainActivity::class.java)
-        val pendingIntent = PendingIntent.getActivity(
+        val pendingIntent = ImmutablePendingIntentCompat.getActivity(
             this, 0,
-            notificationIntent, 0
+            notificationIntent
         )
         val notification = NotificationCompat.Builder(
             this,
@@ -616,10 +617,9 @@ class StopCovid : Application(), LifecycleObserver, RobertApplication, Localized
         }
     }
 
-    @OptIn(ExperimentalTime::class)
     private fun refreshStatusIfNeeded() {
-        val elapsedTimeSinceRefresh = Duration.milliseconds(System.currentTimeMillis() - (robertManager.atRiskLastRefresh ?: 0L))
-        val checkStatusFrequency = Duration.hours(robertManager.configuration.checkStatusFrequencyHour.toDouble())
+        val elapsedTimeSinceRefresh = (System.currentTimeMillis() - (robertManager.atRiskLastRefresh ?: 0L)).milliseconds
+        val checkStatusFrequency = robertManager.configuration.checkStatusFrequencyHour.toDouble().hours
         if (robertManager.isRegistered && elapsedTimeSinceRefresh > checkStatusFrequency) {
             appCoroutineScope.launch {
                 robertManager.updateStatus(this@StopCovid)

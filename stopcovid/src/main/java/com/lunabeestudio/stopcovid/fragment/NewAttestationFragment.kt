@@ -136,7 +136,7 @@ class NewAttestationFragment : MainFragment() {
         activity?.invalidateOptionsMenu()
     }
 
-    override fun getItems(): List<GenericItem> {
+    override suspend fun getItems(): List<GenericItem> {
         val items = ArrayList<GenericItem>()
 
         strings["newAttestationController.header"]?.takeIf { it.isNotBlank() }?.let { header ->

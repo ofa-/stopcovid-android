@@ -14,12 +14,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?colorSurface"
-    android:fillViewport="true">
+    android:fillViewport="true"
+    android:theme="@style/Theme.Base.StopCovid.ForceLight">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:animateLayoutChanges="true"
         android:padding="@dimen/spacing_large">
 
         <TextView
@@ -81,23 +81,12 @@
             android:layout_marginBottom="@dimen/spacing_large"
             android:gravity="top|center_horizontal"
             android:textAppearance="@style/TextAppearance.StopCovid.Title"
-            app:layout_constraintBottom_toTopOf="@id/shareButton"
+            app:layout_constraintBottom_toTopOf="@id/certificateHashTextView"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/showMoreSwitch"
             tools:ignore="SelectableText"
             tools:text="@tools:sample/lorem[30]" />
-
-        <Button
-            android:id="@+id/shareButton"
-            style="@style/Widget.StopCovid.Button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/spacing_large"
-            android:visibility="gone"
-            app:layout_constraintBottom_toTopOf="@id/certificateHashTextView"
-            app:layout_constraintTop_toBottomOf="@id/certificateDetailsTextView"
-            tools:text="@tools:sample/lorem" />
 
         <TextView
             android:id="@+id/certificateHashTextView"
@@ -111,7 +100,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/shareButton"
+            app:layout_constraintTop_toBottomOf="@id/certificateDetailsTextView"
             tools:text="@tools:sample/lorem[8]" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

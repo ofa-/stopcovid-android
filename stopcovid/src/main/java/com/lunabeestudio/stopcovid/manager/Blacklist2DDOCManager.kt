@@ -5,53 +5,35 @@
  *
  * Authors
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Created by Lunabee Studio / Date - 2020/04/05 - for the TOUS-ANTI-COVID project
+ * Created by Lunabee Studio / Date - 2021/2/11 - for the TOUS-ANTI-COVID project
  */
 
 package com.lunabeestudio.stopcovid.manager
 
 import android.content.Context
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import blacklist.Blacklist
+import android.content.SharedPreferences
+import com.lunabeestudio.framework.local.dao.FrenchCertificateBlacklistRoomDao
+import com.lunabeestudio.framework.local.model.FrenchCertificateBlacklistRoom
 import com.lunabeestudio.framework.remote.server.ServerManager
 import com.lunabeestudio.stopcovid.coreui.ConfigConstant
-import java.util.zip.GZIPInputStream
+import com.lunabeestudio.stopcovid.extension.blacklist2DdocIteration
+import java.io.File
 
-class Blacklist2DDOCManager(serverManager: ServerManager) :
-    RemoteProtoGzipManager<Blacklist.BlackListMessage, List<String>>(serverManager) {
+class Blacklist2DDOCManager(
+    context: Context,
+    serverManager: ServerManager,
+    dao: FrenchCertificateBlacklistRoomDao,
+    private val sharedPreferences: SharedPreferences,
+) : RemoteProtoGzipRoomBlacklistManager<FrenchCertificateBlacklistRoom>(serverManager, dao) {
+    override val remoteTemplateUrl: String = ConfigConstant.Blacklist.TwoDDOC.URL
+    override val tmpFile: File = File(context.cacheDir, ConfigConstant.Blacklist.TwoDDOC.FILENAME)
 
-    override fun getLocalFileName(context: Context): String = ConfigConstant.Blacklist2DDOC.FILENAME
-    override fun getRemoteFileUrl(context: Context): String = ConfigConstant.Blacklist2DDOC.URL
-    override fun getAssetFilePath(context: Context): String = ConfigConstant.Blacklist2DDOC.ASSET_FILE_PATH
-
-    private val _blacklisted2DDOCHashes: MutableLiveData<List<String>?> = MutableLiveData(null)
-    val blacklisted2DDOCHashes: LiveData<List<String>?>
-        get() = _blacklisted2DDOCHashes
-
-    suspend fun initialize(context: Context) {
-        loadLocal(context)?.let { localBlacklisted2DDOC ->
-            if (blacklisted2DDOCHashes.value != localBlacklisted2DDOC) {
-                _blacklisted2DDOCHashes.postValue(localBlacklisted2DDOC)
-            }
+    override var blacklistIteration: Int
+        get() = sharedPreferences.blacklist2DdocIteration
+        set(value) {
+            sharedPreferences.blacklist2DdocIteration = value
         }
-    }
 
-    suspend fun onAppForeground(context: Context) {
-        if (fetchLast(context)) {
-            loadLocal(context)?.let { localBlacklisted2DDOC ->
-                if (blacklisted2DDOCHashes.value != localBlacklisted2DDOC) {
-                    _blacklisted2DDOCHashes.postValue(localBlacklisted2DDOC)
-                }
-            }
-        }
-    }
-
-    override fun parseProtoGzipStream(gzipInputStream: GZIPInputStream): Blacklist.BlackListMessage {
-        return Blacklist.BlackListMessage.parseFrom(gzipInputStream)
-    }
-
-    override fun Blacklist.BlackListMessage.mapProtoToApp(): List<String> {
-        return this.itemsList
-    }
+    override fun mapToRoom(hashList: List<String>): Array<FrenchCertificateBlacklistRoom> =
+        hashList.map(::FrenchCertificateBlacklistRoom).toTypedArray()
 }

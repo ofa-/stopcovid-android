@@ -52,7 +52,7 @@ fun Context.startEmailIntent(
     startActivity(Intent.createChooser(intent, null))
 }
 
-fun Context.showPermissionRationale(
+fun Context.showPermissionSettingsDialog(
     strings: Map<String, String>,
     messageKey: String,
     positiveKey: String,

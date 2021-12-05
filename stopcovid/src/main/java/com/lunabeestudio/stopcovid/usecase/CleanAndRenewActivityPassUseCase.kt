@@ -13,8 +13,8 @@ package com.lunabeestudio.stopcovid.usecase
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.stopcovid.extension.isBlacklisted
 import com.lunabeestudio.stopcovid.extension.isEligibleForActivityPass
-import com.lunabeestudio.stopcovid.manager.BlacklistDCCManager
 import com.lunabeestudio.stopcovid.manager.DccCertificatesManager
+import com.lunabeestudio.stopcovid.manager.BlacklistDCCManager
 import com.lunabeestudio.stopcovid.model.EuropeanCertificate
 import com.lunabeestudio.stopcovid.model.TacResult
 import com.lunabeestudio.stopcovid.repository.WalletRepository

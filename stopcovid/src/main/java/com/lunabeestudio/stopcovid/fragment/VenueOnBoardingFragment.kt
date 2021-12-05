@@ -35,5 +35,5 @@ class VenueOnBoardingFragment : BottomSheetMainFragment() {
         findNavControllerOrNull()?.safeNavigate(R.id.venueQrCodeFragment, args.venueArgs)
     }
 
-    override fun getItems(): List<GenericItem> = SignalInfosManager.getInfosItems(requireContext(), strings)
+    override suspend fun getItems(): List<GenericItem> = SignalInfosManager.getInfosItems(requireContext(), strings)
 }

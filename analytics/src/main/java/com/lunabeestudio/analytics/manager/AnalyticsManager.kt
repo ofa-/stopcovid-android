@@ -42,6 +42,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import retrofit2.HttpException
@@ -66,6 +68,10 @@ class AnalyticsManager(okHttpClient: OkHttpClient, context: Context) : Lifecycle
     private val filesDir: File = context.filesDir
 
     private val sharedPreferences = context.getSharedPreferences(SHARED_PREFS_NAME, Context.MODE_PRIVATE)
+
+    private val reportAppEventMtx = Mutex()
+    private val reportHealthEventMtx = Mutex()
+    private val reportErrorEventMtx = Mutex()
 
     init {
         sharedPreferences.apply {
@@ -279,13 +285,14 @@ class AnalyticsManager(okHttpClient: OkHttpClient, context: Context) : Lifecycle
         }
     }
 
-    @Synchronized
     private suspend fun reportSynchronizedAppEvent(eventName: AppEventName, desc: String?) {
-        val timestampedEventList = getAppEvents().toMutableList()
-        val timestamp = dateFormat.format(currentRoundedHourInstant())
-        timestampedEventList += TimestampedEvent(eventName.name, timestamp, desc ?: "")
-        val file = File(File(filesDir, FOLDER_NAME), FILE_NAME_APP_EVENTS)
-        writeTimestampedEventProtoToFile(file, timestampedEventList.toProto())
+        reportAppEventMtx.withLock {
+            val timestampedEventList = getAppEvents().toMutableList()
+            val timestamp = dateFormat.format(currentRoundedHourInstant())
+            timestampedEventList += TimestampedEvent(eventName.name, timestamp, desc ?: "")
+            val file = File(File(filesDir, FOLDER_NAME), FILE_NAME_APP_EVENTS)
+            writeTimestampedEventProtoToFile(file, timestampedEventList.toProto())
+        }
     }
 
     fun reportHealthEvent(eventName: HealthEventName, desc: String? = null) {
@@ -296,12 +303,13 @@ class AnalyticsManager(okHttpClient: OkHttpClient, context: Context) : Lifecycle
         }
     }
 
-    @Synchronized
     private suspend fun reportSynchronizedHealthEvent(eventName: HealthEventName, desc: String? = null) {
-        val timestampedEventList = getHealthEvents().toMutableList()
-        timestampedEventList += TimestampedEvent(eventName.name, dateFormat.format(currentRoundedHourInstant()), desc ?: "")
-        val file = File(File(filesDir, FOLDER_NAME), FILE_NAME_HEALTH_EVENTS)
-        writeTimestampedEventProtoToFile(file, timestampedEventList.toProto())
+        reportHealthEventMtx.withLock {
+            val timestampedEventList = getHealthEvents().toMutableList()
+            timestampedEventList += TimestampedEvent(eventName.name, dateFormat.format(currentRoundedHourInstant()), desc ?: "")
+            val file = File(File(filesDir, FOLDER_NAME), FILE_NAME_HEALTH_EVENTS)
+            writeTimestampedEventProtoToFile(file, timestampedEventList.toProto())
+        }
     }
 
     fun reportWSError(wsName: String, wsVersion: String, errorCode: Int, desc: String? = null) {
@@ -323,12 +331,13 @@ class AnalyticsManager(okHttpClient: OkHttpClient, context: Context) : Lifecycle
         }
     }
 
-    @Synchronized
     private suspend fun reportSynchronizedErrorEvent(errorName: String) {
-        val timestampedEventList = getErrors().toMutableList()
-        timestampedEventList += TimestampedEvent(errorName, dateFormat.format(currentRoundedHourInstant()), "")
-        val file = File(File(filesDir, FOLDER_NAME), FILE_NAME_APP_ERRORS)
-        writeTimestampedEventProtoToFile(file, timestampedEventList.toProto())
+        reportErrorEventMtx.withLock {
+            val timestampedEventList = getErrors().toMutableList()
+            timestampedEventList += TimestampedEvent(errorName, dateFormat.format(currentRoundedHourInstant()), "")
+            val file = File(File(filesDir, FOLDER_NAME), FILE_NAME_APP_ERRORS)
+            writeTimestampedEventProtoToFile(file, timestampedEventList.toProto())
+        }
     }
 
     private fun writeTimestampedEventProtoToFile(file: File, timestampedEventProtoList: ProtoStorage.TimestampedEventProtoList) {

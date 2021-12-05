@@ -4,21 +4,20 @@ import com.lunabeestudio.domain.model.Attestation
 import com.lunabeestudio.domain.model.Configuration
 import com.lunabeestudio.stopcovid.Constants
 import kotlin.time.Duration
-import kotlin.time.ExperimentalTime
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.milliseconds
 
-@OptIn(ExperimentalTime::class)
 fun Attestation.isExpired(configuration: Configuration): Boolean {
     val qrCodeExpired: Duration = when (reason) {
-        Constants.Attestation.VALUE_REASON_SPORT -> Duration.hours(3)
-        else -> Duration.hours(configuration.qrCodeExpiredHours.toDouble())
+        Constants.Attestation.VALUE_REASON_SPORT -> 3.hours
+        else -> configuration.qrCodeExpiredHours.toDouble().hours
     }
-    val attestationDuration = Duration.milliseconds(System.currentTimeMillis() - timestamp)
+    val attestationDuration = (System.currentTimeMillis() - timestamp).milliseconds
     return attestationDuration > qrCodeExpired
 }
 
-@OptIn(ExperimentalTime::class)
 fun Attestation.isObsolete(configuration: Configuration): Boolean {
-    val qrCodeObsolete: Duration = Duration.hours(configuration.qrCodeDeletionHours.toDouble())
-    val attestationDuration = Duration.milliseconds(System.currentTimeMillis() - timestamp)
+    val qrCodeObsolete: Duration = configuration.qrCodeDeletionHours.toDouble().hours
+    val attestationDuration = (System.currentTimeMillis() - timestamp).milliseconds
     return attestationDuration > qrCodeObsolete
 }

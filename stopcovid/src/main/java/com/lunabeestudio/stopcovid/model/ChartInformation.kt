@@ -24,8 +24,7 @@ import com.lunabeestudio.stopcovid.extension.safeParseColor
 import com.lunabeestudio.stopcovid.fragment.ChartDataType
 import java.text.NumberFormat
 import java.util.Locale
-import kotlin.time.Duration
-import kotlin.time.ExperimentalTime
+import kotlin.time.Duration.Companion.seconds
 
 class ChartInformation(
     context: Context,
@@ -105,7 +104,6 @@ class ChartInformation(
         }
     }
 
-    @OptIn(ExperimentalTime::class)
     private fun chartExplanationLabel(
         context: Context,
         figure: KeyFigure,
@@ -120,7 +118,7 @@ class ChartInformation(
             chartData.size > 1 -> strings.stringsFormat(
                 "keyFigureDetailController.section.evolution.subtitle2Charts",
                 strings["${figure.labelKey}.label"],
-                chartData[0].entries.lastOrNull()?.x?.toLong()?.let { Duration.seconds(it) }?.getRelativeDateShortString(context)
+                chartData[0].entries.lastOrNull()?.x?.toLong()?.seconds?.getRelativeDateShortString(context)
                     ?: "",
                 chartData[0].currentValueToDisplay?.formatNumberIfNeeded(numberFormat),
                 chartData[1].currentValueToDisplay?.formatNumberIfNeeded(numberFormat)
@@ -128,7 +126,7 @@ class ChartInformation(
             chartData.isNotEmpty() -> strings.stringsFormat(
                 "keyFigureDetailController.section.evolution.subtitle",
                 strings["${figure.labelKey}.label"],
-                chartData[0].entries.lastOrNull()?.x?.toLong()?.let { Duration.seconds(it) }?.getRelativeDateShortString(context)
+                chartData[0].entries.lastOrNull()?.x?.toLong()?.seconds?.getRelativeDateShortString(context)
                     ?: "",
                 chartData[0].currentValueToDisplay?.formatNumberIfNeeded(numberFormat)
             )

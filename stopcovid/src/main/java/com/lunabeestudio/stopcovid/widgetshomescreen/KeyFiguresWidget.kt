@@ -10,7 +10,6 @@
 
 package com.lunabeestudio.stopcovid.widgetshomescreen
 
-import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
@@ -34,6 +33,7 @@ import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.isNightMode
 import com.lunabeestudio.stopcovid.coreui.extension.toDimensSize
 import com.lunabeestudio.stopcovid.coreui.manager.LocalizedStrings
+import com.lunabeestudio.stopcovid.coreui.utils.ImmutablePendingIntentCompat
 import com.lunabeestudio.stopcovid.extension.colorStringKey
 import com.lunabeestudio.stopcovid.extension.formatNumberIfNeeded
 import com.lunabeestudio.stopcovid.extension.keyFiguresManager
@@ -266,7 +266,7 @@ class KeyFiguresWidget : AppWidgetProvider() {
             Intent.ACTION_VIEW,
             Uri.parse(Constants.Url.FIGURES_FRAGMENT_URI)
         )
-        val pendingIntent = PendingIntent.getActivity(context, 0, intent, 0)
+        val pendingIntent = ImmutablePendingIntentCompat.getActivity(context, 0, intent)
         views.setOnClickPendingIntent(R.id.figuresWidgetLayout, pendingIntent)
     }
 

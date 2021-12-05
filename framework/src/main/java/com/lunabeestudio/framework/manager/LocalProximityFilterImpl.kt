@@ -18,11 +18,9 @@ import com.lunabeestudio.robert.manager.LocalProximityFilter
 import com.orange.proximitynotification.filter.ProximityFilter
 import com.orange.proximitynotification.filter.TimestampedRssi
 import java.util.Date
-import kotlin.time.ExperimentalTime
 
 class LocalProximityFilterImpl : LocalProximityFilter {
 
-    @OptIn(ExperimentalTime::class)
     override fun filter(
         localProximityList: List<LocalProximity>,
         mode: LocalProximityFilter.Mode,

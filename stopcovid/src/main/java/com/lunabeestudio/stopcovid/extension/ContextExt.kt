@@ -68,6 +68,15 @@ fun Context.showInvalidCodeAlert(strings: Map<String, String>, listener: DialogI
         .show()
 }
 
+fun Context.showInvalidVenueCodeAlert(strings: Map<String, String>, listener: DialogInterface.OnDismissListener?) {
+    MaterialAlertDialogBuilder(this)
+        .setTitle(strings["venueFlashCodeController.alert.invalidCode.title"])
+        .setMessage(strings["venueFlashCodeController.alert.invalidCode.message"])
+        .setPositiveButton(strings["common.ok"], null)
+        .setOnDismissListener(listener)
+        .show()
+}
+
 /**
  * Start an explicit intent with text to share
  *
@@ -107,8 +116,6 @@ suspend fun Context.isLowStorage(): Boolean {
             }
         } ?: false
     } else {
-        cacheDir?.let { cacheDir ->
-            cacheDir.freeSpace / 1024 / 1024 < Constants.Android.STORAGE_THRESHOLD_MB
-        } ?: false
+        cacheDir?.let { cacheDir -> cacheDir.freeSpace / 1024 / 1024 < Constants.Android.STORAGE_THRESHOLD_MB } ?: false
     }
 }

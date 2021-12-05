@@ -12,8 +12,8 @@ package com.lunabeestudio.stopcovid.coreui
 
 object ConfigConstant {
     private const val BASE_URL: String = "https://app-static.tousanticovid.gouv.fr/"
-    private const val VERSION_PATH: String = "json/version-35/"
-    private const val VERSIONED_SERVER_URL: String = BASE_URL + VERSION_PATH
+    private const val VERSIONED_PATH: String = "json/version-36/"
+    private const val VERSIONED_SERVER_URL: String = BASE_URL + VERSIONED_PATH
 
     object Maintenance {
         private const val BASE_URL: String = "https://app.tousanticovid.gouv.fr/"
@@ -148,20 +148,21 @@ object ConfigConstant {
         const val LOCAL_FILENAME: String = "calibrationBle.json"
     }
 
-    object BlacklistDCC {
-        const val FILENAME: String = "certlist.pb.gz"
-        private const val ASSET_FILENAME: String = "certlist.pb_gz"
-        const val FOLDER: String = "CertList/"
-        const val URL: String = VERSIONED_SERVER_URL + FOLDER + FILENAME
-        val ASSET_FILE_PATH: String = FOLDER + ASSET_FILENAME
-    }
+    object Blacklist {
 
-    object Blacklist2DDOC {
-        const val FILENAME: String = "2ddoc_list.pb.gz"
-        private const val ASSET_FILENAME: String = "2ddoc_list.pb_gz"
-        const val FOLDER: String = "CertList/"
-        const val URL: String = VERSIONED_SERVER_URL + FOLDER + FILENAME
-        val ASSET_FILE_PATH: String = FOLDER + ASSET_FILENAME
+        private const val FOLDER: String = "json/blacklist/v2/CertList/"
+
+        object DCC {
+            private const val ITERATION_PATH_TEMPLATE: String = "dcc/%d/"
+            const val FILENAME: String = "certlist.pb.gz"
+            val URL: String = BASE_URL + FOLDER + ITERATION_PATH_TEMPLATE + FILENAME
+        }
+
+        object TwoDDOC {
+            private const val ITERATION_PATH_TEMPLATE: String = "2ddoc/%d/"
+            const val FILENAME: String = "2ddoc_list.pb.gz"
+            val URL: String = BASE_URL + FOLDER + ITERATION_PATH_TEMPLATE + FILENAME
+        }
     }
 
     object Store {

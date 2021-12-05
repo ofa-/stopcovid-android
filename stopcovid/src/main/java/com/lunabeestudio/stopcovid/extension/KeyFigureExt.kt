@@ -25,9 +25,11 @@ import com.lunabeestudio.stopcovid.model.KeyFigureCategory
 import com.lunabeestudio.stopcovid.model.KeyFigureChartType
 import com.lunabeestudio.stopcovid.model.KeyFigureSeriesItem
 import keynumbers.Keynumbers
+import java.text.DateFormat
 import java.text.NumberFormat
-import kotlin.time.Duration
-import kotlin.time.ExperimentalTime
+import java.util.Date
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.seconds
 
 val KeyFigure.labelStringKey: String
     get() = "$labelKey.label"
@@ -73,34 +75,41 @@ fun List<KeyFigure>?.getDepartmentLabel(postalCode: String?): String? {
     return localization?.dptLabel
 }
 
-@OptIn(ExperimentalTime::class)
 fun KeyFigure.itemForFigure(
     context: Context,
     sharedPrefs: SharedPreferences,
     departmentKeyFigure: DepartmentKeyFigure?,
     numberFormat: NumberFormat,
+    dateFormat: DateFormat,
     strings: LocalizedStrings,
-    block: (KeyFigureCardItem.() -> Unit)
+    block: KeyFigureCardItem.() -> Unit
 ): KeyFigureCardItem? {
     return keyFigureCardItem {
-        val extractDate: Long
+        val extractDateS: Long
         if (departmentKeyFigure != null) {
             rightLocation = strings["common.country.france"]
             leftLocation = departmentKeyFigure.dptLabel
             leftValue = departmentKeyFigure.valueToDisplay?.formatNumberIfNeeded(numberFormat)
             rightValue = valueGlobalToDisplay.formatNumberIfNeeded(numberFormat)
-            extractDate = departmentKeyFigure.extractDate
+            extractDateS = departmentKeyFigure.extractDateS
         } else {
             if (sharedPrefs.hasChosenPostalCode) {
                 leftLocation = strings["common.country.france"]
             }
             leftValue = valueGlobalToDisplay.formatNumberIfNeeded(numberFormat)
-            extractDate = this@itemForFigure.extractDate
+            extractDateS = this@itemForFigure.extractDateS
         }
-        updatedAt = strings.stringsFormat(
-            "keyFigures.update",
-            Duration.seconds(extractDate).getRelativeDateTimeString(context, strings["common.justNow"])
-        )
+
+        val extractDateMs = extractDateS.seconds.inWholeMilliseconds
+        val dayInMs = 1.days.inWholeMilliseconds
+
+        val nowDaysSinceEpoch = System.currentTimeMillis() / dayInMs
+        val extractDaysSinceEpoch = extractDateMs / dayInMs
+        updatedAt = when (nowDaysSinceEpoch) {
+            extractDaysSinceEpoch -> strings.stringsFormat("keyFigures.update.today", strings["common.today"]?.lowercase())
+            extractDaysSinceEpoch + 1 -> strings.stringsFormat("keyFigures.update.today", strings["common.yesterday"]?.lowercase())
+            else -> strings.stringsFormat("keyFigures.update", dateFormat.format(Date(extractDateMs)))
+        }
 
         label = strings[labelStringKey]
         description = strings[descriptionStringKey]

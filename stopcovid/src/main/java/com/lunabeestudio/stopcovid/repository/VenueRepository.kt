@@ -36,8 +36,7 @@ import java.nio.ByteBuffer
 import java.util.Arrays.copyOfRange
 import java.util.Calendar
 import java.util.UUID
-import kotlin.time.Duration
-import kotlin.time.ExperimentalTime
+import kotlin.time.Duration.Companion.days
 
 class VenueRepository(
     private val localKeystoreDataSource: LocalKeystoreDataSource,
@@ -67,7 +66,6 @@ class VenueRepository(
         }
     }
 
-    @OptIn(ExperimentalTime::class)
     suspend fun processVenue(
         robertManager: RobertManager,
         base64URLCode: String,
@@ -117,7 +115,6 @@ class VenueRepository(
         return UUID(high, low)
     }
 
-    @OptIn(ExperimentalTime::class)
     fun isExpired(
         robertManager: RobertManager,
         unixTimeInMS: Long
@@ -139,7 +136,6 @@ class VenueRepository(
         }
     }
 
-    @OptIn(ExperimentalTime::class)
     suspend fun clearExpired(
         robertManager: RobertManager,
     ) {
@@ -158,9 +154,8 @@ class VenueRepository(
         }
     }
 
-    @OptIn(ExperimentalTime::class)
     private fun gracePeriod(robertManager: RobertManager) =
-        Duration.days(robertManager.configuration.venuesRetentionPeriod).inWholeMilliseconds
+        robertManager.configuration.venuesRetentionPeriod.days.inWholeMilliseconds
 
     suspend fun deleteVenue(venueId: String) {
         localKeystoreDataSource.deleteVenueQrCode(venueId)

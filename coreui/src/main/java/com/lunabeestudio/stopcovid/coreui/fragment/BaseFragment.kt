@@ -17,6 +17,7 @@ import com.lunabeestudio.stopcovid.coreui.LocalizedApplication
 import com.lunabeestudio.stopcovid.coreui.extension.stringsFormat
 import com.lunabeestudio.stopcovid.coreui.manager.LocalizedStrings
 
+import android.view.WindowManager
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.ScaleGestureDetector.SimpleOnScaleGestureListener
@@ -40,6 +41,23 @@ abstract class BaseFragment : Fragment() {
 
     protected fun stringsFormat(key: String, vararg args: Any?): String? {
         return strings.stringsFormat(key, *args)
+    }
+
+    protected fun setFullBrightness(on: Boolean = true) {
+        val window = activity?.window ?: return
+        val params = window.attributes
+        params.screenBrightness = if (on)
+            WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_FULL
+                else
+            WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
+        window.attributes = params
+    }
+
+    protected fun toggleFullBrightness() {
+        val window = activity?.window ?: return
+        setFullBrightness(
+            window.attributes.screenBrightness ==
+            WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE)
     }
 
     protected fun setZoomable(element: View) {

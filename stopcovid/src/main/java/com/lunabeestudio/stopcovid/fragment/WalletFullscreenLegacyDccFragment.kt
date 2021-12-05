@@ -19,8 +19,10 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
-import androidx.lifecycle.asLiveData
+import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.map
+import androidx.navigation.NavController
+import androidx.navigation.NavDestination
 import androidx.navigation.fragment.navArgs
 import androidx.navigation.navGraphViewModels
 import com.google.zxing.BarcodeFormat
@@ -30,10 +32,12 @@ import com.lunabeestudio.stopcovid.coreui.extension.appCompatActivity
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.extension.setTextOrHide
 import com.lunabeestudio.stopcovid.coreui.extension.toDimensSize
+import com.lunabeestudio.stopcovid.coreui.fragment.BaseFragment
 import com.lunabeestudio.stopcovid.databinding.FragmentWalletFullscreenLegacyDccBinding
-import com.lunabeestudio.stopcovid.extension.formatDccText
+import com.lunabeestudio.stopcovid.extension.collectWithLifecycle
 import com.lunabeestudio.stopcovid.extension.fullDescription
 import com.lunabeestudio.stopcovid.extension.fullName
+import com.lunabeestudio.stopcovid.extension.fullScreenBorderDescription
 import com.lunabeestudio.stopcovid.extension.injectionContainer
 import com.lunabeestudio.stopcovid.extension.isFrench
 import com.lunabeestudio.stopcovid.extension.robertManager
@@ -43,10 +47,9 @@ import com.lunabeestudio.stopcovid.manager.ShareManager
 import com.lunabeestudio.stopcovid.model.EuropeanCertificate
 import com.lunabeestudio.stopcovid.viewmodel.WalletViewModel
 import com.lunabeestudio.stopcovid.viewmodel.WalletViewModelFactory
-import java.text.SimpleDateFormat
-import java.util.Locale
+import kotlinx.coroutines.flow.map
 
-class WalletFullscreenLegacyDccFragment : ForceLightFragment(R.layout.fragment_wallet_fullscreen_legacy_dcc) {
+class WalletFullscreenLegacyDccFragment : BaseFragment() {
 
     private val args: WalletFullscreenLegacyDccFragmentArgs by navArgs()
 
@@ -75,32 +78,25 @@ class WalletFullscreenLegacyDccFragment : ForceLightFragment(R.layout.fragment_w
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        val rootView = super.onCreateView(inflater, container, savedInstanceState)
-        binding = FragmentWalletFullscreenLegacyDccBinding.bind(rootView)
-        return rootView
+        binding = FragmentWalletFullscreenLegacyDccBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         appCompatActivity?.supportActionBar?.title = strings["walletController.title"]
-        viewModel.certificates.asLiveData(timeoutInMs = 0).map { certificates ->
+        viewModel.certificates.map { certificates ->
             certificates
                 ?.filterIsInstance<EuropeanCertificate>()
                 ?.firstOrNull { it.id == args.id }
+        }.collectWithLifecycle(viewLifecycleOwner) { europeanCertificate ->
+            this@WalletFullscreenLegacyDccFragment.europeanCertificate = europeanCertificate
+            refreshScreen()
         }
-            .observe(viewLifecycleOwner) { europeanCertificate ->
-                this.europeanCertificate = europeanCertificate
-                refreshScreen()
-            }
         binding.detailsTextSwitcher.setInAnimation(view.context, R.anim.fade_in)
         binding.detailsTextSwitcher.setOutAnimation(view.context, R.anim.fade_out)
         binding.explanationTextSwitcher.setInAnimation(view.context, R.anim.fade_in)
         binding.explanationTextSwitcher.setOutAnimation(view.context, R.anim.fade_out)
-
-        binding.shareButton.text = strings["common.share"]
-        binding.shareButton.setOnClickListener {
-            showCertificateSharingBottomSheet()
-        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -112,6 +108,10 @@ class WalletFullscreenLegacyDccFragment : ForceLightFragment(R.layout.fragment_w
         return when (item.itemId) {
             R.id.qr_code_menu_share -> {
                 showCertificateSharingBottomSheet()
+                true
+            }
+            R.id.qr_code_menu_more -> {
+                showQrCodeMoreActionBottomSheet()
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -127,6 +127,29 @@ class WalletFullscreenLegacyDccFragment : ForceLightFragment(R.layout.fragment_w
         }
         findNavControllerOrNull()?.safeNavigate(
             WalletFullscreenLegacyDccFragmentDirections.actionLegacyFullscreenDccFragmentToCertificateSharingBottomSheetFragment()
+        )
+    }
+
+    private fun showQrCodeMoreActionBottomSheet() {
+        setFragmentResultListener(QrCodeMoreActionBottomSheetFragment.MORE_ACTION_RESULT_KEY) { _, bundle ->
+            if (bundle.getBoolean(QrCodeMoreActionBottomSheetFragment.MORE_ACTION_BUNDLE_KEY_SHARE_REQUESTED, false)) {
+                findNavControllerOrNull()?.addOnDestinationChangedListener(
+                    object : NavController.OnDestinationChangedListener {
+                        override fun onDestinationChanged(controller: NavController, destination: NavDestination, arguments: Bundle?) {
+                            if (controller.currentDestination?.id == R.id.legacyFullscreenDccFragment) {
+                                showCertificateSharingBottomSheet()
+                                controller.removeOnDestinationChangedListener(this)
+                            }
+                        }
+                    })
+            }
+        }
+
+        findNavControllerOrNull()?.safeNavigate(
+            WalletFullscreenLegacyDccFragmentDirections.actionLegacyFullscreenDccFragmentToQrCodeMoreActionBottomSheetFragment(
+                showShare = true,
+                showBrightness = true
+            )
         )
     }
 
@@ -158,11 +181,9 @@ class WalletFullscreenLegacyDccFragment : ForceLightFragment(R.layout.fragment_w
         if (isBorder) {
             detailsTextSwitcher.setCurrentText("")
             detailsTextSwitcher.setText(
-                europeanCertificate.formatDccText(
-                    strings["europeanCertificate.fullscreen.englishDescription.${europeanCertificate.type.code}"],
-                    strings,
-                    SimpleDateFormat("d MMM yyyy", Locale.ENGLISH),
-                    SimpleDateFormat("d MMM yyyy, HH:mm", Locale.ENGLISH),
+                europeanCertificate.fullScreenBorderDescription(
+                    strings = strings,
+                    configuration = injectionContainer.robertManager.configuration
                 )
             )
             explanationTextSwitcher.setCurrentText("")

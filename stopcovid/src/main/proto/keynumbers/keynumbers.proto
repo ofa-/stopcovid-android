@@ -22,6 +22,7 @@ message KeyNumbersMessage {
         string category = 1;
         optional bool isFeatured = 2;
         optional bool displayOnSameChart = 3;
+        uint32 magnitude = 16;
         bool isHighlighted = 4;
         optional string chartType = 5;
         optional double limitLine = 6;
@@ -36,5 +37,18 @@ message KeyNumbersMessage {
         repeated DepartmentValuesMessage valuesDepartments = 15;
     }
 
+    message DepartmentValuesMapMessage {
+        string dptNb = 1;
+        repeated ElementSerieMessage series = 2;
+    }
+
+    message KeyfigureMapMessage {
+        string labelKey = 1;
+        string version = 2;
+        repeated DepartmentValuesMapMessage valuesDepartments = 3;
+    }
+
     repeated KeyfigureMessage keyfigureList = 1;
+
+    repeated KeyfigureMapMessage KeyfigureMapList = 2;
 }

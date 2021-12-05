@@ -76,12 +76,12 @@ allprojects {
 subprojects{
     afterEvaluate {
         android {
-            compileSdkVersion 30
-            buildToolsVersion "30.0.3"
+            compileSdkVersion 31
+            buildToolsVersion "31.0.0"
 
             defaultConfig {
                 minSdkVersion 21
-                targetSdkVersion 30
+                targetSdkVersion 31
 
                 def gitRev = "git rev-parse HEAD".execute().getText().substring(0, 7)
                 buildConfigField 'String', 'BUILD_ID', /"${gitRev}"/

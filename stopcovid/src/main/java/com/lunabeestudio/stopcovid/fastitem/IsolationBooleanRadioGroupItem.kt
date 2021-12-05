@@ -37,9 +37,10 @@ class IsolationBooleanRadioGroupItem : AbstractBindingItem<ItemIsolationBooleanR
         binding.yesRadioButton.text = yesLabel
         binding.noRadioButton.text = noLabel
 
-        when (selectedState) {
-            true -> binding.yesRadioButton.isChecked = true
-            false -> binding.noRadioButton.isChecked = true
+        if (selectedState == true) {
+            binding.yesRadioButton.isChecked = true
+        } else if (selectedState == false) {
+            binding.noRadioButton.isChecked = true
         }
 
         onStateChangedListener?.let {

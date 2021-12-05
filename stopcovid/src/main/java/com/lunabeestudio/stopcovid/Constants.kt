@@ -49,6 +49,9 @@ object Constants {
         const val GOOGLE_REVIEW_SHOWN: String = "Google.Review.Shown"
         const val NOTIFICATION_VERSION_CLOSED: String = "Notification.Version.Closed"
         const val LOW_STORAGE_ALERT_SHOWN: String = "Low.Storage.Alert.Shown"
+        const val BLACKLIST_DCC_ITERATION: String = "Blacklist.Dcc.Iteration"
+        const val BLACKLIST_2DDOC_ITERATION: String = "Blacklist.2Ddoc.Iteration"
+        const val ENABLE_AUTO_FULLSCREEN_BRIGHTNESS: String = "Enable.Auto.Fullscreen.Brightness"
     }
 
     object Notification {
@@ -66,10 +69,13 @@ object Constants {
         const val DCC_LIGHT_GENERATION: String = "StopCovid.DccLightGeneration.Worker"
         const val DCC_LIGHT_RENEW_CLEAN: String = "StopCovid.DccLightRenewClean.Worker"
         const val DCC_LIGHT_AVAILABLE: String = "StopCovid.DccLightAvailable.Worker"
+        const val BLACKLIST_DCC: String = "StopCovid.BlacklistDcc.Worker"
+        const val BLACKLIST_2DDOC: String = "StopCovid.Blacklist2ddoc.Worker"
     }
 
     object WorkerTags {
         const val DCC_LIGHT: String = "DCC_LIGHT_WORKERS"
+        const val BLACKLIST: String = "BLACKLIST_WORKERS"
     }
 
     object ServerConstant {

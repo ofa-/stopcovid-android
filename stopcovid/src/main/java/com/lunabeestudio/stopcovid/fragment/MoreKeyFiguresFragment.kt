@@ -27,7 +27,7 @@ class MoreKeyFiguresFragment : MainFragment() {
         }
     }
 
-    override fun getItems(): List<GenericItem> {
+    override suspend fun getItems(): List<GenericItem> {
         val items = arrayListOf<GenericItem>()
 
         moreKeyFiguresManager.moreKeyFiguresSections.value?.fillItems(items)

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ This Source Code Form is subject to the terms of the Mozilla Public
+  ~ License, v. 2.0. If a copy of the MPL was not distributed with this
+  ~ file, You can obtain one at https://mozilla.org/MPL/2.0/.
+  ~
+  ~ Authors
+  ~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ Created by Lunabee Studio / Date - 2021/4/10 - for the TOUS-ANTI-COVID project
+  -->
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:id="@+id/actionLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingTop="@dimen/spacing_xlarge"
+        android:paddingBottom="@dimen/spacing_large">
+
+        <TextView
+            android:id="@+id/shareButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?selectableItemBackground"
+            android:clickable="true"
+            android:drawablePadding="@dimen/spacing_large"
+            android:focusable="true"
+            android:paddingHorizontal="@dimen/spacing_large"
+            android:paddingVertical="@dimen/spacing_large"
+            android:textAppearance="@style/TextAppearance.StopCovid.Caption"
+            android:textIsSelectable="false"
+            app:drawableStartCompat="@drawable/ic_baseline_share_24"
+            app:drawableTint="?colorPrimary"
+            tools:text="@tools:sample/lorem[0]" />
+
+        <LinearLayout
+            android:id="@+id/brightnessLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:orientation="vertical"
+            android:paddingHorizontal="@dimen/spacing_large"
+            android:paddingVertical="@dimen/spacing_large">
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/brightnessSwitch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                android:clickable="false"
+                android:drawablePadding="@dimen/spacing_large"
+                android:textAppearance="@style/TextAppearance.StopCovid.Caption"
+                android:textColor="@null"
+                app:drawableTint="?colorPrimary"
+                tools:drawableStartCompat="@drawable/ic_brightnesson"
+                tools:text="@tools:sample/lorem[5]" />
+
+            <TextView
+                android:id="@+id/brightnessSwitchCaption"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.StopCovid.Caption.Small.Grey"
+                android:textIsSelectable="false"
+                tools:text="@tools:sample/lorem[15]" />
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>

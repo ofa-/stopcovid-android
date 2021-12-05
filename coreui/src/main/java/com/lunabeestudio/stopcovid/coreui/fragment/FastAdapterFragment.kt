@@ -36,7 +36,7 @@ import kotlinx.coroutines.launch
 abstract class FastAdapterFragment : BaseFragment() {
     protected var binding: FragmentRecyclerViewBinding? = null
     protected val fastAdapter: FastItemAdapter<GenericItem> = GenericFastItemAdapter()
-    protected abstract fun getItems(): List<GenericItem>
+    protected abstract suspend fun getItems(): List<GenericItem>
     protected abstract fun getAppBarLayout(): AppBarLayout?
     private var onScrollListener: RecyclerView.OnScrollListener? = null
     private var refreshScreenJob: Job? = null

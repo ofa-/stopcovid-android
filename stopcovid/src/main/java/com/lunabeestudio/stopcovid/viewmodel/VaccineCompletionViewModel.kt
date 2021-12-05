@@ -50,7 +50,7 @@ class VaccineCompletionViewModelFactory(
     private val walletRepository: WalletRepository,
 ) :
     ViewModelProvider.Factory {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
         @Suppress("UNCHECKED_CAST")
         return VaccineCompletionViewModel(
             certificateId,

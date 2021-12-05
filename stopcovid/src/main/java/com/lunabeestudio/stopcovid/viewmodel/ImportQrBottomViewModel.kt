@@ -134,7 +134,7 @@ class ImportQrBottomViewModel(
 class ImportQrBottomViewModelFactory(
     owner: SavedStateRegistryOwner,
 ) : AbstractSavedStateViewModelFactory(owner, null) {
-    override fun <T : ViewModel?> create(key: String, modelClass: Class<T>, handle: SavedStateHandle): T {
+    override fun <T : ViewModel> create(key: String, modelClass: Class<T>, handle: SavedStateHandle): T {
         @Suppress("UNCHECKED_CAST")
         return ImportQrBottomViewModel(handle) as T
     }

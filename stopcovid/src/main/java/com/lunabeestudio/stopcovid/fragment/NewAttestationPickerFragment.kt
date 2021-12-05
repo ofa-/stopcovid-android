@@ -34,7 +34,7 @@ class NewAttestationPickerFragment : MainFragment() {
 
     override fun getTitleKey(): String = "attestation.form.${args.key}.title"
 
-    override fun getItems(): List<GenericItem> {
+    override suspend fun getItems(): List<GenericItem> {
         val items = ArrayList<GenericItem>()
 
         if (!strings["attestation.form.${args.key}.header"].isNullOrBlank()) {

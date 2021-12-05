@@ -28,7 +28,7 @@ class IsSickFragment : AboutMainFragment() {
 
     override fun getTitleKey(): String = "myHealthController.sick.title"
 
-    override fun getItems(): List<GenericItem> {
+    override suspend fun getItems(): List<GenericItem> {
         val items = ArrayList<GenericItem>()
 
         items += logoItem {

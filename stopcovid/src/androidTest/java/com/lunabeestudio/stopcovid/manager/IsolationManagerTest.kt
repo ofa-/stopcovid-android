@@ -15,7 +15,6 @@ import org.junit.Before
 import org.junit.Test
 import java.security.KeyStore
 import java.util.concurrent.TimeUnit
-import kotlin.time.ExperimentalTime
 
 class IsolationManagerTest {
 
@@ -164,7 +163,6 @@ class IsolationManagerTest {
         )
     }
 
-    @OptIn(ExperimentalTime::class)
     @Test
     fun positiveCaseNoSymptoms() {
         positiveCase()
@@ -194,7 +192,6 @@ class IsolationManagerTest {
         )
     }
 
-    @OptIn(ExperimentalTime::class)
     @Test
     fun positiveCaseWithSymptoms() {
         positiveCase()

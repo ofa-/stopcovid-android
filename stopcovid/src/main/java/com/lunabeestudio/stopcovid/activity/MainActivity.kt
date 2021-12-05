@@ -10,6 +10,7 @@
 
 package com.lunabeestudio.stopcovid.activity
 
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.ShortcutInfo
@@ -18,14 +19,18 @@ import android.graphics.drawable.Icon
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.view.WindowManager
 import android.view.accessibility.AccessibilityEvent
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AlertDialog
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
@@ -57,6 +62,7 @@ import com.lunabeestudio.stopcovid.databinding.ActivityMainBinding
 import com.lunabeestudio.stopcovid.databinding.DialogUserLanguageBinding
 import com.lunabeestudio.stopcovid.databinding.ItemSelectionBinding
 import com.lunabeestudio.stopcovid.extension.alertRiskLevelChanged
+import com.lunabeestudio.stopcovid.extension.enableAutoFullscreenBrightness
 import com.lunabeestudio.stopcovid.extension.flaggedCountry
 import com.lunabeestudio.stopcovid.extension.googleReviewShown
 import com.lunabeestudio.stopcovid.extension.injectionContainer
@@ -68,6 +74,11 @@ import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.showAlertRiskLevelChanged
 import com.lunabeestudio.stopcovid.extension.showRatingDialog
 import com.lunabeestudio.stopcovid.extension.walletRepository
+import com.lunabeestudio.stopcovid.fragment.FullscreenAttestationFragment
+import com.lunabeestudio.stopcovid.fragment.WalletFullscreen2DdocFragment
+import com.lunabeestudio.stopcovid.fragment.WalletFullscreenActivityPassFragment
+import com.lunabeestudio.stopcovid.fragment.WalletFullscreenBorderFragment
+import com.lunabeestudio.stopcovid.fragment.WalletFullscreenLegacyDccFragment
 import com.lunabeestudio.stopcovid.manager.DeeplinkManager
 import com.lunabeestudio.stopcovid.model.EuropeanCertificate
 import com.lunabeestudio.stopcovid.viewmodel.MainViewModel
@@ -75,6 +86,7 @@ import com.lunabeestudio.stopcovid.viewmodel.MainViewModelFactory
 import kotlinx.coroutines.delay
 import timber.log.Timber
 import java.util.Locale
+import kotlin.reflect.KClass
 
 class MainActivity : BaseActivity() {
 
@@ -99,6 +111,17 @@ class MainActivity : BaseActivity() {
     private val strings: LocalizedStrings
         get() = (application as? LocalizedApplication)?.localizedStrings ?: emptyMap()
 
+    private var languageDialog: AlertDialog? = null
+    private var userLanguageSelectionView: DialogUserLanguageBinding? = null
+
+    private val sharedPreferenceChangeListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+        if (key == Constants.SharedPrefs.ENABLE_AUTO_FULLSCREEN_BRIGHTNESS) {
+            refreshBrightnessIfNeeded()
+        }
+    }
+
+    private val resumedFragments = mutableListOf<KClass<out Fragment>>()
+
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         handleIntent(intent)
@@ -110,6 +133,9 @@ class MainActivity : BaseActivity() {
 
         setSupportActionBar(binding.toolbar)
         setupNavigation()
+        registerFragmentCallback()
+
+        sharedPrefs.registerOnSharedPreferenceChangeListener(sharedPreferenceChangeListener)
 
         binding.snackBarView.applyAndConsumeWindowInsetBottom()
         binding.toolbar.contentInsetStartWithNavigation = 0
@@ -204,6 +230,7 @@ class MainActivity : BaseActivity() {
     private fun initStringsObserver() {
         (application as? LocalizedApplication)?.liveLocalizedStrings?.observeEventAndConsume(this) {
             invalidateOptionsMenu()
+            refreshLanguageDialog()
         }
     }
 
@@ -217,6 +244,25 @@ class MainActivity : BaseActivity() {
             }
             refreshAppBarLayout(destination)
         }
+    }
+
+    private fun registerFragmentCallback() {
+        supportFragmentManager.registerFragmentLifecycleCallbacks(
+            object : FragmentManager.FragmentLifecycleCallbacks() {
+                override fun onFragmentResumed(fm: FragmentManager, f: Fragment) {
+                    super.onFragmentResumed(fm, f)
+                    resumedFragments.add(f::class)
+                    refreshBrightnessIfNeeded()
+                }
+
+                override fun onFragmentPaused(fm: FragmentManager, f: Fragment) {
+                    super.onFragmentPaused(fm, f)
+                    resumedFragments.remove(f::class)
+                    refreshBrightnessIfNeeded()
+                }
+            },
+            true
+        )
     }
 
     private fun refreshAppBarLayout(destination: NavDestination) {
@@ -405,45 +451,52 @@ class MainActivity : BaseActivity() {
         if (sharedPrefs.userLanguage == null &&
             UiConstants.SUPPORTED_LOCALES.map { it.language }.none { it == Locale.getDefault().language }
         ) {
-
-            val userLanguageSelectionView = DialogUserLanguageBinding.inflate(layoutInflater)
-
-            var languageViewMap: Map<Locale, ItemSelectionBinding> = emptyMap()
-            languageViewMap = UiConstants.SUPPORTED_LOCALES.associateWith { locale ->
-                val selectionBinding = ItemSelectionBinding.inflate(layoutInflater, userLanguageSelectionView.root, false)
-                selectionBinding.titleTextView.setTextOrHide(locale.flaggedCountry)
-                selectionBinding.captionTextView.isVisible = false
-                selectionBinding.selectionImageView.isInvisible = locale.language != getApplicationLanguage()
-                selectionBinding.root.setOnClickListener {
-                    sharedPrefs.userLanguage = locale.language
-                    languageViewMap.forEach { (loopLocale, loopSelectionBinding) ->
-                        loopSelectionBinding.selectionImageView.isInvisible = loopLocale.language != locale.language
+            userLanguageSelectionView = DialogUserLanguageBinding.inflate(layoutInflater).also { userLanguageSelectionView ->
+                var languageViewMap: Map<Locale, ItemSelectionBinding> = emptyMap()
+                languageViewMap = UiConstants.SUPPORTED_LOCALES.associateWith { locale ->
+                    val selectionBinding = ItemSelectionBinding.inflate(layoutInflater, userLanguageSelectionView.root, false)
+                    selectionBinding.titleTextView.setTextOrHide(locale.flaggedCountry)
+                    selectionBinding.captionTextView.isVisible = false
+                    selectionBinding.selectionImageView.isInvisible = locale.language != getApplicationLanguage()
+                    selectionBinding.root.setOnClickListener {
+                        sharedPrefs.userLanguage = locale.language
+                        languageViewMap.forEach { (loopLocale, loopSelectionBinding) ->
+                            loopSelectionBinding.selectionImageView.isInvisible = loopLocale.language != locale.language
+                        }
                     }
+                    selectionBinding
                 }
-                selectionBinding
-            }
 
-            languageViewMap.values.forEachIndexed { idx, selectionBinding ->
-                val divider = ItemDividerBinding.inflate(layoutInflater, userLanguageSelectionView.root, false)
-                val dividerPos = idx * 2
-                userLanguageSelectionView.root.addView(divider.root, dividerPos)
-                userLanguageSelectionView.root.addView(selectionBinding.root, dividerPos + 1)
-            }
+                languageViewMap.values.forEachIndexed { idx, selectionBinding ->
+                    val divider = ItemDividerBinding.inflate(layoutInflater, userLanguageSelectionView.root, false)
+                    val dividerPos = idx * 2
+                    userLanguageSelectionView.root.addView(divider.root, dividerPos)
+                    userLanguageSelectionView.root.addView(selectionBinding.root, dividerPos + 1)
+                }
 
-            userLanguageSelectionView.userLanguageDialogFooter.text = strings["userLanguageController.footer"]
+                userLanguageSelectionView.userLanguageDialogFooter.text = strings["userLanguageController.footer"]
 
-            MaterialAlertDialogBuilder(this)
-                .setTitle(strings["userLanguageController.title"])
-                .setMessage(strings["userLanguageController.subtitle"])
-                .setView(userLanguageSelectionView.root)
-                .setPositiveButton(strings["userLanguageController.button.title"]) { _, _ ->
-                    if (sharedPrefs.userLanguage == null) {
-                        sharedPrefs.userLanguage = getApplicationLanguage()
+                languageDialog = MaterialAlertDialogBuilder(this)
+                    .setTitle(strings["userLanguageController.title"])
+                    .setMessage(strings["userLanguageController.subtitle"])
+                    .setView(userLanguageSelectionView.root)
+                    .setPositiveButton(strings["userLanguageController.button.title"]) { _, _ ->
+                        if (sharedPrefs.userLanguage == null) {
+                            sharedPrefs.userLanguage = getApplicationLanguage()
+                        }
                     }
-                }
-                .setCancelable(false)
-                .show()
+                    .setCancelable(false)
+                    .create()
+                languageDialog?.show()
+            }
         }
+    }
+
+    private fun refreshLanguageDialog() {
+        languageDialog?.setTitle(strings["userLanguageController.title"])
+        languageDialog?.setMessage(strings["userLanguageController.subtitle"])
+        languageDialog?.getButton(DialogInterface.BUTTON_POSITIVE)?.text = strings["userLanguageController.button.title"]
+        userLanguageSelectionView?.userLanguageDialogFooter?.text = strings["userLanguageController.footer"]
     }
 
     private fun showRatingDialogIfNeeded() {
@@ -463,6 +516,42 @@ class MainActivity : BaseActivity() {
     }
 
     private enum class TabBehavior { SHOW, HIDE, IGNORE }
+
+    fun refreshBrightnessIfNeeded() {
+        val fullBrightnessFragment = listOf(
+            FullscreenAttestationFragment::class,
+            WalletFullscreenActivityPassFragment::class,
+            WalletFullscreenBorderFragment::class,
+            WalletFullscreen2DdocFragment::class,
+            WalletFullscreenLegacyDccFragment::class,
+        )
+
+        val requireFullBrightness = resumedFragments.any { it in fullBrightnessFragment } && sharedPrefs.enableAutoFullscreenBrightness
+        val params: WindowManager.LayoutParams = window.attributes
+
+        val shouldSetFullBrightness =
+            requireFullBrightness && params.screenBrightness != WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_FULL
+        val shouldUnsetFullBrightness =
+            !requireFullBrightness && params.screenBrightness == WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_FULL
+
+        if (!shouldSetFullBrightness && !shouldUnsetFullBrightness) {
+            return
+        }
+
+        val windowInsetsController = WindowInsetsControllerCompat(window, window.decorView)
+        val isAppearanceLightStatusBars = windowInsetsController.isAppearanceLightStatusBars
+
+        if (shouldSetFullBrightness) {
+            window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+            params.screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_FULL
+        } else if (shouldUnsetFullBrightness) {
+            window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+            params.screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
+        }
+
+        window?.attributes = params // this call make the status bars loose its appearance
+        windowInsetsController.isAppearanceLightStatusBars = isAppearanceLightStatusBars
+    }
 
     companion object {
         private const val CURFEW_CERTIFICATE_SHORTCUT_ID: String = "curfewCertificateShortcut"

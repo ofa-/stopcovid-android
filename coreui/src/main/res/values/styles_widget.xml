@@ -73,6 +73,7 @@
         <item name="android:layout_marginEnd">@dimen/spacing_large</item>
         <item name="errorIconDrawable">@null</item>
         <item name="errorEnabled">true</item>
+        <item name="boxStrokeColor">@color/tac_outlined_stroke_color</item>
     </style>
 
     <style name="Widget.StopCovid.Snackbar.TextView" parent="@style/Widget.MaterialComponents.Snackbar.TextView">

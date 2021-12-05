@@ -2,11 +2,11 @@
    "config":[
       {
          "name":"lastUpdate",
-         "value":"13 Oct 2021"
+         "value":"25 Nov 2021"
       },
       {
          "name":"version",
-         "value":93
+         "value":94
       },
       {
          "name":"versionCalibrationBle",
@@ -54,6 +54,21 @@
          "name":"app.keyfigures.displayDepartmentLevel",
          "value":true
       },
+      {
+	     "name":"app.keyfigures.compare",
+	     "value":[
+	        {
+	           "t":"keyfigure.compare.vacsirea",
+	           "k1":"sivicsidepvacsireanonvax",
+	           "k2":"sivicsidepvacsireavax"
+	        },
+	        {
+	           "t":"keyfigure.compare.vacsipcrplus",
+	           "k1":"sivicsidepvacsipcrplusnonvax",
+	           "k2":"sivicsidepvacsipcrplusvax"
+	        }
+	     ]
+	  },
       {
 	      "name":"app.displayUrgentDgs",
 		  "value":true

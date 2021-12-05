@@ -32,8 +32,9 @@ import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.lang.reflect.Type
 import java.security.KeyStore
-import java.text.DateFormat
+import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.Locale
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 import javax.crypto.SecretKey
@@ -52,11 +53,12 @@ class DebugManager(
     private val keyStore = KeyStore.getInstance(LocalCryptoManager.ANDROID_KEY_STORE_PROVIDER).apply {
         this.load(null)
     }
+    private val dateTimeFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.US)
 
     private var debugFile: File = File(logsDir, appPrefs.currentLogFileName).also { file ->
         file.createNewFile()
         val newSessionBlock = StringBuilder().apply {
-            appendLine("++++ Start session  ${DateFormat.getDateTimeInstance().format(Date())} ++++")
+            appendLine("++++ Start session  ${dateTimeFormat.format(Date())} ++++")
             appendLine("${Build.MODEL} - API ${Build.VERSION.SDK_INT}")
             appendLine("keystore aliases = ${keyStore.aliases().toList().joinToString()}")
             keyStore.aliases().toList().forEach { alias ->
@@ -78,13 +80,13 @@ class DebugManager(
         if (!debugFile.exists()) {
             debugFile.apply {
                 createNewFile()
-                appendLine("++++ Restart session  ${DateFormat.getDateTimeInstance().format(Date())} ++++")
+                appendLine("++++ Restart session  ${dateTimeFormat.format(Date())} ++++")
                 appendLine("${Build.MODEL} - API ${Build.VERSION.SDK_INT}")
                 appendLine("")
             }
         }
 
-        insert(0, "[EVENT]\nDate = ${DateFormat.getDateTimeInstance().format(Date())}\n")
+        insert(0, "[EVENT]\nDate = ${dateTimeFormat.format(Date())}\n")
         appendLine("[DATA]")
         appendLine("keystore aliases = ${keyStore.aliases().toList().joinToString()}")
         keyStore.aliases().toList().forEach { alias ->

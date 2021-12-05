@@ -27,7 +27,7 @@ import com.lunabeestudio.stopcovid.coreui.extension.appCompatActivity
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.extension.openAppSettings
 import com.lunabeestudio.stopcovid.coreui.extension.setTextOrHide
-import com.lunabeestudio.stopcovid.coreui.extension.showPermissionRationale
+import com.lunabeestudio.stopcovid.coreui.extension.showPermissionSettingsDialog
 import com.lunabeestudio.stopcovid.coreui.fragment.BaseFragment
 import com.lunabeestudio.stopcovid.databinding.FragmentQrCodeBinding
 import com.lunabeestudio.stopcovid.extension.emitDefaultKonfetti
@@ -54,7 +54,7 @@ abstract class QRCodeFragment : BaseFragment() {
                 resumeQrCodeReader()
             } else if (!shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)) {
                 showingRationale = true
-                context?.showPermissionRationale(
+                context?.showPermissionSettingsDialog(
                     strings = strings,
                     messageKey = "common.needCameraAccessToScan",
                     positiveKey = "common.settings",
@@ -115,7 +115,7 @@ abstract class QRCodeFragment : BaseFragment() {
             ) {
                 if (!showingRationale) {
                     showingRationale = true
-                    context?.showPermissionRationale(
+                    context?.showPermissionSettingsDialog(
                         strings = strings,
                         messageKey = "common.needCameraAccessToScan",
                         positiveKey = "common.ok",

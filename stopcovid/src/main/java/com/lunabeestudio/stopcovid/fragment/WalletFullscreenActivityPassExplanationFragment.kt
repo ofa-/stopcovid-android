@@ -91,7 +91,7 @@ class WalletFullscreenActivityPassExplanationFragment : MainFragment() {
         }
     }
 
-    private fun refreshViewState(activityPass: EuropeanCertificate?) {
+    private suspend fun refreshViewState(activityPass: EuropeanCertificate?) {
         activityPassState = when {
             activityPass?.activityPassValidFuture() == true -> {
                 ActivityPassState.Future(activityPass)
@@ -246,7 +246,7 @@ class WalletFullscreenActivityPassExplanationFragment : MainFragment() {
         bottomBinding?.bottomSheetButton?.text = strings["activityPass.fullscreen.button.generate"]
     }
 
-    override fun getItems(): List<GenericItem> {
+    override suspend fun getItems(): List<GenericItem> {
         val activityPassState = activityPassState ?: return emptyList()
 
         val items = mutableListOf<GenericItem>()

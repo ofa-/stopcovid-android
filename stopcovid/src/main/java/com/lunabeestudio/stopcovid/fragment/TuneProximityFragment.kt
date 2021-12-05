@@ -427,7 +427,7 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
         }
     }
 
-    override fun getItems(): List<GenericItem> {
+    override suspend fun getItems(): List<GenericItem> {
         val items = ArrayList<GenericItem>()
 
         items += dividerItem {}

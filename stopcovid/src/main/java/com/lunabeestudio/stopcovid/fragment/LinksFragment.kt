@@ -27,7 +27,7 @@ class LinksFragment : MainFragment() {
         }
     }
 
-    override fun getItems(): List<GenericItem> {
+    override suspend fun getItems(): List<GenericItem> {
         val items = arrayListOf<GenericItem>()
 
         linksManager.linksSections.value?.fillItems(items)

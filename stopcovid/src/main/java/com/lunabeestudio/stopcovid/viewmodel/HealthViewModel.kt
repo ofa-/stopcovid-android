@@ -50,7 +50,7 @@ class HealthViewModel(private val robertManager: RobertManager) : ViewModel() {
 
 class HealthViewModelFactory(private val robertManager: RobertManager) :
     ViewModelProvider.Factory {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
         @Suppress("UNCHECKED_CAST")
         return HealthViewModel(robertManager) as T
     }

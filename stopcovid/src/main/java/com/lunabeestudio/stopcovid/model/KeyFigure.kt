@@ -17,7 +17,7 @@ data class KeyFigure(
     val valueGlobal: Double?,
     val isFeatured: Boolean,
     val isHighlighted: Boolean?,
-    val extractDate: Long,
+    val extractDateS: Long,
     val valuesDepartments: List<DepartmentKeyFigure>?,
     val displayOnSameChart: Boolean,
     val limitLine: Double?,
@@ -49,7 +49,7 @@ data class KeyFigure(
 data class DepartmentKeyFigure(
     val dptNb: String,
     val dptLabel: String,
-    val extractDate: Long,
+    val extractDateS: Long,
     val value: Number,
     val valueToDisplay: String?,
     val series: List<KeyFigureSeriesItem>?

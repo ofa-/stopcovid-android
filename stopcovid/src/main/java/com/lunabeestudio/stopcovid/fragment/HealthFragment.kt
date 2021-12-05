@@ -50,7 +50,6 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.IllegalFormatException
 import java.util.Locale
-import kotlin.time.ExperimentalTime
 
 class HealthFragment : TimeMainFragment() {
 
@@ -94,7 +93,7 @@ class HealthFragment : TimeMainFragment() {
         }
     }
 
-    override fun getItems(): List<GenericItem> {
+    override suspend fun getItems(): List<GenericItem> {
         return risksLevelManager.getCurrentLevel(robertManager.atRiskStatus?.riskLevel)?.let {
             registeredItems()
         } ?: notRegisteredItems()
@@ -122,7 +121,6 @@ class HealthFragment : TimeMainFragment() {
         return items
     }
 
-    @OptIn(ExperimentalTime::class)
     private fun registeredItems(): ArrayList<GenericItem> {
         val items = ArrayList<GenericItem>()
 

@@ -40,7 +40,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
 
-class ManageDataViewModel(
+class SettingsViewModel(
     secureKeystoreDataSource: SecureKeystoreDataSource,
     private val robertManager: RobertManager,
     isolationManager: IsolationManager,
@@ -187,7 +187,7 @@ class ManageDataViewModel(
     }
 }
 
-class ManageDataViewModelFactory(
+class SettingsViewModelFactory(
     private val secureKeystoreDataSource: SecureKeystoreDataSource,
     private val robertManager: RobertManager,
     private val isolationManager: IsolationManager,
@@ -198,9 +198,9 @@ class ManageDataViewModelFactory(
     private val debugManager: DebugManager,
 ) :
     ViewModelProvider.Factory {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
         @Suppress("UNCHECKED_CAST")
-        return ManageDataViewModel(
+        return SettingsViewModel(
             secureKeystoreDataSource,
             robertManager,
             isolationManager,

@@ -61,7 +61,7 @@ class VenueQrCodeViewModelFactory(
     private val venueRepository: VenueRepository,
 ) :
     ViewModelProvider.Factory {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
         @Suppress("UNCHECKED_CAST")
         return VenueQrCodeViewModel(robertManager, venueRepository) as T
     }

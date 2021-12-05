@@ -69,7 +69,7 @@ class PositiveTestStepsFragment : BottomSheetMainFragment() {
         }
     }
 
-    override fun getItems(): List<GenericItem> {
+    override suspend fun getItems(): List<GenericItem> {
         val items = mutableListOf<GenericItem>()
         val currentStep = viewModel.currentStep.value ?: return items
 

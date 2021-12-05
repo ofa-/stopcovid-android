@@ -101,7 +101,7 @@ class CaptchaViewModel(private val robertManager: RobertManager) : ViewModel() {
 
 class CaptchaViewModelFactory(private val robertManager: RobertManager) :
     ViewModelProvider.Factory {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
         @Suppress("UNCHECKED_CAST")
         return CaptchaViewModel(robertManager) as T
     }

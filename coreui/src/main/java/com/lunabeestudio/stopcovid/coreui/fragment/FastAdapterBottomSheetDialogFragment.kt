@@ -26,7 +26,10 @@ abstract class FastAdapterBottomSheetDialogFragment : BottomSheetDialogFragment(
     val strings: LocalizedStrings
         get() = (activity?.application as? LocalizedApplication)?.localizedStrings ?: emptyMap()
 
-    val adapter: GenericFastItemAdapter = GenericFastItemAdapter()
+    val adapter: GenericFastItemAdapter = GenericFastItemAdapter().apply {
+        attachDefaultListeners = false
+    }
+
     lateinit var binding: FragmentBottomSheetRecyclerViewBinding
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {

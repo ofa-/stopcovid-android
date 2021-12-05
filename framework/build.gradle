@@ -64,7 +64,7 @@ dependencies {
     implementation "androidx.annotation:annotation:_"
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:_"
     implementation 'androidx.preference:preference-ktx:_'
-    implementation "androidx.room:room-ktx:_"
+    api "androidx.room:room-ktx:_"
     kapt "androidx.room:room-compiler:_"
 
 

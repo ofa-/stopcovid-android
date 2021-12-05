@@ -1,0 +1,72 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "29c90756912cfe61238f56765cea01ec",
+    "entities": [
+      {
+        "tableName": "EuropeanCertificateBlacklistRoom",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`hash` TEXT NOT NULL, PRIMARY KEY(`hash`))",
+        "fields": [
+          {
+            "fieldPath": "hash",
+            "columnName": "hash",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "hash"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_EuropeanCertificateBlacklistRoom_hash",
+            "unique": false,
+            "columnNames": [
+              "hash"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_EuropeanCertificateBlacklistRoom_hash` ON `${TABLE_NAME}` (`hash`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "FrenchCertificateBlacklistRoom",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`hash` TEXT NOT NULL, PRIMARY KEY(`hash`))",
+        "fields": [
+          {
+            "fieldPath": "hash",
+            "columnName": "hash",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "hash"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_FrenchCertificateBlacklistRoom_hash",
+            "unique": false,
+            "columnNames": [
+              "hash"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_FrenchCertificateBlacklistRoom_hash` ON `${TABLE_NAME}` (`hash`)"
+          }
+        ],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '29c90756912cfe61238f56765cea01ec')"
+    ]
+  }
+}

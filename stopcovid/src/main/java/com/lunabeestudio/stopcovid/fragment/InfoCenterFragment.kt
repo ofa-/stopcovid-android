@@ -28,8 +28,7 @@ import com.mikepenz.fastadapter.GenericItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlin.time.Duration
-import kotlin.time.ExperimentalTime
+import kotlin.time.Duration.Companion.seconds
 
 import java.util.Date
 import java.text.SimpleDateFormat
@@ -74,8 +73,8 @@ class InfoCenterFragment : TimeMainFragment() {
 
     override fun getTitleKey(): String = "infoCenterController.title"
 
-    @OptIn(ExperimentalTime::class)
-    override fun getItems(): List<GenericItem> {
+    @OptIn(kotlin.time.ExperimentalTime::class)
+    override suspend fun getItems(): List<GenericItem> {
         val items = ArrayList<GenericItem>()
 
         val infoCenterStrings = infoCenterManager.strings.value?.peekContent()
@@ -99,7 +98,7 @@ class InfoCenterFragment : TimeMainFragment() {
                     }
 
                     items += infoCenterDetailCardItem {
-                        header = Duration.seconds(info.timestamp).getRelativeDateTimeString(requireContext(), strings["common.justNow"])
+                        header = info.timestamp.seconds.getRelativeDateTimeString(requireContext(), strings["common.justNow"])
                         title = infoTitle
                         body = infoDescription
                         link = infoCenterStrings[info.buttonLabelKey]
@@ -109,7 +108,7 @@ class InfoCenterFragment : TimeMainFragment() {
                         tagRecyclerViewPool = this@InfoCenterFragment.tagRecyclerPool
                         shareContentDescription = strings["accessibility.hint.info.share"]
                         onShareCard = {
-                            val date = Date(Duration.seconds(info.timestamp).inWholeMilliseconds)
+                            val date = Date(seconds(info.timestamp).inWholeMilliseconds)
                             val text = infoShareText(infoTitle, infoDescription, date)
                             requireContext().startTextIntent(text)
                         }

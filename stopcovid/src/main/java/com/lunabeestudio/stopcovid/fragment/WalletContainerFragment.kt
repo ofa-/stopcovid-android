@@ -79,6 +79,10 @@ class WalletContainerFragment : BaseFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        lifecycleScope.launch {
+            injectionContainer.debugManager.logOpenWalletContainer()
+        }
+
         args.navCertificateId?.let { id ->
             navigateToFullscreenEuropeanCertificateId(id, true)
         }
@@ -87,10 +91,6 @@ class WalletContainerFragment : BaseFragment() {
             lifecycleScope.launch {
                 handleRawCode(args.code, args.certificateFormat?.let { WalletCertificateType.Format.fromValue(it) }, args.origin)
             }
-        }
-
-        lifecycleScope.launch {
-            injectionContainer.debugManager.logOpenWalletContainer()
         }
 
         setupResultListener()

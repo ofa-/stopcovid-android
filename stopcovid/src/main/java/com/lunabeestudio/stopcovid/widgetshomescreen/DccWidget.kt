@@ -9,7 +9,6 @@ package com.lunabeestudio.stopcovid.widgetshomescreen
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  * Created by Lunabee Studio / Date - 2021/26/7 - for the TOUS-ANTI-COVID project
  */
-import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
@@ -27,6 +26,7 @@ import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.toDimensSize
 import com.lunabeestudio.stopcovid.extension.stringsManager
+import com.lunabeestudio.stopcovid.coreui.utils.ImmutablePendingIntentCompat
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -116,7 +116,7 @@ class DccWidget : AppWidgetProvider() {
             Uri.parse(uriIntent)
         )
         intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS)
-        val pendingIntent = PendingIntent.getActivity(context, 0, intent, 0)
+        val pendingIntent = ImmutablePendingIntentCompat.getActivity(context, 0, intent)
         views.setOnClickPendingIntent(R.id.dccWidgetLayout, pendingIntent)
     }
 

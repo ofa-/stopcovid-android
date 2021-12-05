@@ -28,8 +28,7 @@ import com.lunabeestudio.stopcovid.extension.formatCompact
 import com.lunabeestudio.stopcovid.extension.getRelativeDateShortString
 import java.lang.ref.WeakReference
 import kotlin.math.abs
-import kotlin.time.Duration
-import kotlin.time.ExperimentalTime
+import kotlin.time.Duration.Companion.seconds
 
 @SuppressLint("ViewConstructor")
 class TacMarkerView(context: Context, chart: Chart<*>) : ConstraintLayout(context), IMarker {
@@ -46,10 +45,9 @@ class TacMarkerView(context: Context, chart: Chart<*>) : ConstraintLayout(contex
         InitLayoutTacMarkerViewBinding.inflate(LayoutInflater.from(context), this, true)
     }
 
-    @OptIn(ExperimentalTime::class)
     override fun refreshContent(e: Entry, highlight: Highlight?) {
         val yLabel = e.y.formatCompact()
-        val xLabel = Duration.seconds(e.x.toLong()).getRelativeDateShortString(context)
+        val xLabel = e.x.toLong().seconds.getRelativeDateShortString(context)
         binding.markerTextView.text = listOf(yLabel, xLabel).joinToString("\n")
         measureLayout()
     }

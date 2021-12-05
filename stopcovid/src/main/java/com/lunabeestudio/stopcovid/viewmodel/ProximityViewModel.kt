@@ -35,7 +35,6 @@ import com.lunabeestudio.stopcovid.repository.WalletRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlin.time.ExperimentalTime
 
 class ProximityViewModel(
     private val robertManager: RobertManager,
@@ -53,7 +52,6 @@ class ProximityViewModel(
     val isolationDataChanged: SingleLiveEvent<Unit> = isolationManager.changedEvent
     val clearDataSuccess: SingleLiveEvent<Unit> = SingleLiveEvent()
 
-    @OptIn(ExperimentalTime::class)
     val activeAttestationCount: LiveData<Event<Int>> = keystoreDataSource.attestationsFlow.map {
         Event(
             it.filter { attestation ->
@@ -123,7 +121,7 @@ class ProximityViewModelFactory(
     private val walletRepository: WalletRepository,
 ) :
     ViewModelProvider.Factory {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
         @Suppress("UNCHECKED_CAST")
         return ProximityViewModel(
             robertManager,

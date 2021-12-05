@@ -16,9 +16,9 @@ import com.lunabeestudio.stopcovid.model.VaccinationCertificate
 import com.lunabeestudio.stopcovid.model.WalletCertificate
 import timber.log.Timber
 import java.text.SimpleDateFormat
+import java.util.Locale
 import java.util.concurrent.TimeUnit
-import kotlin.time.Duration
-import kotlin.time.ExperimentalTime
+import kotlin.time.Duration.Companion.hours
 
 fun WalletCertificate.fullName(): String =
     "${firstName.orEmpty()} ${name.orEmpty()}".trim().uppercase()
@@ -65,7 +65,7 @@ fun WalletCertificate.fullDescription(strings: LocalizedStrings, configuration: 
             )
 
             if (testResult == "N") {
-                val timeIndicator = validityString(configuration, strings)
+                val timeIndicator = validityString(configuration, strings, false)
                 text = text?.plus("\n$timeIndicator")
             }
 
@@ -105,26 +105,53 @@ fun WalletCertificate.fullDescription(strings: LocalizedStrings, configuration: 
             text ?: ""
         }
         is EuropeanCertificate -> {
-            val prefix = if (this.greenCertificate.isFrench) {
-                ""
-            } else {
-                this.greenCertificate.countryCode?.countryCodeToFlagEmoji ?: ""
+            val descriptionBuilder = StringBuilder()
+            if (!this.greenCertificate.isFrench) {
+                descriptionBuilder.append(this.greenCertificate.countryCode?.countryCodeToFlagEmoji ?: "")
             }
-            formatDccText(
-                prefix + strings["wallet.proof.europe.${this.type.code}.description"],
-                strings,
-                dateFormat,
-                analysisDateFormat
+
+            descriptionBuilder.append(
+                formatDccText(
+                    strings["wallet.proof.europe.${this.type.code}.description"],
+                    strings,
+                    dateFormat,
+                    analysisDateFormat,
+                    false,
+                )
             )
+
+            descriptionBuilder.append(validityString(configuration, strings, false).let { "\n$it" })
+
+            descriptionBuilder.toString()
         }
     }
 }
 
-fun EuropeanCertificate.formatDccText(
+fun EuropeanCertificate.fullScreenBorderDescription(
+    strings: LocalizedStrings,
+    configuration: Configuration,
+): String {
+    val descriptionBuilder = StringBuilder()
+    descriptionBuilder.append(
+        formatDccText(
+            strings["europeanCertificate.fullscreen.englishDescription.${type.code}"],
+            strings,
+            SimpleDateFormat("d MMM yyyy", Locale.ENGLISH),
+            SimpleDateFormat("d MMM yyyy, HH:mm", Locale.ENGLISH),
+            true,
+        )
+    )
+    descriptionBuilder.append(validityString(configuration, strings, true).let { "\n$it" })
+
+    return descriptionBuilder.toString()
+}
+
+private fun EuropeanCertificate.formatDccText(
     inputText: String?,
     strings: LocalizedStrings,
     dateFormat: SimpleDateFormat,
-    analysisDateFormat: SimpleDateFormat
+    analysisDateFormat: SimpleDateFormat,
+    forceEnglish: Boolean,
 ): String {
     var formattedText = inputText
     formattedText = formattedText?.replace("<FULL_NAME>", fullName())
@@ -135,8 +162,11 @@ fun EuropeanCertificate.formatDccText(
             Timber.e("Unexpected type ${this.type} with ${this.javaClass.simpleName}")
         }
         WalletCertificateType.VACCINATION_EUROPE -> {
-            val vacName = this.greenCertificate.vaccineMedicinalProduct?.let { strings["vac.product.$it"] ?: it }
-            formattedText = formattedText?.replace("<VACCINE_NAME>", vacName.orNA())
+            val vaccineName = this.greenCertificate.vaccineMedicinalProduct?.let { strings["vac.product.$it"] ?: it }
+            val vaccineDoseString = this.greenCertificate.vaccineDose?.let { "${it.first}/${it.second}" }
+
+            formattedText = formattedText?.replace("<VACCINE_NAME>", vaccineName.toString().orNA())
+            formattedText = formattedText?.replace("<VACCINE_DOSES>", vaccineDoseString.orEmpty())
             formattedText = formattedText?.replace("<DATE>", this.greenCertificate.vaccineDate?.let(dateFormat::format).orNA())
         }
         WalletCertificateType.RECOVERY_EUROPE -> {
@@ -146,9 +176,24 @@ fun EuropeanCertificate.formatDccText(
             )
         }
         WalletCertificateType.SANITARY_EUROPE -> {
-            val testName = this.greenCertificate.testType?.let { strings["test.man.$it"] ?: it }
+            val testName = this.greenCertificate.testType?.let {
+                val testNameStringKey = StringBuilder("test.man.")
+                if (forceEnglish) {
+                    testNameStringKey.append("englishDescription.")
+                }
+                testNameStringKey.append(it)
+                strings[testNameStringKey.toString()]
+            }
             formattedText = formattedText?.replace("<ANALYSIS_CODE>", testName.orNA())
-            val testResult = this.greenCertificate.testResultCode?.let { strings["wallet.proof.europe.test.$it"] }
+
+            val testResult = this.greenCertificate.testResultCode?.let {
+                val testResultStringKey = StringBuilder("wallet.proof.europe.test.")
+                if (forceEnglish) {
+                    testResultStringKey.append("englishDescription.")
+                }
+                testResultStringKey.append(it)
+                strings[testResultStringKey.toString()]
+            }
             formattedText = formattedText?.replace("<ANALYSIS_RESULT>", testResult.orNA())
             formattedText = formattedText?.replace(
                 "<FROM_DATE>",
@@ -218,18 +263,31 @@ fun WalletCertificate.isOld(configuration: Configuration): Boolean {
     return configuration.walletOldCertificateThresholdInMs(type)?.let { System.currentTimeMillis() - timestamp > it } ?: false
 }
 
-fun SanitaryCertificate.validityString(configuration: Configuration, strings: LocalizedStrings): String? {
+private fun WalletCertificate.validityString(configuration: Configuration, strings: LocalizedStrings, forceEnglish: Boolean): String {
+    if (type != WalletCertificateType.SANITARY && type != WalletCertificateType.SANITARY_EUROPE) {
+        return ""
+    }
+
     val testCertificateValidityThresholds = configuration.testCertificateValidityThresholds
-    val maxValidityInHours = testCertificateValidityThresholds.maxOrNull() ?: 0
     val timeSinceCreation = System.currentTimeMillis() - timestamp
     val validityThresholdInHours = testCertificateValidityThresholds
         .filter { TimeUnit.HOURS.toMillis(it.toLong()) > timeSinceCreation }
         .minOrNull()
-    return if (validityThresholdInHours != null) {
-        strings.stringsFormat("wallet.proof.lessThanSpecificHours", validityThresholdInHours)
-    } else {
-        strings.stringsFormat("wallet.proof.moreThanSpecificHours", maxValidityInHours)
+
+    val validityStringKeyBuilder = StringBuilder("wallet.proof.")
+
+    if (forceEnglish) {
+        validityStringKeyBuilder.append("englishDescription.")
     }
+
+    return if (validityThresholdInHours != null) {
+        validityStringKeyBuilder.append("lessThanSpecificHours")
+        strings.stringsFormat(validityStringKeyBuilder.toString(), validityThresholdInHours)
+    } else {
+        validityStringKeyBuilder.append("moreThanSpecificHours")
+        val maxValidityInHours = testCertificateValidityThresholds.maxOrNull() ?: 0
+        strings.stringsFormat(validityStringKeyBuilder.toString(), maxValidityInHours)
+    }.orEmpty()
 }
 
 val WalletCertificate.raw: RawWalletCertificate
@@ -243,8 +301,10 @@ val WalletCertificate.raw: RawWalletCertificate
         rootWalletCertificateId = (this as? EuropeanCertificate)?.rootWalletCertificateId,
     )
 
-@OptIn(ExperimentalTime::class)
-fun WalletCertificate.isEligibleForActivityPass(blacklistDCCManager: BlacklistDCCManager, activityPassSkipNegTestHours: Int): Boolean {
+suspend fun WalletCertificate.isEligibleForActivityPass(
+    blacklistDCCManager: BlacklistDCCManager,
+    activityPassSkipNegTestHours: Int
+): Boolean {
     if (this.type !in arrayOf(
             WalletCertificateType.SANITARY_EUROPE,
             WalletCertificateType.RECOVERY_EUROPE,
@@ -261,12 +321,12 @@ fun WalletCertificate.isEligibleForActivityPass(blacklistDCCManager: BlacklistDC
     }
 
     if (this.type == WalletCertificateType.SANITARY_EUROPE &&
-        timestamp + Duration.hours(activityPassSkipNegTestHours).inWholeMilliseconds < System.currentTimeMillis()
+        timestamp + activityPassSkipNegTestHours.hours.inWholeMilliseconds < System.currentTimeMillis()
     ) {
         return false
     }
 
-    if (blacklistDCCManager.blacklistedDCCHashes.value?.contains(sha256) == true) return false
+    if (blacklistDCCManager.isBlacklisted(sha256)) return false
 
     return true
 }
@@ -274,11 +334,11 @@ fun WalletCertificate.isEligibleForActivityPass(blacklistDCCManager: BlacklistDC
 val EuropeanCertificate.isExpired: Boolean
     get() = expirationTime < System.currentTimeMillis()
 
-fun EuropeanCertificate.isBlacklisted(blacklistDCCManager: BlacklistDCCManager): Boolean =
-    blacklistDCCManager.blacklistedDCCHashes.value?.contains(sha256) == true
+suspend fun EuropeanCertificate.isBlacklisted(blacklistDCCManager: BlacklistDCCManager): Boolean =
+    blacklistDCCManager.isBlacklisted(sha256)
 
-fun FrenchCertificate.isBlacklisted(blacklist2DDOCManager: Blacklist2DDOCManager): Boolean =
-    blacklist2DDOCManager.blacklisted2DDOCHashes.value?.contains(sha256) == true
+suspend fun FrenchCertificate.isBlacklisted(blacklist2DDOCManager: Blacklist2DDOCManager): Boolean =
+    blacklist2DDOCManager.isBlacklisted(sha256)
 
 // Use 1sec of threshold due to sec -> ms rounding
 fun EuropeanCertificate.activityPassValidFuture(): Boolean = if (type == WalletCertificateType.ACTIVITY_PASS) {

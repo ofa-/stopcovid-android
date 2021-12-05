@@ -10,7 +10,6 @@
 
 package com.lunabeestudio.stopcovid.widgetshomescreen
 
-import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetManager.ACTION_APPWIDGET_UPDATE
 import android.appwidget.AppWidgetProvider
@@ -31,6 +30,7 @@ import com.lunabeestudio.stopcovid.Constants.Url.PROXIMITY_FRAGMENT_URI
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.toDimensSize
 import com.lunabeestudio.stopcovid.coreui.manager.LocalizedStrings
+import com.lunabeestudio.stopcovid.coreui.utils.ImmutablePendingIntentCompat
 import com.lunabeestudio.stopcovid.extension.risksLevelManager
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.stringsManager
@@ -212,8 +212,7 @@ class ProximityWidget : AppWidgetProvider() {
             Intent.ACTION_VIEW,
             Uri.parse(PROXIMITY_FRAGMENT_URI)
         )
-        val pendingIntent =
-            PendingIntent.getActivity(context, 0, intent, 0)
+        val pendingIntent = ImmutablePendingIntentCompat.getActivity(context, 0, intent)
         views.setOnClickPendingIntent(R.id.clickableWidgetLayout, pendingIntent)
     }
 
