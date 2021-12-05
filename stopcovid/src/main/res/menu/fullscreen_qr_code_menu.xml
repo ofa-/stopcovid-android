@@ -12,13 +12,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
     <item
-        android:id="@+id/qr_code_menu_share"
-        android:icon="@drawable/ic_baseline_share_24"
-        android:orderInCategory="1"
-        android:title="Share"
-        app:showAsAction="ifRoom"
-        tools:ignore="HardcodedText" />
-    <item
         android:id="@+id/qr_code_menu_more"
         android:icon="@drawable/ic_more_primary"
         android:orderInCategory="2"

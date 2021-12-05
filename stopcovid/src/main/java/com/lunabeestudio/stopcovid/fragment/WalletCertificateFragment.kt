@@ -299,7 +299,7 @@ class WalletCertificateFragment : MainFragment() {
                 }
             }
 
-            this.allowShare = true
+            this.allowShare = false
             onShare = { barcodeBitmap ->
                 findParentFragmentByType<WalletContainerFragment>()?.let { containerFragment ->
                     val uri = barcodeBitmap?.let { bitmap ->

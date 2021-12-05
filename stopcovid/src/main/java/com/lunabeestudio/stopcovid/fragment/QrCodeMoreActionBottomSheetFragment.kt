@@ -63,11 +63,7 @@ class QrCodeMoreActionBottomSheetFragment : BottomSheetDialogFragment() {
             binding.actionLayout.removeView(binding.brightnessLayout)
         }
 
-        if (args.showShare) {
-            binding.shareButton.setup()
-        } else {
             binding.actionLayout.removeView(binding.shareButton)
-        }
 
         return binding.root
     }
