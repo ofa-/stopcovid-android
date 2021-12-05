@@ -157,5 +157,5 @@ var SharedPreferences.blacklist2DdocIteration: Int
     set(value) = edit { putInt(Constants.SharedPrefs.BLACKLIST_2DDOC_ITERATION, value) }
 
 var SharedPreferences.enableAutoFullscreenBrightness: Boolean
-    get() = getBoolean(Constants.SharedPrefs.ENABLE_AUTO_FULLSCREEN_BRIGHTNESS, true)
+    get() = getBoolean(Constants.SharedPrefs.ENABLE_AUTO_FULLSCREEN_BRIGHTNESS, false)
     set(value) = edit { putBoolean(Constants.SharedPrefs.ENABLE_AUTO_FULLSCREEN_BRIGHTNESS, value) }
