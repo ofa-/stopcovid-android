@@ -73,7 +73,6 @@ class InfoCenterFragment : TimeMainFragment() {
 
     override fun getTitleKey(): String = "infoCenterController.title"
 
-    @OptIn(kotlin.time.ExperimentalTime::class)
     override suspend fun getItems(): List<GenericItem> {
         val items = ArrayList<GenericItem>()
 
@@ -108,7 +107,7 @@ class InfoCenterFragment : TimeMainFragment() {
                         tagRecyclerViewPool = this@InfoCenterFragment.tagRecyclerPool
                         shareContentDescription = strings["accessibility.hint.info.share"]
                         onShareCard = {
-                            val date = Date(seconds(info.timestamp).inWholeMilliseconds)
+                            val date = Date(info.timestamp.seconds.inWholeMilliseconds)
                             val text = infoShareText(infoTitle, infoDescription, date)
                             requireContext().startTextIntent(text)
                         }
