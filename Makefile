@@ -43,7 +43,7 @@ strings-%:
 keystore = stopcovid/my-release-key.jks
 
 build: $(keystore) local.properties .
-	./gradlew assembleRelease
+	./gradlew assembleRelease -x lintVitalRelease
 
 install:
 	./gradlew installRelease
