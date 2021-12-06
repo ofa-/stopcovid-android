@@ -206,6 +206,7 @@ class CertificateCardItem : AbstractBindingItem<ItemCertificateCardBinding>() {
             inflate(R.menu.qr_code_menu)
 
             menu.findItem(R.id.qr_code_menu_share).title = share
+            menu.findItem(R.id.qr_code_menu_share).isVisible = false
 
             menu.findItem(R.id.qr_code_menu_delete).title = delete
 
