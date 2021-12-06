@@ -73,10 +73,6 @@ abstract class MainFragment : FastAdapterFragment() {
         (activity as? MainActivity)?.showSnackBar(message)
     }
 
-    protected fun showErrorSnackBar(message: String) {
-        (activity as? MainActivity)?.showErrorSnackBar(message)
-    }
-
     protected val keyFiguresManager: KeyFiguresManager by lazy(LazyThreadSafetyMode.NONE) {
         injectionContainer.keyFiguresManager
     }

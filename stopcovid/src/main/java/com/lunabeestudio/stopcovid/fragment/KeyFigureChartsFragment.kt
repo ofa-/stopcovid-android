@@ -19,18 +19,14 @@ import android.widget.LinearLayout
 import androidx.annotation.DimenRes
 import androidx.core.os.bundleOf
 import androidx.core.view.updateLayoutParams
-import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import com.lunabeestudio.robert.extension.observeEventAndConsume
-import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.R
-import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.databinding.ItemCaptionBinding
 import com.lunabeestudio.stopcovid.coreui.extension.appCompatActivity
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.extension.findParentFragmentByType
 import com.lunabeestudio.stopcovid.coreui.extension.safeEmojiSpanify
-import com.lunabeestudio.stopcovid.coreui.extension.viewLifecycleOwnerOrNull
 import com.lunabeestudio.stopcovid.coreui.fragment.BaseFragment
 import com.lunabeestudio.stopcovid.databinding.ItemKeyFigureChartCardBinding
 import com.lunabeestudio.stopcovid.extension.chosenPostalCode
@@ -44,9 +40,6 @@ import com.lunabeestudio.stopcovid.manager.KeyFiguresManager
 import com.lunabeestudio.stopcovid.manager.ShareManager
 import com.lunabeestudio.stopcovid.model.ChartInformation
 import com.lunabeestudio.stopcovid.model.KeyFigure
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class KeyFigureChartsFragment : BaseFragment() {
 
@@ -152,7 +145,7 @@ class KeyFigureChartsFragment : BaseFragment() {
                                 chartExplanationLabel = chartInfo.chartExplanationLabel
                                 shareContentDescription = strings["accessibility.hint.keyFigure.chart.share"]
                                 onShareCard = { binding ->
-                                    shareChart(binding)
+                                    ShareManager.shareChart(this@KeyFigureChartsFragment, binding)
                                 }
                                 onClickListener = getChartOnClickListener(figure.labelKey, chartDataType)
                             }.bindView(this, emptyList())
@@ -183,23 +176,8 @@ class KeyFigureChartsFragment : BaseFragment() {
         return chartsToDisplay
     }
 
-    private fun shareChart(binding: ItemKeyFigureChartCardBinding) {
-        viewLifecycleOwnerOrNull()?.lifecycleScope?.launch {
-            val uri = ShareManager.getShareCaptureUri(binding, Constants.Chart.SHARE_CHART_FILENAME)
-            withContext(Dispatchers.Main) {
-                ShareManager.shareImageAndText(requireContext(), uri, null) {
-                    strings["common.error.unknown"]?.let { showErrorSnackBar(it) }
-                }
-            }
-        }
-    }
-
     fun setTitle(title: String) {
         appCompatActivity?.supportActionBar?.title = title
-    }
-
-    private fun showErrorSnackBar(message: String) {
-        (activity as? MainActivity)?.showErrorSnackBar(message)
     }
 
     private fun getChartOnClickListener(labelKey: String, chartDataType: ChartDataType): View.OnClickListener = View.OnClickListener {

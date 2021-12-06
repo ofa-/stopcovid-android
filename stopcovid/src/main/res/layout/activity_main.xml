@@ -58,6 +58,12 @@
         android:visibility="invisible"
         tools:visibility="visible">
 
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_gravity="top"
+            android:background="@color/color_galliano" />
+
         <TextView
             android:id="@+id/errorTextView"
             android:layout_width="match_parent"

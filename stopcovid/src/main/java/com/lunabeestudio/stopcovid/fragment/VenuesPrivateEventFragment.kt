@@ -28,6 +28,7 @@ import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
 import com.lunabeestudio.stopcovid.extension.privateEventQrCode
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
+import com.lunabeestudio.stopcovid.extension.showErrorSnackBar
 import com.lunabeestudio.stopcovid.fastitem.privateVenueQrCodeItem
 import com.lunabeestudio.stopcovid.manager.ShareManager
 import com.mikepenz.fastadapter.GenericItem

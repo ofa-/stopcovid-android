@@ -1,6 +1,7 @@
 package com.lunabeestudio.stopcovid.extension
 
 import android.annotation.SuppressLint
+import android.text.SpannableStringBuilder
 import com.lunabeestudio.domain.extension.walletOldCertificateThresholdInMs
 import com.lunabeestudio.domain.model.Configuration
 import com.lunabeestudio.domain.model.RawWalletCertificate
@@ -10,6 +11,7 @@ import com.lunabeestudio.stopcovid.coreui.manager.LocalizedStrings
 import com.lunabeestudio.stopcovid.manager.Blacklist2DDOCManager
 import com.lunabeestudio.stopcovid.manager.BlacklistDCCManager
 import com.lunabeestudio.stopcovid.model.EuropeanCertificate
+import com.lunabeestudio.stopcovid.model.Expired
 import com.lunabeestudio.stopcovid.model.FrenchCertificate
 import com.lunabeestudio.stopcovid.model.SanitaryCertificate
 import com.lunabeestudio.stopcovid.model.VaccinationCertificate
@@ -20,19 +22,50 @@ import java.util.Locale
 import java.util.concurrent.TimeUnit
 import kotlin.time.Duration.Companion.hours
 
-fun WalletCertificate.fullName(): String =
-    "${firstName.orEmpty()} ${name.orEmpty()}".trim().uppercase()
+fun WalletCertificate.fullNameUppercase(): String =
+    fullName().uppercase()
 
-fun WalletCertificate.shortDescription(): String {
-    return when (this) {
-        is FrenchCertificate,
-        is EuropeanCertificate -> fullName()
+fun WalletCertificate.fullName(): String =
+    "${firstName.orEmpty()} ${name.orEmpty()}".trim()
+
+fun WalletCertificate.titleDescription(strings: LocalizedStrings): String {
+    val titleBuilder = SpannableStringBuilder()
+    if ((this as? EuropeanCertificate)?.greenCertificate?.isFrench == false) {
+        titleBuilder.append(this.greenCertificate.countryCode?.countryCodeToFlagEmoji?.plus(" ") ?: "")
     }
+    titleBuilder.append(
+        when (this) {
+            is EuropeanCertificate -> strings["wallet.proof.europe.${type.code}.title"] ?: ""
+            else -> strings["wallet.proof.${type.stringKey}.title"] ?: ""
+        }.trim()
+    )
+    return titleBuilder.toString()
+}
+
+fun WalletCertificate.infosDescription(strings: LocalizedStrings, configuration: Configuration): String {
+    val text = when (this) {
+        is EuropeanCertificate -> strings["wallet.proof.europe.${type.code}.infos"]
+        else -> strings["wallet.proof.${type.stringKey}.infos"]
+    }
+    return formatText(strings, configuration, text, false).trim()
+}
+
+fun WalletCertificate.fullDescription(strings: LocalizedStrings, configuration: Configuration): String {
+    val text = when (this) {
+        is EuropeanCertificate -> strings["wallet.proof.europe.${type.code}.description"]
+        else -> strings["wallet.proof.${type.stringKey}.description"]
+    }
+    return formatText(strings, configuration, text, true).trim()
 }
 
 @SuppressLint("SimpleDateFormat")
-fun WalletCertificate.fullDescription(strings: LocalizedStrings, configuration: Configuration): String {
-    var text = strings["wallet.proof.${type.stringKey}.description"]
+private fun WalletCertificate.formatText(
+    strings: LocalizedStrings,
+    configuration: Configuration,
+    textToFormat: String?,
+    shouldAddFlag: Boolean,
+): String {
+    var text = textToFormat
     val dateFormat = SimpleDateFormat("d MMM yyyy")
     val analysisDateFormat = SimpleDateFormat("d MMM yyyy, HH:mm")
     return when (this) {
@@ -106,13 +139,13 @@ fun WalletCertificate.fullDescription(strings: LocalizedStrings, configuration: 
         }
         is EuropeanCertificate -> {
             val descriptionBuilder = StringBuilder()
-            if (!this.greenCertificate.isFrench) {
+            if (!this.greenCertificate.isFrench && shouldAddFlag) {
                 descriptionBuilder.append(this.greenCertificate.countryCode?.countryCodeToFlagEmoji ?: "")
             }
 
             descriptionBuilder.append(
                 formatDccText(
-                    strings["wallet.proof.europe.${this.type.code}.description"],
+                    text,
                     strings,
                     dateFormat,
                     analysisDateFormat,
@@ -154,7 +187,7 @@ private fun EuropeanCertificate.formatDccText(
     forceEnglish: Boolean,
 ): String {
     var formattedText = inputText
-    formattedText = formattedText?.replace("<FULL_NAME>", fullName())
+    formattedText = formattedText?.replace("<FULL_NAME>", fullNameUppercase())
     formattedText = formattedText?.replace("<BIRTHDATE>", this.greenCertificate.formattedDateOfBirthDate(dateFormat))
     when (this.type) {
         WalletCertificateType.SANITARY,
@@ -227,6 +260,9 @@ fun EuropeanCertificate.tagStringKey(): String {
 }
 
 fun EuropeanCertificate.statusStringKey(): String {
+    if (this.isSignatureExpired)
+        return "wallet.expired.pillTitle"
+
     return when (this.type) {
         WalletCertificateType.VACCINATION,
         WalletCertificateType.VACCINATION_EUROPE,
@@ -260,7 +296,9 @@ fun WalletCertificate.isRecent(configuration: Configuration): Boolean {
 }
 
 fun WalletCertificate.isOld(configuration: Configuration): Boolean {
-    return configuration.walletOldCertificateThresholdInMs(type)?.let { System.currentTimeMillis() - timestamp > it } ?: false
+    return (configuration.walletOldCertificateThresholdInMs(type)?.let { System.currentTimeMillis() - timestamp > it } ?: false)
+        || (this as? EuropeanCertificate)?.isSignatureExpired == true
+        || (this as? EuropeanCertificate)?.smartWalletState(configuration) is Expired
 }
 
 private fun WalletCertificate.validityString(configuration: Configuration, strings: LocalizedStrings, forceEnglish: Boolean): String {
@@ -303,7 +341,7 @@ val WalletCertificate.raw: RawWalletCertificate
 
 suspend fun WalletCertificate.isEligibleForActivityPass(
     blacklistDCCManager: BlacklistDCCManager,
-    activityPassSkipNegTestHours: Int
+    configuration: Configuration,
 ): Boolean {
     if (this.type !in arrayOf(
             WalletCertificateType.SANITARY_EUROPE,
@@ -312,7 +350,7 @@ suspend fun WalletCertificate.isEligibleForActivityPass(
         )
     ) return false
 
-    if ((this as? EuropeanCertificate)?.isExpired == true) {
+    if ((this as? EuropeanCertificate)?.isSignatureExpired == true) {
         return false
     }
 
@@ -321,17 +359,21 @@ suspend fun WalletCertificate.isEligibleForActivityPass(
     }
 
     if (this.type == WalletCertificateType.SANITARY_EUROPE &&
-        timestamp + activityPassSkipNegTestHours.hours.inWholeMilliseconds < System.currentTimeMillis()
+        timestamp + configuration.activityPassSkipNegTestHours.hours.inWholeMilliseconds < System.currentTimeMillis()
     ) {
         return false
     }
 
     if (blacklistDCCManager.isBlacklisted(sha256)) return false
 
+    if ((this as? EuropeanCertificate)?.smartWalletState(configuration) is Expired) {
+        return false
+    }
+
     return true
 }
 
-val EuropeanCertificate.isExpired: Boolean
+val EuropeanCertificate.isSignatureExpired: Boolean
     get() = expirationTime < System.currentTimeMillis()
 
 suspend fun EuropeanCertificate.isBlacklisted(blacklistDCCManager: BlacklistDCCManager): Boolean =

@@ -31,9 +31,9 @@ import com.lunabeestudio.stopcovid.coreui.extension.findParentFragmentByType
 import com.lunabeestudio.stopcovid.coreui.extension.toDimensSize
 import com.lunabeestudio.stopcovid.coreui.fragment.BaseFragment
 import com.lunabeestudio.stopcovid.databinding.FragmentWalletFullscreenActivityPassBinding
-import com.lunabeestudio.stopcovid.extension.fullName
+import com.lunabeestudio.stopcovid.extension.fullNameUppercase
 import com.lunabeestudio.stopcovid.extension.injectionContainer
-import com.lunabeestudio.stopcovid.extension.isExpired
+import com.lunabeestudio.stopcovid.extension.isSignatureExpired
 import com.lunabeestudio.stopcovid.extension.navGraphWalletViewModels
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.manager.Blacklist2DDOCManager
@@ -68,6 +68,7 @@ class WalletFullscreenActivityPassFragment : BaseFragment() {
             blacklist2DDOCManager,
             injectionContainer.walletRepository,
             injectionContainer.generateActivityPassUseCase,
+            injectionContainer.getSmartWalletCertificateUseCase,
         )
     }
 
@@ -76,7 +77,7 @@ class WalletFullscreenActivityPassFragment : BaseFragment() {
 
     private val timeUpdateReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(p0: Context?, p1: Intent?) {
-            if (activityPass?.isExpired != false) {
+            if (activityPass?.isSignatureExpired != false) {
                 refreshCertificate()
             } else {
                 activityPass?.let {
@@ -161,7 +162,7 @@ class WalletFullscreenActivityPassFragment : BaseFragment() {
                     qrCodeSize
                 )
 
-            certificateDetailsTextView.text = europeanCertificate.fullName()
+            certificateDetailsTextView.text = europeanCertificate.fullNameUppercase()
             setValidityTime(validityTimeChip, europeanCertificate)
             explanationTextView.text = strings["europeanCertificate.fullscreen.type.minimum.footer"]
         }

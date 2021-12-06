@@ -363,15 +363,15 @@
             app:argType="string"
             app:nullable="true" />
         <action
-            android:id="@+id/action_reportFragment_to_codeFragment"
-            app:destination="@id/codeFragment"
+            android:id="@+id/action_reportFragment_to_reportBottomSheetFragment"
+            app:destination="@id/reportBottomSheetFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
         <action
-            android:id="@+id/action_reportFragment_to_reportQrCodeFragment"
-            app:destination="@id/reportQrCodeFragment"
+            android:id="@+id/action_reportFragment_to_codeFragment"
+            app:destination="@id/codeFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
@@ -417,6 +417,13 @@
         <action
             android:id="@+id/action_keyFiguresPagerFragment_toMoreKeyFigureFragment"
             app:destination="@id/moreKeyFiguresFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_keyFiguresPagerFragment_to_compareKeyFiguresFragment"
+            app:destination="@id/compareKeyFiguresFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
@@ -692,6 +699,25 @@
         android:id="@+id/postalCodeBottomSheetFragment"
         android:name="com.lunabeestudio.stopcovid.fragment.PostalCodeBottomSheetFragment"
         tools:layout="@layout/fragment_postal_code_bottom_sheet" />
+    <dialog
+        android:id="@+id/reportBottomSheetFragment"
+        android:name="com.lunabeestudio.stopcovid.fragment.ReportBottomSheetFragment"
+        tools:layout="@layout/fragment_report_bottom_sheet">
+        <action
+            android:id="@+id/action_reportBottomSheetFragment_to_codeFragment"
+            app:destination="@id/codeFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_reportBottomSheetFragment_to_reportQrCodeFragment"
+            app:destination="@id/reportQrCodeFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+    </dialog>
     <fragment
         android:id="@+id/venuesHistoryFragment"
         android:name="com.lunabeestudio.stopcovid.fragment.VenuesHistoryFragment"
@@ -881,6 +907,11 @@
         <argument
             android:name="minDate"
             app:argType="long" />
+        <argument
+            android:name="keyFiguresKey2"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="null" />
     </activity>
     <fragment
         android:id="@+id/urgentInfoFragment"
@@ -906,4 +937,52 @@
             android:name="showBrightness"
             app:argType="boolean" />
     </dialog>
+    <fragment
+        android:id="@+id/chooseKeyFiguresCompareFragment"
+        android:name="com.lunabeestudio.stopcovid.fragment.ChooseKeyFiguresCompareFragment" >
+        <action
+            android:id="@+id/action_chooseKeyFiguresCompareFragment_to_selectKeyFiguresFragment"
+            app:destination="@id/selectKeyFiguresFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_chooseKeyFiguresCompareFragment_to_compareKeyFiguresFragment"
+            app:destination="@id/compareKeyFiguresFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+    </fragment>
+    <fragment
+        android:id="@+id/selectKeyFiguresFragment"
+        android:name="com.lunabeestudio.stopcovid.fragment.SelectKeyFiguresFragment" >
+        <argument
+            android:name="figureNumber"
+            app:argType="integer" />
+        <argument
+            android:name="labelKeyFigure1"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="labelKeyFigure2"
+            app:argType="string"
+            app:nullable="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/compareKeyFiguresFragment"
+        android:name="com.lunabeestudio.stopcovid.fragment.CompareKeyFiguresFragment" >
+        <action
+            android:id="@+id/action_compareKeyFiguresFragment_to_chooseKeyFiguresCompareFragment"
+            app:destination="@id/chooseKeyFiguresCompareFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_compareKeyFiguresFragment_to_chartFullScreenActivity"
+            app:destination="@id/chartFullScreenActivity" />
+    </fragment>
+
 </navigation>

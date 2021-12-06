@@ -33,18 +33,21 @@ import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.extension.refreshLift
 import com.lunabeestudio.stopcovid.coreui.fragment.BaseFragment
+import com.lunabeestudio.stopcovid.databinding.FragmentKeyFiguresPagerBinding
 import com.lunabeestudio.stopcovid.extension.chosenPostalCode
 import com.lunabeestudio.stopcovid.extension.ratingsKeyFiguresOpening
 import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.extension.showPostalCodeDialog
 import com.lunabeestudio.stopcovid.model.KeyFigureCategory
 import com.lunabeestudio.stopcovid.model.UnknownException
+import com.lunabeestudio.stopcovid.utils.ExtendedFloatingActionButtonScrollListener
 
 class KeyFiguresPagerFragment : BaseFragment() {
 
     private lateinit var viewPager: ViewPager2
     private var tabLayoutMediator: TabLayoutMediator? = null
     private var tabSelectedListener: TabLayout.OnTabSelectedListener? = null
+    private lateinit var binding: FragmentKeyFiguresPagerBinding
 
     private val sharedPrefs: SharedPreferences by lazy {
         PreferenceManager.getDefaultSharedPreferences(requireContext())
@@ -57,9 +60,25 @@ class KeyFiguresPagerFragment : BaseFragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        viewPager = ViewPager2(inflater.context)
-        viewPager.id = R.id.keyfigures_pager
-        return viewPager
+        binding = FragmentKeyFiguresPagerBinding.inflate(inflater, container, false)
+        viewPager = binding.viewPager
+        setupExtendedFab()
+        return binding.root
+    }
+
+    private fun setupExtendedFab() {
+        binding.floatingActionButton.apply {
+            text = strings["keyfigures.comparison.screen.title"]
+            setOnClickListener {
+                findNavControllerOrNull()?.safeNavigate(
+                    KeyFiguresPagerFragmentDirections.actionKeyFiguresPagerFragmentToCompareKeyFiguresFragment()
+                )
+            }
+        }
+    }
+
+    fun bindFabToRecyclerView(recyclerView: RecyclerView) {
+        recyclerView.addOnScrollListener(ExtendedFloatingActionButtonScrollListener(binding.floatingActionButton))
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

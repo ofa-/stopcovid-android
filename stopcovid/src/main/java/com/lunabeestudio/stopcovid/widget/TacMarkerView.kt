@@ -12,7 +12,9 @@ package com.lunabeestudio.stopcovid.widget
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.Canvas
+import android.graphics.drawable.GradientDrawable
 import android.view.LayoutInflater
 import androidx.annotation.IdRes
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -49,6 +51,13 @@ class TacMarkerView(context: Context, chart: Chart<*>) : ConstraintLayout(contex
         val yLabel = e.y.formatCompact()
         val xLabel = e.x.toLong().seconds.getRelativeDateShortString(context)
         binding.markerTextView.text = listOf(yLabel, xLabel).joinToString("\n")
+
+        chart?.data?.getDataSetForEntry(e)?.color?.let {
+            (binding.markerTextView.background as GradientDrawable).color = ColorStateList.valueOf(it)
+            binding.arrowBottomImageView.imageTintList = ColorStateList.valueOf(it)
+            binding.arrowTopImageView.imageTintList = ColorStateList.valueOf(it)
+        }
+
         measureLayout()
     }
 

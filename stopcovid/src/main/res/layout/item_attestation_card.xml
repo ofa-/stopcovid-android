@@ -28,33 +28,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/spacing_large"
-            android:layout_marginTop="@dimen/spacing_small"
+            android:layout_marginTop="@dimen/spacing_large"
             android:importantForAccessibility="no"
-            app:layout_constraintBottom_toTopOf="@id/formatTextView"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/favoriteButton"
-            app:layout_constraintVertical_bias="0"
-            app:layout_goneMarginTop="@dimen/spacing_large"
-            tools:layout_height="@dimen/qr_code_size"
-            tools:layout_width="@dimen/qr_code_size"
-            tools:src="@tools:sample/avatars" />
-
-        <TextView
-            android:id="@+id/formatTextView"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/spacing_large"
-            android:layout_marginTop="@dimen/spacing_medium"
-            android:layout_marginBottom="@dimen/spacing_large"
-            android:gravity="center"
-            android:textAppearance="@style/TextAppearance.StopCovid.Title.Bold"
-            android:textIsSelectable="false"
             app:layout_constraintBottom_toTopOf="@id/mainDescriptionTextView"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/imageView"
-            tools:text="@tools:sample/lorem[3]" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0"
+            tools:layout_height="@dimen/qr_code_size"
+            tools:layout_width="@dimen/qr_code_size"
+            tools:src="@tools:sample/avatars" />
 
         <TextView
             android:id="@+id/mainDescriptionTextView"
@@ -66,61 +49,11 @@
             android:gravity="center"
             android:textAppearance="@style/TextAppearance.StopCovid.Caption"
             android:textIsSelectable="false"
-            app:layout_constraintBottom_toTopOf="@id/tagLayout"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/formatTextView"
-            tools:text="@tools:sample/lorem[12]" />
-
-        <LinearLayout
-            android:id="@+id/tagLayout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            app:layout_constraintBottom_toTopOf="@id/footerDescriptionTextView"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/mainDescriptionTextView"
-            app:layout_goneMarginBottom="@dimen/spacing_large">
-
-            <include
-                android:id="@+id/tag1"
-                layout="@layout/item_tag" />
-
-            <include
-                android:id="@+id/tag2"
-                layout="@layout/item_tag" />
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/footerDescriptionTextView"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/spacing_large"
-            android:layout_marginTop="@dimen/spacing_medium"
-            android:gravity="center"
-            android:textAppearance="@style/TextAppearance.StopCovid.Caption"
-            android:textIsSelectable="false"
             app:layout_constraintBottom_toTopOf="@id/bottomActionTextView"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tagLayout"
-            app:layout_goneMarginBottom="@dimen/spacing_large"
+            app:layout_constraintTop_toBottomOf="@id/imageView"
             tools:text="@tools:sample/lorem[12]" />
-
-        <ImageButton
-            android:id="@+id/favoriteButton"
-            android:layout_width="@dimen/min_touch_target_size"
-            android:layout_height="@dimen/min_touch_target_size"
-            android:background="@drawable/ripple_rounded"
-            android:padding="@dimen/spacing_large"
-            android:src="@drawable/ic_empty_heart"
-            android:visibility="gone"
-            app:layout_constraintEnd_toStartOf="@id/actionButton"
-            app:layout_constraintTop_toTopOf="parent"
-            app:tint="?colorControlNormal"
-            tools:ignore="ContentDescription"
-            tools:visibility="visible" />
 
         <ImageButton
             android:id="@+id/actionButton"
@@ -147,7 +80,7 @@
             android:paddingEnd="@dimen/spacing_small"
             android:textIsSelectable="false"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/footerDescriptionTextView"
+            app:layout_constraintTop_toBottomOf="@id/mainDescriptionTextView"
             tools:text="@tools:sample/lorem[3]" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

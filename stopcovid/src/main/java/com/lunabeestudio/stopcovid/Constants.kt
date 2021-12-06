@@ -43,6 +43,7 @@ object Constants {
         const val SHOW_CERTIFICATE_DETAILS: String = "showCertificateDetails"
         const val SHOW_ERROR_PANEL: String = "showErrorPanel"
         const val SHOW_ACTIVATION_REMINDER: String = "showActivationReminder"
+        const val SHOW_SMART_WALLET: String = "showSmartWallet"
         const val HAS_USED_UNIVERSAL_QR_SCAN: String = "hasUsedUniversalQrScan"
         const val RATINGS_KEY_FIGURES_OPENING: String = "ratingsKeyFiguresOpening"
         const val RATINGS_SHOWN: String = "ratingsShown"
@@ -52,6 +53,11 @@ object Constants {
         const val BLACKLIST_DCC_ITERATION: String = "Blacklist.Dcc.Iteration"
         const val BLACKLIST_2DDOC_ITERATION: String = "Blacklist.2Ddoc.Iteration"
         const val ENABLE_AUTO_FULLSCREEN_BRIGHTNESS: String = "Enable.Auto.Fullscreen.Brightness"
+        const val SMART_WALLET_SENT_NOTIFICATIONS: String = "Smart.Wallet.Sent.Notifications"
+
+        // Compare Key Figure
+        const val COMPARE_KEY_FIGURE_LABEL_1: String = "Compare.Key.Figures.1"
+        const val COMPARE_KEY_FIGURE_LABEL_2: String = "Compare.Key.Figures.2"
     }
 
     object Notification {
@@ -68,14 +74,20 @@ object Constants {
         const val VACCINATION_COMPLETED_REMINDER: String = "StopCovid.VaccinationCompleted.Reminder.Worker"
         const val DCC_LIGHT_GENERATION: String = "StopCovid.DccLightGeneration.Worker"
         const val DCC_LIGHT_RENEW_CLEAN: String = "StopCovid.DccLightRenewClean.Worker"
+        const val SMART_WALLET_NOTIFICATION: String = "StopCovid.SmartWalletNotification.Worker"
         const val DCC_LIGHT_AVAILABLE: String = "StopCovid.DccLightAvailable.Worker"
         const val BLACKLIST_DCC: String = "StopCovid.BlacklistDcc.Worker"
         const val BLACKLIST_2DDOC: String = "StopCovid.Blacklist2ddoc.Worker"
     }
 
     object WorkerTags {
-        const val DCC_LIGHT: String = "DCC_LIGHT_WORKERS"
         const val BLACKLIST: String = "BLACKLIST_WORKERS"
+        const val DCC_LIGHT: String = "DCC_LIGHT_WORKERS"
+        const val SMART_WALLET: String = "SMART_WALLET_WORKERS"
+    }
+
+    object WorkerPeriodicTime {
+        const val SMART_WALLET_NOTIFICATION_HOURS: Long = 12L
     }
 
     object ServerConstant {

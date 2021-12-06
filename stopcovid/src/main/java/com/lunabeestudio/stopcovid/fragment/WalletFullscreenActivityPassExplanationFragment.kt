@@ -69,6 +69,7 @@ class WalletFullscreenActivityPassExplanationFragment : MainFragment() {
             injectionContainer.blacklist2DDOCManager,
             injectionContainer.walletRepository,
             injectionContainer.generateActivityPassUseCase,
+            injectionContainer.getSmartWalletCertificateUseCase,
         )
     }
 
@@ -98,7 +99,7 @@ class WalletFullscreenActivityPassExplanationFragment : MainFragment() {
             }
             certificate?.isEligibleForActivityPass(
                 injectionContainer.blacklistDCCManager,
-                robertManager.configuration.activityPassSkipNegTestHours,
+                robertManager.configuration,
             ) == true -> if ((certificate as? EuropeanCertificate)?.canRenewActivityPass == true) {
                 ActivityPassState.EligibleRenewFail
             } else {

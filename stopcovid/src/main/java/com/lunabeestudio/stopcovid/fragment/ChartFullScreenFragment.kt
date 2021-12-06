@@ -12,12 +12,14 @@ package com.lunabeestudio.stopcovid.fragment
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
+import androidx.core.widget.TextViewCompat
 import androidx.navigation.fragment.navArgs
 import androidx.preference.PreferenceManager
 import com.github.mikephil.charting.listener.ChartTouchListener
@@ -28,10 +30,12 @@ import com.lunabeestudio.stopcovid.coreui.fragment.BaseFragment
 import com.lunabeestudio.stopcovid.databinding.FragmentChartFullScreenBinding
 import com.lunabeestudio.stopcovid.extension.chosenPostalCode
 import com.lunabeestudio.stopcovid.extension.fillWithChartData
+import com.lunabeestudio.stopcovid.extension.generateCombinedData
 import com.lunabeestudio.stopcovid.extension.getKeyFigureForPostalCode
 import com.lunabeestudio.stopcovid.extension.injectionContainer
 import com.lunabeestudio.stopcovid.extension.setLegend1FromChartData
 import com.lunabeestudio.stopcovid.extension.setLegend2FromChartData
+import com.lunabeestudio.stopcovid.extension.setupStyle
 import com.lunabeestudio.stopcovid.manager.KeyFiguresManager
 import com.lunabeestudio.stopcovid.model.ChartInformation
 import com.lunabeestudio.stopcovid.model.KeyFigure
@@ -55,8 +59,10 @@ class ChartFullScreenFragment : BaseFragment(), OnChartGestureListener {
     }
 
     private var keyFigure: KeyFigure? = null
+    private var keyFigure2: KeyFigure? = null
     private val chartDataType: ChartDataType by lazy { args.chartDataType }
     private val keyFigureKey: String by lazy { args.keyFigureKey }
+    private val keyFigureKey2: String? by lazy { args.keyFigureKey2 }
     private val minDate: Long by lazy { args.minDate }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -84,6 +90,7 @@ class ChartFullScreenFragment : BaseFragment(), OnChartGestureListener {
             setOnClickListener {
                 binding.keyFigureBarChart.fitScreen()
                 binding.keyFigureLineChart.fitScreen()
+                binding.keyFigureCombinedChart.fitScreen()
                 isVisible = false
             }
         }
@@ -97,6 +104,9 @@ class ChartFullScreenFragment : BaseFragment(), OnChartGestureListener {
         keyFiguresManager.figures.observe(viewLifecycleOwner) {
             keyFigure = it.peekContent().data?.first { figure ->
                 figure.labelKey == keyFigureKey
+            }
+            keyFigure2 = it.peekContent().data?.firstOrNull { figure ->
+                figure.labelKey == keyFigureKey2
             }
             refreshScreen()
         }
@@ -139,20 +149,36 @@ class ChartFullScreenFragment : BaseFragment(), OnChartGestureListener {
         }
     }
 
+    private fun setupCombinedCharts() {
+        binding.keyFigureCombinedChart.apply {
+            setupStyle(keyFigure?.magnitude != keyFigure2?.magnitude)
+            isScaleXEnabled = true
+            isDragXEnabled = true
+            isScaleYEnabled = false
+            isDragYEnabled = false
+            setTouchEnabled(true)
+            isDragDecelerationEnabled = false
+        }
+    }
+
     override fun refreshScreen() {
         keyFigure?.let { figure ->
             context?.let { safeContext ->
-
-                val chartInformation = ChartInformation(
-                    context = safeContext,
-                    departmentKeyFigure = figure.getKeyFigureForPostalCode(sharedPrefs.chosenPostalCode),
-                    strings = strings,
-                    keyFigure = figure,
-                    chartDataType = chartDataType,
-                    minDate = minDate
-                )
-
-                refreshChart(safeContext, chartInformation)
+                if (keyFigure2 == null) {
+                    val chartInformation = ChartInformation(
+                        context = safeContext,
+                        departmentKeyFigure = figure.getKeyFigureForPostalCode(sharedPrefs.chosenPostalCode),
+                        strings = strings,
+                        keyFigure = figure,
+                        chartDataType = chartDataType,
+                        minDate = minDate
+                    )
+                    refreshChart(safeContext, chartInformation)
+                } else {
+                    keyFigure2?.let { figure2 ->
+                        refreshCombinedChart(safeContext, figure, figure2)
+                    }
+                }
             }
         }
     }
@@ -173,12 +199,43 @@ class ChartFullScreenFragment : BaseFragment(), OnChartGestureListener {
             }
             binding.keyFigureBarChart.onChartGestureListener = null
         }
+        binding.keyFigureCombinedChart.onChartGestureListener = null
 
         binding.chartSerie1LegendTextView.setLegend1FromChartData(chartInformation.chartData)
         binding.chartSerie2LegendTextView.setLegend2FromChartData(chartInformation.chartData)
         binding.keyFigureLineChart.isVisible = chartInformation.chartType == KeyFigureChartType.LINES
         binding.keyFigureBarChart.isVisible = chartInformation.chartType == KeyFigureChartType.BARS
         binding.chartDescriptionTextView.text = chartInformation.chartExplanationLabel
+    }
+
+    private fun refreshCombinedChart(context: Context, keyFigure: KeyFigure, keyFigure2: KeyFigure) {
+
+        val chartData = Pair(keyFigure, keyFigure2).generateCombinedData(context, strings, minDate)
+        binding.apply {
+            keyFigureLineChart.isVisible = false
+            keyFigureBarChart.isVisible = false
+            keyFigureCombinedChart.isVisible = true
+            // Set legend
+            chartSerie1LegendTextView.text = chartData.dataSets?.get(0)?.label
+            chartSerie2LegendTextView.text = chartData.dataSets?.get(1)?.label
+            chartData.dataSets?.get(0)?.color?.let {
+                chartSerie1LegendTextView.setTextColor(it)
+                TextViewCompat.setCompoundDrawableTintList(chartSerie1LegendTextView, ColorStateList.valueOf(it))
+            }
+            chartData.dataSets?.get(1)?.color?.let {
+                chartSerie2LegendTextView.setTextColor(it)
+                TextViewCompat.setCompoundDrawableTintList(chartSerie2LegendTextView, ColorStateList.valueOf(it))
+            }
+
+            keyFigureCombinedChart.apply {
+                data = chartData
+                marker = TacMarkerView(context, this)
+                onChartGestureListener = this@ChartFullScreenFragment
+            }
+            setupCombinedCharts()
+            keyFigureLineChart.onChartGestureListener = null
+            keyFigureBarChart.onChartGestureListener = null
+        }
     }
 
     override fun onChartGestureStart(me: MotionEvent?, lastPerformedGesture: ChartTouchListener.ChartGesture?) {}
@@ -194,14 +251,19 @@ class ChartFullScreenFragment : BaseFragment(), OnChartGestureListener {
     override fun onChartFling(me1: MotionEvent?, me2: MotionEvent?, velocityX: Float, velocityY: Float) {}
 
     override fun onChartScale(me: MotionEvent?, scaleX: Float, scaleY: Float) {
-        binding.zoomOutButton.isVisible = !(binding.keyFigureLineChart.scaleX == 1f && binding.keyFigureBarChart.scaleX == 1f)
+        binding.zoomOutButton.isVisible =
+            binding.keyFigureLineChart.scaleX != 1f ||
+            binding.keyFigureBarChart.scaleX != 1f ||
+            binding.keyFigureCombinedChart.scaleX != 1f
 
         // Use a ZOOM_MIN_THRESHOLD to compensate for the high zoom value precision and help to zoom out
         val zoomMin = binding.keyFigureLineChart.scaleX < Constants.Chart.ZOOM_MIN_THRESHOLD
             && binding.keyFigureBarChart.scaleX < Constants.Chart.ZOOM_MIN_THRESHOLD
+            && binding.keyFigureCombinedChart.scaleX < Constants.Chart.ZOOM_MIN_THRESHOLD
         if (zoomMin && scaleX < 1f) {
             binding.keyFigureLineChart.fitScreen()
             binding.keyFigureBarChart.fitScreen()
+            binding.keyFigureCombinedChart.fitScreen()
             binding.zoomOutButton.isVisible = false
         }
     }

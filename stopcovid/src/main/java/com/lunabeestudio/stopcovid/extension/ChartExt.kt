@@ -3,6 +3,7 @@ package com.lunabeestudio.stopcovid.extension
 import android.content.Context
 import android.graphics.Color
 import com.github.mikephil.charting.charts.BarChart
+import com.github.mikephil.charting.charts.CombinedChart
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.LimitLine
 import com.github.mikephil.charting.components.XAxis
@@ -134,11 +135,7 @@ private fun setupYAxis(yAxis: YAxis, limitLineData: LimitLineData?) {
     yAxis.apply {
         setupStyle()
         axisMinimum = axisMinimum.coerceAtLeast(0f)
-        valueFormatter = object : ValueFormatter() {
-            override fun getFormattedValue(value: Float): String {
-                return value.formatCompact()
-            }
-        }
+        setValueFormatter()
 
         limitLineData?.let {
             val limitLine = LimitLine(it.limitLine.toFloat(), it.description)
@@ -154,11 +151,7 @@ private fun setupXAxis(context: Context, xAxis: XAxis, chartData: Array<com.luna
         val chartEntries = chartData.getOrNull(0)?.entries
         chartEntries?.firstOrNull()?.x?.let { axisMinimum = it }
         chartEntries?.lastOrNull()?.x?.let { axisMaximum = it }
-        valueFormatter = object : ValueFormatter() {
-            override fun getFormattedValue(value: Float): String {
-                return value.toLong().seconds.getRelativeDateShortString(context)
-            }
-        }
+        setValueFormatter(context)
     }
 }
 
@@ -205,4 +198,53 @@ private fun radius(circleCount: Int?): Float {
 
 private fun lineWidth(circleCount: Int?): Float {
     return radius(circleCount) / Constants.Chart.CIRCLE_LINE_RATIO
+}
+
+fun CombinedChart.setupStyle(isAxisRightEnabled: Boolean = true) {
+    drawOrder = arrayOf(CombinedChart.DrawOrder.BAR, CombinedChart.DrawOrder.LINE)
+    setTouchEnabled(false)
+    legend.isEnabled = false
+    description.isEnabled = false
+    extraBottomOffset = Constants.Chart.EXTRA_BOTTOM_OFFSET
+    extraTopOffset = Constants.Chart.EXTRA_BOTTOM_OFFSET
+
+    xAxis.setupStyle()
+    xAxis.setValueFormatter(context)
+    xAxis.axisMaximum = (data.xMax) + data.barData.barWidth
+    xAxis.axisMinimum = (data.xMin) - data.barData.barWidth
+
+    axisLeft.axisMinimum = axisLeft.axisMinimum.coerceAtLeast(0f)
+    axisLeft.setupStyle()
+    axisLeft.setValueFormatter()
+
+    if (isAxisRightEnabled) {
+        axisLeft.axisMaximum = data.dataSets[0].yMax
+        axisLeft.textColor = data.dataSets[0].color
+
+        axisRight.setValueFormatter()
+        axisRight.setupStyle()
+        axisRight.textColor = data.dataSets[1].color
+        axisRight.axisMaximum = data.dataSets[1].yMax
+        axisRight.axisMinimum = axisRight.axisMinimum.coerceAtLeast(0f)
+
+        data.dataSets[1].axisDependency = YAxis.AxisDependency.RIGHT
+    } else {
+        axisRight.isEnabled = false
+    }
+}
+
+private fun YAxis.setValueFormatter() {
+    valueFormatter = object : ValueFormatter() {
+        override fun getFormattedValue(value: Float): String {
+            return value.formatCompact()
+        }
+    }
+}
+
+private fun XAxis.setValueFormatter(context: Context) {
+    valueFormatter = object : ValueFormatter() {
+        override fun getFormattedValue(value: Float): String {
+            return value.toLong().seconds.getRelativeDateShortString(context)
+        }
+    }
 }

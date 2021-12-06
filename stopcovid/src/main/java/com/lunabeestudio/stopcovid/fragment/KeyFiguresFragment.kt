@@ -22,6 +22,7 @@ import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.UiConstants
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
+import com.lunabeestudio.stopcovid.coreui.extension.findParentFragmentByType
 import com.lunabeestudio.stopcovid.coreui.extension.getApplicationLanguage
 import com.lunabeestudio.stopcovid.coreui.extension.viewLifecycleOwnerOrNull
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
@@ -32,6 +33,7 @@ import com.lunabeestudio.stopcovid.extension.getString
 import com.lunabeestudio.stopcovid.extension.itemForFigure
 import com.lunabeestudio.stopcovid.extension.labelStringKey
 import com.lunabeestudio.stopcovid.extension.safeNavigate
+import com.lunabeestudio.stopcovid.extension.showErrorSnackBar
 import com.lunabeestudio.stopcovid.fastitem.KeyFigureCardItem
 import com.lunabeestudio.stopcovid.fastitem.explanationActionCardItem
 import com.lunabeestudio.stopcovid.fastitem.linkItem
@@ -71,6 +73,9 @@ class KeyFiguresFragment : MainFragment() {
         super.onViewCreated(view, savedInstanceState)
         keyFiguresManager.figures.observeEventAndConsume(viewLifecycleOwner) {
             refreshScreen()
+        }
+        binding?.recyclerView?.let {
+            findParentFragmentByType<KeyFiguresPagerFragment>()?.bindFabToRecyclerView(it)
         }
     }
 

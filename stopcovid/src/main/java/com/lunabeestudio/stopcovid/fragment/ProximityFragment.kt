@@ -81,6 +81,7 @@ import com.lunabeestudio.stopcovid.databinding.ActivityMainBinding
 import com.lunabeestudio.stopcovid.databinding.FragmentRecyclerViewFabBinding
 import com.lunabeestudio.stopcovid.extension.addIsolationItems
 import com.lunabeestudio.stopcovid.extension.chosenPostalCode
+import com.lunabeestudio.stopcovid.extension.collectWithLifecycle
 import com.lunabeestudio.stopcovid.extension.colorStringKey
 import com.lunabeestudio.stopcovid.extension.formatNumberIfNeeded
 import com.lunabeestudio.stopcovid.extension.getDepartmentLabel
@@ -90,6 +91,7 @@ import com.lunabeestudio.stopcovid.extension.getRelativeDateTimeString
 import com.lunabeestudio.stopcovid.extension.getString
 import com.lunabeestudio.stopcovid.extension.hasChosenPostalCode
 import com.lunabeestudio.stopcovid.extension.hideRiskStatus
+import com.lunabeestudio.stopcovid.extension.injectionContainer
 import com.lunabeestudio.stopcovid.extension.isLowStorage
 import com.lunabeestudio.stopcovid.extension.isValidUUID
 import com.lunabeestudio.stopcovid.extension.isolationManager
@@ -102,6 +104,7 @@ import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
 import com.lunabeestudio.stopcovid.extension.showErrorPanel
 import com.lunabeestudio.stopcovid.extension.showAlertSickVenue
+import com.lunabeestudio.stopcovid.extension.showErrorSnackBar
 import com.lunabeestudio.stopcovid.extension.showPostalCodeDialog
 import com.lunabeestudio.stopcovid.extension.showActivationReminderDialog
 import com.lunabeestudio.stopcovid.extension.toCovidException
@@ -169,7 +172,9 @@ class ProximityFragment : TimeMainFragment() {
             requireContext().secureKeystoreDataSource(),
             vaccinationCenterManager,
             venueRepository,
-            walletRepository
+            walletRepository,
+            sharedPrefs,
+            injectionContainer.getSmartWalletCertificateUseCase,
         )
     }
 
@@ -478,6 +483,9 @@ class ProximityFragment : TimeMainFragment() {
         viewModel.venuesQrCodeLiveData.observe(viewLifecycleOwner) { venues ->
             refreshScreen()
             showRegisterRequiredIfNeeded(venues)
+        }
+        viewModel.profileCertificates.collectWithLifecycle(viewLifecycleOwner) {
+            refreshScreen()
         }
     }
 
@@ -1116,14 +1124,15 @@ class ProximityFragment : TimeMainFragment() {
             }
         }
 
-        items += cardWithActionItem(CardTheme.Primary) {
-            mainImage = R.drawable.wallet_card
+        val walletState = viewModel.getWalletState()
+        items += cardWithActionItem(walletState.theme) {
+            mainImage = walletState.icon
             mainLayoutDirection = LayoutDirection.RTL
             onCardClick = {
                 findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToNavWallet())
             }
             mainTitle = strings["home.attestationSection.sanitaryCertificates.cell.title"]
-            mainBody = strings["home.attestationSection.sanitaryCertificates.cell.subtitle"]
+            mainBody = strings[walletState.bodyKey]
             identifier = R.drawable.wallet_card.toLong()
         }
 
@@ -1191,10 +1200,10 @@ class ProximityFragment : TimeMainFragment() {
 
     private fun addVaccinationItems(items: ArrayList<GenericItem>) {
         items += cardWithActionItem {
-            cardTitle = strings["home.vaccinationSection.cellTitle"]
-            cardTitleColorRes = R.color.color_no_risk
-            cardTitleIcon = R.drawable.ic_vaccin
-            mainHeader = strings["home.vaccinationSection.cellSubtitle"]
+            mainTitle = strings["home.vaccinationSection.cellTitle"]
+            mainTitleColorRes = R.color.color_no_risk
+            mainTitleIcon = R.drawable.ic_vaccin
+            mainBody = strings["home.vaccinationSection.cellSubtitle"]
             contentDescription = strings["home.vaccinationSection.cellTitle"]
             onCardClick = {
                 analyticsManager.reportAppEvent(AppEventName.e7, null)

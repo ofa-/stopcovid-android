@@ -20,5 +20,6 @@ include ':robert'
 include ':framework'
 include ':domain'
 include ':ble'
+include ':analytics'
 include ':dgca-decoder'
 project(':dgca-decoder').projectDir = new File('./dgca-app-core-android/decoder')

@@ -10,11 +10,16 @@
 
 package com.lunabeestudio.stopcovid.fastitem
 
+import android.content.res.ColorStateList
+import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.ColorInt
+import androidx.annotation.DrawableRes
 import androidx.core.view.isInvisible
 import com.lunabeestudio.stopcovid.R
+import com.lunabeestudio.stopcovid.coreui.extension.fetchSystemColor
 import com.lunabeestudio.stopcovid.coreui.extension.setTextOrHide
 import com.lunabeestudio.stopcovid.databinding.ItemSelectionBinding
 import com.mikepenz.fastadapter.binding.AbstractBindingItem
@@ -24,6 +29,16 @@ class SelectionItem : AbstractBindingItem<ItemSelectionBinding>() {
     var caption: String? = null
     var showSelection: Boolean = false
     var onClick: (() -> Unit)? = null
+    var maxLineCaption: Int? = null
+
+    @DrawableRes
+    var iconSelection: Int = R.drawable.ic_check
+
+    @ColorInt
+    var iconTint: Int? = null
+
+    @ColorInt
+    var textColor: Int? = null
 
     override val type: Int = R.id.item_selection
 
@@ -46,6 +61,40 @@ class SelectionItem : AbstractBindingItem<ItemSelectionBinding>() {
         binding.selectionRootLayout.setOnClickListener(clickListener)
         binding.selectionRootLayout.isClickable = clickListener != null
         binding.selectionImageView.isInvisible = !showSelection
+
+        // max line on Caption
+        maxLineCaption?.let {
+            binding.captionTextView.maxLines = it
+            binding.captionTextView.ellipsize = TextUtils.TruncateAt.END
+        }
+
+        binding.selectionImageView.setImageResource(iconSelection)
+
+        iconTint?.let { color ->
+            binding.selectionImageView.imageTintList = ColorStateList.valueOf(color)
+        }
+        textColor?.let { color ->
+            binding.titleTextView.setTextColor(color)
+            binding.captionTextView.setTextColor(color)
+        }
+    }
+
+    override fun unbindView(binding: ItemSelectionBinding) {
+        super.unbindView(binding)
+        binding.apply {
+            selectionImageView.setImageDrawable(null)
+            captionTextView.maxLines = Integer.MAX_VALUE
+            captionTextView.ellipsize = null
+            selectionRootLayout.setOnClickListener(null)
+            selectionImageView.imageTintList = ColorStateList.valueOf(
+                com.lunabeestudio.stopcovid.coreui.R.attr.colorAccent.fetchSystemColor(
+                    root.context
+                )
+            )
+            val colorDefaultText = com.lunabeestudio.stopcovid.coreui.R.attr.colorOnSurface.fetchSystemColor(root.context)
+            titleTextView.setTextColor(colorDefaultText)
+            captionTextView.setTextColor(colorDefaultText)
+        }
     }
 }
 

@@ -56,6 +56,7 @@ class WalletFullscreenPagerFragment : BaseFragment() {
             injectionContainer.blacklist2DDOCManager,
             injectionContainer.walletRepository,
             injectionContainer.generateActivityPassUseCase,
+            injectionContainer.getSmartWalletCertificateUseCase,
         )
     }
 

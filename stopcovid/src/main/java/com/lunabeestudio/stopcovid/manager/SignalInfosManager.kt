@@ -11,11 +11,11 @@
 package com.lunabeestudio.stopcovid.manager
 
 import android.content.Context
-import android.view.Gravity
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.fastitem.cardWithActionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.manager.LocalizedStrings
+import com.lunabeestudio.stopcovid.fastitem.LogoItem
 import com.lunabeestudio.stopcovid.fastitem.defaultPhoneSupportItem
 import com.lunabeestudio.stopcovid.fastitem.logoItem
 import com.mikepenz.fastadapter.GenericItem
@@ -25,13 +25,13 @@ object SignalInfosManager {
         val items = arrayListOf<GenericItem>()
 
         items += logoItem {
-            imageRes = R.drawable.signal
+            imageRes = R.drawable.ic_tac_signal
             identifier = items.size.toLong()
+            minLogoHeightRes = LogoItem.NO_MINIMUM_HEIGHT
         }
         items += cardWithActionItem {
             mainTitle = strings["venuesRecording.onboardingController.mainMessage.title"]
             mainBody = strings["venuesRecording.onboardingController.mainMessage.message"]
-            mainGravity = Gravity.CENTER
             identifier = "venuesRecording.onboardingController.mainMessage.title".hashCode().toLong()
         }
         items += spaceItem {
@@ -40,7 +40,6 @@ object SignalInfosManager {
         items += cardWithActionItem {
             mainTitle = strings["venuesRecording.whenToUse.title"]
             mainBody = strings["venuesRecording.whenToUse.subtitle"]
-            mainGravity = Gravity.CENTER
             identifier = "venuesRecording.whenToUse.title".hashCode().toLong()
         }
         items += spaceItem {
@@ -49,7 +48,6 @@ object SignalInfosManager {
         items += cardWithActionItem {
             mainTitle = strings["venuesRecording.alert.title"]
             mainBody = strings["venuesRecording.alert.subtitle"]
-            mainGravity = Gravity.CENTER
             identifier = "venuesRecording.alert.title".hashCode().toLong()
         }
         items += spaceItem {

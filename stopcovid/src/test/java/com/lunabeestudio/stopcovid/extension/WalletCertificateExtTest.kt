@@ -10,12 +10,15 @@
 
 package com.lunabeestudio.stopcovid.extension
 
-import androidx.lifecycle.MutableLiveData
+import com.lunabeestudio.domain.model.Configuration
 import com.lunabeestudio.domain.model.WalletCertificateType
 import com.lunabeestudio.stopcovid.manager.BlacklistDCCManager
 import com.lunabeestudio.stopcovid.model.EuropeanCertificate
+import io.mockk.MockKAnnotations
+import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
+import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
 import kotlin.time.Duration.Companion.hours
@@ -23,70 +26,88 @@ import kotlin.time.Duration.Companion.hours
 class WalletCertificateExtTest {
 
     private lateinit var blacklistDCCManager: BlacklistDCCManager
+    private lateinit var configuration: Configuration
 
     private val blackListedSha = "blacklisted"
 
     @Before
     fun init() {
+        MockKAnnotations.init(this)
         blacklistDCCManager = mockk(relaxed = true)
-        every { blacklistDCCManager.blacklistedDCCHashes } returns MutableLiveData(listOf(blackListedSha))
+        configuration = mockk(relaxed = true)
+        coEvery { blacklistDCCManager.isBlacklisted(blackListedSha) } returns true
     }
 
     @Test
     fun isEligibleForActivityPass_ok() {
-        val europeanCertificate = mockk<EuropeanCertificate>(relaxed = true)
-        every { europeanCertificate.sha256 } returns ""
-        every { europeanCertificate.type } returns WalletCertificateType.VACCINATION_EUROPE
-        every { europeanCertificate.timestamp } returns System.currentTimeMillis()
-        every { europeanCertificate.expirationTime } returns Long.MAX_VALUE
-        every { europeanCertificate.canRenewActivityPass } returns null
+        runBlocking {
+            val europeanCertificate = mockk<EuropeanCertificate>(relaxed = true)
+            every { europeanCertificate.sha256 } returns ""
+            every { europeanCertificate.type } returns WalletCertificateType.VACCINATION_EUROPE
+            every { europeanCertificate.timestamp } returns System.currentTimeMillis()
+            every { europeanCertificate.expirationTime } returns Long.MAX_VALUE
+            every { europeanCertificate.canRenewActivityPass } returns null
+            every { configuration.activityPassSkipNegTestHours } returns Int.MAX_VALUE
 
-        assert(europeanCertificate.isEligibleForActivityPass(blacklistDCCManager, Int.MAX_VALUE))
+            assert(europeanCertificate.isEligibleForActivityPass(blacklistDCCManager, configuration))
+        }
     }
 
     @Test
     fun isEligibleForActivityPass_blacklisted() {
-        val europeanCertificate = mockk<EuropeanCertificate>(relaxed = true)
-        every { europeanCertificate.sha256 } returns blackListedSha
-        every { europeanCertificate.type } returns WalletCertificateType.VACCINATION_EUROPE
-        every { europeanCertificate.expirationTime } returns Long.MAX_VALUE
-        every { europeanCertificate.canRenewActivityPass } returns null
+        runBlocking {
+            val europeanCertificate = mockk<EuropeanCertificate>(relaxed = true)
+            every { europeanCertificate.sha256 } returns blackListedSha
+            every { europeanCertificate.type } returns WalletCertificateType.VACCINATION_EUROPE
+            every { europeanCertificate.expirationTime } returns Long.MAX_VALUE
+            every { europeanCertificate.canRenewActivityPass } returns null
+            every { configuration.activityPassSkipNegTestHours } returns Int.MAX_VALUE
 
-        assert(!europeanCertificate.isEligibleForActivityPass(blacklistDCCManager, Int.MAX_VALUE))
+            assert(!europeanCertificate.isEligibleForActivityPass(blacklistDCCManager, configuration))
+        }
     }
 
     @Test
     fun isEligibleForActivityPass_expired_sanitary() {
-        val europeanCertificate = mockk<EuropeanCertificate>(relaxed = true)
-        every { europeanCertificate.sha256 } returns ""
-        every { europeanCertificate.type } returns WalletCertificateType.SANITARY_EUROPE
-        every { europeanCertificate.timestamp } returns System.currentTimeMillis() - 2.hours.inWholeMilliseconds
-        every { europeanCertificate.expirationTime } returns Long.MAX_VALUE
-        every { europeanCertificate.canRenewActivityPass } returns null
+        runBlocking {
+            val europeanCertificate = mockk<EuropeanCertificate>(relaxed = true)
+            every { europeanCertificate.sha256 } returns ""
+            every { europeanCertificate.type } returns WalletCertificateType.SANITARY_EUROPE
+            every { europeanCertificate.timestamp } returns System.currentTimeMillis() - 2.hours.inWholeMilliseconds
+            every { europeanCertificate.expirationTime } returns Long.MAX_VALUE
+            every { europeanCertificate.canRenewActivityPass } returns null
+            every { configuration.activityPassSkipNegTestHours } returns 1
 
-        assert(!europeanCertificate.isEligibleForActivityPass(blacklistDCCManager, 1))
+            assert(!europeanCertificate.isEligibleForActivityPass(blacklistDCCManager, configuration))
+        }
     }
 
     @Test
-    fun isEligibleForActivityPass_is_expired() {
-        val europeanCertificate = mockk<EuropeanCertificate>(relaxed = true)
-        every { europeanCertificate.sha256 } returns ""
-        every { europeanCertificate.type } returns WalletCertificateType.VACCINATION_EUROPE
-        every { europeanCertificate.expirationTime } returns Long.MIN_VALUE
-        every { europeanCertificate.canRenewActivityPass } returns null
+    fun isEligibleForActivityPass_is_signature_expired() {
+        runBlocking {
+            val europeanCertificate = mockk<EuropeanCertificate>(relaxed = true)
+            every { europeanCertificate.sha256 } returns ""
+            every { europeanCertificate.type } returns WalletCertificateType.VACCINATION_EUROPE
+            every { europeanCertificate.expirationTime } returns Long.MIN_VALUE
+            every { europeanCertificate.canRenewActivityPass } returns null
+            every { configuration.activityPassSkipNegTestHours } returns Int.MAX_VALUE
 
-        assert(!europeanCertificate.isEligibleForActivityPass(blacklistDCCManager, Int.MAX_VALUE))
+            assert(!europeanCertificate.isEligibleForActivityPass(blacklistDCCManager, configuration))
+        }
     }
 
     @Test
     fun isEligibleForActivityPass_already_completed() {
-        val europeanCertificate = mockk<EuropeanCertificate>(relaxed = true)
-        every { europeanCertificate.sha256 } returns ""
-        every { europeanCertificate.type } returns WalletCertificateType.VACCINATION_EUROPE
-        every { europeanCertificate.timestamp } returns System.currentTimeMillis()
-        every { europeanCertificate.expirationTime } returns Long.MAX_VALUE
-        every { europeanCertificate.canRenewActivityPass } returns false
+        runBlocking {
+            val europeanCertificate = mockk<EuropeanCertificate>(relaxed = true)
+            every { europeanCertificate.sha256 } returns ""
+            every { europeanCertificate.type } returns WalletCertificateType.VACCINATION_EUROPE
+            every { europeanCertificate.timestamp } returns System.currentTimeMillis()
+            every { europeanCertificate.expirationTime } returns Long.MAX_VALUE
+            every { europeanCertificate.canRenewActivityPass } returns false
+            every { configuration.activityPassSkipNegTestHours } returns Int.MAX_VALUE
 
-        assert(!europeanCertificate.isEligibleForActivityPass(blacklistDCCManager, Int.MAX_VALUE))
+            assert(!europeanCertificate.isEligibleForActivityPass(blacklistDCCManager, configuration))
+        }
     }
 }

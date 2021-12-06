@@ -26,7 +26,6 @@ import com.lunabeestudio.stopcovid.extension.navGraphWalletViewModels
 import com.lunabeestudio.stopcovid.extension.openInExternalBrowser
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
-import com.lunabeestudio.stopcovid.fastitem.LogoItem
 import com.lunabeestudio.stopcovid.fastitem.defaultPhoneSupportItem
 import com.lunabeestudio.stopcovid.fastitem.logoItem
 import com.lunabeestudio.stopcovid.fastitem.walletDoubleDocumentCardItem
@@ -42,6 +41,7 @@ class WalletInfoFragment : MainFragment() {
             injectionContainer.blacklist2DDOCManager,
             injectionContainer.walletRepository,
             injectionContainer.generateActivityPassUseCase,
+            injectionContainer.getSmartWalletCertificateUseCase,
         )
     }
 
@@ -69,7 +69,6 @@ class WalletInfoFragment : MainFragment() {
 
         items += logoItem {
             imageRes = R.drawable.wallet
-            minLogoHeightRes = LogoItem.NO_MINIMUM_HEIGHT
             identifier = R.drawable.wallet.toLong()
         }
 

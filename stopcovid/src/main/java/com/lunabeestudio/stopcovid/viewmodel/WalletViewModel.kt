@@ -26,15 +26,17 @@ import com.lunabeestudio.stopcovid.extension.isBlacklisted
 import com.lunabeestudio.stopcovid.extension.isOld
 import com.lunabeestudio.stopcovid.extension.isRecent
 import com.lunabeestudio.stopcovid.extension.raw
-import com.lunabeestudio.stopcovid.manager.BlacklistDCCManager
 import com.lunabeestudio.stopcovid.manager.Blacklist2DDOCManager
+import com.lunabeestudio.stopcovid.manager.BlacklistDCCManager
 import com.lunabeestudio.stopcovid.model.EuropeanCertificate
 import com.lunabeestudio.stopcovid.model.FrenchCertificate
 import com.lunabeestudio.stopcovid.model.TacResult
 import com.lunabeestudio.stopcovid.model.WalletCertificate
+import com.lunabeestudio.stopcovid.model.SmartWallet
 import com.lunabeestudio.stopcovid.repository.WalletRepository
 import com.lunabeestudio.stopcovid.usecase.GenerateActivityPassState
 import com.lunabeestudio.stopcovid.usecase.GenerateActivityPassUseCase
+import com.lunabeestudio.stopcovid.usecase.GetSmartWalletCertificateUseCase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -48,9 +50,11 @@ class WalletViewModel(
     private val blacklist2DDOCManager: Blacklist2DDOCManager,
     private val walletRepository: WalletRepository,
     private val generateActivityPassUseCase: GenerateActivityPassUseCase,
+    getSmartWalletCertificateUseCase: GetSmartWalletCertificateUseCase,
 ) : ViewModel() {
 
     val error: SingleLiveEvent<Exception> = SingleLiveEvent()
+    val loading: SingleLiveEvent<Boolean> = SingleLiveEvent()
 
     private val _scrollEvent: MutableLiveData<Event<WalletCertificate>> = MutableLiveData()
     val scrollEvent: LiveData<Event<WalletCertificate>>
@@ -65,8 +69,12 @@ class WalletViewModel(
                     ?.let { _scrollEvent.value = Event(it) }
             }
             previousCertificatesId = certificates?.map { it.id }.orEmpty()
+            loading.postValue(false)
             certificates
         }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+
+    val profileCertificates: StateFlow<SmartWallet?> = getSmartWalletCertificateUseCase()
+        .stateIn(viewModelScope, SharingStarted.Eagerly, emptyMap())
 
     val blacklistUpdateEvent: LiveData<Event<Unit>> = MediatorLiveData<Event<Unit>>().apply {
         addSource(blacklistDCCManager.blacklistUpdateEvent) { this.value = it }
@@ -96,6 +104,7 @@ class WalletViewModel(
 
     fun removeCertificate(certificate: WalletCertificate) {
         viewModelScope.launch {
+            loading.postValue(true)
             walletRepository.deleteCertificate(certificate)
         }
     }
@@ -117,8 +126,10 @@ class WalletViewModel(
     ) {
         viewModelScope.launch {
             try {
+                loading.postValue(true)
                 walletRepository.toggleFavorite(walletCertificate)
             } catch (e: Exception) {
+                loading.postValue(false)
                 error.postValue(e)
             }
         }
@@ -162,6 +173,7 @@ class WalletViewModelFactory(
     private val blacklist2DDOCManager: Blacklist2DDOCManager,
     private val walletRepository: WalletRepository,
     private val generateActivityPassUseCase: GenerateActivityPassUseCase,
+    private val getSmartWalletCertificateUseCase: GetSmartWalletCertificateUseCase,
 ) :
     ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -172,6 +184,7 @@ class WalletViewModelFactory(
             blacklist2DDOCManager,
             walletRepository,
             generateActivityPassUseCase,
+            getSmartWalletCertificateUseCase,
         ) as T
     }
 }

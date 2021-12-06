@@ -11,12 +11,17 @@
 package com.lunabeestudio.stopcovid.extension
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.SharedPreferences
+import android.os.Build
 import android.view.LayoutInflater
 import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import android.widget.DatePicker
 import android.widget.NumberPicker
 import androidx.appcompat.app.AlertDialog
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -66,6 +71,17 @@ fun MaterialAlertDialogBuilder.showPostalCodeDialog(
             false
         }
     }
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        ViewCompat.getWindowInsetsController(postalCodeEditTextBinding.root)?.show(WindowInsetsCompat.Type.ime())
+    } else {
+        postalCodeEditTextBinding.textInputEditText.post {
+            val inputMethodManager = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            inputMethodManager.showSoftInput(postalCodeEditTextBinding.textInputEditText, InputMethodManager.SHOW_IMPLICIT)
+        }
+    }
+
+    postalCodeEditTextBinding.textInputEditText.requestFocus()
 
     positiveButton.setOnClickListener {
         val result = postalCodeEditTextBinding.textInputEditText.text.toString()

@@ -42,6 +42,7 @@ class ChartFullScreenActivity : BaseActivity() {
                 keyFigureKey = args.keyFiguresKey,
                 chartDataType = args.chartDataType,
                 minDate = args.minDate,
+                keyFigureKey2 = args.keyFiguresKey2
             ).toBundle()
             navController.setGraph(R.navigation.nav_chart_full_screen, fragmentArgs)
         }

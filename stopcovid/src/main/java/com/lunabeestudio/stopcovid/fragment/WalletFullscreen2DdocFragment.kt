@@ -32,10 +32,10 @@ import com.lunabeestudio.stopcovid.coreui.extension.toDimensSize
 import com.lunabeestudio.stopcovid.coreui.fragment.BaseFragment
 import com.lunabeestudio.stopcovid.databinding.FragmentWalletFullscreen2ddocBinding
 import com.lunabeestudio.stopcovid.extension.fullDescription
+import com.lunabeestudio.stopcovid.extension.fullNameUppercase
 import com.lunabeestudio.stopcovid.extension.injectionContainer
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
-import com.lunabeestudio.stopcovid.extension.shortDescription
 import com.lunabeestudio.stopcovid.manager.ShareManager
 import com.lunabeestudio.stopcovid.model.FrenchCertificate
 import com.lunabeestudio.stopcovid.viewmodel.WalletViewModel
@@ -52,6 +52,7 @@ class WalletFullscreen2DdocFragment : BaseFragment() {
             injectionContainer.blacklist2DDOCManager,
             injectionContainer.walletRepository,
             injectionContainer.generateActivityPassUseCase,
+            injectionContainer.getSmartWalletCertificateUseCase,
         )
     }
 
@@ -120,7 +121,7 @@ class WalletFullscreen2DdocFragment : BaseFragment() {
                 qrCodeSize,
                 qrCodeSize
             )
-        binding.detailsTextView.text = frenchCertificate.shortDescription()
+        binding.detailsTextView.text = frenchCertificate.fullNameUppercase()
         binding.sha256TextView.text = frenchCertificate.sha256
     }
 

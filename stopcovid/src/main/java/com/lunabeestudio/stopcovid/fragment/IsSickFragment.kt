@@ -10,15 +10,12 @@
 
 package com.lunabeestudio.stopcovid.fragment
 
-import android.view.Gravity
-import android.view.View
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.callPhone
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
-import com.lunabeestudio.stopcovid.coreui.fastitem.buttonItem
-import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
+import com.lunabeestudio.stopcovid.coreui.fastitem.cardWithActionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
-import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
+import com.lunabeestudio.stopcovid.coreui.model.Action
 import com.lunabeestudio.stopcovid.extension.openInExternalBrowser
 import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.fastitem.logoItem
@@ -35,47 +32,25 @@ class IsSickFragment : AboutMainFragment() {
             imageRes = R.drawable.sick
             identifier = items.count().toLong()
         }
+        items += cardWithActionItem {
+            mainTitle = strings["myHealthController.sick.mainMessage.title"]
+            mainBody = strings["myHealthController.sick.mainMessage.subtitle"]
+            actions = listOfNotNull(
+                Action(null, strings["myHealthController.button.recommendations"]) {
+                    strings["myHealthController.button.recommendations.url"]?.openInExternalBrowser(requireContext())
+                },
+                Action(null, strings["myHealthController.step.appointment.buttonTitle"]) {
+                    strings["callCenter.phoneNumber"]?.callPhone(requireContext())
+                },
+                Action(null, strings["myHealthController.button.cautionMeasures"]) {
+                    findNavControllerOrNull()?.safeNavigate(IsSickFragmentDirections.actionIsSickFragmentToGestureFragment())
+                }
+            )
+            identifier = "myHealthController.sick.mainMessage.title".hashCode().toLong()
+        }
+
         items += spaceItem {
-            spaceRes = R.dimen.spacing_xlarge
-            identifier = items.size.toLong()
-        }
-        items += titleItem {
-            text = strings["myHealthController.sick.mainMessage.title"]
-            gravity = Gravity.CENTER
-            identifier = items.count().toLong()
-        }
-        items += captionItem {
-            text = strings["myHealthController.sick.mainMessage.subtitle"]
-            gravity = Gravity.CENTER
-            identifier = items.count().toLong()
-        }
-        items += spaceItem {
-            spaceRes = R.dimen.spacing_xlarge
-            identifier = items.size.toLong()
-        }
-        items += buttonItem {
-            text = strings["myHealthController.button.recommendations"]
-            gravity = Gravity.CENTER
-            onClickListener = View.OnClickListener {
-                strings["myHealthController.button.recommendations.url"]?.openInExternalBrowser(requireContext())
-            }
-            identifier = items.count().toLong()
-        }
-        items += buttonItem {
-            text = strings["myHealthController.step.appointment.buttonTitle"]
-            gravity = Gravity.CENTER
-            onClickListener = View.OnClickListener {
-                strings["callCenter.phoneNumber"]?.callPhone(requireContext())
-            }
-            identifier = items.count().toLong()
-        }
-        items += buttonItem {
-            text = strings["myHealthController.button.cautionMeasures"]
-            gravity = Gravity.CENTER
-            onClickListener = View.OnClickListener {
-                findNavControllerOrNull()?.safeNavigate(IsSickFragmentDirections.actionIsSickFragmentToGestureFragment())
-            }
-            identifier = items.count().toLong()
+            spaceRes = R.dimen.spacing_large
         }
 
         return items

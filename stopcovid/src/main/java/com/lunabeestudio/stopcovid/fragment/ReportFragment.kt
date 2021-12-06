@@ -11,19 +11,14 @@
 package com.lunabeestudio.stopcovid.fragment
 
 import android.os.Bundle
-import android.view.Gravity
 import android.view.View
-import android.view.ViewGroup
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
-import com.lunabeestudio.stopcovid.coreui.fastitem.buttonItem
-import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
-import com.lunabeestudio.stopcovid.coreui.fastitem.lightButtonItem
-import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
-import com.lunabeestudio.stopcovid.coreui.fastitem.textButtonItem
-import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
+import com.lunabeestudio.stopcovid.coreui.fastitem.cardWithActionItem
+import com.lunabeestudio.stopcovid.coreui.model.Action
+import com.lunabeestudio.stopcovid.databinding.FragmentRecyclerWithBottomActionBinding
 import com.lunabeestudio.stopcovid.extension.openInExternalBrowser
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
@@ -33,6 +28,8 @@ import com.mikepenz.fastadapter.GenericItem
 class ReportFragment : MainFragment() {
 
     private val args: ReportFragmentArgs by navArgs()
+    override val layout: Int = R.layout.fragment_recycler_with_bottom_action
+    private var bottomActionBinding: FragmentRecyclerWithBottomActionBinding? = null
     private var codeUsed: Boolean = false
     private val robertManager by lazy {
         requireContext().robertManager()
@@ -47,6 +44,17 @@ class ReportFragment : MainFragment() {
                 codeUsed = true
             }
         }
+
+        bottomActionBinding = FragmentRecyclerWithBottomActionBinding.bind(view).apply {
+            bottomSheetButton.setOnClickListener {
+                findNavControllerOrNull()?.safeNavigate(ReportFragmentDirections.actionReportFragmentToReportBottomSheetFragment())
+            }
+        }
+    }
+
+    override fun refreshScreen() {
+        super.refreshScreen()
+        bottomActionBinding?.bottomSheetButton?.text = strings["declareController.title"]
     }
 
     override fun getTitleKey(): String = "declareController.title"
@@ -58,69 +66,35 @@ class ReportFragment : MainFragment() {
             imageRes = R.drawable.declare
             identifier = items.count().toLong()
         }
-        items += spaceItem {
-            spaceRes = R.dimen.spacing_large
-            identifier = items.size.toLong()
-        }
         if (robertManager.isRegistered) {
-            items += titleItem {
-                text = strings["declareController.message.testedPositive.title"]
-                gravity = Gravity.CENTER
-                identifier = items.count().toLong()
-            }
-            items += captionItem {
-                text = strings["declareController.message.testedPositive.subtitle"]
-                gravity = Gravity.CENTER
-                identifier = items.count().toLong()
-            }
-            items += spaceItem {
-                spaceRes = R.dimen.spacing_large
-                identifier = items.size.toLong()
-            }
-            items += textButtonItem {
-                width = ViewGroup.LayoutParams.MATCH_PARENT
-                text = strings["declareController.codeNotReceived.buttonTitle"]
-                onClickListener = View.OnClickListener {
-                    MaterialAlertDialogBuilder(requireContext())
-                        .setTitle(strings["declareController.codeNotReceived.alert.title"])
-                        .setMessage(strings["declareController.codeNotReceived.alert.message"])
-                        .setPositiveButton(strings["common.ok"], null)
-                        .setNegativeButton(strings["declareController.codeNotReceived.alert.showVideo"]) { _, _ ->
-                            strings["declareController.codeNotReceived.alert.video.url"]?.openInExternalBrowser(requireContext())
+            items += cardWithActionItem {
+                mainTitle = strings["declareController.message.testedPositive.title"]
+                mainBody = strings["declareController.message.testedPositive.subtitle"]
+                identifier = "declareController.message.testedPositive.title".hashCode().toLong()
+                actions = listOf(
+                    Action(
+                        label = strings["declareController.codeNotReceived.buttonTitle"],
+                        onClickListener = {
+                            MaterialAlertDialogBuilder(requireContext())
+                                .setTitle(strings["declareController.codeNotReceived.alert.title"])
+                                .setMessage(strings["declareController.codeNotReceived.alert.message"])
+                                .setPositiveButton(strings["common.ok"], null)
+                                .setNegativeButton(strings["declareController.codeNotReceived.alert.showVideo"]) { _, _ ->
+                                    strings["declareController.codeNotReceived.alert.video.url"]?.openInExternalBrowser(requireContext())
+                                }
+                                .setNeutralButton(strings["declareController.codeNotReceived.alert.contactUs"]) { _, _ ->
+                                    strings["contactUs.url"]?.openInExternalBrowser(requireContext())
+                                }
+                                .show()
                         }
-                        .setNeutralButton(strings["declareController.codeNotReceived.alert.contactUs"]) { _, _ ->
-                            strings["contactUs.url"]?.openInExternalBrowser(requireContext())
-                        }
-                        .show()
-                }
-                identifier = items.count().toLong()
-            }
-            items += buttonItem {
-                width = ViewGroup.LayoutParams.MATCH_PARENT
-                text = strings["declareController.button.flash"]
-                onClickListener = View.OnClickListener {
-                    findNavControllerOrNull()?.safeNavigate(ReportFragmentDirections.actionReportFragmentToReportQrCodeFragment())
-                }
-                identifier = items.count().toLong()
-            }
-            items += lightButtonItem {
-                width = ViewGroup.LayoutParams.MATCH_PARENT
-                text = strings["declareController.button.tap"]
-                onClickListener = View.OnClickListener {
-                    findNavControllerOrNull()?.safeNavigate(ReportFragmentDirections.actionReportFragmentToCodeFragment())
-                }
-                identifier = items.count().toLong()
+                    )
+                )
             }
         } else {
-            items += titleItem {
-                text = strings["declareController.notRegistered.mainMessage.title"]
-                gravity = Gravity.CENTER
-                identifier = items.count().toLong()
-            }
-            items += captionItem {
-                text = strings["declareController.notRegistered.mainMessage.subtitle"]
-                gravity = Gravity.CENTER
-                identifier = items.count().toLong()
+            items += cardWithActionItem {
+                mainTitle = strings["declareController.notRegistered.mainMessage.title"]
+                mainBody = strings["declareController.notRegistered.mainMessage.subtitle"]
+                identifier = "declareController.notRegistered.mainMessage.title".hashCode().toLong()
             }
         }
 
