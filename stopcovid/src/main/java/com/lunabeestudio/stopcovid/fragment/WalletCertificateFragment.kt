@@ -328,10 +328,9 @@ class WalletCertificateFragment : MainFragment() {
 
         return certificateCardItem {
             this.generateBarcode = generateBarcode
-            //mainDescription = certificateDetails
-            titleText = certificate.titleDescription(strings)
-            nameText = certificate.fullNameUppercase()
-            descriptionText = description
+            titleText = formatText
+            nameText = certificate.fullNameUppercase().split(" ")[0]
+            descriptionText = certificateDetails
             infoText = infoDescription
             warningText = warningDescription
             errorText = errorDescription
