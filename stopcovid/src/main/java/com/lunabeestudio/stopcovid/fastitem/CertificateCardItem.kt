@@ -144,7 +144,7 @@ class CertificateCardItem : AbstractBindingItem<ItemCertificateCardBinding>() {
         }
 
         binding.actionButton.setOnClickListener {
-            showMenu(it, bitmap)
+            onDelete?.invoke()
         }
     }
 
