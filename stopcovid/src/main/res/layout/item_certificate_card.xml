@@ -83,8 +83,8 @@
 
         <ImageView
             android:id="@+id/imageView"
-            android:layout_width="@dimen/qr_code_small_size"
-            android:layout_height="@dimen/qr_code_small_size"
+            android:layout_width="@dimen/qr_code_size"
+            android:layout_height="@dimen/qr_code_size"
             android:layout_marginVertical="@dimen/spacing_large"
             android:layout_marginStart="@dimen/spacing_large"
             android:importantForAccessibility="no"
