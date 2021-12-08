@@ -15,6 +15,7 @@ import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.stopcovid.extension.isBlacklisted
 import com.lunabeestudio.stopcovid.extension.isRecovery
 import com.lunabeestudio.stopcovid.extension.isSignatureExpired
+import com.lunabeestudio.stopcovid.extension.parseOrNull
 import com.lunabeestudio.stopcovid.extension.profileId
 import com.lunabeestudio.stopcovid.extension.recoveryDateOfFirstPositiveTest
 import com.lunabeestudio.stopcovid.extension.testDateTimeOfCollection
@@ -51,7 +52,7 @@ class GetSmartWalletCertificateUseCase(
         groupedCertificates.forEach { (key, certificates) ->
             // Skip too young
             val age =
-                yearMonthDayUsParser.parse(certificates.first().greenCertificate.dateOfBirth)?.yearsOld() ?: 0
+                yearMonthDayUsParser.parseOrNull(certificates.first().greenCertificate.dateOfBirth)?.yearsOld() ?: -1
             val minAge = robertManager.configuration.smartWalletAges?.low ?: 0
             if (age >= minAge) {
                 // Keep only DCC complete and DCC recovery, remove expired and blacklisted
