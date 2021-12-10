@@ -218,10 +218,6 @@ class WalletCertificateFragment : MainFragment() {
         }
 
         if (!viewModel.recentCertificates.isNullOrEmpty()) {
-            items += bigTitleItem {
-                text = strings["walletController.recentCertificatesSection.title"]
-                identifier = text.hashCode().toLong()
-            }
             viewModel.recentCertificates?.forEach { certificate ->
                 items += certificateCardItemFromWalletDocument(certificate, blacklistedCertificates.contains(certificate))
             }
