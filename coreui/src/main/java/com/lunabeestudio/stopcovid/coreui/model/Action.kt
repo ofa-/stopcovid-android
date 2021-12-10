@@ -10,5 +10,6 @@ data class Action(
     val label: String? = null,
     val showBadge: Boolean = false,
     val loading: Boolean = false,
-    val onClickListener: View.OnClickListener?
+    val showArrow: Boolean = true,
+    val onClickListener: View.OnClickListener?,
 )

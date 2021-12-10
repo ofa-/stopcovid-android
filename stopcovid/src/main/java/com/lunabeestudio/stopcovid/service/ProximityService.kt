@@ -45,7 +45,7 @@ import timber.log.Timber
 
 open class ProximityService : RobertProximityService() {
 
-    var onError: ((RobertException?) -> Unit)? = null
+    var onError: ((RobertException?) -> Any?)? = null
 
     private var lastError: RobertException? = null
 

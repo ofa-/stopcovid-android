@@ -2,11 +2,11 @@
     "config":[
         {
             "name":"lastUpdate",
-            "value":"3 Dec 2021"
+            "value":"9 Dec 2021"
         },
         {
             "name":"version",
-            "value":103
+            "value":107
         },
         {
             "name":"versionCalibrationBle",
@@ -150,11 +150,11 @@
         },
         {
 		   "name":"app.isSmartwalletOn",
-		   "value": false
+		   "value":true
 		},
         {
             "name":"app.smartwallet.notif",
-            "value":false
+            "value":true
         },
         {
             "name":"app.smartwallet.ages",
@@ -168,11 +168,12 @@
             "name":"app.smartwallet.exp",
             "value":{
                 "pivot1":"2021-12-15",
-                "pivot2":"2033-12-15",
+                "pivot2":"2022-01-15",
                 "vacc22DosesNbDays":214,
                 "vacc11DosesNbDays":214,
                 "recNbDays":180,
                 "vaccJan11DosesNbDays":61,
+                "displayExpOnAllDcc":240,
                 "displayExpDays":21
             }
         },

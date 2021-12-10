@@ -734,6 +734,16 @@
             android:name="certificateFormat"
             app:argType="string"
             app:nullable="true" />
+        <action
+            android:id="@+id/action_confirmAddWalletCertificateFragment_to_walletCertificateErrorFragment"
+            app:destination="@id/walletCertificateErrorFragment"
+            app:popUpTo="@id/confirmAddWalletCertificateFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_confirmAddWalletCertificateFragment_to_vaccineCompletionFragment"
+            app:destination="@id/vaccineCompletionFragment"
+            app:popUpTo="@id/confirmAddWalletCertificateFragment"
+            app:popUpToInclusive="true" />
     </fragment>
     <dialog
         android:id="@+id/vaccinationActionsBottomSheetFragment"
@@ -767,6 +777,13 @@
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+    </fragment>
+    <fragment
+        android:id="@+id/vaccineCompletionFragment"
+        android:name="com.lunabeestudio.stopcovid.fragment.VaccineCompletionFragment">
+        <argument
+            android:name="certificateId"
+            app:argType="string" />
     </fragment>
     <fragment
         android:id="@+id/universalQrScanFragment"
@@ -818,6 +835,14 @@
         <action
             android:id="@+id/action_positiveTestStepsFragment_to_walletCertificateErrorFragment"
             app:destination="@id/walletCertificateErrorFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+
+        <action
+            android:id="@+id/action_positiveTestStepsFragment_to_confirmAddWalletCertificateFragment"
+            app:destination="@id/confirmAddWalletCertificateFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"

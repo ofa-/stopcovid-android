@@ -21,7 +21,7 @@ import com.lunabeestudio.stopcovid.extension.chosenPostalCode
 import com.lunabeestudio.stopcovid.extension.toKeyFigures
 import com.lunabeestudio.stopcovid.model.KeyFigure
 import com.lunabeestudio.stopcovid.model.KeyFiguresNotAvailableException
-import com.lunabeestudio.stopcovid.model.TacResult
+import com.lunabeestudio.domain.model.TacResult
 import com.lunabeestudio.stopcovid.widgetshomescreen.KeyFiguresWidget
 import keynumbers.Keynumbers
 import timber.log.Timber

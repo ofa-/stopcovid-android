@@ -20,6 +20,7 @@ import com.lunabeestudio.analytics.model.AppEventName
 import com.lunabeestudio.analytics.model.ErrorEventName
 import com.lunabeestudio.domain.model.DccLightData
 import com.lunabeestudio.domain.model.RawWalletCertificate
+import com.lunabeestudio.domain.model.TacResult
 import com.lunabeestudio.domain.model.WalletCertificateType
 import com.lunabeestudio.framework.manager.DebugManager
 import com.lunabeestudio.robert.RobertManager
@@ -40,6 +41,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -55,7 +57,7 @@ class WalletRepository(
     private val remoteDccLightDataSource: RemoteDccLightDataSource,
     private val robertManager: RobertManager,
 ) {
-    val walletCertificateFlow: StateFlow<List<WalletCertificate>?>
+    val walletCertificateFlow: StateFlow<TacResult<List<WalletCertificate>>>
 
     val certificateCountFlow: Flow<Int>
         get() = localKeystoreDataSource.certificateCountFlow
@@ -66,9 +68,9 @@ class WalletRepository(
 
     init {
         // SharingStarted.Eagerly to use the state flow as cache
-        walletCertificateFlow = localKeystoreDataSource.rawWalletCertificatesFlow.map { rawWalletList ->
-            rawWalletList.toWalletCertificates()
-        }.stateIn(coroutineScope, SharingStarted.Eagerly, null)
+        walletCertificateFlow = localKeystoreDataSource.rawWalletCertificatesFlow.map { rawWalletCertificatesResult ->
+            rawWalletCertificatesResult.toWalletCertificatesResult()
+        }.stateIn(coroutineScope, SharingStarted.Eagerly, TacResult.Loading())
 
         coroutineScope.launch(Dispatchers.Main) {
             walletCertificateFlow.collect {
@@ -120,23 +122,23 @@ class WalletRepository(
     }
 
     suspend fun toggleFavorite(walletCertificate: EuropeanCertificate) {
-        val walletCertificates = localKeystoreDataSource.rawWalletCertificates()
-        var currentFavorite: RawWalletCertificate? = null
-        val rawWalletCertificate: RawWalletCertificate? = walletCertificates.firstOrNull { it.id == walletCertificate.id }
+        val walletCertificates = localKeystoreDataSource.rawWalletCertificatesFlow.firstOrNull()?.data.orEmpty()
+        var currentRawFavorite: RawWalletCertificate? = null
+        val newRawFavorite: RawWalletCertificate? = walletCertificates.firstOrNull { it.id == walletCertificate.id }
 
-        rawWalletCertificate?.let {
+        newRawFavorite?.let {
             if (!walletCertificate.isFavorite) {
                 // Remove current favorite if there is one
-                currentFavorite = walletCertificates.firstOrNull { it.isFavorite }
-                currentFavorite?.let { currentFavorite ->
+                currentRawFavorite = walletCertificates.firstOrNull { it.isFavorite }
+                currentRawFavorite?.let { currentFavorite ->
                     currentFavorite.isFavorite = false
                 }
             }
 
-            rawWalletCertificate.isFavorite = !rawWalletCertificate.isFavorite
+            newRawFavorite.isFavorite = !newRawFavorite.isFavorite
         }
 
-        localKeystoreDataSource.updateNonLightRawWalletCertificate(*listOfNotNull(currentFavorite, rawWalletCertificate).toTypedArray())
+        localKeystoreDataSource.updateNonLightRawWalletCertificate(*listOfNotNull(currentRawFavorite, newRawFavorite).toTypedArray())
     }
 
     suspend fun deleteCertificate(walletCertificate: WalletCertificate) {
@@ -191,7 +193,7 @@ class WalletRepository(
     }
 
     fun certificateExists(certificate: WalletCertificate): Boolean {
-        return walletCertificateFlow.value?.any { certificate.value == it.value } == true
+        return walletCertificateFlow.value.data?.any { certificate.value == it.value } == true
     }
 
     fun getCertificateByIdFlow(certificateId: String): Flow<WalletCertificate?> =
@@ -200,10 +202,16 @@ class WalletRepository(
     suspend fun getCertificateById(certificateId: String): WalletCertificate? =
         localKeystoreDataSource.getCertificateById(certificateId)?.toWalletCertificate()
 
-    private suspend fun List<RawWalletCertificate>.toWalletCertificates() =
-        mapNotNull { rawWallet ->
+    private suspend fun TacResult<List<RawWalletCertificate>>.toWalletCertificatesResult(): TacResult<List<WalletCertificate>> {
+        val walletCertificates = data?.mapNotNull { rawWallet ->
             rawWallet.toWalletCertificate()
+        }.orEmpty()
+        return if (this is TacResult.Success) {
+            TacResult.Success(walletCertificates)
+        } else {
+            TacResult.Failure((this as? TacResult.Failure)?.throwable, walletCertificates)
         }
+    }
 
     private suspend fun RawWalletCertificate.toWalletCertificate() = try {
         WalletCertificate.createCertificateFromRaw(this)?.apply {
@@ -262,5 +270,17 @@ class WalletRepository(
             robertManager.configuration.generationServerPublicKey,
             certificateValue,
         )
+    }
+
+    suspend fun forceRefreshCertificatesFlow() {
+        localKeystoreDataSource.forceRefreshCertificatesFlow()
+    }
+
+    suspend fun deleteLostCertificates() {
+        localKeystoreDataSource.deleteLostCertificates()
+    }
+
+    fun resetKeyCryptoGeneratedFlag() {
+        localKeystoreDataSource.resetKeyGeneratedFlag()
     }
 }

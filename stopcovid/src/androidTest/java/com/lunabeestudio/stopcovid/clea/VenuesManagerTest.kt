@@ -1,8 +1,6 @@
 package com.lunabeestudio.stopcovid.clea
 
 import android.content.Context
-import android.content.SharedPreferences
-import androidx.preference.PreferenceManager
 import androidx.test.annotation.UiThreadTest
 import androidx.test.core.app.ApplicationProvider
 import com.lunabeestudio.domain.extension.ntpTimeSToUnixTimeS
@@ -11,7 +9,6 @@ import com.lunabeestudio.domain.model.VenueQrCode
 import com.lunabeestudio.framework.local.LocalCryptoManager
 import com.lunabeestudio.framework.local.datasource.SecureKeystoreDataSource
 import com.lunabeestudio.stopcovid.extension.robertManager
-import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
 import com.lunabeestudio.stopcovid.extension.venueRepository
 import com.lunabeestudio.stopcovid.model.VenueExpiredException
 import com.lunabeestudio.stopcovid.model.VenueInvalidFormatException
@@ -31,13 +28,8 @@ import kotlin.time.DurationUnit
 class VenuesManagerTest {
 
     private val context: Context = ApplicationProvider.getApplicationContext()
-    private val keystoreDataSource: SecureKeystoreDataSource = context.secureKeystoreDataSource()
     private val venueRepository: VenueRepository by lazy {
         context.venueRepository()
-    }
-
-    private val sharedPrefs: SharedPreferences by lazy {
-        PreferenceManager.getDefaultSharedPreferences(context)
     }
 
     @Before
@@ -50,7 +42,7 @@ class VenuesManagerTest {
         context.getSharedPreferences(SecureKeystoreDataSource.SHARED_PREF_NAME, Context.MODE_PRIVATE).edit().clear().commit()
         context.getSharedPreferences(LocalCryptoManager.SHARED_PREF_NAME, Context.MODE_PRIVATE).edit().clear().commit()
         runBlocking {
-            venueRepository.clearAllData(sharedPrefs)
+            venueRepository.clearAllData()
         }
     }
 
@@ -64,7 +56,7 @@ class VenuesManagerTest {
         context.getSharedPreferences(SecureKeystoreDataSource.SHARED_PREF_NAME, Context.MODE_PRIVATE).edit().clear().commit()
         context.getSharedPreferences(LocalCryptoManager.SHARED_PREF_NAME, Context.MODE_PRIVATE).edit().clear().commit()
         runBlocking {
-            venueRepository.clearAllData(sharedPrefs)
+            venueRepository.clearAllData()
         }
     }
 
@@ -100,7 +92,7 @@ class VenuesManagerTest {
             version = 0
         )
         runBlocking {
-            venueRepository.clearAllData(sharedPrefs)
+            venueRepository.clearAllData()
             assert(venueRepository.getVenuesQrCode().count() == 0)
             venueRepository.saveVenue(venue1)
             venueRepository.saveVenue(venue2)
@@ -128,7 +120,7 @@ class VenuesManagerTest {
             assert(venueRepository.getVenuesQrCode().count() == 4)
             assert(venueRepository.getVenuesQrCode(2L).count() == 3)
 
-            venueRepository.clearAllData(sharedPrefs)
+            venueRepository.clearAllData()
             assert(venueRepository.getVenuesQrCode().count() == 0)
         }
     }
@@ -152,7 +144,7 @@ class VenuesManagerTest {
             version = 0
         )
         runBlocking {
-            venueRepository.clearAllData(sharedPrefs)
+            venueRepository.clearAllData()
             assert(venueRepository.getVenuesQrCode().count() == 0)
             venueRepository.saveVenue(venue1)
             venueRepository.saveVenue(venue2)
@@ -161,7 +153,7 @@ class VenuesManagerTest {
             assert(venueRepository.getVenuesQrCode().count() == 1)
             assert(venueRepository.getVenuesQrCode()[0] == venue2)
 
-            venueRepository.clearAllData(sharedPrefs)
+            venueRepository.clearAllData()
             assert(venueRepository.getVenuesQrCode().count() == 0)
         }
     }

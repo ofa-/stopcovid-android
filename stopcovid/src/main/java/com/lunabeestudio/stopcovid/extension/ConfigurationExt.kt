@@ -9,7 +9,3 @@ fun Configuration.getDefaultFigureLabel1(): String? {
 fun Configuration.getDefaultFigureLabel2(): String? {
     return keyFiguresCombination?.get(0)?.keyFigureLabel2?.getLabelKeyFigureFromConfig()
 }
-
-private fun String.getLabelKeyFigureFromConfig(): String {
-    return "keyfigure.$this"
-}

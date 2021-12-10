@@ -16,6 +16,8 @@ import androidx.navigation.fragment.navArgs
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
+import com.lunabeestudio.stopcovid.coreui.extension.hideBottomSheet
+import com.lunabeestudio.stopcovid.coreui.extension.showBottomSheet
 import com.lunabeestudio.stopcovid.coreui.fastitem.cardWithActionItem
 import com.lunabeestudio.stopcovid.coreui.model.Action
 import com.lunabeestudio.stopcovid.databinding.FragmentRecyclerWithBottomActionBinding
@@ -54,7 +56,7 @@ class ReportFragment : MainFragment() {
 
     override fun refreshScreen() {
         super.refreshScreen()
-        bottomActionBinding?.bottomSheetButton?.text = strings["declareController.title"]
+        bottomActionBinding?.bottomSheetButton?.text = strings["declareController.button.enterCode"]
     }
 
     override fun getTitleKey(): String = "declareController.title"
@@ -90,12 +92,14 @@ class ReportFragment : MainFragment() {
                     )
                 )
             }
+            bottomActionBinding?.bottomSheetButton?.showBottomSheet()
         } else {
             items += cardWithActionItem {
                 mainTitle = strings["declareController.notRegistered.mainMessage.title"]
                 mainBody = strings["declareController.notRegistered.mainMessage.subtitle"]
                 identifier = "declareController.notRegistered.mainMessage.title".hashCode().toLong()
             }
+            bottomActionBinding?.bottomSheetButton?.hideBottomSheet()
         }
 
         return items

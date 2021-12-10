@@ -44,22 +44,20 @@ class UrgentInfoFragment : MainFragment() {
 
         val items = ArrayList<GenericItem>()
 
-        items += spaceItem {
-            spaceRes = R.dimen.spacing_large
+        strings["dgsUrgentController.videoUrl"]?.let {
+            if (it.isNotBlank()) {
+                items += videoPlayerItem {
+                    url = it
+                    hideMediaController = this::hideMediaController
+                    autoPlay = true
+                    retryContentDescription = strings["common.tryAgain"]
+                    identifier = "dgsUrgentController.videoUrl".hashCode().toLong()
+                }
+            }
         }
 
-        strings["dgsUrgentController.videoUrl"]?.let {
-            items += videoPlayerItem {
-                url = it
-                hideMediaController = this::hideMediaController
-                autoPlay = true
-                retryContentDescription = strings["common.tryAgain"]
-                identifier = "dgsUrgentController.videoUrl".hashCode().toLong()
-            }
-
-            items += spaceItem {
-                spaceRes = R.dimen.spacing_large
-            }
+        items += spaceItem {
+            spaceRes = R.dimen.spacing_large
         }
 
         items += cardWithActionItem {

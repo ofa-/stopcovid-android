@@ -333,39 +333,36 @@ class IsolationManager(
     private fun calculateContactRecommendationState(): IsolationRecommendationStateEnum {
         var recommendation: IsolationRecommendationStateEnum = IsolationRecommendationStateEnum.INDETERMINATE
 
-        when (isolationIsKnownIndexAtHome) {
-            false -> {
-                if (isolationIsTestNegative == null) {
-                    recommendation = IsolationRecommendationStateEnum.CONTACT_CASE_UNKNOWN_INDEX
-                } else {
-                    if (isContactCasePostIsolationEnded != null) {
-                        recommendation = if (isContactCasePostIsolationEnded == true) {
-                            calculateInitialCase()
-                        } else {
-                            IsolationRecommendationStateEnum.CONTACT_CASE_POST_ISOLATION_PERIOD
-                        }
+        if (isolationIsKnownIndexAtHome == false) {
+            if (isolationIsTestNegative == null) {
+                recommendation = IsolationRecommendationStateEnum.CONTACT_CASE_UNKNOWN_INDEX
+            } else {
+                if (isContactCasePostIsolationEnded != null) {
+                    recommendation = if (isContactCasePostIsolationEnded == true) {
+                        calculateInitialCase()
+                    } else {
+                        IsolationRecommendationStateEnum.CONTACT_CASE_POST_ISOLATION_PERIOD
                     }
                 }
             }
-            true -> {
-                if (isolationIsTestNegative == null) {
-                    recommendation = IsolationRecommendationStateEnum.CONTACT_CASE_KNOWN_INDEX_NOT_TESTED
-                } else {
-                    if (isolationKnowsIndexSymptomsEndDate == true) {
-                        if (isolationIndexSymptomsEndDate != null) {
-                            if (isContactCaseIsolationEnded == true) {
-                                if (isContactCasePostIsolationEnded == true) {
-                                    recommendation = calculateInitialCase()
-                                } else if (isContactCasePostIsolationEnded == false) {
-                                    recommendation = IsolationRecommendationStateEnum.CONTACT_CASE_POST_ISOLATION_PERIOD
-                                }
-                            } else if (isContactCaseIsolationEnded == false) {
-                                recommendation = IsolationRecommendationStateEnum.CONTACT_CASE_KNOWN_INDEX_TESTED_KNOWN_DATE
+        } else if (isolationIsKnownIndexAtHome == true) {
+            if (isolationIsTestNegative == null) {
+                recommendation = IsolationRecommendationStateEnum.CONTACT_CASE_KNOWN_INDEX_NOT_TESTED
+            } else {
+                if (isolationKnowsIndexSymptomsEndDate == true) {
+                    if (isolationIndexSymptomsEndDate != null) {
+                        if (isContactCaseIsolationEnded == true) {
+                            if (isContactCasePostIsolationEnded == true) {
+                                recommendation = calculateInitialCase()
+                            } else if (isContactCasePostIsolationEnded == false) {
+                                recommendation = IsolationRecommendationStateEnum.CONTACT_CASE_POST_ISOLATION_PERIOD
                             }
+                        } else if (isContactCaseIsolationEnded == false) {
+                            recommendation = IsolationRecommendationStateEnum.CONTACT_CASE_KNOWN_INDEX_TESTED_KNOWN_DATE
                         }
-                    } else if (isolationKnowsIndexSymptomsEndDate == false) {
-                        recommendation = IsolationRecommendationStateEnum.CONTACT_CASE_KNOWN_INDEX_TESTED_UNKNOWN_DATE
                     }
+                } else if (isolationKnowsIndexSymptomsEndDate == false) {
+                    recommendation = IsolationRecommendationStateEnum.CONTACT_CASE_KNOWN_INDEX_TESTED_UNKNOWN_DATE
                 }
             }
         }

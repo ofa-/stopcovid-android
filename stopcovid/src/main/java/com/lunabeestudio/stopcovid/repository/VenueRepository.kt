@@ -20,6 +20,7 @@ import com.lunabeestudio.domain.model.VenueQrCode
 import com.lunabeestudio.framework.extension.fromBase64URL
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.robert.datasource.LocalKeystoreDataSource
+import com.lunabeestudio.robert.repository.RobertVenueRepository
 import com.lunabeestudio.stopcovid.extension.isValidUUID
 import com.lunabeestudio.stopcovid.extension.isVenueOnBoardingDone
 import com.lunabeestudio.stopcovid.extension.venuesFeaturedWasActivatedAtLeastOneTime
@@ -35,7 +36,8 @@ import kotlin.time.Duration.Companion.days
 
 class VenueRepository(
     private val localKeystoreDataSource: LocalKeystoreDataSource,
-) {
+    private val sharedPreferences: SharedPreferences,
+) : RobertVenueRepository {
     val venuesQrCodeFlow: Flow<List<VenueQrCode>>
         get() = localKeystoreDataSource.venuesQrCodeFlow
 
@@ -120,27 +122,27 @@ class VenueRepository(
         venueListHasChanged()
     }
 
-    suspend fun getVenuesQrCode(
-        startNtpTimestamp: Long? = null,
-        endNtpTimestamp: Long? = null,
+    override suspend fun getVenuesQrCode(
+        startNtpTimestamp: Long?,
+        endNtpTimestamp: Long?,
     ): List<VenueQrCode> = (startNtpTimestamp ?: Long.MIN_VALUE).let { forcedStartNtpTimestamp ->
         (endNtpTimestamp ?: Long.MAX_VALUE).let { forcedEndNtpTimestamp ->
-            localKeystoreDataSource.venuesQrCode().filter {
+            localKeystoreDataSource.venuesQrCode().data?.filter {
                 it.ntpTimestamp in forcedStartNtpTimestamp..forcedEndNtpTimestamp
-            }
+            }.orEmpty()
         }
     }
 
     suspend fun clearExpired(
         robertManager: RobertManager,
     ) {
-        val expiredVenuesQrCode = localKeystoreDataSource.venuesQrCode().filter {
+        val expiredVenuesQrCode = localKeystoreDataSource.venuesQrCode().data?.filter {
             @Suppress("SENSELESS_COMPARISON")
             isExpired(
                 robertManager,
                 it.ntpTimestamp.ntpTimeSToUnixTimeMs()
             ) || it.ltid == null // This test is added to handle "old" venues that may have null here due to JSON parsing handling
-        }
+        }.orEmpty()
         if (expiredVenuesQrCode.isNotEmpty()) {
             expiredVenuesQrCode.forEach {
                 localKeystoreDataSource.deleteVenueQrCode(it.id)
@@ -161,14 +163,22 @@ class VenueRepository(
         localKeystoreDataSource.deleteDeprecatedVenuesQrCode()
     }
 
-    suspend fun clearAllData(preferences: SharedPreferences) {
+    override suspend fun clearAllData() {
         localKeystoreDataSource.deleteAllVenuesQrCode()
-        preferences.isVenueOnBoardingDone = false
-        preferences.venuesFeaturedWasActivatedAtLeastOneTime = false
+        sharedPreferences.isVenueOnBoardingDone = false
+        sharedPreferences.venuesFeaturedWasActivatedAtLeastOneTime = false
     }
 
     private fun venueListHasChanged() {
         // We reset Clea scoring iteration because we changed the venues
         localKeystoreDataSource.cleaLastStatusIteration = null
+    }
+
+    suspend fun forceRefreshVenues() {
+        localKeystoreDataSource.forceRefreshVenues()
+    }
+
+    suspend fun deleteLostVenues() {
+        localKeystoreDataSource.deleteLostVenues()
     }
 }

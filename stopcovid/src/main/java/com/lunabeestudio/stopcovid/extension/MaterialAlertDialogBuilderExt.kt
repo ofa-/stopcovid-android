@@ -276,11 +276,16 @@ fun MaterialAlertDialogBuilder.showMigrationFailed(
 
 fun MaterialAlertDialogBuilder.showDbFailure(
     strings: LocalizedStrings,
-) {
+    onRetry: (() -> Unit),
+    onClear: Pair<String, (() -> Unit)>,
+): AlertDialog {
     setTitle(strings["common.warning"])
     setMessage(strings["android.db.error"])
     setPositiveButton(strings["common.ok"], null)
-    show()
+    setNeutralButton(strings["common.retry"]) { _, _ -> onRetry() }
+    setNegativeButton(strings[onClear.first]) { _, _ -> onClear.second() }
+    setCancelable(false)
+    return show()
 }
 
 fun MaterialAlertDialogBuilder.showRatingDialog(

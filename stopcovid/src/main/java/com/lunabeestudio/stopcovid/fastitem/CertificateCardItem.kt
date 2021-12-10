@@ -94,7 +94,7 @@ class CertificateCardItem : AbstractBindingItem<ItemCertificateCardBinding>() {
 
     private fun setupHeader(binding: ItemCertificateCardBinding) {
         val headerMessage = errorText?.takeIf { it.isNotBlank() } ?: warningText?.takeIf { it.isNotBlank() } ?: infoText
-        binding.headerMessageTextView.text = headerMessage
+        binding.headerMessageTextView.setTextOrHide(headerMessage)
         headerMessage?.let { spannable ->
             if (spannable.nextSpanTransition(0, spannable.length, URLSpan::class.java) != spannable.length) {
                 binding.headerMessageTextView.movementMethod = LinkMovementMethod.getInstance()

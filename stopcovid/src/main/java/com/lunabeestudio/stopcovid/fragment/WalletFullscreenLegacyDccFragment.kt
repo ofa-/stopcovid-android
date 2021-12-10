@@ -26,7 +26,9 @@ import androidx.navigation.fragment.navArgs
 import androidx.navigation.navGraphViewModels
 import com.google.zxing.BarcodeFormat
 import com.journeyapps.barcodescanner.BarcodeEncoder
+import com.lunabeestudio.domain.model.TacResult
 import com.lunabeestudio.stopcovid.R
+import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.extension.appCompatActivity
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.extension.setTextOrHide
@@ -86,12 +88,26 @@ class WalletFullscreenLegacyDccFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
         appCompatActivity?.supportActionBar?.title = strings["walletController.title"]
         viewModel.certificates.map { certificates ->
-            certificates
-                ?.filterIsInstance<EuropeanCertificate>()
-                ?.firstOrNull { it.id == args.id }
-        }.collectWithLifecycle(viewLifecycleOwner) { europeanCertificate ->
-            this@WalletFullscreenLegacyDccFragment.europeanCertificate = europeanCertificate
-            refreshScreen()
+            certificates.mapData { list ->
+                list
+                    ?.filterIsInstance<EuropeanCertificate>()
+                    ?.firstOrNull { it.id == args.id }
+            }
+        }.collectWithLifecycle(viewLifecycleOwner) { result ->
+            val mainActivity = activity as? MainActivity
+            when (result) {
+                is TacResult.Failure -> {
+                    mainActivity?.showProgress(false)
+                    strings["walletFullscreenController.error.certificateNotFound"]?.let { mainActivity?.showErrorSnackBar(it) }
+                    findNavControllerOrNull()?.popBackStack()
+                }
+                is TacResult.Loading -> mainActivity?.showProgress(true)
+                is TacResult.Success -> {
+                    mainActivity?.showProgress(false)
+                    this@WalletFullscreenLegacyDccFragment.europeanCertificate = result.successData
+                    refreshScreen()
+                }
+            }
         }
         binding.detailsTextSwitcher.setInAnimation(view.context, R.anim.fade_in)
         binding.detailsTextSwitcher.setOutAnimation(view.context, R.anim.fade_out)

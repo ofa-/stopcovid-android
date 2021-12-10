@@ -10,17 +10,13 @@
 
 package com.lunabeestudio.stopcovid.usecase
 
-import com.lunabeestudio.domain.model.WalletCertificateType
 import com.lunabeestudio.robert.RobertManager
-import com.lunabeestudio.stopcovid.extension.isBlacklisted
-import com.lunabeestudio.stopcovid.extension.isRecovery
-import com.lunabeestudio.stopcovid.extension.isSignatureExpired
+import com.lunabeestudio.stopcovid.extension.isEligibleForSmartWallet
 import com.lunabeestudio.stopcovid.extension.parseOrNull
 import com.lunabeestudio.stopcovid.extension.profileId
 import com.lunabeestudio.stopcovid.extension.recoveryDateOfFirstPositiveTest
 import com.lunabeestudio.stopcovid.extension.testDateTimeOfCollection
 import com.lunabeestudio.stopcovid.extension.vaccineDate
-import com.lunabeestudio.stopcovid.extension.vaccineDose
 import com.lunabeestudio.stopcovid.extension.yearMonthDayUsParser
 import com.lunabeestudio.stopcovid.extension.yearsOld
 import com.lunabeestudio.stopcovid.manager.BlacklistDCCManager
@@ -41,10 +37,11 @@ class GetSmartWalletCertificateUseCase(
     operator fun invoke(): Flow<SmartWallet> = walletRepository.walletCertificateFlow.filterNotNull().map { walletCertificates ->
         // Group certificates by firstName+birthdate (to avoid twins)
         var groupedCertificates = walletCertificates
-            .filterIsInstance<EuropeanCertificate>()
-            .groupBy { certificate ->
+            .data
+            ?.filterIsInstance<EuropeanCertificate>()
+            ?.groupBy { certificate ->
                 certificate.profileId()
-            }
+            }.orEmpty()
         groupedCertificates = groupedCertificates.filter { (_, certificates) ->
             certificates.isNotEmpty()
         }
@@ -57,14 +54,7 @@ class GetSmartWalletCertificateUseCase(
             if (age >= minAge) {
                 // Keep only DCC complete and DCC recovery, remove expired and blacklisted
                 val filteredCertificates = certificates.filter { certificate ->
-                    val isRecovery = certificate.greenCertificate.isRecovery
-                    val isCompleteVaccin =
-                        certificate.type == WalletCertificateType.VACCINATION_EUROPE
-                            && certificate.greenCertificate.vaccineDose?.let { (first, second) -> first == second } == true
-
-                    (isRecovery || isCompleteVaccin) &&
-                        !certificate.isSignatureExpired &&
-                        !certificate.isBlacklisted(blacklistDCCManager)
+                    certificate.isEligibleForSmartWallet(blacklistDCCManager)
                 }
                 // Put latest first
                 val sortedCertificates = filteredCertificates.sortedByDescending { certificate ->

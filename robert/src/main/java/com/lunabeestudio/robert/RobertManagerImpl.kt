@@ -62,6 +62,7 @@ import com.lunabeestudio.robert.repository.EphemeralBluetoothIdentifierRepositor
 import com.lunabeestudio.robert.repository.KeystoreRepository
 import com.lunabeestudio.robert.repository.LocalProximityRepository
 import com.lunabeestudio.robert.repository.RemoteServiceRepository
+import com.lunabeestudio.robert.repository.RobertVenueRepository
 import com.lunabeestudio.robert.utils.Event
 import com.lunabeestudio.robert.worker.StatusWorker
 import kotlinx.coroutines.CoroutineScope
@@ -96,6 +97,7 @@ class RobertManagerImpl(
     private val localProximityFilter: LocalProximityFilter,
     private val analyticsManager: AnalyticsManager,
     coroutineScope: CoroutineScope,
+    private val venueRepository: RobertVenueRepository,
 ) : RobertManager {
     private val statusMtx: Mutex = Mutex()
     private val ephemeralBluetoothIdentifierRepository: EphemeralBluetoothIdentifierRepository =
@@ -192,7 +194,7 @@ class RobertManagerImpl(
             migrateOldIsAtRisk()
         } else {
             coroutineScope.launch {
-                if (!localKeystoreDataSource.venuesQrCode().isNullOrEmpty()) {
+                if (!localKeystoreDataSource.venuesQrCode().data.isNullOrEmpty()) {
                     startStatusWorker(application.getAppContext())
                 }
             }
@@ -437,7 +439,7 @@ class RobertManagerImpl(
 
     suspend fun cleaStatus(robertApplication: RobertApplication): RobertResultData<AtRiskStatus> {
         val venueQrCodeList: List<VenueQrCode>? = try {
-            robertApplication.getVenueQrCodeList(null, null)
+            venueRepository.getVenuesQrCode(null, null)
         } catch (e: Exception) {
             Timber.e(e)
             return RobertResultData.Failure((e as? RobertException) ?: UnknownException())
@@ -760,7 +762,7 @@ class RobertManagerImpl(
             } ?: System.currentTimeMillis() - TimeUnit.DAYS.toMillis(configuration.venuesRetentionPeriod.toLong())
 
             // we send everything
-            val venueQrCodeList = application.getVenueQrCodeList(null, null)
+            val venueQrCodeList = venueRepository.getVenuesQrCode(null, null)
             if (!venueQrCodeList.isNullOrEmpty()) {
                 val result = cleaRepository.wreportClea(
                     configuration.cleaReportApiVersion,
@@ -774,7 +776,7 @@ class RobertManagerImpl(
                         keystoreRepository.reportValidationToken = null
                         keystoreRepository.reportToSendStartTime = null
                         keystoreRepository.reportToSendEndTime = null
-                        application.clearVenueQrCodeList()
+                        venueRepository.clearAllData()
                     }
                     is RobertResult.Failure -> {
                         // 403 means token invalid, erase token
@@ -782,7 +784,7 @@ class RobertManagerImpl(
                             keystoreRepository.reportValidationToken = null
                             keystoreRepository.reportToSendStartTime = null
                             keystoreRepository.reportToSendEndTime = null
-                            application.clearVenueQrCodeList()
+                            venueRepository.clearAllData()
                         } else if (shouldRetry) {
                             cleaReportIfNeeded(application, false)
                         }
@@ -792,7 +794,7 @@ class RobertManagerImpl(
                 keystoreRepository.reportValidationToken = null
                 keystoreRepository.reportToSendStartTime = null
                 keystoreRepository.reportToSendEndTime = null
-                application.clearVenueQrCodeList()
+                venueRepository.clearAllData()
             }
         }
     }

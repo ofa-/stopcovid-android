@@ -40,6 +40,16 @@ class AttestationsViewModel(
     fun deleteDeprecatedAttestations() {
         keystoreDataSource.deleteDeprecatedAttestations()
     }
+
+    suspend fun forceRefreshAttestations() {
+        keystoreDataSource.forceRefreshAttestations()
+    }
+
+    fun deleteLostAttestations() {
+        viewModelScope.launch {
+            keystoreDataSource.deleteLostAttestations()
+        }
+    }
 }
 
 class AttestationsViewModelFactory(

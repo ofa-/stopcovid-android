@@ -91,7 +91,7 @@ class InjectionContainer(private val context: StopCovid, val coroutineScope: Cor
     val logsDir: File by lazy { File(context.filesDir, Constants.Logs.DIR_NAME) }
     val debugManager: DebugManager by lazy { DebugManager(context, secureKeystoreDataSource, logsDir, cryptoManager) }
     val attestationRepository: AttestationRepository by lazy { AttestationRepository(secureKeystoreDataSource) }
-    val venueRepository: VenueRepository by lazy { VenueRepository(secureKeystoreDataSource) }
+    val venueRepository: VenueRepository by lazy { VenueRepository(secureKeystoreDataSource, sharedPrefs) }
     val walletRepository: WalletRepository by lazy {
         WalletRepository(
             context = context,
@@ -151,20 +151,21 @@ class InjectionContainer(private val context: StopCovid, val coroutineScope: Cor
     )
 
     val robertManager: RobertManager = RobertManagerImpl(
-        context,
-        SecureFileEphemeralBluetoothIdentifierDataSource(context, cryptoManager),
-        secureKeystoreDataSource,
-        SecureFileLocalProximityDataSource(File(context.filesDir, LOCAL_PROXIMITY_DIR), cryptoManager),
-        serviceDataSource,
-        cleaDataSource,
-        sharedCryptoDataSource,
-        configurationDataSource,
-        calibrationDataSource,
-        EnvConstant.Prod.serverPublicKey,
-        LocalProximityFilterImpl(),
-        analyticsManager,
-        coroutineScope = coroutineScope,
-    )
+            application = context,
+            localEphemeralBluetoothIdentifierDataSource = SecureFileEphemeralBluetoothIdentifierDataSource(context, cryptoManager),
+            localKeystoreDataSource = secureKeystoreDataSource,
+            localLocalProximityDataSource = SecureFileLocalProximityDataSource(File(context.filesDir, LOCAL_PROXIMITY_DIR), cryptoManager),
+            serviceDataSource = serviceDataSource,
+            cleaDataSource = cleaDataSource,
+            sharedCryptoDataSource = sharedCryptoDataSource,
+            configurationDataSource = configurationDataSource,
+            calibrationDataSource = calibrationDataSource,
+            serverPublicKey = EnvConstant.Prod.serverPublicKey,
+            localProximityFilter = LocalProximityFilterImpl(),
+            analyticsManager = analyticsManager,
+            coroutineScope = coroutineScope,
+            venueRepository = venueRepository,
+        )
 
     val cleanAndRenewActivityPassUseCase: CleanAndRenewActivityPassUseCase
         get() = CleanAndRenewActivityPassUseCase(

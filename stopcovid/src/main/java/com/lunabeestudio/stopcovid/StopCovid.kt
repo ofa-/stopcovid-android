@@ -38,7 +38,6 @@ import androidx.work.WorkManager
 import com.lunabeestudio.analytics.model.AppEventName
 import com.lunabeestudio.analytics.model.HealthEventName
 import com.lunabeestudio.domain.extension.ntpTimeSToUnixTimeMs
-import com.lunabeestudio.domain.model.VenueQrCode
 import com.lunabeestudio.framework.remote.server.ServerManager
 import com.lunabeestudio.robert.RobertApplication
 import com.lunabeestudio.robert.RobertManager
@@ -78,6 +77,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import okhttp3.Cache
@@ -467,20 +467,6 @@ class StopCovid : Application(), RobertApplication, LocalizedApplication {
         }
     }
 
-    override suspend fun getVenueQrCodeList(
-        startTime: Long?,
-        endTime: Long?
-    ): List<VenueQrCode> = injectionContainer.venueRepository.getVenuesQrCode(
-        startTime,
-        endTime,
-    )
-
-    override fun clearVenueQrCodeList() {
-        appCoroutineScope.launch {
-            injectionContainer.venueRepository.clearAllData(sharedPrefs)
-        }
-    }
-
     fun cancelClockNotAlignedNotification() {
         val notificationManager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.cancel(UiConstants.Notification.TIME.notificationId)
@@ -597,9 +583,9 @@ class StopCovid : Application(), RobertApplication, LocalizedApplication {
 
     private fun deleteOldAttestations() {
         appCoroutineScope.launch {
-            injectionContainer.secureKeystoreDataSource.attestations().filter { attestation ->
+            injectionContainer.secureKeystoreDataSource.attestations().data?.filter { attestation ->
                 attestation.isObsolete(robertManager.configuration)
-            }.forEach { attestation ->
+            }?.forEach { attestation ->
                 injectionContainer.secureKeystoreDataSource.deleteAttestation(attestation.id)
             }
         }
@@ -641,26 +627,11 @@ class StopCovid : Application(), RobertApplication, LocalizedApplication {
 
     override fun getAppBuild(): Int = BuildConfig.VERSION_CODE
 
-    override suspend fun getPlacesCount(): Int = try {
-        injectionContainer.secureKeystoreDataSource.venuesQrCode().size
-    } catch (e: Exception) {
-        Timber.e(e)
-        0
-    }
+    override suspend fun getPlacesCount(): Int = injectionContainer.secureKeystoreDataSource.venuesQrCode().data?.size ?: 0
 
-    override suspend fun getFormsCount(): Int = try {
-        injectionContainer.secureKeystoreDataSource.attestations().size
-    } catch (e: Exception) {
-        Timber.e(e)
-        0
-    }
+    override suspend fun getFormsCount(): Int = injectionContainer.secureKeystoreDataSource.attestations().data?.size ?: 0
 
-    override suspend fun getCertificatesCount(): Int = try {
-        injectionContainer.secureKeystoreDataSource.rawWalletCertificates().size
-    } catch (e: Exception) {
-        Timber.e(e)
-        0
-    }
+    override suspend fun getCertificatesCount(): Int = injectionContainer.secureKeystoreDataSource.certificateCountFlow.firstOrNull() ?: 0
 
     override fun userHaveAZipCode(): Boolean = sharedPrefs.hasChosenPostalCode
 

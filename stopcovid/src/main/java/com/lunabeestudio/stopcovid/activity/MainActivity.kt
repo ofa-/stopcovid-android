@@ -33,6 +33,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
+import androidx.navigation.NavDeepLinkRequest
 import androidx.navigation.NavDestination
 import androidx.navigation.fragment.DialogFragmentNavigator
 import androidx.navigation.fragment.findNavController
@@ -74,6 +75,7 @@ import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.showAlertRiskLevelChanged
 import com.lunabeestudio.stopcovid.extension.showRatingDialog
 import com.lunabeestudio.stopcovid.extension.walletRepository
+import com.lunabeestudio.stopcovid.fragment.DeeplinkFragment
 import com.lunabeestudio.stopcovid.fragment.FullscreenAttestationFragment
 import com.lunabeestudio.stopcovid.fragment.WalletFullscreen2DdocFragment
 import com.lunabeestudio.stopcovid.fragment.WalletFullscreenActivityPassFragment
@@ -129,6 +131,10 @@ class MainActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val launchIntent = intent?.let { Intent(it) }
+        intent = null // Nullify intent to bypass deeplink in NavController::onGraphCreated
+
         binding = ActivityMainBinding.inflate(layoutInflater)
 
         setSupportActionBar(binding.toolbar)
@@ -148,8 +154,8 @@ class MainActivity : BaseActivity() {
 
         initStringsObserver()
 
-        if (intent?.isLaunchedFromHistory == false) {
-            handleIntent(intent)
+        if (launchIntent?.isLaunchedFromHistory == false) {
+            handleIntent(launchIntent)
         }
 
         showLanguageDialogIfNeeded()
@@ -197,18 +203,36 @@ class MainActivity : BaseActivity() {
 
     fun processDeeplink(data: Uri) {
         if (navController.graph.hasDeepLink(data)) {
-            navController.navigate(
-                data,
-                navOptions {
-                    anim {
-                        enter = R.anim.nav_default_enter_anim
-                        exit = R.anim.nav_default_exit_anim
-                        popEnter = R.anim.nav_default_pop_enter_anim
-                        popExit = R.anim.nav_default_pop_exit_anim
+            var deeplinkProcessed = false
+
+            val navDeepLinkRequest = NavDeepLinkRequest(data, null, null)
+
+            // Handle deeplink to current fragment. In this case, try to call fun DeeplinkFragment::onNewIntent instead of using the nav
+            // graph (which does nothing).
+            navController.graph.matchDeepLink(navDeepLinkRequest)?.let { deepLinkMatch ->
+                if (deepLinkMatch.destination == navController.currentDestination) {
+                    val currentFragment = binding.navHostFragment.getFragment<Fragment>().childFragmentManager.fragments[0]
+                    (currentFragment as? DeeplinkFragment)?.let { deeplinkFragment ->
+                        deeplinkFragment.onNewIntent(deepLinkMatch.matchingArgs)
+                        deeplinkProcessed = true
                     }
-                    launchSingleTop = true
                 }
-            )
+            }
+
+            if (!deeplinkProcessed) {
+                navController.navigate(
+                    navDeepLinkRequest,
+                    navOptions {
+                        anim {
+                            enter = R.anim.nav_default_enter_anim
+                            exit = R.anim.nav_default_exit_anim
+                            popEnter = R.anim.nav_default_pop_enter_anim
+                            popExit = R.anim.nav_default_pop_exit_anim
+                        }
+                        launchSingleTop = true
+                    },
+                )
+            }
         } else {
             strings["universalQrScanController.error.wrongUrl"]?.let { errorMessage ->
                 showErrorSnackBar(errorMessage, Snackbar.LENGTH_SHORT)

@@ -81,6 +81,7 @@ class ProximityViewModel(
     val favoriteDcc: LiveData<Event<EuropeanCertificate?>> = walletRepository.walletCertificateFlow.map { list ->
         Event(
             list
+                .data
                 ?.filterIsInstance<EuropeanCertificate>()
                 ?.firstOrNull { certificate ->
                     (certificate as? EuropeanCertificate)?.isFavorite == true

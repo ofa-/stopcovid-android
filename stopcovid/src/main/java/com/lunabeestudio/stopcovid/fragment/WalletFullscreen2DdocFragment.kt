@@ -80,6 +80,7 @@ class WalletFullscreen2DdocFragment : BaseFragment() {
         appCompatActivity?.supportActionBar?.title = strings["walletController.title"]
         viewModel.certificates.asLiveData(timeoutInMs = 0).map { certificates ->
             certificates
+                .data
                 ?.filterIsInstance<FrenchCertificate>()
                 ?.firstOrNull { it.id == args.id }
         }

@@ -16,7 +16,7 @@ import com.lunabeestudio.stopcovid.extension.isEligibleForActivityPass
 import com.lunabeestudio.stopcovid.manager.DccCertificatesManager
 import com.lunabeestudio.stopcovid.manager.BlacklistDCCManager
 import com.lunabeestudio.stopcovid.model.EuropeanCertificate
-import com.lunabeestudio.stopcovid.model.TacResult
+import com.lunabeestudio.domain.model.TacResult
 import com.lunabeestudio.stopcovid.repository.WalletRepository
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filterNotNull
@@ -33,6 +33,7 @@ class CleanAndRenewActivityPassUseCase(
         val dccList: List<EuropeanCertificate> = walletRepository.walletCertificateFlow
             .filterNotNull()
             .first()
+            .data.orEmpty()
             .filterIsInstance<EuropeanCertificate>()
 
         val dccToClear = dccList.filter {

@@ -25,13 +25,13 @@ import com.lunabeestudio.framework.local.datasource.SecureKeystoreDataSource
 import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.toDimensSize
-import com.lunabeestudio.stopcovid.extension.stringsManager
 import com.lunabeestudio.stopcovid.coreui.utils.ImmutablePendingIntentCompat
+import com.lunabeestudio.stopcovid.extension.stringsManager
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 class DccWidget : AppWidgetProvider() {
     @OptIn(DelicateCoroutinesApi::class)
@@ -53,12 +53,8 @@ class DccWidget : AppWidgetProvider() {
     private suspend fun updateDccWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int) {
         val views: RemoteViews?
         val cryptoManager = LocalCryptoManager(context)
-        val favCertificate = try {
-            SecureKeystoreDataSource(context, cryptoManager, null).rawWalletCertificates().firstOrNull { it.isFavorite }
-        } catch (e: Exception) {
-            Timber.e(e)
-            null
-        }
+        val favCertificate = SecureKeystoreDataSource(context, cryptoManager, null)
+            .rawWalletCertificatesFlow.firstOrNull()?.data?.firstOrNull { it.isFavorite }
 
         if (favCertificate != null) {
             views = RemoteViews(context.packageName, R.layout.dcc_widget)

@@ -125,7 +125,7 @@ import com.lunabeestudio.stopcovid.model.DeviceSetup
 import com.lunabeestudio.stopcovid.model.KeyFigure
 import com.lunabeestudio.stopcovid.model.KeyFiguresNotAvailableException
 import com.lunabeestudio.stopcovid.model.NoEphemeralBluetoothIdentifierFound
-import com.lunabeestudio.stopcovid.model.TacResult
+import com.lunabeestudio.domain.model.TacResult
 import com.lunabeestudio.stopcovid.service.ProximityService
 import com.lunabeestudio.stopcovid.utils.ExtendedFloatingActionButtonScrollListener
 import com.lunabeestudio.stopcovid.viewmodel.ProximityViewModel
@@ -221,12 +221,14 @@ class ProximityFragment : TimeMainFragment() {
 
             val handleError = { error: RobertException? ->
                 context?.let {
-                    currentServiceError = error?.toCovidException()
-                    currentServiceError?.let {
-                        showErrorSnackBar(it.getString(strings))
+                    viewLifecycleOwnerOrNull()?.lifecycleScope?.launch(Dispatchers.Main) {
+                        currentServiceError = error?.toCovidException()
+                        currentServiceError?.let {
+                            showErrorSnackBar(it.getString(strings))
+                        }
+                        refreshScreen()
                     }
-                    refreshScreen()
-                } ?: Unit
+                }
             }
 
             boundedService?.getLastError()?.let(handleError)
@@ -742,12 +744,13 @@ class ProximityFragment : TimeMainFragment() {
             importantForAccessibility = ViewCompat.IMPORTANT_FOR_ACCESSIBILITY_NO
         }
         if (robertManager.configuration.displayUrgentDgs) {
-            items += cardWithActionItem(CardTheme.Urgent) {
+            items += cardWithActionItem {
                 onCardClick = {
                     findNavControllerOrNull()?.safeNavigate(
                         ProximityFragmentDirections.actionProximityFragmentToUrgentInfoFragment()
                     )
                 }
+                mainImage = R.drawable.ic_dgsurgent
                 mainTitle = strings["home.healthSection.dgsUrgent.title"]
                 mainBody = strings["home.healthSection.dgsUrgent.subtitle"]
                 identifier = "home.healthSection.dgsUrgent.title".hashCode().toLong()
@@ -810,8 +813,9 @@ class ProximityFragment : TimeMainFragment() {
     }
 
     private fun addVenueItems(items: ArrayList<GenericItem>, isSick: Boolean) {
-        items += cardWithActionItem(CardTheme.Primary) {
+        items += cardWithActionItem {
             mainImage = R.drawable.signal_card
+            mainLayoutDirection = LayoutDirection.RTL
             onCardClick = {
                 if (isSick) {
                     MaterialAlertDialogBuilder(requireContext()).showAlertSickVenue(
@@ -1154,7 +1158,9 @@ class ProximityFragment : TimeMainFragment() {
     private fun addVaccinationItems(items: ArrayList<GenericItem>) {
         items += cardWithActionItem {
             mainTitle = strings["home.vaccinationSection.cellTitle"]
+            mainLayoutDirection = LayoutDirection.RTL
             mainTitleColorRes = R.color.color_no_risk
+            mainImage = R.drawable.ic_vaccine_center
             mainTitleIcon = R.drawable.ic_vaccin
             mainBody = strings["home.vaccinationSection.cellSubtitle"]
             contentDescription = strings["home.vaccinationSection.cellTitle"]

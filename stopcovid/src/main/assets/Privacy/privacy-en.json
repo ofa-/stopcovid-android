@@ -30,12 +30,16 @@
         "description": "In compliance with the General Data Protection Regulation (GDPR), you can delete the data stored on your phone, the data stored on the server and the data relating to your registration, and you can cancel your registration.\n\nIn accordance with the General Data Protection Regulation, you can also deactivate the sending of this data for the preparation of anonymous statistics in the settings section of TousAntiCovid."
     },
     {
+        "section": "Information on the health pass wallet",
+        "description": "For the storage of the COVID-19 certificate (vaccination, test, exemption and recovery), as well as for notifications of eligibility for the vaccination booster or the expiration of the health pass (as part of the French activity pass), the information entered is not processed by the Ministère des Solidarités et de la Santé.\n\nThey are processed locally, on the user's smartphone, and are not subject to any transfer."
+    },
+    {
         "section": "Minors under the age of 15 years",
         "description": "If you are a minor under the age of 15 years, talk to your parents or your guardians about the appropriateness of installing the app."
     },
     {
         "section": "The team behind TousAntiCovid",
-        "description": "This app was developed by the TousAntiCovid team under the supervision of the Ministry for Solidarity and Health and the Ministry of State for Digital Affairs.\nTousAntiCovid team: Inria, ANSSI, Dassault Systèmes, Inserm, Lunabee Studio, Ministry for Solidarity and Health, Orange, Santé Publique France and Withings.\nThe app is entirely open source and the source code is accessible at the address below."
+        "description": "This app was developed by the TousAntiCovid team under the supervision of the Ministère des Solidarités et de la Santé and the Secrétariat d'Etat chargé du Numérique.\nTousAntiCovid team: Inria, ANSSI, Dassault Systèmes, Inserm, Lunabee Studio, Ministry for Solidarity and Health, Orange and Santé Publique France.\nThe app is entirely open source and the source code is accessible at the address below."
     },
     {
         "section": "Further information",

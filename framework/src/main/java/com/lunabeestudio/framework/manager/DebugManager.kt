@@ -16,10 +16,9 @@ import android.os.Build
 import android.os.StatFs
 import androidx.core.content.edit
 import androidx.preference.PreferenceManager
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import com.lunabeestudio.domain.extension.safeIsDestroyed
 import com.lunabeestudio.domain.model.RawWalletCertificate
+import com.lunabeestudio.domain.model.TacResult
 import com.lunabeestudio.framework.local.LocalCryptoManager
 import com.lunabeestudio.framework.local.datasource.SecureKeystoreDataSource
 import kotlinx.coroutines.Dispatchers
@@ -30,7 +29,6 @@ import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
-import java.lang.reflect.Type
 import java.security.KeyStore
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -46,43 +44,83 @@ class DebugManager(
     private val cryptoManager: LocalCryptoManager,
 ) {
 
-    private val gson = Gson()
     private val cryptoPrefs = appContext.getSharedPreferences(LocalCryptoManager.SHARED_PREF_NAME, Context.MODE_PRIVATE)
     private val robertPrefs = appContext.getSharedPreferences(SecureKeystoreDataSource.SHARED_PREF_NAME, Context.MODE_PRIVATE)
+    private val debugPrefs = appContext.getSharedPreferences(DEBUG_PREF_NAME, Context.MODE_PRIVATE)
     private val appPrefs = PreferenceManager.getDefaultSharedPreferences(appContext)
     private val keyStore = KeyStore.getInstance(LocalCryptoManager.ANDROID_KEY_STORE_PROVIDER).apply {
         this.load(null)
     }
     private val dateTimeFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.US)
 
+    private val masterKeyExist: Boolean
+        get() {
+            val hasAesAlias = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && keyStore.containsAlias("aes_local_protection")
+            val hasRsaAlias = Build.VERSION.SDK_INT < Build.VERSION_CODES.M &&
+                keyStore.containsAlias("rsa_wrap_local_protection") &&
+                cryptoPrefs.getString("aes_wrapped_local_protection", null) != null
+            return hasAesAlias || hasRsaAlias
+        }
+
     private var debugFile: File = File(logsDir, appPrefs.currentLogFileName).also { file ->
         file.createNewFile()
         val newSessionBlock = StringBuilder().apply {
             appendLine("++++ Start session  ${dateTimeFormat.format(Date())} ++++")
-            appendLine("${Build.MODEL} - API ${Build.VERSION.SDK_INT}")
-            appendLine("keystore aliases = ${keyStore.aliases().toList().joinToString()}")
-            keyStore.aliases().toList().forEach { alias ->
-                try {
-                    val key = keyStore.getKey(alias, null) as? SecretKey
-                    appendLine("$alias = ${key?.javaClass?.simpleName}, ${key?.algorithm}, ${key?.format}, ${key?.safeIsDestroyed}")
-                } catch (e: Exception) {
-                    appendLine("$alias = ${e.javaClass.simpleName}")
-                }
-            }
-            appendLine("Available space = ${StatFs(file.path).availableBytes / 1024 / 1024}mB")
-            appendCertificateNoDecrypt()
-            appendLine()
+            appendCommonData(file)
         }.toString()
         file.appendTextAndRotate(newSessionBlock)
     }
 
-    private suspend fun StringBuilder.log() {
+    private fun StringBuilder.appendCommonData(file: File) {
+        appendLine("${Build.MODEL} - API ${Build.VERSION.SDK_INT}")
+        appendLine("keystore aliases = ${keyStore.aliases().toList().joinToString()}")
+        keyStore.aliases().toList().forEach { alias ->
+            try {
+                val key = keyStore.getKey(alias, null) as? SecretKey
+                appendLine("$alias = ${key?.javaClass?.simpleName}, ${key?.algorithm}, ${key?.format}, ${key?.safeIsDestroyed}")
+            } catch (e: Exception) {
+                appendLine("$alias = ${e.javaClass.simpleName} ${e.message}")
+            }
+
+            try {
+                if (masterKeyExist) {
+                    val clearText = debugPrefs.getString(SHARED_PREFS_CRYPTO_DEBUG, null)?.let { cryptoManager.decryptToString(it) }
+                    val isTestOk = clearText?.equals(CRYPTO_DEBUG_TEST_STRING)
+                    appendLine("Crypto test = $isTestOk")
+                    if (isTestOk == false) {
+                        resetCryptoTest()
+                    }
+                }
+            } catch (e: Exception) {
+                appendLine("Crypto test = ${e.javaClass.simpleName} ${e.message}")
+                resetCryptoTest()
+            }
+        }
+        appendLine("Available space = ${StatFs(file.path).availableBytes / 1024 / 1024}mB")
+        appendCertificateNoDecrypt()
+        appendLine()
+    }
+
+    init {
+        if (debugPrefs.getString(SHARED_PREFS_CRYPTO_DEBUG, null) == null && masterKeyExist) {
+            resetCryptoTest()
+        }
+    }
+
+    private fun resetCryptoTest() {
+        debugPrefs.edit {
+            putString(SHARED_PREFS_CRYPTO_DEBUG, cryptoManager.encryptToString(CRYPTO_DEBUG_TEST_STRING))
+        }
+    }
+
+    private fun StringBuilder.log() {
         if (!debugFile.exists()) {
             debugFile.apply {
                 createNewFile()
-                appendLine("++++ Restart session  ${dateTimeFormat.format(Date())} ++++")
-                appendLine("${Build.MODEL} - API ${Build.VERSION.SDK_INT}")
-                appendLine("")
+                val stringBuilder = StringBuilder()
+                stringBuilder.appendLine("++++ Restart session  ${dateTimeFormat.format(Date())} ++++")
+                stringBuilder.appendCommonData(this)
+                debugFile.appendTextAndRotate(stringBuilder.toString())
             }
         }
 
@@ -98,14 +136,7 @@ class DebugManager(
             }
         }
 
-        try {
-            appendLine("certificates = ${keystoreDataSource.rawWalletCertificates().joinToString { "${it.id} (${it.type})" }}")
-        } catch (e: Exception) {
-            appendLine("couldn't decrypt certificates")
-        }
-
         appendCertificateNoDecrypt()
-        appendOldCertificateNoCache()
         appendLine("app pref = ${appPrefs.all}")
         appendLine("crypto pref = ${cryptoPrefs.all}")
         val isRegistered = try {
@@ -117,29 +148,6 @@ class DebugManager(
         appendLine("Available space = ${StatFs(debugFile.path).availableBytes / 1024 / 1024}mB")
         appendLine()
         debugFile.appendTextAndRotate(this.toString())
-    }
-
-    @Suppress("DEPRECATION")
-    private fun StringBuilder.appendOldCertificateNoCache() {
-        val certificatesLength = robertPrefs.getString(
-            SecureKeystoreDataSource.SHARED_PREF_KEY_WALLET_CERTIFICATES,
-            ""
-        )?.length
-        try {
-            val certificateData = getEncryptedValue<List<RawWalletCertificate>>(
-                key = SecureKeystoreDataSource.SHARED_PREF_KEY_WALLET_CERTIFICATES,
-                type = object : TypeToken<List<RawWalletCertificate>>() {}.type,
-            )?.joinToString { "${it.id} (${it.type})" }
-            appendLine(
-                "old certificates nocache ($certificatesLength) = $certificateData"
-            )
-        } catch (e: Exception) {
-            appendLine(
-                "old certificates nocache ($certificatesLength) [FAILURE] = " +
-                    "${e.javaClass.simpleName}, " +
-                    "${e.message}"
-            )
-        }
     }
 
     @Suppress("DEPRECATION")
@@ -173,15 +181,13 @@ class DebugManager(
         runBlocking {
             withContext(Dispatchers.IO) {
                 appendLine(
-                    "certificates nodecrypt = ${
-                    keystoreDataSource.db.certificateRoomDao().getAll().joinToString { it.uid }
-                    }"
+                    "certificates nodecrypt = ${keystoreDataSource.db.certificateRoomDao().getAll().joinToString { it.uid }}"
                 )
             }
         }
     }
 
-    suspend fun logSaveCertificates(rawWalletCertificate: RawWalletCertificate, info: String? = null) {
+    fun logSaveCertificates(rawWalletCertificate: RawWalletCertificate, info: String? = null) {
         StringBuilder().apply {
             appendLine("• Save certificate ${rawWalletCertificate.id} (${rawWalletCertificate.type})")
             if (info != null) {
@@ -191,7 +197,7 @@ class DebugManager(
         }
     }
 
-    suspend fun logDeleteCertificates(rawWalletCertificate: RawWalletCertificate, info: String? = null) {
+    fun logDeleteCertificates(rawWalletCertificate: RawWalletCertificate, info: String? = null) {
         StringBuilder().apply {
             appendLine("• Delete certificate ${rawWalletCertificate.id} (${rawWalletCertificate.type})")
             if (info != null) {
@@ -201,7 +207,7 @@ class DebugManager(
         }
     }
 
-    suspend fun logCertificateMigrated(rawWalletCertificate: List<RawWalletCertificate>, info: String? = null) {
+    fun logCertificateMigrated(rawWalletCertificate: List<RawWalletCertificate>, info: String? = null) {
         StringBuilder().apply {
             appendLine("• Migrate certificate ${rawWalletCertificate.joinToString { "${it.id} (${it.type})" }}")
             if (info != null) {
@@ -211,9 +217,11 @@ class DebugManager(
         }
     }
 
-    suspend fun logObserveCertificate(rawWalletCertificate: List<RawWalletCertificate>?, info: String? = null) {
+    fun logObserveCertificate(rawWalletCertificateResult: TacResult<List<RawWalletCertificate>>, info: String? = null) {
         StringBuilder().apply {
-            appendLine("• Observe certificate ${rawWalletCertificate?.joinToString { it.id }}")
+            appendLine("• Observe certificate")
+            appendCertificatesResult(rawWalletCertificateResult)
+
             if (info != null) {
                 appendLine("info = $info")
             }
@@ -221,12 +229,28 @@ class DebugManager(
         }
     }
 
-    suspend fun logOpenWalletContainer(info: String? = null) {
+    fun logOpenWalletContainer(rawWalletCertificateResult: TacResult<List<RawWalletCertificate>>, info: String? = null) {
         StringBuilder().apply {
             appendLine("• Open container")
+            appendCertificatesResult(rawWalletCertificateResult)
             if (info != null) {
                 appendLine("info = $info")
             }
+            log()
+        }
+    }
+
+    private fun StringBuilder.appendCertificatesResult(rawWalletCertificateResult: TacResult<List<RawWalletCertificate>>) {
+        appendLine("result = ${rawWalletCertificateResult.print()}")
+        if (rawWalletCertificateResult is TacResult.Failure) {
+            val error = rawWalletCertificateResult.throwable
+            appendLine("error = ${error?.javaClass?.simpleName} ${error?.message}")
+        }
+    }
+
+    fun logReinitializeWallet() {
+        StringBuilder().apply {
+            appendLine("• Reinitialize container")
             log()
         }
     }
@@ -242,23 +266,6 @@ class DebugManager(
         }
     }
 
-    private fun <T> getEncryptedValue(key: String, type: Type): T? {
-        val encryptedText = robertPrefs.getString(key, null)
-        return if (encryptedText != null) {
-            runBlocking {
-                if (type == ByteArray::class.java) {
-                    @Suppress("UNCHECKED_CAST")
-                    cryptoManager.decrypt(encryptedText) as? T
-                } else {
-                    val decryptedString = cryptoManager.decryptToString(encryptedText)
-                    gson.fromJson<T>(decryptedString, type)
-                }
-            }
-        } else {
-            null
-        }
-    }
-
     private var SharedPreferences.currentLogFileName: String
         get() = getString(CURRENT_LOG_FILENAME, null) ?: LOGS_FILENAME.first()
         set(value) {
@@ -266,10 +273,17 @@ class DebugManager(
             debugFile = File(logsDir, appPrefs.currentLogFileName)
         }
 
+    private fun TacResult<List<RawWalletCertificate>>.print(): String =
+        """${this.javaClass.simpleName} : ${data?.joinToString { "${it.id} (${it.type})" }}"""
+
     companion object {
         private const val CURRENT_LOG_FILENAME: String = "currentLogFilename"
-        private val LOGS_FILENAME: List<String> = listOf("event_logs_0.log", "event_logs_1.log")
 
+        private const val DEBUG_PREF_NAME: String = "9b47e1c9-6740-4bc0-ae61-059d80f78a1b"
+        private const val SHARED_PREFS_CRYPTO_DEBUG: String = "6ddbaaaf-0669-457b-afa9-79e826352911"
+        private const val CRYPTO_DEBUG_TEST_STRING: String = "945cb3bc-853b-44e9-8cd4-a4002f803d70"
+
+        private val LOGS_FILENAME: List<String> = listOf("event_logs_0.log", "event_logs_1.log")
         suspend fun zip(files: List<File>, toZipFile: File) {
             @Suppress("BlockingMethodInNonBlockingContext")
             withContext(Dispatchers.IO) {

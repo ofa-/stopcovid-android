@@ -58,6 +58,9 @@ val GreenCertificate.vaccineMedicinalProduct: String?
 val GreenCertificate.vaccineDate: Date?
     get() = vaccinations?.lastOrNull()?.dateOfVaccination?.let(yearMonthDayUsParser()::parseOrNull)
 
+val GreenCertificate.vaccineDateForceTimeZone: Date?
+    get() = vaccinations?.lastOrNull()?.dateOfVaccination?.let(yearMonthDayUsParserForceTimeZone()::parseOrNull)
+
 val GreenCertificate.vaccineDose: Pair<Int, Int>?
     get() {
         val vaccination = vaccinations?.lastOrNull() ?: return null
@@ -84,6 +87,9 @@ val GreenCertificate.testDateTimeOfCollection: Date?
 
 val GreenCertificate.recoveryDateOfFirstPositiveTest: Date?
     get() = recoveryStatements?.lastOrNull()?.dateOfFirstPositiveTest?.let(yearMonthDayUsParser()::parseOrNull)
+
+val GreenCertificate.recoveryDateOfFirstPositiveTestForceTimeZone: Date?
+    get() = recoveryStatements?.lastOrNull()?.dateOfFirstPositiveTest?.let(yearMonthDayUsParserForceTimeZone()::parseOrNull)
 
 val GreenCertificate.exemptionCertificateValidFrom: Date?
     get() = exemptionStatement?.certificateValidFrom?.let(yearMonthDayUsParser()::parseOrNull)

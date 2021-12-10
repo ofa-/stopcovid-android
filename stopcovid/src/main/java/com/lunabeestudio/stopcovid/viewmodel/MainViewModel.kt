@@ -17,12 +17,14 @@ import androidx.lifecycle.asLiveData
 import com.lunabeestudio.stopcovid.model.WalletCertificate
 import com.lunabeestudio.stopcovid.repository.WalletRepository
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.map
 
 class MainViewModel(
     walletRepository: WalletRepository,
 ) : ViewModel() {
-    val walletCertificateLiveData: LiveData<List<WalletCertificate>> = walletRepository.walletCertificateFlow.filterNotNull()
-        .asLiveData(timeoutInMs = 0)
+    val walletCertificateLiveData: LiveData<List<WalletCertificate>> = walletRepository.walletCertificateFlow.filterNotNull().map {
+        it.data.orEmpty()
+    }.asLiveData(timeoutInMs = 0)
 }
 
 class MainViewModelFactory(

@@ -210,26 +210,31 @@ fun CombinedChart.setupStyle(isAxisRightEnabled: Boolean = true) {
 
     xAxis.setupStyle()
     xAxis.setValueFormatter(context)
-    xAxis.axisMaximum = (data.xMax) + data.barData.barWidth
-    xAxis.axisMinimum = (data.xMin) - data.barData.barWidth
 
-    axisLeft.axisMinimum = axisLeft.axisMinimum.coerceAtLeast(0f)
-    axisLeft.setupStyle()
-    axisLeft.setValueFormatter()
+    // Display value when both figure have data
+    data?.let { data ->
+        val xMin = data.dataSets.maxOf { it.xMin }
+        xAxis.axisMaximum = (data.xMax) + data.barData.barWidth
+        xAxis.axisMinimum = xMin - data.barData.barWidth
 
-    if (isAxisRightEnabled) {
-        axisLeft.axisMaximum = data.dataSets[0].yMax
-        axisLeft.textColor = data.dataSets[0].color
+        axisLeft.axisMinimum = axisLeft.axisMinimum.coerceAtLeast(0f)
+        axisLeft.setupStyle()
+        axisLeft.setValueFormatter()
 
-        axisRight.setValueFormatter()
-        axisRight.setupStyle()
-        axisRight.textColor = data.dataSets[1].color
-        axisRight.axisMaximum = data.dataSets[1].yMax
-        axisRight.axisMinimum = axisRight.axisMinimum.coerceAtLeast(0f)
+        if (isAxisRightEnabled) {
+            axisLeft.axisMaximum = data.dataSets[0].yMax
+            axisLeft.textColor = data.dataSets[0].color
 
-        data.dataSets[1].axisDependency = YAxis.AxisDependency.RIGHT
-    } else {
-        axisRight.isEnabled = false
+            axisRight.setValueFormatter()
+            axisRight.setupStyle()
+            axisRight.textColor = data.dataSets[1].color
+            axisRight.axisMaximum = data.dataSets[1].yMax
+            axisRight.axisMinimum = axisRight.axisMinimum.coerceAtLeast(0f)
+
+            data.dataSets[1].axisDependency = YAxis.AxisDependency.RIGHT
+        } else {
+            axisRight.isEnabled = false
+        }
     }
 }
 

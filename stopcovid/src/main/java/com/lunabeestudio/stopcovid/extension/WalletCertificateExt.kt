@@ -5,6 +5,7 @@ import android.text.SpannableStringBuilder
 import com.lunabeestudio.domain.extension.walletOldCertificateThresholdInMs
 import com.lunabeestudio.domain.model.Configuration
 import com.lunabeestudio.domain.model.RawWalletCertificate
+import com.lunabeestudio.domain.model.TacResult
 import com.lunabeestudio.domain.model.WalletCertificateType
 import com.lunabeestudio.stopcovid.coreui.extension.stringsFormat
 import com.lunabeestudio.stopcovid.coreui.manager.LocalizedStrings
@@ -341,6 +342,20 @@ suspend fun WalletCertificate.isEligibleForActivityPass(
     return true
 }
 
+suspend fun WalletCertificate.isEligibleForSmartWallet(
+    blacklistDCCManager: BlacklistDCCManager,
+): Boolean {
+    if (this !is EuropeanCertificate) return false
+
+    val isCompleteVaccine =
+        type == WalletCertificateType.VACCINATION_EUROPE
+            && (greenCertificate.vaccineDose?.let { (first, second) -> first == second } == true)
+    val isRecovery = greenCertificate.isRecovery
+    val isBlacklisted = isBlacklisted(blacklistDCCManager)
+
+    return (isCompleteVaccine || isRecovery) && !isBlacklisted && !isSignatureExpired
+}
+
 val EuropeanCertificate.isSignatureExpired: Boolean
     get() = expirationTime < System.currentTimeMillis()
 
@@ -355,4 +370,12 @@ fun EuropeanCertificate.activityPassValidFuture(): Boolean = if (type == WalletC
     System.currentTimeMillis() < timestamp - 1_000
 } else {
     false
+}
+
+fun TacResult<List<WalletCertificate>>.toRaw(): TacResult<List<RawWalletCertificate>> {
+    return when (this) {
+        is TacResult.Failure -> TacResult.Failure(throwable, failureData?.map { it.raw })
+        is TacResult.Loading -> TacResult.Loading(partialData?.map { it.raw }, progress)
+        is TacResult.Success -> TacResult.Success(successData.map { it.raw })
+    }
 }
