@@ -60,6 +60,7 @@ class WalletPagerFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupViewPager()
+        viewPager.setUserInputEnabled(false)
         viewModel.certificatesCount.observe(viewLifecycleOwner) { certificatesCount ->
             if (certificatesCount == 0) {
                 findNavControllerOrNull()?.safeNavigate(WalletPagerFragmentDirections.actionWalletPagerFragmentToWalletInfoFragment())
