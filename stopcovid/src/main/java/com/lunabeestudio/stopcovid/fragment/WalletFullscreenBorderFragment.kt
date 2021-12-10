@@ -103,9 +103,11 @@ class WalletFullscreenBorderFragment : BaseFragment() {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
+/*
         if (menu.findItem(R.id.qr_code_menu_share) == null) {
             inflater.inflate(R.menu.fullscreen_qr_code_menu, menu)
         }
+*/
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
