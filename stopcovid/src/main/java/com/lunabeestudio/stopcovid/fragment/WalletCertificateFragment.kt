@@ -304,6 +304,10 @@ class WalletCertificateFragment : MainFragment() {
            certificate.fullDescription(strings, robertManager.configuration)
         } else { "" }
 
+        val firstName = if (! sharedPrefs.showCertificateDetails) {
+           certificate.fullNameUppercase().split(" ")[0]
+        } else { "" }
+
         val greenCertificate = (certificate as? EuropeanCertificate)?.greenCertificate
 
         var smartWalletState: SmartWalletState? = null
@@ -325,7 +329,7 @@ class WalletCertificateFragment : MainFragment() {
         return certificateCardItem {
             this.generateBarcode = generateBarcode
             titleText = formatText
-            nameText = certificate.fullNameUppercase().split(" ")[0]
+            nameText = firstName
             descriptionText = certificateDetails
             infoText = infoDescription
             warningText = warningDescription
