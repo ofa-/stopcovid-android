@@ -94,16 +94,17 @@
 
         <TextView
             android:id="@+id/nameTextView"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/spacing_large"
             android:layout_marginTop="@dimen/spacing_large"
             android:textAppearance="@style/TextAppearance.StopCovid.Title"
             android:textIsSelectable="false"
-            app:layout_constraintBottom_toTopOf="@id/descriptionTextView"
+            android:rotation="-90"
+            app:layout_constraintTop_toBottomOf="@id/separator"
+            app:layout_constraintBottom_toTopOf="@id/aboveTagBarrier"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/imageView"
-            app:layout_constraintTop_toBottomOf="@id/actionButton"
+            app:layout_constraintStart_toStartOf="@id/actionButton"
             tools:text="@tools:sample/lorem[3]" />
 
         <TextView
@@ -111,12 +112,12 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/spacing_large"
-            android:layout_marginBottom="@dimen/spacing_large"
+            android:layout_marginVertical="@dimen/spacing_large"
             android:textAppearance="@style/TextAppearance.StopCovid.Caption"
             android:textIsSelectable="false"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/imageView"
-            app:layout_constraintTop_toBottomOf="@id/nameTextView"
+            app:layout_constraintTop_toBottomOf="@id/separator"
             tools:text="@tools:sample/lorem[14]" />
 
         <androidx.constraintlayout.widget.Barrier
@@ -131,8 +132,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toTopOf="@id/bottomActionTextView"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toStartOf="@id/imageView"
+            app:layout_constraintEnd_toEndOf="@id/imageView"
             app:layout_constraintTop_toBottomOf="@id/aboveTagBarrier"
             app:layout_goneMarginBottom="@dimen/spacing_large">
 
