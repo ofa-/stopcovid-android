@@ -88,6 +88,11 @@ class WalletPagerFragment : BaseFragment() {
             }
             tabSelectedListener = object : TabLayout.OnTabSelectedListener {
                 override fun onTabSelected(tab: TabLayout.Tab?) {
+                    viewPager.setUserInputEnabled(
+                        when (tabLayout.selectedTabPosition) {
+                            WALLET_INFO_FRAGMENT_POSITION -> true
+                            else -> false
+                        })
                     view?.postDelayed(
                         {
                             val appBarLayout = (activity as? MainActivity)?.binding?.appBarLayout ?: return@postDelayed
