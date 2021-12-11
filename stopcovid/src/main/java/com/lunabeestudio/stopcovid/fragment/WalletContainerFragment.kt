@@ -78,8 +78,6 @@ class WalletContainerFragment : BaseFragment(), DeeplinkFragment {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        injectionContainer.debugManager.logOpenWalletContainer(viewModel.certificates.value.toRaw())
-
         args.navCertificateId?.let { id ->
             navigateToFullscreenEuropeanCertificateId(id, true)
         }
