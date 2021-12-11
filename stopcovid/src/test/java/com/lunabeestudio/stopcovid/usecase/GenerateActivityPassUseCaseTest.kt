@@ -16,7 +16,7 @@ import com.lunabeestudio.domain.model.WalletCertificateType
 import com.lunabeestudio.robert.model.RobertResultData
 import com.lunabeestudio.stopcovid.extension.raw
 import com.lunabeestudio.stopcovid.model.EuropeanCertificate
-import com.lunabeestudio.stopcovid.model.TacResult
+import com.lunabeestudio.domain.model.TacResult
 import com.lunabeestudio.stopcovid.model.WalletCertificate
 import com.lunabeestudio.stopcovid.repository.WalletRepository
 import io.mockk.coEvery

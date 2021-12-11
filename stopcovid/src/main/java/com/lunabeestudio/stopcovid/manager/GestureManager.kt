@@ -34,8 +34,44 @@ object GestureManager {
             identifier = items.size.toLong()
         }
         items += logoBodyItem {
+            imageRes = R.drawable.ic_gesture_mask
+            text = strings["onboarding.gesturesController.gesture7"]
+            identifier = items.size.toLong()
+        }
+        items += spaceItem {
+            spaceRes = R.dimen.spacing_medium
+            identifier = items.size.toLong()
+        }
+        items += logoBodyItem {
+            imageRes = R.drawable.ic_gesture_air
+            text = strings["onboarding.gesturesController.gesture9"]
+            identifier = items.size.toLong()
+        }
+        items += spaceItem {
+            spaceRes = R.dimen.spacing_medium
+            identifier = items.size.toLong()
+        }
+        items += logoBodyItem {
             imageRes = R.drawable.ic_gesture_hands
             text = strings["onboarding.gesturesController.gesture1"]
+            identifier = items.size.toLong()
+        }
+        items += spaceItem {
+            spaceRes = R.dimen.spacing_medium
+            identifier = items.size.toLong()
+        }
+        items += logoBodyItem {
+            imageRes = R.drawable.ic_gesture_aircheck
+            text = strings["onboarding.gesturesController.gesture4"]
+            identifier = items.size.toLong()
+        }
+        items += spaceItem {
+            spaceRes = R.dimen.spacing_medium
+            identifier = items.size.toLong()
+        }
+        items += logoBodyItem {
+            imageRes = R.drawable.ic_gesture_distance
+            text = strings["onboarding.gesturesController.gesture6"]
             identifier = items.size.toLong()
         }
         items += spaceItem {
@@ -58,65 +94,6 @@ object GestureManager {
         }
         items += spaceItem {
             spaceRes = R.dimen.spacing_medium
-            identifier = items.size.toLong()
-        }
-        items += logoBodyItem {
-            imageRes = R.drawable.ic_gesture_face
-            text = strings["onboarding.gesturesController.gesture5"]
-            identifier = items.size.toLong()
-        }
-        items += spaceItem {
-            spaceRes = R.dimen.spacing_medium
-            identifier = items.size.toLong()
-        }
-        items += logoBodyItem {
-            imageRes = R.drawable.ic_gesture_distance
-            text = strings["onboarding.gesturesController.gesture6"]
-            identifier = items.size.toLong()
-        }
-        items += spaceItem {
-            spaceRes = R.dimen.spacing_medium
-            identifier = items.size.toLong()
-        }
-        items += logoBodyItem {
-            imageRes = R.drawable.ic_gesture_aircheck
-            text = strings["onboarding.gesturesController.gesture4"]
-            identifier = items.size.toLong()
-        }
-        items += spaceItem {
-            spaceRes = R.dimen.spacing_medium
-            identifier = items.size.toLong()
-        }
-        items += logoBodyItem {
-            imageRes = R.drawable.ic_gesture_mask
-            text = strings["onboarding.gesturesController.gesture7"]
-            identifier = items.size.toLong()
-        }
-        items += spaceItem {
-            spaceRes = R.dimen.spacing_medium
-            identifier = items.size.toLong()
-        }
-        items += logoBodyItem {
-            imageRes = R.drawable.ic_gesture_6
-            text = strings["onboarding.gesturesController.gesture8"]
-            identifier = items.size.toLong()
-        }
-        items += spaceItem {
-            spaceRes = R.dimen.spacing_medium
-            identifier = items.size.toLong()
-        }
-        items += logoBodyItem {
-            imageRes = R.drawable.ic_gesture_air
-            text = strings["onboarding.gesturesController.gesture9"]
-            identifier = items.size.toLong()
-        }
-        items += spaceItem {
-            spaceRes = R.dimen.spacing_medium
-            identifier = items.size.toLong()
-        }
-        items += logoBodyItem {
-            imageRes = R.drawable.ic_gesture_app
-            text = strings["onboarding.gesturesController.gesture10"]
             identifier = items.size.toLong()
         }
     }

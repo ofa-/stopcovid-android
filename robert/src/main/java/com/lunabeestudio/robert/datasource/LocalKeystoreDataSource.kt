@@ -17,6 +17,7 @@ import com.lunabeestudio.domain.model.Calibration
 import com.lunabeestudio.domain.model.Configuration
 import com.lunabeestudio.domain.model.FormEntry
 import com.lunabeestudio.domain.model.RawWalletCertificate
+import com.lunabeestudio.domain.model.TacResult
 import com.lunabeestudio.domain.model.VenueQrCode
 import kotlinx.coroutines.flow.Flow
 
@@ -39,15 +40,14 @@ interface LocalKeystoreDataSource {
     var deprecatedLastRiskReceivedDate: Long?
     var deprecatedLastExposureTimeframe: Int?
 
-    suspend fun attestations(): List<Attestation>
+    suspend fun attestations(): TacResult<List<Attestation>>
     val attestationsFlow: Flow<List<Attestation>>
     suspend fun insertAllAttestations(vararg attestations: Attestation)
     suspend fun deleteAttestation(attestationId: String)
     suspend fun deleteAllAttestations()
     fun deleteDeprecatedAttestations()
 
-    suspend fun rawWalletCertificates(): List<RawWalletCertificate>
-    val rawWalletCertificatesFlow: Flow<List<RawWalletCertificate>>
+    val rawWalletCertificatesFlow: Flow<TacResult<List<RawWalletCertificate>>>
     suspend fun insertAllRawWalletCertificates(vararg certificates: RawWalletCertificate)
     suspend fun updateNonLightRawWalletCertificate(vararg certificates: RawWalletCertificate)
     suspend fun deleteRawWalletCertificate(certificateId: String)
@@ -66,7 +66,7 @@ interface LocalKeystoreDataSource {
     var reportToSendStartTime: Long?
     var reportToSendEndTime: Long?
 
-    suspend fun venuesQrCode(): List<VenueQrCode>
+    suspend fun venuesQrCode(): TacResult<List<VenueQrCode>>
     val venuesQrCodeFlow: Flow<List<VenueQrCode>>
     suspend fun insertAllVenuesQrCode(vararg venuesQrCode: VenueQrCode)
     suspend fun deleteVenueQrCode(venueQrCodeId: String)
@@ -98,4 +98,13 @@ interface LocalKeystoreDataSource {
     var isolationIsStillHavingFever: Boolean?
     var isolationIsFeverReminderScheduled: Boolean?
     var isolationFormState: Int?
+
+    suspend fun forceRefreshCertificatesFlow()
+    suspend fun deleteLostCertificates()
+    suspend fun forceRefreshAttestations()
+    suspend fun deleteLostAttestations()
+    suspend fun forceRefreshVenues()
+    suspend fun deleteLostVenues()
+
+    fun resetKeyGeneratedFlag()
 }

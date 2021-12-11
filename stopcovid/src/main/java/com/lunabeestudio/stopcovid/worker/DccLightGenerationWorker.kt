@@ -25,7 +25,7 @@ import androidx.work.workDataOf
 import com.lunabeestudio.robert.extension.safeEnumValueOf
 import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.StopCovid
-import com.lunabeestudio.stopcovid.model.TacResult
+import com.lunabeestudio.domain.model.TacResult
 import com.lunabeestudio.stopcovid.usecase.GenerateActivityPassStateName
 import kotlinx.coroutines.flow.collect
 import timber.log.Timber

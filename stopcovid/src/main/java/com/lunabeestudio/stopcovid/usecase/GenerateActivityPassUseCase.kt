@@ -18,7 +18,7 @@ import com.lunabeestudio.stopcovid.extension.raw
 import com.lunabeestudio.stopcovid.extension.toCovidException
 import com.lunabeestudio.stopcovid.model.EuropeanCertificate
 import com.lunabeestudio.stopcovid.model.GenerateActivityPassException
-import com.lunabeestudio.stopcovid.model.TacResult
+import com.lunabeestudio.domain.model.TacResult
 import com.lunabeestudio.stopcovid.model.WalletCertificate
 import com.lunabeestudio.stopcovid.model.WalletCertificateNoKeyException
 import com.lunabeestudio.stopcovid.repository.WalletRepository

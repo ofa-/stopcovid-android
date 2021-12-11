@@ -26,13 +26,21 @@ fun DateFormat.parseOrNull(source: String): Date? =
         null
     }
 
+fun yearMonthDayUsParser(): SimpleDateFormat {
+    return SimpleDateFormat("yyyy-MM-dd", Locale.US)
+}
+
 // In France the default TimeZone is “Europe/Paris”
 // which means that importing “2021-07-03" will result in a date with time set to midnight in GMT+2
 // and that importing “2021-12-03” will result in a date with time set to midnight in GMT+1
 // To avoid this tricky situation, this function force the timeZone to be the current GMT
-fun yearMonthDayUsParser(): SimpleDateFormat {
-    val offset = OffsetTime.ofInstant(midnightDate().toInstant(), ZoneId.of(TimeZone.getDefault().id)).offset
+fun yearMonthDayUsParserForceTimeZone(): SimpleDateFormat {
     return SimpleDateFormat("yyyy-MM-dd", Locale.US).apply {
-        timeZone = TimeZone.getTimeZone("GMT$offset")
+        timeZone = currentTimeZone()
     }
+}
+
+fun currentTimeZone(): TimeZone {
+    val offset = OffsetTime.ofInstant(midnightDate().toInstant(), ZoneId.of(TimeZone.getDefault().id)).offset
+    return TimeZone.getTimeZone("GMT$offset")
 }

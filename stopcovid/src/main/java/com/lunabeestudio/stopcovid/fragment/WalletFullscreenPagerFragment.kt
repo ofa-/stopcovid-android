@@ -27,22 +27,26 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import com.lunabeestudio.domain.model.TacResult
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.extension.refreshLift
 import com.lunabeestudio.stopcovid.coreui.fragment.BaseFragment
 import com.lunabeestudio.stopcovid.extension.activityPassValidFuture
+import com.lunabeestudio.stopcovid.extension.collectWithLifecycle
 import com.lunabeestudio.stopcovid.extension.fullDescription
 import com.lunabeestudio.stopcovid.extension.injectionContainer
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.manager.ShareManager
+import com.lunabeestudio.stopcovid.model.EuropeanCertificate
 import com.lunabeestudio.stopcovid.model.UnknownException
 import com.lunabeestudio.stopcovid.model.WalletCertificate
 import com.lunabeestudio.stopcovid.view.SecuredBitmapView
 import com.lunabeestudio.stopcovid.viewmodel.WalletViewModel
 import com.lunabeestudio.stopcovid.viewmodel.WalletViewModelFactory
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class WalletFullscreenPagerFragment : BaseFragment() {
@@ -72,6 +76,26 @@ class WalletFullscreenPagerFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        viewModel.certificates.map { certificates ->
+            certificates.mapData { list ->
+                list
+                    ?.filterIsInstance<EuropeanCertificate>()
+                    ?.firstOrNull { it.id == args.id }
+            }
+        }.collectWithLifecycle(viewLifecycleOwner) { result ->
+            val mainActivity = activity as? MainActivity
+            when (result) {
+                is TacResult.Failure -> {
+                    mainActivity?.showProgress(false)
+                    strings["walletFullscreenController.error.certificateNotFound"]?.let { mainActivity?.showErrorSnackBar(it) }
+                    findNavControllerOrNull()?.popBackStack()
+                }
+                is TacResult.Loading -> mainActivity?.showProgress(true)
+                is TacResult.Success -> {
+                    mainActivity?.showProgress(false)
+                }
+            }
+        }
         refreshPager()
     }
 

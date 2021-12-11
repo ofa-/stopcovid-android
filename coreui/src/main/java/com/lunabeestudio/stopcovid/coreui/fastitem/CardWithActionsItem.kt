@@ -7,6 +7,7 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AccelerateInterpolator
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.appcompat.view.ContextThemeWrapper
@@ -136,15 +137,15 @@ class CardWithActionsItem(private val cardTheme: CardTheme) : AbstractBindingIte
                 }
             }
 
-            actions?.forEachIndexed { index, (icon, label, showBadge, loading, onClickListener) ->
+            actions?.forEachIndexed { index, (icon, label, showBadge, loading, showArrow, onClickListener) ->
                 val actionBinding = ItemActionBinding.bind(binding.actionsLinearLayout.getChildAt(index))
                 actionBinding.actionDivider.isVisible = (index == 0 && mainLayoutVisible) || (index > 0)
                 actionBinding.textView.text = label.safeEmojiSpanify()
                 actionBinding.leftIconImageView.setImageResourceOrHide(icon)
                 actionBinding.badgeView.isVisible = showBadge
                 actionBinding.actionRootLayout.setOnClickListenerOrHideRipple(onClickListener)
-                actionBinding.arrowImageView.isVisible = onClickListener != null
-                actionBinding.progressBar.isVisible = loading == true
+                actionBinding.arrowImageView.isVisible = onClickListener != null && showArrow
+                actionBinding.progressBar.isVisible = loading
             }
             if (!binding.actionsLinearLayout.isVisible) {
                 binding.actionsLinearLayout.visibility = View.VISIBLE
@@ -169,6 +170,28 @@ class CardWithActionsItem(private val cardTheme: CardTheme) : AbstractBindingIte
         if (onDismissClick != null && cardTitle == null) {
             setDismissButtonMargin(binding)
         }
+
+        if (payloads.contains(BUMP_ICON)) {
+            val duration = binding.root.context.resources.getInteger(android.R.integer.config_shortAnimTime).toLong()
+            val interpolator = AccelerateInterpolator()
+            actions?.forEachIndexed { index, _ ->
+                val actionBinding = ItemActionBinding.bind(binding.actionsLinearLayout.getChildAt(index))
+                animateBump(actionBinding, duration, interpolator)
+            }
+        }
+    }
+
+    fun animateBump(actionBinding: ItemActionBinding, duration: Long, interpolator: AccelerateInterpolator) {
+        actionBinding.leftIconImageView.animate().apply {
+            this.duration = duration
+            this.interpolator = interpolator
+            scaleX(SCALE_ANIMATION_ICON)
+            scaleY(SCALE_ANIMATION_ICON)
+            withEndAction {
+                scaleX(1.0f)
+                scaleY(1.0f)
+            }.start()
+        }.start()
     }
 
     private fun setDismissButtonMargin(binding: ItemCardWithActionsBinding) {
@@ -186,8 +209,14 @@ class CardWithActionsItem(private val cardTheme: CardTheme) : AbstractBindingIte
         super.unbindView(binding)
         binding.mainBodyTextView.maxLines = Int.MAX_VALUE
         binding.mainBodyTextView.visibility = View.VISIBLE
+
         binding.cardTitleTextView.apply {
             val color = R.attr.colorAccent.fetchSystemColor(context)
+            setTextColor(color)
+            TextViewCompat.setCompoundDrawableTintList(this, ColorStateList.valueOf(color))
+        }
+        binding.mainTitleTextView.apply {
+            val color = R.attr.colorOnSurface.fetchSystemColor(context)
             setTextColor(color)
             TextViewCompat.setCompoundDrawableTintList(this, ColorStateList.valueOf(color))
         }
@@ -202,6 +231,11 @@ class CardWithActionsItem(private val cardTheme: CardTheme) : AbstractBindingIte
             marginEnd = 0
             topMargin = R.dimen.spacing_small.toDimensSize(binding.rootLayout.context).toInt()
         }
+    }
+
+    companion object {
+        const val SCALE_ANIMATION_ICON: Float = 1.5F
+        const val BUMP_ICON: String = "BUMP_ICON"
     }
 }
 

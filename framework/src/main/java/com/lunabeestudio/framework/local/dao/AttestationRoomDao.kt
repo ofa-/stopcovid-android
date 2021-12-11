@@ -11,6 +11,7 @@
 package com.lunabeestudio.framework.local.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -34,4 +35,10 @@ interface AttestationRoomDao {
 
     @Query("DELETE FROM attestationroom")
     fun deleteAll()
+
+    @Delete
+    fun delete(vararg attestationRoom: AttestationRoom)
+
+    @Query("UPDATE attestationroom SET uid = :uid WHERE uid = (SELECT uid FROM attestationroom LIMIT 1)")
+    fun updateFirstAttestationUid(uid: String)
 }

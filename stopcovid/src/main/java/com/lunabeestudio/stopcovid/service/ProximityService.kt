@@ -56,7 +56,7 @@ import kotlin.math.pow
 
 open class ProximityService : RobertProximityService() {
 
-    var onError: ((RobertException?) -> Unit)? = null
+    var onError: ((RobertException?) -> Any?)? = null
 
     private var lastError: RobertException? = null
 

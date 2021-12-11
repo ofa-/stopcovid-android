@@ -34,8 +34,12 @@
         "description": "Si vous êtes un mineur de moins de 15 ans, discutez avec vos parents ou vos responsables légaux de l’opportunité d’installer cette application."
     },
     {
+        "section": "Informations sur le Carnet de certificats",
+        "description": "Pour la conservation du certificat COVID-19 (vaccination, test, contre-indication et rétablissement), ainsi que pour les notifications à l’éligibilité au rappel vaccinal ou à l’expiration du pass sanitaire (dans le cadre du pass activité sur le territoire français), les informations saisies ne font l’objet d’aucun traitement par le Ministère des Solidarités et de la Santé.\n\nElles sont traitées localement, sur le téléphone de l’utilisateur, et ne font l’objet d’aucun transfert."
+    },
+    {
         "section": "Qui a créé TousAntiCovid ?",
-        "description": "Cette application a été réalisée par l'équipe TousAntiCovid, sous la supervision du Ministère des Solidarités et de la Santé et du Secrétariat d'Etat chargé du Numérique.\nL'équipe TousAntiCovid : Inria, ANSSI, Dassault Systèmes, Inserm, Lunabee Studio, Ministère des Solidarités et de la Santé, Orange, Santé Publique France et Withings.\nLe code source de cette plateforme est intégralement ouvert et accessible à l’adresse ci-dessous."
+        "description": "Cette application a été réalisée par l'équipe TousAntiCovid, sous la supervision du Ministère des Solidarités et de la Santé et du Secrétariat d'Etat chargé du Numérique.\nL'équipe TousAntiCovid : Inria, ANSSI, Dassault Systèmes, Inserm, Lunabee Studio, Ministère des Solidarités et de la Santé, Orange et Santé Publique France.\nLe code source de cette plateforme est intégralement ouvert et accessible à l’adresse ci-dessous."
     },
     {
         "section": "Informations complémentaires",

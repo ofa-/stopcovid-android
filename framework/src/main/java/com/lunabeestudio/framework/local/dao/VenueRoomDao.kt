@@ -11,6 +11,7 @@
 package com.lunabeestudio.framework.local.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -32,6 +33,12 @@ interface VenueRoomDao {
     @Query("DELETE FROM venueroom WHERE uid = :venueId")
     fun delete(venueId: String)
 
+    @Delete
+    fun delete(vararg venueRoom: VenueRoom)
+
     @Query("DELETE FROM venueroom")
     fun deleteAll()
+
+    @Query("UPDATE venueroom SET uid = :uid WHERE uid = (SELECT uid FROM venueroom LIMIT 1)")
+    fun updateFirstVenueUid(uid: String)
 }

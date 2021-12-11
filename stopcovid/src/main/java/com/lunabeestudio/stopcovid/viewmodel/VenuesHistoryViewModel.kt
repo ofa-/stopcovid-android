@@ -36,6 +36,16 @@ class VenuesHistoryViewModel(
             venueRepository.deleteDeprecatedVenues()
         }
     }
+
+    suspend fun forceRefreshVenues() {
+        venueRepository.forceRefreshVenues()
+    }
+
+    fun deleteLostVenues() {
+        viewModelScope.launch {
+            venueRepository.deleteLostVenues()
+        }
+    }
 }
 
 class VenuesHistoryViewModelFactory(

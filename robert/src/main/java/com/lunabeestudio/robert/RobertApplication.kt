@@ -12,7 +12,6 @@ package com.lunabeestudio.robert
 
 import android.content.Context
 import com.lunabeestudio.analytics.proxy.AnalyticsInfosProvider
-import com.lunabeestudio.domain.model.VenueQrCode
 
 interface RobertApplication : AnalyticsInfosProvider {
     val robertManager: RobertManager
@@ -30,6 +29,4 @@ interface RobertApplication : AnalyticsInfosProvider {
     fun atRiskLevelChange(prevRiskLevel: Float)
     suspend fun sendClockNotAlignedNotification()
     fun refreshInfoCenter()
-    suspend fun getVenueQrCodeList(startTime: Long?, endTime: Long?): List<VenueQrCode>?
-    fun clearVenueQrCodeList()
 }

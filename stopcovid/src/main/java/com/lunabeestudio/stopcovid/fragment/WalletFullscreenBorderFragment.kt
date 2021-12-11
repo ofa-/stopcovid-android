@@ -74,6 +74,7 @@ class WalletFullscreenBorderFragment : BaseFragment() {
 
         viewModel.certificates.map { certificates ->
             certificates
+                .data
                 ?.filterIsInstance<EuropeanCertificate>()
                 ?.firstOrNull { it.id == arguments?.getString(CERTIFICATE_ID_ARG_KEY) }
         }.collectWithLifecycle(viewLifecycleOwner) { europeanCertificate ->

@@ -25,6 +25,7 @@ import com.lunabeestudio.stopcovid.activity.ImportQRCodeActivity
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.fragment.FastAdapterBottomSheetDialogFragment
+import com.lunabeestudio.stopcovid.extension.injectionContainer
 import com.lunabeestudio.stopcovid.extension.showPasswordDialog
 import com.lunabeestudio.stopcovid.fastitem.selectionItem
 import com.lunabeestudio.stopcovid.viewmodel.ImportQrBottomViewModel
@@ -39,7 +40,7 @@ class ImportQrBottomSheetDialogFragment : FastAdapterBottomSheetDialogFragment()
         ) { activityResult -> onPickerResult(activityResult) }
 
     private val viewModel: ImportQrBottomViewModel by viewModels {
-        ImportQrBottomViewModelFactory(this)
+        ImportQrBottomViewModelFactory(this, injectionContainer.analyticsManager)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

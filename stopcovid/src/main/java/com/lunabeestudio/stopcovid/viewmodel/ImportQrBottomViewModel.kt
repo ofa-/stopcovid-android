@@ -22,10 +22,12 @@ import androidx.savedstate.SavedStateRegistryOwner
 import com.google.zxing.BinaryBitmap
 import com.google.zxing.MultiFormatReader
 import com.google.zxing.NotFoundException
-import com.google.zxing.RGBLuminanceSource
 import com.google.zxing.Result
 import com.google.zxing.common.HybridBinarizer
+import com.lunabeestudio.analytics.manager.AnalyticsManager
+import com.lunabeestudio.analytics.model.ErrorEventName
 import com.lunabeestudio.stopcovid.coreui.utils.SingleLiveEvent
+import com.lunabeestudio.stopcovid.utils.RGBLuminanceBitmapSource
 import com.tom_roush.pdfbox.android.PDFBoxResourceLoader
 import com.tom_roush.pdfbox.pdmodel.PDDocument
 import com.tom_roush.pdfbox.pdmodel.encryption.InvalidPasswordException
@@ -40,6 +42,7 @@ import java.io.InputStream
 
 class ImportQrBottomViewModel(
     private val handle: SavedStateHandle,
+    private val analyticsManager: AnalyticsManager,
     private val dispatcherIO: CoroutineDispatcher = Dispatchers.IO,
 ) : ViewModel() {
 
@@ -91,11 +94,18 @@ class ImportQrBottomViewModel(
             } catch (e: InvalidPasswordException) {
                 passwordFailure.postValue(!password.isNullOrEmpty())
             } catch (e: Exception) {
-                Timber.e(e)
-                scanResult.postValue(null)
+                handlePdfImportError(e)
+            } catch (e: OutOfMemoryError) {
+                handlePdfImportError(e)
             }
             loading.postValue(false)
         }
+    }
+
+    private fun handlePdfImportError(e: Throwable) {
+        Timber.e(e)
+        scanResult.postValue(null)
+        analyticsManager.reportErrorEvent(ErrorEventName.ERR_WALLET_PDF_IMPORT)
     }
 
     private fun Uri?.inputStream(context: Context): InputStream? {
@@ -111,12 +121,8 @@ class ImportQrBottomViewModel(
     }
 
     private fun scanBitmap(bitmap: Bitmap): Result? {
-        val width: Int = bitmap.width
-        val height: Int = bitmap.height
-        val pixels = IntArray(width * height)
-        bitmap.getPixels(pixels, 0, width, 0, 0, width, height)
-        val source = RGBLuminanceSource(width, height, pixels)
-        val bBitmap = BinaryBitmap(HybridBinarizer(source))
+        val luminanceSource = RGBLuminanceBitmapSource(bitmap)
+        val bBitmap = BinaryBitmap(HybridBinarizer(luminanceSource))
         val reader = MultiFormatReader()
         bitmap.recycle()
         return try {
@@ -133,9 +139,10 @@ class ImportQrBottomViewModel(
 
 class ImportQrBottomViewModelFactory(
     owner: SavedStateRegistryOwner,
+    private val analyticsManager: AnalyticsManager,
 ) : AbstractSavedStateViewModelFactory(owner, null) {
     override fun <T : ViewModel> create(key: String, modelClass: Class<T>, handle: SavedStateHandle): T {
         @Suppress("UNCHECKED_CAST")
-        return ImportQrBottomViewModel(handle) as T
+        return ImportQrBottomViewModel(handle, analyticsManager) as T
     }
 }

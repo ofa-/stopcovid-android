@@ -184,9 +184,8 @@ class LocalCryptoManager(private val appContext: Context) {
                 newSecretKey
             } else {
                 Timber.e(
-                    "Secret key couldn't be found in the KeyStore but data are already encrypted with it\nkeystore aliases = ${
-                    keyStore.aliases().toList()
-                    }"
+                    "Secret key couldn't be found in the KeyStore but data are already encrypted with it\n" +
+                        "keystore aliases = ${keyStore.aliases().toList()}"
                 )
                 throw SecretKeyAlreadyGeneratedException()
             }
@@ -306,6 +305,12 @@ class LocalCryptoManager(private val appContext: Context) {
         cipher.init(Cipher.DECRYPT_MODE, localProtectionKey, spec)
 
         return SelfDestroyCipherInputStream(inputStream, cipher, localProtectionKey)
+    }
+
+    fun resetKeyGeneratedFlag() {
+        sharedPreferences.edit {
+            putBoolean(SECRET_KEY_GENERATED_SHARED_PREFERENCE, false)
+        }
     }
 
     companion object {

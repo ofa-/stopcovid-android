@@ -23,6 +23,7 @@ import com.lunabeestudio.domain.model.Calibration
 import com.lunabeestudio.domain.model.Configuration
 import com.lunabeestudio.domain.model.FormEntry
 import com.lunabeestudio.domain.model.RawWalletCertificate
+import com.lunabeestudio.domain.model.TacResult
 import com.lunabeestudio.domain.model.VenueQrCode
 import com.lunabeestudio.domain.model.WalletCertificateType
 import com.lunabeestudio.framework.extension.setOrRemove
@@ -147,13 +148,27 @@ class SecureKeystoreDataSource(
             }
         }
 
-    override suspend fun attestations(): List<Attestation> {
-        return withContext(Dispatchers.IO) {
-            migrateAttestations()
-            db.attestationRoomDao().getAll().map { attestationRoom ->
-                val decryptedString = cryptoManager.decryptToString(attestationRoom.encryptedValue)
-                gson.fromJson(decryptedString, Attestation::class.java)
+    override suspend fun attestations(): TacResult<List<Attestation>> {
+        migrateAttestations()
+
+        var lastError: Exception? = null
+        val attestations = withContext(ioDispatcher) {
+            db.attestationRoomDao().getAll().mapNotNull { (_, encryptedValue) ->
+                try {
+                    val decryptedString = cryptoManager.decryptToString(encryptedValue)
+                    gson.fromJson(decryptedString, Attestation::class.java)
+                } catch (e: Exception) {
+                    Timber.e(e)
+                    lastError = e
+                    null
+                }
             }
+        }
+
+        return if (lastError == null) {
+            TacResult.Success(attestations)
+        } else {
+            TacResult.Failure(lastError, attestations)
         }
     }
 
@@ -207,15 +222,6 @@ class SecureKeystoreDataSource(
             setEncryptedValue(SHARED_PREF_KEY_ATTESTATIONS_V2, value)
         }
 
-    override suspend fun rawWalletCertificates(): List<RawWalletCertificate> {
-        return withContext(ioDispatcher) {
-            db.certificateRoomDao().getAll().mapNotNull { (_, encryptedValue) ->
-                val decryptedString = cryptoManager.decryptToString(encryptedValue)
-                gson.fromJson(decryptedString, RawWalletCertificate::class.java)
-            }
-        }
-    }
-
     override fun getCertificateByIdFlow(id: String): Flow<RawWalletCertificate?> {
         return db.certificateRoomDao().getByIdFlow(id).map { certificateRoom ->
             withContext(ioDispatcher) {
@@ -236,14 +242,25 @@ class SecureKeystoreDataSource(
         }
     }
 
-    override val rawWalletCertificatesFlow: Flow<List<RawWalletCertificate>>
+    override val rawWalletCertificatesFlow: Flow<TacResult<List<RawWalletCertificate>>>
         get() = db.certificateRoomDao().getAllFlow().map { certificatesRoom ->
             withContext(ioDispatcher) {
-                certificatesRoom.mapNotNull { (_, encryptedValue) ->
-                    kotlin.runCatching {
+                var lastError: Exception? = null
+                val rawWalletCertificates = certificatesRoom.mapNotNull { (_, encryptedValue) ->
+                    try {
                         val decryptedString = cryptoManager.decryptToString(encryptedValue)
                         gson.fromJson(decryptedString, RawWalletCertificate::class.java)
-                    }.getOrNull()
+                    } catch (e: Exception) {
+                        Timber.e(e)
+                        lastError = e
+                        null
+                    }
+                }
+
+                if (lastError == null) {
+                    TacResult.Success(rawWalletCertificates)
+                } else {
+                    TacResult.Failure(lastError, rawWalletCertificates)
                 }
             }
         }
@@ -416,13 +433,25 @@ class SecureKeystoreDataSource(
         get() = getEncryptedValue(SHARED_PREF_KEY_REPORT_VALIDATION_TOKEN, String::class.java)
         set(value) = setEncryptedValue(SHARED_PREF_KEY_REPORT_VALIDATION_TOKEN, value)
 
-    override suspend fun venuesQrCode(): List<VenueQrCode> {
-        return withContext(ioDispatcher) {
-            migrateVenuesQrCode()
-            db.venueRoomDao().getAll().map { venueRoom ->
-                val decryptedString = cryptoManager.decryptToString(venueRoom.encryptedValue)
-                gson.fromJson(decryptedString, VenueQrCode::class.java)
+    override suspend fun venuesQrCode(): TacResult<List<VenueQrCode>> {
+        var lastError: Exception? = null
+        val rawWalletCertificates = withContext(ioDispatcher) {
+            db.venueRoomDao().getAll().mapNotNull { (_, encryptedValue) ->
+                try {
+                    val decryptedString = cryptoManager.decryptToString(encryptedValue)
+                    gson.fromJson(decryptedString, VenueQrCode::class.java)
+                } catch (e: Exception) {
+                    Timber.e(e)
+                    lastError = e
+                    null
+                }
             }
+        }
+
+        return if (lastError == null) {
+            TacResult.Success(rawWalletCertificates)
+        } else {
+            TacResult.Failure(lastError, rawWalletCertificates)
         }
     }
 
@@ -669,6 +698,64 @@ class SecureKeystoreDataSource(
         } else {
             getEncryptedValue(newKey, Long::class.java)
         }
+    }
+
+    override suspend fun forceRefreshCertificatesFlow() {
+        val dao = db.certificateRoomDao()
+        withContext(ioDispatcher) {
+            dao.updateFirstCertificateUid(uid = UUID.randomUUID().toString())
+        }
+    }
+
+    override suspend fun deleteLostCertificates() {
+        val certificateRoomDao = db.certificateRoomDao()
+        withContext(ioDispatcher) {
+            val certificates = certificateRoomDao.getAll()
+            val certificatesToDelete = certificates.filter {
+                kotlin.runCatching { cryptoManager.decryptToString(it.encryptedValue) }.isFailure
+            }.toTypedArray()
+            certificateRoomDao.delete(*certificatesToDelete)
+        }
+    }
+
+    override suspend fun forceRefreshAttestations() {
+        val dao = db.attestationRoomDao()
+        withContext(ioDispatcher) {
+            dao.updateFirstAttestationUid(uid = UUID.randomUUID().toString())
+        }
+    }
+
+    override suspend fun deleteLostAttestations() {
+        val attestationRoomDao = db.attestationRoomDao()
+        withContext(ioDispatcher) {
+            val attestations = attestationRoomDao.getAll()
+            val attestationsToDelete = attestations.filter {
+                kotlin.runCatching { cryptoManager.decryptToString(it.encryptedValue) }.isFailure
+            }.toTypedArray()
+            attestationRoomDao.delete(*attestationsToDelete)
+        }
+    }
+
+    override suspend fun forceRefreshVenues() {
+        val dao = db.venueRoomDao()
+        withContext(ioDispatcher) {
+            dao.updateFirstVenueUid(uid = UUID.randomUUID().toString())
+        }
+    }
+
+    override suspend fun deleteLostVenues() {
+        val venueRoomDao = db.venueRoomDao()
+        withContext(ioDispatcher) {
+            val venues = venueRoomDao.getAll()
+            val venuesToDelete = venues.filter {
+                kotlin.runCatching { cryptoManager.decryptToString(it.encryptedValue) }.isFailure
+            }.toTypedArray()
+            venueRoomDao.delete(*venuesToDelete)
+        }
+    }
+
+    override fun resetKeyGeneratedFlag() {
+        cryptoManager.resetKeyGeneratedFlag()
     }
 
     companion object {

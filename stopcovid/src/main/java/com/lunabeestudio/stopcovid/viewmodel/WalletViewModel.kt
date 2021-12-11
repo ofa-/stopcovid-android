@@ -17,6 +17,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import com.lunabeestudio.domain.model.TacResult
 import com.lunabeestudio.domain.model.WalletCertificateType
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.robert.model.RobertResultData
@@ -30,9 +31,8 @@ import com.lunabeestudio.stopcovid.manager.Blacklist2DDOCManager
 import com.lunabeestudio.stopcovid.manager.BlacklistDCCManager
 import com.lunabeestudio.stopcovid.model.EuropeanCertificate
 import com.lunabeestudio.stopcovid.model.FrenchCertificate
-import com.lunabeestudio.stopcovid.model.TacResult
-import com.lunabeestudio.stopcovid.model.WalletCertificate
 import com.lunabeestudio.stopcovid.model.SmartWallet
+import com.lunabeestudio.stopcovid.model.WalletCertificate
 import com.lunabeestudio.stopcovid.repository.WalletRepository
 import com.lunabeestudio.stopcovid.usecase.GenerateActivityPassState
 import com.lunabeestudio.stopcovid.usecase.GenerateActivityPassUseCase
@@ -40,6 +40,7 @@ import com.lunabeestudio.stopcovid.usecase.GetSmartWalletCertificateUseCase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -61,17 +62,18 @@ class WalletViewModel(
         get() = _scrollEvent
 
     private var previousCertificatesId = emptyList<String>()
-    val certificates: StateFlow<List<WalletCertificate>?> = walletRepository.walletCertificateFlow
+    val certificates: StateFlow<TacResult<List<WalletCertificate>>> = walletRepository.walletCertificateFlow
         .map { certificates ->
             if (previousCertificatesId.isNotEmpty()) {
                 certificates
+                    .data
                     ?.find { it.id !in previousCertificatesId }
                     ?.let { _scrollEvent.value = Event(it) }
             }
-            previousCertificatesId = certificates?.map { it.id }.orEmpty()
+            previousCertificatesId = certificates.data?.map { it.id }.orEmpty()
             loading.postValue(false)
             certificates
-        }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+        }.stateIn(viewModelScope, SharingStarted.Eagerly, TacResult.Loading(emptyList()))
 
     val profileCertificates: StateFlow<SmartWallet?> = getSmartWalletCertificateUseCase()
         .stateIn(viewModelScope, SharingStarted.Eagerly, emptyMap())
@@ -81,24 +83,26 @@ class WalletViewModel(
         addSource(blacklist2DDOCManager.blacklistUpdateEvent) { this.value = it }
     }
 
-    val certificatesCount: LiveData<Int?> = walletRepository.certificateCountFlow.asLiveData()
+    val certificatesCount: LiveData<Int?> = walletRepository.certificateCountFlow.combine(certificates) { encryptedCount, certificates ->
+        certificates.data?.size?.let { encryptedCount.coerceAtMost(it) } ?: encryptedCount
+    }.asLiveData()
 
     val migrationInProgress: LiveData<Boolean> = walletRepository.migrationInProgress
 
     val recentCertificates: List<WalletCertificate>?
-        get() = certificates.value?.filter {
+        get() = certificates.value.data?.filter {
             it.isRecent(robertManager.configuration) &&
                 (it as? EuropeanCertificate)?.isFavorite != true
         }?.sortedByDescending { it.timestamp }
 
     val olderCertificates: List<WalletCertificate>?
-        get() = certificates.value?.filter {
+        get() = certificates.value.data?.filter {
             it.isOld(robertManager.configuration) &&
                 (it as? EuropeanCertificate)?.isFavorite != true
         }?.sortedByDescending { it.timestamp }
 
     val favoriteCertificates: List<WalletCertificate>?
-        get() = certificates.value?.filter {
+        get() = certificates.value.data?.filter {
             (it as? EuropeanCertificate)?.isFavorite == true
         }?.sortedByDescending { it.timestamp }
 
@@ -111,10 +115,6 @@ class WalletViewModel(
 
     fun deleteDeprecatedCertificates() {
         walletRepository.deleteDeprecatedCertificated()
-    }
-
-    fun isEmpty(): Boolean {
-        return certificates.value.isNullOrEmpty()
     }
 
     suspend fun saveCertificate(walletCertificate: WalletCertificate) {
@@ -147,7 +147,7 @@ class WalletViewModel(
     }
 
     suspend fun getCertificatesCount(): Int {
-        return walletRepository.getCertificateCount()
+        return certificatesCount.value ?: walletRepository.getCertificateCount()
     }
 
     suspend fun convert2ddocToDcc(certificate: FrenchCertificate): RobertResultData<String> {
@@ -164,6 +164,20 @@ class WalletViewModel(
 
     fun generateActivityPass(certificate: EuropeanCertificate): Flow<TacResult<GenerateActivityPassState>> {
         return generateActivityPassUseCase(certificate)
+    }
+
+    suspend fun forceRefreshCertificates() {
+        walletRepository.forceRefreshCertificatesFlow()
+    }
+
+    fun deleteLostCertificates() {
+        viewModelScope.launch {
+            walletRepository.deleteLostCertificates()
+        }
+    }
+
+    fun resetWalletCryptoKeyGeneratedFlag() {
+        walletRepository.resetKeyCryptoGeneratedFlag()
     }
 }
 

@@ -90,8 +90,8 @@ class WalletPagerFragment : BaseFragment() {
                 override fun onTabSelected(tab: TabLayout.Tab?) {
                     viewPager.setUserInputEnabled(
                         when (tabLayout.selectedTabPosition) {
-                            WALLET_INFO_FRAGMENT_POSITION -> true
-                            else -> false
+                            WALLET_CERTIFICATE_FRAGMENT_POSITION -> false
+                            else -> true
                         })
                     view?.postDelayed(
                         {

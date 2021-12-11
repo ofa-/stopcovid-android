@@ -18,6 +18,7 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.lunabeestudio.analytics.model.ErrorEventName
 import com.lunabeestudio.domain.extension.ntpTimeSToUnixTimeMs
+import com.lunabeestudio.domain.model.TacResult
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.setImageResourceOrHide
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
@@ -64,7 +65,7 @@ class VenuesHistoryFragment : MainFragment() {
         binding?.emptyLayout?.emptyButton?.isVisible = false
 
         showMigrationFailedIfNeeded()
-        showDbFailureIfNeeded()
+        showDbFailureIfNeeded(false)
     }
 
     private fun initViewModelObserver() {
@@ -138,15 +139,30 @@ class VenuesHistoryFragment : MainFragment() {
         }
     }
 
-    private fun showDbFailureIfNeeded() {
+    private fun showDbFailureIfNeeded(isRetry: Boolean) {
         lifecycleScope.launch {
-            try {
-                context?.secureKeystoreDataSource()?.venuesQrCode()
-            } catch (e: Exception) {
-                context?.let {
+            val result = context?.secureKeystoreDataSource()?.venuesQrCode()
+            if (result is TacResult.Failure) {
+                if (isRetry) {
+                    analyticsManager.reportErrorEvent(ErrorEventName.ERR_VENUES_DB_RETRY_FAILED)
+                } else {
                     analyticsManager.reportErrorEvent(ErrorEventName.ERR_VENUES_DB)
-                    MaterialAlertDialogBuilder(it).showDbFailure(strings)
                 }
+                context?.let { ctx ->
+                    MaterialAlertDialogBuilder(ctx)
+                        .showDbFailure(
+                            strings,
+                            onRetry = {
+                                lifecycleScope.launch {
+                                    viewModel.forceRefreshVenues()
+                                    showDbFailureIfNeeded(true)
+                                }
+                            },
+                            onClear = "android.db.error.clearVenues" to { viewModel.deleteLostVenues() }
+                        )
+                }
+            } else if (isRetry && result is TacResult.Success) {
+                analyticsManager.reportErrorEvent(ErrorEventName.ERR_VENUES_DB_RETRY_SUCCEEDED)
             }
         }
     }

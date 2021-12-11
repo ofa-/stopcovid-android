@@ -12,12 +12,12 @@ package com.lunabeestudio.robert.extension
 
 import timber.log.Timber
 
-inline fun <reified T : Enum<T>> safeEnumValueOf(name: String?, uppercase: Boolean = true): T? {
+inline fun <reified T : Enum<T>> safeEnumValueOf(name: String, uppercase: Boolean = true): T? {
     return try {
         val fixedName = if (uppercase) {
-            name!!.uppercase()
+            name.uppercase()
         } else {
-            name!!
+            name
         }
         enumValueOf<T>(fixedName)
     } catch (e: IllegalArgumentException) {

@@ -8,7 +8,7 @@
  * Created by Lunabee Studio / Date - 2021/2/9 - for the TOUS-ANTI-COVID project
  */
 
-package com.lunabeestudio.stopcovid.model
+package com.lunabeestudio.domain.model
 
 /**
  * Generic result wrapper to wrap data fetched asynchronously with a status.
@@ -60,4 +60,19 @@ sealed class TacResult<out T> {
                 is Failure -> failureData
             }
         }
+
+    fun <U> mapData(transform: (T?) -> U?): TacResult<U> {
+        return when (this) {
+            is Failure -> Failure(throwable, transform(failureData))
+            is Loading -> Loading(transform(partialData), progress)
+            is Success -> {
+                val transformed = transform(successData)
+                if (transformed == null) {
+                    Failure(null, transformed)
+                } else {
+                    Success(transformed)
+                }
+            }
+        }
+    }
 }

@@ -39,7 +39,7 @@ import com.lunabeestudio.stopcovid.extension.openInExternalBrowser
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.model.EuropeanCertificate
 import com.lunabeestudio.stopcovid.model.NoInternetException
-import com.lunabeestudio.stopcovid.model.TacResult
+import com.lunabeestudio.domain.model.TacResult
 import com.lunabeestudio.stopcovid.model.WalletCertificate
 import com.lunabeestudio.stopcovid.usecase.GenerateActivityPassState
 import com.lunabeestudio.stopcovid.usecase.GenerateActivityPassStateName
@@ -77,7 +77,7 @@ class WalletFullscreenActivityPassExplanationFragment : MainFragment() {
 
     private val certificate: WalletCertificate? by lazy {
         val certificateId = arguments?.getString(CERTIFICATE_ID_ARG_KEY)
-        viewModel.certificates.value?.firstOrNull { it.id == certificateId }
+        viewModel.certificates.value.data?.firstOrNull { it.id == certificateId }
     }
 
     private var activityPassState: ActivityPassState? = null

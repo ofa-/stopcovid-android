@@ -15,7 +15,6 @@ import android.content.Context
 import androidx.annotation.CallSuper
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.preference.PreferenceManager
 import androidx.work.WorkManager
 import com.lunabeestudio.framework.local.datasource.SecureKeystoreDataSource
 import com.lunabeestudio.robert.RobertApplication
@@ -42,9 +41,7 @@ abstract class CommonDataViewModel(
     @CallSuper
     open fun eraseVenues(application: RobertApplication) {
         viewModelScope.launch {
-            venueRepository.clearAllData(
-                PreferenceManager.getDefaultSharedPreferences(application.getAppContext()),
-            )
+            venueRepository.clearAllData()
         }
     }
 

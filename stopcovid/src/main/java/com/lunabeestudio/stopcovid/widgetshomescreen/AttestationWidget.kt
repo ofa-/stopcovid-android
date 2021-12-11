@@ -66,8 +66,8 @@ class AttestationWidget : AppWidgetProvider() {
         // get the valid attestations list
         val attestations = context.secureKeystoreDataSource().attestations()
         val validAttestations =
-            attestations.filter { !it.isExpired(context.robertManager().configuration) }
-                .sortedBy { attestation -> attestation.timestamp }
+            attestations.data?.filter { !it.isExpired(context.robertManager().configuration) }
+                ?.sortedBy { attestation -> attestation.timestamp }
         if (!context.robertManager().configuration.displayAttestation) {
             views = RemoteViews(context.packageName, R.layout.attestation_widget_no_attestation)
             uriIntent = Constants.Url.PROXIMITY_FRAGMENT_URI
@@ -84,7 +84,7 @@ class AttestationWidget : AppWidgetProvider() {
                 context.stringsManager().strings["attestationsController.newAttestation"] ?: "Nouvelle attestation"
             )
         }
-        // already created a certif
+        // already created an attestation
         else {
             val mainAttestation = validAttestations.last()
             views = RemoteViews(context.packageName, R.layout.attestation_widget_valid_attestation)

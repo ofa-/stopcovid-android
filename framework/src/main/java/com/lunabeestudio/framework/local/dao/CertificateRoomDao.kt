@@ -11,6 +11,7 @@
 package com.lunabeestudio.framework.local.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -39,6 +40,9 @@ interface CertificateRoomDao {
     @Update
     fun updateAll(vararg certificate: CertificateRoom)
 
+    @Delete
+    fun delete(vararg certificateRoom: CertificateRoom)
+
     @Query("DELETE FROM certificateroom WHERE uid = :certificateId")
     fun delete(certificateId: String)
 
@@ -50,4 +54,7 @@ interface CertificateRoomDao {
 
     @Query("SELECT COUNT(uid) FROM certificateroom")
     fun getAllCountFlow(): Flow<Int>
+
+    @Query("UPDATE certificateroom SET uid = :uid WHERE uid = (SELECT uid FROM certificateroom LIMIT 1)")
+    fun updateFirstCertificateUid(uid: String)
 }

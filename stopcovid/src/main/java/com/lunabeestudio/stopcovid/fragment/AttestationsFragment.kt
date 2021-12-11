@@ -20,6 +20,7 @@ import com.google.zxing.BarcodeFormat
 import com.journeyapps.barcodescanner.BarcodeEncoder
 import com.lunabeestudio.analytics.model.ErrorEventName
 import com.lunabeestudio.domain.model.Attestation
+import com.lunabeestudio.domain.model.TacResult
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.R
@@ -39,7 +40,6 @@ import com.lunabeestudio.stopcovid.extension.showDbFailure
 import com.lunabeestudio.stopcovid.extension.showErrorSnackBar
 import com.lunabeestudio.stopcovid.extension.showMigrationFailed
 import com.lunabeestudio.stopcovid.fastitem.AttestationCardItem
-import com.lunabeestudio.stopcovid.fastitem.LogoItem
 import com.lunabeestudio.stopcovid.fastitem.attestationCardItem
 import com.lunabeestudio.stopcovid.fastitem.bigTitleItem
 import com.lunabeestudio.stopcovid.fastitem.linkCardItem
@@ -84,7 +84,7 @@ class AttestationsFragment : MainFragment() {
             refreshScreen()
         }
         showMigrationFailedIfNeeded()
-        showDbFailureIfNeeded()
+        showDbFailureIfNeeded(false)
 
         bottomActionBinding = FragmentRecyclerWithBottomActionBinding.bind(view).apply {
             bottomSheetButton.setOnClickListener {
@@ -126,22 +126,6 @@ class AttestationsFragment : MainFragment() {
     override suspend fun getItems(): List<GenericItem> {
         val items = ArrayList<GenericItem>()
 
-        items += logoItem {
-            imageRes = R.drawable.ic_attestation
-            identifier = items.size.toLong()
-            minLogoHeightRes = LogoItem.NO_MINIMUM_HEIGHT
-        }
-
-        items += cardWithActionItem {
-            mainTitle = strings["attestationController.header.title"]
-            mainBody = strings["attestationController.header.subtitle"]
-            identifier = "attestationController.header.title".hashCode().toLong()
-        }
-
-        items += spaceItem {
-            spaceRes = R.dimen.spacing_large
-        }
-
         labelMap.forEach { key, labelText ->
         items += linkCardItem {
             label = "$key. $labelText"
@@ -167,6 +151,23 @@ class AttestationsFragment : MainFragment() {
             attestation.isExpired(robertManager.configuration)
         }?.sortedByDescending { attestation ->
             attestation.timestamp
+        }
+
+        if (validAttestations.isNullOrEmpty() && expiredAttestations.isNullOrEmpty()) {
+            items += logoItem {
+                imageRes = R.drawable.ic_attestation
+                identifier = items.size.toLong()
+            }
+
+            items += cardWithActionItem {
+                mainTitle = strings["attestationController.header.title"]
+                mainBody = strings["attestationController.header.subtitle"]
+                identifier = "attestationController.header.title".hashCode().toLong()
+            }
+
+            items += spaceItem {
+                spaceRes = R.dimen.spacing_large
+            }
         }
 
         if (!validAttestations.isNullOrEmpty()) {
@@ -320,15 +321,30 @@ class AttestationsFragment : MainFragment() {
         }
     }
 
-    private fun showDbFailureIfNeeded() {
+    private fun showDbFailureIfNeeded(isRetry: Boolean) {
         lifecycleScope.launch {
-            try {
-                context?.secureKeystoreDataSource()?.attestations()
-            } catch (e: Exception) {
-                context?.let {
+            val result = context?.secureKeystoreDataSource()?.attestations()
+            if (result is TacResult.Failure) {
+                if (isRetry) {
+                    analyticsManager.reportErrorEvent(ErrorEventName.ERR_ATTESTATION_DB_RETRY_FAILED)
+                } else {
                     analyticsManager.reportErrorEvent(ErrorEventName.ERR_ATTESTATION_DB)
-                    MaterialAlertDialogBuilder(it).showDbFailure(strings)
                 }
+                context?.let { ctx ->
+                    MaterialAlertDialogBuilder(ctx)
+                        .showDbFailure(
+                            strings,
+                            onRetry = {
+                                lifecycleScope.launch {
+                                    viewModel.forceRefreshAttestations()
+                                    showDbFailureIfNeeded(true)
+                                }
+                            },
+                            onClear = "android.db.error.clearAttestations" to { viewModel.deleteLostAttestations() }
+                        )
+                }
+            } else if (isRetry && result is TacResult.Success) {
+                analyticsManager.reportErrorEvent(ErrorEventName.ERR_ATTESTATION_DB_RETRY_SUCCEEDED)
             }
         }
     }

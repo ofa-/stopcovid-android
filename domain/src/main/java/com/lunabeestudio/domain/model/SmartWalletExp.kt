@@ -17,5 +17,6 @@ class SmartWalletExp(
     val vacc11DosesNbDays: Int,
     val recNbDays: Int,
     val vaccJan11DosesNbDays: Int,
+    val displayExpOnAllDcc: Int,
     val displayExpDays: Int,
 )
