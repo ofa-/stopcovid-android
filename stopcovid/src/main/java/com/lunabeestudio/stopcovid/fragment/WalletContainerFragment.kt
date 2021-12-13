@@ -18,6 +18,7 @@ import android.webkit.URLUtil
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.whenCreated
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.navArgs
 import androidx.navigation.navGraphViewModels
@@ -78,24 +79,26 @@ class WalletContainerFragment : BaseFragment(), DeeplinkFragment {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        args.navCertificateId?.let { id ->
-            navigateToFullscreenEuropeanCertificateId(id, true)
-        }
+        val navCertificateId = args.navCertificateId
+        if (navCertificateId != null) {
+            navigateToFullscreenEuropeanCertificateId(navCertificateId, true)
+        } else {
 
-        if (savedInstanceState == null) { // do not replay navigation on config change
-            lifecycleScope.launch {
-                val rawCodeHandled = handleRawCode(
-                    args.code,
-                    args.certificateFormat?.let { WalletCertificateType.Format.fromValue(it) },
-                    args.origin
-                )
-                if (!rawCodeHandled) {
-                    showDbFailureIfNeeded(false)
+            if (savedInstanceState == null) { // do not replay navigation on config change
+                lifecycleScope.launch {
+                    val rawCodeHandled = handleRawCode(
+                        args.code,
+                        args.certificateFormat?.let { WalletCertificateType.Format.fromValue(it) },
+                        args.origin
+                    )
+                    if (!rawCodeHandled) {
+                        showDbFailureIfNeeded(false)
+                    }
                 }
             }
-        }
 
-        setupResultListener()
+            setupResultListener()
+        }
     }
 
     private suspend fun handleRawCode(
@@ -265,7 +268,9 @@ class WalletContainerFragment : BaseFragment(), DeeplinkFragment {
                 val certificateFormat = fragmentArgs.certificateFormat?.let { it ->
                     WalletCertificateType.Format.fromValue(it)
                 }
-                handleRawCode(fragmentArgs.code, certificateFormat, fragmentArgs.origin)
+                fragmentArgs.navCertificateId?.let { certificateId ->
+                    navigateToFullscreenEuropeanCertificateId(certificateId, false)
+                } ?: handleRawCode(fragmentArgs.code, certificateFormat, fragmentArgs.origin)
             }
         }
     }
