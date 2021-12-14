@@ -12,21 +12,22 @@ _Extended_ StopCovid app, featuring:
 - no "maintenance" mode
 
 This repo is a fork of [upstream gitlab][upstream]
-`stopcovid-android` and is compatible with [StopCovid][StopCovid].
+`stopcovid-android`.
 
-Automated [release builds][builds] are provided
-for transparency and easy install.
+Automated [release builds][builds] are available
+for transparency and no-play-store install.
 
-Checkout the [screenshots][screenshots] for a first taste.
+Checkout the [screenshots][screenshots] for a first taste,
+or see [popularity][stats].
 
-Download the [latest release][latest] and [contribute][contribute].
+Install the [latest release][latest] and [contribute][contribute].
+
 
 [![download latest][download]][release]
 
 
 
 
-[StopCovid]: https://gitlab.inria.fr/stopcovid19/accueil/
 [upstream]:  https://gitlab.inria.fr/stopcovid19/stopcovid-android/
 [download]:  https://coviiid.github.io/app/direct-download-apk.png
 [release]:   ../../releases/latest/download/stopcovid-release.apk
@@ -34,3 +35,4 @@ Download the [latest release][latest] and [contribute][contribute].
 [builds]:    ../../actions
 [contribute]: CONTRIBUTING.md
 [screenshots]: https://coviiid.github.io/app
+[stats]: https://hanadigital.github.io/grev/?user=ofa-&repo=stopcovid-android
