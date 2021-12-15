@@ -130,7 +130,7 @@ private fun EuropeanCertificate.eligibleDate(configuration: Configuration): Date
     val vaccinDoseNumber = greenCertificate.vaccineDose?.first ?: 0
 
     val elgDcc = when {
-        isAr || isAz && (vaccinDoseNumber == 1 || vaccinDoseNumber == 2) -> {
+        (isAr || isAz) && (vaccinDoseNumber == 1 || vaccinDoseNumber == 2) -> {
             val vacc22DosesMillis = (configuration.smartWalletElg?.vacc22DosesNbDays ?: 0).days.inWholeMilliseconds
             greenCertificate.vaccineDateForceTimeZone?.time?.plus(vacc22DosesMillis) ?: 0L
         }
