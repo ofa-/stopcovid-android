@@ -51,7 +51,7 @@ class ConfirmAddWalletCertificateFragment : BaseFragment() {
 
     private val args: ConfirmAddWalletCertificateFragmentArgs by navArgs()
 
-    private lateinit var binding: FragmentConfirmAddWalletCertificateBinding
+    private var binding: FragmentConfirmAddWalletCertificateBinding? = null
 
     private var dbFailureDialog: AlertDialog? = null
 
@@ -90,7 +90,7 @@ class ConfirmAddWalletCertificateFragment : BaseFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentConfirmAddWalletCertificateBinding.inflate(inflater, container, false)
         (activity as? MainActivity)?.showProgress(true)
-        return binding.root
+        return binding?.root!!
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -107,30 +107,32 @@ class ConfirmAddWalletCertificateFragment : BaseFragment() {
     override fun refreshScreen() {
         appCompatActivity?.supportActionBar?.title = strings["confirmWalletQrCodeController.title"]
 
-        certificate?.let { certificate ->
-            binding.walletCaptionTextView.textView.setTextOrHide(strings["confirmWalletQrCodeController.explanation.title"])
-            binding.walletCaptionTextView.textView.gravity = Gravity.CENTER
+        binding?.apply {
+            certificate?.let { certificate ->
+                walletCaptionTextView.textView.setTextOrHide(strings["confirmWalletQrCodeController.explanation.title"])
+                walletCaptionTextView.textView.gravity = Gravity.CENTER
 
-            binding.walletTitleTextView.textSwitcher.setText(
-                strings["confirmWalletQrCodeController.explanation.subtitle"]?.safeEmojiSpanify()
-            )
-            binding.walletTitleTextView.textView1.gravity = Gravity.CENTER
-            binding.walletTitleTextView.textView2.gravity = Gravity.CENTER
+                walletTitleTextView.textSwitcher.setText(
+                    strings["confirmWalletQrCodeController.explanation.subtitle"]?.safeEmojiSpanify()
+                )
+                walletTitleTextView.textView1.gravity = Gravity.CENTER
+                walletTitleTextView.textView2.gravity = Gravity.CENTER
 
-            binding.walletAddButton.setTextOrHide(strings["confirmWalletQrCodeController.confirm"])
-            binding.walletAddButton.setOnClickListener {
-                lifecycleScope.launch {
-                    checkAndProcessCertificate(certificate)
+                walletAddButton.setTextOrHide(strings["confirmWalletQrCodeController.confirm"])
+                walletAddButton.setOnClickListener {
+                    lifecycleScope.launch {
+                        checkAndProcessCertificate(certificate)
+                    }
                 }
-            }
 
-            binding.walletCancelButton.setTextOrHide(strings["common.cancel"])
-            binding.walletCancelButton.setOnClickListener {
-                findNavControllerOrNull()?.navigateUp()
-            }
+                walletCancelButton.setTextOrHide(strings["common.cancel"])
+                walletCancelButton.setOnClickListener {
+                    findNavControllerOrNull()?.navigateUp()
+                }
 
-            (activity as? MainActivity)?.showProgress(false)
-            binding.walletConfirmContentGroup.isVisible = true
+                (activity as? MainActivity)?.showProgress(false)
+                walletConfirmContentGroup.isVisible = true
+            }
         }
     }
 
