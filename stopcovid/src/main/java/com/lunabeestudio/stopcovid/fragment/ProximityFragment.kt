@@ -1573,10 +1573,11 @@ class ProximityFragment : TimeMainFragment() {
     private fun asyncUpdateNewVersionAvailableTitle() {
         CoroutineScope(Dispatchers.Default).launch {
             val indicatorText = newVersionAvailableIndicator()
+            if (indicatorText != "")
             CoroutineScope(Dispatchers.Main).launch {
                 val titleText = strings[getTitleKey()] + "  " + indicatorText
                 (activity as AppCompatActivity).supportActionBar?.title = titleText
-                if (indicatorText != "") setTopBarOnclick()
+                setTopBarOnclick()
             }
         }
     }
