@@ -230,10 +230,6 @@ class WalletCertificateFragment : MainFragment() {
                 text = strings["walletController.oldCertificatesSection.title"]
                 identifier = text.hashCode().toLong()
             }
-            items += captionItem {
-                text = strings["walletController.oldCertificatesSection.subtitle"]
-                identifier = text.hashCode().toLong()
-            }
             viewModel.olderCertificates?.forEach { certificate ->
                 items += certificateCardItemFromWalletDocument(certificate, blacklistedCertificates.contains(certificate))
             }

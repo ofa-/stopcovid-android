@@ -701,7 +701,7 @@
     "walletController.title":"Wallet",
     "walletController.recentCertificatesSection.title":"Recent certificates",
     "walletController.recentCertificatesSection.subtitle":"Check the eligibility of your health pass in the \"Information\" tab.",
-    "walletController.oldCertificatesSection.title":"Other certificates",
+    "walletController.oldCertificatesSection.title":"Expired certificates",
     "walletController.oldCertificatesSection.subtitle":"Test certificates more than 3 days old, or expired.",
     "walletController.menu.share":"Share the certificate",
     "walletController.menu.share.text":"Here is my #TousAntiCovid certificate",

@@ -666,7 +666,7 @@
     "walletController.title":"Carnet",
     "walletController.recentCertificatesSection.title":"Certificats récents",
     "walletController.recentCertificatesSection.subtitle":"Vérifiez l'éligibilité de votre pass sanitaire dans l'onglet \"Informations\".",
-    "walletController.oldCertificatesSection.title":"Autres certificats",
+    "walletController.oldCertificatesSection.title":"Certificats expirés",
     "walletController.oldCertificatesSection.subtitle":"Certificats de test de plus de 3 jours, ou expirés.",
     "walletController.menu.share":"Partager le certificat",
     "walletController.menu.share.text":"Voici mon certificat #TousAntiCovid",
