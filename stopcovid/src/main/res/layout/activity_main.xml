@@ -28,6 +28,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:focusableInTouchMode="true"
+            app:titleCentered="true"
             app:titleTextAppearance="@style/TextAppearance.StopCovid.Title.Bold" />
 
         <com.google.android.material.tabs.TabLayout
