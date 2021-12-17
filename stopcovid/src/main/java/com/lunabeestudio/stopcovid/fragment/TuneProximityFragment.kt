@@ -267,7 +267,8 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
         return if (pde == 0) ""
         else
             (if (pde != lpe) "\n" else "") +
-            "(%d ebids, %d ${long}, %d ${short})\n" .format(pde, pde-lpe, lpe)
+            "(%d ebids, %d ${long}, %d ${short})\n\n"
+                .format(pde, pde-lpe, lpe)
     }
 
     private fun showRemainingEbids() {
