@@ -227,6 +227,7 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
     private val nbConsideredItems = 20000
     private fun compactList(): String {
         var currentDay = ""
+        var currentSlot = 0L
         var nbEbidPerDay = 0
         var nbLowPingEbids = 0
         return localProximityItems
@@ -234,6 +235,7 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
             .groupBy { it.ebidBase64 }
             .map { (_, group) ->
                 val it = group.last()
+                val slot = it.collectedTime / (60*15)
                 val duration = group.first().collectedTime - it.collectedTime
                 val day = it.collectedTime.shortDate
                 if (day != currentDay) {
@@ -241,13 +243,20 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
                     val stats = statsLine(nbLowPingEbids, nbEbidPerDay)
                     nbLowPingEbids = 0
                     nbEbidPerDay = 1
+                    currentSlot = 0
                     stats + dayHeader(day, "________")
                 } else { nbEbidPerDay += 1; "" } +
                 if (group.count() < minPings) {
                     nbLowPingEbids += 1
                     ""
                 }
-                else
+                else {
+                (if (currentSlot != slot) {
+                    val firstTime = currentSlot == 0L
+                    currentSlot = slot
+                    if (!firstTime)
+                        "\n_\n" else ""
+                } else "") +
                 "%s  [%d'%02d\"]  %s  (%d)".format(
                     it.collectedTime.shortTime,
                     duration / 60,
@@ -255,6 +264,7 @@ class TuneProximityFragment : MainFragment(), RobertApplication.Listener {
                     it.shortEbid,
                     group.count()
                 )
+                }
             }
             .filterNot { it == "" }
             .joinToString("\n")
