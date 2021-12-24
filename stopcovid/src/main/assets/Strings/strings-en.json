@@ -934,8 +934,8 @@
     "europeanCertificate.fullscreen.type.minimum":"Activity",
     "europeanCertificate.fullscreen.type.border":"Border",
     "europeanCertificate.fullscreen.type.border.switch":"Border mode 🌏",
-    "europeanCertificate.fullscreen.type.minimum.footer":"👉 This screen with the QR Code has to be presented at a venue or event subject to the health pass on French territory. For a border crossing, please switch to the \"Border\" mode.",
-    "europeanCertificate.fullscreen.englishDescription.vaccine":"<FULL_NAME>\nDate of birth: <BIRTHDATE>\n<VACCINE_NAME>\nInjection date: <DATE>",
+    "europeanCertificate.fullscreen.type.minimum.footer":"👉 For a border crossing, please switch to the \"Border\" mode.\n\n✉️ Sharing : to share this QR Code (or screenshot), tap the \"share\" icon on the top right corner.",
+    "europeanCertificate.fullscreen.englishDescription.vaccine":"<FULL_NAME>\nDate of birth: <BIRTHDATE>\n<VACCINE_NAME> <VACCINE_DOSES>\nInjection date: <DATE>",
     "europeanCertificate.fullscreen.englishDescription.recovery":"<FULL_NAME>\nDate of birth: <BIRTHDATE>\nTested on <DATE>",
     "europeanCertificate.fullscreen.englishDescription.test":"<FULL_NAME>\nDate of birth: <BIRTHDATE>\n<ANALYSIS_RESULT> - <ANALYSIS_CODE>\nTested on <FROM_DATE>",
     "documentExplanationController.vaccinCertificate.title":"Vaccination certificate",
@@ -1334,5 +1334,10 @@
     "keyfigures.comparison.keyfiguresCombination.section.subtitle":"The TousAntiCovid team predefined the following combinations of key figures. The aim is to illustrate relevant evolutions and comparisons.",
     "risk.section.symptoms.button":"More on symptoms",
     "risk.section.symptoms.url":"https://mesconseilscovid.sante.gouv.fr/j-ai-des-symptomes-covid.html",
-    "walletFullscreenController.error.certificateNotFound":"The certificate can not be found."
+    "walletFullscreenController.error.certificateNotFound":"The certificate can not be found.",
+    "keyfigure.compare.3":"Vaccination coverage and intensive care",
+    "keyfigure.compare.2":"Reported cases and app notifications",
+    "keyfigure.compare.4":"New cases and intensive care",
+    "notification.smartWallet.eligible.title":"Vaccine booster eligibility",
+    "notification.smartWallet.eligible.body":"According to the certificates in your wallet, %@ is now eligible for the vaccine booster. Tap to learn more."
 }

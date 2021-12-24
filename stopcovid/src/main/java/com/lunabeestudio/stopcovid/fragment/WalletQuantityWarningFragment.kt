@@ -19,12 +19,15 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
 import androidx.fragment.app.setFragmentResult
+import androidx.navigation.fragment.navArgs
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.fragment.BaseFragment
 import com.lunabeestudio.stopcovid.databinding.FragmentWalletQuantityWarningBinding
 
 class WalletQuantityWarningFragment : BaseFragment() {
+
+    val args: WalletQuantityWarningFragmentArgs by navArgs()
 
     lateinit var binding: FragmentWalletQuantityWarningBinding
 
@@ -51,10 +54,19 @@ class WalletQuantityWarningFragment : BaseFragment() {
                 .setTitle(strings["walletQuantityWarningController.continueAlert.title"])
                 .setMessage(strings["walletQuantityWarningController.continueAlert.message"])
                 .setPositiveButton(strings["walletQuantityWarningController.continueAlert.confirm"]) { _, _ ->
-                    setFragmentResult(MAX_CERTIFICATES_CONFIRM_ADD_RESULT_KEY, bundleOf(MAX_CERTIFICATES_CONFIRM_ADD_BUNDLE_KEY to true))
+                    val result = bundleOf(
+                        WALLET_QUANTITY_WARNING_BUNDLE_CONFIRM_KEY to true,
+                        WALLET_QUANTITY_WARNING_BUNDLE_PASSTHROUGH_KEY to args.passthrough,
+                    )
+                    setFragmentResult(WALLET_QUANTITY_WARNING_RESULT_KEY, result)
                     findNavControllerOrNull()?.navigateUp()
                 }
                 .setNegativeButton(strings["common.cancel"]) { _, _ ->
+                    val result = bundleOf(
+                        WALLET_QUANTITY_WARNING_BUNDLE_CONFIRM_KEY to false,
+                        WALLET_QUANTITY_WARNING_BUNDLE_PASSTHROUGH_KEY to args.passthrough,
+                    )
+                    setFragmentResult(WALLET_QUANTITY_WARNING_RESULT_KEY, result)
                     findNavControllerOrNull()?.navigateUp()
                 }
                 .setCancelable(false)
@@ -74,7 +86,8 @@ class WalletQuantityWarningFragment : BaseFragment() {
     }
 
     companion object {
-        const val MAX_CERTIFICATES_CONFIRM_ADD_RESULT_KEY: String = "MAX_CERTIFICATES_CONFIRM_ADD_RESULT_KEY"
-        const val MAX_CERTIFICATES_CONFIRM_ADD_BUNDLE_KEY: String = "MAX_CERTIFICATES_CONFIRM_ADD_BUNDLE_KEY"
+        const val WALLET_QUANTITY_WARNING_RESULT_KEY: String = "WALLET_QUANTITY_WARNING_RESULT_KEY"
+        const val WALLET_QUANTITY_WARNING_BUNDLE_CONFIRM_KEY: String = "WALLET_QUANTITY_WARNING_BUNDLE_CONFIRM_KEY"
+        const val WALLET_QUANTITY_WARNING_BUNDLE_PASSTHROUGH_KEY: String = "WALLET_QUANTITY_WARNING_BUNDLE_PASSTHROUGH_KEY"
     }
 }

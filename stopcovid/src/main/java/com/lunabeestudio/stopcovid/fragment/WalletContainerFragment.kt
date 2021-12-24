@@ -16,9 +16,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.webkit.URLUtil
 import androidx.appcompat.app.AlertDialog
+import androidx.core.os.bundleOf
 import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.whenCreated
+import androidx.lifecycle.whenStarted
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.navArgs
 import androidx.navigation.navGraphViewModels
@@ -41,8 +42,8 @@ import com.lunabeestudio.stopcovid.extension.showDbFailure
 import com.lunabeestudio.stopcovid.extension.showMigrationFailed
 import com.lunabeestudio.stopcovid.extension.splitUrlFragment
 import com.lunabeestudio.stopcovid.extension.toRaw
-import com.lunabeestudio.stopcovid.manager.DeeplinkManager
 import com.lunabeestudio.stopcovid.model.EuropeanCertificate
+import com.lunabeestudio.stopcovid.model.RawCodeData
 import com.lunabeestudio.stopcovid.model.WalletCertificate
 import com.lunabeestudio.stopcovid.model.WalletCertificateMalformedException
 import com.lunabeestudio.stopcovid.viewmodel.WalletViewModel
@@ -83,31 +84,35 @@ class WalletContainerFragment : BaseFragment(), DeeplinkFragment {
         if (navCertificateId != null) {
             navigateToFullscreenEuropeanCertificateId(navCertificateId, true)
         } else {
-
             if (savedInstanceState == null) { // do not replay navigation on config change
                 lifecycleScope.launch {
-                    val rawCodeHandled = handleRawCode(
-                        args.code,
-                        args.certificateFormat?.let { WalletCertificateType.Format.fromValue(it) },
-                        args.origin
-                    )
-                    if (!rawCodeHandled) {
-                        showDbFailureIfNeeded(false)
+                    // Make sure nav graph viewmodel is available by waiting fragment's started state
+                    whenStarted {
+                        injectionContainer.debugManager.logOpenWalletContainer(viewModel.certificates.value.toRaw())
+
+                        val rawCodeData = RawCodeData(
+                            args.code,
+                            args.certificateFormat?.let { WalletCertificateType.Format.fromValue(it) },
+                            args.deeplinkOrigin,
+                        )
+                        val rawCodeHandled = handleRawCode(rawCodeData)
+                        if (!rawCodeHandled) {
+                            showDbFailureIfNeeded(false)
+                        }
                     }
                 }
             }
 
-            setupResultListener()
+            setScanResultListener()
+            setQuantityWarningResultListener()
         }
     }
 
     private suspend fun handleRawCode(
-        rawCode: String?,
-        certificateFormat: WalletCertificateType.Format?,
-        origin: DeeplinkManager.Origin?,
+        rawCodeData: RawCodeData,
         skipMaxWarning: Boolean = false,
     ): Boolean {
-        val code = rawCode?.splitUrlFragment()
+        val code = rawCodeData.code?.splitUrlFragment()
         val certificateValue = code?.getOrNull(0)
         val reportCode = code?.getOrNull(1)
 
@@ -120,16 +125,9 @@ class WalletContainerFragment : BaseFragment(), DeeplinkFragment {
 
         when {
             shouldShowMaxCertificatesWarning -> {
-                setFragmentResultListener(WalletQuantityWarningFragment.MAX_CERTIFICATES_CONFIRM_ADD_RESULT_KEY) { _, bundle ->
-                    val confirmAdd = bundle.getBoolean(WalletQuantityWarningFragment.MAX_CERTIFICATES_CONFIRM_ADD_BUNDLE_KEY, false)
-                    if (confirmAdd) {
-                        lifecycleScope.launch {
-                            handleRawCode(rawCode, certificateFormat, origin, true)
-                        }
-                    }
-                }
+                val passThroughData = bundleOf(BUNDLE_PASSTHROUGH_RAW_CODE_DATA_KEY to rawCodeData)
                 findNavControllerOrNull()?.safeNavigate(
-                    WalletContainerFragmentDirections.actionWalletContainerFragmentToWalletQuantityWarningFragment()
+                    WalletContainerFragmentDirections.actionWalletContainerFragmentToWalletQuantityWarningFragment(passThroughData)
                 )
             }
             shouldAddCertificate && shouldReport -> findNavControllerOrNull()?.safeNavigate(
@@ -142,7 +140,7 @@ class WalletContainerFragment : BaseFragment(), DeeplinkFragment {
                 findNavControllerOrNull()?.safeNavigate(
                     WalletContainerFragmentDirections.actionWalletContainerFragmentToConfirmAddWalletCertificateFragment(
                         certificateValue!!,
-                        certificateFormat?.name,
+                        rawCodeData.format?.name,
                     )
                 )
             }
@@ -159,7 +157,7 @@ class WalletContainerFragment : BaseFragment(), DeeplinkFragment {
         return true
     }
 
-    private fun setupResultListener() {
+    private fun setScanResultListener() {
         setFragmentResultListener(WalletQRCodeFragment.SCANNED_CODE_RESULT_KEY) { _, bundle ->
             val scannedData = bundle.getString(WalletQRCodeFragment.SCANNED_CODE_BUNDLE_KEY)
             scannedData?.let { data ->
@@ -168,9 +166,11 @@ class WalletContainerFragment : BaseFragment(), DeeplinkFragment {
                         val certificateData = injectionContainer.walletRepository.extractCertificateDataFromUrl(data)
                         lifecycleScope.launch {
                             handleRawCode(
-                                certificateData.first,
-                                certificateData.second,
-                                null,
+                                RawCodeData(
+                                    certificateData.first,
+                                    certificateData.second,
+                                    null,
+                                )
                             )
                         }
                     } catch (e: WalletCertificateMalformedException) {
@@ -183,7 +183,21 @@ class WalletContainerFragment : BaseFragment(), DeeplinkFragment {
                     }
                 } else {
                     lifecycleScope.launch {
-                        handleRawCode(data, null, null)
+                        handleRawCode(RawCodeData(data, null, null))
+                    }
+                }
+            }
+        }
+    }
+
+    private fun setQuantityWarningResultListener() {
+        setFragmentResultListener(WalletQuantityWarningFragment.WALLET_QUANTITY_WARNING_RESULT_KEY) { _, bundle ->
+            val confirmAdd = bundle.getBoolean(WalletQuantityWarningFragment.WALLET_QUANTITY_WARNING_BUNDLE_CONFIRM_KEY, false)
+            if (confirmAdd) {
+                val passthroughBundle = bundle.getBundle(WalletQuantityWarningFragment.WALLET_QUANTITY_WARNING_BUNDLE_PASSTHROUGH_KEY)
+                passthroughBundle?.getParcelable<RawCodeData>(BUNDLE_PASSTHROUGH_RAW_CODE_DATA_KEY)?.let { rawCodeData ->
+                    lifecycleScope.launch {
+                        handleRawCode(rawCodeData, true)
                     }
                 }
             }
@@ -196,6 +210,7 @@ class WalletContainerFragment : BaseFragment(), DeeplinkFragment {
             findNavControllerOrNull()
                 ?.safeNavigate(WalletContainerFragmentDirections.actionWalletContainerFragmentToWalletQRCodeFragment())
         }
+
         return binding.root
     }
 
@@ -265,12 +280,17 @@ class WalletContainerFragment : BaseFragment(), DeeplinkFragment {
     override fun onNewIntent(bundleArgs: Bundle?) {
         bundleArgs?.runCatching { WalletContainerFragmentArgs.fromBundle(this) }?.getOrNull()?.let { fragmentArgs ->
             lifecycleScope.launch {
-                val certificateFormat = fragmentArgs.certificateFormat?.let { it ->
-                    WalletCertificateType.Format.fromValue(it)
-                }
-                fragmentArgs.navCertificateId?.let { certificateId ->
+                val certificateId = fragmentArgs.navCertificateId
+                if (certificateId != null) {
                     navigateToFullscreenEuropeanCertificateId(certificateId, false)
-                } ?: handleRawCode(fragmentArgs.code, certificateFormat, fragmentArgs.origin)
+                } else {
+                    val rawCodeData = RawCodeData(
+                        fragmentArgs.code,
+                        fragmentArgs.certificateFormat?.let { WalletCertificateType.Format.fromValue(it) },
+                        fragmentArgs.deeplinkOrigin,
+                    )
+                    handleRawCode(rawCodeData)
+                }
             }
         }
     }
@@ -320,5 +340,9 @@ class WalletContainerFragment : BaseFragment(), DeeplinkFragment {
                 }
             }
         }
+    }
+
+    companion object {
+        private const val BUNDLE_PASSTHROUGH_RAW_CODE_DATA_KEY: String = "BUNDLE_PASSTHROUGH_RAW_CODE_DATA_KEY"
     }
 }

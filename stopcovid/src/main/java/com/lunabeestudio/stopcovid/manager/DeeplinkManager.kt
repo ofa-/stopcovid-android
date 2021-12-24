@@ -24,8 +24,4 @@ object DeeplinkManager {
             .appendQueryParameter(DEEPLINK_CERTIFICATE_FORMAT_PARAMETER, uri.lastPathSegment?.removeSuffix(".html"))
             .build()
     }
-
-    enum class Origin {
-        EXTERNAL, UNIVERSAL
-    }
 }

@@ -20,8 +20,8 @@ class CompareFigureChartItem : AbstractBindingItem<ItemKeyFigureChartCardBinding
     var shareContentDescription: String? = null
     var onShareCard: ((binding: ItemKeyFigureChartCardBinding) -> Unit)? = null
     var onClickListener: View.OnClickListener? = null
-    var getChartData: (() -> CombinedData?)? = null
-    var areMagnitudeTheSame: (() -> Boolean)? = null
+    var chartData: CombinedData? = null
+    var areMagnitudeTheSame: Boolean? = null
     override fun createBinding(inflater: LayoutInflater, parent: ViewGroup?): ItemKeyFigureChartCardBinding {
 
         return ItemKeyFigureChartCardBinding.inflate(inflater, parent, false).apply {
@@ -39,10 +39,9 @@ class CompareFigureChartItem : AbstractBindingItem<ItemKeyFigureChartCardBinding
             shareButton.contentDescription = shareContentDescription
             shareButton.setOnClickListener { onShareCard?.invoke(binding) }
 
-            val chartData = getChartData?.invoke()
             keyFigureCombinedChart.apply {
                 data = chartData
-                areMagnitudeTheSame?.invoke()?.let { setupStyle(!it) }
+                areMagnitudeTheSame?.let { setupStyle(!it) }
                 animateX(Constants.Chart.X_ANIMATION_DURATION_MILLIS)
             }
 

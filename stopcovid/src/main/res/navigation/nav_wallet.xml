@@ -19,27 +19,27 @@
         android:name="com.lunabeestudio.stopcovid.fragment.WalletContainerFragment">
         <deepLink
             android:autoVerify="true"
-            app:uri="https://bonjour.tousanticovid.gouv.fr/app/wallet?v={code}&amp;certificateFormat={certificateFormat}&amp;origin={origin}"
+            app:uri="https://bonjour.tousanticovid.gouv.fr/app/wallet?v={code}&amp;certificateFormat={certificateFormat}&amp;origin={deeplinkOrigin}"
             tools:targetApi="m" />
         <deepLink
             android:autoVerify="true"
-            app:uri="https://bonjour.tousanticovid.gouv.fr/wallet.html?v={code}&amp;certificateFormat={certificateFormat}&amp;origin={origin}"
+            app:uri="https://bonjour.tousanticovid.gouv.fr/wallet.html?v={code}&amp;certificateFormat={certificateFormat}&amp;origin={deeplinkOrigin}"
             tools:targetApi="m" />
         <deepLink
             android:autoVerify="true"
-            app:uri="https://bonjour.tousanticovid.gouv.fr/app/wallet2d?code={code}&amp;certificateFormat={certificateFormat}&amp;origin={origin}"
+            app:uri="https://bonjour.tousanticovid.gouv.fr/app/wallet2d?code={code}&amp;certificateFormat={certificateFormat}&amp;origin={deeplinkOrigin}"
             tools:targetApi="m" />
         <deepLink
             android:autoVerify="true"
-            app:uri="https://bonjour.tousanticovid.gouv.fr/wallet2d.html?code={code}&amp;certificateFormat={certificateFormat}&amp;origin={origin}"
+            app:uri="https://bonjour.tousanticovid.gouv.fr/wallet2d.html?code={code}&amp;certificateFormat={certificateFormat}&amp;origin={deeplinkOrigin}"
             tools:targetApi="m" />
         <deepLink
             android:autoVerify="true"
-            app:uri="https://bonjour.tousanticovid.gouv.fr/app/walletdcc?code={code}&amp;certificateFormat={certificateFormat}&amp;origin={origin}"
+            app:uri="https://bonjour.tousanticovid.gouv.fr/app/walletdcc?code={code}&amp;certificateFormat={certificateFormat}&amp;origin={deeplinkOrigin}"
             tools:targetApi="m" />
         <deepLink
             android:autoVerify="true"
-            app:uri="https://bonjour.tousanticovid.gouv.fr/walletdcc.html?code={code}&amp;certificateFormat={certificateFormat}&amp;origin={origin}"
+            app:uri="https://bonjour.tousanticovid.gouv.fr/walletdcc.html?code={code}&amp;certificateFormat={certificateFormat}&amp;origin={deeplinkOrigin}"
             tools:targetApi="m" />
         <deepLink app:uri="tousanticovid://walletCertificate/list" />
         <deepLink app:uri="tousanticovid://dccFullScreen/{navCertificateId}" />
@@ -54,9 +54,9 @@
             app:argType="string"
             app:nullable="true" />
         <argument
-            android:name="origin"
+            android:name="deeplinkOrigin"
             android:defaultValue="EXTERNAL"
-            app:argType="com.lunabeestudio.stopcovid.manager.DeeplinkManager$Origin" />
+            app:argType="com.lunabeestudio.stopcovid.model.DeeplinkOrigin" />
         <argument
             android:name="navCertificateId"
             android:defaultValue="@null"
@@ -293,7 +293,13 @@
     </fragment>
     <fragment
         android:id="@+id/walletQuantityWarningFragment"
-        android:name="com.lunabeestudio.stopcovid.fragment.WalletQuantityWarningFragment" />
+        android:name="com.lunabeestudio.stopcovid.fragment.WalletQuantityWarningFragment" >
+
+        <argument
+            android:name="passthrough"
+            app:argType="android.os.Bundle"
+            app:nullable="true" />
+    </fragment>
     <fragment
         android:id="@+id/walletFullscreenPagerFragment"
         android:name="com.lunabeestudio.stopcovid.fragment.WalletFullscreenPagerFragment">

@@ -906,8 +906,8 @@
     "europeanCertificate.fullscreen.type.minimum":"Activité",
     "europeanCertificate.fullscreen.type.border":"Frontière",
     "europeanCertificate.fullscreen.type.border.switch":"Mode frontière 🌏",
-    "europeanCertificate.fullscreen.type.minimum.footer":"👉 Cet affichage du QR Code est à utiliser pour les lieux et activités soumis au pass sanitaire sur le territoire français. Pour un passage de frontière, veuillez passer en mode \"Frontière\".",
-    "europeanCertificate.fullscreen.englishDescription.vaccine":"<FULL_NAME>\nDate of birth: <BIRTHDATE>\n<VACCINE_NAME>\nInjection date: <DATE>",
+    "europeanCertificate.fullscreen.type.minimum.footer":"👉 Pour un passage de frontière, veuillez passer en mode \"Frontière\".\n\n✉️ Partage : pour partager ce QR Code (ou capture d'écran), appuyez sur l'icône \"partager\" en haut à droite.",
+    "europeanCertificate.fullscreen.englishDescription.vaccine":"<FULL_NAME>\nDate of birth: <BIRTHDATE>\n<VACCINE_NAME> <VACCINE_DOSES>\nInjection date: <DATE>",
     "europeanCertificate.fullscreen.englishDescription.recovery":"<FULL_NAME>\nDate of birth: <BIRTHDATE>\nTested on <DATE>",
     "europeanCertificate.fullscreen.englishDescription.test":"<FULL_NAME>\nDate of birth: <BIRTHDATE>\n<ANALYSIS_RESULT> - <ANALYSIS_CODE>\nTested on <FROM_DATE>",
     "documentExplanationController.vaccinCertificate.title":"Attestation de vaccin",
@@ -1307,5 +1307,10 @@
     "keyfigures.comparison.keyfiguresCombination.section.subtitle":"Les équipes de TousAntiCovid vous proposent les couples de chiffres clés suivants. L'objectif est d'illustrer les évolutions et comparaisons pertinentes.",
     "risk.section.symptoms.button":"Plus sur les symptômes",
     "risk.section.symptoms.url":"https://mesconseilscovid.sante.gouv.fr/j-ai-des-symptomes-covid.html",
-    "walletFullscreenController.error.certificateNotFound":"Certificat introuvable"
+    "walletFullscreenController.error.certificateNotFound":"Certificat introuvable",
+    "keyfigure.compare.3":"Couverture vaccinale et réanimations",
+    "keyfigure.compare.2":"Déclarés positifs et notifications de l'appli",
+    "keyfigure.compare.4":"Nouveaux cas J-3 et réanimations",
+    "notification.smartWallet.eligible.title":"Eligibilité rappel vaccinal",
+    "notification.smartWallet.eligible.body":"D'après les certificats dans votre carnet, %@ est éligible au rappel vaccinal. Appuyez pour en savoir plus."
 }

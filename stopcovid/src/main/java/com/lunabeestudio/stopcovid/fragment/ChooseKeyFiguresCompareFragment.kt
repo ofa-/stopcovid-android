@@ -85,6 +85,10 @@ class ChooseKeyFiguresCompareFragment : MainFragment() {
         keyFigureCombinationSection()?.let {
             items += it
         }
+        items += spaceItem {
+            spaceRes = R.dimen.spacing_large
+            identifier = items.count().toLong()
+        }
         return items
     }
 

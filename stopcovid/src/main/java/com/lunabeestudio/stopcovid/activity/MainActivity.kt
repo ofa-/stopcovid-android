@@ -33,6 +33,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
+import androidx.navigation.NavDeepLinkBuilder
 import androidx.navigation.NavDeepLinkRequest
 import androidx.navigation.NavDestination
 import androidx.navigation.fragment.DialogFragmentNavigator
@@ -205,7 +206,7 @@ class MainActivity : BaseActivity() {
         if (navController.graph.hasDeepLink(data)) {
             var deeplinkProcessed = false
 
-            val navDeepLinkRequest = NavDeepLinkRequest(data, null, null)
+            val navDeepLinkRequest = NavDeepLinkRequest.Builder.fromUri(data).build()
 
             // Handle deeplink to current fragment. In this case, try to call fun DeeplinkFragment::onNewIntent instead of using the nav
             // graph (which does nothing).

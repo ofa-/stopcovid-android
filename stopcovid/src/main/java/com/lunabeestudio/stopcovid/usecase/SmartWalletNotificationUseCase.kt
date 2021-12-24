@@ -201,6 +201,13 @@ class SmartWalletNotificationUseCase(
         val prefsKey: String,
     ) {
         // /!\ Order is important
+        ELIGIBLE(
+            titleKey = "notification.smartWallet.eligible.title",
+            bodyKey = "notification.smartWallet.eligible.body",
+            max = ELG_PAST_MAX,
+            min = ELG_PAST_MIN,
+            prefsKey = ELG_PAST_SHARED_PREFS_KEY,
+        ),
         ELIGIBLE_SOON(
             titleKey = "notification.smartWallet.eligibility.title",
             bodyKey = "notification.smartWallet.eligibility.body",
@@ -236,7 +243,7 @@ class SmartWalletNotificationUseCase(
 
         companion object {
             private val expirationTypes = listOf(EXPIRE_SOON_1, EXPIRE_SOON_2, EXPIRE_SOON_3)
-            private val eligibleTypes = listOf(ELIGIBLE_SOON)
+            private val eligibleTypes = listOf(ELIGIBLE_SOON, ELIGIBLE)
 
             fun expirationTypeFromDaysDiff(daysDiff: Float): SmartWalletNotificationType? =
                 expirationTypes.firstOrNull { it.contains(daysDiff) }
@@ -255,9 +262,12 @@ class SmartWalletNotificationUseCase(
         private const val EXP_3_MIN: Float = 0f
         private const val ELG_MAX: Float = 15f
         private const val ELG_MIN: Float = 0f
+        private const val ELG_PAST_MAX: Float = 0f
+        private const val ELG_PAST_MIN: Float = Float.NEGATIVE_INFINITY
         private const val EXP_1_SHARED_PREFS_KEY: String = "exp1"
         private const val EXP_2_SHARED_PREFS_KEY: String = "exp2"
         private const val EXP_3_SHARED_PREFS_KEY: String = "exp3"
         private const val ELG_SHARED_PREFS_KEY: String = "elg"
+        private const val ELG_PAST_SHARED_PREFS_KEY: String = "elgPast"
     }
 }

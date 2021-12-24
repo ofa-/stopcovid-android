@@ -134,6 +134,7 @@ import com.lunabeestudio.stopcovid.model.KeyFigure
 import com.lunabeestudio.stopcovid.model.KeyFiguresNotAvailableException
 import com.lunabeestudio.stopcovid.model.NoEphemeralBluetoothIdentifierFound
 import com.lunabeestudio.domain.model.TacResult
+import com.lunabeestudio.stopcovid.model.DeeplinkOrigin
 import com.lunabeestudio.stopcovid.service.ProximityService
 import com.lunabeestudio.stopcovid.utils.ExtendedFloatingActionButtonScrollListener
 import com.lunabeestudio.stopcovid.viewmodel.ProximityViewModel
@@ -284,7 +285,7 @@ class ProximityFragment : TimeMainFragment() {
             }?.let { data ->
                 if (URLUtil.isValidUrl(data)) {
                     val uri = Uri.parse(data).buildUpon()
-                        .appendQueryParameter(DeeplinkManager.DEEPLINK_CERTIFICATE_ORIGIN_PARAMETER, DeeplinkManager.Origin.UNIVERSAL.name)
+                        .appendQueryParameter(DeeplinkManager.DEEPLINK_CERTIFICATE_ORIGIN_PARAMETER, DeeplinkOrigin.UNIVERSAL.name)
                         .build()
                     val finalUri = DeeplinkManager.transformFragmentToCodeParam(uri)
                     (activity as? MainActivity)?.processDeeplink(finalUri)
@@ -294,7 +295,7 @@ class ProximityFragment : TimeMainFragment() {
                             ?.safeNavigate(
                                 ProximityFragmentDirections.actionProximityFragmentToNavWallet(
                                     code = data,
-                                    origin = DeeplinkManager.Origin.UNIVERSAL,
+                                    deeplinkOrigin = DeeplinkOrigin.UNIVERSAL,
                                 )
                             )
                     }

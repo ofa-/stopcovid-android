@@ -175,9 +175,9 @@
                 app:argType="string"
                 app:nullable="true" />
             <argument
-                android:name="origin"
+                android:name="deeplinkOrigin"
                 android:defaultValue="EXTERNAL"
-                app:argType="com.lunabeestudio.stopcovid.manager.DeeplinkManager$Origin" />
+                app:argType="com.lunabeestudio.stopcovid.model.DeeplinkOrigin" />
             <argument
                 android:name="navCertificateId"
                 android:defaultValue="@null"
@@ -456,10 +456,10 @@
         tools:layout="@layout/fragment_qr_code">
         <deepLink app:uri="tousanticovid://venueQRCode" />
         <deepLink
-            app:uri="https://tac.gouv.fr?v={venueVersion}&amp;code={venueContent}&amp;origin={origin}"
+            app:uri="https://tac.gouv.fr?v={venueVersion}&amp;code={venueContent}&amp;origin={deeplinkOrigin}"
             tools:targetApi="m" />
         <deepLink
-            app:uri="https://tac.gouv.fr?v={venueVersion}&amp;t={venueTime}&amp;code={venueContent}&amp;origin={origin}"
+            app:uri="https://tac.gouv.fr?v={venueVersion}&amp;t={venueTime}&amp;code={venueContent}&amp;origin={deeplinkOrigin}"
             tools:targetApi="m" />
         <argument
             android:name="venueContent"
@@ -477,9 +477,9 @@
             app:argType="string"
             app:nullable="true" />
         <argument
-            android:name="origin"
+            android:name="deeplinkOrigin"
             android:defaultValue="EXTERNAL"
-            app:argType="com.lunabeestudio.stopcovid.manager.DeeplinkManager$Origin" />
+            app:argType="com.lunabeestudio.stopcovid.model.DeeplinkOrigin" />
         <action
             android:id="@+id/action_venueQrCodeFragment_to_venueConfirmationFragment"
             app:destination="@id/venueConfirmationFragment"

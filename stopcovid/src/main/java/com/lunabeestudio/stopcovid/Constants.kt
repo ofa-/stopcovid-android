@@ -137,6 +137,8 @@ object Constants {
         const val WIDGET_MARGIN_SIZE: Float = 6f
         const val ZOOM_MIN_THRESHOLD: Float = 1.25f
         const val SIGNIFICANT_DIGIT_MAX: Int = 3
+        const val PAGER_FIRST_TAB_THRESHOLD = 31
+        const val PAGER_SECOND_TAB_THRESHOLD = 91
     }
 
     object QrCode {

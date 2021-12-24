@@ -88,6 +88,7 @@ class Configuration(
     var isSmartWalletOn: Boolean,
     var colorsCompareKeyFigures: ColorsCompareKeyFigures?,
     var keyFiguresCombination: List<KeyFigureCombination>?,
+    var noWaitDosesPivotDate: String?,
 ) {
     class Notification(val title: String, val subtitle: String, val url: String, val version: Int)
     class ColorsCompareKeyFigures(val colorKeyFigure1: ColorCompareKeyFigures, val colorKeyFigure2: ColorCompareKeyFigures)
