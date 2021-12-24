@@ -31,6 +31,10 @@ log:
 tar:
 	$(ADB) tar c $(FILES)/local_proximity		> data.tar
 
+data.log:
+	bash -c 'p() { date +"%a %F %T" -d@$$((36#$$1 - 2208988800)); \
+		cut -d " " -f 2- <<< "$$@"; } ; \
+		while read line; do p $$line | xargs; done'
 
 strings: strings-fr
 strings-%: src.dir = stopcovid/src/main/assets/Strings
@@ -38,6 +42,12 @@ strings-%:
 	curl -s https://app.tousanticovid.gouv.fr/json/version-31/Strings/$@.json \
 		> $(src.dir)/$@.json
 	git diff $(src.dir)
+
+
+fame:
+	curl -s 'https://api.github.com/repos/ofa-/stopcovid-android/releases?page=1&per_page=100' \
+	| jq '.[] | [ .created_at, .assets[0].download_count, .tag_name ] | @csv' \
+	| tr -d '"\\' | cut -c -10,21- | tr , '\t'
 
 
 keystore = stopcovid/my-release-key.jks
