@@ -40,6 +40,7 @@ import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.vaccineDate
 import com.lunabeestudio.stopcovid.extension.vaccineDose
 import com.lunabeestudio.stopcovid.extension.vaccineMedicinalProduct
+import com.lunabeestudio.stopcovid.extension.yearMonthDayUsParser
 import com.lunabeestudio.stopcovid.fastitem.logoItem
 import com.lunabeestudio.stopcovid.model.EuropeanCertificate
 import com.lunabeestudio.stopcovid.viewmodel.VaccineCompletionViewModel
@@ -160,6 +161,10 @@ class VaccineCompletionFragment : MainFragment() {
             )
             ?.let { vaccineDoseNumber >= it }
             ?: false
+        val noWaitDosesPivotDate: Date? = configuration.noWaitDosesPivotDate?.let { dateString ->
+            yearMonthDayUsParser().parse(dateString)
+        }
+        val shouldShowNoWaitDoseWarning = noWaitDoses && (noWaitDosesPivotDate?.after(vaccineDate) != false)
         val daysAfterCompletion = try {
             configuration.daysAfterCompletion[vaccineMedicinalProduct]
                 ?: configuration.daysAfterCompletion[DEFAULT_KEY]
@@ -172,8 +177,7 @@ class VaccineCompletionFragment : MainFragment() {
             time = vaccineDate
             add(Calendar.DAY_OF_YEAR, daysAfterCompletion)
         }.time
-        val isVaccineCompleted = (noWaitDoses || completedDate <= Date())
-
+        val isVaccineCompleted = shouldShowNoWaitDoseWarning || completedDate <= Date()
         val items = mutableListOf<GenericItem>()
 
         items += logoItem {
@@ -203,7 +207,10 @@ class VaccineCompletionFragment : MainFragment() {
         items += cardWithActionItem {
             val formattedDate = longDateFormat.format(completedDate)
             val explanations = listOfNotNull(
-                stringsFormat("vaccineCompletionController.noWait.explanation.body", vaccineDoseNumber - 1).takeIf { noWaitDoses },
+                stringsFormat(
+                    "vaccineCompletionController.noWait.explanation.body",
+                    vaccineDoseNumber - 1
+                ).takeIf { shouldShowNoWaitDoseWarning },
                 stringsFormat("vaccineCompletionController.$stringStateKey.explanation.body", formattedDate),
             )
             mainTitle = stringsFormat("vaccineCompletionController.$stringStateKey.explanation.title", formattedDate)

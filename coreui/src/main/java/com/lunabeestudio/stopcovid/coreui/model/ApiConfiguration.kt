@@ -177,6 +177,8 @@ internal class ApiConfiguration(
     val compareColors: String,
     @SerializedName("app.keyfigures.compare")
     val keyFiguresCombination: String,
+    @SerializedName("app.wallet.vaccin.noWaitDosesPivotDate")
+    val noWaitDosesPivotDate: String,
 )
 
 internal fun ApiConfiguration.toDomain(gson: Gson) = Configuration(
@@ -331,4 +333,5 @@ internal fun ApiConfiguration.toDomain(gson: Gson) = Configuration(
             )
         }
     },
+    noWaitDosesPivotDate = noWaitDosesPivotDate,
 )

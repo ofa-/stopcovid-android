@@ -36,6 +36,7 @@ import com.lunabeestudio.stopcovid.extension.injectionContainer
 import com.lunabeestudio.stopcovid.extension.labelStringKey
 import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.fastitem.keyFigureCardChartItem
+import com.lunabeestudio.stopcovid.manager.ChartManager
 import com.lunabeestudio.stopcovid.manager.KeyFiguresManager
 import com.lunabeestudio.stopcovid.manager.ShareManager
 import com.lunabeestudio.stopcovid.model.ChartInformation
@@ -55,7 +56,7 @@ class KeyFigureChartsFragment : BaseFragment() {
     private lateinit var rootLayout: LinearLayout
 
     private val minDate: Long by lazy(LazyThreadSafetyMode.NONE) {
-        val rangeMs = (arguments?.getSerializable(RANGE_ARG_KEY) as? ChartRange ?: ChartRange.ALL).rangeMs
+        val rangeMs = (arguments?.getSerializable(RANGE_ARG_KEY) as? ChartManager.ChartRange ?: ChartManager.ChartRange.ALL).rangeMs
         System.currentTimeMillis() / 1000 - rangeMs
     }
 
@@ -190,17 +191,11 @@ class KeyFigureChartsFragment : BaseFragment() {
         )
     }
 
-    enum class ChartRange(val labelKey: String, val rangeMs: Long) {
-        THIRTY("keyFigureDetailController.chartRange.segmentTitle.30", 30L * 86400L),
-        NINETY("keyFigureDetailController.chartRange.segmentTitle.90", 90L * 86400L),
-        ALL("keyFigureDetailController.chartRange.segmentTitle.1000", Long.MAX_VALUE),
-    }
-
     companion object {
         private const val LABEL_KEY_ARG_KEY = "LABEL_KEY_ARG_KEY"
         private const val RANGE_ARG_KEY = "RANGE_ARG_KEY"
 
-        fun newInstance(labelKey: String, range: ChartRange?): KeyFigureChartsFragment {
+        fun newInstance(labelKey: String, range: ChartManager.ChartRange?): KeyFigureChartsFragment {
             return KeyFigureChartsFragment().apply {
                 arguments = bundleOf(
                     LABEL_KEY_ARG_KEY to labelKey,

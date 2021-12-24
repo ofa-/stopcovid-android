@@ -54,10 +54,10 @@ import com.lunabeestudio.stopcovid.manager.VaccinationCenterManager
 import com.lunabeestudio.stopcovid.model.KeyFigure
 import com.lunabeestudio.stopcovid.model.KeyFiguresNotAvailableException
 import com.lunabeestudio.domain.model.TacResult
+import com.lunabeestudio.stopcovid.manager.ChartManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -190,18 +190,14 @@ class KeyFigureDetailsFragment : BaseFragment() {
         val keyFigure = keyFigure ?: return
         val serieSize = keyFigure.series?.size ?: 0
 
-        val itemCount = when (serieSize) {
-            in Int.MIN_VALUE..PAGER_FIRST_TAB_THRESHOLD -> 1
-            in PAGER_FIRST_TAB_THRESHOLD..PAGER_SECOND_TAB_THRESHOLD -> 2
-            else -> 3
-        }
+        val itemCount = ChartManager.getItemCount(serieSize)
 
         val showTab = itemCount > 1
         binding.detailsTabLayout.isVisible = showTab
         binding.detailsViewPager.adapter = KeyFigureDetailsPagerAdapter(itemCount, keyFigure.labelKey)
         if (showTab) {
             TabLayoutMediator(binding.detailsTabLayout, binding.detailsViewPager) { tab, position ->
-                val tabTitleKey = getChartRange(position, itemCount)?.labelKey
+                val tabTitleKey = ChartManager.getChartRange(position, itemCount)?.labelKey
                 tab.text = strings[tabTitleKey]
             }.attach()
         }
@@ -243,29 +239,11 @@ class KeyFigureDetailsFragment : BaseFragment() {
     ) {
         override fun getItemCount(): Int = itemCount
         override fun createFragment(position: Int): Fragment {
-            return KeyFigureChartsFragment.newInstance(labelKey, getChartRange(position, itemCount))
-        }
-    }
-
-    private fun getChartRange(position: Int, itemCount: Int) = when {
-        position == 0 && itemCount == 1 -> KeyFigureChartsFragment.ChartRange.ALL
-        position == 0 && itemCount == 2 -> KeyFigureChartsFragment.ChartRange.NINETY
-        position == 1 && itemCount == 2 -> KeyFigureChartsFragment.ChartRange.THIRTY
-        position == 0 && itemCount == 3 -> KeyFigureChartsFragment.ChartRange.ALL
-        position == 1 && itemCount == 3 -> KeyFigureChartsFragment.ChartRange.NINETY
-        position == 2 && itemCount == 3 -> KeyFigureChartsFragment.ChartRange.THIRTY
-        else -> {
-            Timber.e("Unexpected range at $position with $itemCount items")
-            null
+            return KeyFigureChartsFragment.newInstance(labelKey, ChartManager.getChartRange(position, itemCount))
         }
     }
 
     private fun showErrorSnackBar(message: String) {
         (activity as? MainActivity)?.showErrorSnackBar(message)
-    }
-
-    companion object {
-        private const val PAGER_FIRST_TAB_THRESHOLD = 31
-        private const val PAGER_SECOND_TAB_THRESHOLD = 91
     }
 }

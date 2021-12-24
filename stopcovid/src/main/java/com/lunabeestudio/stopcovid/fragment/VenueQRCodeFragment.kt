@@ -30,7 +30,7 @@ import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.extension.showExpiredCodeAlert
 import com.lunabeestudio.stopcovid.extension.showInvalidCodeAlert
 import com.lunabeestudio.stopcovid.extension.showUnknownErrorAlert
-import com.lunabeestudio.stopcovid.manager.DeeplinkManager
+import com.lunabeestudio.stopcovid.model.DeeplinkOrigin
 import com.lunabeestudio.stopcovid.model.CaptchaNextFragment
 import com.lunabeestudio.stopcovid.model.VenueExpiredException
 import com.lunabeestudio.stopcovid.model.VenueInvalidFormatException
@@ -69,7 +69,7 @@ class VenueQRCodeFragment : QRCodeFragment() {
         val venueContent = args.venueContent
         val venueVersion = args.venueVersion
         val venueTime = args.venueTime
-        val origin = args.origin
+        val origin = args.deeplinkOrigin
 
         when {
             !robertManager.isRegistered -> findNavControllerOrNull()?.safeNavigate(
@@ -78,7 +78,7 @@ class VenueQRCodeFragment : QRCodeFragment() {
                     args.toBundle()
                 )
             )
-            venueContent != null && venueVersion != null && origin == DeeplinkManager.Origin.UNIVERSAL -> {
+            venueContent != null && venueVersion != null && origin == DeeplinkOrigin.UNIVERSAL -> {
                 viewModel.processVenue(venueContent, venueVersion, venueTime)
             }
             venueContent != null && venueVersion != null -> findNavControllerOrNull()?.safeNavigate(

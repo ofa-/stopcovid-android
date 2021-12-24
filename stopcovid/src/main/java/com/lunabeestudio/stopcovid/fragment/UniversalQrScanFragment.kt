@@ -16,6 +16,7 @@ import android.view.View
 import androidx.core.os.bundleOf
 import androidx.fragment.app.setFragmentResult
 import androidx.preference.PreferenceManager
+import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.extension.hasUsedUniversalQrScan
 import com.lunabeestudio.stopcovid.extension.openInExternalBrowser
@@ -47,7 +48,7 @@ class UniversalQrScanFragment : QRCodeDccFragment() {
             SCANNED_CODE_RESULT_KEY,
             bundleOf(SCANNED_CODE_BUNDLE_KEY to code)
         )
-        findNavControllerOrNull()?.popBackStack()
+        findNavControllerOrNull()?.popBackStack(R.id.proximityFragment, false)
     }
 
     override fun onFooterClick() {
