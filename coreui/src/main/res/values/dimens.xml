@@ -37,6 +37,7 @@
     <dimen name="indicator_font_size">24sp</dimen>
     <dimen name="title_big_font_size">24sp</dimen>
     <dimen name="key_figure_font_size">50sp</dimen>
+    <dimen name="home_key_figure_font_size">36sp</dimen>
     <dimen name="title_font_size">18sp</dimen>
     <dimen name="nav_title_font_size">24sp</dimen>
     <dimen name="title_small_font_size">12sp</dimen>

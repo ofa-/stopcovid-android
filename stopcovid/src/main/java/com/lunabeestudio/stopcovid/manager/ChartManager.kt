@@ -5,9 +5,9 @@ import timber.log.Timber
 
 object ChartManager {
 
-    enum class ChartRange(val labelKey: String, val rangeMs: Long) {
-        THIRTY("keyFigureDetailController.chartRange.segmentTitle.30", 30L * 86400L),
-        NINETY("keyFigureDetailController.chartRange.segmentTitle.90", 90L * 86400L),
+    enum class ChartRange(val labelKey: String, val rangeSec: Long) {
+        THIRTY("keyFigureDetailController.chartRange.segmentTitle.30", 30L * Constants.Chart.SECOND_IN_ONE_DAY),
+        NINETY("keyFigureDetailController.chartRange.segmentTitle.90", 90L * Constants.Chart.SECOND_IN_ONE_DAY),
         ALL("keyFigureDetailController.chartRange.segmentTitle.1000", Long.MAX_VALUE),
     }
 
@@ -24,8 +24,8 @@ object ChartManager {
         }
     }
 
-    fun getItemCount(serieSize: Int) = when (serieSize) {
-        in Int.MIN_VALUE..Constants.Chart.PAGER_FIRST_TAB_THRESHOLD -> 1
+    fun getItemCount(diffTimeStamp: Long) = when (diffTimeStamp) {
+        in Long.MIN_VALUE..Constants.Chart.PAGER_FIRST_TAB_THRESHOLD -> 1
         in Constants.Chart.PAGER_FIRST_TAB_THRESHOLD..Constants.Chart.PAGER_SECOND_TAB_THRESHOLD -> 2
         else -> 3
     }

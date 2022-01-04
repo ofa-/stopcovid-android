@@ -188,9 +188,9 @@ class KeyFigureDetailsFragment : BaseFragment() {
 
     private fun setupPager() {
         val keyFigure = keyFigure ?: return
-        val serieSize = keyFigure.series?.size ?: 0
+        val diffTimeStamp = (keyFigure.series?.lastOrNull()?.date ?: 0L) - (keyFigure.series?.get(0)?.date ?: 0L)
 
-        val itemCount = ChartManager.getItemCount(serieSize)
+        val itemCount = ChartManager.getItemCount(diffTimeStamp)
 
         val showTab = itemCount > 1
         binding.detailsTabLayout.isVisible = showTab

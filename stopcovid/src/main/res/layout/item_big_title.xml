@@ -7,14 +7,41 @@
   ~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   ~ Created by Lunabee Studio / Date - 2020/07/05 - for the TOUS-ANTI-COVID project
   -->
-<TextView
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/textView"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginHorizontal="@dimen/spacing_large"
-    android:layout_marginVertical="@dimen/spacing_small"
-    android:textAppearance="@style/TextAppearance.StopCovid.Title.Big"
-    android:textIsSelectable="false"
-    tools:text="@tools:sample/lorem[5]" />
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/spacing_large"
+        android:layout_marginVertical="@dimen/spacing_small"
+        android:textAppearance="@style/TextAppearance.StopCovid.Title.Big"
+        android:textIsSelectable="false"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/endTextView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="@tools:sample/lorem[1]" />
+
+    <TextView
+        android:id="@+id/endTextView"
+        style="@style/Theme.StopCovid.Link.Big"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/spacing_medium"
+        android:background="?selectableItemBackground"
+        android:paddingHorizontal="@dimen/spacing_medium"
+        android:paddingVertical="@dimen/spacing_small"
+        android:visibility="invisible"
+        app:layout_constraintBaseline_toBaselineOf="@id/textView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:tint="?colorControlNormal"
+        tools:ignore="ContentDescription"
+        tools:text="Tout voir"
+        tools:visibility="visible" />
+</androidx.constraintlayout.widget.ConstraintLayout>

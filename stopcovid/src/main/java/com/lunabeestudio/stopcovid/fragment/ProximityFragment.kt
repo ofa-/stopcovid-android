@@ -48,12 +48,14 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.navOptions
 import androidx.preference.PreferenceManager
+import androidx.recyclerview.widget.RecyclerView
 import com.airbnb.lottie.utils.Utils
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.zxing.BarcodeFormat
 import com.journeyapps.barcodescanner.BarcodeEncoder
 import com.lunabeestudio.analytics.model.AppEventName
 import com.lunabeestudio.domain.model.Configuration
+import com.lunabeestudio.domain.model.TacResult
 import com.lunabeestudio.domain.model.VenueQrCode
 import com.lunabeestudio.robert.RobertApplication
 import com.lunabeestudio.robert.extension.observeEventAndConsume
@@ -73,7 +75,9 @@ import com.lunabeestudio.stopcovid.coreui.extension.showPermissionSettingsDialog
 import com.lunabeestudio.stopcovid.coreui.extension.toDimensSize
 import com.lunabeestudio.stopcovid.coreui.extension.viewLifecycleOwnerOrNull
 import com.lunabeestudio.stopcovid.coreui.fastitem.CardWithActionsItem
+import com.lunabeestudio.stopcovid.coreui.fastitem.SpaceItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.cardWithActionItem
+import com.lunabeestudio.stopcovid.coreui.fastitem.horizontalRecyclerViewItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.model.Action
 import com.lunabeestudio.stopcovid.coreui.model.CardTheme
@@ -84,7 +88,9 @@ import com.lunabeestudio.stopcovid.extension.chosenPostalCode
 import com.lunabeestudio.stopcovid.extension.collectWithLifecycle
 import com.lunabeestudio.stopcovid.extension.colorStringKey
 import com.lunabeestudio.stopcovid.extension.formatNumberIfNeeded
-import com.lunabeestudio.stopcovid.extension.getDepartmentLabel
+import com.lunabeestudio.stopcovid.extension.generateCombinedData
+import com.lunabeestudio.stopcovid.extension.getDefaultFigureLabel1
+import com.lunabeestudio.stopcovid.extension.getDefaultFigureLabel2
 import com.lunabeestudio.stopcovid.extension.getGradientBackground
 import com.lunabeestudio.stopcovid.extension.getKeyFigureForPostalCode
 import com.lunabeestudio.stopcovid.extension.getRelativeDateTimeString
@@ -95,6 +101,8 @@ import com.lunabeestudio.stopcovid.extension.injectionContainer
 import com.lunabeestudio.stopcovid.extension.isLowStorage
 import com.lunabeestudio.stopcovid.extension.isValidUUID
 import com.lunabeestudio.stopcovid.extension.isolationManager
+import com.lunabeestudio.stopcovid.extension.keyFigureCompare1
+import com.lunabeestudio.stopcovid.extension.keyFigureCompare2
 import com.lunabeestudio.stopcovid.extension.labelShortStringKey
 import com.lunabeestudio.stopcovid.extension.lowStorageAlertShown
 import com.lunabeestudio.stopcovid.extension.notificationVersionClosed
@@ -108,8 +116,8 @@ import com.lunabeestudio.stopcovid.extension.showErrorSnackBar
 import com.lunabeestudio.stopcovid.extension.showPostalCodeDialog
 import com.lunabeestudio.stopcovid.extension.showActivationReminderDialog
 import com.lunabeestudio.stopcovid.extension.toCovidException
+import com.lunabeestudio.stopcovid.fastitem.CompareFigureChartItem
 import com.lunabeestudio.stopcovid.fastitem.LogoItem
-import com.lunabeestudio.stopcovid.fastitem.NumbersCardItem
 import com.lunabeestudio.stopcovid.fastitem.OnOffLottieItem
 import com.lunabeestudio.stopcovid.fastitem.ProximityButtonItem
 import com.lunabeestudio.stopcovid.fastitem.State
@@ -117,24 +125,25 @@ import com.lunabeestudio.stopcovid.fastitem.bigTitleItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.TitleItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
 import com.lunabeestudio.stopcovid.fastitem.changePostalCodeItem
+import com.lunabeestudio.stopcovid.fastitem.compareFigureCardChartItem
 import com.lunabeestudio.stopcovid.fastitem.explanationActionCardItem
-import com.lunabeestudio.stopcovid.fastitem.highlightedNumberCardItem
+import com.lunabeestudio.stopcovid.fastitem.homeScreeFigureCardItem
+import com.lunabeestudio.stopcovid.fastitem.homeScreeInfoCardItem
 import com.lunabeestudio.stopcovid.fastitem.logoItem
-import com.lunabeestudio.stopcovid.fastitem.numbersCardItem
 import com.lunabeestudio.stopcovid.fastitem.onOffLottieItem
 import com.lunabeestudio.stopcovid.fastitem.proximityButtonItem
 import com.lunabeestudio.stopcovid.fastitem.smallQrCodeCardItem
 import com.lunabeestudio.stopcovid.manager.AppMaintenanceManager
+import com.lunabeestudio.stopcovid.manager.ChartManager
 import com.lunabeestudio.stopcovid.manager.DeeplinkManager
 import com.lunabeestudio.stopcovid.manager.ProximityManager
+import com.lunabeestudio.stopcovid.manager.ShareManager
 import com.lunabeestudio.stopcovid.model.CaptchaNextFragment
 import com.lunabeestudio.stopcovid.model.CovidException
+import com.lunabeestudio.stopcovid.model.DeeplinkOrigin
 import com.lunabeestudio.stopcovid.model.DeviceSetup
-import com.lunabeestudio.stopcovid.model.KeyFigure
 import com.lunabeestudio.stopcovid.model.KeyFiguresNotAvailableException
 import com.lunabeestudio.stopcovid.model.NoEphemeralBluetoothIdentifierFound
-import com.lunabeestudio.domain.model.TacResult
-import com.lunabeestudio.stopcovid.model.DeeplinkOrigin
 import com.lunabeestudio.stopcovid.service.ProximityService
 import com.lunabeestudio.stopcovid.utils.ExtendedFloatingActionButtonScrollListener
 import com.lunabeestudio.stopcovid.viewmodel.ProximityViewModel
@@ -192,7 +201,6 @@ class ProximityFragment : TimeMainFragment() {
     private var logoItem: LogoItem? = null
     private var proximityButtonItem: ProximityButtonItem? = null
     private lateinit var subTitleItem: TitleItem
-    private lateinit var infoCenterCardItem: CardWithActionsItem
     private var healthItem: CardWithActionsItem? = null
     private var shouldRefresh: Boolean = false
     private var isProximityOn: Boolean = false
@@ -225,6 +233,7 @@ class ProximityFragment : TimeMainFragment() {
     private var showErrorLayoutAnimationInProgress: Boolean = false
     private var hideErrorLayoutAnimationInProgress: Boolean = false
     private var hasShownRegisterAlert: Boolean = false
+    private val recyclerViewPool = RecyclerView.RecycledViewPool()
 
     private val proximityServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
@@ -595,9 +604,10 @@ class ProximityFragment : TimeMainFragment() {
             addSectionSeparator(items)
         }
 
+        addFiguresItems(items)
+        addSectionSeparator(items)
         // News items
         addNewsItems(items)
-        addSectionSeparator(items)
 
         // More items
         addMoreItems(items)
@@ -891,40 +901,98 @@ class ProximityFragment : TimeMainFragment() {
         findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToVenuesPrivateEventFragment())
     }
 
-    private fun addNewsItems(items: ArrayList<GenericItem>) {
-        items += bigTitleItem {
-            text = strings["home.infoSection.title"]
-            identifier = "home.infoSection.title".hashCode().toLong()
-            importantForAccessibility = ViewCompat.IMPORTANT_FOR_ACCESSIBILITY_NO
+    private fun addFiguresItems(items: ArrayList<GenericItem>) {
+        val localKeyFiguresFetchError = (keyFiguresManager.figures.value?.peekContent() as? TacResult.Failure)?.throwable
+        if (localKeyFiguresFetchError is KeyFiguresNotAvailableException) {
+            addNoConnectionItem(items, localKeyFiguresFetchError)
+        } else {
+            items += bigTitleItem {
+                text = strings["home.infoSection.keyFigures"]
+                linkText = strings["home.figuresSection.all"]
+                onClickLink = View.OnClickListener {
+                    analyticsManager.reportAppEvent(AppEventName.e8, null)
+                    findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToKeyFiguresFragment())
+                }
+                identifier = "home.infoSection.keyFigures".hashCode().toLong()
+            }
+            addKeyFiguresRecycler(items)
+            addPostalCodeItem(items)
+            addCompareChart(items)
         }
+    }
 
-        items += getKeyFiguresItems()
+    private fun addKeyFiguresRecycler(items: ArrayList<GenericItem>) {
+        val darkMode = requireContext().isNightMode()
+        items += horizontalRecyclerViewItem {
+            viewPool = recyclerViewPool
+            identifier = "keyfigureRecyclerview".hashCode().toLong()
 
-        infoCenterCardItem = cardWithActionItem {
-            cardTitle = strings["home.infoSection.lastInfo"]
-            cardTitleIcon = R.drawable.ic_bell
-
-            contentDescription = strings["home.infoSection.readAll"]
-
-            identifier = cardTitle.hashCode().toLong()
-            mainMaxLines = 3
-            onCardClick = {
-                analyticsManager.reportAppEvent(AppEventName.e10, null)
-                findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToInfoCenterFragment())
+            val arrayListItems = arrayListOf<GenericItem>()
+            arrayListItems += spaceItem {
+                spaceRes = R.dimen.spacing_large
+                orientation = SpaceItem.Orientation.HORIZONTAL
+            }
+            keyFiguresManager.figures.value?.peekContent()?.data?.filter { it.isFeatured || it.isHighlighted == true }?.forEach {
+                arrayListItems += homeScreeFigureCardItem {
+                    strings[it.colorStringKey(darkMode)]?.let { colorBackground = Color.parseColor(it) }
+                    onClick = View.OnClickListener { _ ->
+                        analyticsManager.reportAppEvent(AppEventName.e8, null)
+                        findNavControllerOrNull()?.safeNavigate(
+                            ProximityFragmentDirections.actionProximityFragmentToKeyFigureDetailsFragment(
+                                it.labelKey
+                            )
+                        )
+                    }
+                    figureText = strings[it.labelShortStringKey]
+                    identifier = it.labelShortStringKey.hashCode().toLong()
+                    if (sharedPrefs.hasChosenPostalCode) {
+                        valueText = it.getKeyFigureForPostalCode(sharedPrefs.chosenPostalCode)
+                            ?.valueToDisplay
+                            ?.formatNumberIfNeeded(numberFormat) ?: it.valueGlobalToDisplay.formatNumberIfNeeded(numberFormat)
+                        regionText = it.getKeyFigureForPostalCode(sharedPrefs.chosenPostalCode)?.dptLabel
+                            ?: strings["common.country.france"]
+                    } else {
+                        valueText = it.valueGlobalToDisplay.formatNumberIfNeeded(numberFormat)
+                    }
+                }
+                arrayListItems += spaceItem {
+                    spaceRes = R.dimen.spacing_medium
+                    orientation = SpaceItem.Orientation.HORIZONTAL
+                }
+            }
+            arrayListItems += spaceItem {
+                spaceRes = R.dimen.spacing_medium
+                orientation = SpaceItem.Orientation.HORIZONTAL
             }
 
-            actions = listOf(
-                Action(
-                    label = strings["home.infoSection.readAll"],
-                    showBadge = sharedPrefs.getBoolean(Constants.SharedPrefs.HAS_NEWS, false)
-                ) {
-                    analyticsManager.reportAppEvent(AppEventName.e10, null)
-                    findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToInfoCenterFragment())
-                }
-            )
+            horizontalItems = arrayListItems
         }
-        if (infoCenterManager.infos.value?.peekContent()?.isNotEmpty() == true) {
-            items += infoCenterCardItem
+    }
+
+    private fun addNoConnectionItem(items: ArrayList<GenericItem>, localKeyFiguresFetchError: KeyFiguresNotAvailableException) {
+        items += bigTitleItem {
+            text = strings["home.infoSection.keyFigures"]
+            identifier = "home.infoSection.keyFigures".hashCode().toLong()
+            importantForAccessibility = ViewCompat.IMPORTANT_FOR_ACCESSIBILITY_NO
+        }
+        items += explanationActionCardItem {
+            explanation = localKeyFiguresFetchError.getString(strings)
+            bottomText = strings["keyFiguresController.fetchError.button"]
+            onClick = {
+                viewLifecycleOwnerOrNull()?.lifecycleScope?.launch {
+                    (activity as? MainActivity)?.showProgress(true)
+                    keyFiguresManager.onAppForeground(requireContext())
+                    vaccinationCenterManager.postalCodeDidUpdate(
+                        requireContext(),
+                        sharedPrefs,
+                        sharedPrefs.chosenPostalCode,
+                    )
+                    infoCenterManager.refreshIfNeeded(requireContext())
+                    (activity as? MainActivity)?.showProgress(false)
+                    refreshScreen()
+                }
+            }
+            identifier = "keyFiguresController.fetchError.button".hashCode().toLong()
         }
 
         items += spaceItem {
@@ -933,108 +1001,7 @@ class ProximityFragment : TimeMainFragment() {
         }
     }
 
-    private fun getKeyFiguresItems(): ArrayList<GenericItem> {
-        val items = ArrayList<GenericItem>()
-        var isHighlighted = false
-        val darkMode = requireContext().isNightMode()
-
-        val keyFiguresClickListener = View.OnClickListener {
-            analyticsManager.reportAppEvent(AppEventName.e8, null)
-            findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToKeyFiguresFragment())
-        }
-
-        val localKeyFiguresFetchError = (keyFiguresManager.figures.value?.peekContent() as? TacResult.Failure)?.throwable
-        if (localKeyFiguresFetchError is KeyFiguresNotAvailableException) {
-            items += explanationActionCardItem {
-                explanation = localKeyFiguresFetchError.getString(strings)
-                bottomText = strings["keyFiguresController.fetchError.button"]
-                onClick = {
-                    viewLifecycleOwnerOrNull()?.lifecycleScope?.launch {
-                        (activity as? MainActivity)?.showProgress(true)
-                        keyFiguresManager.onAppForeground(requireContext())
-                        vaccinationCenterManager.postalCodeDidUpdate(
-                            requireContext(),
-                            sharedPrefs,
-                            sharedPrefs.chosenPostalCode,
-                        )
-                        (activity as? MainActivity)?.showProgress(false)
-                        refreshScreen()
-                    }
-                }
-                identifier = "keyFiguresController.fetchError.button".hashCode().toLong()
-            }
-
-            items += spaceItem {
-                spaceRes = R.dimen.spacing_medium
-                identifier = items.count().toLong()
-            }
-        }
-
-        keyFiguresManager.highlightedFigures?.let { figure ->
-            strings[figure.labelShortStringKey]?.let { shortTitle ->
-                items += highlightedNumberCardItem {
-                    label = "$shortTitle (${strings["common.country.france"]})"
-                    updatedAt = strings["keyfigure.dailyUpdates"]
-                    value = figure.valueGlobalToDisplay.formatNumberIfNeeded(numberFormat)
-                    onClickListener = View.OnClickListener {
-                        analyticsManager.reportAppEvent(AppEventName.e9, null)
-                        findNavControllerOrNull()?.safeNavigate(
-                            ProximityFragmentDirections.actionProximityFragmentToKeyFigureDetailsFragment(
-                                figure.labelKey
-                            )
-                        )
-                    }
-                    strings[figure.colorStringKey(darkMode)]?.let {
-                        color = Color.parseColor(it)
-                    }
-                    identifier = "highlightedNumberCard".hashCode().toLong()
-                }
-                items += spaceItem {
-                    spaceRes = R.dimen.spacing_medium
-                    identifier = items.count().toLong()
-                }
-                isHighlighted = true
-            }
-        }
-
-        keyFiguresManager.featuredFigures?.let { keyFigures ->
-            items += numbersCardItem {
-                if (isHighlighted) {
-                    subheader = null
-                    header = strings["home.infoSection.otherKeyFigures"]
-                } else {
-                    subheader = strings["keyfigure.dailyUpdates"]
-                    header = strings["home.infoSection.keyFigures"]
-                }
-                link = strings["home.infoSection.seeAll"]
-                contentDescription = strings["home.infoSection.seeAll"]
-                onClickListener = keyFiguresClickListener
-                identifier = header.hashCode().toLong()
-
-                franceData = NumbersCardItem.Data(
-                    strings["common.country.france"],
-                    generateFromKeyFigure(keyFigures.getOrNull(0)),
-                    generateFromKeyFigure(keyFigures.getOrNull(1)),
-                    generateFromKeyFigure(keyFigures.getOrNull(2))
-                )
-
-                localData = if (sharedPrefs.hasChosenPostalCode && localKeyFiguresFetchError !is KeyFiguresNotAvailableException) {
-                    NumbersCardItem.Data(
-                        keyFigures.getDepartmentLabel(sharedPrefs.chosenPostalCode),
-                        generateFromKeyFigure(keyFigures.getOrNull(0), true),
-                        generateFromKeyFigure(keyFigures.getOrNull(1), true),
-                        generateFromKeyFigure(keyFigures.getOrNull(2), true)
-                    )
-                } else {
-                    null
-                }
-            }
-        }
-        items += spaceItem {
-            spaceRes = R.dimen.spacing_medium
-            identifier = items.count().toLong()
-        }
-
+    private fun addPostalCodeItem(items: ArrayList<GenericItem>) {
         if (robertManager.configuration.displayDepartmentLevel) {
             if (sharedPrefs.chosenPostalCode == null) {
                 items += cardWithActionItem(CardTheme.Primary) {
@@ -1069,27 +1036,111 @@ class ProximityFragment : TimeMainFragment() {
                 identifier = items.count().toLong()
             }
         }
-
-        return items
     }
 
-    private fun generateFromKeyFigure(keyFigure: KeyFigure?, fromDepartment: Boolean = false): NumbersCardItem.DataFigure? {
-        return keyFigure?.let {
-            strings[keyFigure.labelShortStringKey]?.let { label ->
-                NumbersCardItem.DataFigure(
-                    label,
-                    if (fromDepartment) {
-                        keyFigure.getKeyFigureForPostalCode(sharedPrefs.chosenPostalCode)
-                            ?.valueToDisplay
-                            ?.formatNumberIfNeeded(numberFormat)
-                    } else {
-                        keyFigure.valueGlobalToDisplay.formatNumberIfNeeded(numberFormat)
-                    },
-                    strings[keyFigure.colorStringKey(requireContext().isNightMode())]?.let {
-                        Color.parseColor(it)
-                    }
+    private fun addCompareChart(items: ArrayList<GenericItem>) {
+        items += compareFigureCardChartItem {
+            shareContentDescription = strings["accessibility.hint.keyFigure.chart.share"]
+            chartExplanationLabel = strings["home.figuresSection.keyFigures.chart.footer"]
+            onClickListener = View.OnClickListener {
+                findNavControllerOrNull()?.safeNavigate(
+                    ProximityFragmentDirections.actionProximityFragmentToChooseKeyFiguresCompareFragment(
+                        true
+                    )
                 )
             }
+            onShareCard = { binding ->
+                ShareManager.shareChart(
+                    this@ProximityFragment,
+                    binding
+                )
+            }
+            chartData = {
+                val minDate = System.currentTimeMillis() / 1000 - ChartManager.ChartRange.ALL.rangeSec
+                keyFiguresManager.figures.value?.peekContent()?.let { keyFiguresResult ->
+
+                    val keyFigure1 = keyFiguresResult.data?.firstOrNull {
+                        it.labelKey == sharedPrefs.keyFigureCompare1
+                    } ?: keyFiguresResult.data?.firstOrNull {
+                        // Fallback to config KeyFigures if the selected figures does not exist anymore
+                        it.labelKey == robertManager.configuration.getDefaultFigureLabel1()
+                    }
+                    val keyFigure2 = keyFiguresResult.data?.firstOrNull {
+                        it.labelKey == sharedPrefs.keyFigureCompare2
+                    } ?: keyFiguresResult.data?.firstOrNull {
+                        // Fallback to config KeyFigures if the selected figures does not exist anymore
+                        it.labelKey == robertManager.configuration.getDefaultFigureLabel2()
+                    }
+
+                    CompareFigureChartItem.ChartCompareFiguresData(
+                        keyFigure1?.let { key1 ->
+                            keyFigure2?.let { key2 ->
+                                context?.let { context ->
+                                    val pair = Pair(key1, key2)
+                                    pair.generateCombinedData(context, strings, minDate)
+                                }
+                            }
+                        },
+                        keyFigure1?.magnitude == keyFigure2?.magnitude
+                    )
+                }
+            }
+            isChartAnimated = false
+            identifier = "home.figuresSection.keyFigures.chart.footer".hashCode().toLong()
+        }
+    }
+
+    private fun addNewsItems(items: ArrayList<GenericItem>) {
+        val infoCenterStrings = infoCenterManager.strings.value?.peekContent() ?: emptyMap()
+        val infoCenterInfos = infoCenterManager.infos.value?.peekContent()?.take(NUMBER_NEWS_DISPLAYED)
+
+        if (infoCenterStrings.isNotEmpty() && infoCenterInfos != null) {
+            items += bigTitleItem {
+                text = strings["home.infoSection.news"]
+                linkText = strings["home.infoSection.all"]
+                onClickLink = View.OnClickListener {
+                    analyticsManager.reportAppEvent(AppEventName.e10, null)
+                    findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToInfoCenterFragment())
+                }
+                identifier = "home.infoSection.news".hashCode().toLong()
+            }
+            items += horizontalRecyclerViewItem {
+                val arrayListItems = arrayListOf<GenericItem>()
+                arrayListItems += spaceItem {
+                    spaceRes = R.dimen.spacing_large
+                    orientation = SpaceItem.Orientation.HORIZONTAL
+                }
+                infoCenterInfos.forEach { info ->
+                    arrayListItems += homeScreeInfoCardItem {
+                        titleText = infoCenterStrings[info.titleKey]
+                        captionText = info.timestamp.seconds.getRelativeDateTimeString(requireContext(), strings["common.justNow"])
+                        subtitleText = infoCenterStrings[info.descriptionKey]
+                        identifier = info.titleKey.hashCode().toLong()
+                        onClick = View.OnClickListener {
+                            analyticsManager.reportAppEvent(AppEventName.e10, null)
+                            findNavControllerOrNull()?.safeNavigate(
+                                ProximityFragmentDirections.actionProximityFragmentToInfoCenterFragment(
+                                    info.titleKey.hashCode().toLong()
+                                )
+                            )
+                        }
+                    }
+                    arrayListItems += spaceItem {
+                        spaceRes = R.dimen.spacing_medium
+                        orientation = SpaceItem.Orientation.HORIZONTAL
+                    }
+                }
+                arrayListItems += spaceItem {
+                    spaceRes = R.dimen.spacing_medium
+                    orientation = SpaceItem.Orientation.HORIZONTAL
+                }
+
+                viewPool = recyclerViewPool
+                horizontalItems = arrayListItems
+                identifier = "infosRecyclerView".hashCode().toLong()
+            }
+
+            addSectionSeparator(items)
         }
     }
 
@@ -1333,18 +1384,6 @@ class ProximityFragment : TimeMainFragment() {
             isProximityOn = freshProximityOn
             refreshTopImage(wasProximityDifferent)
 
-            val infoCenterStrings = infoCenterManager.strings.value?.peekContent() ?: emptyMap()
-
-            infoCenterManager.infos.value?.peekContent()?.firstOrNull()?.let { info ->
-                if (::infoCenterCardItem.isInitialized) {
-                    infoCenterCardItem.apply {
-                        mainHeader = info.timestamp.seconds.getRelativeDateTimeString(requireContext(), strings["common.justNow"])
-                        mainTitle = infoCenterStrings[info.titleKey]
-                        mainBody = infoCenterStrings[info.descriptionKey]
-                    }
-                }
-            }
-
             proximityButtonItem?.showMainButton = !isProximityOn
             if (deviceSetup != DeviceSetup.BLE) {
                 proximityButtonItem?.onClickListener = getErrorClickListener()
@@ -1438,14 +1477,6 @@ class ProximityFragment : TimeMainFragment() {
                         robertManager.atRiskLastRefresh,
                         robertManager.atRiskStatus?.riskLevel ?: 0f
                     )
-                }
-                infoCenterManager.infos.value?.peekContent()?.firstOrNull()?.let { info ->
-                    if (::infoCenterCardItem.isInitialized) {
-                        infoCenterCardItem.apply {
-                            mainHeader = info.timestamp.seconds
-                                .getRelativeDateTimeString(requireContext(), strings["common.justNow"])
-                        }
-                    }
                 }
 
                 if (binding?.recyclerView?.isComputingLayout == false) {
@@ -1630,6 +1661,7 @@ class ProximityFragment : TimeMainFragment() {
         private const val PROXIMITY_BUTTON_DELAY: Long = 2000L
         const val START_PROXIMITY_ARG_KEY: String = "START_PROXIMITY_ARG_KEY"
         private const val REPORT_UUID_DEEPLINK: String = "https://bonjour.tousanticovid.gouv.fr/app/code/"
+        private const val NUMBER_NEWS_DISPLAYED: Int = 4
 
         private const val SAVE_INSTANCE_HAS_SHOWN_REGISTER_ALERT: String = "SAVED_STATE_HAS_SHOWN_REGISTER_ALERT_KEY"
     }

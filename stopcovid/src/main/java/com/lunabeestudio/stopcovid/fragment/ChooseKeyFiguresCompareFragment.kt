@@ -7,6 +7,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.navigation.NavOptions
+import androidx.navigation.fragment.navArgs
 import androidx.preference.PreferenceManager
 import com.lunabeestudio.domain.model.Configuration
 import com.lunabeestudio.stopcovid.R
@@ -30,6 +31,8 @@ class ChooseKeyFiguresCompareFragment : MainFragment() {
     override val layout: Int = R.layout.fragment_recycler_with_bottom_action
     override fun getTitleKey(): String = "keyfigures.comparison.screen.title"
 
+    private val args: ChooseKeyFiguresCompareFragmentArgs by navArgs()
+
     private val sharedPreferences: SharedPreferences by lazy {
         PreferenceManager.getDefaultSharedPreferences(context)
     }
@@ -52,10 +55,14 @@ class ChooseKeyFiguresCompareFragment : MainFragment() {
             bottomSheetButton.setOnClickListener {
                 sharedPreferences.keyFigureCompare1 = viewModel.labelKey1
                 sharedPreferences.keyFigureCompare2 = viewModel.labelKey2
-                findNavControllerOrNull()?.safeNavigate(
-                    ChooseKeyFiguresCompareFragmentDirections.actionChooseKeyFiguresCompareFragmentToCompareKeyFiguresFragment(),
-                    NavOptions.Builder().setPopUpTo(R.id.chooseKeyFiguresCompareFragment, true).setLaunchSingleTop(true).build()
-                )
+                if (args.isComingFromHome) {
+                    findNavControllerOrNull()?.popBackStack()
+                } else {
+                    findNavControllerOrNull()?.safeNavigate(
+                        ChooseKeyFiguresCompareFragmentDirections.actionChooseKeyFiguresCompareFragmentToCompareKeyFiguresFragment(),
+                        NavOptions.Builder().setPopUpTo(R.id.chooseKeyFiguresCompareFragment, true).setLaunchSingleTop(true).build()
+                    )
+                }
             }
             bottomSheetButtonLight.setOnClickListener {
                 findNavControllerOrNull()?.popBackStack()

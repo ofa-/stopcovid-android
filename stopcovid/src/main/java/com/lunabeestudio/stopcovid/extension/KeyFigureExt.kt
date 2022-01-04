@@ -212,27 +212,53 @@ private fun KeyFigure.generateLineData(figureNumber: Int, context: Context, stri
 
 fun Pair<KeyFigure, KeyFigure>.generateCombinedData(context: Context, strings: LocalizedStrings, minDate: Long): CombinedData {
     return CombinedData().apply {
+
+        val keyFigure1 = first.clearSeries(second)
+        val keyFigure2 = second.clearSeries(first)
+
         val lineData = LineData()
         val barData = BarData()
-        when (first.chartType) {
-            KeyFigureChartType.LINES -> lineData.addDataSet(first.generateLineData(0, context, strings, minDate))
-            KeyFigureChartType.BARS -> barData.addDataSet(first.generateBarData(0, context, strings, minDate))
+        when (keyFigure1.chartType) {
+            KeyFigureChartType.LINES -> lineData.addDataSet(keyFigure1.generateLineData(0, context, strings, minDate))
+            KeyFigureChartType.BARS -> barData.addDataSet(keyFigure1.generateBarData(0, context, strings, minDate))
         }
-        when (second.chartType) {
-            KeyFigureChartType.LINES -> lineData.addDataSet(second.generateLineData(1, context, strings, minDate))
-            KeyFigureChartType.BARS -> barData.addDataSet(second.generateBarData(1, context, strings, minDate))
+        when (keyFigure2.chartType) {
+            KeyFigureChartType.LINES -> lineData.addDataSet(keyFigure2.generateLineData(1, context, strings, minDate))
+            KeyFigureChartType.BARS -> barData.addDataSet(keyFigure2.generateBarData(1, context, strings, minDate))
         }
         if (barData.dataSets.isNotEmpty()) {
             barData.apply {
+                val entriesCount = barData.entryCount
                 val xValueDiff = xMax - xMin
-                val spacing = 0.05f
-                val entriesCount = barData.entryCount / barData.dataSetCount
-                barWidth = xValueDiff / (entriesCount) - (spacing * xValueDiff / (entriesCount + 1))
+                barWidth = xValueDiff / entriesCount
+                if (barData.dataSetCount > 1) {
+                    groupBars(xMin, 0f, 0f)
+                }
             }
         }
         setData(lineData)
         setData(barData)
     }
+}
+
+private fun KeyFigure.clearSeries(keyFigure2: KeyFigure): KeyFigure {
+    val newSeries = keyFigure2.series?.let { serie2 -> this.series?.filter { entry -> serie2.any { it.date == entry.date } } }
+    return KeyFigure(
+        this.category,
+        this.labelKey,
+        this.valueGlobalToDisplay,
+        this.valueGlobal,
+        false,
+        false,
+        this.extractDateS,
+        null,
+        false,
+        null,
+        this.chartType,
+        newSeries,
+        null,
+        this.magnitude
+    )
 }
 
 private fun KeyFigure.getLegend(strings: LocalizedStrings): String {

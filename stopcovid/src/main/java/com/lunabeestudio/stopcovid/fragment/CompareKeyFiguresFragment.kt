@@ -27,7 +27,7 @@ import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.manager.ChartManager
 import com.lunabeestudio.stopcovid.manager.KeyFiguresManager
 import com.lunabeestudio.stopcovid.model.KeyFigure
-import java.lang.Integer.min
+import kotlin.math.max
 
 class CompareKeyFiguresFragment : BaseFragment() {
 
@@ -94,7 +94,9 @@ class CompareKeyFiguresFragment : BaseFragment() {
     }
 
     private fun setupPager() {
-        val itemCount = ChartManager.getItemCount(min(keyFigure1?.series?.size ?: 0, keyFigure2?.series?.size ?: 0))
+        val maxMinDate = max(keyFigure1?.series?.get(0)?.date ?: 0L, keyFigure2?.series?.get(0)?.date ?: 0L)
+        val diffTimeStamp = (keyFigure1?.series?.lastOrNull()?.date ?: 0L) - maxMinDate
+        val itemCount = ChartManager.getItemCount(diffTimeStamp)
         val showTab = itemCount > 1
         binding.detailsTabLayout.isVisible = showTab
         binding.detailsViewPager.adapter = CompareKeyFiguresPagerAdapter(itemCount)

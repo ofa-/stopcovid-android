@@ -56,8 +56,8 @@ class KeyFigureChartsFragment : BaseFragment() {
     private lateinit var rootLayout: LinearLayout
 
     private val minDate: Long by lazy(LazyThreadSafetyMode.NONE) {
-        val rangeMs = (arguments?.getSerializable(RANGE_ARG_KEY) as? ChartManager.ChartRange ?: ChartManager.ChartRange.ALL).rangeMs
-        System.currentTimeMillis() / 1000 - rangeMs
+        val rangeSec = (arguments?.getSerializable(RANGE_ARG_KEY) as? ChartManager.ChartRange ?: ChartManager.ChartRange.ALL).rangeSec
+        System.currentTimeMillis() / 1000 - rangeSec
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {

@@ -42,9 +42,8 @@
             <include
                 android:id="@+id/detailsEvolutionTitle"
                 layout="@layout/item_big_title"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/spacing_large"
                 android:layout_marginVertical="@dimen/spacing_large" />
 
             <com.google.android.material.tabs.TabLayout
@@ -63,9 +62,8 @@
             <include
                 android:id="@+id/learnMoreTitle"
                 layout="@layout/item_big_title"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/spacing_large"
                 android:layout_marginBottom="@dimen/spacing_large"
                 android:visibility="gone"
                 tools:visibility="visible" />

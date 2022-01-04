@@ -37,14 +37,12 @@
     <item name="item_info_center_detail_card" type="id" />
     <item name="item_key_figure_card" type="id" />
     <item name="item_key_figure_chart_card" type="id" />
-    <item name="item_highlighted_number_card" type="id" />
     <item name="item_link" type="id" />
     <item name="item_link_card" type="id" />
     <item name="item_logo" type="id" />
     <item name="item_logo_body" type="id" />
     <item name="item_more_card" type="id" />
     <item name="item_number" type="id" />
-    <item name="item_numbers_card" type="id" />
     <item name="item_on_off_lottie" type="id" />
     <item name="item_phone_support" type="id" />
     <item name="item_picker_edit_text" type="id" />
@@ -59,4 +57,6 @@
     <item name="keyfigures_charts_container" type="id" />
     <item name="wallet_pager" type="id" />
     <item name="item_compare_key_figure_chart_card" type="id" />
+    <item name="item_home_screen_figure_card" type="id" />
+    <item name="item_home_screen_info_card" type="id" />
 </resources>

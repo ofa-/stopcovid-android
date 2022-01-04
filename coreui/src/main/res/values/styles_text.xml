@@ -97,4 +97,10 @@
         <item name="android:textSize">@dimen/health_chip_font_size</item>
         <item name="android:fontFamily">@font/marianne_bold</item>
     </style>
+
+    <style name="TextAppearance.StopCovid.Home.KeyFigure" parent="TextAppearance.MaterialComponents.Headline5">
+        <item name="fontFamily">@font/marianne_extrabold</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">@dimen/home_key_figure_font_size</item>
+    </style>
 </resources>

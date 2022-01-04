@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
-import com.github.mikephil.charting.data.CombinedData
+import androidx.core.view.updateLayoutParams
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.fragment.BaseFragment
@@ -15,6 +15,7 @@ import com.lunabeestudio.stopcovid.databinding.ItemKeyFigureChartCardBinding
 import com.lunabeestudio.stopcovid.extension.generateCombinedData
 import com.lunabeestudio.stopcovid.extension.injectionContainer
 import com.lunabeestudio.stopcovid.extension.safeNavigate
+import com.lunabeestudio.stopcovid.fastitem.CompareFigureChartItem
 import com.lunabeestudio.stopcovid.fastitem.compareFigureCardChartItem
 import com.lunabeestudio.stopcovid.manager.ChartManager
 import com.lunabeestudio.stopcovid.manager.KeyFiguresManager
@@ -24,8 +25,8 @@ import com.lunabeestudio.stopcovid.model.KeyFigure
 class CompareKeyFiguresChartsFragment : BaseFragment() {
 
     private val minDate: Long by lazy(LazyThreadSafetyMode.NONE) {
-        val rangeMs = (arguments?.getSerializable(RANGE_ARG_KEY) as? ChartManager.ChartRange ?: ChartManager.ChartRange.ALL).rangeMs
-        System.currentTimeMillis() / 1000 - rangeMs
+        val rangeSec = (arguments?.getSerializable(RANGE_ARG_KEY) as? ChartManager.ChartRange ?: ChartManager.ChartRange.ALL).rangeSec
+        System.currentTimeMillis() / 1000 - rangeSec
     }
 
     val keyFiguresManager: KeyFiguresManager by lazy(LazyThreadSafetyMode.NONE) {
@@ -91,26 +92,27 @@ class CompareKeyFiguresChartsFragment : BaseFragment() {
                         binding
                     )
                 }
-                areMagnitudeTheSame = areMagnitudesTheSame()
-                chartData = getCombinedData()
+                chartData = ::getData
             }.bindView(this, emptyList())
-        }.root
-    }
-
-    private fun getCombinedData(): CombinedData? {
-        keyFigure1?.let { key1 ->
-            keyFigure2?.let { key2 ->
-                context?.let { context ->
-                    val pair = Pair(key1, key2)
-                    return pair.generateCombinedData(context, strings, minDate)
-                }
+        }.root.apply {
+            updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                bottomMargin += resources.getDimensionPixelSize(R.dimen.spacing_large)
             }
         }
-        return null
     }
 
-    private fun areMagnitudesTheSame(): Boolean {
-        return keyFigure1?.magnitude == keyFigure2?.magnitude
+    private fun getData(): CompareFigureChartItem.ChartCompareFiguresData {
+        return CompareFigureChartItem.ChartCompareFiguresData(
+            keyFigure1?.let { key1 ->
+                keyFigure2?.let { key2 ->
+                    context?.let { context ->
+                        val pair = Pair(key1, key2)
+                        pair.generateCombinedData(context, strings, minDate)
+                    }
+                }
+            },
+            keyFigure1?.magnitude == keyFigure2?.magnitude
+        )
     }
 
     companion object {

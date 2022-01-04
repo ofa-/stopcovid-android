@@ -14,7 +14,9 @@ import android.os.Bundle
 import android.view.View
 import androidx.core.content.edit
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.navArgs
 import androidx.preference.PreferenceManager
+import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
 import com.lunabeestudio.robert.extension.observeEventAndConsume
 import com.lunabeestudio.stopcovid.Constants
@@ -37,6 +39,16 @@ class InfoCenterFragment : TimeMainFragment() {
 
     private val tagRecyclerPool = RecyclerView.RecycledViewPool()
 
+    val args: InfoCenterFragmentArgs by navArgs()
+
+    private val smoothScroller: RecyclerView.SmoothScroller by lazy {
+        object : LinearSmoothScroller(context) {
+            override fun getVerticalSnapPreference(): Int {
+                return SNAP_TO_START
+            }
+        }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -58,6 +70,15 @@ class InfoCenterFragment : TimeMainFragment() {
                     refreshScreen()
                 }
             }
+        }
+
+        // Scroll to the right info skipping the first space item and the space between items
+        args.infoIdentifier.takeIf { it != -1L }?.let { identifier ->
+            binding?.recyclerView?.postDelayed({
+                val infoIndex = fastAdapter.getPosition(identifier)
+                smoothScroller.targetPosition = infoIndex
+                binding?.recyclerView?.layoutManager?.startSmoothScroll(smoothScroller)
+            }, 200)
         }
     }
 
