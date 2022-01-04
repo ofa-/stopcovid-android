@@ -41,7 +41,6 @@ import com.lunabeestudio.stopcovid.extension.labelShortStringKey
 import com.lunabeestudio.stopcovid.extension.safeParseColor
 import com.lunabeestudio.stopcovid.extension.setupStyleWidget
 import com.lunabeestudio.stopcovid.extension.stringsManager
-import com.lunabeestudio.stopcovid.fastitem.NumbersCardItem
 import com.lunabeestudio.stopcovid.model.ChartData
 import com.lunabeestudio.stopcovid.model.KeyFigure
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -104,7 +103,7 @@ class KeyFiguresWidget : AppWidgetProvider() {
         numberFormat: NumberFormat,
     ) {
         context.keyFiguresManager().featuredFigures?.let { keyFigures ->
-            val data = NumbersCardItem.Data(
+            val data = Data(
                 strings["common.country.france"],
                 keyFigures.getOrNull(0)?.let { generateFromKeyFigure(it, context, strings, numberFormat) },
                 keyFigures.getOrNull(1)?.let { generateFromKeyFigure(it, context, strings, numberFormat) },
@@ -130,8 +129,8 @@ class KeyFiguresWidget : AppWidgetProvider() {
         context: Context,
         strings: LocalizedStrings,
         numberFormat: NumberFormat,
-    ): NumbersCardItem.DataFigure {
-        return NumbersCardItem.DataFigure(
+    ): DataFigure {
+        return DataFigure(
             strings[keyFigure.labelShortStringKey],
             keyFigure.valueGlobalToDisplay.formatNumberIfNeeded(numberFormat),
             strings[keyFigure.colorStringKey(context.isNightMode())].safeParseColor()
@@ -280,4 +279,17 @@ class KeyFiguresWidget : AppWidgetProvider() {
             context.sendBroadcast(intent)
         }
     }
+
+    data class DataFigure(
+        var label: String? = null,
+        var value: String? = null,
+        var color: Int? = null
+    )
+
+    data class Data(
+        var localization: String?,
+        var dataFigure1: DataFigure?,
+        var dataFigure2: DataFigure?,
+        var dataFigure3: DataFigure?,
+    )
 }

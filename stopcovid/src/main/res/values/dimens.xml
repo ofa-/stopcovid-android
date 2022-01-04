@@ -22,4 +22,5 @@
     <dimen name="certificate_single_thumbnail_height">250dp</dimen>
     <dimen name="small_qr_code_size">80dp</dimen>
     <dimen name="default_video_view_height">250dp</dimen>
+    <dimen name="home_info_card_width">250dp</dimen>
 </resources>

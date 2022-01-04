@@ -20,8 +20,9 @@ class CompareFigureChartItem : AbstractBindingItem<ItemKeyFigureChartCardBinding
     var shareContentDescription: String? = null
     var onShareCard: ((binding: ItemKeyFigureChartCardBinding) -> Unit)? = null
     var onClickListener: View.OnClickListener? = null
-    var chartData: CombinedData? = null
-    var areMagnitudeTheSame: Boolean? = null
+    var chartData: (() -> ChartCompareFiguresData?)? = null
+    var isChartAnimated: Boolean = true
+
     override fun createBinding(inflater: LayoutInflater, parent: ViewGroup?): ItemKeyFigureChartCardBinding {
 
         return ItemKeyFigureChartCardBinding.inflate(inflater, parent, false).apply {
@@ -39,20 +40,24 @@ class CompareFigureChartItem : AbstractBindingItem<ItemKeyFigureChartCardBinding
             shareButton.contentDescription = shareContentDescription
             shareButton.setOnClickListener { onShareCard?.invoke(binding) }
 
+            val datas = chartData?.invoke()
+
             keyFigureCombinedChart.apply {
-                data = chartData
-                areMagnitudeTheSame?.let { setupStyle(!it) }
-                animateX(Constants.Chart.X_ANIMATION_DURATION_MILLIS)
+                data = datas?.combinedData
+                datas?.areMagnitudeTheSame?.let { setupStyle(!it) }
+                if (isChartAnimated) {
+                    animateX(Constants.Chart.X_ANIMATION_DURATION_MILLIS)
+                }
             }
 
             // Set legend
-            chartSerie1LegendTextView.text = chartData?.dataSets?.get(0)?.label
-            chartSerie2LegendTextView.text = chartData?.dataSets?.get(1)?.label
-            chartData?.dataSets?.get(0)?.color?.let {
+            chartSerie1LegendTextView.text = datas?.combinedData?.dataSets?.get(0)?.label
+            chartSerie2LegendTextView.text = datas?.combinedData?.dataSets?.get(1)?.label
+            datas?.combinedData?.dataSets?.get(0)?.color?.let {
                 chartSerie1LegendTextView.setTextColor(it)
                 TextViewCompat.setCompoundDrawableTintList(chartSerie1LegendTextView, ColorStateList.valueOf(it))
             }
-            chartData?.dataSets?.get(1)?.color?.let {
+            datas?.combinedData?.dataSets?.get(1)?.color?.let {
                 chartSerie2LegendTextView.setTextColor(it)
                 TextViewCompat.setCompoundDrawableTintList(chartSerie2LegendTextView, ColorStateList.valueOf(it))
             }
@@ -77,6 +82,11 @@ class CompareFigureChartItem : AbstractBindingItem<ItemKeyFigureChartCardBinding
         binding.keyFigureCombinedChart.xAxis.resetAxisMinimum()
         binding.keyFigureCombinedChart.xAxis.resetAxisMaximum()
     }
+
+    data class ChartCompareFiguresData(
+        val combinedData: CombinedData?,
+        val areMagnitudeTheSame: Boolean
+    )
 }
 
 fun compareFigureCardChartItem(block: (CompareFigureChartItem.() -> Unit)): CompareFigureChartItem = CompareFigureChartItem().apply(

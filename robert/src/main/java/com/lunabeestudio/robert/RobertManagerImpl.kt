@@ -627,9 +627,11 @@ class RobertManagerImpl(
         val newStatusList = listOfNotNull(currentRobertRiskStatus(), currentCleaRiskStatus())
         val newAtRiskStatus: AtRiskStatus = newStatusList.maxByOrNull { it.riskLevel }!!
 
-        newAtRiskStatus.ntpLastContactS = newAtRiskStatus.ntpLastContactS?.let { ntpLastContactS ->
-            (ntpLastContactS + Random.nextLong(-RobertConstant.LAST_CONTACT_DELTA_S, RobertConstant.LAST_CONTACT_DELTA_S))
-                .coerceAtMost(System.currentTimeMillis().unixTimeMsToNtpTimeS() - RobertConstant.LAST_CONTACT_DELTA_S)
+        if (newAtRiskStatus == currentCleaRiskStatus() && newAtRiskStatus != prevAtRiskStatus) {
+            newAtRiskStatus.ntpLastContactS = newAtRiskStatus.ntpLastContactS?.let { ntpLastContactS ->
+                (ntpLastContactS + Random.nextLong(-RobertConstant.LAST_CONTACT_DELTA_S, RobertConstant.LAST_CONTACT_DELTA_S))
+                    .coerceAtMost(System.currentTimeMillis().unixTimeMsToNtpTimeS() - RobertConstant.LAST_CONTACT_DELTA_S)
+            }
         }
 
         // Edge case: robert status might failed because user has been unregistered after 18 days of failing status
@@ -638,7 +640,7 @@ class RobertManagerImpl(
         val isCleaStatusOk = wStatusResult is RobertResultData.Success
         val isRiskRaised = newAtRiskStatus.riskLevel > prevAtRiskStatus?.riskLevel ?: 0f
 
-        return if (isRobertStatusOk && isCleaStatusOk || isRiskRaised) {
+        return if ((isRobertStatusOk && isCleaStatusOk) || isRiskRaised) {
             keystoreRepository.atRiskLastRefresh = System.currentTimeMillis()
             keystoreRepository.atRiskStatus = newAtRiskStatus
             if (!isImmune) {

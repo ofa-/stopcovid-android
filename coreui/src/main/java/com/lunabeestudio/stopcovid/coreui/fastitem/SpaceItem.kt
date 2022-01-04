@@ -22,6 +22,7 @@ class SpaceItem : BaseItem<SpaceItem.ViewHolder>(
 ) {
     @DimenRes
     var spaceRes: Int = DEFAULT_HEIGHT
+    var orientation: Orientation = Orientation.VERTICAL
 
     override fun bindView(holder: ViewHolder, payloads: List<Any>) {
         super.bindView(holder, payloads)
@@ -29,10 +30,15 @@ class SpaceItem : BaseItem<SpaceItem.ViewHolder>(
             if (spaceRes == DEFAULT_HEIGHT) {
                 updateLayoutParams {
                     height = 0
+                    width = 0
                 }
             } else {
                 updateLayoutParams {
-                    height = context.resources.getDimensionPixelSize(spaceRes)
+                    if (orientation == Orientation.VERTICAL) {
+                        height = context.resources.getDimensionPixelSize(spaceRes)
+                    } else {
+                        width = context.resources.getDimensionPixelSize(spaceRes)
+                    }
                 }
             }
         }
@@ -44,6 +50,10 @@ class SpaceItem : BaseItem<SpaceItem.ViewHolder>(
 
     companion object {
         const val DEFAULT_HEIGHT: Int = -1
+    }
+
+    enum class Orientation {
+        VERTICAL, HORIZONTAL
     }
 }
 

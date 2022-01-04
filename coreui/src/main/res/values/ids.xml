@@ -19,4 +19,5 @@
     <item name="item_card_with_actions" type="id" />
     <!--Attempt to fix crash with notification on App upgrade-->
     <item name="ic_notification_bar" type="drawable" />
+    <item name="item_horizontal_recyclerview" type="id" />
 </resources>

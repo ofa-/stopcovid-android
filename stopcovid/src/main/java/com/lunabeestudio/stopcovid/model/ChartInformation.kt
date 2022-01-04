@@ -120,15 +120,15 @@ class ChartInformation(
                 strings["${figure.labelKey}.label"],
                 chartData[0].entries.lastOrNull()?.x?.toLong()?.seconds?.getRelativeDateShortString(context)
                     ?: "",
-                chartData[0].currentValueToDisplay?.formatNumberIfNeeded(numberFormat),
-                chartData[1].currentValueToDisplay?.formatNumberIfNeeded(numberFormat)
+                chartData[0].entries.lastOrNull()?.y?.toString()?.addUnitKeyFigure(figure, strings)?.formatNumberIfNeeded(numberFormat),
+                chartData[1].entries.lastOrNull()?.y?.toString()?.addUnitKeyFigure(figure, strings)?.formatNumberIfNeeded(numberFormat)
             )
             chartData.isNotEmpty() -> strings.stringsFormat(
                 "keyFigureDetailController.section.evolution.subtitle",
                 strings["${figure.labelKey}.label"],
                 chartData[0].entries.lastOrNull()?.x?.toLong()?.seconds?.getRelativeDateShortString(context)
                     ?: "",
-                chartData[0].currentValueToDisplay?.formatNumberIfNeeded(numberFormat)
+                chartData[0].entries.lastOrNull()?.y?.toString()?.addUnitKeyFigure(figure, strings)?.formatNumberIfNeeded(numberFormat)
             )
             else -> null
         }
@@ -202,5 +202,9 @@ class ChartInformation(
                 strings[figure.colorStringKey(context.isNightMode())].safeParseColor()
             )
         }
+    }
+
+    private fun String.addUnitKeyFigure(figure: KeyFigure, strings: LocalizedStrings): String {
+        return "$this${strings["${figure.labelKey}.unit"].takeIf { it == "%" } ?: ""}"
     }
 }

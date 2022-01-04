@@ -2,11 +2,11 @@
     "config":[
         {
             "name":"lastUpdate",
-            "value":"13 Dec 2021"
+            "value":"23 Dec 2021"
         },
         {
             "name":"version",
-            "value":111
+            "value":115
         },
         {
             "name":"versionCalibrationBle",
@@ -149,6 +149,13 @@
             ]
         },
         {
+	      "name":"app.wallet.dccKids",
+	      "value":{
+                "age":11,
+                "s":["🐼","🐰","🐻","🦁","🐱","🐯","🐨"]
+            }
+        },
+        {
             "name":"app.walletPubKeys",
             "value":[
                 {
@@ -198,7 +205,7 @@
                 "vacc22DosesNbDays":153,
                 "vaccJan11DosesNbDays":31,
                 "recNbDays":153,
-                "displayElgDays":60
+                "displayElgDays":26
             }
         },
         {
