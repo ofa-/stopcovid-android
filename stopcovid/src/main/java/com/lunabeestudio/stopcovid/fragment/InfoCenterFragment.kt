@@ -38,6 +38,8 @@ class InfoCenterFragment : TimeMainFragment() {
 
     val args: InfoCenterFragmentArgs by navArgs()
 
+    private var alreadyScrolledToItem: Boolean = false
+
     private val smoothScroller: RecyclerView.SmoothScroller by lazy {
         object : LinearSmoothScroller(context) {
             override fun getVerticalSnapPreference(): Int {
@@ -48,6 +50,8 @@ class InfoCenterFragment : TimeMainFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        alreadyScrolledToItem = savedInstanceState?.getBoolean(SAVE_INSTANCE_ALREADY_SCROLL, false) ?: false
 
         infoCenterManager.infos.observeEventAndConsume(viewLifecycleOwner) {
             refreshScreen()
@@ -67,15 +71,6 @@ class InfoCenterFragment : TimeMainFragment() {
                     refreshScreen()
                 }
             }
-        }
-
-        // Scroll to the right info skipping the first space item and the space between items
-        args.infoIdentifier.takeIf { it != -1L }?.let { identifier ->
-            binding?.recyclerView?.postDelayed({
-                val infoIndex = fastAdapter.getPosition(identifier)
-                smoothScroller.targetPosition = infoIndex
-                binding?.recyclerView?.layoutManager?.startSmoothScroll(smoothScroller)
-            }, 200)
         }
     }
 
@@ -138,7 +133,22 @@ class InfoCenterFragment : TimeMainFragment() {
             }
         }
 
+        scrollToFirstIfNeeded()
+
         return items
+    }
+
+    private fun scrollToFirstIfNeeded() {
+        args.infoIdentifier.takeIf { it != -1L && !alreadyScrolledToItem }?.let { identifier ->
+            binding?.recyclerView?.postDelayed({
+                val infoIndex = fastAdapter.getPosition(identifier)
+                if (infoIndex != RecyclerView.NO_POSITION) {
+                    smoothScroller.targetPosition = infoIndex
+                    binding?.recyclerView?.layoutManager?.startSmoothScroll(smoothScroller)
+                }
+                alreadyScrolledToItem = true
+            }, 200)
+        }
     }
 
     override fun refreshScreen() {
@@ -151,5 +161,14 @@ class InfoCenterFragment : TimeMainFragment() {
 
     override fun timeRefresh() {
         refreshScreen()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putBoolean(SAVE_INSTANCE_ALREADY_SCROLL, alreadyScrolledToItem)
+        super.onSaveInstanceState(outState)
+    }
+
+    companion object {
+        private const val SAVE_INSTANCE_ALREADY_SCROLL: String = "Save.Instance.Already.Scroll"
     }
 }
