@@ -48,7 +48,7 @@ class TacMarkerView(context: Context, chart: Chart<*>) : ConstraintLayout(contex
     }
 
     override fun refreshContent(e: Entry, highlight: Highlight?) {
-        val yLabel = e.y.formatCompact()
+        val yLabel = e.y.formatCompact(context)
         val xLabel = e.x.toLong().seconds.getRelativeDateShortString(context)
         binding.markerTextView.text = listOf(yLabel, xLabel).joinToString("\n")
 

@@ -10,10 +10,12 @@
 
 package com.lunabeestudio.stopcovid.repository
 
+import android.content.Context
 import com.lunabeestudio.domain.model.Attestation
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.robert.datasource.LocalKeystoreDataSource
 import com.lunabeestudio.stopcovid.Constants
+import com.lunabeestudio.stopcovid.coreui.extension.getApplicationLocale
 import com.lunabeestudio.stopcovid.coreui.manager.LocalizedStrings
 import com.lunabeestudio.stopcovid.extension.attestationLongLabelFromKey
 import com.lunabeestudio.stopcovid.extension.attestationShortLabelFromKey
@@ -27,9 +29,10 @@ import java.util.UUID
 
 class AttestationRepository(
     private val localKeystoreDataSource: LocalKeystoreDataSource,
+    context: Context,
 ) {
-    private val dateFormat: DateFormat = SimpleDateFormat.getDateInstance(DateFormat.SHORT)
-    private val timeFormat: DateFormat = SimpleDateFormat.getTimeInstance(DateFormat.SHORT)
+    private val dateFormat: DateFormat = SimpleDateFormat.getDateInstance(DateFormat.SHORT, context.getApplicationLocale())
+    private val timeFormat: DateFormat = SimpleDateFormat.getTimeInstance(DateFormat.SHORT, context.getApplicationLocale())
 
     val attestationsFlow: Flow<List<Attestation>>
         get() = localKeystoreDataSource.attestationsFlow

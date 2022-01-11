@@ -27,6 +27,7 @@ import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.manager.ChartManager
 import com.lunabeestudio.stopcovid.manager.KeyFiguresManager
 import com.lunabeestudio.stopcovid.model.KeyFigure
+import com.lunabeestudio.stopcovid.utils.lazyFast
 import kotlin.math.max
 
 class CompareKeyFiguresFragment : BaseFragment() {
@@ -37,7 +38,7 @@ class CompareKeyFiguresFragment : BaseFragment() {
         PreferenceManager.getDefaultSharedPreferences(context)
     }
 
-    val keyFiguresManager: KeyFiguresManager by lazy(LazyThreadSafetyMode.NONE) {
+    val keyFiguresManager: KeyFiguresManager by lazyFast {
         injectionContainer.keyFiguresManager
     }
 

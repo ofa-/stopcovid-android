@@ -90,7 +90,7 @@ class InjectionContainer(private val context: StopCovid, val coroutineScope: Cor
     val secureKeystoreDataSource: SecureKeystoreDataSource by lazy { SecureKeystoreDataSource(context, cryptoManager, ConcurrentHashMap()) }
     val logsDir: File by lazy { File(context.filesDir, Constants.Logs.DIR_NAME) }
     val debugManager: DebugManager by lazy { DebugManager(context, secureKeystoreDataSource, logsDir, cryptoManager) }
-    val attestationRepository: AttestationRepository by lazy { AttestationRepository(secureKeystoreDataSource) }
+    val attestationRepository: AttestationRepository by lazy { AttestationRepository(secureKeystoreDataSource, context) }
     val venueRepository: VenueRepository by lazy { VenueRepository(secureKeystoreDataSource, sharedPrefs) }
     val walletRepository: WalletRepository by lazy {
         WalletRepository(

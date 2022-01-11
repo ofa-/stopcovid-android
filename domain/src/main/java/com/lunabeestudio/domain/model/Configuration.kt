@@ -89,9 +89,11 @@ class Configuration(
     var colorsCompareKeyFigures: ColorsCompareKeyFigures?,
     var keyFiguresCombination: List<KeyFigureCombination>?,
     var noWaitDosesPivotDate: String?,
+    var dccKidsEmoji: DccKidsEmoji?,
 ) {
     class Notification(val title: String, val subtitle: String, val url: String, val version: Int)
     class ColorsCompareKeyFigures(val colorKeyFigure1: ColorCompareKeyFigures, val colorKeyFigure2: ColorCompareKeyFigures)
     class ColorCompareKeyFigures(val darkColor: String?, val lightColor: String?)
     class KeyFigureCombination(val title: String?, val keyFigureLabel1: String?, val keyFigureLabel2: String?)
+    class DccKidsEmoji(val age: Int, val emojis: List<String>)
 }

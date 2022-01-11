@@ -22,6 +22,7 @@ import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
+import com.lunabeestudio.stopcovid.coreui.extension.getApplicationLocale
 import com.lunabeestudio.stopcovid.coreui.extension.viewLifecycleOwnerOrNull
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.cardWithActionItem
@@ -43,6 +44,8 @@ import com.lunabeestudio.stopcovid.fastitem.linkItem
 import com.mikepenz.fastadapter.GenericItem
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.text.DateFormat
+import java.text.SimpleDateFormat
 import kotlin.math.max
 
 class VaccinationFragment : MainFragment() {
@@ -190,8 +193,9 @@ class VaccinationFragment : MainFragment() {
                 identifier = items.count().toLong()
             }
         } else {
+            val dateFormat = SimpleDateFormat.getDateInstance(DateFormat.SHORT, getApplicationLocale())
             vaccinationCenters.forEach { vaccinationCenter ->
-                items += vaccinationCenter.toItem(strings) {
+                items += vaccinationCenter.toItem(strings, dateFormat) {
                     findNavControllerOrNull()
                         ?.safeNavigate(
                             VaccinationFragmentDirections.actionVaccinationFragmentToVaccinationActionsBottomSheetFragment(

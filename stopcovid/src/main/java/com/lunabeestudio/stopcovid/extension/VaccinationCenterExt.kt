@@ -16,7 +16,6 @@ import com.lunabeestudio.stopcovid.fastitem.vaccinationCenterCardItem
 import com.lunabeestudio.stopcovid.model.VaccinationCenter
 import com.mikepenz.fastadapter.GenericItem
 import java.text.DateFormat
-import java.text.SimpleDateFormat
 import java.util.Date
 
 val VaccinationCenter.location: Location?
@@ -43,9 +42,7 @@ private fun VaccinationCenter.availabilityTimestamp(): Long? {
     }
 }
 
-private val dateFormat: DateFormat = SimpleDateFormat.getDateInstance(DateFormat.SHORT)
-
-fun VaccinationCenter.toItem(strings: Map<String, String>, onClickListener: View.OnClickListener?): GenericItem {
+fun VaccinationCenter.toItem(strings: Map<String, String>, dateFormat: DateFormat, onClickListener: View.OnClickListener?): GenericItem {
     return vaccinationCenterCardItem {
         title = name
         modality = modalities

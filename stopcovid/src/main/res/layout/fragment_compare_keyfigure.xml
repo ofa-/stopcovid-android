@@ -1,75 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/contentLayout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fillViewport="true">
+    android:layout_height="match_parent">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/contentLayout"
+    <ScrollView
+        android:id="@+id/chartScrollView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintBottom_toTopOf="@id/bottomSheetCard"
+        app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
-            android:id="@+id/infoTextView"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/spacing_large"
-            android:layout_marginVertical="@dimen/spacing_small"
-            android:textAppearance="@style/TextAppearance.StopCovid.Caption"
-            android:textIsSelectable="false"
-            app:layout_constraintBottom_toTopOf="@id/detailsTabLayout"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="@tools:sample/lorem[5]" />
-
-        <com.google.android.material.tabs.TabLayout
-            android:id="@+id/detailsTabLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            app:layout_constraintBottom_toTopOf="@id/detailsViewPager"
-            app:layout_constraintTop_toBottomOf="@id/infoTextView"
-            tools:visibility="visible" />
-
-        <androidx.viewpager2.widget.ViewPager2
-            android:id="@+id/detailsViewPager"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
             android:layout_marginBottom="@dimen/spacing_large"
-            app:layout_constraintBottom_toTopOf="@id/bottomSheetCard"
-            app:layout_constraintTop_toBottomOf="@id/detailsTabLayout" />
+            android:orientation="vertical">
 
-        <Space
-            android:id="@+id/bottomSheetTopSpace"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/bottom_sheet_top_space_shadow_height"
-            app:layout_constraintTop_toTopOf="@id/bottomSheetCard" />
-
-        <include
-            layout="@layout/top_shadow"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/bottom_sheet_top_shadow_height"
-            app:layout_constraintBottom_toBottomOf="@id/bottomSheetTopSpace" />
-
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/bottomSheetCard"
-            style="@style/Widget.MaterialComponents.CardView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:cardElevation="@dimen/bottom_sheet_card_elevation"
-            app:layout_constraintBottom_toBottomOf="parent">
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/chooseKeyFiguresButton"
-                style="@style/Widget.StopCovid.Button"
+            <TextView
+                android:id="@+id/infoTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/spacing_xlarge"
-                android:layout_marginVertical="@dimen/spacing_large"
-                android:textAllCaps="false"
-                tools:text="@tools:sample/lorem[2]" />
-        </com.google.android.material.card.MaterialCardView>
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</ScrollView>
+                android:layout_marginHorizontal="@dimen/spacing_large"
+                android:layout_marginVertical="@dimen/spacing_small"
+                android:textAppearance="@style/TextAppearance.StopCovid.Caption"
+                android:textIsSelectable="false"
+                tools:text="@tools:sample/lorem[5]" />
+
+            <com.google.android.material.tabs.TabLayout
+                android:id="@+id/detailsTabLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
+            <androidx.viewpager2.widget.ViewPager2
+                android:id="@+id/detailsViewPager"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+    </ScrollView>
+
+    <Space
+        android:id="@+id/bottomSheetTopSpace"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/bottom_sheet_top_space_shadow_height"
+        app:layout_constraintTop_toTopOf="@id/bottomSheetCard" />
+
+    <include
+        layout="@layout/top_shadow"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/bottom_sheet_top_shadow_height"
+        app:layout_constraintBottom_toBottomOf="@id/bottomSheetTopSpace" />
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/bottomSheetCard"
+        style="@style/Widget.MaterialComponents.CardView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardElevation="@dimen/bottom_sheet_card_elevation"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/chooseKeyFiguresButton"
+            style="@style/Widget.StopCovid.Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/spacing_xlarge"
+            android:layout_marginVertical="@dimen/spacing_large"
+            android:textAllCaps="false"
+            tools:text="@tools:sample/lorem[2]" />
+    </com.google.android.material.card.MaterialCardView>
+</androidx.constraintlayout.widget.ConstraintLayout>

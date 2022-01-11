@@ -25,7 +25,7 @@ class IsolationReminderNotificationWorker(context: Context, workerParams: Worker
     override val pendingIntent: PendingIntent = NavDeepLinkBuilder(applicationContext)
         .setComponentName(MainActivity::class.java)
         .setGraph(R.navigation.nav_main)
-        .setDestination(R.id.proximityFragment)
+        .setDestination(R.id.homeFragment)
         .createPendingIntent()
     override val notificationTitleKey: String = "notification.stillHavingFever.title"
     override val notificationBodyKey: String = "notification.stillHavingFever.message"

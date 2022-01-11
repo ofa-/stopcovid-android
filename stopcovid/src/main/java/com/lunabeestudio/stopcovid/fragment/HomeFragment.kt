@@ -64,6 +64,7 @@ import com.lunabeestudio.stopcovid.coreui.ConfigConstant
 import com.lunabeestudio.stopcovid.coreui.extension.addRipple
 import com.lunabeestudio.stopcovid.coreui.extension.appCompatActivity
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
+import com.lunabeestudio.stopcovid.coreui.extension.getApplicationLocale
 import com.lunabeestudio.stopcovid.coreui.extension.isNightMode
 import com.lunabeestudio.stopcovid.coreui.extension.openAppSettings
 import com.lunabeestudio.stopcovid.coreui.extension.refreshLift
@@ -138,25 +139,25 @@ import com.lunabeestudio.stopcovid.model.KeyFiguresNotAvailableException
 import com.lunabeestudio.stopcovid.model.NoEphemeralBluetoothIdentifierFound
 import com.lunabeestudio.stopcovid.service.ProximityService
 import com.lunabeestudio.stopcovid.utils.ExtendedFloatingActionButtonScrollListener
-import com.lunabeestudio.stopcovid.viewmodel.ProximityViewModel
-import com.lunabeestudio.stopcovid.viewmodel.ProximityViewModelFactory
+import com.lunabeestudio.stopcovid.utils.lazyFast
+import com.lunabeestudio.stopcovid.viewmodel.HomeViewModel
+import com.lunabeestudio.stopcovid.viewmodel.HomeViewModelFactory
 import com.mikepenz.fastadapter.GenericItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.NumberFormat
-import java.util.Locale
 import java.util.concurrent.TimeUnit
 import kotlin.time.Duration.Companion.seconds
 
-class ProximityFragment : TimeMainFragment() {
+class HomeFragment : TimeMainFragment() {
 
     override val layout: Int = R.layout.fragment_recycler_view_fab
 
     private var fragmentRecyclerViewFabBinding: FragmentRecyclerViewFabBinding? = null
 
-    private val numberFormat: NumberFormat = NumberFormat.getNumberInstance(Locale.getDefault())
+    private val numberFormat: NumberFormat by lazyFast { NumberFormat.getNumberInstance(context.getApplicationLocale()) }
 
     private val robertManager by lazy {
         requireContext().robertManager()
@@ -166,8 +167,8 @@ class ProximityFragment : TimeMainFragment() {
         requireContext().isolationManager()
     }
 
-    private val viewModel: ProximityViewModel by viewModels {
-        ProximityViewModelFactory(
+    private val viewModel: HomeViewModel by viewModels {
+        HomeViewModelFactory(
             robertManager,
             isolationManager,
             requireContext().secureKeystoreDataSource(),
@@ -183,7 +184,7 @@ class ProximityFragment : TimeMainFragment() {
         PreferenceManager.getDefaultSharedPreferences(requireContext())
     }
 
-    private val barcodeEncoder by lazy(LazyThreadSafetyMode.NONE) { BarcodeEncoder() }
+    private val barcodeEncoder by lazyFast { BarcodeEncoder() }
 
     private var activityResultLauncher: ActivityResultLauncher<Intent>? = null
     private var permissionResultLauncher: ActivityResultLauncher<Array<String>>? = null
@@ -291,7 +292,7 @@ class ProximityFragment : TimeMainFragment() {
                     lifecycleScope.launch {
                         findNavControllerOrNull()
                             ?.safeNavigate(
-                                ProximityFragmentDirections.actionProximityFragmentToNavWallet(
+                                HomeFragmentDirections.actionHomeFragmentToNavWallet(
                                     code = data,
                                     deeplinkOrigin = DeeplinkOrigin.UNIVERSAL,
                                 )
@@ -309,8 +310,8 @@ class ProximityFragment : TimeMainFragment() {
         permissionResultLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { isGranted ->
             if (isGranted.all { it.value }) {
                 activateProximity()
-            } else if (ProximityManager.getManifestProximityPermissions()
-                .any { permission -> !shouldShowRequestPermissionRationale(permission) }
+            } else if (
+                ProximityManager.getManifestProximityPermissions().any { permission -> !shouldShowRequestPermissionRationale(permission) }
             ) {
                 context?.showPermissionSettingsDialog(
                     strings = strings,
@@ -359,7 +360,7 @@ class ProximityFragment : TimeMainFragment() {
             if (isLowStorage && !sharedPrefs.lowStorageAlertShown) {
                 sharedPrefs.lowStorageAlertShown = true
                 findNavControllerOrNull()
-                    ?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToLowStorageBottomSheetFragment())
+                    ?.safeNavigate(HomeFragmentDirections.actionHomeFragmentToLowStorageBottomSheetFragment())
             } else if (!isLowStorage) {
                 sharedPrefs.lowStorageAlertShown = false
             }
@@ -377,7 +378,7 @@ class ProximityFragment : TimeMainFragment() {
                 } else {
                     analyticsManager.reportAppEvent(AppEventName.e18, null)
                 }
-                findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToUniversalQrScanFragment())
+                findNavControllerOrNull()?.safeNavigate(HomeFragmentDirections.actionHomeFragmentToUniversalQrScanFragment())
             }
             binding?.recyclerView?.addOnScrollListener(ExtendedFloatingActionButtonScrollListener(fab))
         }
@@ -504,7 +505,7 @@ class ProximityFragment : TimeMainFragment() {
                     .setPositiveButton(strings["robertStatus.error.alert.action"]) { _, _ ->
                         findNavControllerOrNull()
                             ?.safeNavigate(
-                                ProximityFragmentDirections.actionProximityFragmentToCaptchaFragment(
+                                HomeFragmentDirections.actionHomeFragmentToCaptchaFragment(
                                     CaptchaNextFragment.Back,
                                     null,
                                 )
@@ -758,7 +759,7 @@ class ProximityFragment : TimeMainFragment() {
             items += cardWithActionItem {
                 onCardClick = {
                     findNavControllerOrNull()?.safeNavigate(
-                        ProximityFragmentDirections.actionProximityFragmentToUrgentInfoFragment()
+                        HomeFragmentDirections.actionHomeFragmentToUrgentInfoFragment()
                     )
                 }
                 mainImage = R.drawable.ic_dgsurgent
@@ -788,7 +789,7 @@ class ProximityFragment : TimeMainFragment() {
                     mainTitle = strings["home.healthSection.isSick.standaloneTitle"]
                     onCardClick = {
                         analyticsManager.reportAppEvent(AppEventName.e5, null)
-                        findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToIsSickFragment())
+                        findNavControllerOrNull()?.safeNavigate(HomeFragmentDirections.actionHomeFragmentToIsSickFragment())
                     }
                     identifier = R.drawable.health_card.toLong()
                 }
@@ -804,7 +805,7 @@ class ProximityFragment : TimeMainFragment() {
                         gradientBackground = it.getGradientBackground()
                         onCardClick = {
                             analyticsManager.reportAppEvent(AppEventName.e5, null)
-                            findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToHealthFragment())
+                            findNavControllerOrNull()?.safeNavigate(HomeFragmentDirections.actionHomeFragmentToHealthFragment())
                         }
                         identifier = R.drawable.health_card.toLong()
 
@@ -851,7 +852,7 @@ class ProximityFragment : TimeMainFragment() {
 
     private fun startRecordVenue() {
         analyticsManager.reportAppEvent(AppEventName.e12, null)
-        findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToVenueQrCodeFragment())
+        findNavControllerOrNull()?.safeNavigate(HomeFragmentDirections.actionHomeFragmentToVenueQrCodeFragment())
     }
 
     private fun addFiguresItems(items: ArrayList<GenericItem>) {
@@ -864,7 +865,7 @@ class ProximityFragment : TimeMainFragment() {
                 linkText = strings["home.figuresSection.all"]
                 onClickLink = View.OnClickListener {
                     analyticsManager.reportAppEvent(AppEventName.e8, null)
-                    findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToKeyFiguresFragment())
+                    findNavControllerOrNull()?.safeNavigate(HomeFragmentDirections.actionHomeFragmentToKeyFiguresFragment())
                 }
                 identifier = "home.infoSection.keyFigures".hashCode().toLong()
             }
@@ -891,7 +892,7 @@ class ProximityFragment : TimeMainFragment() {
                     onClick = View.OnClickListener { _ ->
                         analyticsManager.reportAppEvent(AppEventName.e8, null)
                         findNavControllerOrNull()?.safeNavigate(
-                            ProximityFragmentDirections.actionProximityFragmentToKeyFigureDetailsFragment(
+                            HomeFragmentDirections.actionHomeFragmentToKeyFigureDetailsFragment(
                                 it.labelKey
                             )
                         )
@@ -979,7 +980,7 @@ class ProximityFragment : TimeMainFragment() {
                     iconRes = R.drawable.ic_map
                     onClickListener = View.OnClickListener {
                         findNavControllerOrNull()
-                            ?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToPostalCodeBottomSheetFragment())
+                            ?.safeNavigate(HomeFragmentDirections.actionHomeFragmentToPostalCodeBottomSheetFragment())
                     }
                     identifier = "common.updatePostalCode".hashCode().toLong()
                 }
@@ -996,15 +997,11 @@ class ProximityFragment : TimeMainFragment() {
             shareContentDescription = strings["accessibility.hint.keyFigure.chart.share"]
             chartExplanationLabel = strings["home.figuresSection.keyFigures.chart.footer"]
             onClickListener = View.OnClickListener {
-                findNavControllerOrNull()?.safeNavigate(
-                    ProximityFragmentDirections.actionProximityFragmentToChooseKeyFiguresCompareFragment(
-                        true
-                    )
-                )
+                findNavControllerOrNull()?.safeNavigate(HomeFragmentDirections.actionHomeFragmentToCompareKeyFiguresFragment())
             }
             onShareCard = { binding ->
                 ShareManager.shareChart(
-                    this@ProximityFragment,
+                    this@HomeFragment,
                     binding
                 )
             }
@@ -1053,7 +1050,7 @@ class ProximityFragment : TimeMainFragment() {
                 linkText = strings["home.infoSection.all"]
                 onClickLink = View.OnClickListener {
                     analyticsManager.reportAppEvent(AppEventName.e10, null)
-                    findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToInfoCenterFragment())
+                    findNavControllerOrNull()?.safeNavigate(HomeFragmentDirections.actionHomeFragmentToInfoCenterFragment())
                 }
                 identifier = "home.infoSection.news".hashCode().toLong()
             }
@@ -1066,13 +1063,13 @@ class ProximityFragment : TimeMainFragment() {
                 infoCenterInfos.forEach { info ->
                     arrayListItems += homeScreeInfoCardItem {
                         titleText = infoCenterStrings[info.titleKey]
-                        captionText = info.timestamp.seconds.getRelativeDateTimeString(requireContext(), strings["common.justNow"])
+                        captionText = info.timestamp.seconds.getRelativeDateTimeString(requireContext(), strings)
                         subtitleText = infoCenterStrings[info.descriptionKey]
                         identifier = info.titleKey.hashCode().toLong()
                         onClick = View.OnClickListener {
                             analyticsManager.reportAppEvent(AppEventName.e10, null)
                             findNavControllerOrNull()?.safeNavigate(
-                                ProximityFragmentDirections.actionProximityFragmentToInfoCenterFragment(
+                                HomeFragmentDirections.actionHomeFragmentToInfoCenterFragment(
                                     info.titleKey.hashCode().toLong()
                                 )
                             )
@@ -1120,7 +1117,7 @@ class ProximityFragment : TimeMainFragment() {
                 }
                 onClick = {
                     findNavControllerOrNull()?.safeNavigate(
-                        ProximityFragmentDirections.actionProximityFragmentToNavWallet(
+                        HomeFragmentDirections.actionHomeFragmentToNavWallet(
                             navCertificateId = favoriteDcc.id
                         )
                     )
@@ -1138,7 +1135,7 @@ class ProximityFragment : TimeMainFragment() {
             mainImage = walletState.icon
             mainLayoutDirection = LayoutDirection.RTL
             onCardClick = {
-                findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToNavWallet())
+                findNavControllerOrNull()?.safeNavigate(HomeFragmentDirections.actionHomeFragmentToNavWallet())
             }
             mainTitle = strings["home.attestationSection.sanitaryCertificates.cell.title"]
             mainBody = strings[walletState.bodyKey]
@@ -1162,7 +1159,7 @@ class ProximityFragment : TimeMainFragment() {
             mainImage = R.drawable.attestation_card
             onCardClick = {
                 analyticsManager.reportAppEvent(AppEventName.e11, null)
-                findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToAttestationsFragment())
+                findNavControllerOrNull()?.safeNavigate(HomeFragmentDirections.actionHomeFragmentToAttestationsFragment())
             }
             mainTitle = strings["home.attestationSection.cell.title"]
             val attestationCount = viewModel.activeAttestationCount.value?.peekContent()
@@ -1196,7 +1193,7 @@ class ProximityFragment : TimeMainFragment() {
             mainImage = R.drawable.declare_card
             contentDescription = strings["home.declareSection.title"]
             onCardClick = {
-                findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToReportFragment())
+                findNavControllerOrNull()?.safeNavigate(HomeFragmentDirections.actionHomeFragmentToReportFragment())
             }
             identifier = mainTitle.hashCode().toLong()
         }
@@ -1218,7 +1215,7 @@ class ProximityFragment : TimeMainFragment() {
             contentDescription = strings["home.vaccinationSection.cellTitle"]
             onCardClick = {
                 analyticsManager.reportAppEvent(AppEventName.e7, null)
-                findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToVaccinationFragment())
+                findNavControllerOrNull()?.safeNavigate(HomeFragmentDirections.actionHomeFragmentToVaccinationFragment())
             }
             identifier = "home.vaccinationSection.cellTitle".hashCode().toLong()
         }
@@ -1239,7 +1236,7 @@ class ProximityFragment : TimeMainFragment() {
         items += cardWithActionItem {
             actions = listOfNotNull(
                 Action(R.drawable.ic_link, strings["home.moreSection.usefulLinks"]) {
-                    findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToLinksFragment())
+                    findNavControllerOrNull()?.safeNavigate(HomeFragmentDirections.actionHomeFragmentToLinksFragment())
                 },
                 Action(R.drawable.ic_share, strings["home.moreSection.appSharing"]) {
                     analyticsManager.reportAppEvent(AppEventName.e4, null)
@@ -1249,16 +1246,16 @@ class ProximityFragment : TimeMainFragment() {
                         .startChooser()
                 },
                 Action(R.drawable.ic_history, strings["home.moreSection.venuesHistory"]) {
-                    findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToVenuesHistoryFragment())
+                    findNavControllerOrNull()?.safeNavigate(HomeFragmentDirections.actionHomeFragmentToVenuesHistoryFragment())
                 }.takeIf {
                     robertManager.configuration.displayRecordVenues
                         || !viewModel.venuesQrCodeLiveData.value.isNullOrEmpty()
                 },
                 Action(R.drawable.ic_settings, strings["common.settings"]) {
-                    findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToSettingsFragment())
+                    findNavControllerOrNull()?.safeNavigate(HomeFragmentDirections.actionHomeFragmentToSettingsFragment())
                 },
                 Action(R.drawable.ic_privacy, strings["home.moreSection.privacy"]) {
-                    findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToPrivacyFragment())
+                    findNavControllerOrNull()?.safeNavigate(HomeFragmentDirections.actionHomeFragmentToPrivacyFragment())
                 },
                 Action(R.drawable.ic_about, strings["home.moreSection.aboutStopCovid"]) {
                     findNavControllerOrNull()?.safeNavigate(
@@ -1299,7 +1296,7 @@ class ProximityFragment : TimeMainFragment() {
                         withContext(Dispatchers.Main) {
                             findNavControllerOrNull()
                                 ?.safeNavigate(
-                                    ProximityFragmentDirections.actionProximityFragmentToCaptchaFragment(
+                                    HomeFragmentDirections.actionHomeFragmentToCaptchaFragment(
                                         CaptchaNextFragment.Back,
                                         null
                                     )
@@ -1320,7 +1317,7 @@ class ProximityFragment : TimeMainFragment() {
         robertManager.deactivateProximity(requireContext().applicationContext as RobertApplication)
         view?.rootView?.announceForAccessibility(strings["notification.proximityServiceNotRunning.title"])
         if (showReminder) {
-            findNavControllerOrNull()?.safeNavigate(ProximityFragmentDirections.actionProximityFragmentToReminderDialogFragment())
+            findNavControllerOrNull()?.safeNavigate(HomeFragmentDirections.actionHomeFragmentToReminderDialogFragment())
         }
     }
 
@@ -1478,7 +1475,7 @@ class ProximityFragment : TimeMainFragment() {
                 activityMainBinding.errorTextView.isClickable = false
                 errorLayout.animate()?.apply {
                     duration = resources.getInteger(android.R.integer.config_mediumAnimTime).toLong()
-                    interpolator = this@ProximityFragment.interpolator
+                    interpolator = this@HomeFragment.interpolator
                     setUpdateListener { valueAnimator ->
                         binding?.root
                             ?.updatePadding(bottom = (errorLayout.height.toFloat() * (1f - valueAnimator.animatedValue as Float)).toInt())
@@ -1508,7 +1505,7 @@ class ProximityFragment : TimeMainFragment() {
                         errorLayout.isVisible = true
                         errorLayout.animate().apply {
                             duration = resources.getInteger(android.R.integer.config_mediumAnimTime).toLong()
-                            interpolator = this@ProximityFragment.interpolator
+                            interpolator = this@HomeFragment.interpolator
                             setUpdateListener { valueAnimator ->
                                 binding?.root
                                     ?.updatePadding(bottom = (errorLayout.height.toFloat() * valueAnimator.animatedValue as Float).toInt())

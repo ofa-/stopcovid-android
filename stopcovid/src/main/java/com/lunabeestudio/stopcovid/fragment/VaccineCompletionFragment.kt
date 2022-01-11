@@ -10,7 +10,6 @@
 
 package com.lunabeestudio.stopcovid.fragment
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.view.HapticFeedbackConstants
@@ -30,6 +29,7 @@ import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.extension.appCompatActivity
 import com.lunabeestudio.stopcovid.coreui.extension.fetchSystemColor
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
+import com.lunabeestudio.stopcovid.coreui.extension.getApplicationLocale
 import com.lunabeestudio.stopcovid.coreui.fastitem.buttonItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.cardWithActionItem
@@ -78,10 +78,8 @@ class VaccineCompletionFragment : MainFragment() {
         )
     }
 
-    private val longDateFormat = SimpleDateFormat.getDateInstance(DateFormat.LONG)
-
-    @SuppressLint("SimpleDateFormat")
-    private val noYearDateFormat = SimpleDateFormat("d MMMM")
+    private val longDateFormat = SimpleDateFormat.getDateInstance(DateFormat.LONG, getApplicationLocale())
+    private val noYearDateFormat = SimpleDateFormat("d MMMM", getApplicationLocale())
 
     private var reminderSet: Boolean = false
     private var konfettiEmitted = false

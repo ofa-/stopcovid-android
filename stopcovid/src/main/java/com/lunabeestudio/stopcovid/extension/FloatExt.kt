@@ -1,31 +1,32 @@
 package com.lunabeestudio.stopcovid.extension
 
+import android.content.Context
 import android.icu.text.CompactDecimalFormat
 import com.lunabeestudio.stopcovid.Constants
+import com.lunabeestudio.stopcovid.coreui.extension.getApplicationLocale
 import java.text.DecimalFormat
-import java.util.Locale
 import kotlin.math.ln
 import kotlin.math.log10
 import kotlin.math.pow
 
-fun Float.formatCompact(): String {
+fun Float.formatCompact(context: Context): String {
     return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
         // Hack because the CompactDecimalFormat throws exception with negative values
         if (this <= 0) {
             "0"
         } else {
-            CompactDecimalFormat.getInstance(Locale.getDefault(), CompactDecimalFormat.CompactStyle.SHORT).apply {
+            CompactDecimalFormat.getInstance(context.getApplicationLocale(), CompactDecimalFormat.CompactStyle.SHORT).apply {
                 maximumSignificantDigits = Constants.Chart.SIGNIFICANT_DIGIT_MAX
             }.format(this.toDouble())
         }
     } else {
-        this.formatCompactLowApi()
+        this.formatCompactLowApi(context)
     }
 }
 
-fun Float.formatCompactLowApi(): String {
+fun Float.formatCompactLowApi(context: Context): String {
     val suffixChars = "kMGTPE"
-    val formatter = DecimalFormat.getInstance(Locale.getDefault())
+    val formatter = DecimalFormat.getInstance(context.getApplicationLocale())
 
     return when {
         this < 1 -> {

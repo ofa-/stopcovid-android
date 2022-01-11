@@ -16,12 +16,14 @@ import android.view.View
 import androidx.navigation.fragment.navArgs
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
+import com.lunabeestudio.stopcovid.coreui.extension.getApplicationLocale
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.dividerItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.titleItem
 import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.fastitem.doubleTextItem
+import com.lunabeestudio.stopcovid.utils.lazyFast
 import com.mikepenz.fastadapter.GenericItem
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -33,7 +35,7 @@ class PositiveTestFragment : MainFragment() {
 
     override fun getTitleKey(): String = "positiveTestController.title"
 
-    private val dateFormat: DateFormat = SimpleDateFormat.getDateInstance(DateFormat.FULL)
+    private val dateFormat: DateFormat by lazyFast { SimpleDateFormat.getDateInstance(DateFormat.FULL, getApplicationLocale()) }
 
     @SuppressLint("UseValueOf")
     override suspend fun getItems(): List<GenericItem> {

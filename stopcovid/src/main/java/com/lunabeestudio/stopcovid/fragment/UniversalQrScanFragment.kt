@@ -48,7 +48,7 @@ class UniversalQrScanFragment : QRCodeDccFragment() {
             SCANNED_CODE_RESULT_KEY,
             bundleOf(SCANNED_CODE_BUNDLE_KEY to code)
         )
-        findNavControllerOrNull()?.popBackStack(R.id.proximityFragment, false)
+        findNavControllerOrNull()?.popBackStack(R.id.homeFragment, false)
     }
 
     override fun onFooterClick() {

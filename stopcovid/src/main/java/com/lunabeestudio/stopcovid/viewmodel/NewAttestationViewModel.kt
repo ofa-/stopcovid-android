@@ -18,6 +18,7 @@ import com.lunabeestudio.domain.model.FormEntry
 import com.lunabeestudio.framework.local.datasource.SecureKeystoreDataSource
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.stopcovid.Constants
+import com.lunabeestudio.stopcovid.coreui.extension.getApplicationLocale
 import com.lunabeestudio.stopcovid.coreui.manager.LocalizedStrings
 import com.lunabeestudio.stopcovid.coreui.utils.SingleLiveEvent
 import com.lunabeestudio.stopcovid.manager.FormManager
@@ -35,15 +36,16 @@ import java.util.TimeZone
 class NewAttestationViewModel(
     private val secureKeystoreDataSource: SecureKeystoreDataSource,
     private val attestationRepository: AttestationRepository,
-    private val formManager: FormManager
+    private val formManager: FormManager,
+    context: Context,
 ) : ViewModel() {
 
     val attestationGeneratedSuccess: SingleLiveEvent<Unit> = SingleLiveEvent()
     val covidException: SingleLiveEvent<CovidException> = SingleLiveEvent()
     var shouldSaveInfos: Boolean = secureKeystoreDataSource.saveAttestationData ?: false
     val infos: MutableMap<String, FormEntry> = (secureKeystoreDataSource.savedAttestationData ?: mapOf()).toMutableMap()
-    private val dateFormat: DateFormat = SimpleDateFormat.getDateInstance(DateFormat.SHORT)
-    private val timeFormat: DateFormat = SimpleDateFormat.getTimeInstance(DateFormat.SHORT)
+    private val dateFormat: DateFormat = SimpleDateFormat.getDateInstance(DateFormat.SHORT, context.getApplicationLocale())
+    private val timeFormat: DateFormat = SimpleDateFormat.getTimeInstance(DateFormat.SHORT, context.getApplicationLocale())
 
     fun getInfoForFormField(formField: FormField): FormEntry? {
         return infos[formField.dataKeyValue]?.takeIf { it.key == formField.key }
@@ -109,10 +111,11 @@ class NewAttestationViewModelFactory(
     private val secureKeystoreDataSource: SecureKeystoreDataSource,
     private val attestationRepository: AttestationRepository,
     private val formManager: FormManager,
+    private val context: Context,
 ) :
     ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         @Suppress("UNCHECKED_CAST")
-        return NewAttestationViewModel(secureKeystoreDataSource, attestationRepository, formManager) as T
+        return NewAttestationViewModel(secureKeystoreDataSource, attestationRepository, formManager, context) as T
     }
 }

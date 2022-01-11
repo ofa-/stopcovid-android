@@ -19,11 +19,12 @@ import com.lunabeestudio.stopcovid.extension.fillItems
 import com.lunabeestudio.stopcovid.extension.injectionContainer
 import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.manager.PrivacyManager
+import com.lunabeestudio.stopcovid.utils.lazyFast
 import com.mikepenz.fastadapter.GenericItem
 
 class OnBoardingPrivacyFragment : OnBoardingFragment() {
 
-    val privacyManager: PrivacyManager by lazy(LazyThreadSafetyMode.NONE) {
+    val privacyManager: PrivacyManager by lazyFast {
         injectionContainer.privacyManager
     }
 

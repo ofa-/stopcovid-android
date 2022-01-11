@@ -30,6 +30,7 @@ import com.lunabeestudio.stopcovid.extension.injectionContainer
 import com.lunabeestudio.stopcovid.extension.showPostalCodeDialog
 import com.lunabeestudio.stopcovid.manager.KeyFiguresManager
 import com.lunabeestudio.stopcovid.manager.VaccinationCenterManager
+import com.lunabeestudio.stopcovid.utils.lazyFast
 import kotlinx.coroutines.launch
 
 class PostalCodeBottomSheetFragment : BottomSheetDialogFragment() {
@@ -41,11 +42,11 @@ class PostalCodeBottomSheetFragment : BottomSheetDialogFragment() {
     private val strings: LocalizedStrings
         get() = (activity?.application as? LocalizedApplication)?.localizedStrings ?: emptyMap()
 
-    private val vaccinationCenterManager: VaccinationCenterManager by lazy(LazyThreadSafetyMode.NONE) {
+    private val vaccinationCenterManager: VaccinationCenterManager by lazyFast {
         injectionContainer.vaccinationCenterManager
     }
 
-    private val keyFiguresManager: KeyFiguresManager by lazy(LazyThreadSafetyMode.NONE) {
+    private val keyFiguresManager: KeyFiguresManager by lazyFast {
         injectionContainer.keyFiguresManager
     }
 

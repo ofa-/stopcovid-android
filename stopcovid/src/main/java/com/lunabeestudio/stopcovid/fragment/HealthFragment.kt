@@ -22,6 +22,7 @@ import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.extension.fixFormatter
+import com.lunabeestudio.stopcovid.coreui.extension.getApplicationLocale
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.cardWithActionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
@@ -43,6 +44,7 @@ import com.lunabeestudio.stopcovid.manager.ShareManager
 import com.lunabeestudio.stopcovid.model.ContactDateFormat
 import com.lunabeestudio.stopcovid.model.LinkType
 import com.lunabeestudio.stopcovid.model.RisksUILevelSectionLink
+import com.lunabeestudio.stopcovid.utils.lazyFast
 import com.lunabeestudio.stopcovid.viewmodel.HealthViewModel
 import com.lunabeestudio.stopcovid.viewmodel.HealthViewModelFactory
 import com.mikepenz.fastadapter.GenericItem
@@ -51,7 +53,6 @@ import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.IllegalFormatException
-import java.util.Locale
 
 class HealthFragment : TimeMainFragment() {
 
@@ -65,10 +66,11 @@ class HealthFragment : TimeMainFragment() {
 
     private val viewModel: HealthViewModel by viewModels { HealthViewModelFactory(robertManager) }
 
-    private val shortDateTimeFormat by lazy { SimpleDateFormat("dd/MM/yyyy, HH:mm", Locale.getDefault()) }
-    private val fromDateFormat: DateFormat = SimpleDateFormat("dd LLL", Locale.getDefault())
-    private val toDateFormat: DateFormat = SimpleDateFormat("dd LLL yyyy", Locale.getDefault())
-    private val longDateFormat: DateFormat = SimpleDateFormat.getDateInstance(DateFormat.LONG)
+    private val appLocale by lazyFast { getApplicationLocale() }
+    private val shortDateTimeFormat by lazyFast { SimpleDateFormat("dd/MM/yyyy, HH:mm", appLocale) }
+    private val fromDateFormat: DateFormat by lazyFast { SimpleDateFormat("dd LLL", appLocale) }
+    private val toDateFormat: DateFormat by lazyFast { SimpleDateFormat("dd LLL yyyy", appLocale) }
+    private val longDateFormat: DateFormat by lazyFast { SimpleDateFormat.getDateInstance(DateFormat.LONG, appLocale) }
 
     override fun getTitleKey(): String = "myHealthController.title"
 

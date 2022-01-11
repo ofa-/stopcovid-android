@@ -1,55 +1,95 @@
 package com.lunabeestudio.stopcovid.extension
 
 import android.content.Context
-import android.text.format.DateUtils
-import java.util.Calendar
+import android.icu.text.RelativeDateTimeFormatter
+import android.os.Build
+import com.lunabeestudio.stopcovid.coreui.extension.getApplicationLocale
+import com.lunabeestudio.stopcovid.coreui.extension.stringsFormat
+import com.lunabeestudio.stopcovid.coreui.manager.LocalizedStrings
+import java.text.DateFormat
+import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.temporal.ChronoUnit
+import java.util.Date
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 
-fun Duration.getRelativeDateTimeString(context: Context, nowString: String?): String? {
+fun Duration.getRelativeDateTimeString(context: Context, localizedStrings: LocalizedStrings): String? {
+    val appLocale = context.getApplicationLocale()
     val now = System.currentTimeMillis().milliseconds
+    val daysSinceThis = ChronoUnit.DAYS.between(LocalDate.ofEpochDay(inWholeDays), LocalDate.now()).toInt()
 
     return when {
-        now - this <= 1.minutes -> nowString
-        now - this <= 1.days -> DateUtils.getRelativeTimeSpanString(
-            this.coerceAtMost(now - 1.minutes).inWholeMilliseconds,
-            now.inWholeMilliseconds,
-            DateUtils.MINUTE_IN_MILLIS,
-            DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_SHOW_YEAR or DateUtils.FORMAT_ABBREV_MONTH,
-        )
-            .toString()
-            .fixQuoteInString()
-        else -> DateUtils.getRelativeDateTimeString(
-            context,
-            this.inWholeMilliseconds,
-            DateUtils.DAY_IN_MILLIS,
-            DateUtils.WEEK_IN_MILLIS,
-            DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_SHOW_YEAR or DateUtils.FORMAT_ABBREV_MONTH,
-        )
-            .toString()
-            .fixQuoteInString()
+        now - this <= 1.minutes -> localizedStrings["common.justNow"]
+        now - this <= 1.hours -> {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                RelativeDateTimeFormatter.getInstance(appLocale).format(
+                    (now - this).inWholeMinutes.toDouble(),
+                    RelativeDateTimeFormatter.Direction.LAST,
+                    RelativeDateTimeFormatter.RelativeUnit.MINUTES,
+                )
+            } else {
+                val timeString = SimpleDateFormat.getTimeInstance(DateFormat.SHORT, appLocale)
+                    .format(Date(this.inWholeMilliseconds))
+                "${localizedStrings["common.today"]}, $timeString"
+            }
+        }
+        daysSinceThis <= 7 -> {
+            val timeString = SimpleDateFormat.getTimeInstance(DateFormat.SHORT, appLocale)
+                .format(Date(this.inWholeMilliseconds))
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                val dateTimeFormatter = RelativeDateTimeFormatter.getInstance(appLocale)
+                val dateString = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                    dateTimeFormatter.format(
+                        daysSinceThis * -1.0,
+                        RelativeDateTimeFormatter.RelativeDateTimeUnit.DAY,
+                    ).titleCaseFirstChar()
+                } else {
+                    when {
+                        daysSinceThis <= 1 -> getRelativeString(daysSinceThis, localizedStrings)
+                        else -> {
+                            dateTimeFormatter.format(
+                                daysSinceThis.toDouble(),
+                                RelativeDateTimeFormatter.Direction.LAST,
+                                RelativeDateTimeFormatter.RelativeUnit.DAYS,
+                            ).titleCaseFirstChar()
+                        }
+                    }
+                }
+
+                dateTimeFormatter.combineDateAndTime(dateString, timeString)
+            } else {
+                val dateString = getRelativeString(daysSinceThis, localizedStrings)
+                "$dateString, $timeString"
+            }
+        }
+        else -> {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                val dateString = SimpleDateFormat.getDateInstance(DateFormat.SHORT, appLocale)
+                    .format(Date(this.inWholeMilliseconds))
+                val timeString = SimpleDateFormat.getTimeInstance(DateFormat.SHORT, appLocale)
+                    .format(Date(this.inWholeMilliseconds))
+
+                RelativeDateTimeFormatter.getInstance(appLocale).combineDateAndTime(dateString, timeString)
+            } else {
+                SimpleDateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, appLocale)
+                    .format(Date(this.inWholeMilliseconds))
+            }
+        }
+    }
+}
+
+private fun getRelativeString(daysSince: Int, localizedStrings: LocalizedStrings): String? {
+    return when (daysSince) {
+        0 -> localizedStrings["common.today"]
+        1 -> localizedStrings["common.yesterday"]
+        else -> localizedStrings.stringsFormat("common.daysAgo", daysSince)
     }
 }
 
 fun Duration.getRelativeDateShortString(context: Context): String {
-    val calendar = Calendar.getInstance()
-    val currentYear = calendar.get(Calendar.YEAR)
-
-    val dataDateMs = this@getRelativeDateShortString.inWholeMilliseconds
-    calendar.timeInMillis = dataDateMs
-    val dataYear = calendar.get(Calendar.YEAR)
-
-    val formatYear = if (currentYear == dataYear) {
-        DateUtils.FORMAT_NO_YEAR
-    } else {
-        DateUtils.FORMAT_SHOW_YEAR
-    }
-
-    return DateUtils.formatDateTime(
-        context,
-        dataDateMs,
-        DateUtils.FORMAT_SHOW_DATE or formatYear or DateUtils.FORMAT_ABBREV_MONTH
-    )
+    return SimpleDateFormat.getDateInstance(DateFormat.MEDIUM, context.getApplicationLocale()).format(Date(this.inWholeMilliseconds))
 }

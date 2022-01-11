@@ -10,9 +10,10 @@
 
 package com.lunabeestudio.stopcovid.model
 
+import android.content.Context
+import com.lunabeestudio.stopcovid.coreui.extension.getApplicationLanguage
 import org.json.JSONObject
 import java.util.HashMap
-import java.util.Locale
 
 /**
  * Abstract class to manage multi language for message and buttonTitle
@@ -25,23 +26,16 @@ class Info(jsonObject: JSONObject) {
     var minRequiredBuildNumber: Int? = null
     var minInfoBuildNumber: Int? = null
     private var messageMap: HashMap<String, String> = hashMapOf()
-    val message: String?
-        get() {
-            return getValueForDefaultLanguageOrNull(messageMap)
-        }
-    private var buttonTitleMap: HashMap<String, String> = hashMapOf()
-    val buttonTitle: String?
-        get() {
-            return getValueForDefaultLanguageOrNull(buttonTitleMap)
-        }
-    private var buttonUrlMap: HashMap<String, String> = hashMapOf()
-    val buttonUrl: String?
-        get() {
-            return getValueForDefaultLanguageOrNull(buttonUrlMap)
-        }
 
-    private fun getValueForDefaultLanguageOrNull(map: HashMap<String, String>): String? {
-        val result = map[Locale.getDefault().language] ?: map["en"]
+    fun getMessage(context: Context): String? = getValueForDefaultLanguageOrNull(messageMap, context)
+    fun getButtonTitle(context: Context): String? = getValueForDefaultLanguageOrNull(buttonTitleMap, context)
+    fun getButtonUrl(context: Context): String? = getValueForDefaultLanguageOrNull(buttonUrlMap, context)
+
+    private var buttonTitleMap: HashMap<String, String> = hashMapOf()
+    private var buttonUrlMap: HashMap<String, String> = hashMapOf()
+
+    private fun getValueForDefaultLanguageOrNull(map: HashMap<String, String>, context: Context): String? {
+        val result = map[context.getApplicationLanguage()] ?: map["en"]
         return if (result.isNullOrEmpty()) null else result
     }
 

@@ -28,6 +28,7 @@ import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.robert.extension.observeEventAndConsume
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
+import com.lunabeestudio.stopcovid.coreui.extension.getApplicationLocale
 import com.lunabeestudio.stopcovid.coreui.extension.hideSoftKeyBoard
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
@@ -45,6 +46,7 @@ import com.lunabeestudio.stopcovid.fastitem.editTextItem
 import com.lunabeestudio.stopcovid.fastitem.pickerEditTextItem
 import com.lunabeestudio.stopcovid.model.AttestationMap
 import com.lunabeestudio.stopcovid.model.FormField
+import com.lunabeestudio.stopcovid.utils.lazyFast
 import com.lunabeestudio.stopcovid.viewmodel.NewAttestationViewModel
 import com.lunabeestudio.stopcovid.viewmodel.NewAttestationViewModelFactory
 import com.mikepenz.fastadapter.GenericItem
@@ -57,10 +59,16 @@ class NewAttestationFragment : MainFragment() {
 
     private val gson: Gson = Gson()
     private val viewModel: NewAttestationViewModel by activityViewModels {
-        NewAttestationViewModelFactory(requireContext().secureKeystoreDataSource(), attestationRepository, formManager)
+        NewAttestationViewModelFactory(requireContext().secureKeystoreDataSource(), attestationRepository, formManager, requireContext())
     }
-    private val dateFormat: DateFormat = SimpleDateFormat.getDateInstance(DateFormat.LONG)
-    private val dateTimeFormat: DateFormat = SimpleDateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.SHORT)
+    private val dateFormat: DateFormat by lazyFast { SimpleDateFormat.getDateInstance(DateFormat.LONG, getApplicationLocale()) }
+    private val dateTimeFormat: DateFormat by lazyFast {
+        SimpleDateFormat.getDateTimeInstance(
+            DateFormat.LONG,
+            DateFormat.SHORT,
+            getApplicationLocale()
+        )
+    }
 
     private val robertManager: RobertManager by lazy {
         requireContext().robertManager()

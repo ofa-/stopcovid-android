@@ -25,7 +25,7 @@ class AtRiskNotificationWorker(context: Context, workerParams: WorkerParameters)
     override val pendingIntent: PendingIntent = NavDeepLinkBuilder(applicationContext)
         .setComponentName(MainActivity::class.java)
         .setGraph(R.navigation.nav_main)
-        .setDestination(R.id.proximityFragment)
+        .setDestination(R.id.homeFragment)
         .createPendingIntent()
     override val notificationTitleKey: String = inputData.getString(INPUT_DATA_TITLE_KEY) ?: ""
     override val notificationBodyKey: String = inputData.getString(INPUT_DATA_MESSAGE_KEY) ?: ""

@@ -26,6 +26,7 @@ import com.github.mikephil.charting.listener.ChartTouchListener
 import com.github.mikephil.charting.listener.OnChartGestureListener
 import com.lunabeestudio.robert.extension.observeEventAndConsume
 import com.lunabeestudio.stopcovid.Constants
+import com.lunabeestudio.stopcovid.coreui.extension.setTextOrHide
 import com.lunabeestudio.stopcovid.coreui.fragment.BaseFragment
 import com.lunabeestudio.stopcovid.databinding.FragmentChartFullScreenBinding
 import com.lunabeestudio.stopcovid.extension.chosenPostalCode
@@ -40,9 +41,10 @@ import com.lunabeestudio.stopcovid.manager.KeyFiguresManager
 import com.lunabeestudio.stopcovid.model.ChartInformation
 import com.lunabeestudio.stopcovid.model.KeyFigure
 import com.lunabeestudio.stopcovid.model.KeyFigureChartType
+import com.lunabeestudio.stopcovid.utils.lazyFast
 import com.lunabeestudio.stopcovid.widget.TacMarkerView
 
-class ChartFullScreenFragment : BaseFragment(), OnChartGestureListener {
+class ChartFullScreenFragment : BaseFragment() {
 
     private val binding: FragmentChartFullScreenBinding by lazy {
         FragmentChartFullScreenBinding.inflate(layoutInflater)
@@ -54,7 +56,7 @@ class ChartFullScreenFragment : BaseFragment(), OnChartGestureListener {
         PreferenceManager.getDefaultSharedPreferences(requireContext())
     }
 
-    private val keyFiguresManager: KeyFiguresManager by lazy(LazyThreadSafetyMode.NONE) {
+    private val keyFiguresManager: KeyFiguresManager by lazyFast {
         injectionContainer.keyFiguresManager
     }
 
@@ -64,6 +66,49 @@ class ChartFullScreenFragment : BaseFragment(), OnChartGestureListener {
     private val keyFigureKey: String by lazy { args.keyFigureKey }
     private val keyFigureKey2: String? by lazy { args.keyFigureKey2 }
     private val minDate: Long by lazy { args.minDate }
+
+    private val chartGestureListener = object : OnChartGestureListener {
+        override fun onChartGestureStart(me: MotionEvent?, lastPerformedGesture: ChartTouchListener.ChartGesture?) {}
+
+        override fun onChartGestureEnd(me: MotionEvent?, lastPerformedGesture: ChartTouchListener.ChartGesture?) {}
+
+        override fun onChartLongPressed(me: MotionEvent?) {}
+
+        override fun onChartDoubleTapped(me: MotionEvent?) {
+            // post because scale is done after listener is called
+            binding.chartContainer.post {
+                toggleZoomOutButtonIfNeeded()
+            }
+        }
+
+        override fun onChartSingleTapped(me: MotionEvent?) {}
+
+        override fun onChartFling(me1: MotionEvent?, me2: MotionEvent?, velocityX: Float, velocityY: Float) {}
+
+        override fun onChartScale(me: MotionEvent?, scaleX: Float, scaleY: Float) {
+            toggleZoomOutButtonIfNeeded()
+
+            // Use a ZOOM_MIN_THRESHOLD to compensate for the high zoom value precision and help to zoom out
+            val zoomMin = binding.keyFigureLineChart.scaleX < Constants.Chart.ZOOM_MIN_THRESHOLD
+                && binding.keyFigureBarChart.scaleX < Constants.Chart.ZOOM_MIN_THRESHOLD
+                && binding.keyFigureCombinedChart.scaleX < Constants.Chart.ZOOM_MIN_THRESHOLD
+            if (zoomMin && scaleX < 1f) {
+                binding.keyFigureLineChart.fitScreen()
+                binding.keyFigureBarChart.fitScreen()
+                binding.keyFigureCombinedChart.fitScreen()
+                binding.zoomOutButton.isVisible = false
+            }
+        }
+
+        override fun onChartTranslate(me: MotionEvent?, dX: Float, dY: Float) {}
+
+        private fun toggleZoomOutButtonIfNeeded() {
+            binding.zoomOutButton.isVisible =
+                binding.keyFigureLineChart.scaleX != 1f ||
+                binding.keyFigureBarChart.scaleX != 1f ||
+                binding.keyFigureCombinedChart.scaleX != 1f
+        }
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return binding.root
@@ -188,14 +233,14 @@ class ChartFullScreenFragment : BaseFragment(), OnChartGestureListener {
             binding.keyFigureBarChart.apply {
                 fillWithChartData(context, chartInformation.chartData, chartInformation.limitLineData)
                 marker = TacMarkerView(context, this)
-                onChartGestureListener = this@ChartFullScreenFragment
+                onChartGestureListener = chartGestureListener
             }
             binding.keyFigureLineChart.onChartGestureListener = null
         } else {
             binding.keyFigureLineChart.apply {
                 fillWithChartData(context, chartInformation.chartData, chartInformation.limitLineData)
                 marker = TacMarkerView(context, this)
-                onChartGestureListener = this@ChartFullScreenFragment
+                onChartGestureListener = chartGestureListener
             }
             binding.keyFigureBarChart.onChartGestureListener = null
         }
@@ -205,7 +250,7 @@ class ChartFullScreenFragment : BaseFragment(), OnChartGestureListener {
         binding.chartSerie2LegendTextView.setLegend2FromChartData(chartInformation.chartData)
         binding.keyFigureLineChart.isVisible = chartInformation.chartType == KeyFigureChartType.LINES
         binding.keyFigureBarChart.isVisible = chartInformation.chartType == KeyFigureChartType.BARS
-        binding.chartDescriptionTextView.text = chartInformation.chartExplanationLabel
+        binding.chartDescriptionTextView.setTextOrHide(chartInformation.chartExplanationLabel)
     }
 
     private fun refreshCombinedChart(context: Context, keyFigure: KeyFigure, keyFigure2: KeyFigure) {
@@ -230,45 +275,14 @@ class ChartFullScreenFragment : BaseFragment(), OnChartGestureListener {
             keyFigureCombinedChart.apply {
                 data = chartData
                 marker = TacMarkerView(context, this)
-                onChartGestureListener = this@ChartFullScreenFragment
+                onChartGestureListener = chartGestureListener
             }
             setupCombinedCharts()
             keyFigureLineChart.onChartGestureListener = null
             keyFigureBarChart.onChartGestureListener = null
+            binding.chartDescriptionTextView.isVisible = false
         }
     }
-
-    override fun onChartGestureStart(me: MotionEvent?, lastPerformedGesture: ChartTouchListener.ChartGesture?) {}
-
-    override fun onChartGestureEnd(me: MotionEvent?, lastPerformedGesture: ChartTouchListener.ChartGesture?) {}
-
-    override fun onChartLongPressed(me: MotionEvent?) {}
-
-    override fun onChartDoubleTapped(me: MotionEvent?) {}
-
-    override fun onChartSingleTapped(me: MotionEvent?) {}
-
-    override fun onChartFling(me1: MotionEvent?, me2: MotionEvent?, velocityX: Float, velocityY: Float) {}
-
-    override fun onChartScale(me: MotionEvent?, scaleX: Float, scaleY: Float) {
-        binding.zoomOutButton.isVisible =
-            binding.keyFigureLineChart.scaleX != 1f ||
-            binding.keyFigureBarChart.scaleX != 1f ||
-            binding.keyFigureCombinedChart.scaleX != 1f
-
-        // Use a ZOOM_MIN_THRESHOLD to compensate for the high zoom value precision and help to zoom out
-        val zoomMin = binding.keyFigureLineChart.scaleX < Constants.Chart.ZOOM_MIN_THRESHOLD
-            && binding.keyFigureBarChart.scaleX < Constants.Chart.ZOOM_MIN_THRESHOLD
-            && binding.keyFigureCombinedChart.scaleX < Constants.Chart.ZOOM_MIN_THRESHOLD
-        if (zoomMin && scaleX < 1f) {
-            binding.keyFigureLineChart.fitScreen()
-            binding.keyFigureBarChart.fitScreen()
-            binding.keyFigureCombinedChart.fitScreen()
-            binding.zoomOutButton.isVisible = false
-        }
-    }
-
-    override fun onChartTranslate(me: MotionEvent?, dX: Float, dY: Float) {}
 }
 
 enum class ChartDataType { LOCAL, GLOBAL, MULTI, AVERAGE }

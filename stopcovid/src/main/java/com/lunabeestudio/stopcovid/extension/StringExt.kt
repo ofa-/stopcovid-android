@@ -22,6 +22,7 @@ import java.security.MessageDigest
 import java.text.NumberFormat
 import java.util.Locale
 import java.util.regex.Pattern
+import kotlin.math.abs
 
 fun String.openInExternalBrowser(context: Context, showToast: Boolean = true): Boolean {
     val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(this))
@@ -73,9 +74,9 @@ fun String.formatNumberIfNeeded(numberFormat: NumberFormat): String {
     }
 }
 
-private fun String.titleCaseFirstChar(): String = replaceFirstChar {
+fun String.titleCaseFirstChar(): String = replaceFirstChar {
     if (it.isLowerCase()) {
-        it.titlecase(Locale.getDefault())
+        it.titlecase(Locale.ROOT)
     } else {
         it.toString()
     }
@@ -112,4 +113,13 @@ fun String.splitUrlFragment(): List<String> = this.split(Char(0x1E))
 
 fun String.getLabelKeyFigureFromConfig(): String {
     return "keyfigure.$this"
+}
+
+fun String.iOSCommonHash(): Long {
+    var h = 1125899906842597L // prime
+    val len: Int = length
+    for (i in 0 until len) {
+        h = 31 * h + this[i].code.toLong()
+    }
+    return abs(h)
 }

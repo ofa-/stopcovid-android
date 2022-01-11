@@ -128,7 +128,7 @@ class WalletFullscreen2DdocFragment : BaseFragment() {
 
     fun showCertificateSharingBottomSheet() {
         val activityBinding = (activity as? MainActivity)?.binding ?: return
-        val text = frenchCertificate?.fullDescription(strings, injectionContainer.robertManager.configuration)
+        val text = frenchCertificate?.fullDescription(strings, injectionContainer.robertManager.configuration, context)
         ShareManager.setupCertificateSharingBottomSheet(this, text) {
             binding.barcodeSecuredView.runUnsecured {
                 ShareManager.getShareCaptureUri(activityBinding, ShareManager.certificateScreenshotFilename)

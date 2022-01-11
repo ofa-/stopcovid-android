@@ -10,16 +10,6 @@
 
 package com.lunabeestudio.stopcovid.coreui.extension
 
-import timber.log.Timber
-import java.util.IllegalFormatException
-
 fun Map<String, String>.stringsFormat(key: String, vararg args: Any?): String? {
-    return this[key]?.let {
-        try {
-            String.format(it, *args)
-        } catch (e: IllegalFormatException) {
-            Timber.e(e)
-            it
-        }
-    }
+    return this[key].formatOrNull(*args)
 }

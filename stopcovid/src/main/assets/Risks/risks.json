@@ -59,7 +59,7 @@
     },
     {
         "riskLevel":2.0,
-        "description":"TAC-S lieu modéré",
+        "description":"TAC-Cléa lieu modéré",
         "labels":{
             "homeTitle":"risk2.home.title",
             "homeSub":"risk2.home.sub",
@@ -81,26 +81,13 @@
                 "description":"risk2.section1.body"
             },
             {
-                "section":"isolation.recommendation.initialCaseSafe.title",
-                "description":"isolation.recommendation.initialCaseSafe.body",
-                "link":{
-                    "label":"isolation.recommendation.initialCaseAtRiskOrSick.title",
-                    "action":"mcc.isolation.url",
-                    "type":"web"
-                }
-            },
-            {
                 "section":"risk.section.test.title",
-                "description":"risk.section.test.body",
+                "description":"risk2.section.test.body",
                 "link":{
                     "label":"risk.section.test.button",
                     "action":"risk.section.test.url",
                     "type":"web"
                 }
-            },
-            {
-                "section":"risk.section.limit.title",
-                "description":"risk.section.limit.body"
             },
             {
                 "section":"risk.section.symptoms.title",
@@ -112,19 +99,14 @@
                 }
             },
             {
-                "section":"risk.section.mcc.title",
-                "description":"risk.section.mcc.body",
-                "link":{
-                    "label":"risk.section.mcc.button",
-                    "action":"risk.section.mcc.url",
-                    "type":"web"
-                }
+                "section":"risk.section.how.title",
+                "description":"risk.section.how.body"
             }
         ]
     },
     {
         "riskLevel":3.0,
-        "description":"TAC-S risque élevé",
+        "description":"TAC-Cléa risque élevé",
         "labels":{
             "homeTitle":"risk3.home.title",
             "homeSub":"risk3.home.sub",
@@ -146,20 +128,20 @@
                 "description":"risk3.section1.body"
             },
             {
-                "section":"risk.section.isolate.title",
-                "description":"risk.section.isolate.body",
-                "link":{
-                    "label":"isolation.recommendation.initialCaseAtRiskOrSick.title",
-                    "action":"mcc.isolation.url",
-                    "type":"web"
-                }
-            },
-            {
                 "section":"risk.section.test.title",
                 "description":"risk.section.test.body",
                 "link":{
                     "label":"risk.section.test.button",
                     "action":"risk.section.test.url",
+                    "type":"web"
+                }
+            },
+            {
+                "section":"risk.section.isolate.title",
+                "description":"risk.section.isolate.body",
+                "link":{
+                    "label":"isolation.recommendation.initialCaseAtRiskOrSick.title",
+                    "action":"mcc.isolation.url",
                     "type":"web"
                 }
             },
@@ -173,19 +155,14 @@
                 }
             },
             {
-                "section":"risk.section.mcc.title",
-                "description":"risk.section.mcc.body",
-                "link":{
-                    "label":"risk.section.mcc.button",
-                    "action":"risk.section.mcc.url",
-                    "type":"web"
-                }
+                "section":"risk.section.how.title",
+                "description":"risk.section.how.body"
             }
         ]
     },
     {
         "riskLevel":4.0,
-        "description":"Tracing risque élevé",
+        "description":"Tracing Robert risque élevé",
         "labels":{
             "homeTitle":"risk4.home.title",
             "homeSub":"risk4.home.sub",
@@ -207,20 +184,20 @@
                 "description":"risk4.section1.body"
             },
             {
-                "section":"risk.section.isolate.title",
-                "description":"risk.section.isolate.body",
-                "link":{
-                    "label":"isolation.recommendation.initialCaseAtRiskOrSick.title",
-                    "action":"mcc.isolation.url",
-                    "type":"web"
-                }
-            },
-            {
                 "section":"risk.section.test.title",
                 "description":"risk.section.test.body",
                 "link":{
                     "label":"risk.section.test.button",
                     "action":"risk.section.test.url",
+                    "type":"web"
+                }
+            },
+            {
+                "section":"risk.section.isolate.title",
+                "description":"risk.section.isolate.body",
+                "link":{
+                    "label":"isolation.recommendation.initialCaseAtRiskOrSick.title",
+                    "action":"mcc.isolation.url",
                     "type":"web"
                 }
             },
@@ -232,6 +209,10 @@
                     "action":"risk.section.symptoms.url",
                     "type":"web"
                 }
+            },
+            {
+                "section":"risk.section.how.title",
+                "description":"risk.section.how.body"
             }
         ]
     }

@@ -43,7 +43,7 @@ abstract class TimeMainFragment : MainFragment() {
     } else {
         stringsFormat(
             "myHealthController.notification.update",
-            lastRefresh?.milliseconds?.getRelativeDateTimeString(context, strings["common.justNow"]) ?: ""
+            lastRefresh?.milliseconds?.getRelativeDateTimeString(context, strings) ?: ""
         )
     }
 

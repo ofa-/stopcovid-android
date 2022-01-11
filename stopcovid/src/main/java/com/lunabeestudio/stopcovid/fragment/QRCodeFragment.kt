@@ -33,6 +33,7 @@ import com.lunabeestudio.stopcovid.databinding.FragmentQrCodeBinding
 import com.lunabeestudio.stopcovid.extension.emitDefaultKonfetti
 import com.lunabeestudio.stopcovid.extension.injectionContainer
 import com.lunabeestudio.stopcovid.extension.openInExternalBrowser
+import com.lunabeestudio.stopcovid.utils.lazyFast
 
 abstract class QRCodeFragment : BaseFragment() {
 
@@ -169,7 +170,7 @@ abstract class QRCodeFragment : BaseFragment() {
         binding?.footer?.setOnClickListener { onFooterClick() }
     }
 
-    protected val analyticsManager: AnalyticsManager by lazy(LazyThreadSafetyMode.NONE) {
+    protected val analyticsManager: AnalyticsManager by lazyFast {
         injectionContainer.analyticsManager
     }
 }

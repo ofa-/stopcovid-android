@@ -13,7 +13,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:orientation="horizontal">
 
     <TextView
@@ -26,10 +26,10 @@
         android:textAppearance="@style/TextAppearance.StopCovid.Caption.Bold"
         app:drawableStartCompat="@drawable/ic_chart_marker"
         app:layout_constraintBottom_toTopOf="@id/chartSerie2LegendTextView"
-        app:layout_constraintEnd_toStartOf="@id/shareButton"
+        app:layout_constraintEnd_toStartOf="@id/zoomOutButton"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="Bourgogne Franche-Comté" />
+        tools:text="@tools:sample/lorem[10]" />
 
     <TextView
         android:id="@+id/chartSerie2LegendTextView"
@@ -40,11 +40,11 @@
         android:textAppearance="@style/TextAppearance.StopCovid.Caption.Bold"
         app:drawableStartCompat="@drawable/ic_chart_marker"
         app:layout_constraintBottom_toTopOf="@id/chartContainer"
-        app:layout_constraintEnd_toStartOf="@id/shareButton"
+        app:layout_constraintEnd_toStartOf="@id/zoomOutButton"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/chartSerie1LegendTextView"
         app:layout_goneMarginTop="@dimen/spacing_large"
-        tools:text="Bourgogne Franche-Comté" />
+        tools:text="@tools:sample/lorem[10]" />
 
     <TextView
         android:id="@+id/exitButton"
@@ -57,7 +57,7 @@
         android:textAppearance="@style/TextAppearance.StopCovid.Caption.Small.Grey"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="Fermer" />
+        tools:text="@tools:sample/lorem[0]" />
 
     <TextView
         android:id="@+id/zoomOutButton"
@@ -71,14 +71,14 @@
         android:textAppearance="@style/TextAppearance.StopCovid.Caption.Small.Grey"
         app:layout_constraintEnd_toStartOf="@+id/exitButton"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="Dézoomer"
+        tools:text="@tools:sample/lorem[0]"
         tools:visibility="visible"
         tools:ignore="ContentDescription" />
 
     <FrameLayout
         android:id="@+id/chartContainer"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@id/chartDescriptionTextView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -87,21 +87,21 @@
         <com.github.mikephil.charting.charts.LineChart
             android:id="@+id/keyFigureLineChart"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/key_figure_chart_height"
+            android:layout_height="match_parent"
             android:layout_marginHorizontal="@dimen/spacing_large"
             android:visibility="gone" />
 
         <com.github.mikephil.charting.charts.CombinedChart
             android:id="@+id/keyFigureCombinedChart"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/key_figure_chart_height"
+            android:layout_height="match_parent"
             android:layout_marginHorizontal="@dimen/spacing_large"
             android:visibility="gone" />
 
         <com.github.mikephil.charting.charts.BarChart
             android:id="@+id/keyFigureBarChart"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/key_figure_chart_height"
+            android:layout_height="match_parent"
             android:layout_marginHorizontal="@dimen/spacing_large"
             android:visibility="gone" />
 

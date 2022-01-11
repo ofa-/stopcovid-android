@@ -7,9 +7,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.navigation.NavOptions
-import androidx.navigation.fragment.navArgs
 import androidx.preference.PreferenceManager
-import com.lunabeestudio.domain.model.Configuration
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.fastitem.CardWithActionsItem
@@ -31,13 +29,11 @@ class ChooseKeyFiguresCompareFragment : MainFragment() {
     override val layout: Int = R.layout.fragment_recycler_with_bottom_action
     override fun getTitleKey(): String = "keyfigures.comparison.screen.title"
 
-    private val args: ChooseKeyFiguresCompareFragmentArgs by navArgs()
-
     private val sharedPreferences: SharedPreferences by lazy {
         PreferenceManager.getDefaultSharedPreferences(context)
     }
 
-    val viewModel: ChooseKeyFiguresCompareViewModel by viewModels {
+    private val viewModel: ChooseKeyFiguresCompareViewModel by viewModels {
         ChooseKeyFiguresCompareViewModelFactory(
             strings,
             sharedPreferences,
@@ -45,29 +41,29 @@ class ChooseKeyFiguresCompareFragment : MainFragment() {
         )
     }
 
-    val identifierKeyFiguresChoiceCard = "keyfigures.comparison.keyfiguresChoice.section.title".hashCode().toLong()
+    private val identifierKeyFiguresChoiceCard = "keyfigures.comparison.keyfiguresChoice.section.title".hashCode().toLong()
 
-    var bindingBottomAction: FragmentRecyclerWithBottomActionBinding? = null
+    private var bindingBottomAction: FragmentRecyclerWithBottomActionBinding? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         bindingBottomAction = FragmentRecyclerWithBottomActionBinding.bind(view).apply {
             bottomSheetButton.setOnClickListener {
-                sharedPreferences.keyFigureCompare1 = viewModel.labelKey1
-                sharedPreferences.keyFigureCompare2 = viewModel.labelKey2
-                if (args.isComingFromHome) {
-                    findNavControllerOrNull()?.popBackStack()
-                } else {
-                    findNavControllerOrNull()?.safeNavigate(
-                        ChooseKeyFiguresCompareFragmentDirections.actionChooseKeyFiguresCompareFragmentToCompareKeyFiguresFragment(),
-                        NavOptions.Builder().setPopUpTo(R.id.chooseKeyFiguresCompareFragment, true).setLaunchSingleTop(true).build()
-                    )
-                }
+                applySelectionAndNavigate(viewModel.labelKey1, viewModel.labelKey2)
             }
             bottomSheetButtonLight.setOnClickListener {
                 findNavControllerOrNull()?.popBackStack()
             }
         }
+    }
+
+    private fun applySelectionAndNavigate(labelKey1: String?, labelKey2: String?) {
+        sharedPreferences.keyFigureCompare1 = labelKey1
+        sharedPreferences.keyFigureCompare2 = labelKey2
+        findNavControllerOrNull()?.safeNavigate(
+            ChooseKeyFiguresCompareFragmentDirections.actionChooseKeyFiguresCompareFragmentToCompareKeyFiguresFragment(),
+            NavOptions.Builder().setPopUpTo(R.id.chooseKeyFiguresCompareFragment, true).setLaunchSingleTop(true).build()
+        )
     }
 
     override fun refreshScreen() {
@@ -119,7 +115,10 @@ class ChooseKeyFiguresCompareFragment : MainFragment() {
         val actions = context?.robertManager()?.configuration?.keyFiguresCombination?.mapNotNull { combination ->
             strings[combination.title]?.let {
                 Action(null, it, showBadge = false, showArrow = false) {
-                    applyCombination(combination)
+                    applySelectionAndNavigate(
+                        combination.keyFigureLabel1?.getLabelKeyFigureFromConfig(),
+                        combination.keyFigureLabel2?.getLabelKeyFigureFromConfig(),
+                    )
                 }
             }
         }
@@ -132,17 +131,6 @@ class ChooseKeyFiguresCompareFragment : MainFragment() {
             }
         }
         return null
-    }
-
-    private fun applyCombination(keyFigureCombination: Configuration.KeyFigureCombination) {
-        viewModel.labelKey1 = keyFigureCombination.keyFigureLabel1?.getLabelKeyFigureFromConfig()
-        viewModel.labelKey2 = keyFigureCombination.keyFigureLabel2?.getLabelKeyFigureFromConfig()
-        val positionCardChoice = fastAdapter.getPosition(identifierKeyFiguresChoiceCard)
-        (fastAdapter.getItem(positionCardChoice) as CardWithActionsItem).actions = getActionsChoiceSection()
-        fastAdapter.notifyItemChanged(
-            positionCardChoice,
-            CardWithActionsItem.BUMP_ICON
-        )
     }
 
     private fun launchPickerKeyFigure(figureNumber: Int) {

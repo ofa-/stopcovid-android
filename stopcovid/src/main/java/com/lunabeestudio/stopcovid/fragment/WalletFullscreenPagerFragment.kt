@@ -191,7 +191,7 @@ class WalletFullscreenPagerFragment : BaseFragment() {
 
     fun showCertificateSharingBottomSheet(barcodeSecuredView: SecuredBitmapView, certificate: WalletCertificate?) {
         val activityBinding = (activity as? MainActivity)?.binding ?: return
-        val text = certificate?.fullDescription(strings, injectionContainer.robertManager.configuration)
+        val text = certificate?.fullDescription(strings, injectionContainer.robertManager.configuration, context)
         ShareManager.setupCertificateSharingBottomSheet(this, text) {
             barcodeSecuredView.runUnsecured {
                 ShareManager.getShareCaptureUri(activityBinding, ShareManager.certificateScreenshotFilename)

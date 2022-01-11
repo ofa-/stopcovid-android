@@ -1,12 +1,14 @@
 package com.lunabeestudio.stopcovid.extension
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.text.SpannableStringBuilder
 import com.lunabeestudio.domain.extension.walletOldCertificateThresholdInMs
 import com.lunabeestudio.domain.model.Configuration
 import com.lunabeestudio.domain.model.RawWalletCertificate
 import com.lunabeestudio.domain.model.TacResult
 import com.lunabeestudio.domain.model.WalletCertificateType
+import com.lunabeestudio.stopcovid.coreui.extension.getApplicationLocale
 import com.lunabeestudio.stopcovid.coreui.extension.stringsFormat
 import com.lunabeestudio.stopcovid.coreui.manager.LocalizedStrings
 import com.lunabeestudio.stopcovid.manager.Blacklist2DDOCManager
@@ -19,9 +21,46 @@ import com.lunabeestudio.stopcovid.model.VaccinationCertificate
 import com.lunabeestudio.stopcovid.model.WalletCertificate
 import timber.log.Timber
 import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 import kotlin.time.Duration.Companion.hours
+
+fun WalletCertificate.fullNameList(configuration: Configuration): String {
+    val prefix =
+        configuration.dccKidsEmoji?.let { dccKidsEmoji ->
+            birthDate()?.let { birthDate ->
+                val maxKidEmojiCal = Calendar.getInstance().apply {
+                    time = birthDate
+                    add(Calendar.YEAR, dccKidsEmoji.age)
+                }
+                val nowCal = Calendar.getInstance()
+                if (nowCal.before(maxKidEmojiCal)) {
+                    val emojiIdx = (rawBirthDate() + fullName()).iOSCommonHash().mod(dccKidsEmoji.emojis.size)
+                    dccKidsEmoji.emojis.getOrNull(emojiIdx).orEmpty() + " "
+                } else {
+                    null
+                }
+            }
+        }.orEmpty()
+
+    return (prefix + fullNameUppercase()).trim()
+}
+
+fun WalletCertificate.rawBirthDate(): String? {
+    return when (this) {
+        is EuropeanCertificate -> greenCertificate.dateOfBirth
+        is FrenchCertificate -> birthDate
+    }
+}
+
+fun WalletCertificate.birthDate(): Date? {
+    return when (this) {
+        is EuropeanCertificate -> yearMonthDayUsParserForceTimeZone().parseOrNull(greenCertificate.dateOfBirth)
+        is FrenchCertificate -> birthDate?.let { dayMonthYearUsParser().parseOrNull(it) }
+    }
+}
 
 fun WalletCertificate.fullNameUppercase(): String =
     fullName().uppercase()
@@ -43,20 +82,20 @@ fun WalletCertificate.titleDescription(strings: LocalizedStrings): String {
     return titleBuilder.toString()
 }
 
-fun WalletCertificate.infosDescription(strings: LocalizedStrings, configuration: Configuration): String {
+fun WalletCertificate.infosDescription(strings: LocalizedStrings, configuration: Configuration, context: Context?): String {
     val text = when (this) {
         is EuropeanCertificate -> strings["wallet.proof.europe.${type.code}.infos"]
         else -> strings["wallet.proof.${type.stringKey}.infos"]
     }
-    return formatText(strings, configuration, text, false).trim()
+    return formatText(strings, configuration, text, false, context).trim()
 }
 
-fun WalletCertificate.fullDescription(strings: LocalizedStrings, configuration: Configuration): String {
+fun WalletCertificate.fullDescription(strings: LocalizedStrings, configuration: Configuration, context: Context?): String {
     val text = when (this) {
         is EuropeanCertificate -> strings["wallet.proof.europe.${type.code}.description"]
         else -> strings["wallet.proof.${type.stringKey}.description"]
     }
-    return formatText(strings, configuration, text, true).trim()
+    return formatText(strings, configuration, text, true, context).trim()
 }
 
 @SuppressLint("SimpleDateFormat")
@@ -65,10 +104,11 @@ private fun WalletCertificate.formatText(
     configuration: Configuration,
     textToFormat: String?,
     shouldAddFlag: Boolean,
+    context: Context?,
 ): String {
     var text = textToFormat
-    val dateFormat = SimpleDateFormat("d MMM yyyy")
-    val analysisDateFormat = SimpleDateFormat("d MMM yyyy, HH:mm")
+    val dateFormat = SimpleDateFormat("d MMM yyyy", context.getApplicationLocale())
+    val analysisDateFormat = SimpleDateFormat("d MMM yyyy, HH:mm", context.getApplicationLocale())
     return when (this) {
         is SanitaryCertificate -> {
             text = text?.replace("<${SanitaryCertificate.SanitaryCertificateFields.FIRST_NAME.code}>", firstName.orNA())

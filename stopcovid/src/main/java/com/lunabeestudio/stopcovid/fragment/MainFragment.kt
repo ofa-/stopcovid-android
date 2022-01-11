@@ -38,6 +38,7 @@ import com.lunabeestudio.stopcovid.manager.VaccinationCenterManager
 import com.lunabeestudio.stopcovid.repository.AttestationRepository
 import com.lunabeestudio.stopcovid.repository.VenueRepository
 import com.lunabeestudio.stopcovid.repository.WalletRepository
+import com.lunabeestudio.stopcovid.utils.lazyFast
 
 abstract class MainFragment : FastAdapterFragment() {
     abstract fun getTitleKey(): String
@@ -73,55 +74,55 @@ abstract class MainFragment : FastAdapterFragment() {
         (activity as? MainActivity)?.showSnackBar(message)
     }
 
-    protected val keyFiguresManager: KeyFiguresManager by lazy(LazyThreadSafetyMode.NONE) {
+    protected val keyFiguresManager: KeyFiguresManager by lazyFast {
         injectionContainer.keyFiguresManager
     }
-    protected val vaccinationCenterManager: VaccinationCenterManager by lazy(LazyThreadSafetyMode.NONE) {
+    protected val vaccinationCenterManager: VaccinationCenterManager by lazyFast {
         injectionContainer.vaccinationCenterManager
     }
-    protected val risksLevelManager: RisksLevelManager by lazy(LazyThreadSafetyMode.NONE) {
+    protected val risksLevelManager: RisksLevelManager by lazyFast {
         injectionContainer.risksLevelManager
     }
-    protected val infoCenterManager: InfoCenterManager by lazy(LazyThreadSafetyMode.NONE) {
+    protected val infoCenterManager: InfoCenterManager by lazyFast {
         injectionContainer.infoCenterManager
     }
-    protected val linksManager: LinksManager by lazy(LazyThreadSafetyMode.NONE) {
+    protected val linksManager: LinksManager by lazyFast {
         injectionContainer.linksManager
     }
-    protected val moreKeyFiguresManager: MoreKeyFiguresManager by lazy(LazyThreadSafetyMode.NONE) {
+    protected val moreKeyFiguresManager: MoreKeyFiguresManager by lazyFast {
         injectionContainer.moreKeyFiguresManager
     }
-    protected val formManager: FormManager by lazy(LazyThreadSafetyMode.NONE) {
+    protected val formManager: FormManager by lazyFast {
         injectionContainer.formManager
     }
-    protected val privacyManager: PrivacyManager by lazy(LazyThreadSafetyMode.NONE) {
+    protected val privacyManager: PrivacyManager by lazyFast {
         injectionContainer.privacyManager
     }
-    protected val blacklistDCCManager: BlacklistDCCManager by lazy(LazyThreadSafetyMode.NONE) {
+    protected val blacklistDCCManager: BlacklistDCCManager by lazyFast {
         injectionContainer.blacklistDCCManager
     }
-    protected val blacklist2DDOCManager: Blacklist2DDOCManager by lazy(LazyThreadSafetyMode.NONE) {
+    protected val blacklist2DDOCManager: Blacklist2DDOCManager by lazyFast {
         injectionContainer.blacklist2DDOCManager
     }
-    protected val analyticsManager: AnalyticsManager by lazy(LazyThreadSafetyMode.NONE) {
+    protected val analyticsManager: AnalyticsManager by lazyFast {
         injectionContainer.analyticsManager
     }
-    protected val attestationRepository: AttestationRepository by lazy(LazyThreadSafetyMode.NONE) {
+    protected val attestationRepository: AttestationRepository by lazyFast {
         injectionContainer.attestationRepository
     }
-    protected val venueRepository: VenueRepository by lazy(LazyThreadSafetyMode.NONE) {
+    protected val venueRepository: VenueRepository by lazyFast {
         injectionContainer.venueRepository
     }
-    protected val walletRepository: WalletRepository by lazy(LazyThreadSafetyMode.NONE) {
+    protected val walletRepository: WalletRepository by lazyFast {
         injectionContainer.walletRepository
     }
-    protected val debugManager: DebugManager by lazy(LazyThreadSafetyMode.NONE) {
+    protected val debugManager: DebugManager by lazyFast {
         injectionContainer.debugManager
     }
-    protected val configManager: ConfigManager by lazy(LazyThreadSafetyMode.NONE) {
+    protected val configManager: ConfigManager by lazyFast {
         injectionContainer.configManager
     }
-    protected val calibrationManager: CalibrationManager by lazy(LazyThreadSafetyMode.NONE) {
+    protected val calibrationManager: CalibrationManager by lazyFast {
         injectionContainer.calibrationManager
     }
 }

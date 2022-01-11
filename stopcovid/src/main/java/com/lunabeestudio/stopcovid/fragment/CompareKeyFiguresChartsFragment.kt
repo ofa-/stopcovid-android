@@ -21,15 +21,16 @@ import com.lunabeestudio.stopcovid.manager.ChartManager
 import com.lunabeestudio.stopcovid.manager.KeyFiguresManager
 import com.lunabeestudio.stopcovid.manager.ShareManager
 import com.lunabeestudio.stopcovid.model.KeyFigure
+import com.lunabeestudio.stopcovid.utils.lazyFast
 
 class CompareKeyFiguresChartsFragment : BaseFragment() {
 
-    private val minDate: Long by lazy(LazyThreadSafetyMode.NONE) {
+    private val minDate: Long by lazyFast {
         val rangeSec = (arguments?.getSerializable(RANGE_ARG_KEY) as? ChartManager.ChartRange ?: ChartManager.ChartRange.ALL).rangeSec
         System.currentTimeMillis() / 1000 - rangeSec
     }
 
-    val keyFiguresManager: KeyFiguresManager by lazy(LazyThreadSafetyMode.NONE) {
+    val keyFiguresManager: KeyFiguresManager by lazyFast {
         injectionContainer.keyFiguresManager
     }
 

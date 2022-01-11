@@ -50,7 +50,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class ProximityViewModel(
+class HomeViewModel(
     private val robertManager: RobertManager,
     isolationManager: IsolationManager,
     keystoreDataSource: SecureKeystoreDataSource,
@@ -153,7 +153,7 @@ class ProximityViewModel(
     }
 }
 
-class ProximityViewModelFactory(
+class HomeViewModelFactory(
     private val robertManager: RobertManager,
     private val isolationManager: IsolationManager,
     private val keystoreDataSource: SecureKeystoreDataSource,
@@ -166,7 +166,7 @@ class ProximityViewModelFactory(
     ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         @Suppress("UNCHECKED_CAST")
-        return ProximityViewModel(
+        return HomeViewModel(
             robertManager,
             isolationManager,
             keystoreDataSource,
