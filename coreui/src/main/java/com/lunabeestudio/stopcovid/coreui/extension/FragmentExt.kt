@@ -19,6 +19,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import timber.log.Timber
+import java.util.Locale
 
 fun Fragment.openAppSettings() {
     val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
@@ -58,3 +59,5 @@ inline fun <reified T : Fragment> Fragment.findParentFragmentByType(): T? {
     }
     return parent as? T
 }
+
+fun Fragment.getApplicationLocale(): Locale = context.getApplicationLocale()

@@ -27,6 +27,7 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.activity.MainActivity
+import com.lunabeestudio.stopcovid.coreui.extension.getApplicationLocale
 import com.lunabeestudio.stopcovid.coreui.extension.viewLifecycleOwnerOrNull
 import com.lunabeestudio.stopcovid.coreui.fragment.BaseFragment
 import com.lunabeestudio.stopcovid.coreui.manager.LocalizedStrings
@@ -126,7 +127,7 @@ fun MaterialAlertDialogBuilder.showSpinnerDayPicker(
     dayInThePast: Int,
     onDatePicked: (Long) -> Unit,
 ) {
-    val dateFormat: DateFormat = SimpleDateFormat.getDateInstance(DateFormat.FULL)
+    val dateFormat: DateFormat = SimpleDateFormat.getDateInstance(DateFormat.FULL, context.getApplicationLocale())
 
     val initialCalendar: Calendar = Calendar.getInstance().apply {
         timeInMillis = initialTimestamp

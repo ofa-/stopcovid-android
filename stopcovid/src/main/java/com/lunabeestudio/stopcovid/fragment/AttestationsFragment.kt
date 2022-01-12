@@ -115,7 +115,7 @@ class AttestationsFragment : MainFragment() {
 
     private fun generateNewAttestation(typ: Int) {
         val navm: NewAttestationViewModel by activityViewModels {
-            NewAttestationViewModelFactory(requireContext().secureKeystoreDataSource(), attestationRepository, formManager)
+            NewAttestationViewModelFactory(requireContext().secureKeystoreDataSource(), attestationRepository, formManager, requireContext())
         }
         navm.infos.put("datetime", FormEntry(System.currentTimeMillis().toString(), "datetime", Constants.Attestation.KEY_DATE_TIME))
         navm.infos.put("reason", FormEntry(reasonMap[typ], "list", Constants.Attestation.DATA_KEY_REASON))

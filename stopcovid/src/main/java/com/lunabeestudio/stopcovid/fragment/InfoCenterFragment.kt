@@ -113,7 +113,7 @@ class InfoCenterFragment : TimeMainFragment() {
                     }
 
                     items += infoCenterDetailCardItem {
-                        header = info.timestamp.seconds.getRelativeDateTimeString(requireContext(), strings["common.justNow"])
+                        header = info.timestamp.seconds.getRelativeDateTimeString(requireContext(), this@InfoCenterFragment.strings)
                         title = infoTitle
                         body = infoDescription
                         link = infoCenterStrings[info.buttonLabelKey]

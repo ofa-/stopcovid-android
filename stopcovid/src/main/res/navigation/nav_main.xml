@@ -11,7 +11,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_main"
-    app:startDestination="@id/proximityFragment">
+    app:startDestination="@id/homeFragment">
 
     <activity
         android:id="@+id/onBoardingActivity"
@@ -19,145 +19,145 @@
         tools:layout="@layout/activity_on_boarding" />
 
     <fragment
-        android:id="@+id/proximityFragment"
-        android:name="com.lunabeestudio.stopcovid.fragment.ProximityFragment"
+        android:id="@+id/homeFragment"
+        android:name="com.lunabeestudio.stopcovid.fragment.HomeFragment"
         tools:layout="@layout/fragment_recycler_view">
         <deepLink app:uri="tousanticovid://proximity" />
         <action
-            android:id="@+id/action_proximityFragment_to_tuneProximityFragment"
+            android:id="@+id/action_homeFragment_to_tuneProximityFragment"
             app:destination="@id/tuneProximityFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
         <action
-            android:id="@+id/action_proximityFragment_to_settingsFragment"
+            android:id="@+id/action_homeFragment_to_settingsFragment"
             app:destination="@id/settingsFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
         <action
-            android:id="@+id/action_proximityFragment_to_linksFragment"
+            android:id="@+id/action_homeFragment_to_linksFragment"
             app:destination="@id/linksFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
         <action
-            android:id="@+id/action_proximityFragment_to_privacyFragment"
+            android:id="@+id/action_homeFragment_to_privacyFragment"
             app:destination="@id/privacyFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
         <action
-            android:id="@+id/action_proximityFragment_to_captchaFragment"
+            android:id="@+id/action_homeFragment_to_captchaFragment"
             app:destination="@id/captchaFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
         <action
-            android:id="@+id/action_proximityFragment_to_reportFragment"
+            android:id="@+id/action_homeFragment_to_reportFragment"
             app:destination="@id/reportFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
         <action
-            android:id="@+id/action_proximityFragment_to_healthFragment"
+            android:id="@+id/action_homeFragment_to_healthFragment"
             app:destination="@id/healthFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
         <action
-            android:id="@+id/action_proximityFragment_to_infoCenterFragment"
+            android:id="@+id/action_homeFragment_to_infoCenterFragment"
             app:destination="@id/infoCenterFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
         <action
-            android:id="@+id/action_proximityFragment_to_keyFiguresFragment"
+            android:id="@+id/action_homeFragment_to_keyFiguresFragment"
             app:destination="@id/keyFiguresPagerFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
         <action
-            android:id="@+id/action_proximityFragment_to_keyFigureDetailsFragment"
+            android:id="@+id/action_homeFragment_to_keyFigureDetailsFragment"
             app:destination="@id/keyFigureDetailsFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
         <action
-            android:id="@+id/action_proximityFragment_to_postalCodeBottomSheetFragment"
+            android:id="@+id/action_homeFragment_to_postalCodeBottomSheetFragment"
             app:destination="@id/postalCodeBottomSheetFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
         <action
-            android:id="@+id/action_proximityFragment_to_attestationsFragment"
+            android:id="@+id/action_homeFragment_to_attestationsFragment"
             app:destination="@id/attestationsFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
         <action
-            android:id="@+id/action_proximityFragment_to_isSickFragment"
+            android:id="@+id/action_homeFragment_to_isSickFragment"
             app:destination="@id/isSickFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
         <action
-            android:id="@+id/action_proximityFragment_to_reminderDialogFragment"
+            android:id="@+id/action_homeFragment_to_reminderDialogFragment"
             app:destination="@id/reminderBottomSheetDialogFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
         <action
-            android:id="@+id/action_proximityFragment_to_venueQrCodeFragment"
+            android:id="@+id/action_homeFragment_to_venueQrCodeFragment"
             app:destination="@id/venueQrCodeFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
         <action
-            android:id="@+id/action_proximityFragment_to_venuesHistoryFragment"
+            android:id="@+id/action_homeFragment_to_venuesHistoryFragment"
             app:destination="@id/venuesHistoryFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
         <action
-            android:id="@+id/action_proximityFragment_to_venuesPrivateEventFragment"
+            android:id="@+id/action_homeFragment_to_venuesPrivateEventFragment"
             app:destination="@id/venuesPrivateEventFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
         <action
-            android:id="@+id/action_proximityFragment_to_isolationFormFragment"
+            android:id="@+id/action_homeFragment_to_isolationFormFragment"
             app:destination="@id/isolationFormFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
         <action
-            android:id="@+id/action_proximityFragment_to_vaccinationFragment"
+            android:id="@+id/action_homeFragment_to_vaccinationFragment"
             app:destination="@id/vaccinationFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
         <action
-            android:id="@+id/action_proximityFragment_to_navWallet"
+            android:id="@+id/action_homeFragment_to_navWallet"
             app:destination="@id/nav_wallet"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
@@ -186,32 +186,32 @@
 
         </action>
         <action
-            android:id="@+id/action_proximityFragment_to_verifyWalletQRCodeFragment"
+            android:id="@+id/action_homeFragment_to_verifyWalletQRCodeFragment"
             app:destination="@id/verifyWalletQRCodeFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
         <action
-            android:id="@+id/action_proximityFragment_to_universalQrScanFragment"
+            android:id="@+id/action_homeFragment_to_universalQrScanFragment"
             app:destination="@id/universalQrScanFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
         <action
-            android:id="@+id/action_proximityFragment_to_urgentInfoFragment"
+            android:id="@+id/action_homeFragment_to_urgentInfoFragment"
             app:destination="@id/urgentInfoFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
         <action
-            android:id="@+id/action_proximityFragment_to_lowStorageBottomSheetFragment"
+            android:id="@+id/action_homeFragment_to_lowStorageBottomSheetFragment"
             app:destination="@id/lowStorageBottomSheetFragment" />
         <action
-            android:id="@+id/action_proximityFragment_to_chooseKeyFiguresCompareFragment"
-            app:destination="@id/chooseKeyFiguresCompareFragment"
+            android:id="@+id/action_homeFragment_to_compareKeyFiguresFragment"
+            app:destination="@id/compareKeyFiguresFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
@@ -499,7 +499,7 @@
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim"
-            app:popUpTo="@id/proximityFragment" />
+            app:popUpTo="@id/homeFragment" />
         <action
             android:id="@+id/action_venueQrCodeFragment_to_venueOnBoardingFragment"
             app:destination="@id/venueOnBoardingFragment"
@@ -507,7 +507,7 @@
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim"
-            app:popUpTo="@id/proximityFragment" />
+            app:popUpTo="@id/homeFragment" />
         <action
             android:id="@+id/action_venueQrCodeFragment_to_captchaFragment"
             app:destination="@id/captchaFragment"
@@ -515,7 +515,7 @@
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim"
-            app:popUpTo="@id/proximityFragment" />
+            app:popUpTo="@id/homeFragment" />
         <action
             android:id="@+id/action_venueQrCodeFragment_to_confirmVenueQrCodeFragment"
             app:destination="@id/confirmVenueQrCodeFragment"
@@ -523,7 +523,7 @@
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim"
-            app:popUpTo="@id/proximityFragment" />
+            app:popUpTo="@id/homeFragment" />
         <action
             android:id="@+id/action_venueQrCodeFragment_to_venueMoreInfoFragment"
             app:destination="@id/venueMoreInfoFragment"
@@ -553,7 +553,7 @@
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim"
-            app:popUpTo="@id/proximityFragment" />
+            app:popUpTo="@id/homeFragment" />
     </fragment>
     <fragment
         android:id="@+id/venueConfirmationFragment"
@@ -650,7 +650,7 @@
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim"
-            app:popUpTo="@id/proximityFragment"
+            app:popUpTo="@id/homeFragment"
             app:popUpToInclusive="false" />
     </fragment>
     <fragment
@@ -804,7 +804,7 @@
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim"
-            app:popUpTo="@id/proximityFragment" />
+            app:popUpTo="@id/homeFragment" />
         <action
             android:id="@+id/action_verifyWalletQRCodeFragment_to_walletCertificateErrorFragment"
             app:destination="@id/walletCertificateErrorFragment"
@@ -827,7 +827,7 @@
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim"
-            app:popUpTo="@id/proximityFragment" />
+            app:popUpTo="@id/homeFragment" />
     </fragment>
     <dialog
         android:id="@+id/vaccinationActionsBottomSheetFragment"
@@ -991,10 +991,6 @@
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
-        <argument
-            android:name="isComingFromHome"
-            app:argType="boolean"
-            android:defaultValue="false" />
     </fragment>
     <fragment
         android:id="@+id/selectKeyFiguresFragment"

@@ -21,6 +21,7 @@ import com.lunabeestudio.robert.extension.observeEventAndConsume
 import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
+import com.lunabeestudio.stopcovid.coreui.extension.getApplicationLocale
 import com.lunabeestudio.stopcovid.coreui.extension.viewLifecycleOwnerOrNull
 import com.lunabeestudio.stopcovid.coreui.fastitem.buttonItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
@@ -34,6 +35,7 @@ import com.lunabeestudio.stopcovid.fastitem.isolationStateRadioGroupItem
 import com.lunabeestudio.stopcovid.fastitem.pickerEditTextItem
 import com.lunabeestudio.stopcovid.manager.IsolationFormStateEnum
 import com.lunabeestudio.stopcovid.model.IsolationRecommendationStateEnum
+import com.lunabeestudio.stopcovid.utils.lazyFast
 import com.lunabeestudio.stopcovid.viewmodel.IsolationFormViewModel
 import com.lunabeestudio.stopcovid.viewmodel.IsolationFormViewModelFactory
 import com.mikepenz.fastadapter.GenericItem
@@ -47,7 +49,7 @@ import java.util.Date
 
 class IsolationFormFragment : MainFragment() {
 
-    private val dateFormat: DateFormat = SimpleDateFormat.getDateInstance(DateFormat.LONG)
+    private val dateFormat: DateFormat by lazyFast { SimpleDateFormat.getDateInstance(DateFormat.LONG, getApplicationLocale()) }
 
     private val isolationManager by lazy {
         requireContext().isolationManager()

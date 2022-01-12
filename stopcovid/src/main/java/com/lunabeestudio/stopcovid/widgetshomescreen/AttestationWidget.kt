@@ -27,6 +27,7 @@ import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.Constants.Url.CERTIFICATE_SHORTCUT_URI
 import com.lunabeestudio.stopcovid.Constants.Url.NEW_CERTIFICATE_SHORTCUT_URI
 import com.lunabeestudio.stopcovid.R
+import com.lunabeestudio.stopcovid.coreui.extension.getApplicationLocale
 import com.lunabeestudio.stopcovid.coreui.extension.toDimensSize
 import com.lunabeestudio.stopcovid.coreui.utils.ImmutablePendingIntentCompat
 import com.lunabeestudio.stopcovid.extension.isExpired
@@ -98,8 +99,11 @@ class AttestationWidget : AppWidgetProvider() {
                 qrSize,
                 qrSize
             )
-            val dateHour = SimpleDateFormat.getDateInstance(DateFormat.SHORT)
-                .format(mainAttestation.timestamp) + ", " + SimpleDateFormat.getTimeInstance(DateFormat.SHORT)
+            val dateHour = SimpleDateFormat.getDateInstance(DateFormat.SHORT, context.getApplicationLocale())
+                .format(mainAttestation.timestamp) + ", " + SimpleDateFormat.getTimeInstance(
+                DateFormat.SHORT,
+                context.getApplicationLocale()
+            )
                 .format(mainAttestation.timestamp)
             val reason = mainAttestation.widgetString
 

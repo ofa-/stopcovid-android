@@ -7,7 +7,6 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.AccelerateInterpolator
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.appcompat.view.ContextThemeWrapper
@@ -170,28 +169,6 @@ class CardWithActionsItem(private val cardTheme: CardTheme) : AbstractBindingIte
         if (onDismissClick != null && cardTitle == null) {
             setDismissButtonMargin(binding)
         }
-
-        if (payloads.contains(BUMP_ICON)) {
-            val duration = binding.root.context.resources.getInteger(android.R.integer.config_shortAnimTime).toLong()
-            val interpolator = AccelerateInterpolator()
-            actions?.forEachIndexed { index, _ ->
-                val actionBinding = ItemActionBinding.bind(binding.actionsLinearLayout.getChildAt(index))
-                animateBump(actionBinding, duration, interpolator)
-            }
-        }
-    }
-
-    fun animateBump(actionBinding: ItemActionBinding, duration: Long, interpolator: AccelerateInterpolator) {
-        actionBinding.leftIconImageView.animate().apply {
-            this.duration = duration
-            this.interpolator = interpolator
-            scaleX(SCALE_ANIMATION_ICON)
-            scaleY(SCALE_ANIMATION_ICON)
-            withEndAction {
-                scaleX(1.0f)
-                scaleY(1.0f)
-            }.start()
-        }.start()
     }
 
     private fun setDismissButtonMargin(binding: ItemCardWithActionsBinding) {
@@ -231,11 +208,6 @@ class CardWithActionsItem(private val cardTheme: CardTheme) : AbstractBindingIte
             marginEnd = 0
             topMargin = R.dimen.spacing_small.toDimensSize(binding.rootLayout.context).toInt()
         }
-    }
-
-    companion object {
-        const val SCALE_ANIMATION_ICON: Float = 1.5F
-        const val BUMP_ICON: String = "BUMP_ICON"
     }
 }
 

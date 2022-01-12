@@ -263,7 +263,7 @@ class MainActivity : BaseActivity() {
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
             binding.toolbar.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_FOCUSED)
-            if (destination.id != R.id.proximityFragment) {
+            if (destination.id != R.id.homeFragment) {
                 binding.errorLayout.isInvisible = true
             }
             refreshAppBarLayout(destination)

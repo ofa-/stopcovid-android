@@ -84,7 +84,7 @@ fun LineChart.fillWithChartData(
     data = LineData(*dataSetArray)
 
     setupXAxis(context, xAxis, chartData)
-    setupYAxis(axisLeft, limitLineData)
+    setupYAxis(axisLeft, limitLineData, context)
     animateX(Constants.Chart.X_ANIMATION_DURATION_MILLIS)
 }
 
@@ -125,17 +125,17 @@ fun BarChart.fillWithChartData(
         }
 
         setupXAxis(context, xAxis, chartData)
-        setupYAxis(axisLeft, limitLineData)
+        setupYAxis(axisLeft, limitLineData, context)
 
         animateY(Constants.Chart.X_ANIMATION_DURATION_MILLIS)
     }
 }
 
-private fun setupYAxis(yAxis: YAxis, limitLineData: LimitLineData?) {
+private fun setupYAxis(yAxis: YAxis, limitLineData: LimitLineData?, context: Context) {
     yAxis.apply {
         setupStyle()
         axisMinimum = axisMinimum.coerceAtLeast(0f)
-        setValueFormatter()
+        setValueFormatter(context)
 
         limitLineData?.let {
             val limitLine = LimitLine(it.limitLine.toFloat(), it.description)
@@ -219,13 +219,13 @@ fun CombinedChart.setupStyle(isAxisRightEnabled: Boolean = true) {
 
         axisLeft.axisMinimum = axisLeft.axisMinimum.coerceAtLeast(0f)
         axisLeft.setupStyle()
-        axisLeft.setValueFormatter()
+        axisLeft.setValueFormatter(context)
 
         if (isAxisRightEnabled) {
             axisLeft.axisMaximum = data.dataSets[0].yMax
             axisLeft.textColor = data.dataSets[0].color
 
-            axisRight.setValueFormatter()
+            axisRight.setValueFormatter(context)
             axisRight.setupStyle()
             axisRight.textColor = data.dataSets[1].color
             axisRight.axisMaximum = data.dataSets[1].yMax
@@ -238,10 +238,10 @@ fun CombinedChart.setupStyle(isAxisRightEnabled: Boolean = true) {
     }
 }
 
-private fun YAxis.setValueFormatter() {
+private fun YAxis.setValueFormatter(context: Context) {
     valueFormatter = object : ValueFormatter() {
         override fun getFormattedValue(value: Float): String {
-            return value.formatCompact()
+            return value.formatCompact(context)
         }
     }
 }

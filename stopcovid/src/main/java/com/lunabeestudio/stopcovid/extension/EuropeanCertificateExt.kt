@@ -28,7 +28,7 @@ import kotlin.math.min
 import kotlin.time.Duration.Companion.days
 
 fun EuropeanCertificate.profileId(): String {
-    return (firstName + greenCertificate.dateOfBirth).uppercase()
+    return ((firstName ?: name).orEmpty() + greenCertificate.dateOfBirth).uppercase()
 }
 
 fun EuropeanCertificate.smartWalletState(configuration: Configuration): SmartWalletState {

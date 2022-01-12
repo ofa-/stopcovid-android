@@ -88,6 +88,8 @@ sealed class FrenchCertificate(id: String, value: String) : WalletCertificate(id
     var keySignature: String = ""
     final override val sha256: String
 
+    var birthDate: String? = null
+
     init {
         val split = value.split(Separator.UNIT.ascii)
         val message = split.getOrNull(0)
@@ -132,7 +134,6 @@ sealed class FrenchCertificate(id: String, value: String) : WalletCertificate(id
 class SanitaryCertificate private constructor(id: String, override val value: String) : FrenchCertificate(id, value) {
     override val type: WalletCertificateType = WalletCertificateType.SANITARY
 
-    var birthDate: String? = null
     var gender: String? = null
     var testResult: String? = null
     var analysisDate: Long? = null
@@ -230,7 +231,6 @@ class SanitaryCertificate private constructor(id: String, override val value: St
 class VaccinationCertificate private constructor(id: String, override val value: String) : FrenchCertificate(id, value) {
     override val type: WalletCertificateType = WalletCertificateType.VACCINATION
 
-    var birthDate: String? = null
     var diseaseName: String? = null
     var prophylacticAgent: String? = null
     var vaccineName: String? = null
@@ -398,8 +398,8 @@ class EuropeanCertificate private constructor(
 
     override fun parse() {
         keyCertificateId = Base64.encodeToString(kid, Base64.NO_WRAP)
-        firstName = greenCertificate.person.givenName
-        name = greenCertificate.person.familyName
+        firstName = greenCertificate.person.givenName ?: greenCertificate.person.standardisedGivenName
+        name = greenCertificate.person.familyName ?: greenCertificate.person.standardisedFamilyName
     }
 
     override fun verifyKey(publicKey: String) {

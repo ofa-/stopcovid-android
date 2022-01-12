@@ -44,10 +44,12 @@ class CaptchaViewModel(private val robertManager: RobertManager) : ViewModel() {
         if (loadingInProgress.value == false) {
             viewModelScope.launch(Dispatchers.IO) {
                 loadingInProgress.postValue(true)
-                val result = robertManager.generateCaptcha(
-                    if (isImage) CaptchaType.IMAGE else CaptchaType.AUDIO,
-                    Locale.getDefault().language
-                )
+                val type = if (isImage) {
+                    CaptchaType.IMAGE
+                } else {
+                    CaptchaType.AUDIO
+                }
+                val result = robertManager.generateCaptcha(type, Locale.getDefault().language)
                 when (result) {
                     is RobertResultData.Success -> {
                         captchaId = result.data

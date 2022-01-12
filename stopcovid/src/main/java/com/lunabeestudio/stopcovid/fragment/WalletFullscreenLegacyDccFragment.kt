@@ -135,7 +135,7 @@ class WalletFullscreenLegacyDccFragment : BaseFragment() {
     }
 
     private fun showCertificateSharingBottomSheet() {
-        val text = europeanCertificate?.fullDescription(strings, injectionContainer.robertManager.configuration)
+        val text = europeanCertificate?.fullDescription(strings, injectionContainer.robertManager.configuration, context)
         ShareManager.setupCertificateSharingBottomSheet(this, text) {
             binding.barcodeSecuredView.runUnsecured {
                 binding.let { ShareManager.getShareCaptureUri(it, ShareManager.certificateScreenshotFilename) }

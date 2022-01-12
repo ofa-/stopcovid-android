@@ -61,9 +61,9 @@ class AppMaintenanceActivity : AppCompatActivity() {
      * @param info information
      */
     private fun fillScreen(info: Info) {
-        binding.textView.setTextOrHide(info.message)
-        if (info.buttonTitle != null && info.buttonUrl != null) {
-            binding.button.text = info.buttonTitle
+        binding.textView.setTextOrHide(info.getMessage(this))
+        if (info.getButtonTitle(this) != null && info.getButtonUrl(this) != null) {
+            binding.button.text = info.getButtonTitle(this)
             binding.button.setOnClickListener {
                 startOpenInStore()
             }

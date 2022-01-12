@@ -30,6 +30,10 @@ fun yearMonthDayUsParser(): SimpleDateFormat {
     return SimpleDateFormat("yyyy-MM-dd", Locale.US)
 }
 
+fun dayMonthYearUsParser(): SimpleDateFormat {
+    return SimpleDateFormat("dd-MM-yyyy", Locale.US)
+}
+
 // In France the default TimeZone is “Europe/Paris”
 // which means that importing “2021-07-03" will result in a date with time set to midnight in GMT+2
 // and that importing “2021-12-03” will result in a date with time set to midnight in GMT+1

@@ -30,6 +30,7 @@ import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.R
+import com.lunabeestudio.stopcovid.coreui.extension.getApplicationLocale
 import com.lunabeestudio.stopcovid.coreui.extension.isNightMode
 import com.lunabeestudio.stopcovid.coreui.extension.toDimensSize
 import com.lunabeestudio.stopcovid.coreui.manager.LocalizedStrings
@@ -48,7 +49,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.text.NumberFormat
-import java.util.Locale
 
 class KeyFiguresWidget : AppWidgetProvider() {
     @OptIn(DelicateCoroutinesApi::class)
@@ -79,7 +79,7 @@ class KeyFiguresWidget : AppWidgetProvider() {
     ) {
         val views = RemoteViews(context.packageName, R.layout.key_figures_widget)
         val strings = context.stringsManager().strings
-        val numberFormat = NumberFormat.getNumberInstance(Locale.getDefault())
+        val numberFormat = NumberFormat.getNumberInstance(context.getApplicationLocale())
         // Set title widget
         views.setTextViewText(
             R.id.titleWidgetTextView,

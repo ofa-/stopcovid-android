@@ -54,7 +54,7 @@ class VerifyWalletResultFragment : BaseFragment() {
     override fun refreshScreen() {
         appCompatActivity?.supportActionBar?.title = strings[titleKey]
 
-        binding?.textView?.text = certificate?.fullDescription(strings, robertManager.configuration)
+        binding?.textView?.text = certificate?.fullDescription(strings, robertManager.configuration, requireContext())
         binding?.button?.text = strings["walletCertificateVerifiedController.validateAnotherProof"]
         binding?.button?.setOnClickListener {
             findNavControllerOrNull()?.safeNavigate(

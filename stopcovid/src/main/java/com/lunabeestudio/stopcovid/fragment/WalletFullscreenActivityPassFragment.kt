@@ -39,6 +39,7 @@ import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.manager.Blacklist2DDOCManager
 import com.lunabeestudio.stopcovid.manager.BlacklistDCCManager
 import com.lunabeestudio.stopcovid.model.EuropeanCertificate
+import com.lunabeestudio.stopcovid.utils.lazyFast
 import com.lunabeestudio.stopcovid.viewmodel.WalletViewModelFactory
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -48,11 +49,11 @@ import kotlin.time.Duration.Companion.minutes
 
 class WalletFullscreenActivityPassFragment : BaseFragment() {
 
-    private val blacklistDCCManager: BlacklistDCCManager by lazy(LazyThreadSafetyMode.NONE) {
+    private val blacklistDCCManager: BlacklistDCCManager by lazyFast {
         injectionContainer.blacklistDCCManager
     }
 
-    private val blacklist2DDOCManager: Blacklist2DDOCManager by lazy(LazyThreadSafetyMode.NONE) {
+    private val blacklist2DDOCManager: Blacklist2DDOCManager by lazyFast {
         injectionContainer.blacklist2DDOCManager
     }
 

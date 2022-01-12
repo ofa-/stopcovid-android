@@ -2,11 +2,11 @@
     "config":[
         {
             "name":"lastUpdate",
-            "value":"23 Dec 2021"
+            "value":"06 Jan 2022"
         },
         {
             "name":"version",
-            "value":115
+            "value":120
         },
         {
             "name":"versionCalibrationBle",
@@ -60,17 +60,27 @@
                 {
                     "t":"keyfigure.compare.vacsirea",
                     "k1":"sivicsidepvacsireanonvax",
-                    "k2":"sivicsidepvacsireavax"
+                    "k2":"sivicsidepvacsireavax6plusrappel"
+                },
+                {
+                    "t":"keyfigure.compare.5",
+                    "k1":"nombrecas",
+                    "k2":"deces"
+                },
+                {
+                    "t":"keyfigure.compare.6",
+                    "k1":"omicron",
+                    "k2":"delta"
                 },
                 {
                     "t":"keyfigure.compare.vacsipcrplus",
                     "k1":"sivicsidepvacsipcrplusnonvax",
-                    "k2":"sivicsidepvacsipcrplusvax"
+                    "k2":"sivicsidepvacsipcrplusvax6plusrappel"
                 },
                 {
                     "t":"keyfigure.compare.3",
                     "k1":"couvcompletvaccination",
-                    "k2":"tauxoccupation"
+                    "k2":"patientsrea"
                 },
                 {
                     "t":"keyfigure.compare.4",
@@ -182,7 +192,7 @@
             "name":"app.smartwallet.ages",
             "value":{
                 "low":18,
-                "lowExpDays":152,
+                "lowExpDays":31,
                 "high":65
             }
         },
@@ -202,9 +212,9 @@
         {
             "name":"app.smartwallet.elg",
             "value":{
-                "vacc22DosesNbDays":153,
+                "vacc22DosesNbDays":92,
                 "vaccJan11DosesNbDays":31,
-                "recNbDays":153,
+                "recNbDays":92,
                 "displayElgDays":26
             }
         },

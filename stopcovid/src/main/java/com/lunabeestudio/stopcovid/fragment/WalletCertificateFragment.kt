@@ -38,6 +38,8 @@ import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.extension.findParentFragmentByType
+import com.lunabeestudio.stopcovid.coreui.extension.formatOrNull
+import com.lunabeestudio.stopcovid.coreui.extension.getApplicationLocale
 import com.lunabeestudio.stopcovid.coreui.extension.toDimensSize
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
@@ -45,6 +47,7 @@ import com.lunabeestudio.stopcovid.extension.collectWithLifecycle
 import com.lunabeestudio.stopcovid.extension.countryCode
 import com.lunabeestudio.stopcovid.extension.daysTo
 import com.lunabeestudio.stopcovid.extension.fullDescription
+import com.lunabeestudio.stopcovid.extension.fullNameList
 import com.lunabeestudio.stopcovid.extension.fullNameUppercase
 import com.lunabeestudio.stopcovid.extension.getString
 import com.lunabeestudio.stopcovid.extension.infosDescription
@@ -68,6 +71,7 @@ import com.lunabeestudio.stopcovid.extension.titleDescription
 import com.lunabeestudio.stopcovid.extension.toCovidException
 import com.lunabeestudio.stopcovid.extension.toRaw
 import com.lunabeestudio.stopcovid.extension.vaccineDose
+import com.lunabeestudio.stopcovid.extension.vaccineMedicinalProduct
 import com.lunabeestudio.stopcovid.fastitem.CertificateCardItem
 import com.lunabeestudio.stopcovid.fastitem.bigTitleItem
 import com.lunabeestudio.stopcovid.fastitem.certificateCardItem
@@ -84,6 +88,7 @@ import com.lunabeestudio.stopcovid.model.UnknownException
 import com.lunabeestudio.stopcovid.model.VaccinationCertificate
 import com.lunabeestudio.stopcovid.model.Valid
 import com.lunabeestudio.stopcovid.model.WalletCertificate
+import com.lunabeestudio.stopcovid.utils.lazyFast
 import com.lunabeestudio.stopcovid.viewmodel.WalletViewModelFactory
 import com.lunabeestudio.stopcovid.worker.DccLightGenerationWorker
 import com.mikepenz.fastadapter.GenericItem
@@ -91,7 +96,6 @@ import kotlinx.coroutines.launch
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Date
-import java.util.Locale
 import kotlin.math.roundToInt
 
 import com.lunabeestudio.stopcovid.extension.showCertificateDetails
@@ -122,7 +126,7 @@ class WalletCertificateFragment : MainFragment() {
         )
     }
 
-    private val longDateFormat = SimpleDateFormat.getDateInstance(DateFormat.LONG)
+    private val longDateFormat by lazyFast { SimpleDateFormat.getDateInstance(DateFormat.LONG, getApplicationLocale()) }
 
     override fun getTitleKey(): String = "walletController.title"
 
@@ -185,11 +189,11 @@ class WalletCertificateFragment : MainFragment() {
 
         val hasExpiredDcc = {
             sharedPrefs.showSmartWallet
-                && robertManager.configuration.isSmartWalletOn
-                && viewModel.profileCertificates.value?.any { (_, certificate) ->
-                    val smartWalletState = certificate.smartWalletState(robertManager.configuration)
-                    smartWalletState !is Valid
-                } == true
+                    && robertManager.configuration.isSmartWalletOn
+                    && viewModel.profileCertificates.value?.any { (_, certificate) ->
+                val smartWalletState = certificate.smartWalletState(robertManager.configuration)
+                smartWalletState !is Valid
+            } == true
         }
 
         val hasErrorCertificate = hasInvalidDcc() || hasBlacklistedCertificate() || hasExpiredDcc()
@@ -295,7 +299,7 @@ class WalletCertificateFragment : MainFragment() {
             is EuropeanCertificate -> null
         }
         val certificateDetails = if (sharedPrefs.showCertificateDetails) {
-           certificate.fullDescription(strings, robertManager.configuration)
+           certificate.fullDescription(strings, robertManager.configuration, requireContext())
         } else { "" }
 
         val firstName = if (! sharedPrefs.showCertificateDetails) {
@@ -319,7 +323,7 @@ class WalletCertificateFragment : MainFragment() {
 
         val infoDescription = getInfoDescription(certificate, smartWalletState)
         val warningDescription = getWarningDescription(certificate, isBlacklisted, smartWalletState)
-        val errorDescription = getErrorDescription(smartWalletState)
+        val errorDescription = getErrorDescription(certificate, smartWalletState)
         val description = getDescription(certificate)
 
         return certificateCardItem {
@@ -350,7 +354,7 @@ class WalletCertificateFragment : MainFragment() {
                     val uri = barcodeBitmap?.let { bitmap ->
                         ShareManager.getShareCaptureUriFromBitmap(requireContext(), bitmap, "qrCode")
                     }
-                    val text = certificate.fullDescription(strings, robertManager.configuration).takeIf { uri != null }
+                    val text = certificate.fullDescription(strings, robertManager.configuration, context).takeIf { uri != null }
                     ShareManager.setupCertificateSharingBottomSheet(containerFragment, text) {
                         uri
                     }
@@ -399,8 +403,8 @@ class WalletCertificateFragment : MainFragment() {
     }
 
     private suspend fun getDescription(certificate: WalletCertificate): String {
-        var description = certificate.infosDescription(strings, robertManager.configuration)
-        val dateFormat = SimpleDateFormat("d MMM yyyy", Locale.getDefault())
+        var description = certificate.infosDescription(strings, robertManager.configuration, context)
+        val dateFormat = SimpleDateFormat("d MMM yyyy", getApplicationLocale())
         if (robertManager.configuration.isSmartWalletOn && sharedPrefs.showSmartWallet) {
             if (certificate.isEligibleForSmartWallet(blacklistDCCManager)) {
                 (certificate as? EuropeanCertificate)
@@ -423,18 +427,25 @@ class WalletCertificateFragment : MainFragment() {
     }
 
     private fun getInfoDescription(certificate: WalletCertificate, smartWalletState: SmartWalletState?): Spannable {
-        val greenCertificate = (certificate as? EuropeanCertificate)?.greenCertificate
         val eligibilityInfo = when (smartWalletState) {
             is Eligible -> {
-                strings["smartWallet.elegibility.info"]
+                (certificate as? EuropeanCertificate)?.greenCertificate?.vaccineMedicinalProduct?.let { vaccineProduct ->
+                    strings["smartWallet.elegibility.info.${certificate.type.code}.$vaccineProduct"]
+                } ?: strings["smartWallet.elegibility.info.${certificate.type.code}"]
             }
             is EligibleSoon -> {
-                stringsFormat("smartWallet.elegibility.soon.info", longDateFormat.format(smartWalletState.eligibleDate ?: Date()))
+                val label = (certificate as? EuropeanCertificate)?.greenCertificate?.vaccineMedicinalProduct?.let { vaccineProduct ->
+                    strings["smartWallet.elegibility.soon.info.${certificate.type.code}.$vaccineProduct"]
+                } ?: strings["smartWallet.elegibility.soon.info.${certificate.type.code}"]
+
+                label.formatOrNull(longDateFormat.format(smartWalletState.eligibleDate ?: Date()))
             }
             else -> {
                 null
             }
         }
+
+        val greenCertificate = (certificate as? EuropeanCertificate)?.greenCertificate
         val foreignCountryInfo = if (greenCertificate?.isFrench == false) {
             strings["wallet.proof.europe.foreignCountryWarning.${greenCertificate.countryCode?.lowercase()}"]
         } else {
@@ -456,9 +467,12 @@ class WalletCertificateFragment : MainFragment() {
         isBlacklisted: Boolean,
         smartWalletState: SmartWalletState?
     ): Spannable {
-        val greenCertificate = (certificate as? EuropeanCertificate)?.greenCertificate
         val expirationWarning = if (smartWalletState is ExpireSoon) {
-            stringsFormat("smartWallet.expiration.soon.warning", longDateFormat.format(smartWalletState.expirationDate ?: Date()))
+            val label = (certificate as? EuropeanCertificate)?.greenCertificate?.vaccineMedicinalProduct?.let { vaccineProduct ->
+                strings["smartWallet.expiration.soon.warning.${certificate.type.code}.$vaccineProduct"]
+            } ?: strings["smartWallet.expiration.soon.warning.${certificate.type.code}"]
+
+            label.formatOrNull(longDateFormat.format(smartWalletState.expirationDate ?: Date()))
         } else {
             null
         }
@@ -467,7 +481,9 @@ class WalletCertificateFragment : MainFragment() {
         } else {
             null
         }
+
         // Fix SIDEP has generated positive test instead of recovery
+        val greenCertificate = (certificate as? EuropeanCertificate)?.greenCertificate
         val positiveSidepErrorWarning = if (greenCertificate?.testResultIsNegative == false) {
             strings["wallet.proof.europe.test.positiveSidepError"]
         } else {
@@ -491,9 +507,16 @@ class WalletCertificateFragment : MainFragment() {
             }
     }
 
-    private fun getErrorDescription(smartWalletState: SmartWalletState?): Spannable {
+    private fun getErrorDescription(
+        certificate: WalletCertificate,
+        smartWalletState: SmartWalletState?,
+    ): Spannable {
         val expirationError = if (smartWalletState is Expired) {
-            stringsFormat("smartWallet.expiration.error", longDateFormat.format(smartWalletState.expirationDate ?: Date()))
+            val label = (certificate as? EuropeanCertificate)?.greenCertificate?.vaccineMedicinalProduct?.let { vaccineProduct ->
+                strings["smartWallet.expiration.error.${certificate.type.code}.$vaccineProduct"]
+            } ?: strings["smartWallet.expiration.error.${certificate.type.code}"]
+
+            label.formatOrNull(longDateFormat.format(smartWalletState.expirationDate ?: Date()))
         } else {
             null
         }

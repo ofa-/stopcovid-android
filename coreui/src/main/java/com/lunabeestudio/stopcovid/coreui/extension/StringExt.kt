@@ -22,8 +22,10 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import retrofit2.HttpException
 import retrofit2.Response
+import timber.log.Timber
 import java.io.File
 import java.net.HttpURLConnection
+import java.util.IllegalFormatException
 import java.util.concurrent.TimeUnit
 
 @Deprecated("Use com.lunabeestudio.framework.remote.server.ServerManager.saveTo")
@@ -123,5 +125,16 @@ fun String?.formatWithSameValue(value: Any?): String? {
         val count = (this.count() - cleanedString.count()) / placeholder.count()
         val values = Array(count) { value }
         return String.format(it, *values)
+    }
+}
+
+fun String?.formatOrNull(vararg args: Any?): String? {
+    return this?.let {
+        try {
+            String.format(it, *args)
+        } catch (e: IllegalFormatException) {
+            Timber.e(e)
+            it
+        }
     }
 }

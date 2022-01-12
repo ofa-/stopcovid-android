@@ -20,6 +20,7 @@ import com.lunabeestudio.analytics.model.ErrorEventName
 import com.lunabeestudio.domain.extension.ntpTimeSToUnixTimeMs
 import com.lunabeestudio.domain.model.TacResult
 import com.lunabeestudio.stopcovid.R
+import com.lunabeestudio.stopcovid.coreui.extension.getApplicationLocale
 import com.lunabeestudio.stopcovid.coreui.extension.setImageResourceOrHide
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
@@ -28,6 +29,7 @@ import com.lunabeestudio.stopcovid.extension.secureKeystoreDataSource
 import com.lunabeestudio.stopcovid.extension.showDbFailure
 import com.lunabeestudio.stopcovid.extension.showMigrationFailed
 import com.lunabeestudio.stopcovid.fastitem.deleteCardItem
+import com.lunabeestudio.stopcovid.utils.lazyFast
 import com.lunabeestudio.stopcovid.viewmodel.VenuesHistoryViewModel
 import com.lunabeestudio.stopcovid.viewmodel.VenuesHistoryViewModelFactory
 import com.mikepenz.fastadapter.GenericItem
@@ -35,7 +37,6 @@ import kotlinx.coroutines.launch
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Date
-import java.util.Locale
 
 class VenuesHistoryFragment : MainFragment() {
 
@@ -49,11 +50,13 @@ class VenuesHistoryFragment : MainFragment() {
 
     override fun getTitleKey(): String = "venuesHistoryController.title"
 
-    private val dateTimeFormat: DateFormat = SimpleDateFormat.getDateTimeInstance(
-        DateFormat.LONG,
-        DateFormat.SHORT,
-        Locale.getDefault()
-    )
+    private val dateTimeFormat: DateFormat by lazyFast {
+        SimpleDateFormat.getDateTimeInstance(
+            DateFormat.LONG,
+            DateFormat.SHORT,
+            context.getApplicationLocale(),
+        )
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

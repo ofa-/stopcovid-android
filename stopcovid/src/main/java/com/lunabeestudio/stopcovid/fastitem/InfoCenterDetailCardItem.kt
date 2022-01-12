@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.setTextOrHide
+import com.lunabeestudio.stopcovid.coreui.manager.LocalizedStrings
 import com.lunabeestudio.stopcovid.databinding.ItemInfoCenterDetailCardBinding
 import com.lunabeestudio.stopcovid.extension.openInExternalBrowser
 import com.lunabeestudio.stopcovid.model.InfoCenterTag
@@ -31,7 +32,7 @@ import com.mikepenz.fastadapter.binding.BindingViewHolder
 class InfoCenterDetailCardItem : AbstractBindingItem<ItemInfoCenterDetailCardBinding>() {
     var header: String? = null
     var tags: List<InfoCenterTag> = emptyList()
-    var strings: Map<String, String> = emptyMap()
+    var strings: LocalizedStrings = emptyMap()
     var title: String? = null
     var body: String? = null
     var link: String? = null

@@ -306,6 +306,14 @@ class AnalyticsManager(okHttpClient: OkHttpClient, context: Context) : Lifecycle
     private suspend fun reportSynchronizedHealthEvent(eventName: HealthEventName, desc: String? = null) {
         reportHealthEventMtx.withLock {
             val timestampedEventList = getHealthEvents().toMutableList()
+
+            // Enforce eh1 uniqueness
+            if (eventName == HealthEventName.eh1) {
+                timestampedEventList.removeIf {
+                    it.name == HealthEventName.eh1.name
+                }
+            }
+
             timestampedEventList += TimestampedEvent(eventName.name, dateFormat.format(currentRoundedHourInstant()), desc ?: "")
             val file = File(File(filesDir, FOLDER_NAME), FILE_NAME_HEALTH_EVENTS)
             writeTimestampedEventProtoToFile(file, timestampedEventList.toProto())
@@ -315,7 +323,7 @@ class AnalyticsManager(okHttpClient: OkHttpClient, context: Context) : Lifecycle
     fun reportWSError(wsName: String, wsVersion: String, errorCode: Int, desc: String? = null) {
         if (sharedPreferences.isOptIn) {
             if (desc?.contains("No address associated with hostname") != true) {
-                val name = "ERR-${wsName.uppercase(Locale.getDefault())}-${wsVersion.uppercase(Locale.getDefault())}-$errorCode"
+                val name = "ERR-${wsName.uppercase(Locale.ROOT)}-${wsVersion.uppercase(Locale.ROOT)}-$errorCode"
                 CoroutineScope(Dispatchers.IO).launch {
                     reportSynchronizedErrorEvent(name)
                 }
@@ -342,13 +350,15 @@ class AnalyticsManager(okHttpClient: OkHttpClient, context: Context) : Lifecycle
 
     private fun writeTimestampedEventProtoToFile(file: File, timestampedEventProtoList: ProtoStorage.TimestampedEventProtoList) {
         executeActionOnAtomicFile {
+            val atomicFile = AtomicFile(file)
             try {
-                val atomicFile = AtomicFile(file)
-                val fileOutputStream = atomicFile.startWrite()
-                timestampedEventProtoList.writeTo(fileOutputStream)
-                atomicFile.finishWrite(fileOutputStream)
+                atomicFile.startWrite().use { fos ->
+                    timestampedEventProtoList.writeTo(fos)
+                    atomicFile.finishWrite(fos)
+                }
             } catch (e: Exception) {
                 Timber.e(e)
+                atomicFile.delete()
             }
         }
     }

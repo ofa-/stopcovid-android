@@ -91,3 +91,9 @@ fun Context.getApplicationLanguage(): String {
         Locale.getDefault().language.takeIf { supportedLanguages.contains(it) } ?: UiConstants.DEFAULT_LANGUAGE
     }
 }
+
+fun Context?.getApplicationLocale(): Locale {
+    return this?.getApplicationLanguage()?.let {
+        Locale(it)
+    } ?: Locale.getDefault().takeIf { UiConstants.SUPPORTED_LOCALES.contains(it) } ?: Locale(UiConstants.DEFAULT_LANGUAGE)
+}

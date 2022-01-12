@@ -17,13 +17,14 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import com.lunabeestudio.analytics.model.AppEventName
+import com.lunabeestudio.domain.model.TacResult
 import com.lunabeestudio.robert.extension.observeEventAndConsume
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.UiConstants
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.extension.findParentFragmentByType
-import com.lunabeestudio.stopcovid.coreui.extension.getApplicationLanguage
+import com.lunabeestudio.stopcovid.coreui.extension.getApplicationLocale
 import com.lunabeestudio.stopcovid.coreui.extension.viewLifecycleOwnerOrNull
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
@@ -42,23 +43,21 @@ import com.lunabeestudio.stopcovid.model.DepartmentKeyFigure
 import com.lunabeestudio.stopcovid.model.KeyFigure
 import com.lunabeestudio.stopcovid.model.KeyFigureCategory
 import com.lunabeestudio.stopcovid.model.KeyFiguresNotAvailableException
-import com.lunabeestudio.domain.model.TacResult
+import com.lunabeestudio.stopcovid.utils.lazyFast
 import com.mikepenz.fastadapter.GenericItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
-import java.util.Locale
 
 class KeyFiguresFragment : MainFragment() {
 
     private var category: KeyFigureCategory = KeyFigureCategory.UNKNOWN
 
-    private val numberFormat: NumberFormat = NumberFormat.getNumberInstance(Locale.getDefault())
-    private val dateFormat by lazy {
-        SimpleDateFormat(UiConstants.DAY_MONTH_DATE_PATTERN, Locale(requireContext().getApplicationLanguage()))
-    }
+    private val locale by lazyFast { context.getApplicationLocale() }
+    private val numberFormat: NumberFormat by lazyFast { NumberFormat.getNumberInstance(locale) }
+    private val dateFormat by lazyFast { SimpleDateFormat(UiConstants.DAY_MONTH_DATE_PATTERN, locale) }
 
     private val sharedPrefs: SharedPreferences by lazy {
         PreferenceManager.getDefaultSharedPreferences(requireContext())

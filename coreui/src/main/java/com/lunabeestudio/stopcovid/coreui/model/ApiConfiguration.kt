@@ -179,6 +179,8 @@ internal class ApiConfiguration(
     val keyFiguresCombination: String,
     @SerializedName("app.wallet.vaccin.noWaitDosesPivotDate")
     val noWaitDosesPivotDate: String,
+    @SerializedName("app.wallet.dccKids")
+    val dccKids: String,
 )
 
 internal fun ApiConfiguration.toDomain(gson: Gson) = Configuration(
@@ -334,4 +336,5 @@ internal fun ApiConfiguration.toDomain(gson: Gson) = Configuration(
         }
     },
     noWaitDosesPivotDate = noWaitDosesPivotDate,
+    dccKidsEmoji = gson.fromJson(dccKids, ApiDccKidsEmoji::class.java).dccKidsEmoji
 )

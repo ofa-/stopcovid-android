@@ -54,7 +54,9 @@ import com.lunabeestudio.stopcovid.manager.VaccinationCenterManager
 import com.lunabeestudio.stopcovid.model.KeyFigure
 import com.lunabeestudio.stopcovid.model.KeyFiguresNotAvailableException
 import com.lunabeestudio.domain.model.TacResult
+import com.lunabeestudio.stopcovid.coreui.extension.getApplicationLocale
 import com.lunabeestudio.stopcovid.manager.ChartManager
+import com.lunabeestudio.stopcovid.utils.lazyFast
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -72,15 +74,15 @@ class KeyFigureDetailsFragment : BaseFragment() {
         PreferenceManager.getDefaultSharedPreferences(requireContext())
     }
 
-    private val keyFiguresManager: KeyFiguresManager by lazy(LazyThreadSafetyMode.NONE) {
+    private val keyFiguresManager: KeyFiguresManager by lazyFast {
         injectionContainer.keyFiguresManager
     }
-    private val vaccinationCenterManager: VaccinationCenterManager by lazy(LazyThreadSafetyMode.NONE) {
+    private val vaccinationCenterManager: VaccinationCenterManager by lazyFast {
         injectionContainer.vaccinationCenterManager
     }
 
     private var keyFigure: KeyFigure? = null
-    private val numberFormat: NumberFormat = NumberFormat.getNumberInstance(Locale.getDefault())
+    private val numberFormat: NumberFormat by lazyFast { NumberFormat.getNumberInstance(context.getApplicationLocale()) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -18,7 +18,7 @@ import androidx.work.WorkerParameters
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.UiConstants
-import com.lunabeestudio.stopcovid.fragment.ProximityFragment
+import com.lunabeestudio.stopcovid.fragment.HomeFragment
 
 class ActivateReminderNotificationWorker(context: Context, workerParams: WorkerParameters) : NotificationWorker(context, workerParams) {
     override val notificationChannelId: String = UiConstants.Notification.ACTIVATE_REMINDER.channelId
@@ -27,8 +27,8 @@ class ActivateReminderNotificationWorker(context: Context, workerParams: WorkerP
     override val pendingIntent: PendingIntent = NavDeepLinkBuilder(applicationContext)
         .setComponentName(MainActivity::class.java)
         .setGraph(R.navigation.nav_main)
-        .setDestination(R.id.proximityFragment)
-        .setArguments(bundleOf(Pair(ProximityFragment.START_PROXIMITY_ARG_KEY, true)))
+        .setDestination(R.id.homeFragment)
+        .setArguments(bundleOf(Pair(HomeFragment.START_PROXIMITY_ARG_KEY, true)))
         .createPendingIntent()
     override val notificationTitleKey: String = "notification.reactivationReminder.title"
     override val notificationBodyKey: String = "notification.reactivationReminder.body"

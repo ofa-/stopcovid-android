@@ -12,6 +12,7 @@ package com.lunabeestudio.stopcovid.model
 
 import android.content.Context
 import com.github.mikephil.charting.data.Entry
+import com.lunabeestudio.stopcovid.coreui.extension.getApplicationLocale
 import com.lunabeestudio.stopcovid.coreui.extension.isNightMode
 import com.lunabeestudio.stopcovid.coreui.extension.stringsFormat
 import com.lunabeestudio.stopcovid.coreui.manager.LocalizedStrings
@@ -23,7 +24,6 @@ import com.lunabeestudio.stopcovid.extension.limitLineStringKey
 import com.lunabeestudio.stopcovid.extension.safeParseColor
 import com.lunabeestudio.stopcovid.fragment.ChartDataType
 import java.text.NumberFormat
-import java.util.Locale
 import kotlin.time.Duration.Companion.seconds
 
 class ChartInformation(
@@ -47,7 +47,7 @@ class ChartInformation(
     var chartExplanationLabel: String? = null
         private set
 
-    private val numberFormat: NumberFormat = NumberFormat.getNumberInstance(Locale.getDefault())
+    private val numberFormat: NumberFormat = NumberFormat.getNumberInstance(context.getApplicationLocale())
 
     init {
         val localChartData = departmentKeyFigure?.let {
