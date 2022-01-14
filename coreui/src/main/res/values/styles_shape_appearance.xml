@@ -41,7 +41,7 @@
         <item name="cornerSize">@dimen/corner_radius</item>
     </style>
 
-    <style name="ShapeAppearance.StopCovid.BottomSheetDialog" parent="">
+    <style name="ShapeAppearance.StopCovid.TopRoundedCardView" parent="">
         <item name="cornerSize">0dp</item>
         <item name="cornerFamilyTopLeft">rounded</item>
         <item name="cornerFamilyTopRight">rounded</item>

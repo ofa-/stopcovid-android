@@ -90,7 +90,7 @@ fun String.sha256(): String = MessageDigest
     .fold("", { str, it -> str + "%02x".format(it) })
 
 // Dirty hack to fix strange display of quotes on some Android devices
-fun String.fixQuoteInString(): String = replace("'", "")
+fun String.fixQuoteInString(): String = replace("'à'", "à")
 
 fun String?.safeParseColor(): Int = Color.parseColor(this ?: "#0B0091")
 

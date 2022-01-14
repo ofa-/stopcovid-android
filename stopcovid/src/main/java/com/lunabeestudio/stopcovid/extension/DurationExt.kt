@@ -60,7 +60,7 @@ fun Duration.getRelativeDateTimeString(context: Context, localizedStrings: Local
                     }
                 }
 
-                dateTimeFormatter.combineDateAndTime(dateString, timeString)
+                dateTimeFormatter.combineDateAndTime(dateString, timeString).fixQuoteInString()
             } else {
                 val dateString = getRelativeString(daysSinceThis, localizedStrings)
                 "$dateString, $timeString"
@@ -68,12 +68,13 @@ fun Duration.getRelativeDateTimeString(context: Context, localizedStrings: Local
         }
         else -> {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                val dateTimeFormatter = RelativeDateTimeFormatter.getInstance(appLocale)
                 val dateString = SimpleDateFormat.getDateInstance(DateFormat.SHORT, appLocale)
                     .format(Date(this.inWholeMilliseconds))
                 val timeString = SimpleDateFormat.getTimeInstance(DateFormat.SHORT, appLocale)
                     .format(Date(this.inWholeMilliseconds))
 
-                RelativeDateTimeFormatter.getInstance(appLocale).combineDateAndTime(dateString, timeString)
+                dateTimeFormatter.combineDateAndTime(dateString, timeString).fixQuoteInString()
             } else {
                 SimpleDateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, appLocale)
                     .format(Date(this.inWholeMilliseconds))

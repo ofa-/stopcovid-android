@@ -1362,5 +1362,6 @@
     "smartWallet.elegibility.soon.info.vaccine.EU/1/20/1525":"D’après ce certificat Janssen, vous serez éligible au rappel vaccinal le %@.",
     "smartWallet.elegibility.info.vaccine.EU/1/20/1525":"D’après ce certificat Janssen, vous êtes actuellement éligible au rappel vaccinal.",
     "smartWallet.expiration.soon.warning.vaccine.EU/1/20/1525":"Ce pass activité 🇫🇷 ne sera plus valide le %@. Un rappel est nécessaire.\nTesté positif après ce Janssen ? Importez votre certificat de rétablissement.",
-    "smartWallet.expiration.error.vaccine.EU/1/20/1525":"Ce pass activité 🇫🇷 a expiré le %@. Un rappel est nécessaire.\nTesté positif après ce Janssen ? Importez votre certificat de rétablissement."
+    "smartWallet.expiration.error.vaccine.EU/1/20/1525":"Ce pass activité 🇫🇷 a expiré le %@. Un rappel est nécessaire.\nTesté positif après ce Janssen ? Importez votre certificat de rétablissement.",
+    "common.readNext":"Lire la suite"
 }

@@ -75,7 +75,7 @@
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/bottomSheetCard"
-        style="@style/Widget.MaterialComponents.CardView"
+        style="@style/Widget.StopCovid.CardView.TopRounded"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:cardElevation="@dimen/bottom_sheet_card_elevation"

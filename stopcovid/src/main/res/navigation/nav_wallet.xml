@@ -147,6 +147,9 @@
         <action
             android:id="@+id/action_walletContainerFragment_to_qrCodeMoreActionBottomSheetFragment"
             app:destination="@id/qrCodeMoreActionBottomSheetFragment" />
+        <action
+            android:id="@+id/action_walletContainerFragment_to_simpleTextBottomSheetFragment"
+            app:destination="@id/certificateInfoBottomSheetFragment" />
     </fragment>
     <fragment
         android:id="@+id/confirmAddWalletCertificateFragment"
@@ -293,7 +296,7 @@
     </fragment>
     <fragment
         android:id="@+id/walletQuantityWarningFragment"
-        android:name="com.lunabeestudio.stopcovid.fragment.WalletQuantityWarningFragment" >
+        android:name="com.lunabeestudio.stopcovid.fragment.WalletQuantityWarningFragment">
 
         <argument
             android:name="passthrough"
@@ -396,5 +399,16 @@
         <argument
             android:name="showBrightness"
             app:argType="boolean" />
+    </dialog>
+    <dialog
+        android:id="@+id/certificateInfoBottomSheetFragment"
+        android:name="com.lunabeestudio.stopcovid.fragment.CertificateInfoBottomSheetFragment"
+        tools:layout="@layout/fragment_certificate_info_bottom_sheet">
+        <argument
+            android:name="text"
+            app:argType="string" />
+        <argument
+            android:name="headerState"
+            app:argType="com.lunabeestudio.stopcovid.model.CertificateHeaderState" />
     </dialog>
 </navigation>

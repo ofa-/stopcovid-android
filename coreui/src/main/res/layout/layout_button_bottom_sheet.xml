@@ -39,7 +39,7 @@
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/bottomSheetCardView"
-                style="@style/Widget.MaterialComponents.CardView"
+                style="@style/Widget.StopCovid.CardView.TopRounded"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/spacing_medium"

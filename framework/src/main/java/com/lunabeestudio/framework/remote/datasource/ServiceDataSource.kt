@@ -54,8 +54,6 @@ class ServiceDataSource(
     private val api: StopCovidApi = RetrofitClient.getService(baseUrl, StopCovidApi::class.java, okHttpClient)
     private val reportApi: StopCovidApi = RetrofitClient.getService(baseUrl, StopCovidApi::class.java, reportOkHttpClient)
 
-    private val filesDir = context.filesDir
-
     override suspend fun generateCaptcha(apiVersion: String, type: CaptchaType, language: String): RobertResultData<String> {
         val result = RequestHelper.tryCatchRequestData(
             apiVersion,

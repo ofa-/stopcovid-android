@@ -74,6 +74,7 @@ import com.lunabeestudio.stopcovid.fastitem.CertificateCardItem
 import com.lunabeestudio.stopcovid.fastitem.bigTitleItem
 import com.lunabeestudio.stopcovid.fastitem.certificateCardItem
 import com.lunabeestudio.stopcovid.manager.ShareManager
+import com.lunabeestudio.stopcovid.model.CertificateHeaderState
 import com.lunabeestudio.stopcovid.model.Eligible
 import com.lunabeestudio.stopcovid.model.EligibleSoon
 import com.lunabeestudio.stopcovid.model.EuropeanCertificate
@@ -347,18 +348,29 @@ class WalletCertificateFragment : MainFragment() {
         val errorDescription = getErrorDescription(certificate, smartWalletState)
         val description = getDescription(certificate)
 
+        val (headerState, headerText) = when {
+            errorDescription.isNotBlank() -> Pair(CertificateHeaderState.ERROR, errorDescription)
+            warningDescription.isNotBlank() -> Pair(CertificateHeaderState.WARNING, warningDescription)
+            else -> Pair(CertificateHeaderState.INFO, infoDescription)
+        }
+
         return certificateCardItem {
             this.generateBarcode = generateBarcode
             titleText = certificate.titleDescription(strings)
             nameText = certificate.fullNameList(robertManager.configuration)
             descriptionText = description
-            infoText = infoDescription
-            warningText = warningDescription
-            errorText = errorDescription
+            this.headerText = headerText
+            this.headerState = headerState
             share = strings["walletController.menu.share"]
             delete = strings["walletController.menu.delete"]
             convertText = strings["walletController.menu.convertToEurope"]
             tag1Text = strings[certificate.tagStringKey()]
+            readMoreText = strings["common.readNext"]
+            onReadMoreClick = {
+                findParentFragmentByType<WalletContainerFragment>()?.findNavControllerOrNull()?.safeNavigate(
+                    WalletContainerFragmentDirections.actionWalletContainerFragmentToSimpleTextBottomSheetFragment(headerText, headerState)
+                )
+            }
 
             when (certificate) {
                 is FrenchCertificate -> {
@@ -459,7 +471,7 @@ class WalletCertificateFragment : MainFragment() {
         return description
     }
 
-    private fun getInfoDescription(certificate: WalletCertificate, smartWalletState: SmartWalletState?): Spannable {
+    private fun getInfoDescription(certificate: WalletCertificate, smartWalletState: SmartWalletState?): String {
         val eligibilityInfo = when (smartWalletState) {
             is Eligible -> {
                 (certificate as? EuropeanCertificate)?.greenCertificate?.vaccineMedicinalProduct?.let { vaccineProduct ->
@@ -489,17 +501,13 @@ class WalletCertificateFragment : MainFragment() {
             foreignCountryInfo,
         )
             .joinToString("\n\n")
-            .toSpannable()
-            .also {
-                Linkify.addLinks(it, Linkify.WEB_URLS)
-            }
     }
 
     private fun getWarningDescription(
         certificate: WalletCertificate,
         isBlacklisted: Boolean,
         smartWalletState: SmartWalletState?
-    ): Spannable {
+    ): String {
         val expirationWarning = if (smartWalletState is ExpireSoon) {
             val label = (certificate as? EuropeanCertificate)?.greenCertificate?.vaccineMedicinalProduct?.let { vaccineProduct ->
                 strings["smartWallet.expiration.soon.warning.${certificate.type.code}.$vaccineProduct"]
@@ -534,16 +542,12 @@ class WalletCertificateFragment : MainFragment() {
             autotestWarning,
         )
             .joinToString("\n\n")
-            .toSpannable()
-            .also {
-                Linkify.addLinks(it, Linkify.WEB_URLS)
-            }
     }
 
     private fun getErrorDescription(
         certificate: WalletCertificate,
         smartWalletState: SmartWalletState?,
-    ): Spannable {
+    ): String {
         val expirationError = if (smartWalletState is Expired) {
             val label = (certificate as? EuropeanCertificate)?.greenCertificate?.vaccineMedicinalProduct?.let { vaccineProduct ->
                 strings["smartWallet.expiration.error.${certificate.type.code}.$vaccineProduct"]
@@ -557,10 +561,6 @@ class WalletCertificateFragment : MainFragment() {
             expirationError,
         )
             .joinToString("\n\n")
-            .toSpannable()
-            .also {
-                Linkify.addLinks(it, Linkify.WEB_URLS)
-            }
     }
 
     private fun showConversionConfirmationAlert(certificate: FrenchCertificate) {
