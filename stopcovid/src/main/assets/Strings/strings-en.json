@@ -1413,5 +1413,6 @@
     "smartWallet.elegibility.soon.info.vaccine.EU/1/20/1525":"Based on this Janssen certificate, you are eligible for the vaccine booster on %@.",
     "smartWallet.elegibility.info.vaccine.EU/1/20/1525":"Based on this Janssen certificate, you are eligible for the vaccine booster now.",
     "smartWallet.expiration.soon.warning.vaccine.EU/1/20/1525":"This French 🇫🇷 health pass will be deactivated on %@. A booster is required.",
-    "smartWallet.expiration.error.vaccine.EU/1/20/1525":"This French 🇫🇷 health pass expired on %@. A booster is required."
+    "smartWallet.expiration.error.vaccine.EU/1/20/1525":"This French 🇫🇷 health pass expired on %@. A booster is required.",
+    "common.readNext":"Read more"
 }

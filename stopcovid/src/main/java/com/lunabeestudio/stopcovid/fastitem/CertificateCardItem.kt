@@ -11,18 +11,18 @@
 package com.lunabeestudio.stopcovid.fastitem
 
 import android.graphics.Bitmap
-import android.text.Spannable
 import android.text.method.LinkMovementMethod
 import android.text.style.URLSpan
+import android.text.util.Linkify
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorRes
-import androidx.annotation.DrawableRes
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
+import androidx.core.text.toSpannable
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.lunabeestudio.stopcovid.R
@@ -31,13 +31,13 @@ import com.lunabeestudio.stopcovid.coreui.extension.fetchSystemColorStateList
 import com.lunabeestudio.stopcovid.coreui.extension.setTextOrHide
 import com.lunabeestudio.stopcovid.databinding.ItemCertificateCardBinding
 import com.lunabeestudio.stopcovid.databinding.ItemTagBinding
+import com.lunabeestudio.stopcovid.model.CertificateHeaderState
 import com.mikepenz.fastadapter.binding.AbstractBindingItem
 
 class CertificateCardItem : AbstractBindingItem<ItemCertificateCardBinding>() {
     var generateBarcode: (() -> Bitmap)? = null
-    var infoText: Spannable? = null
-    var warningText: Spannable? = null
-    var errorText: Spannable? = null
+    var headerText: String? = null
+    var headerState: CertificateHeaderState? = null
     var titleText: String? = null
     var nameText: String? = null
     var descriptionText: String? = null
@@ -57,6 +57,8 @@ class CertificateCardItem : AbstractBindingItem<ItemCertificateCardBinding>() {
     var favoriteState: FavoriteState = FavoriteState.HIDDEN
     var onFavoriteClick: (() -> Unit)? = null
     var bottomText: String? = null
+    var readMoreText: String? = null
+    var onReadMoreClick: (() -> Unit)? = null
 
     @ColorRes
     var tag1ColorRes: Int? = null
@@ -87,40 +89,51 @@ class CertificateCardItem : AbstractBindingItem<ItemCertificateCardBinding>() {
         setupTags(binding)
         setupBottomAction(binding)
 
-        binding.constraintLayout.setOnClickListener {
+        binding.certificateContentLayout.setOnClickListener {
             onClick?.invoke()
         }
     }
 
     private fun setupHeader(binding: ItemCertificateCardBinding) {
-        val headerMessage = errorText?.takeIf { it.isNotBlank() } ?: warningText?.takeIf { it.isNotBlank() } ?: infoText
-        binding.headerMessageTextView.setTextOrHide(headerMessage)
-        headerMessage?.let { spannable ->
-            if (spannable.nextSpanTransition(0, spannable.length, URLSpan::class.java) != spannable.length) {
-                binding.headerMessageTextView.movementMethod = LinkMovementMethod.getInstance()
+        val headerTextSpan = headerText?.toSpannable()?.also {
+            Linkify.addLinks(it, Linkify.WEB_URLS)
+        }
+
+        binding.headerMessageTextView.setTextOrHide(headerTextSpan)
+        headerState?.let { headerState ->
+            binding.headerMessageLayout.setBackgroundColor(
+                ContextCompat.getColor(
+                    binding.root.context,
+                    headerState.backgroundColor,
+                )
+            )
+            val textColor = ContextCompat.getColor(binding.root.context, headerState.textColor)
+            binding.headerMessageTextView.setTextColor(textColor)
+            binding.readMoreTextView.setTextColor(textColor)
+            binding.topMessageImageView.setImageResource(headerState.icon)
+        }
+        binding.headerMessageLayout.isGone = headerTextSpan.isNullOrBlank()
+
+        binding.headerMessageTextView.post {
+            val isEllipsized = (binding.headerMessageTextView.layout?.getEllipsisCount(1) ?: 0) > 0
+            if (isEllipsized && onReadMoreClick != null) {
+                binding.readMoreTextView.setTextOrHide(readMoreText)
+                binding.headerMessageLayout.requestLayout()
+                binding.headerMessageLayout.setOnClickListener {
+                    onReadMoreClick?.invoke()
+                }
             } else {
-                binding.headerMessageTextView.movementMethod = null
+                if (!headerTextSpan?.getSpans(0, headerTextSpan.length, URLSpan::class.java).isNullOrEmpty()) {
+                    binding.headerMessageTextView.movementMethod = LinkMovementMethod.getInstance()
+                } else {
+                    binding.headerMessageTextView.movementMethod = null
+                }
+
+                binding.readMoreTextView.isVisible = false
+                binding.headerMessageLayout.setOnClickListener(null)
+                binding.headerMessageLayout.isClickable = false
             }
         }
-        val headerState = when {
-            !errorText.isNullOrBlank() -> HeaderState.ERROR
-            !warningText.isNullOrBlank() -> HeaderState.WARNING
-            else -> HeaderState.INFO
-        }
-        binding.headerMessageLayout.setBackgroundColor(
-            ContextCompat.getColor(
-                binding.root.context,
-                headerState.backgroundColor,
-            )
-        )
-        binding.headerMessageTextView.setTextColor(
-            ContextCompat.getColor(
-                binding.root.context,
-                headerState.textColor,
-            )
-        )
-        binding.topMessageImageView.setImageResource(headerState.icon)
-        binding.headerMessageLayout.isGone = headerMessage.isNullOrBlank()
     }
 
     private fun setupTitle(binding: ItemCertificateCardBinding) {
@@ -237,28 +250,6 @@ class CertificateCardItem : AbstractBindingItem<ItemCertificateCardBinding>() {
 
     enum class FavoriteState {
         HIDDEN, NOT_CHECKED, CHECKED
-    }
-
-    enum class HeaderState(
-        @ColorRes val backgroundColor: Int,
-        @ColorRes val textColor: Int,
-        @DrawableRes val icon: Int,
-    ) {
-        INFO(
-            backgroundColor = R.color.color_mountain_meadow,
-            textColor = R.color.color_white_85,
-            icon = R.drawable.ic_info,
-        ),
-        WARNING(
-            backgroundColor = R.color.color_alert,
-            textColor = R.color.color_black_55,
-            icon = R.drawable.ic_warning,
-        ),
-        ERROR(
-            backgroundColor = R.color.color_error,
-            textColor = R.color.color_white_85,
-            icon = R.drawable.ic_warning,
-        )
     }
 }
 

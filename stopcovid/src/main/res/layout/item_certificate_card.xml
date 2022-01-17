@@ -17,21 +17,18 @@
     android:layout_marginHorizontal="@dimen/spacing_large"
     android:layout_marginVertical="@dimen/spacing_small">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/constraintLayout"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?selectableItemBackground">
+        android:orientation="vertical">
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/headerMessageLayout"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:foreground="?selectableItemBackground"
             android:orientation="horizontal"
             android:padding="@dimen/spacing_large"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
             tools:background="@color/color_malibu">
 
             <ImageView
@@ -42,152 +39,182 @@
                 android:layout_marginEnd="@dimen/spacing_large"
                 android:alpha="0.55"
                 android:importantForAccessibility="no"
-                android:src="@drawable/ic_info" />
+                android:src="@drawable/ic_info"
+                app:layout_constraintEnd_toStartOf="@id/headerMessageTextView"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/headerMessageTextView"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:ellipsize="end"
                 android:includeFontPadding="false"
+                android:maxLines="2"
                 android:textAppearance="@style/TextAppearance.StopCovid.Caption"
                 android:textIsSelectable="false"
+                app:layout_constraintBottom_toTopOf="@id/readMoreTextView"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/topMessageImageView"
+                app:layout_constraintTop_toTopOf="parent"
                 tools:alpha="0.55"
                 tools:text="@tools:sample/lorem[20]" />
-        </LinearLayout>
 
-        <TextView
-            android:id="@+id/titleTextView"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/spacing_large"
-            android:gravity="center_vertical"
-            android:lines="1"
-            android:textAppearance="@style/TextAppearance.StopCovid.Caption.Small.Grey"
-            android:textIsSelectable="false"
-            app:layout_constraintBottom_toBottomOf="@id/actionButton"
-            app:layout_constraintEnd_toStartOf="@id/favoriteButton"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/headerMessageLayout"
-            tools:text="@tools:sample/lorem[15]" />
+            <TextView
+                android:id="@+id/readMoreTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_small"
+                android:includeFontPadding="false"
+                android:textAppearance="@style/TextAppearance.StopCovid.Caption.Small"
+                android:textIsSelectable="false"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="@id/headerMessageTextView"
+                app:layout_constraintTop_toBottomOf="@id/headerMessageTextView"
+                tools:alpha="0.55"
+                tools:text="@tools:sample/lorem" />
 
-        <View
-            android:id="@+id/separator"
-            android:layout_width="0dp"
-            android:layout_height="1dp"
-            android:background="?dividerColor"
-            app:layout_constraintBottom_toTopOf="@id/imageView"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/actionButton" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <ImageView
-            android:id="@+id/imageView"
-            android:layout_width="@dimen/qr_code_size"
-            android:layout_height="@dimen/qr_code_size"
-            android:layout_marginVertical="@dimen/spacing_large"
-            android:layout_marginStart="@dimen/spacing_large"
-            android:importantForAccessibility="no"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/separator"
-            tools:src="@tools:sample/avatars" />
-
-        <TextView
-            android:id="@+id/nameTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/spacing_large"
-            android:layout_marginTop="@dimen/spacing_large"
-            android:textAppearance="@style/TextAppearance.StopCovid.Title"
-            android:textIsSelectable="false"
-            android:rotation="-90"
-            app:layout_constraintTop_toBottomOf="@id/separator"
-            app:layout_constraintBottom_toTopOf="@id/aboveTagBarrier"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@id/actionButton"
-            tools:text="@tools:sample/lorem[3]" />
-
-        <TextView
-            android:id="@+id/descriptionTextView"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/spacing_large"
-            android:layout_marginVertical="@dimen/spacing_large"
-            android:textAppearance="@style/TextAppearance.StopCovid.Caption"
-            android:textIsSelectable="false"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/imageView"
-            app:layout_constraintTop_toBottomOf="@id/separator"
-            tools:text="@tools:sample/lorem[14]" />
-
-        <androidx.constraintlayout.widget.Barrier
-            android:id="@+id/aboveTagBarrier"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:barrierDirection="bottom"
-            app:constraint_referenced_ids="imageView,descriptionTextView" />
-
-        <LinearLayout
-            android:id="@+id/tagLayout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toTopOf="@id/bottomActionTextView"
-            app:layout_constraintStart_toStartOf="@id/imageView"
-            app:layout_constraintEnd_toEndOf="@id/imageView"
-            app:layout_constraintTop_toBottomOf="@id/aboveTagBarrier"
-            app:layout_goneMarginBottom="@dimen/spacing_large">
-
-            <include
-                android:id="@+id/tag1"
-                layout="@layout/item_tag" />
-
-            <include
-                android:id="@+id/tag2"
-                layout="@layout/item_tag" />
-        </LinearLayout>
-
-        <ImageButton
-            android:id="@+id/favoriteButton"
-            android:layout_width="@dimen/min_touch_target_size"
-            android:layout_height="@dimen/min_touch_target_size"
-            android:background="@drawable/ripple_rounded"
-            android:padding="@dimen/spacing_large"
-            android:src="@drawable/ic_empty_heart"
-            android:visibility="gone"
-            app:layout_constraintEnd_toStartOf="@id/actionButton"
-            app:layout_constraintTop_toBottomOf="@id/headerMessageLayout"
-            app:tint="?colorControlNormal"
-            tools:ignore="ContentDescription"
-            tools:visibility="visible" />
-
-        <ImageButton
-            android:id="@+id/actionButton"
-            android:layout_width="@dimen/min_touch_target_size"
-            android:layout_height="@dimen/min_touch_target_size"
-            android:background="@drawable/ripple_rounded"
-            android:padding="@dimen/spacing_large"
-            android:src="@drawable/ic_delete"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/headerMessageLayout"
-            app:tint="?colorControlNormal"
-            tools:ignore="ContentDescription" />
-
-        <TextView
-            android:id="@+id/bottomActionTextView"
-            style="@style/Theme.StopCovid.Link"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/certificateContentLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/spacing_large"
-            android:background="@color/color_primary_light"
-            android:gravity="center"
-            android:paddingVertical="@dimen/spacing_large"
-            android:paddingStart="@dimen/spacing_large"
-            android:paddingEnd="@dimen/spacing_small"
-            android:textIsSelectable="false"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tagLayout"
-            tools:text="@tools:sample/lorem[3]" />
+            android:background="?selectableItemBackground">
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <TextView
+                android:id="@+id/titleTextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/spacing_large"
+                android:gravity="center_vertical"
+                android:lines="1"
+                android:textAppearance="@style/TextAppearance.StopCovid.Caption.Small.Grey"
+                android:textIsSelectable="false"
+                app:layout_constraintBottom_toBottomOf="@id/actionButton"
+                app:layout_constraintEnd_toStartOf="@id/favoriteButton"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/headerMessageLayout"
+                tools:text="@tools:sample/lorem[15]" />
+
+            <View
+                android:id="@+id/separator"
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:background="?dividerColor"
+                app:layout_constraintBottom_toTopOf="@id/imageView"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/actionButton" />
+
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="@dimen/qr_code_size"
+                android:layout_height="@dimen/qr_code_size"
+                android:layout_marginVertical="@dimen/spacing_large"
+                android:layout_marginStart="@dimen/spacing_large"
+                android:importantForAccessibility="no"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/separator"
+                tools:src="@tools:sample/avatars" />
+
+            <TextView
+                android:id="@+id/nameTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/spacing_large"
+                android:layout_marginTop="@dimen/spacing_large"
+                android:textAppearance="@style/TextAppearance.StopCovid.Title"
+                android:textIsSelectable="false"
+                android:rotation="-90"
+                app:layout_constraintTop_toBottomOf="@id/separator"
+                app:layout_constraintBottom_toTopOf="@id/aboveTagBarrier"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@id/actionButton"
+                tools:text="@tools:sample/lorem[3]" />
+
+            <TextView
+                android:id="@+id/descriptionTextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/spacing_large"
+                android:layout_marginVertical="@dimen/spacing_large"
+                android:textAppearance="@style/TextAppearance.StopCovid.Caption"
+                android:textIsSelectable="false"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/imageView"
+                app:layout_constraintTop_toBottomOf="@id/separator"
+                tools:text="@tools:sample/lorem[14]" />
+
+            <androidx.constraintlayout.widget.Barrier
+                android:id="@+id/aboveTagBarrier"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:barrierDirection="bottom"
+                app:constraint_referenced_ids="imageView,descriptionTextView" />
+
+            <LinearLayout
+                android:id="@+id/tagLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toTopOf="@id/bottomActionTextView"
+                app:layout_constraintEnd_toEndOf="@id/imageView"
+                app:layout_constraintStart_toStartOf="@id/imageView"
+                app:layout_constraintTop_toBottomOf="@id/aboveTagBarrier"
+                app:layout_goneMarginBottom="@dimen/spacing_large">
+
+                <include
+                    android:id="@+id/tag1"
+                    layout="@layout/item_tag" />
+
+                <include
+                    android:id="@+id/tag2"
+                    layout="@layout/item_tag" />
+            </LinearLayout>
+
+            <ImageButton
+                android:id="@+id/favoriteButton"
+                android:layout_width="@dimen/min_touch_target_size"
+                android:layout_height="@dimen/min_touch_target_size"
+                android:background="@drawable/ripple_rounded"
+                android:padding="@dimen/spacing_large"
+                android:src="@drawable/ic_empty_heart"
+                android:visibility="gone"
+                app:layout_constraintEnd_toStartOf="@id/actionButton"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="?colorControlNormal"
+                tools:ignore="ContentDescription"
+                tools:visibility="visible" />
+
+            <ImageButton
+                android:id="@+id/actionButton"
+                android:layout_width="@dimen/min_touch_target_size"
+                android:layout_height="@dimen/min_touch_target_size"
+                android:background="@drawable/ripple_rounded"
+                android:padding="@dimen/spacing_large"
+                android:src="@drawable/ic_delete"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/headerMessageLayout"
+                app:tint="?colorControlNormal"
+                tools:ignore="ContentDescription" />
+
+            <TextView
+                android:id="@+id/bottomActionTextView"
+                style="@style/Theme.StopCovid.Link"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_large"
+                android:background="@color/color_primary_light"
+                android:gravity="center"
+                android:paddingVertical="@dimen/spacing_large"
+                android:paddingStart="@dimen/spacing_large"
+                android:paddingEnd="@dimen/spacing_small"
+                android:textIsSelectable="false"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tagLayout"
+                tools:text="@tools:sample/lorem[3]" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 
 </com.google.android.material.card.MaterialCardView>

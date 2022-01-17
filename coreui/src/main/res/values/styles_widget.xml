@@ -81,7 +81,7 @@
     </style>
 
     <style name="Widget.StopCovid.BottomSheetDialog" parent="Widget.MaterialComponents.BottomSheet">
-        <item name="shapeAppearanceOverlay">@style/ShapeAppearance.StopCovid.BottomSheetDialog</item>
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearance.StopCovid.TopRoundedCardView</item>
     </style>
 
     <style name="Widget.App.CardView" parent="Widget.MaterialComponents.CardView">
@@ -154,6 +154,10 @@
         <item name="android:layout_height">@dimen/divider_height</item>
         <item name="android:layout_width">match_parent</item>
         <item name="android:background">@color/color_black_15</item>
+    </style>
+
+    <style name="Widget.StopCovid.CardView.TopRounded" parent="@style/Widget.MaterialComponents.CardView">
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearance.StopCovid.TopRoundedCardView</item>
     </style>
 
 </resources>

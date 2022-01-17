@@ -24,13 +24,8 @@ val GreenCertificate.certificateType: WalletCertificateType
             CertificateType.VACCINATION -> WalletCertificateType.VACCINATION_EUROPE
             CertificateType.RECOVERY -> WalletCertificateType.RECOVERY_EUROPE
             CertificateType.TEST -> WalletCertificateType.SANITARY_EUROPE
-            CertificateType.UNKNOWN -> {
-                if (exemptionStatement != null) {
-                    WalletCertificateType.EXEMPTION
-                } else {
-                    WalletCertificateType.ACTIVITY_PASS
-                }
-            }
+            CertificateType.EXEMPTION -> WalletCertificateType.EXEMPTION
+            else -> WalletCertificateType.ACTIVITY_PASS
         }
     }
 
@@ -42,15 +37,15 @@ val GreenCertificate.countryCode: String?
         WalletCertificateType.SANITARY,
         WalletCertificateType.VACCINATION -> null
         WalletCertificateType.ACTIVITY_PASS -> Locale.FRANCE.country
-        WalletCertificateType.SANITARY_EUROPE -> tests?.lastOrNull()?.countryOfVaccination
-        WalletCertificateType.VACCINATION_EUROPE -> vaccinations?.lastOrNull()?.countryOfVaccination
-        WalletCertificateType.RECOVERY_EUROPE -> recoveryStatements?.lastOrNull()?.countryOfVaccination
-        WalletCertificateType.EXEMPTION -> exemptionStatement?.countryOfVaccination
+        WalletCertificateType.SANITARY_EUROPE,
+        WalletCertificateType.VACCINATION_EUROPE,
+        WalletCertificateType.RECOVERY_EUROPE,
+        WalletCertificateType.EXEMPTION -> getIssuingCountry()
     }
 
 // French Polynesia, New Caledonia, Wallis and Futuna, and Saint Pierre and Miquelon are French territory
 val GreenCertificate.isFrench: Boolean
-    get() = listOf(Locale.FRANCE.country, "NC", "WF", "PM", "PF").contains(this.countryCode)
+    get() = listOf(Locale.FRANCE.country, "NC", "WF", "PM", "PF").contains(this.countryCode?.uppercase())
 
 val GreenCertificate.vaccineMedicinalProduct: String?
     get() = vaccinations?.lastOrNull()?.medicinalProduct?.trim()
