@@ -2,11 +2,11 @@
     "config":[
         {
             "name":"lastUpdate",
-            "value":"06 Jan 2022"
+            "value":"19 Jan 2022"
         },
         {
             "name":"version",
-            "value":120
+            "value":124
         },
         {
             "name":"versionCalibrationBle",
@@ -201,8 +201,11 @@
             "value":{
                 "pivot1":"2021-12-15",
                 "pivot2":"2022-01-15",
+                "pivot3":"2022-02-15",
                 "vacc22DosesNbDays":214,
                 "vacc11DosesNbDays":214,
+                "vacc22DosesNbNewDays":122,
+                "vacc11DosesNbNewDays":122,
                 "recNbDays":180,
                 "vaccJan11DosesNbDays":61,
                 "displayExpOnAllDcc":240,
@@ -259,7 +262,7 @@
         },
         {
             "name":"app.activityPass.generationServerPublicKey",
-            "value":"MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEbW1CsREnlCkmZIzpX/D3jBB5ok5shbIYSHCpE/1Q0QqY2JmfpS2qlPLYJcu7Ouc7YNRXT+c3uTtv1Drokzf+oA=="
+            "value":"MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEpuWWSr7/9EgjNxg4a7HuvjKtPuV9+M2kXHwLH5GOwRZK5dB6WcvTynfqDagTdCAkQoi6xSojQPsk5LpswjgyXQ=="
         },
         {
             "name":"app.activityPass.renewThreshold",
@@ -389,7 +392,7 @@
         },
         {
             "name":"app.checkStatusFrequency",
-            "value":12.0
+            "value":8.0
         },
         {
             "name":"app.minStatusRetryDuration",

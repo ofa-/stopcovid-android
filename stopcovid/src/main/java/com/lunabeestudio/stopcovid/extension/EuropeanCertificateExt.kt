@@ -57,6 +57,7 @@ private fun EuropeanCertificate.expirationDate(configuration: Configuration): Da
 
     val datePivot1 = configuration.smartWalletExp?.pivot1?.let(yearMonthDayUsParserForceTimeZone::parse)?.time ?: 0L
     val datePivot2 = configuration.smartWalletExp?.pivot2?.let(yearMonthDayUsParserForceTimeZone::parse)?.time ?: 0L
+    val datePivot3 = configuration.smartWalletExp?.pivot3?.let(yearMonthDayUsParserForceTimeZone::parse)?.time ?: 0L
 
     val agePivotLow: Long
     val agePivotHigh: Long
@@ -86,17 +87,25 @@ private fun EuropeanCertificate.expirationDate(configuration: Configuration): Da
     val expDcc = when {
         (isAr || isAz) && vaccinDoseNumber == 1 -> {
             val vacc11DosesMillis = configuration.smartWalletExp?.vacc11DosesNbDays?.days?.inWholeMilliseconds ?: 0L
+            val vacc11DosesNewMillis = configuration.smartWalletExp?.vacc11DosesNbNewDays?.days?.inWholeMilliseconds ?: 0L
             max(
-                cutoff,
-                greenCertificate.vaccineDateForceTimeZone?.time?.plus(vacc11DosesMillis)
+                max(
+                    cutoff,
+                    min(datePivot3, greenCertificate.vaccineDateForceTimeZone?.time?.plus(vacc11DosesMillis) ?: 0L)
+                ),
+                greenCertificate.vaccineDateForceTimeZone?.time?.plus(vacc11DosesNewMillis)
                     ?: 0L
             )
         }
         (isAr || isAz) && vaccinDoseNumber == 2 -> {
             val vacc22DosesMillis = configuration.smartWalletExp?.vacc22DosesNbDays?.days?.inWholeMilliseconds ?: 0L
+            val vacc22DosesNewMillis = configuration.smartWalletExp?.vacc22DosesNbNewDays?.days?.inWholeMilliseconds ?: 0L
             max(
-                cutoff,
-                greenCertificate.vaccineDateForceTimeZone?.time?.plus(vacc22DosesMillis)
+                max(
+                    cutoff,
+                    min(datePivot3, greenCertificate.vaccineDateForceTimeZone?.time?.plus(vacc22DosesMillis) ?: 0L)
+                ),
+                greenCertificate.vaccineDateForceTimeZone?.time?.plus(vacc22DosesNewMillis)
                     ?: 0L
             )
         }

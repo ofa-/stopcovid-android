@@ -52,7 +52,7 @@ class ImportQrBottomViewModel(
             field = value
         }
     val loading: SingleLiveEvent<Boolean> = SingleLiveEvent()
-    val scanResult: SingleLiveEvent<Result> = SingleLiveEvent()
+    val scanResult: SingleLiveEvent<Result?> = SingleLiveEvent()
     val passwordFailure: SingleLiveEvent<Boolean> = SingleLiveEvent()
 
     fun scanImageFile(context: Context, uri: Uri?) {

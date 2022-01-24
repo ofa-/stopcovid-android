@@ -10,6 +10,7 @@
 
 package com.lunabeestudio.stopcovid.usecase
 
+import com.lunabeestudio.domain.model.TacResult
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.stopcovid.extension.isBlacklisted
 import com.lunabeestudio.stopcovid.extension.isEligibleForActivityPass
@@ -48,7 +49,7 @@ class CleanAndRenewActivityPassUseCaseTest {
             generateActivityPassUseCase,
         )
 
-        every { walletRepository.walletCertificateFlow } returns MutableStateFlow(emptyList())
+        every { walletRepository.walletCertificateFlow } returns MutableStateFlow(TacResult.Success(emptyList()))
     }
 
     @Test
@@ -63,7 +64,14 @@ class CleanAndRenewActivityPassUseCaseTest {
         every { notBlacklistedDcc.id } returns "not_blacklisted"
         coEvery { notBlacklistedDcc.isBlacklisted(any()) } returns false
 
-        every { walletRepository.walletCertificateFlow } returns MutableStateFlow(listOf(blacklistedDcc, notBlacklistedDcc))
+        every { walletRepository.walletCertificateFlow } returns MutableStateFlow(
+            TacResult.Success(
+                listOf(
+                    blacklistedDcc,
+                    notBlacklistedDcc,
+                )
+            )
+        )
 
         runBlocking { useCase.invoke() }
 
@@ -116,7 +124,7 @@ class CleanAndRenewActivityPassUseCaseTest {
         coEvery { walletRepository.countValidActivityPassForCertificate("renewable", any()) } returns Int.MIN_VALUE
         coEvery { renewableDcc.isBlacklisted(any()) } returns false
 
-        every { walletRepository.walletCertificateFlow } returns MutableStateFlow(listOf(renewableDcc))
+        every { walletRepository.walletCertificateFlow } returns MutableStateFlow(TacResult.Success(listOf(renewableDcc)))
 
         runBlocking { useCase.invoke() }
 
@@ -149,7 +157,7 @@ class CleanAndRenewActivityPassUseCaseTest {
         coEvery { walletRepository.countValidActivityPassForCertificate("threshold_not_reached", any()) } returns Int.MAX_VALUE
         coEvery { thresholdNotReachedDcc.isBlacklisted(any()) } returns false
 
-        every { walletRepository.walletCertificateFlow } returns MutableStateFlow(listOf(thresholdNotReachedDcc))
+        every { walletRepository.walletCertificateFlow } returns MutableStateFlow(TacResult.Success(listOf(thresholdNotReachedDcc)))
 
         runBlocking { useCase.invoke() }
 
@@ -175,7 +183,7 @@ class CleanAndRenewActivityPassUseCaseTest {
         coEvery { notRenewableDcc.isEligibleForActivityPass(any(), any()) } returns true
         coEvery { notRenewableDcc.isBlacklisted(any()) } returns false
 
-        every { walletRepository.walletCertificateFlow } returns MutableStateFlow(listOf(notRenewableDcc))
+        every { walletRepository.walletCertificateFlow } returns MutableStateFlow(TacResult.Success(listOf(notRenewableDcc)))
 
         runBlocking { useCase.invoke() }
 
@@ -194,7 +202,7 @@ class CleanAndRenewActivityPassUseCaseTest {
         coEvery { notEligibleDcc.isEligibleForActivityPass(any(), any()) } returns false
         coEvery { notEligibleDcc.isBlacklisted(any()) } returns false
 
-        every { walletRepository.walletCertificateFlow } returns MutableStateFlow(listOf(notEligibleDcc))
+        every { walletRepository.walletCertificateFlow } returns MutableStateFlow(TacResult.Success(listOf(notEligibleDcc)))
 
         runBlocking { useCase.invoke() }
 

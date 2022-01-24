@@ -38,7 +38,7 @@ class ConfirmVenueQrCodeViewModel(
                     venueTime?.toLong()
                 )
                 analyticsManager.reportAppEvent(AppEventName.e14, null)
-                venueProcessed.postValue(null)
+                venueProcessed.postValue(Unit)
             } catch (e: Exception) {
                 exception.postValue(e)
             }

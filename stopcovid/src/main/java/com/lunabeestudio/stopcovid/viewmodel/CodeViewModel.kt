@@ -45,7 +45,7 @@ class CodeViewModel(private val robertManager: RobertManager) : ViewModel() {
                 Timber.d("report total duration = ${(System.currentTimeMillis() - startTime).milliseconds}")
                 loadingInProgress.postValue(null)
                 when (result) {
-                    is RobertResult.Success -> codeSuccess.postValue(null)
+                    is RobertResult.Success -> codeSuccess.postValue(Unit)
                     is RobertResult.Failure -> covidException.postValue(result.error.toCovidException())
                 }
             }

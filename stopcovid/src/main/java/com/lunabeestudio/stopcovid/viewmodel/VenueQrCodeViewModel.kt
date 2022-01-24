@@ -34,7 +34,7 @@ class VenueQrCodeViewModel(
                     version = venueVersion.toInt(),
                     unixTimeInSeconds = venueTime?.toLongOrNull(),
                 )
-                venueProcessed.postValue(null)
+                venueProcessed.postValue(Unit)
             } catch (e: Exception) {
                 exception.postValue(e)
             }
@@ -48,7 +48,7 @@ class VenueQrCodeViewModel(
                     robertManager = robertManager,
                     code
                 )
-                venueProcessed.postValue(null)
+                venueProcessed.postValue(Unit)
             } catch (e: Exception) {
                 exception.postValue(e)
             }
