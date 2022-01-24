@@ -84,7 +84,7 @@ class NewAttestationViewModel(
                     infos.remove(Constants.Attestation.DATA_KEY_REASON)
                     secureKeystoreDataSource.savedAttestationData = infos
                 }
-                attestationGeneratedSuccess.postValue(null)
+                attestationGeneratedSuccess.postValue(Unit)
             } catch (e: Exception) {
                 covidException.postValue((e as? CovidException) ?: UnknownException(e.message ?: ""))
             }

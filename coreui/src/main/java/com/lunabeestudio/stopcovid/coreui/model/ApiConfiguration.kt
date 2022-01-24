@@ -336,5 +336,5 @@ internal fun ApiConfiguration.toDomain(gson: Gson) = Configuration(
         }
     },
     noWaitDosesPivotDate = noWaitDosesPivotDate,
-    dccKidsEmoji = gson.fromJson(dccKids, ApiDccKidsEmoji::class.java).dccKidsEmoji
+    dccKidsEmoji = gson.fromJson(dccKids, ApiDccKidsEmoji::class.java)?.dccKidsEmoji
 )

@@ -40,7 +40,7 @@ class VaccineCompletionViewModel(
                     walletRepository.toggleFavorite(it)
                 }
             }
-            showWalletEvent.postValue(null)
+            showWalletEvent.postValue(Unit)
         }
     }
 }

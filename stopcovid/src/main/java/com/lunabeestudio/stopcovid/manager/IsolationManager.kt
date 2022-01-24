@@ -33,7 +33,7 @@ class IsolationManager(
 
     private fun notifyChangeIfAllowed() {
         if (canTriggerChangedEvent) {
-            changedEvent.postValue(null)
+            changedEvent.postValue(Unit)
         }
     }
 

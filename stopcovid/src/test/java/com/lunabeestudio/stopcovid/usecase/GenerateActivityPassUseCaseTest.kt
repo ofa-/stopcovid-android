@@ -47,7 +47,7 @@ class GenerateActivityPassUseCaseTest {
             verifyCertificateUseCase,
         )
 
-        every { walletRepository.walletCertificateFlow } returns MutableStateFlow(emptyList())
+        every { walletRepository.walletCertificateFlow } returns MutableStateFlow(TacResult.Success(emptyList()))
     }
 
     @Test

@@ -72,7 +72,7 @@ class CaptchaViewModel(private val robertManager: RobertManager) : ViewModel() {
         val result = robertManager.getCaptchaImage(captchaId, imagePath)
         loadingInProgress.postValue(false)
         when (result) {
-            is RobertResult.Success -> imageSuccess.postValue(null)
+            is RobertResult.Success -> imageSuccess.postValue(Unit)
             is RobertResult.Failure -> covidException.postValue(result.error.toCovidException())
         }
     }
@@ -81,7 +81,7 @@ class CaptchaViewModel(private val robertManager: RobertManager) : ViewModel() {
         val result = robertManager.getCaptchaAudio(captchaId, audioPath)
         loadingInProgress.postValue(false)
         when (result) {
-            is RobertResult.Success -> audioSuccess.postValue(null)
+            is RobertResult.Success -> audioSuccess.postValue(Unit)
             is RobertResult.Failure -> covidException.postValue(result.error.toCovidException())
         }
     }

@@ -69,22 +69,22 @@ class SettingsViewModel(
 
     override fun eraseVenues(application: RobertApplication) {
         super.eraseVenues(application)
-        eraseLocalSuccess.postValue(null)
+        eraseLocalSuccess.postValue(Unit)
     }
 
     override fun eraseAttestations(context: Context) {
         super.eraseAttestations(context)
-        eraseLocalSuccess.postValue(null)
+        eraseLocalSuccess.postValue(Unit)
     }
 
     override fun eraseIsolation() {
         super.eraseIsolation()
-        eraseLocalSuccess.postValue(null)
+        eraseLocalSuccess.postValue(Unit)
     }
 
     override fun eraseCertificates() {
         super.eraseCertificates()
-        eraseLocalSuccess.postValue(null)
+        eraseLocalSuccess.postValue(Unit)
     }
 
     fun eraseLocalHistory() {
@@ -93,7 +93,7 @@ class SettingsViewModel(
                 viewModelScope.launch(Dispatchers.IO) {
                     loadingInProgress.postValue(true)
                     when (val result = robertManager.eraseLocalHistory()) {
-                        is RobertResult.Success -> eraseLocalSuccess.postValue(null)
+                        is RobertResult.Success -> eraseLocalSuccess.postValue(Unit)
                         is RobertResult.Failure -> covidException.postValue(result.error.toCovidException())
                     }
                     loadingInProgress.postValue(false)
@@ -110,7 +110,7 @@ class SettingsViewModel(
                 viewModelScope.launch(Dispatchers.IO) {
                     loadingInProgress.postValue(true)
                     when (val result = robertManager.eraseRemoteExposureHistory(application)) {
-                        is RobertResult.Success -> eraseRemoteSuccess.postValue(null)
+                        is RobertResult.Success -> eraseRemoteSuccess.postValue(Unit)
                         is RobertResult.Failure -> covidException.postValue(result.error.toCovidException())
                     }
                     loadingInProgress.postValue(false)
@@ -133,7 +133,7 @@ class SettingsViewModel(
                     loadingInProgress.postValue(true)
                     robertManager.updateStatus(application)
                     loadingInProgress.postValue(false)
-                    deleteAnalyticsSuccess.postValue(null)
+                    deleteAnalyticsSuccess.postValue(Unit)
                 }
             }
         } else {
@@ -149,7 +149,7 @@ class SettingsViewModel(
                     when (val result = robertManager.quitStopCovid(application)) {
                         is RobertResult.Success -> {
                             clearLocalData(application)
-                            quitStopCovidSuccess.postValue(null)
+                            quitStopCovidSuccess.postValue(Unit)
                         }
                         is RobertResult.Failure -> covidException.postValue(result.error.toCovidException())
                     }

@@ -36,7 +36,7 @@ class HealthViewModel(private val robertManager: RobertManager) : ViewModel() {
                 viewModelScope.launch(Dispatchers.IO) {
                     loadingInProgress.postValue(true)
                     when (val result = robertManager.eraseRemoteAlert()) {
-                        is RobertResult.Success -> eraseNotificationSuccess.postValue(null)
+                        is RobertResult.Success -> eraseNotificationSuccess.postValue(Unit)
                         is RobertResult.Failure -> covidException.postValue(result.error.toCovidException())
                     }
                     loadingInProgress.postValue(false)

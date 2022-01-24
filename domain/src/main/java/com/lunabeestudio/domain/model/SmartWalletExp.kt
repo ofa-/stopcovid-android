@@ -13,8 +13,11 @@ package com.lunabeestudio.domain.model
 class SmartWalletExp(
     val pivot1: String,
     val pivot2: String,
+    val pivot3: String,
     val vacc22DosesNbDays: Int,
     val vacc11DosesNbDays: Int,
+    val vacc22DosesNbNewDays: Int,
+    val vacc11DosesNbNewDays: Int,
     val recNbDays: Int,
     val vaccJan11DosesNbDays: Int,
     val displayExpOnAllDcc: Int,
