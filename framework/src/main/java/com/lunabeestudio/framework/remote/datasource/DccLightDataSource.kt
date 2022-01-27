@@ -17,11 +17,15 @@ import com.lunabeestudio.domain.model.DccLightData
 import com.lunabeestudio.framework.crypto.ServerKeyAgreementHelper
 import com.lunabeestudio.framework.remote.RetrofitClient
 import com.lunabeestudio.framework.remote.extension.remoteToRobertException
+import com.lunabeestudio.framework.remote.model.ApiAggregateCertificate
+import com.lunabeestudio.framework.remote.model.ApiAggregateError
+import com.lunabeestudio.framework.remote.model.ApiAggregateRQ
 import com.lunabeestudio.framework.remote.model.ApiDccLightList
 import com.lunabeestudio.framework.remote.model.ApiGenerateRQ
 import com.lunabeestudio.framework.remote.server.DccLightApi
 import com.lunabeestudio.robert.datasource.RemoteDccLightDataSource
 import com.lunabeestudio.robert.datasource.SharedCryptoDataSource
+import com.lunabeestudio.robert.model.AggregateBackendException
 import com.lunabeestudio.robert.model.BackendException
 import com.lunabeestudio.robert.model.NoInternetException
 import com.lunabeestudio.robert.model.RobertResultData
@@ -48,7 +52,7 @@ class DccLightDataSource(
         encodedCertificate: String,
     ): RobertResultData<DccLightData> {
         val serverKeyAgreementData = try {
-            serverKeyAgreementHelper.encryptRequestData(serverPublicKey, encodedCertificate)
+            serverKeyAgreementHelper.encryptRequestData(serverPublicKey, listOf(encodedCertificate))
         } catch (e: Exception) {
             Timber.e(e)
             return RobertResultData.Failure(UnknownException("Failed to encrypt certificate for dcc generation\n${e.message}"))
@@ -56,7 +60,7 @@ class DccLightDataSource(
 
         val apiGenerateRQ = ApiGenerateRQ(
             serverKeyAgreementData.encodedLocalPublicKey,
-            serverKeyAgreementData.encryptedData,
+            serverKeyAgreementData.encryptedData.first(),
         )
 
         @Suppress("BlockingMethodInNonBlockingContext")
@@ -85,6 +89,60 @@ class DccLightDataSource(
                 if (robertException !is NoInternetException) {
                     analyticsManager.reportWSError(
                         AnalyticsServiceName.DCC_LIGHT,
+                        "0",
+                        0,
+                        e.message,
+                    )
+                }
+                RobertResultData.Failure(robertException)
+            }
+        }
+    }
+
+    override suspend fun generateMultipass(serverPublicKey: String, encodedCertificateList: List<String>): RobertResultData<String> {
+        val serverKeyAgreementData = try {
+            serverKeyAgreementHelper.encryptRequestData(serverPublicKey, encodedCertificateList)
+        } catch (e: Exception) {
+            Timber.e(e)
+            return RobertResultData.Failure(UnknownException("Failed to encrypt certificate for dcc aggregation\n${e.message}"))
+        }
+
+        val apiAggregateRQ = ApiAggregateRQ(
+            serverKeyAgreementData.encodedLocalPublicKey,
+            serverKeyAgreementData.encryptedData,
+        )
+
+        @Suppress("BlockingMethodInNonBlockingContext")
+        return withContext(Dispatchers.IO) {
+            try {
+                val response = api.aggregate(apiAggregateRQ)
+                if (response.isSuccessful) {
+                    response.body()?.let {
+                        val multipassJson = serverKeyAgreementHelper.decryptResponse(it.response)
+                        val multipass = gson.fromJson(multipassJson, ApiAggregateCertificate::class.java).certificate
+                        RobertResultData.Success(multipass)
+                    } ?: RobertResultData.Failure(BackendException("Response successful but body is empty", response.code()))
+                } else {
+                    val error = response.errorBody()?.string()?.let { errorBody ->
+                        gson.fromJson(errorBody, ApiAggregateError::class.java)
+                    }
+                    if (error != null) {
+                        RobertResultData.Failure(
+                            AggregateBackendException(
+                                message = error.message,
+                                httpCode = response.code(),
+                                errorCodes = error.errors.map { it.code },
+                            )
+                        )
+                    } else {
+                        RobertResultData.Failure(BackendException(httpCode = response.code()))
+                    }
+                }
+            } catch (e: Exception) {
+                val robertException = e.remoteToRobertException()
+                if (robertException !is NoInternetException) {
+                    analyticsManager.reportWSError(
+                        AnalyticsServiceName.DCC_LIGHT_AGGREGATE,
                         "0",
                         0,
                         e.message,

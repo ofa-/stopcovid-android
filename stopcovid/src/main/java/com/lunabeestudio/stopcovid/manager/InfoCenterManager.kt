@@ -54,7 +54,6 @@ class InfoCenterManager(private val serverManager: ServerManager, private val st
     private var gson: Gson = Gson()
 
     private fun getUrl(): String = ConfigConstant.InfoCenter.URL
-
     private val typeInfoCenterLastUpdatedAt: Type = object : TypeToken<InfoCenterLastUpdatedAt>() {}.type
     private val typeInfoCenterEntry: Type = object : TypeToken<List<InfoCenterEntry>>() {}.type
     private val typeInfoCenterTag: Type = object : TypeToken<List<InfoCenterTag>>() {}.type

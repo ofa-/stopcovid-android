@@ -25,6 +25,7 @@ import com.lunabeestudio.stopcovid.viewmodel.ChooseKeyFiguresCompareViewModel
 import com.lunabeestudio.stopcovid.viewmodel.ChooseKeyFiguresCompareViewModelFactory
 import com.mikepenz.fastadapter.GenericItem
 
+// TODO BottomSheetMainFragment (?)
 class ChooseKeyFiguresCompareFragment : MainFragment() {
     override val layout: Int = R.layout.fragment_recycler_with_bottom_action
     override fun getTitleKey(): String = "keyfigures.comparison.screen.title"

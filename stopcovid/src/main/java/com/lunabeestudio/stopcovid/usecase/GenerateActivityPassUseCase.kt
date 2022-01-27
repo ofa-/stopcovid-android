@@ -85,7 +85,7 @@ class GenerateActivityPassUseCase(
                     dccData.rawDcc.forEach {
                         val rawDcc = RawWalletCertificate(
                             id = UUID.randomUUID().toString(),
-                            type = WalletCertificateType.ACTIVITY_PASS,
+                            type = WalletCertificateType.DCC_LIGHT,
                             value = it.value,
                             timestamp = -1, // not needed to store dcc light
                             isFavorite = false,

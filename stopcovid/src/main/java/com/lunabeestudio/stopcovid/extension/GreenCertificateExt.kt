@@ -25,7 +25,7 @@ val GreenCertificate.certificateType: WalletCertificateType
             CertificateType.RECOVERY -> WalletCertificateType.RECOVERY_EUROPE
             CertificateType.TEST -> WalletCertificateType.SANITARY_EUROPE
             CertificateType.EXEMPTION -> WalletCertificateType.EXEMPTION
-            else -> WalletCertificateType.ACTIVITY_PASS
+            else -> WalletCertificateType.DCC_LIGHT
         }
     }
 
@@ -36,11 +36,12 @@ val GreenCertificate.countryCode: String?
     get() = when (certificateType) {
         WalletCertificateType.SANITARY,
         WalletCertificateType.VACCINATION -> null
-        WalletCertificateType.ACTIVITY_PASS -> Locale.FRANCE.country
+        WalletCertificateType.DCC_LIGHT -> Locale.FRANCE.country
         WalletCertificateType.SANITARY_EUROPE,
         WalletCertificateType.VACCINATION_EUROPE,
         WalletCertificateType.RECOVERY_EUROPE,
-        WalletCertificateType.EXEMPTION -> getIssuingCountry()
+        WalletCertificateType.EXEMPTION,
+        WalletCertificateType.MULTI_PASS -> getIssuingCountry()
     }
 
 // French Polynesia, New Caledonia, Wallis and Futuna, and Saint Pierre and Miquelon are French territory
@@ -79,6 +80,9 @@ val GreenCertificate.testResultCode: String?
 val GreenCertificate.testDateTimeOfCollection: Date?
     get() = tests?.lastOrNull()?.dateTimeOfCollection
         ?.let(::parseToOffsetDateTimeOrNull)?.toInstant()?.let { Date.from(it) }
+
+val GreenCertificate.positiveTestOrRecoveryDate: Date?
+    get() = testDateTimeOfCollection.takeIf { this.testResultIsNegative != true } ?: recoveryDateOfFirstPositiveTest
 
 val GreenCertificate.recoveryDateOfFirstPositiveTest: Date?
     get() = recoveryStatements?.lastOrNull()?.dateOfFirstPositiveTest?.let(yearMonthDayUsParser()::parseOrNull)

@@ -45,4 +45,8 @@ abstract class BottomSheetMainFragment : MainFragment() {
         super.refreshScreen()
         bottomSheetBinding?.bottomSheetButton?.text = strings[getBottomSheetButtonKey()]
     }
+
+    protected fun setBottomButtonEnabled(isEnabled: Boolean) {
+        bottomSheetBinding?.bottomSheetButton?.isEnabled = isEnabled
+    }
 }

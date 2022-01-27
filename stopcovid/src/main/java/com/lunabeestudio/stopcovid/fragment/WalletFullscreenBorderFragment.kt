@@ -28,7 +28,7 @@ import com.lunabeestudio.stopcovid.coreui.extension.toDimensSize
 import com.lunabeestudio.stopcovid.coreui.fragment.BaseFragment
 import com.lunabeestudio.stopcovid.databinding.FragmentWalletFullscreenBorderBinding
 import com.lunabeestudio.stopcovid.extension.fullScreenBorderDescription
-import com.lunabeestudio.stopcovid.extension.collectWithLifecycle
+import com.lunabeestudio.stopcovid.extension.collectDataWithLifecycle
 import com.lunabeestudio.stopcovid.extension.injectionContainer
 import com.lunabeestudio.stopcovid.extension.isFrench
 import com.lunabeestudio.stopcovid.extension.navGraphWalletViewModels
@@ -77,7 +77,7 @@ class WalletFullscreenBorderFragment : BaseFragment() {
                 .data
                 ?.filterIsInstance<EuropeanCertificate>()
                 ?.firstOrNull { it.id == arguments?.getString(CERTIFICATE_ID_ARG_KEY) }
-        }.collectWithLifecycle(viewLifecycleOwner) { europeanCertificate ->
+        }.collectDataWithLifecycle(viewLifecycleOwner) { europeanCertificate ->
             this@WalletFullscreenBorderFragment.europeanCertificate = europeanCertificate
             europeanCertificate?.value?.let { dccValue ->
                 binding.barcodeSecuredView.bitmap = barcodeEncoder.encodeBitmap(

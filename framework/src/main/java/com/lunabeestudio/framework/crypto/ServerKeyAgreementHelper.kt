@@ -23,7 +23,7 @@ internal class ServerKeyAgreementHelper(
 
     fun encryptRequestData(
         serverPublicKey: String,
-        encodedData: String,
+        encodedDataList: List<String>,
     ): ServerKeyAgreementData {
         val rawServerKey = Base64.decode(serverPublicKey, Base64.NO_WRAP)
 
@@ -38,8 +38,12 @@ internal class ServerKeyAgreementHelper(
             )
         ).first().let {
             localPrivateKey = it
-            val encryptedData = sharedCryptoDataSource.encrypt(it, encodedData.toByteArray(Charsets.UTF_8))
-            val encodedEncryptedData = Base64.encodeToString(encryptedData, Base64.NO_WRAP)
+            val encryptedDataList = encodedDataList.map { encodedData ->
+                sharedCryptoDataSource.encrypt(it, encodedData.toByteArray(Charsets.UTF_8))
+            }
+            val encodedEncryptedData = encryptedDataList.map { encryptedData ->
+                Base64.encodeToString(encryptedData, Base64.NO_WRAP)
+            }
             ServerKeyAgreementData(encodedLocalPublicKey, encodedEncryptedData)
         }
 
@@ -60,6 +64,6 @@ internal class ServerKeyAgreementHelper(
 
     class ServerKeyAgreementData(
         val encodedLocalPublicKey: String,
-        val encryptedData: String,
+        val encryptedData: List<String>,
     )
 }

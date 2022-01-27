@@ -110,7 +110,7 @@ class GenerateActivityPassUseCaseTest {
                         )
                         walletRepository.saveCertificate(
                             *varargAll {
-                                it.type == WalletCertificateType.ACTIVITY_PASS &&
+                                it.type == WalletCertificateType.DCC_LIGHT &&
                                     it.value == "dcc_raw" &&
                                     it.timestamp == -1L &&
                                     !it.isFavorite &&

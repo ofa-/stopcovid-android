@@ -57,6 +57,10 @@ import com.lunabeestudio.stopcovid.repository.VenueRepository
 import com.lunabeestudio.stopcovid.repository.WalletRepository
 import com.lunabeestudio.stopcovid.usecase.CleanAndRenewActivityPassUseCase
 import com.lunabeestudio.stopcovid.usecase.GenerateActivityPassUseCase
+import com.lunabeestudio.stopcovid.usecase.GenerateMultipassUseCase
+import com.lunabeestudio.stopcovid.usecase.GetCloseMultipassProfilesUseCase
+import com.lunabeestudio.stopcovid.usecase.GetMultipassProfilesUseCase
+import com.lunabeestudio.stopcovid.usecase.GetFilteredMultipassProfileFromIdUseCase
 import com.lunabeestudio.stopcovid.usecase.GetSmartWalletCertificateUseCase
 import com.lunabeestudio.stopcovid.usecase.SmartWalletNotificationUseCase
 import com.lunabeestudio.stopcovid.usecase.VerifyAndGetCertificateCodeValueUseCase
@@ -151,21 +155,21 @@ class InjectionContainer(private val context: StopCovid, val coroutineScope: Cor
     )
 
     val robertManager: RobertManager = RobertManagerImpl(
-            application = context,
-            localEphemeralBluetoothIdentifierDataSource = SecureFileEphemeralBluetoothIdentifierDataSource(context, cryptoManager),
-            localKeystoreDataSource = secureKeystoreDataSource,
-            localLocalProximityDataSource = SecureFileLocalProximityDataSource(File(context.filesDir, LOCAL_PROXIMITY_DIR), cryptoManager),
-            serviceDataSource = serviceDataSource,
-            cleaDataSource = cleaDataSource,
-            sharedCryptoDataSource = sharedCryptoDataSource,
-            configurationDataSource = configurationDataSource,
-            calibrationDataSource = calibrationDataSource,
-            serverPublicKey = EnvConstant.Prod.serverPublicKey,
-            localProximityFilter = LocalProximityFilterImpl(),
-            analyticsManager = analyticsManager,
-            coroutineScope = coroutineScope,
-            venueRepository = venueRepository,
-        )
+        application = context,
+        localEphemeralBluetoothIdentifierDataSource = SecureFileEphemeralBluetoothIdentifierDataSource(context, cryptoManager),
+        localKeystoreDataSource = secureKeystoreDataSource,
+        localLocalProximityDataSource = SecureFileLocalProximityDataSource(File(context.filesDir, LOCAL_PROXIMITY_DIR), cryptoManager),
+        serviceDataSource = serviceDataSource,
+        cleaDataSource = cleaDataSource,
+        sharedCryptoDataSource = sharedCryptoDataSource,
+        configurationDataSource = configurationDataSource,
+        calibrationDataSource = calibrationDataSource,
+        serverPublicKey = EnvConstant.Prod.serverPublicKey,
+        localProximityFilter = LocalProximityFilterImpl(),
+        analyticsManager = analyticsManager,
+        coroutineScope = coroutineScope,
+        venueRepository = venueRepository,
+    )
 
     val cleanAndRenewActivityPassUseCase: CleanAndRenewActivityPassUseCase
         get() = CleanAndRenewActivityPassUseCase(
@@ -206,6 +210,27 @@ class InjectionContainer(private val context: StopCovid, val coroutineScope: Cor
             sharedPreferences = sharedPrefs,
             getSmartWalletCertificateUseCase = getSmartWalletCertificateUseCase,
         )
+
+    val getFilteredMultipassProfileFromIdUseCase: GetFilteredMultipassProfileFromIdUseCase
+        get() = GetFilteredMultipassProfileFromIdUseCase(
+            robertManager = robertManager,
+            walletRepository = walletRepository,
+            blacklistDCCManager = blacklistDCCManager,
+        )
+
+    val getMultipassProfilesUseCase: GetMultipassProfilesUseCase
+        get() = GetMultipassProfilesUseCase(
+            walletRepository = walletRepository,
+        )
+
+    val generateMultipassUseCase: GenerateMultipassUseCase
+        get() = GenerateMultipassUseCase(
+            walletRepository = walletRepository,
+            verifyCertificateUseCase = verifyCertificateUseCase,
+        )
+
+    val getCloseMultipassProfilesUseCase: GetCloseMultipassProfilesUseCase
+        get() = GetCloseMultipassProfilesUseCase()
 
     companion object {
         private const val LOCAL_PROXIMITY_DIR = "local_proximity"

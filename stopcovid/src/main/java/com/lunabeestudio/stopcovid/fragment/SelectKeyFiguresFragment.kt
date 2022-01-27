@@ -103,7 +103,7 @@ class SelectKeyFiguresFragment : MainFragment() {
     fun applyColorSelectItem(selectionItem: SelectionItem, labelKeyNumber: Int) {
         selectionItem.apply {
             showSelection = true
-            iconSelection = if (labelKeyNumber == 1) R.drawable.ic_one else R.drawable.ic_two
+            iconSelectionOn = if (labelKeyNumber == 1) R.drawable.ic_one else R.drawable.ic_two
             if (args.figureNumber != labelKeyNumber) {
                 context?.let {
                     val color = ContextCompat.getColor(it, R.color.color_gray)

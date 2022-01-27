@@ -54,7 +54,7 @@ fun View.applyAndConsumeWindowInsetBottom() {
 fun View.registerToAppBarLayoutForLiftOnScroll(appBarLayout: AppBarLayout) {
     // Ensure lift code is called after view is on screen
     appBarLayout.post {
-        appBarLayout.setLiftable(true)
+        appBarLayout.setLiftableOverrideEnabled(false)
         appBarLayout.isLiftOnScroll = true
         appBarLayout.liftOnScrollTargetViewId = id
         appBarLayout.refreshLift(this)

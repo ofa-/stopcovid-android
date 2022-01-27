@@ -27,8 +27,15 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.time.Duration.Companion.days
 
-fun EuropeanCertificate.profileId(): String {
+fun EuropeanCertificate.smartWalletProfileId(): String {
     return ((firstName ?: name).orEmpty() + greenCertificate.dateOfBirth).uppercase()
+}
+
+fun EuropeanCertificate.multipassProfileId(): String {
+    return (greenCertificate.person.standardisedGivenName.orEmpty() + greenCertificate.person.standardisedFamilyName)
+        .replace(Regex("[^a-zA-Z]*"), "")
+        .trim()
+        .uppercase() + greenCertificate.dateOfBirth
 }
 
 fun EuropeanCertificate.smartWalletState(configuration: Configuration): SmartWalletState {

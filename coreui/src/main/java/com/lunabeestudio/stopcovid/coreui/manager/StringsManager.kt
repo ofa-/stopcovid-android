@@ -67,10 +67,7 @@ class StringsManager(okHttpClient: OkHttpClient) : ServerManager<LocalizedString
         }
     }
 
-    override fun getUrl(): String {
-        return ConfigConstant.Labels.URL
-    }
-
+    override fun getUrl(): String = ConfigConstant.Labels.URL
     override val folderName: String = ConfigConstant.Labels.FOLDER
     override val prefix: String = ConfigConstant.Labels.FILE_PREFIX
     override val type: Type = object : TypeToken<LocalizedStrings>() {}.type

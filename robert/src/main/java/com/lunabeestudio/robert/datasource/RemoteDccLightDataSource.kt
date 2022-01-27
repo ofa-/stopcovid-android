@@ -10,9 +10,17 @@
 
 package com.lunabeestudio.robert.datasource
 
+import com.lunabeestudio.domain.model.DccLightData
+import com.lunabeestudio.robert.model.RobertResultData
+
 interface RemoteDccLightDataSource {
     suspend fun generateActivityPass(
         serverPublicKey: String,
         encodedCertificate: String,
-    ): com.lunabeestudio.robert.model.RobertResultData<com.lunabeestudio.domain.model.DccLightData>
+    ): RobertResultData<DccLightData>
+
+    suspend fun generateMultipass(
+        serverPublicKey: String,
+        encodedCertificateList: List<String>
+    ): RobertResultData<String>
 }

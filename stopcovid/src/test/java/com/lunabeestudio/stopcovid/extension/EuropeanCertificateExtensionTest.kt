@@ -22,7 +22,6 @@ import com.lunabeestudio.stopcovid.model.EuropeanCertificate
 import com.lunabeestudio.stopcovid.model.ExpireSoon
 import com.lunabeestudio.stopcovid.model.Expired
 import com.lunabeestudio.stopcovid.model.Valid
-import com.lunabeestudio.support.manager.SupportSmartWalletManager
 import dgca.verifier.app.decoder.model.GreenCertificate
 import dgca.verifier.app.decoder.model.Vaccination
 import io.mockk.MockKAnnotations
@@ -186,7 +185,7 @@ class EuropeanCertificateExtensionTest {
     private fun vaccineDcc(date: String): EuropeanCertificate {
         val vaccination = mockk<Vaccination>(relaxed = true).apply {
             every { dateOfVaccination } returns date
-            every { medicinalProduct } returns SupportSmartWalletManager.VaccinType.Pfizer.value
+            every { medicinalProduct } returns "EU/1/20/1528"
             every { doseNumber } returns 2
             every { totalSeriesOfDoses } returns 2
         }

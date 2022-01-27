@@ -82,7 +82,7 @@ fun String.titleCaseFirstChar(): String = replaceFirstChar {
     }
 }
 
-fun String.capitalizeWords(): String = split(" ").joinToString(" ") { it.titleCaseFirstChar() }
+fun String.capitalizeWords(): String = lowercase().split(" ").joinToString(" ") { it.titleCaseFirstChar() }
 
 fun String.sha256(): String = MessageDigest
     .getInstance("SHA-256")

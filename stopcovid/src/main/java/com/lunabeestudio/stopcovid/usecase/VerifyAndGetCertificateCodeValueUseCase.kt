@@ -22,7 +22,7 @@ class VerifyAndGetCertificateCodeValueUseCase(
 
         if (walletCertificate == null ||
             (certificateFormat != null && walletCertificate.type.format != certificateFormat) ||
-            walletCertificate.type == WalletCertificateType.ACTIVITY_PASS
+            walletCertificate.type == WalletCertificateType.DCC_LIGHT
         ) {
             throw WalletCertificateMalformedException()
         }

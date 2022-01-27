@@ -10,4 +10,9 @@ class DummyDccLightDataSource : RemoteDccLightDataSource {
         serverPublicKey: String,
         encodedCertificate: String,
     ): RobertResultData<DccLightData> = RobertResultData.Failure(ForbiddenException("Dummy datasource"))
+
+    override suspend fun generateMultipass(
+        serverPublicKey: String,
+        encodedCertificateList: List<String>
+    ): RobertResultData<String> = RobertResultData.Failure(ForbiddenException("Dummy datasource"))
 }

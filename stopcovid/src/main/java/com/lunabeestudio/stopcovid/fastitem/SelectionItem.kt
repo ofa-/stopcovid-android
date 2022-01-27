@@ -18,6 +18,7 @@ import android.view.ViewGroup
 import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.core.view.isInvisible
+import androidx.core.view.isVisible
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.fetchSystemColor
 import com.lunabeestudio.stopcovid.coreui.extension.setTextOrHide
@@ -32,7 +33,10 @@ class SelectionItem : AbstractBindingItem<ItemSelectionBinding>() {
     var maxLineCaption: Int? = null
 
     @DrawableRes
-    var iconSelection: Int = R.drawable.ic_check
+    var iconSelectionOff: Int? = null
+
+    @DrawableRes
+    var iconSelectionOn: Int = R.drawable.ic_check_on
 
     @ColorInt
     var iconTint: Int? = null
@@ -60,7 +64,6 @@ class SelectionItem : AbstractBindingItem<ItemSelectionBinding>() {
         binding.selectionImageView.isEnabled = this.isEnabled
         binding.selectionRootLayout.setOnClickListener(clickListener)
         binding.selectionRootLayout.isClickable = clickListener != null
-        binding.selectionImageView.isInvisible = !showSelection
 
         // max line on Caption
         maxLineCaption?.let {
@@ -68,14 +71,33 @@ class SelectionItem : AbstractBindingItem<ItemSelectionBinding>() {
             binding.captionTextView.ellipsize = TextUtils.TruncateAt.END
         }
 
-        binding.selectionImageView.setImageResource(iconSelection)
+        setupIcon(binding)
 
         iconTint?.let { color ->
             binding.selectionImageView.imageTintList = ColorStateList.valueOf(color)
         }
+
         textColor?.let { color ->
             binding.titleTextView.setTextColor(color)
             binding.captionTextView.setTextColor(color)
+        }
+    }
+
+    private fun setupIcon(binding: ItemSelectionBinding) {
+        val iconSelectionOff = this.iconSelectionOff
+        when {
+            showSelection -> {
+                binding.selectionImageView.isVisible = true
+                binding.selectionImageView.setImageResource(iconSelectionOn)
+            }
+            iconSelectionOff != null -> {
+                binding.selectionImageView.isVisible = true
+                binding.selectionImageView.setImageResource(iconSelectionOff)
+            }
+            else -> {
+                binding.selectionImageView.isInvisible = true
+                binding.selectionImageView.setImageResource(iconSelectionOn)
+            }
         }
     }
 

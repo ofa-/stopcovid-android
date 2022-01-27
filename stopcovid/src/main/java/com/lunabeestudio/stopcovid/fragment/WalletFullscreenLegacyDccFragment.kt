@@ -27,6 +27,7 @@ import androidx.navigation.navGraphViewModels
 import com.google.zxing.BarcodeFormat
 import com.journeyapps.barcodescanner.BarcodeEncoder
 import com.lunabeestudio.domain.model.TacResult
+import com.lunabeestudio.domain.model.WalletCertificateType
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.extension.appCompatActivity
@@ -35,10 +36,10 @@ import com.lunabeestudio.stopcovid.coreui.extension.setTextOrHide
 import com.lunabeestudio.stopcovid.coreui.extension.toDimensSize
 import com.lunabeestudio.stopcovid.coreui.fragment.BaseFragment
 import com.lunabeestudio.stopcovid.databinding.FragmentWalletFullscreenLegacyDccBinding
-import com.lunabeestudio.stopcovid.extension.collectWithLifecycle
+import com.lunabeestudio.stopcovid.extension.collectDataWithLifecycle
 import com.lunabeestudio.stopcovid.extension.fullDescription
-import com.lunabeestudio.stopcovid.extension.fullNameUppercase
 import com.lunabeestudio.stopcovid.extension.fullScreenBorderDescription
+import com.lunabeestudio.stopcovid.extension.fullScreenDescription
 import com.lunabeestudio.stopcovid.extension.injectionContainer
 import com.lunabeestudio.stopcovid.extension.isFrench
 import com.lunabeestudio.stopcovid.extension.robertManager
@@ -93,7 +94,7 @@ class WalletFullscreenLegacyDccFragment : BaseFragment() {
                     ?.filterIsInstance<EuropeanCertificate>()
                     ?.firstOrNull { it.id == args.id }
             }
-        }.collectWithLifecycle(viewLifecycleOwner) { result ->
+        }.collectDataWithLifecycle(viewLifecycleOwner) { result ->
             val mainActivity = activity as? MainActivity
             when (result) {
                 is TacResult.Failure -> {
@@ -173,7 +174,11 @@ class WalletFullscreenLegacyDccFragment : BaseFragment() {
         val europeanCertificate = europeanCertificate ?: return
 
         binding.apply {
-            logosImageView.isVisible = europeanCertificate.greenCertificate.isFrench
+            logosImageView.isVisible =
+                europeanCertificate.greenCertificate.isFrench && europeanCertificate.type != WalletCertificateType.MULTI_PASS
+            binding.showMoreSwitch.isVisible = europeanCertificate.type != WalletCertificateType.MULTI_PASS
+            binding.explanationTextSwitcher.isVisible = europeanCertificate.type != WalletCertificateType.MULTI_PASS
+
             showMoreSwitch.text = strings["europeanCertificate.fullscreen.type.border.switch"]
             showMoreSwitch.setOnCheckedChangeListener { _, isChecked ->
                 refreshDetails(isChecked, europeanCertificate)
@@ -207,7 +212,7 @@ class WalletFullscreenLegacyDccFragment : BaseFragment() {
             headerTextView.setTextOrHide(strings["europeanCertificate.fullscreen.${europeanCertificate.type.stringKey}.border.warning"])
         } else {
             detailsTextSwitcher.setCurrentText("")
-            detailsTextSwitcher.setText(europeanCertificate.fullNameUppercase())
+            detailsTextSwitcher.setText(context?.let { ctx -> europeanCertificate.fullScreenDescription(strings = strings, context = ctx) })
             explanationTextSwitcher.setCurrentText("")
             explanationTextSwitcher.setText(strings["europeanCertificate.fullscreen.type.minimum.footer"])
             headerTextView.isVisible = false

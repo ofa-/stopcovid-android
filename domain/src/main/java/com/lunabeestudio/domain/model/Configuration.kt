@@ -10,6 +10,8 @@
 
 package com.lunabeestudio.domain.model
 
+import kotlin.time.Duration
+
 class Configuration(
     var version: Int,
     val versionCalibrationBle: Int,
@@ -90,10 +92,14 @@ class Configuration(
     var keyFiguresCombination: List<KeyFigureCombination>?,
     var noWaitDosesPivotDate: String?,
     var dccKidsEmoji: DccKidsEmoji?,
+    var multipassConfig: MultipassConfig?,
+    var recoveryValidityThreshold: RecoveryValidityThreshold?,
 ) {
     class Notification(val title: String, val subtitle: String, val url: String, val version: Int)
     class ColorsCompareKeyFigures(val colorKeyFigure1: ColorCompareKeyFigures, val colorKeyFigure2: ColorCompareKeyFigures)
     class ColorCompareKeyFigures(val darkColor: String?, val lightColor: String?)
     class KeyFigureCombination(val title: String?, val keyFigureLabel1: String?, val keyFigureLabel2: String?)
     class DccKidsEmoji(val age: Int, val emojis: List<String>)
+    data class MultipassConfig(val isEnabled: Boolean, val testMaxDuration: Duration, val maxDcc: Int, val minDcc: Int)
+    class RecoveryValidityThreshold(val min: Duration, val max: Duration)
 }

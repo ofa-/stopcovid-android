@@ -21,6 +21,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.extension.appCompatActivity
@@ -29,6 +30,7 @@ import com.lunabeestudio.stopcovid.coreui.extension.refreshLift
 import com.lunabeestudio.stopcovid.coreui.fragment.BaseFragment
 import com.lunabeestudio.stopcovid.extension.injectionContainer
 import com.lunabeestudio.stopcovid.extension.navGraphWalletViewModels
+import com.lunabeestudio.stopcovid.extension.onFirstFragmentAttached
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.model.UnknownException
@@ -39,6 +41,10 @@ class WalletPagerFragment : BaseFragment() {
     private lateinit var viewPager: ViewPager2
     private var tabLayoutMediator: TabLayoutMediator? = null
     private var tabSelectedListener: TabLayout.OnTabSelectedListener? = null
+
+    private val robertManager: RobertManager by lazy {
+        requireContext().robertManager()
+    }
 
     private val viewModel by navGraphWalletViewModels<WalletContainerFragment> {
         WalletViewModelFactory(
@@ -62,9 +68,10 @@ class WalletPagerFragment : BaseFragment() {
         setupViewPager()
         viewModel.certificatesCount.observe(viewLifecycleOwner) { certificatesCount ->
             if (certificatesCount == 0) {
+                (activity as? MainActivity)?.showProgress(false)
                 findNavControllerOrNull()?.safeNavigate(WalletPagerFragmentDirections.actionWalletPagerFragmentToWalletInfoFragment())
             } else if (certificatesCount != null) {
-                (activity as? MainActivity)?.binding?.tabLayout?.getTabAt(WALLET_CERTIFICATE_FRAGMENT_POSITION)?.text =
+                (activity as? MainActivity)?.binding?.tabLayout?.getTabAt(walletCertificateFragmentPosition)?.text =
                     stringsFormat("walletController.mode.myCertificates", certificatesCount)
             }
         }
@@ -79,30 +86,28 @@ class WalletPagerFragment : BaseFragment() {
         viewPager.adapter = WalletPagerAdapter()
         (activity as? MainActivity)?.binding?.tabLayout?.let { tabLayout ->
             tabLayoutMediator = TabLayoutMediator(tabLayout, viewPager) { tab, position ->
-                if (position == WALLET_INFO_FRAGMENT_POSITION) {
-                    tab.text = strings["walletController.mode.info"]
+                tab.text = when (position) {
+                    walletInfoFragmentPosition -> strings["walletController.mode.info"]
+                    walletMultipassFragmentPosition -> strings["multiPass.tab.title"]
+                    else -> null
                 }
             }.also {
                 it.attach()
             }
+
             tabSelectedListener = object : TabLayout.OnTabSelectedListener {
                 override fun onTabSelected(tab: TabLayout.Tab?) {
                     view?.postDelayed(
                         {
+                            val fragment = getTabFragmentForPosition(tabLayout.selectedTabPosition)
+                            (fragment as? PagerTabFragment)?.onTabSelected()
+
                             val appBarLayout = (activity as? MainActivity)?.binding?.appBarLayout ?: return@postDelayed
 
                             // Force invalidate cached target view
                             appBarLayout.liftOnScrollTargetViewId = R.id.recycler_view
 
                             // Refresh current lift state
-                            val fragment = when (tabLayout.selectedTabPosition) {
-                                WALLET_CERTIFICATE_FRAGMENT_POSITION ->
-                                    childFragmentManager.fragments.firstOrNull { it is WalletCertificateFragment }
-                                WALLET_INFO_FRAGMENT_POSITION ->
-                                    childFragmentManager.fragments.firstOrNull { it is WalletInfoFragment }
-                                else -> throw UnknownException("No fragment for position ${tabLayout.selectedTabPosition}")
-                            }
-
                             fragment?.view
                                 ?.findViewById<RecyclerView>(R.id.recycler_view)?.let { recyclerView ->
                                     appBarLayout.refreshLift(recyclerView)
@@ -121,7 +126,26 @@ class WalletPagerFragment : BaseFragment() {
                 }
             }
 
-            tabSelectedListener?.let { tabLayout.addOnTabSelectedListener(it) }
+            tabSelectedListener?.let {
+                tabLayout.addOnTabSelectedListener(it)
+            }
+        }
+
+        // Call onTabSelected on first fragment attached to emulate the tab selection
+        childFragmentManager.onFirstFragmentAttached { _, fragment ->
+            (fragment as? PagerTabFragment)?.onTabSelected()
+        }
+    }
+
+    private fun getTabFragmentForPosition(selectedTabPosition: Int): Fragment? {
+        return when (selectedTabPosition) {
+            walletCertificateFragmentPosition ->
+                childFragmentManager.fragments.firstOrNull { it is WalletCertificateFragment }
+            walletMultipassFragmentPosition ->
+                childFragmentManager.fragments.firstOrNull { it is WalletMultipassFragment }
+            walletInfoFragmentPosition ->
+                childFragmentManager.fragments.firstOrNull { it is WalletInfoFragment }
+            else -> throw UnknownException("No fragment for position $selectedTabPosition")
         }
     }
 
@@ -141,21 +165,39 @@ class WalletPagerFragment : BaseFragment() {
     }
 
     private inner class WalletPagerAdapter : FragmentStateAdapter(childFragmentManager, lifecycle) {
-        override fun getItemCount(): Int = VIEWPAGER_ITEM_COUNT
+        override fun getItemCount(): Int = viewpagerItemCount
 
         override fun createFragment(position: Int): Fragment {
             return when (position) {
-                WALLET_CERTIFICATE_FRAGMENT_POSITION -> WalletCertificateFragment()
-                WALLET_INFO_FRAGMENT_POSITION -> WalletInfoFragment()
+                walletCertificateFragmentPosition -> WalletCertificateFragment()
+                walletMultipassFragmentPosition -> WalletMultipassFragment()
+                walletInfoFragmentPosition -> WalletInfoFragment()
                 else -> throw UnknownException("No fragment for position $position")
             }
         }
     }
 
-    companion object {
-        private const val VIEWPAGER_ITEM_COUNT = 2
+    private val viewpagerItemCount: Int
+        get() = if (robertManager.configuration.multipassConfig?.isEnabled == true) {
+            3
+        } else {
+            2
+        }
 
-        private const val WALLET_CERTIFICATE_FRAGMENT_POSITION = 0
-        private const val WALLET_INFO_FRAGMENT_POSITION = 1
-    }
+    private val walletCertificateFragmentPosition: Int
+        get() = 0
+
+    private val walletMultipassFragmentPosition: Int
+        get() = if (robertManager.configuration.multipassConfig?.isEnabled == true) {
+            1
+        } else {
+            -1
+        }
+
+    private val walletInfoFragmentPosition: Int
+        get() = if (robertManager.configuration.multipassConfig?.isEnabled == true) {
+            2
+        } else {
+            1
+        }
 }

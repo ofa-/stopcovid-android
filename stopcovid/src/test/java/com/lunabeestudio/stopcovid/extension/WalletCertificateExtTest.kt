@@ -35,6 +35,9 @@ class WalletCertificateExtTest {
         MockKAnnotations.init(this)
         blacklistDCCManager = mockk(relaxed = true)
         configuration = mockk(relaxed = true)
+        every { configuration.smartWalletExp?.pivot1 } returns "2021-12-15"
+        every { configuration.smartWalletExp?.pivot2 } returns "2022-01-15"
+        every { configuration.smartWalletExp?.pivot3 } returns "2022-02-15"
         coEvery { blacklistDCCManager.isBlacklisted(blackListedSha) } returns true
     }
 

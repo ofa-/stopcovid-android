@@ -8,12 +8,14 @@
   ~ Created by Lunabee Studio / Date - 2021/21/5 - for the TOUS-ANTI-COVID project
   -->
 
-<androidx.constraintlayout.widget.ConstraintLayout
+<androidx.constraintlayout.motion.widget.MotionLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    app:layoutDescription="@xml/wallet_container_motion_scene"
+    tools:showPaths="true">
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/walletNavHostFragment"
@@ -23,7 +25,8 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         app:layout_constraintBottom_toTopOf="@id/walletBottomSheetCard"
         app:layout_constraintTop_toTopOf="parent"
-        app:navGraph="@navigation/nav_wallet_container" />
+        app:navGraph="@navigation/nav_wallet_container"
+        tools:layout="@layout/fragment_recycler_view" />
 
     <Space
         android:id="@+id/bottomSheetTopSpace"
@@ -32,6 +35,7 @@
         app:layout_constraintTop_toTopOf="@id/walletBottomSheetCard" />
 
     <include
+        android:id="@+id/walletBottomSheetTopShadow"
         layout="@layout/top_shadow"
         android:layout_width="match_parent"
         android:layout_height="@dimen/bottom_sheet_top_shadow_height"
@@ -55,4 +59,4 @@
             android:textAllCaps="false"
             tools:text="@tools:sample/lorem[3]" />
     </com.google.android.material.card.MaterialCardView>
-</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.motion.widget.MotionLayout>
