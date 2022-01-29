@@ -768,7 +768,7 @@
     "walletController.phone.number":"0800087148",
     "walletController.addCertificate":"Ajouter un certificat",
     "walletController.mode.myCertificates":"Mes certificats",
-    "walletController.mode.info":"Informations",
+    "walletController.mode.info":"Info",
     "walletCertificateErrorController.title":"Erreur de certificat",
     "walletCertificateErrorController.explanations.invalidSignature.testCertificate.title":"⚠️ Erreur d'import",
     "walletCertificateErrorController.explanations.invalidSignature.testCertificate.subtitle":"Ce certificat ne peut être importé.\n\nAssurez-vous que vous tentez de scanner le QR Code sur le bon document 👇",
