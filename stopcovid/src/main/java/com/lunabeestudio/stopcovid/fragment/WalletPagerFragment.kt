@@ -183,8 +183,11 @@ class WalletPagerFragment : BaseFragment() {
         }
     }
 
+    private val multipassEnabled: Boolean
+        get() = true || (robertManager.configuration.multipassConfig?.isEnabled == true)
+
     private val viewpagerItemCount: Int
-        get() = if (robertManager.configuration.multipassConfig?.isEnabled == true) {
+        get() = if (multipassEnabled) {
             3
         } else {
             2
@@ -194,14 +197,14 @@ class WalletPagerFragment : BaseFragment() {
         get() = 0
 
     private val walletMultipassFragmentPosition: Int
-        get() = if (robertManager.configuration.multipassConfig?.isEnabled == true) {
+        get() = if (multipassEnabled) {
             1
         } else {
             -1
         }
 
     private val walletInfoFragmentPosition: Int
-        get() = if (robertManager.configuration.multipassConfig?.isEnabled == true) {
+        get() = if (multipassEnabled) {
             2
         } else {
             1
