@@ -75,7 +75,13 @@ fun WalletCertificate.titleDescription(strings: LocalizedStrings): String {
     }
     titleBuilder.append(
         when (this) {
-            is EuropeanCertificate -> strings["wallet.proof.europe.${type.code}.title"] ?: ""
+            is EuropeanCertificate -> {
+                if (this.type == WalletCertificateType.MULTI_PASS) {
+                    strings["wallet.proof.${type.code}.title"] ?: ""
+                } else {
+                    strings["wallet.proof.europe.${type.code}.title"] ?: ""
+                }
+            }
             else -> strings["wallet.proof.${type.stringKey}.title"] ?: ""
         }.trim()
     )
@@ -83,16 +89,34 @@ fun WalletCertificate.titleDescription(strings: LocalizedStrings): String {
 }
 
 fun WalletCertificate.infosDescription(strings: LocalizedStrings, configuration: Configuration, context: Context?): String {
-    val text = when (this) {
-        is EuropeanCertificate -> strings["wallet.proof.europe.${type.code}.infos"]
-        else -> strings["wallet.proof.${type.stringKey}.infos"]
+    val text = when (type) {
+        WalletCertificateType.SANITARY,
+        WalletCertificateType.VACCINATION -> strings["wallet.proof.${type.stringKey}.infos"]
+        WalletCertificateType.MULTI_PASS -> strings["wallet.proof.${type.code}.infos"]
+        WalletCertificateType.SANITARY_EUROPE -> {
+            if ((this as? EuropeanCertificate)?.greenCertificate?.testResultIsNegative == true) {
+                strings["wallet.proof.europe.${type.code}.infos"]
+            } else {
+                strings["wallet.proof.europe.testPositive.infos"]
+            }
+        }
+        WalletCertificateType.EXEMPTION,
+        WalletCertificateType.VACCINATION_EUROPE,
+        WalletCertificateType.RECOVERY_EUROPE,
+        WalletCertificateType.DCC_LIGHT -> strings["wallet.proof.europe.${type.code}.infos"]
     }
     return formatText(strings, configuration, text, false, context).trim()
 }
 
 fun WalletCertificate.fullDescription(strings: LocalizedStrings, configuration: Configuration, context: Context?): String {
     val text = when (this) {
-        is EuropeanCertificate -> strings["wallet.proof.europe.${type.code}.description"]
+        is EuropeanCertificate -> {
+            if (this.type == WalletCertificateType.MULTI_PASS) {
+                strings["wallet.proof.${type.code}.description"]
+            } else {
+                strings["wallet.proof.europe.${type.code}.description"]
+            }
+        }
         else -> strings["wallet.proof.${type.stringKey}.description"]
     }
     return formatText(strings, configuration, text, true, context).trim()
@@ -106,9 +130,47 @@ private fun WalletCertificate.formatText(
     shouldAddFlag: Boolean,
     context: Context?,
 ): String {
+    val dateFormat = shortDateFormat(context)
+    val analysisDateFormat = shortDateTimeFormat(context)
+    return when (this) {
+        is FrenchCertificate -> formatFrenchCertificateText(
+            strings = strings,
+            configuration = configuration,
+            textToFormat = textToFormat,
+            dateFormat = dateFormat,
+            analysisDateFormat = analysisDateFormat,
+        )
+        is EuropeanCertificate -> {
+            val descriptionBuilder = StringBuilder()
+            if (!this.greenCertificate.isFrench && shouldAddFlag) {
+                descriptionBuilder.append(this.greenCertificate.countryCode?.countryCodeToFlagEmoji ?: "")
+            }
+
+            descriptionBuilder.append(
+                formatDccText(
+                    textToFormat,
+                    strings,
+                    dateFormat,
+                    analysisDateFormat,
+                    false,
+                    configuration,
+                )
+            )
+
+            descriptionBuilder.append(validityString(configuration, strings, false).let { "\n$it" })
+            descriptionBuilder.toString()
+        }
+    }
+}
+
+private fun FrenchCertificate.formatFrenchCertificateText(
+    strings: LocalizedStrings,
+    configuration: Configuration,
+    textToFormat: String?,
+    dateFormat: SimpleDateFormat,
+    analysisDateFormat: SimpleDateFormat,
+): String {
     var text = textToFormat
-    val dateFormat = SimpleDateFormat("d MMM yyyy", context.getApplicationLocale())
-    val analysisDateFormat = SimpleDateFormat("d MMM yyyy, HH:mm", context.getApplicationLocale())
     return when (this) {
         is SanitaryCertificate -> {
             text = text?.replace("<${SanitaryCertificate.SanitaryCertificateFields.FIRST_NAME.code}>", firstName.orNA())
@@ -178,26 +240,6 @@ private fun WalletCertificate.formatText(
             text = text?.replace("<$vaxCode>", vaccinationState.orNA())
             text ?: ""
         }
-        is EuropeanCertificate -> {
-            val descriptionBuilder = StringBuilder()
-            if (!this.greenCertificate.isFrench && shouldAddFlag) {
-                descriptionBuilder.append(this.greenCertificate.countryCode?.countryCodeToFlagEmoji ?: "")
-            }
-
-            descriptionBuilder.append(
-                formatDccText(
-                    text,
-                    strings,
-                    dateFormat,
-                    analysisDateFormat,
-                    false,
-                )
-            )
-
-            descriptionBuilder.append(validityString(configuration, strings, false).let { "\n$it" })
-
-            descriptionBuilder.toString()
-        }
     }
 }
 
@@ -210,8 +252,8 @@ fun EuropeanCertificate.fullScreenBorderDescription(
         formatDccText(
             strings["europeanCertificate.fullscreen.englishDescription.${type.code}"],
             strings,
-            SimpleDateFormat("d MMM yyyy", Locale.ENGLISH),
-            SimpleDateFormat("d MMM yyyy, HH:mm", Locale.ENGLISH),
+            shortDateFormat(Locale.ENGLISH),
+            shortDateTimeFormat(Locale.ENGLISH),
             true,
         )
     )
@@ -220,12 +262,57 @@ fun EuropeanCertificate.fullScreenBorderDescription(
     return descriptionBuilder.toString()
 }
 
+fun EuropeanCertificate.fullScreenDescription(
+    strings: LocalizedStrings,
+    context: Context,
+): String {
+    return when (this.type) {
+        WalletCertificateType.SANITARY,
+        WalletCertificateType.VACCINATION,
+        WalletCertificateType.SANITARY_EUROPE,
+        WalletCertificateType.VACCINATION_EUROPE,
+        WalletCertificateType.RECOVERY_EUROPE,
+        WalletCertificateType.EXEMPTION,
+        WalletCertificateType.DCC_LIGHT -> fullNameUppercase()
+        WalletCertificateType.MULTI_PASS -> {
+            val dateFormat = shortDateFormat(context)
+            val analysisDateFormat = shortDateTimeFormat(context)
+            formatDccText(
+                inputText = strings["multiPassCertificate.fullscreen"],
+                strings = strings,
+                dateFormat = dateFormat,
+                analysisDateFormat = analysisDateFormat,
+                forceEnglish = false,
+            )
+        }
+    }
+}
+
+fun EuropeanCertificate.multipassPickerDescription(
+    strings: LocalizedStrings,
+    context: Context,
+): String {
+    return formatDccText(
+        strings["multiPass.selectionScreen.${this.type.code}.description"],
+        strings,
+        shortDateFormat(context),
+        shortDateTimeFormat(context),
+        false
+    )
+}
+
+private fun shortDateTimeFormat(context: Context?): SimpleDateFormat = shortDateTimeFormat(context.getApplicationLocale())
+private fun shortDateTimeFormat(locale: Locale): SimpleDateFormat = SimpleDateFormat("d MMM yyyy, HH:mm", locale)
+fun shortDateFormat(context: Context?): SimpleDateFormat = shortDateFormat(context.getApplicationLocale())
+private fun shortDateFormat(locale: Locale): SimpleDateFormat = SimpleDateFormat("d MMM yyyy", locale)
+
 private fun EuropeanCertificate.formatDccText(
     inputText: String?,
     strings: LocalizedStrings,
     dateFormat: SimpleDateFormat,
     analysisDateFormat: SimpleDateFormat,
     forceEnglish: Boolean,
+    configuration: Configuration? = null,
 ): String {
     var formattedText = inputText
     formattedText = formattedText?.replace("<FULL_NAME>", fullNameUppercase())
@@ -244,12 +331,53 @@ private fun EuropeanCertificate.formatDccText(
             formattedText = formattedText?.replace("<DATE>", this.greenCertificate.vaccineDate?.let(dateFormat::format).orNA())
         }
         WalletCertificateType.RECOVERY_EUROPE -> {
+            var fromDate: Date? = null
+            var toDate: Date? = null
+            configuration?.recoveryValidityThreshold?.let { recoveryValidityThreshold ->
+                fromDate = greenCertificate.recoveryDateOfFirstPositiveTest?.time
+                    ?.plus(recoveryValidityThreshold.min.inWholeMilliseconds)
+                    ?.let { Date(it) }
+                toDate = greenCertificate.recoveryDateOfFirstPositiveTest?.time
+                    ?.plus(recoveryValidityThreshold.min.inWholeMilliseconds)
+                    ?.plus(recoveryValidityThreshold.max.inWholeMilliseconds)
+                    ?.let { Date(it) }
+            }
+
             formattedText = formattedText?.replace(
                 "<DATE>",
                 this.greenCertificate.recoveryDateOfFirstPositiveTest?.let(dateFormat::format).orNA()
             )
+            formattedText = formattedText?.replace(
+                "<FROM_DATE>",
+                fromDate?.let(dateFormat::format).orNA()
+            )
+            formattedText = formattedText?.replace(
+                "<TO_DATE>",
+                toDate?.let(dateFormat::format).orNA()
+            )
         }
         WalletCertificateType.SANITARY_EUROPE -> {
+            val testDateFormat: SimpleDateFormat
+            var fromDate: Date? = null
+            var toDate: Date? = null
+            if (greenCertificate.testResultIsNegative != true) {
+                testDateFormat = dateFormat
+
+                configuration?.recoveryValidityThreshold?.let { recoveryValidityThreshold ->
+                    fromDate = greenCertificate.testDateTimeOfCollection?.time
+                        ?.plus(recoveryValidityThreshold.min.inWholeMilliseconds)
+                        ?.let { Date(it) }
+                    toDate = greenCertificate.testDateTimeOfCollection?.time
+                        ?.plus(recoveryValidityThreshold.min.inWholeMilliseconds)
+                        ?.plus(recoveryValidityThreshold.max.inWholeMilliseconds)
+                        ?.let { Date(it) }
+                }
+            } else {
+                testDateFormat = analysisDateFormat
+                fromDate = this.greenCertificate.testDateTimeOfCollection
+                toDate = null
+            }
+
             val testName = this.greenCertificate.testType?.let {
                 val testNameStringKey = StringBuilder("test.man.")
                 if (forceEnglish) {
@@ -270,8 +398,16 @@ private fun EuropeanCertificate.formatDccText(
             }
             formattedText = formattedText?.replace("<ANALYSIS_RESULT>", testResult.orNA())
             formattedText = formattedText?.replace(
+                "<DATE>",
+                this.greenCertificate.testDateTimeOfCollection?.let(testDateFormat::format).orNA()
+            )
+            formattedText = formattedText?.replace(
                 "<FROM_DATE>",
-                this.greenCertificate.testDateTimeOfCollection?.let(analysisDateFormat::format).orNA()
+                fromDate?.let(testDateFormat::format).orNA()
+            )
+            formattedText = formattedText?.replace(
+                "<TO_DATE>",
+                toDate?.let(testDateFormat::format).orNA()
             )
         }
         WalletCertificateType.EXEMPTION -> {
@@ -284,8 +420,20 @@ private fun EuropeanCertificate.formatDccText(
                 this.greenCertificate.exemptionCertificateValidUntil?.let(dateFormat::format).orNA()
             )
         }
-        WalletCertificateType.ACTIVITY_PASS -> {
+        WalletCertificateType.DCC_LIGHT -> {
             /* no-op */
+        }
+        WalletCertificateType.MULTI_PASS -> {
+            val testResult = this.greenCertificate.testResultCode?.let {
+                val testResultStringKey = StringBuilder("wallet.proof.europe.test.")
+                testResultStringKey.append(it)
+                strings[testResultStringKey.toString()]
+            }
+            formattedText = formattedText?.replace("<ANALYSIS_RESULT>", testResult.orNA())
+            formattedText = formattedText?.replace(
+                "<TO_DATE>",
+                analysisDateFormat.format(this.expirationTime).orNA(),
+            )
         }
     }
     return formattedText.orEmpty()
@@ -343,7 +491,10 @@ fun WalletCertificate.isOld(configuration: Configuration): Boolean {
 }
 
 private fun WalletCertificate.validityString(configuration: Configuration, strings: LocalizedStrings, forceEnglish: Boolean): String {
-    if (type != WalletCertificateType.SANITARY && type != WalletCertificateType.SANITARY_EUROPE) {
+    if (type != WalletCertificateType.SANITARY &&
+        type != WalletCertificateType.SANITARY_EUROPE
+        || (this as? EuropeanCertificate)?.greenCertificate?.testResultIsNegative != true
+    ) {
         return ""
     }
 
@@ -431,6 +582,18 @@ suspend fun WalletCertificate.isEligibleForSmartWallet(
 val EuropeanCertificate.isSignatureExpired: Boolean
     get() = expirationTime < System.currentTimeMillis()
 
+fun EuropeanCertificate.isExpired(configuration: Configuration): Boolean {
+    val recoveryValidityThreshold = configuration.recoveryValidityThreshold
+    val positiveTestOrRecoveryDate = greenCertificate.positiveTestOrRecoveryDate
+
+    return if (recoveryValidityThreshold != null && positiveTestOrRecoveryDate != null) {
+        positiveTestOrRecoveryDate.time + (recoveryValidityThreshold.min + recoveryValidityThreshold.max).inWholeMilliseconds <
+            System.currentTimeMillis()
+    } else {
+        isSignatureExpired
+    }
+}
+
 suspend fun EuropeanCertificate.isBlacklisted(blacklistDCCManager: BlacklistDCCManager): Boolean =
     blacklistDCCManager.isBlacklisted(sha256)
 
@@ -438,7 +601,7 @@ suspend fun FrenchCertificate.isBlacklisted(blacklist2DDOCManager: Blacklist2DDO
     blacklist2DDOCManager.isBlacklisted(sha256)
 
 // Use 1sec of threshold due to sec -> ms rounding
-fun EuropeanCertificate.activityPassValidFuture(): Boolean = if (type == WalletCertificateType.ACTIVITY_PASS) {
+fun EuropeanCertificate.activityPassValidFuture(): Boolean = if (type == WalletCertificateType.DCC_LIGHT) {
     System.currentTimeMillis() < timestamp - 1_000
 } else {
     false

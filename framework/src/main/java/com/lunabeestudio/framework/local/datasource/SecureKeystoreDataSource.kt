@@ -283,7 +283,7 @@ class SecureKeystoreDataSource(
 
     override suspend fun insertAllRawWalletCertificates(vararg certificates: RawWalletCertificate) {
         withContext(ioDispatcher) {
-            val splitCertificates = certificates.groupBy { it.type == WalletCertificateType.ACTIVITY_PASS }
+            val splitCertificates = certificates.groupBy { it.type == WalletCertificateType.DCC_LIGHT }
             splitCertificates[true]?.mapNotNull { certificate ->
                 val encryptedString = cryptoManager.encryptToString(gson.toJson(certificate))
                 val expireAt = certificate.expireAt
@@ -312,7 +312,7 @@ class SecureKeystoreDataSource(
 
     override suspend fun updateNonLightRawWalletCertificate(vararg certificates: RawWalletCertificate) {
         withContext(ioDispatcher) {
-            val roomCertificates = certificates.filter { it.type != WalletCertificateType.ACTIVITY_PASS }.map { certificate ->
+            val roomCertificates = certificates.filter { it.type != WalletCertificateType.DCC_LIGHT }.map { certificate ->
                 val encryptedString = cryptoManager.encryptToString(gson.toJson(certificate))
                 CertificateRoom(certificate.id, encryptedString)
             }

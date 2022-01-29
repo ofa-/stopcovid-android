@@ -16,10 +16,15 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
-inline fun <T> Flow<T>.collectWithLifecycle(lifecycleOwner: LifecycleOwner, crossinline action: suspend CoroutineScope.(value: T) -> Unit) {
+/**
+ * Must only be use with local data and not API call
+ */
+inline fun <T> Flow<T>.collectDataWithLifecycle(
+    lifecycleOwner: LifecycleOwner,
+    crossinline action: suspend CoroutineScope.(value: T) -> Unit
+) {
     lifecycleOwner.lifecycleScope.launch {
         flowWithLifecycle(lifecycleOwner.lifecycle, Lifecycle.State.STARTED)
             .collect {

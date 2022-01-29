@@ -34,7 +34,7 @@ import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.extension.refreshLift
 import com.lunabeestudio.stopcovid.coreui.fragment.BaseFragment
 import com.lunabeestudio.stopcovid.extension.activityPassValidFuture
-import com.lunabeestudio.stopcovid.extension.collectWithLifecycle
+import com.lunabeestudio.stopcovid.extension.collectDataWithLifecycle
 import com.lunabeestudio.stopcovid.extension.fullDescription
 import com.lunabeestudio.stopcovid.extension.injectionContainer
 import com.lunabeestudio.stopcovid.extension.robertManager
@@ -82,7 +82,7 @@ class WalletFullscreenPagerFragment : BaseFragment() {
                     ?.filterIsInstance<EuropeanCertificate>()
                     ?.firstOrNull { it.id == args.id }
             }
-        }.collectWithLifecycle(viewLifecycleOwner) { result ->
+        }.collectDataWithLifecycle(viewLifecycleOwner) { result ->
             val mainActivity = activity as? MainActivity
             when (result) {
                 is TacResult.Failure -> {

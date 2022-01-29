@@ -13,10 +13,7 @@ abstract class RemoteImageDocumentManager(serverManager: ServerManager) : Remote
     abstract val remoteFileUrlTemplate: String
     override val mimeType: String = "image/png"
 
-    override fun getRemoteFileUrl(context: Context): String {
-        return remoteFileUrlTemplate.format(context.getApplicationLanguage())
-    }
-
+    override fun getRemoteFileUrl(context: Context): String = remoteFileUrlTemplate.format(context.getApplicationLanguage())
     final override fun getAssetFilePath(context: Context): String? = null
 
     final override suspend fun fileNotCorrupted(file: File): Boolean {

@@ -49,7 +49,6 @@ import com.lunabeestudio.stopcovid.worker.DccLightGenerationWorker
 import com.mikepenz.fastadapter.GenericItem
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.text.DateFormat

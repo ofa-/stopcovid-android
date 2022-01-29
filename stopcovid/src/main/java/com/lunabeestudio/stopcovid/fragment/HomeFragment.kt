@@ -86,7 +86,7 @@ import com.lunabeestudio.stopcovid.databinding.ActivityMainBinding
 import com.lunabeestudio.stopcovid.databinding.FragmentRecyclerViewFabBinding
 import com.lunabeestudio.stopcovid.extension.addIsolationItems
 import com.lunabeestudio.stopcovid.extension.chosenPostalCode
-import com.lunabeestudio.stopcovid.extension.collectWithLifecycle
+import com.lunabeestudio.stopcovid.extension.collectDataWithLifecycle
 import com.lunabeestudio.stopcovid.extension.colorStringKey
 import com.lunabeestudio.stopcovid.extension.formatNumberIfNeeded
 import com.lunabeestudio.stopcovid.extension.generateCombinedData
@@ -497,7 +497,7 @@ class HomeFragment : TimeMainFragment() {
             refreshScreen()
             showRegisterRequiredIfNeeded(venues)
         }
-        viewModel.profileCertificates.collectWithLifecycle(viewLifecycleOwner) {
+        viewModel.profileCertificates.collectDataWithLifecycle(viewLifecycleOwner) {
             refreshScreen()
         }
     }

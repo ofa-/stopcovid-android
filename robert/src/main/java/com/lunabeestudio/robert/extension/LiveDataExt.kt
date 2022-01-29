@@ -17,9 +17,23 @@ import androidx.lifecycle.Observer
 import com.lunabeestudio.robert.utils.Event
 import com.lunabeestudio.robert.utils.EventObserver
 
-fun <U, T : Event<U?>> LiveData<T>.observeEventAndConsume(@NonNull owner: LifecycleOwner, @NonNull observer: Observer<U>) {
-    val eventObserverId = owner.hashCode()
-    this.value?.getContentIfNotHandled(eventObserverId)
+/**
+ * Observe an [Event] wrapped in a live data and consume it.
+ *
+ * @param owner The LifecycleOwner which controls the observer
+ * @param skipCurrent If true, do not trigger the observer with the initial live data value
+ * @param observer The [Observer] callback
+ */
+fun <U, T : Event<U?>> LiveData<T>.observeEventAndConsume(
+    @NonNull owner: LifecycleOwner,
+    skipCurrent: Boolean = true,
+    observerId: Int? = null,
+    @NonNull observer: Observer<U>,
+) {
+    val eventObserverId = observerId ?: owner.hashCode()
+    if (skipCurrent) {
+        this.value?.getContentIfNotHandled(eventObserverId)
+    }
     observe(
         owner,
         EventObserver(eventObserverId) {

@@ -30,6 +30,7 @@ import com.lunabeestudio.robert.datasource.RemoteDccLightDataSource
 import com.lunabeestudio.robert.model.RobertResultData
 import com.lunabeestudio.robert.model.UnknownException
 import com.lunabeestudio.stopcovid.extension.raw
+import com.lunabeestudio.stopcovid.extension.smartWalletProfileId
 import com.lunabeestudio.stopcovid.model.EuropeanCertificate
 import com.lunabeestudio.stopcovid.model.WalletCertificate
 import com.lunabeestudio.stopcovid.model.WalletCertificateMalformedException
@@ -40,7 +41,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -272,6 +272,13 @@ class WalletRepository(
         )
     }
 
+    suspend fun generateMultipass(certificateValueList: List<String>): RobertResultData<String> {
+        return remoteDccLightDataSource.generateMultipass(
+            robertManager.configuration.generationServerPublicKey,
+            certificateValueList,
+        )
+    }
+
     suspend fun forceRefreshCertificatesFlow() {
         localKeystoreDataSource.forceRefreshCertificatesFlow()
     }
@@ -282,5 +289,13 @@ class WalletRepository(
 
     fun resetKeyCryptoGeneratedFlag() {
         localKeystoreDataSource.resetKeyGeneratedFlag()
+    }
+
+    fun findCertificateByProfileId(profileId: String): List<EuropeanCertificate> {
+        return walletCertificateFlow.value.data
+            ?.filterIsInstance<EuropeanCertificate>()
+            ?.filter { dcc ->
+                dcc.smartWalletProfileId() == profileId
+            }.orEmpty()
     }
 }

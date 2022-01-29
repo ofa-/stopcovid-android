@@ -13,7 +13,7 @@ package com.lunabeestudio.stopcovid.usecase
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.stopcovid.extension.isEligibleForSmartWallet
 import com.lunabeestudio.stopcovid.extension.parseOrNull
-import com.lunabeestudio.stopcovid.extension.profileId
+import com.lunabeestudio.stopcovid.extension.smartWalletProfileId
 import com.lunabeestudio.stopcovid.extension.recoveryDateOfFirstPositiveTest
 import com.lunabeestudio.stopcovid.extension.testDateTimeOfCollection
 import com.lunabeestudio.stopcovid.extension.vaccineDate
@@ -40,7 +40,7 @@ class GetSmartWalletCertificateUseCase(
             .data
             ?.filterIsInstance<EuropeanCertificate>()
             ?.groupBy { certificate ->
-                certificate.profileId()
+                certificate.smartWalletProfileId()
             }.orEmpty()
         groupedCertificates = groupedCertificates.filter { (_, certificates) ->
             certificates.isNotEmpty()

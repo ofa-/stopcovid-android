@@ -179,6 +179,12 @@ class WalletViewModel(
     fun resetWalletCryptoKeyGeneratedFlag() {
         walletRepository.resetKeyCryptoGeneratedFlag()
     }
+
+    fun requestScrollToId(scrollCertificateId: String?) {
+        _scrollEvent.value = certificates.value.data?.find { it.id == scrollCertificateId }?.let {
+            Event(it)
+        }
+    }
 }
 
 class WalletViewModelFactory(

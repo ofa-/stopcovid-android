@@ -2,11 +2,11 @@
     "config":[
         {
             "name":"lastUpdate",
-            "value":"19 Jan 2022"
+            "value":"25 Jan 2022"
         },
         {
             "name":"version",
-            "value":124
+            "value":129
         },
         {
             "name":"versionCalibrationBle",
@@ -37,6 +37,14 @@
             "value":[
                 "https://signal-static.tousanticovid.gouv.fr/"
             ]
+        },
+        {
+	        "name" : "app.displayMultipass",
+	        "value": false
+        },
+        {
+	        "name" : "app.multipass.list",
+	        "value": {"testMaxHours": 24, "maxDcc": 2, "minDcc": 2}
         },
         {
             "name":"app.ameliUrl",
@@ -147,6 +155,13 @@
             }
         },
         {
+            "name":"app.wallet.recoveryValidityThresholdInDays",
+            "value":{
+                "minDays":11,
+                "maxDays":180
+            }
+        },
+        {
             "name":"app.wallet.testCertificateValidityThresholdInHours",
             "value":72
         },
@@ -235,7 +250,8 @@
                     "EU/1/21/1529",
                     "Covidshield",
                     "Covid-19-recombinant",
-                    "R-COVI"
+                    "R-COVI",
+                    "R-Covi"
                 ]
             }
         },

@@ -11,12 +11,12 @@
 package com.lunabeestudio.stopcovid.coreui
 
 object ConfigConstant {
-    private const val BASE_URL: String = "https://app-static.tousanticovid.gouv.fr/"
-    private const val VERSIONED_PATH: String = "json/version-36/"
-    private const val VERSIONED_SERVER_URL: String = BASE_URL + VERSIONED_PATH
+    private const val BASE_URL: String = "https://app.tousanticovid.gouv.fr/"
+    private const val STATIC_BASE_URL: String = "https://app-static.tousanticovid.gouv.fr/"
+    private const val VERSIONED_PATH: String = "json/version-37/"
+    private const val VERSIONED_SERVER_URL: String = STATIC_BASE_URL + VERSIONED_PATH
 
     object Maintenance {
-        private const val BASE_URL: String = "https://app.tousanticovid.gouv.fr/"
         private const val FOLDER: String = "maintenance/"
         private const val FILENAME: String = "info-maintenance-v2.json"
         const val URL: String = BASE_URL + FOLDER + FILENAME
@@ -27,7 +27,7 @@ object ConfigConstant {
         const val CENTER_FILENAME: String = "centres-vaccination.json"
         const val CENTER_LAST_UPDATE_FILENAME: String = "lastUpdate.json"
         private const val FOLDER: String = "/infos/dep/"
-        const val URL: String = BASE_URL + FOLDER
+        const val URL: String = STATIC_BASE_URL + FOLDER
         const val CENTER_SUFFIX: String = "-centers.json"
         const val LAST_UPDATE_SUFFIX: String = "-lastUpdate.json"
     }
@@ -35,7 +35,7 @@ object ConfigConstant {
     object KeyFigures {
         const val NATIONAL_SUFFIX: String = "nat"
         const val LOCAL_FILENAME_TEMPLATE: String = "key-figures-%s.pb.gz"
-        const val URL: String = BASE_URL + "infos/v2%s/$LOCAL_FILENAME_TEMPLATE"
+        const val URL: String = STATIC_BASE_URL + "infos/v2%s/$LOCAL_FILENAME_TEMPLATE"
     }
 
     object MoreKeyFigures {
@@ -53,7 +53,8 @@ object ConfigConstant {
 
     object InfoCenter {
         private const val FOLDER: String = "InfoCenter/"
-        const val URL: String = VERSIONED_SERVER_URL + FOLDER
+        private const val PATH: String = "json/news/v1/"
+        const val URL: String = BASE_URL + PATH + FOLDER
         const val LOCAL_FALLBACK_FILENAME: String = "info-labels-en.json"
         const val STRINGS_PREFIX: String = "info-labels-"
         const val TAGS_PREFIX: String = "info-tags"
@@ -132,8 +133,8 @@ object ConfigConstant {
     }
 
     object DccCertificates {
-        const val FOLDER: String = "Certs/"
-        const val URL: String = VERSIONED_SERVER_URL + FOLDER
+        const val URL: String = STATIC_BASE_URL + "json/dsc/"
+        const val FOLDER: String = "dsc/"
     }
 
     object Config {
@@ -155,13 +156,13 @@ object ConfigConstant {
         object DCC {
             private const val ITERATION_PATH_TEMPLATE: String = "dcc/%d/"
             const val FILENAME: String = "certlist.pb.gz"
-            val URL: String = BASE_URL + FOLDER + ITERATION_PATH_TEMPLATE + FILENAME
+            val URL: String = STATIC_BASE_URL + FOLDER + ITERATION_PATH_TEMPLATE + FILENAME
         }
 
         object TwoDDOC {
             private const val ITERATION_PATH_TEMPLATE: String = "2ddoc/%d/"
             const val FILENAME: String = "2ddoc_list.pb.gz"
-            val URL: String = BASE_URL + FOLDER + ITERATION_PATH_TEMPLATE + FILENAME
+            val URL: String = STATIC_BASE_URL + FOLDER + ITERATION_PATH_TEMPLATE + FILENAME
         }
     }
 

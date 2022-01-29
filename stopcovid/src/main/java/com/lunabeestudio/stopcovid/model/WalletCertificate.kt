@@ -61,6 +61,7 @@ sealed class WalletCertificate(
 
         suspend fun createCertificateFromRaw(rawWalletCertificate: RawWalletCertificate): WalletCertificate? {
             return withContext(Dispatchers.Default) {
+                val forcedType = WalletCertificateType.MULTI_PASS.takeIf { rawWalletCertificate.type == WalletCertificateType.MULTI_PASS }
                 SanitaryCertificate.getCertificate(rawWalletCertificate.value, rawWalletCertificate.id)
                     ?: VaccinationCertificate.getCertificate(rawWalletCertificate.value, rawWalletCertificate.id)
                     ?: EuropeanCertificate.getCertificate(
@@ -69,6 +70,7 @@ sealed class WalletCertificate(
                         isFavorite = rawWalletCertificate.isFavorite,
                         canRenewActivityPass = rawWalletCertificate.canRenewDccLight,
                         rootWalletCertificateId = rawWalletCertificate.rootWalletCertificateId,
+                        forcedType = forcedType,
                     )
             }
         }
@@ -352,6 +354,7 @@ class EuropeanCertificate private constructor(
     val isFavorite: Boolean,
     val canRenewActivityPass: Boolean?,
     val rootWalletCertificateId: String?,
+    forcedType: WalletCertificateType?,
 ) : WalletCertificate(id, value) {
     override val timestamp: Long
     override val type: WalletCertificateType
@@ -382,7 +385,7 @@ class EuropeanCertificate private constructor(
         kid = checkNotNull(coseData.kid)
         val greenCertificateData = checkNotNull(DefaultCborService().decodeData(coseData.cbor, verificationResult))
         greenCertificate = greenCertificateData.greenCertificate
-        type = greenCertificate.certificateType
+        type = forcedType ?: greenCertificate.certificateType
         timestamp = when (type) {
             WalletCertificateType.SANITARY,
             WalletCertificateType.VACCINATION -> null
@@ -390,7 +393,8 @@ class EuropeanCertificate private constructor(
             WalletCertificateType.VACCINATION_EUROPE -> greenCertificate.vaccineDate?.time
             WalletCertificateType.RECOVERY_EUROPE -> greenCertificate.recoveryDateOfFirstPositiveTest?.time
             WalletCertificateType.EXEMPTION -> greenCertificate.exemptionCertificateValidFrom?.time
-            WalletCertificateType.ACTIVITY_PASS -> greenCertificateData.issuedAt.toInstant().toEpochMilli()
+            WalletCertificateType.DCC_LIGHT,
+            WalletCertificateType.MULTI_PASS -> greenCertificateData.issuedAt.toInstant().toEpochMilli()
         } ?: -1
         sha256 = "${greenCertificate.countryCode?.uppercase()}${greenCertificate.getDgci()}".sha256()
         expirationTime = greenCertificateData.expirationTime.toInstant().toEpochMilli()
@@ -419,9 +423,10 @@ class EuropeanCertificate private constructor(
             isFavorite: Boolean = false,
             canRenewActivityPass: Boolean? = null,
             rootWalletCertificateId: String? = null,
+            forcedType: WalletCertificateType? = null,
         ): EuropeanCertificate? {
             return try {
-                EuropeanCertificate(id, value, isFavorite, canRenewActivityPass, rootWalletCertificateId)
+                EuropeanCertificate(id, value, isFavorite, canRenewActivityPass, rootWalletCertificateId, forcedType)
             } catch (e: IllegalStateException) {
                 Timber.e(e)
                 null
@@ -431,7 +436,16 @@ class EuropeanCertificate private constructor(
         fun getTypeFromValue(value: String): WalletCertificateType? {
             return try {
                 val verificationResult = VerificationResult()
-                val plainInput = DefaultPrefixValidationService().decode(value, verificationResult)
+                var plainInput = DefaultPrefixValidationService().decode(value, verificationResult)
+                if (verificationResult.contextPrefix == null) {
+                    plainInput = DefaultPrefixValidationService(Constants.Certificate.DCC_EXEMPTION_PREFIX).decode(
+                        value,
+                        verificationResult
+                    )
+                }
+                if (verificationResult.contextPrefix == null) {
+                    plainInput = DefaultPrefixValidationService(Constants.Certificate.DCC_LIGHT_PREFIX).decode(value, verificationResult)
+                }
                 val compressedCose = DefaultBase45Service().decode(plainInput, verificationResult)
                 val cose = checkNotNull(DefaultCompressorService().decode(compressedCose, verificationResult))
                 val coseData = DefaultCoseService().decode(cose, verificationResult)

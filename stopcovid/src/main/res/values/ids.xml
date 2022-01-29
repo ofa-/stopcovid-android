@@ -59,4 +59,5 @@
     <item name="item_compare_key_figure_chart_card" type="id" />
     <item name="item_home_screen_figure_card" type="id" />
     <item name="item_home_screen_info_card" type="id" />
+    <item name="item_certificate_picker" type="id" />
 </resources>

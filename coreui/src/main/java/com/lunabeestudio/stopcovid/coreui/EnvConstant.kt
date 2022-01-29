@@ -22,7 +22,7 @@ enum class EnvConstant {
             "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEAc9IDt6qJq453SwyWPB94JaLB2VfTAcL43YVtMr3HhDCd22gKaQXIbX1d+tNhfvaKM51sxeaXziPjntUzbTNiw=="
         override val dccCertificatesFilename: String = "dcc-certs.json"
         override val conversionBaseUrl: String = "https://portail.tacv.myservices-ingroupe.com"
-        override val activityPassBaseUrl: String = ""
+        override val activityPassBaseUrl: String = "https://dcclight.tousanticovid.gouv.fr"
     };
 
     abstract val baseUrl: String

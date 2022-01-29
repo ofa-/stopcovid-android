@@ -48,7 +48,7 @@ class UnauthorizedException(message: String = "Not authorized to call this endpo
 class ForbiddenException(message: String = "Forbidden to call this endpoint") :
     RobertException(ErrorCode.FORBIDDEN, message)
 
-class BackendException(message: String = "An error occurs. Our team is working to fix it!", val httpCode: Int?) :
+open class BackendException(message: String = "An error occurs. Our team is working to fix it!", val httpCode: Int?) :
     RobertException(ErrorCode.BACKEND, message)
 
 class NoInternetException(message: String = "No internet") :
@@ -104,3 +104,9 @@ class RequireRobertResetException(message: String = "Robert needs to be reset du
 
 class RequireRobertRegisterException(message: String = "Robert needs to register") :
     RobertException(ErrorCode.ROBERT_NOT_REGISTERED, message)
+
+class AggregateBackendException(
+    message: String = "An error occurs. Our team is working to fix it!",
+    httpCode: Int?,
+    val errorCodes: List<String>,
+) : BackendException(message, httpCode)

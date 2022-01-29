@@ -33,4 +33,8 @@ class Event<out T>(private val content: T) {
      * Returns the content, even if it's already been handled.
      */
     fun peekContent(): T = content
+
+    companion object {
+        const val NO_ID: Int = -1
+    }
 }

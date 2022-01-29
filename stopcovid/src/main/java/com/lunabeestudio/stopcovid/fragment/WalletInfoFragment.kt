@@ -32,7 +32,11 @@ import com.lunabeestudio.stopcovid.fastitem.walletDoubleDocumentCardItem
 import com.lunabeestudio.stopcovid.viewmodel.WalletViewModelFactory
 import com.mikepenz.fastadapter.GenericItem
 
-class WalletInfoFragment : MainFragment() {
+class WalletInfoFragment : MainFragment(), PagerTabFragment {
+
+    private val robertManager by lazy {
+        requireContext().robertManager()
+    }
 
     private val viewModel by navGraphWalletViewModels<WalletContainerFragment> {
         WalletViewModelFactory(
@@ -53,6 +57,10 @@ class WalletInfoFragment : MainFragment() {
         viewModel.certificatesCount.observe(viewLifecycleOwner) { certificatesCount ->
             if (certificatesCount == 0 || parentFragment is WalletPagerFragment) {
                 refreshScreen()
+
+                if (certificatesCount == 0) {
+                    onTabSelected() // init bottom button
+                }
             } else if (certificatesCount != null) {
                 findNavControllerOrNull()?.safeNavigate(WalletInfoFragmentDirections.actionWalletInfoFragmentToWalletPagerFragment())
             }
@@ -159,5 +167,18 @@ class WalletInfoFragment : MainFragment() {
         }
 
         return items
+    }
+
+    override fun onTabSelected() {
+        findParentFragmentByType<WalletContainerFragment>()?.let { walletContainerFragment ->
+            if (robertManager.configuration.multipassConfig?.isEnabled == true && (viewModel.certificatesCount.value ?: 0) > 0) {
+                walletContainerFragment.setupBottomAction(null, null)
+            } else {
+                walletContainerFragment.setupBottomAction(strings["walletController.addCertificate"]) {
+                    walletContainerFragment.findNavControllerOrNull()
+                        ?.safeNavigate(WalletContainerFragmentDirections.actionWalletContainerFragmentToWalletQRCodeFragment())
+                }
+            }
+        }
     }
 }

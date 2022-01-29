@@ -103,14 +103,14 @@ class InGroupeDatasource(
     ): RobertResultData<String> {
 
         val serverKeyAgreementData = try {
-            serverKeyAgreementHelper.encryptRequestData(serverKeyConfig.second, encodedCertificate)
+            serverKeyAgreementHelper.encryptRequestData(serverKeyConfig.second, listOf(encodedCertificate))
         } catch (e: Exception) {
             Timber.e(e)
             return RobertResultData.Failure(UnknownException("Failed to encrypt certificate for conversion\n${e.message}"))
         }
 
         val apiConversionRq = ApiConversionRQ(
-            chainEncoded = serverKeyAgreementData.encryptedData,
+            chainEncoded = serverKeyAgreementData.encryptedData.first(),
             destination = to.toApiKey(),
             source = from.toApiKey(),
         )

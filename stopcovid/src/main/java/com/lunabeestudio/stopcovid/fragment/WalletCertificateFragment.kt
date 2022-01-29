@@ -33,6 +33,7 @@ import com.lunabeestudio.domain.model.WalletCertificateType
 import com.lunabeestudio.robert.extension.observeEventAndConsume
 import com.lunabeestudio.robert.model.RobertException
 import com.lunabeestudio.robert.model.RobertResultData
+import com.lunabeestudio.robert.utils.Event
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.activity.MainActivity
@@ -43,7 +44,7 @@ import com.lunabeestudio.stopcovid.coreui.extension.getApplicationLocale
 import com.lunabeestudio.stopcovid.coreui.extension.toDimensSize
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
-import com.lunabeestudio.stopcovid.extension.collectWithLifecycle
+import com.lunabeestudio.stopcovid.extension.collectDataWithLifecycle
 import com.lunabeestudio.stopcovid.extension.countryCode
 import com.lunabeestudio.stopcovid.extension.daysTo
 import com.lunabeestudio.stopcovid.extension.fullDescription
@@ -54,6 +55,7 @@ import com.lunabeestudio.stopcovid.extension.infosDescription
 import com.lunabeestudio.stopcovid.extension.injectionContainer
 import com.lunabeestudio.stopcovid.extension.isAutoTest
 import com.lunabeestudio.stopcovid.extension.isEligibleForSmartWallet
+import com.lunabeestudio.stopcovid.extension.isExpired
 import com.lunabeestudio.stopcovid.extension.isFrench
 import com.lunabeestudio.stopcovid.extension.isSignatureExpired
 import com.lunabeestudio.stopcovid.extension.navGraphWalletViewModels
@@ -61,6 +63,7 @@ import com.lunabeestudio.stopcovid.extension.openInExternalBrowser
 import com.lunabeestudio.stopcovid.extension.raw
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
+import com.lunabeestudio.stopcovid.extension.shortDateFormat
 import com.lunabeestudio.stopcovid.extension.showErrorSnackBar
 import com.lunabeestudio.stopcovid.extension.showSmartWallet
 import com.lunabeestudio.stopcovid.extension.smartWalletState
@@ -101,7 +104,7 @@ import kotlin.math.roundToInt
 
 import com.lunabeestudio.stopcovid.extension.showCertificateDetails
 
-class WalletCertificateFragment : MainFragment() {
+class WalletCertificateFragment : MainFragment(), PagerTabFragment {
 
     private val barcodeEncoder: BarcodeEncoder = BarcodeEncoder()
     private val qrCodeSize: Int by lazy {
@@ -146,18 +149,18 @@ class WalletCertificateFragment : MainFragment() {
             (activity as? MainActivity)?.showProgress(isLoading)
         }
 
-        viewModel.certificates.collectWithLifecycle(viewLifecycleOwner) {
+        viewModel.certificates.collectDataWithLifecycle(viewLifecycleOwner) {
             refreshScreen()
             debugManager.logObserveCertificate(it.toRaw())
         }
-        viewModel.profileCertificates.collectWithLifecycle(viewLifecycleOwner) {
+        viewModel.profileCertificates.collectDataWithLifecycle(viewLifecycleOwner) {
             refreshScreen()
         }
         viewModel.blacklistUpdateEvent.observeEventAndConsume(viewLifecycleOwner) {
             refreshScreen()
         }
 
-        viewModel.scrollEvent.observeEventAndConsume(viewLifecycleOwner, ::scrollToCertificate)
+        viewModel.scrollEvent.observeEventAndConsume(viewLifecycleOwner, false, Event.NO_ID, ::scrollToCertificate)
     }
 
     override fun refreshScreen() {
@@ -190,11 +193,11 @@ class WalletCertificateFragment : MainFragment() {
 
         val hasExpiredDcc = {
             sharedPrefs.showSmartWallet
-                    && robertManager.configuration.isSmartWalletOn
-                    && viewModel.profileCertificates.value?.any { (_, certificate) ->
-                val smartWalletState = certificate.smartWalletState(robertManager.configuration)
-                smartWalletState !is Valid
-            } == true
+                && robertManager.configuration.isSmartWalletOn
+                && viewModel.profileCertificates.value?.any { (_, certificate) ->
+                    val smartWalletState = certificate.smartWalletState(robertManager.configuration)
+                    smartWalletState !is Valid
+                } == true
         }
 
         val hasErrorCertificate = hasInvalidDcc() || hasBlacklistedCertificate() || hasExpiredDcc()
@@ -249,8 +252,27 @@ class WalletCertificateFragment : MainFragment() {
 
     private fun scrollToCertificate(certificate: WalletCertificate) {
         binding?.recyclerView?.doOnNextLayout {
-            fastAdapter.getItemById(certificate.fastAdapterIdentifier())?.second?.let { position ->
+            val identifier = certificate.fastAdapterIdentifier()
+
+            val position = fastAdapter.getItemById(identifier)?.second
+            if (position != null) {
                 binding?.recyclerView?.smoothScrollToPosition(position)
+            } else {
+                // Retry scroll once
+                binding?.recyclerView?.postDelayed({
+                    fastAdapter.getItemById(identifier)?.second?.let { position ->
+                        binding?.recyclerView?.smoothScrollToPosition(position)
+                    }
+                }, 200)
+            }
+        }
+    }
+
+    override fun onTabSelected() {
+        findParentFragmentByType<WalletContainerFragment>()?.let { walletContainerFragment ->
+            walletContainerFragment.setupBottomAction(strings["walletController.addCertificate"]) {
+                walletContainerFragment.findNavControllerOrNull()
+                    ?.safeNavigate(WalletContainerFragmentDirections.actionWalletContainerFragmentToWalletQRCodeFragment())
             }
         }
     }
@@ -354,7 +376,7 @@ class WalletCertificateFragment : MainFragment() {
 
             when (certificate) {
                 is EuropeanCertificate -> {
-                    if (certificate.isSignatureExpired) {
+                    if (certificate.isExpired(robertManager.configuration)) {
                         tag2ColorRes = R.color.color_error
                     }
                 }
@@ -416,7 +438,7 @@ class WalletCertificateFragment : MainFragment() {
 
     private suspend fun getDescription(certificate: WalletCertificate): String {
         var description = certificate.infosDescription(strings, robertManager.configuration, context)
-        val dateFormat = SimpleDateFormat("d MMM yyyy", getApplicationLocale())
+        val dateFormat = shortDateFormat(context)
         if (robertManager.configuration.isSmartWalletOn && sharedPrefs.showSmartWallet) {
             if (certificate.isEligibleForSmartWallet(blacklistDCCManager)) {
                 (certificate as? EuropeanCertificate)

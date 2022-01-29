@@ -10,6 +10,8 @@
 
 package com.lunabeestudio.framework.remote.server
 
+import com.lunabeestudio.framework.remote.model.ApiAggregateRQ
+import com.lunabeestudio.framework.remote.model.ApiAggregateRS
 import com.lunabeestudio.framework.remote.model.ApiGenerateRQ
 import com.lunabeestudio.framework.remote.model.ApiGenerateRS
 import retrofit2.Response
@@ -17,8 +19,13 @@ import retrofit2.http.Body
 import retrofit2.http.POST
 
 internal interface DccLightApi {
-    @POST("/api/v1/dcclight/generate")
+    @POST("/api/v1/generate")
     suspend fun generate(
         @Body apiGenerateRQ: ApiGenerateRQ,
     ): Response<ApiGenerateRS>
+
+    @POST("/api/v1/aggregate")
+    suspend fun aggregate(
+        @Body apiAggregateRQ: ApiAggregateRQ,
+    ): Response<ApiAggregateRS>
 }

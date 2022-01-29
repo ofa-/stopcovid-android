@@ -90,6 +90,8 @@ class WalletContainerFragment : BaseFragment(), DeeplinkFragment {
                     whenStarted {
                         injectionContainer.debugManager.logOpenWalletContainer(viewModel.certificates.value.toRaw())
 
+                        viewModel.requestScrollToId(args.scrollCertificateId)
+
                         val rawCodeData = RawCodeData(
                             args.code,
                             args.certificateFormat?.let { WalletCertificateType.Format.fromValue(it) },
@@ -206,11 +208,6 @@ class WalletContainerFragment : BaseFragment(), DeeplinkFragment {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentWalletContainerBinding.inflate(inflater, container, false)
-        binding.walletBottomSheetButton.setOnClickListener {
-            findNavControllerOrNull()
-                ?.safeNavigate(WalletContainerFragmentDirections.actionWalletContainerFragmentToWalletQRCodeFragment())
-        }
-
         return binding.root
     }
 
@@ -230,7 +227,6 @@ class WalletContainerFragment : BaseFragment(), DeeplinkFragment {
 
     override fun refreshScreen() {
         appCompatActivity?.supportActionBar?.title = strings["walletController.title"]
-        binding.walletBottomSheetButton.text = strings["walletController.addCertificate"]
     }
 
     private fun showMigrationFailedIfNeeded() {
@@ -339,6 +335,18 @@ class WalletContainerFragment : BaseFragment(), DeeplinkFragment {
                     }
                 }
             }
+        }
+    }
+
+    fun setupBottomAction(text: String?, onClick: (() -> Unit)?) {
+        if (onClick != null) {
+            binding.walletBottomSheetButton.text = text
+            binding.walletBottomSheetButton.setOnClickListener {
+                onClick()
+            }
+            binding.root.transitionToStart()
+        } else {
+            binding.root.transitionToEnd()
         }
     }
 

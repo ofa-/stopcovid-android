@@ -181,6 +181,12 @@ internal class ApiConfiguration(
     val noWaitDosesPivotDate: String,
     @SerializedName("app.wallet.dccKids")
     val dccKids: String,
+    @SerializedName("app.displayMultipass")
+    val displayMultipass: Boolean,
+    @SerializedName("app.multipass.list")
+    val multipassConfig: String,
+    @SerializedName("app.wallet.recoveryValidityThresholdInDays")
+    val recoveryValidityThreshold: String,
 )
 
 internal fun ApiConfiguration.toDomain(gson: Gson) = Configuration(
@@ -336,5 +342,8 @@ internal fun ApiConfiguration.toDomain(gson: Gson) = Configuration(
         }
     },
     noWaitDosesPivotDate = noWaitDosesPivotDate,
-    dccKidsEmoji = gson.fromJson(dccKids, ApiDccKidsEmoji::class.java)?.dccKidsEmoji
+    dccKidsEmoji = gson.fromJson(dccKids, ApiDccKidsEmoji::class.java)?.dccKidsEmoji,
+    multipassConfig = gson.fromJson(multipassConfig, ApiMultipassConfig::class.java)?.toMultipassConfig(displayMultipass),
+    recoveryValidityThreshold = gson.fromJson(recoveryValidityThreshold, ApiRecoveryValidityThreshold::class.java)
+        ?.toRecoveryValidityThreshold(),
 )
