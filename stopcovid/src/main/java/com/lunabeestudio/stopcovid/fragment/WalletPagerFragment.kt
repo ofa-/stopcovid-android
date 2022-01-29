@@ -81,6 +81,7 @@ class WalletPagerFragment : BaseFragment() {
     override fun refreshScreen() {
         appCompatActivity?.supportActionBar?.title = strings["walletController.title"]
         (activity as? MainActivity)?.binding?.tabLayout?.isVisible = true
+        viewPager.setCurrentItem(walletCertificateFragmentPosition, false)
     }
 
     private fun setupViewPager() {
@@ -193,10 +194,10 @@ class WalletPagerFragment : BaseFragment() {
             2
         }
 
-    private val walletCertificateFragmentPosition: Int
+    private val walletMultipassFragmentPosition: Int
         get() = 0
 
-    private val walletMultipassFragmentPosition: Int
+    private val walletCertificateFragmentPosition: Int
         get() = if (multipassEnabled) {
             1
         } else {
