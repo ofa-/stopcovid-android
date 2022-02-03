@@ -381,11 +381,11 @@
     <fragment
         android:id="@+id/infoCenterFragment"
         android:name="com.lunabeestudio.stopcovid.fragment.InfoCenterFragment"
-        tools:layout="@layout/fragment_recycler_view" >
+        tools:layout="@layout/fragment_recycler_view">
         <argument
             android:name="infoIdentifier"
-            app:argType="long"
-            android:defaultValue="-1L" />
+            android:defaultValue="-1L"
+            app:argType="long" />
     </fragment>
     <fragment
         android:id="@+id/keyFiguresPagerFragment"
@@ -864,19 +864,8 @@
         android:id="@+id/chartFullScreenActivity"
         android:name="com.lunabeestudio.stopcovid.activity.ChartFullScreenActivity">
         <argument
-            android:name="keyFiguresKey"
-            app:argType="string" />
-        <argument
-            android:name="chartDataType"
-            app:argType="com.lunabeestudio.stopcovid.fragment.ChartDataType" />
-        <argument
-            android:name="minDate"
-            app:argType="long" />
-        <argument
-            android:name="keyFiguresKey2"
-            app:argType="string"
-            app:nullable="true"
-            android:defaultValue="null" />
+            android:name="chartFullScreenData"
+            app:argType="com.lunabeestudio.stopcovid.model.ChartFullScreenData" />
     </activity>
     <fragment
         android:id="@+id/urgentInfoFragment"
@@ -904,7 +893,7 @@
     </dialog>
     <fragment
         android:id="@+id/chooseKeyFiguresCompareFragment"
-        android:name="com.lunabeestudio.stopcovid.fragment.ChooseKeyFiguresCompareFragment" >
+        android:name="com.lunabeestudio.stopcovid.fragment.ChooseKeyFiguresCompareFragment">
         <action
             android:id="@+id/action_chooseKeyFiguresCompareFragment_to_selectKeyFiguresFragment"
             app:destination="@id/selectKeyFiguresFragment"
@@ -922,7 +911,7 @@
     </fragment>
     <fragment
         android:id="@+id/selectKeyFiguresFragment"
-        android:name="com.lunabeestudio.stopcovid.fragment.SelectKeyFiguresFragment" >
+        android:name="com.lunabeestudio.stopcovid.fragment.SelectKeyFiguresFragment">
         <argument
             android:name="figureNumber"
             app:argType="integer" />
@@ -937,7 +926,7 @@
     </fragment>
     <fragment
         android:id="@+id/compareKeyFiguresFragment"
-        android:name="com.lunabeestudio.stopcovid.fragment.CompareKeyFiguresFragment" >
+        android:name="com.lunabeestudio.stopcovid.fragment.CompareKeyFiguresFragment">
         <action
             android:id="@+id/action_compareKeyFiguresFragment_to_chooseKeyFiguresCompareFragment"
             app:destination="@id/chooseKeyFiguresCompareFragment"

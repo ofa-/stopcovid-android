@@ -11,6 +11,7 @@
 package com.lunabeestudio.stopcovid.extension
 
 import com.lunabeestudio.domain.model.Configuration
+import com.lunabeestudio.domain.model.WalletCertificateType
 import com.lunabeestudio.stopcovid.model.Eligible
 import com.lunabeestudio.stopcovid.model.EligibleSoon
 import com.lunabeestudio.stopcovid.model.EuropeanCertificate
@@ -25,6 +26,7 @@ import java.util.Calendar
 import java.util.Date
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 
 fun EuropeanCertificate.smartWalletProfileId(): String {
@@ -58,7 +60,6 @@ fun EuropeanCertificate.smartWalletState(configuration: Configuration): SmartWal
 }
 
 private fun EuropeanCertificate.expirationDate(configuration: Configuration): Date? {
-    val yearMonthDayUsParser = yearMonthDayUsParser()
     val yearMonthDayUsParserForceTimeZone = yearMonthDayUsParserForceTimeZone()
     val calendar = Calendar.getInstance()
 
@@ -66,19 +67,19 @@ private fun EuropeanCertificate.expirationDate(configuration: Configuration): Da
     val datePivot2 = configuration.smartWalletExp?.pivot2?.let(yearMonthDayUsParserForceTimeZone::parse)?.time ?: 0L
     val datePivot3 = configuration.smartWalletExp?.pivot3?.let(yearMonthDayUsParserForceTimeZone::parse)?.time ?: 0L
 
-    val agePivotLow: Long
     val agePivotHigh: Long
+    val agePivotLow: Long
     try {
-        agePivotLow = calendar.apply {
-            timeZone = currentTimeZone()
-            time = yearMonthDayUsParserForceTimeZone.parse(greenCertificate.dateOfBirth) ?: Date()
-            add(Calendar.YEAR, configuration.smartWalletAges?.low ?: 0)
-        }.timeInMillis + (configuration.smartWalletAges?.lowExpDays?.days?.inWholeMilliseconds ?: 0)
         agePivotHigh = calendar.apply {
             timeZone = currentTimeZone()
             time = yearMonthDayUsParserForceTimeZone.parse(greenCertificate.dateOfBirth) ?: Date()
             add(Calendar.YEAR, configuration.smartWalletAges?.high ?: 0)
         }.timeInMillis
+        agePivotLow = calendar.apply {
+            timeZone = currentTimeZone()
+            time = yearMonthDayUsParserForceTimeZone.parse(greenCertificate.dateOfBirth) ?: Date()
+            add(Calendar.YEAR, configuration.smartWalletAges?.low ?: 0)
+        }.timeInMillis + (configuration.smartWalletAges?.lowExpDays?.days?.inWholeMilliseconds ?: 0)
     } catch (e: ParseException) {
         Timber.e(e)
         return null
@@ -86,54 +87,94 @@ private fun EuropeanCertificate.expirationDate(configuration: Configuration): Da
 
     val cutoff = max(datePivot1, min(agePivotHigh, datePivot2))
 
-    val isAr = configuration.smartWalletVacc?.ar?.contains(greenCertificate.vaccineMedicinalProduct) == true
-    val isAz = configuration.smartWalletVacc?.az?.contains(greenCertificate.vaccineMedicinalProduct) == true
-    val isJa = configuration.smartWalletVacc?.ja?.contains(greenCertificate.vaccineMedicinalProduct) == true
-    val vaccinDoseNumber = greenCertificate.vaccineDose?.first ?: 0
+    return when {
+        type == WalletCertificateType.VACCINATION_EUROPE -> {
+            val isAr = configuration.smartWalletVacc?.ar?.contains(greenCertificate.vaccineMedicinalProduct) == true
+            val isAz = configuration.smartWalletVacc?.az?.contains(greenCertificate.vaccineMedicinalProduct) == true
+            val isJa = configuration.smartWalletVacc?.ja?.contains(greenCertificate.vaccineMedicinalProduct) == true
+            val vaccinDoseNumber = greenCertificate.vaccineDose?.first ?: 0
 
-    val expDcc = when {
-        (isAr || isAz) && vaccinDoseNumber == 1 -> {
-            val vacc11DosesMillis = configuration.smartWalletExp?.vacc11DosesNbDays?.days?.inWholeMilliseconds ?: 0L
-            val vacc11DosesNewMillis = configuration.smartWalletExp?.vacc11DosesNbNewDays?.days?.inWholeMilliseconds ?: 0L
-            max(
-                max(
-                    cutoff,
-                    min(datePivot3, greenCertificate.vaccineDateForceTimeZone?.time?.plus(vacc11DosesMillis) ?: 0L)
-                ),
-                greenCertificate.vaccineDateForceTimeZone?.time?.plus(vacc11DosesNewMillis)
-                    ?: 0L
-            )
+            val expDcc = when {
+                // Vaccine 1 dose
+                (isAr || isAz) && vaccinDoseNumber == 1 -> {
+                    val vacc11DosesMillis = configuration.smartWalletExp?.vacc11DosesNbDays?.days?.inWholeMilliseconds ?: 0L
+                    val vacc11DosesNewMillis = configuration.smartWalletExp?.vacc11DosesNbNewDays?.days?.inWholeMilliseconds ?: 0L
+                    max(
+                        max(
+                            cutoff,
+                            min(datePivot3, greenCertificate.vaccineDateForceTimeZone?.time?.plus(vacc11DosesMillis) ?: 0L)
+                        ),
+                        greenCertificate.vaccineDateForceTimeZone?.time?.plus(vacc11DosesNewMillis)
+                            ?: 0L
+                    )
+                }
+                isJa && vaccinDoseNumber == 1 -> {
+                    val vaccJan11DosesMillis = configuration.smartWalletExp?.vaccJan11DosesNbDays?.days?.inWholeMilliseconds ?: 0L
+                    max(datePivot1, greenCertificate.vaccineDate?.time?.plus(vaccJan11DosesMillis) ?: 0L)
+                }
+                // Vaccine 2 doses
+                (isAr || isAz) && vaccinDoseNumber == 2 -> {
+                    val vacc22DosesMillis = configuration.smartWalletExp?.vacc22DosesNbDays?.days?.inWholeMilliseconds ?: 0L
+                    val vacc22DosesNewMillis = configuration.smartWalletExp?.vacc22DosesNbNewDays?.days?.inWholeMilliseconds ?: 0L
+                    max(
+                        max(
+                            cutoff,
+                            min(datePivot3, greenCertificate.vaccineDateForceTimeZone?.time?.plus(vacc22DosesMillis) ?: 0L)
+                        ),
+                        greenCertificate.vaccineDateForceTimeZone?.time?.plus(vacc22DosesNewMillis)
+                            ?: 0L
+                    )
+                }
+                isJa && vaccinDoseNumber == 2 -> {
+                    val vaccJan22DosesMillis = configuration.smartWalletExp?.vaccJan22DosesNbDays?.days?.inWholeMilliseconds ?: 0L
+                    val vaccJan22DosesNewMillis = configuration.smartWalletExp?.vaccJan22DosesNbNewDays?.days?.inWholeMilliseconds ?: 0L
+                    max(
+                        max(
+                            cutoff,
+                            min(datePivot3, greenCertificate.vaccineDateForceTimeZone?.time?.plus(vaccJan22DosesMillis) ?: 0L)
+                        ),
+                        greenCertificate.vaccineDateForceTimeZone?.time?.plus(vaccJan22DosesNewMillis)
+                            ?: 0L
+                    )
+                }
+                else -> null
+            }
+
+            expDcc?.let { Date(max(agePivotLow, it)) }
         }
-        (isAr || isAz) && vaccinDoseNumber == 2 -> {
-            val vacc22DosesMillis = configuration.smartWalletExp?.vacc22DosesNbDays?.days?.inWholeMilliseconds ?: 0L
-            val vacc22DosesNewMillis = configuration.smartWalletExp?.vacc22DosesNbNewDays?.days?.inWholeMilliseconds ?: 0L
-            max(
-                max(
-                    cutoff,
-                    min(datePivot3, greenCertificate.vaccineDateForceTimeZone?.time?.plus(vacc22DosesMillis) ?: 0L)
-                ),
-                greenCertificate.vaccineDateForceTimeZone?.time?.plus(vacc22DosesNewMillis)
-                    ?: 0L
-            )
-        }
-        greenCertificate.isRecovery -> {
+        greenCertificate.isRecoveryOrTestPositive -> {
+            val yearMonthDayUsParser = yearMonthDayUsParser()
+            val age = yearMonthDayUsParser.parseOrNull(greenCertificate.dateOfBirth)?.yearsOld() ?: 0
+            val recoveryValidityThreshold = configuration.recoveryValidityThreshold
+
             val recMillis = configuration.smartWalletExp?.recNbDays?.days?.inWholeMilliseconds ?: 0L
+            val recNewMillis = if (age >= configuration.smartWalletAges?.low ?: 0) {
+                configuration.smartWalletExp?.recNbNewDays?.days?.inWholeMilliseconds ?: 0L
+            } else {
+                recoveryValidityThreshold?.min?.plus(recoveryValidityThreshold.max)?.inWholeMilliseconds ?: 0L
+            }
+
             val testDate =
                 greenCertificate.recoveryDateOfFirstPositiveTestForceTimeZone
                     ?: greenCertificate.testDateTimeOfCollection?.midnightInCurrentTimeZone(
                         yearMonthDayUsParser,
                         yearMonthDayUsParserForceTimeZone
                     )
-            max(cutoff, testDate?.time?.plus(recMillis) ?: 0L)
-        }
-        isJa && (vaccinDoseNumber == 1 || vaccinDoseNumber == 2) -> {
-            val vaccJan11DosesMillis = configuration.smartWalletExp?.vaccJan11DosesNbDays?.days?.inWholeMilliseconds ?: 0L
-            max(datePivot1, greenCertificate.vaccineDate?.time?.plus(vaccJan11DosesMillis) ?: 0L)
-        }
-        else -> return null
-    }
+            val expDcc = max(
+                max(
+                    cutoff,
+                    min(
+                        datePivot3,
+                        testDate?.time?.plus(recMillis) ?: 0L
+                    )
+                ),
+                testDate?.time?.plus(recNewMillis) ?: 0L
+            )
 
-    return Date(max(agePivotLow, expDcc))
+            Date(expDcc)
+        }
+        else -> null
+    }
 }
 
 private fun EuropeanCertificate.eligibleDate(configuration: Configuration): Date? {
@@ -145,25 +186,40 @@ private fun EuropeanCertificate.eligibleDate(configuration: Configuration): Date
     val isJa = configuration.smartWalletVacc?.ja?.contains(greenCertificate.vaccineMedicinalProduct) == true
     val vaccinDoseNumber = greenCertificate.vaccineDose?.first ?: 0
 
+    val vacc22Doses: Duration
+    val vaccJan11Doses: Duration
+    val vaccJan22Doses: Duration
+    val rec: Duration
+    val age = yearMonthDayUsParser.parseOrNull(greenCertificate.dateOfBirth)?.yearsOld() ?: 0
+    if (age >= configuration.smartWalletAges?.low ?: 0) {
+        vacc22Doses = configuration.smartWalletElg?.vacc22DosesNbDays?.days ?: Duration.ZERO
+        vaccJan11Doses = configuration.smartWalletElg?.vaccJan11DosesNbDays?.days ?: Duration.ZERO
+        vaccJan22Doses = configuration.smartWalletElg?.vaccJan22DosesNbDays?.days ?: Duration.ZERO
+        rec = configuration.smartWalletElg?.recNbDays?.days ?: Duration.ZERO
+    } else {
+        vacc22Doses = configuration.smartWalletElg?.vacc22DosesNbDaysLow?.days ?: Duration.ZERO
+        vaccJan11Doses = configuration.smartWalletElg?.vaccJan11DosesNbDaysLow?.days ?: Duration.ZERO
+        vaccJan22Doses = configuration.smartWalletElg?.vaccJan22DosesNbDaysLow?.days ?: Duration.ZERO
+        rec = configuration.smartWalletElg?.recNbDaysLow?.days ?: Duration.ZERO
+    }
+
     val elgDcc = when {
         (isAr || isAz) && (vaccinDoseNumber == 1 || vaccinDoseNumber == 2) -> {
-            val vacc22DosesMillis = (configuration.smartWalletElg?.vacc22DosesNbDays ?: 0).days.inWholeMilliseconds
-            greenCertificate.vaccineDateForceTimeZone?.time?.plus(vacc22DosesMillis) ?: 0L
+            greenCertificate.vaccineDateForceTimeZone?.time?.plus(vacc22Doses.inWholeMilliseconds) ?: 0L
         }
-        isJa && (vaccinDoseNumber == 1 || vaccinDoseNumber == 2) -> {
-            val vaccJan11DosesMillis = (configuration.smartWalletElg?.vaccJan11DosesNbDays ?: 0).days.inWholeMilliseconds
-            greenCertificate.vaccineDateForceTimeZone?.time?.plus(vaccJan11DosesMillis)
-                ?: 0L
+        isJa && vaccinDoseNumber == 1 -> {
+            greenCertificate.vaccineDateForceTimeZone?.time?.plus(vaccJan11Doses.inWholeMilliseconds) ?: 0L
         }
-        greenCertificate.isRecovery -> {
-            val recMillis = (configuration.smartWalletElg?.recNbDays ?: 0).days.inWholeMilliseconds
-            val testDate =
-                greenCertificate.recoveryDateOfFirstPositiveTestForceTimeZone
-                    ?: greenCertificate.testDateTimeOfCollection?.midnightInCurrentTimeZone(
-                        yearMonthDayUsParser,
-                        yearMonthDayUsParserForceTimeZone
-                    )
-            testDate?.time?.plus(recMillis) ?: 0L
+        isJa && vaccinDoseNumber == 2 -> {
+            greenCertificate.vaccineDateForceTimeZone?.time?.plus(vaccJan22Doses.inWholeMilliseconds) ?: 0L
+        }
+        greenCertificate.isRecoveryOrTestPositive -> {
+            val testDate = greenCertificate.recoveryDateOfFirstPositiveTestForceTimeZone
+                ?: greenCertificate.testDateTimeOfCollection?.midnightInCurrentTimeZone(
+                    yearMonthDayUsParser,
+                    yearMonthDayUsParserForceTimeZone,
+                )
+            testDate?.time?.plus(rec.inWholeMilliseconds) ?: 0L
         }
         else -> return null
     }
@@ -172,7 +228,7 @@ private fun EuropeanCertificate.eligibleDate(configuration: Configuration): Date
         Calendar.getInstance().apply {
             timeZone = currentTimeZone()
             time = yearMonthDayUsParserForceTimeZone.parse(greenCertificate.dateOfBirth) ?: Date()
-            add(Calendar.YEAR, configuration.smartWalletAges?.low ?: 0)
+            add(Calendar.YEAR, configuration.smartWalletAges?.lowElg ?: 0)
         }.timeInMillis
     } catch (e: ParseException) {
         Timber.e(e)

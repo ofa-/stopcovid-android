@@ -14,5 +14,10 @@ class SmartWalletElg(
     val vacc22DosesNbDays: Int,
     val vaccJan11DosesNbDays: Int,
     val recNbDays: Int,
+    val vacc22DosesNbDaysLow: Int,
+    val vaccJan11DosesNbDaysLow: Int,
+    val recNbDaysLow: Int,
     val displayElgDays: Int,
+    val vaccJan22DosesNbDays: Int,
+    val vaccJan22DosesNbDaysLow: Int,
 )

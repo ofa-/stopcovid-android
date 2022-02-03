@@ -1,9 +1,21 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * Authors
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * Created by Lunabee Studio / Date - 2022/1/27 - for the TOUS-ANTI-COVID project
+ */
+
 package com.lunabeestudio.stopcovid.extension
 
 import org.junit.Test
+import java.util.Calendar
 import java.util.Date
+import kotlin.test.assertEquals
 
-class DateExtensionTest {
+class DateExtTest {
 
     @Test
     fun roundTimeIntervalSince1900_interval_1() {
@@ -81,5 +93,28 @@ class DateExtensionTest {
         assert(Date(946683000000L).roundedTimeIntervalSince1900(interval) == 3155673600L)
         // 1999/12/31 23h30m00s001 => 2000/01/01 00h00m00s000
         assert(Date(946683000001L).roundedTimeIntervalSince1900(interval) == 3155673600L)
+    }
+
+    @Test
+    fun yearsOld_before_birthday() {
+        val today = Calendar.getInstance()
+        today.add(Calendar.YEAR, -15)
+        today.add(Calendar.DAY_OF_YEAR, 1)
+        assertEquals(14, today.time.yearsOld())
+    }
+
+    @Test
+    fun yearsOld_after_birthday() {
+        val today = Calendar.getInstance()
+        today.add(Calendar.YEAR, -15)
+        today.add(Calendar.DAY_OF_YEAR, -1)
+        assertEquals(15, today.time.yearsOld())
+    }
+
+    @Test
+    fun yearsOld_on_birthday() {
+        val today = Calendar.getInstance()
+        today.add(Calendar.YEAR, -15)
+        assertEquals(15, today.time.yearsOld())
     }
 }

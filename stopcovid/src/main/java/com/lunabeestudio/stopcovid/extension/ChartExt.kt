@@ -3,6 +3,7 @@ package com.lunabeestudio.stopcovid.extension
 import android.content.Context
 import android.graphics.Color
 import com.github.mikephil.charting.charts.BarChart
+import com.github.mikephil.charting.charts.Chart
 import com.github.mikephil.charting.charts.CombinedChart
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.LimitLine
@@ -74,6 +75,7 @@ fun LineChart.fillWithChartData(
     chartData: Array<com.lunabeestudio.stopcovid.model.ChartData>,
     limitLineData: LimitLineData?,
 ) {
+    resetMinMaxAxis()
     val dataSetArray = chartData.map {
         LineDataSet(it.entries, it.description).apply {
             setupStyle(it.color)
@@ -86,6 +88,13 @@ fun LineChart.fillWithChartData(
     setupXAxis(context, xAxis, chartData)
     setupYAxis(axisLeft, limitLineData, context)
     animateX(Constants.Chart.X_ANIMATION_DURATION_MILLIS)
+}
+
+fun LineChart.resetMinMaxAxis() {
+    xAxis.resetAxisMinimum()
+    xAxis.resetAxisMaximum()
+    axisLeft.resetAxisMinimum()
+    axisLeft.resetAxisMaximum()
 }
 
 fun BarChart.setupStyle() {
@@ -105,6 +114,7 @@ fun BarChart.fillWithChartData(
     chartData: Array<com.lunabeestudio.stopcovid.model.ChartData>,
     limitLineData: LimitLineData?,
 ) {
+    resetMinMaxAxis()
     val dataSetArray = chartData.map { (description, _, entries, color) ->
         BarDataSet(
             entries.mapIndexed { _, entry ->
@@ -129,6 +139,14 @@ fun BarChart.fillWithChartData(
 
         animateY(Constants.Chart.X_ANIMATION_DURATION_MILLIS)
     }
+}
+
+// Reset Min/Max because axisMinimum = axisMinimum.coerceAtLeast(0f) of setupYAxis set custom axis to true
+fun BarChart.resetMinMaxAxis() {
+    xAxis.resetAxisMinimum()
+    xAxis.resetAxisMaximum()
+    axisLeft.resetAxisMinimum()
+    axisLeft.resetAxisMaximum()
 }
 
 private fun setupYAxis(yAxis: YAxis, limitLineData: LimitLineData?, context: Context) {

@@ -10,41 +10,40 @@
 
 package com.lunabeestudio.stopcovid.activity
 
+import android.content.Intent
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.navigation.NavController
-import androidx.navigation.fragment.findNavController
-import androidx.navigation.navArgs
-import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.coreui.extension.isNightMode
 import com.lunabeestudio.stopcovid.databinding.ActivityChartsFullScreenBinding
-import com.lunabeestudio.stopcovid.fragment.ChartFullScreenFragmentArgs
+import com.lunabeestudio.stopcovid.viewmodel.ChartFullScreenViewModel
 
 class ChartFullScreenActivity : BaseActivity() {
 
+    val viewModel: ChartFullScreenViewModel by viewModels()
+
     val binding: ActivityChartsFullScreenBinding by lazy {
         ActivityChartsFullScreenBinding.inflate(layoutInflater)
-    }
-
-    private val args: ChartFullScreenActivityArgs by navArgs()
-
-    private val navController: NavController by lazy {
-        supportFragmentManager.findFragmentById(R.id.navHostFragment)!!.findNavController()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = !isNightMode()
+        handleIntent(intent)
+    }
 
-        intent.extras?.let {
-            val fragmentArgs = ChartFullScreenFragmentArgs(
-                keyFigureKey = args.keyFiguresKey,
-                chartDataType = args.chartDataType,
-                minDate = args.minDate,
-                keyFigureKey2 = args.keyFiguresKey2
-            ).toBundle()
-            navController.setGraph(R.navigation.nav_chart_full_screen, fragmentArgs)
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        intent?.let {
+            this.intent = it
+            handleIntent(it)
+        }
+    }
+
+    private fun handleIntent(intent: Intent) {
+        intent.extras?.let { extras ->
+            viewModel.chartData.value = ChartFullScreenActivityArgs.fromBundle(extras).chartFullScreenData
         }
     }
 }

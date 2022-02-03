@@ -24,6 +24,7 @@ import androidx.navigation.NavOptions
 import androidx.navigation.fragment.navArgs
 import androidx.navigation.navGraphViewModels
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.lunabeestudio.analytics.model.AppEventName
 import com.lunabeestudio.analytics.model.ErrorEventName
 import com.lunabeestudio.domain.model.TacResult
 import com.lunabeestudio.domain.model.WalletCertificateError
@@ -241,8 +242,10 @@ class WalletContainerFragment : BaseFragment(), DeeplinkFragment {
 
     fun navigateToFullscreenCertificate(certificate: WalletCertificate) {
         if (certificate is EuropeanCertificate) {
+            analyticsManager.reportAppEvent(AppEventName.e26)
             navigateToFullscreenEuropeanCertificateId(certificate.id, false)
         } else {
+            analyticsManager.reportAppEvent(AppEventName.e27)
             findNavControllerOrNull()?.safeNavigate(
                 WalletContainerFragmentDirections.actionWalletContainerFragmentToFullscreenQRCodeFragment(certificate.id)
             )
