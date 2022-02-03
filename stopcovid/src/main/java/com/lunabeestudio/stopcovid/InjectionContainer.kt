@@ -23,7 +23,6 @@ import com.lunabeestudio.framework.manager.DebugManager
 import com.lunabeestudio.framework.manager.LocalProximityFilterImpl
 import com.lunabeestudio.framework.remote.datasource.CleaDataSource
 import com.lunabeestudio.framework.remote.datasource.DccLightDataSource
-import com.lunabeestudio.framework.remote.datasource.DummyDccLightDataSource
 import com.lunabeestudio.framework.remote.datasource.InGroupeDatasource
 import com.lunabeestudio.framework.remote.datasource.ServiceDataSource
 import com.lunabeestudio.framework.remote.server.ServerManager
@@ -59,8 +58,8 @@ import com.lunabeestudio.stopcovid.usecase.CleanAndRenewActivityPassUseCase
 import com.lunabeestudio.stopcovid.usecase.GenerateActivityPassUseCase
 import com.lunabeestudio.stopcovid.usecase.GenerateMultipassUseCase
 import com.lunabeestudio.stopcovid.usecase.GetCloseMultipassProfilesUseCase
-import com.lunabeestudio.stopcovid.usecase.GetMultipassProfilesUseCase
 import com.lunabeestudio.stopcovid.usecase.GetFilteredMultipassProfileFromIdUseCase
+import com.lunabeestudio.stopcovid.usecase.GetMultipassProfilesUseCase
 import com.lunabeestudio.stopcovid.usecase.GetSmartWalletCertificateUseCase
 import com.lunabeestudio.stopcovid.usecase.SmartWalletNotificationUseCase
 import com.lunabeestudio.stopcovid.usecase.VerifyAndGetCertificateCodeValueUseCase
@@ -127,11 +126,7 @@ class InjectionContainer(private val context: StopCovid, val coroutineScope: Cor
     }
 
     private val remoteDccLightDataSource: RemoteDccLightDataSource by lazy {
-        if (EnvConstant.Prod.activityPassBaseUrl.isNotBlank()) {
-            DccLightDataSource(sharedCryptoDataSource, EnvConstant.Prod.activityPassBaseUrl, serverManager.okHttpClient, analyticsManager)
-        } else {
-            DummyDccLightDataSource()
-        }
+            DccLightDataSource(sharedCryptoDataSource, EnvConstant.Prod.dcclightBaseUrl, serverManager.okHttpClient, analyticsManager)
     }
 
     val isolationManager: IsolationManager by lazy { IsolationManager(context, robertManager, secureKeystoreDataSource) }
@@ -227,6 +222,7 @@ class InjectionContainer(private val context: StopCovid, val coroutineScope: Cor
         get() = GenerateMultipassUseCase(
             walletRepository = walletRepository,
             verifyCertificateUseCase = verifyCertificateUseCase,
+            analyticsManager = analyticsManager,
         )
 
     val getCloseMultipassProfilesUseCase: GetCloseMultipassProfilesUseCase

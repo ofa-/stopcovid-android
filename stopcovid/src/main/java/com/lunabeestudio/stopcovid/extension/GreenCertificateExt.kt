@@ -66,7 +66,7 @@ val GreenCertificate.vaccineDose: Pair<Int, Int>?
 val GreenCertificate.testType: String?
     get() = tests?.lastOrNull()?.typeOfTest?.trim()
 
-val GreenCertificate.isRecovery: Boolean
+val GreenCertificate.isRecoveryOrTestPositive: Boolean
     get() = (testResultIsNegative == false) || certificateType == WalletCertificateType.RECOVERY_EUROPE
 
 val GreenCertificate.testResultIsNegative: Boolean?

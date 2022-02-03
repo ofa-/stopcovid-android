@@ -32,7 +32,7 @@ fun Date.yearsOld(): Int {
         time = this@yearsOld
     }
     var diff = today[Calendar.YEAR] - birthdate[Calendar.YEAR]
-    if (today[Calendar.DAY_OF_YEAR] > birthdate[Calendar.DAY_OF_YEAR]) {
+    if (today[Calendar.DAY_OF_YEAR] < birthdate[Calendar.DAY_OF_YEAR]) {
         diff--
     }
     return diff

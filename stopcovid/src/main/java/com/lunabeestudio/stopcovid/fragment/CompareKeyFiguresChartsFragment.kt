@@ -20,6 +20,7 @@ import com.lunabeestudio.stopcovid.fastitem.compareFigureCardChartItem
 import com.lunabeestudio.stopcovid.manager.ChartManager
 import com.lunabeestudio.stopcovid.manager.KeyFiguresManager
 import com.lunabeestudio.stopcovid.manager.ShareManager
+import com.lunabeestudio.stopcovid.model.ChartFullScreenData
 import com.lunabeestudio.stopcovid.model.KeyFigure
 import com.lunabeestudio.stopcovid.utils.lazyFast
 
@@ -41,10 +42,12 @@ class CompareKeyFiguresChartsFragment : BaseFragment() {
         View.OnClickListener {
             parentFragment?.findNavControllerOrNull()?.safeNavigate(
                 CompareKeyFiguresFragmentDirections.actionCompareKeyFiguresFragmentToChartFullScreenActivity(
-                    keyFiguresKey = labelKey,
-                    chartDataType = ChartDataType.GLOBAL,
-                    minDate = minDate,
-                    keyFiguresKey2 = labelKey2
+                    ChartFullScreenData(
+                        keyFigureKey = labelKey,
+                        chartDataType = ChartDataType.GLOBAL,
+                        minDate = minDate,
+                        keyFigureKey2 = labelKey2
+                    )
                 )
             )
         }

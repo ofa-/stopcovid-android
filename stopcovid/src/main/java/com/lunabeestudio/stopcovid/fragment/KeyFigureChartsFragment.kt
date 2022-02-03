@@ -39,6 +39,7 @@ import com.lunabeestudio.stopcovid.fastitem.keyFigureCardChartItem
 import com.lunabeestudio.stopcovid.manager.ChartManager
 import com.lunabeestudio.stopcovid.manager.KeyFiguresManager
 import com.lunabeestudio.stopcovid.manager.ShareManager
+import com.lunabeestudio.stopcovid.model.ChartFullScreenData
 import com.lunabeestudio.stopcovid.model.ChartInformation
 import com.lunabeestudio.stopcovid.model.KeyFigure
 import com.lunabeestudio.stopcovid.utils.lazyFast
@@ -185,9 +186,12 @@ class KeyFigureChartsFragment : BaseFragment() {
     private fun getChartOnClickListener(labelKey: String, chartDataType: ChartDataType): View.OnClickListener = View.OnClickListener {
         findParentFragmentByType<KeyFigureDetailsFragment>()?.findNavControllerOrNull()?.safeNavigate(
             KeyFigureDetailsFragmentDirections.actionKeyFigureDetailsFragmentToChartFullScreenActivity(
-                keyFiguresKey = labelKey,
-                chartDataType = chartDataType,
-                minDate = minDate,
+                ChartFullScreenData(
+                    keyFigureKey = labelKey,
+                    chartDataType = chartDataType,
+                    minDate = minDate,
+                    keyFigureKey2 = null,
+                )
             )
         )
     }

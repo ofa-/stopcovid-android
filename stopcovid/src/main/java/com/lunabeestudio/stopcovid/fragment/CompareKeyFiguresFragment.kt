@@ -35,7 +35,7 @@ class CompareKeyFiguresFragment : BaseFragment() {
     private lateinit var binding: FragmentCompareKeyfigureBinding
 
     private val sharedPreferences: SharedPreferences by lazy {
-        PreferenceManager.getDefaultSharedPreferences(context)
+        PreferenceManager.getDefaultSharedPreferences(requireContext())
     }
 
     val keyFiguresManager: KeyFiguresManager by lazyFast {

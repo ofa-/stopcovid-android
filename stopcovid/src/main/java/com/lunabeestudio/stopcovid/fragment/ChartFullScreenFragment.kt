@@ -20,11 +20,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.core.widget.TextViewCompat
-import androidx.navigation.fragment.navArgs
+import androidx.fragment.app.activityViewModels
 import androidx.preference.PreferenceManager
 import com.github.mikephil.charting.listener.ChartTouchListener
 import com.github.mikephil.charting.listener.OnChartGestureListener
-import com.lunabeestudio.robert.extension.observeEventAndConsume
 import com.lunabeestudio.stopcovid.Constants
 import com.lunabeestudio.stopcovid.coreui.extension.setTextOrHide
 import com.lunabeestudio.stopcovid.coreui.fragment.BaseFragment
@@ -42,15 +41,16 @@ import com.lunabeestudio.stopcovid.model.ChartInformation
 import com.lunabeestudio.stopcovid.model.KeyFigure
 import com.lunabeestudio.stopcovid.model.KeyFigureChartType
 import com.lunabeestudio.stopcovid.utils.lazyFast
+import com.lunabeestudio.stopcovid.viewmodel.ChartFullScreenViewModel
 import com.lunabeestudio.stopcovid.widget.TacMarkerView
 
 class ChartFullScreenFragment : BaseFragment() {
 
+    private val viewModel: ChartFullScreenViewModel by activityViewModels()
+
     private val binding: FragmentChartFullScreenBinding by lazy {
         FragmentChartFullScreenBinding.inflate(layoutInflater)
     }
-
-    private val args by navArgs<ChartFullScreenFragmentArgs>()
 
     private val sharedPrefs: SharedPreferences by lazy {
         PreferenceManager.getDefaultSharedPreferences(requireContext())
@@ -62,10 +62,6 @@ class ChartFullScreenFragment : BaseFragment() {
 
     private var keyFigure: KeyFigure? = null
     private var keyFigure2: KeyFigure? = null
-    private val chartDataType: ChartDataType by lazy { args.chartDataType }
-    private val keyFigureKey: String by lazy { args.keyFigureKey }
-    private val keyFigureKey2: String? by lazy { args.keyFigureKey2 }
-    private val minDate: Long by lazy { args.minDate }
 
     private val chartGestureListener = object : OnChartGestureListener {
         override fun onChartGestureStart(me: MotionEvent?, lastPerformedGesture: ChartTouchListener.ChartGesture?) {}
@@ -116,10 +112,14 @@ class ChartFullScreenFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        viewModel.chartData.observe(viewLifecycleOwner) {
+            setupObservers()
+        }
+
         setupBarCharts()
         setupLineCharts()
         setupScreen()
-        setupObservers()
     }
 
     private fun setupScreen() {
@@ -142,16 +142,14 @@ class ChartFullScreenFragment : BaseFragment() {
     }
 
     private fun setupObservers() {
-        keyFiguresManager.figures.observeEventAndConsume(viewLifecycleOwner) {
-            refreshScreen()
-        }
+        keyFiguresManager.figures.removeObservers(viewLifecycleOwner)
 
         keyFiguresManager.figures.observe(viewLifecycleOwner) {
             keyFigure = it.peekContent().data?.first { figure ->
-                figure.labelKey == keyFigureKey
+                figure.labelKey == viewModel.chartData.value?.keyFigureKey
             }
             keyFigure2 = it.peekContent().data?.firstOrNull { figure ->
-                figure.labelKey == keyFigureKey2
+                figure.labelKey == viewModel.chartData.value?.keyFigureKey2
             }
             refreshScreen()
         }
@@ -210,15 +208,17 @@ class ChartFullScreenFragment : BaseFragment() {
         keyFigure?.let { figure ->
             context?.let { safeContext ->
                 if (keyFigure2 == null) {
-                    val chartInformation = ChartInformation(
-                        context = safeContext,
-                        departmentKeyFigure = figure.getKeyFigureForPostalCode(sharedPrefs.chosenPostalCode),
-                        strings = strings,
-                        keyFigure = figure,
-                        chartDataType = chartDataType,
-                        minDate = minDate
-                    )
-                    refreshChart(safeContext, chartInformation)
+                    viewModel.chartData.value?.let { chartData ->
+                        val chartInformation = ChartInformation(
+                            context = safeContext,
+                            departmentKeyFigure = figure.getKeyFigureForPostalCode(sharedPrefs.chosenPostalCode),
+                            strings = strings,
+                            keyFigure = figure,
+                            chartDataType = chartData.chartDataType,
+                            minDate = chartData.minDate
+                        )
+                        refreshChart(safeContext, chartInformation)
+                    }
                 } else {
                     keyFigure2?.let { figure2 ->
                         refreshCombinedChart(safeContext, figure, figure2)
@@ -229,58 +229,62 @@ class ChartFullScreenFragment : BaseFragment() {
     }
 
     private fun refreshChart(context: Context, chartInformation: ChartInformation) {
-        if (chartInformation.chartType == KeyFigureChartType.BARS) {
-            binding.keyFigureBarChart.apply {
-                fillWithChartData(context, chartInformation.chartData, chartInformation.limitLineData)
-                marker = TacMarkerView(context, this)
-                onChartGestureListener = chartGestureListener
+        binding.apply {
+            keyFigureLineChart.isVisible = chartInformation.chartType == KeyFigureChartType.LINES
+            keyFigureBarChart.isVisible = chartInformation.chartType == KeyFigureChartType.BARS
+            keyFigureCombinedChart.isVisible = false
+            if (chartInformation.chartType == KeyFigureChartType.BARS) {
+                keyFigureBarChart.apply {
+                    fillWithChartData(context, chartInformation.chartData, chartInformation.limitLineData)
+                    marker = TacMarkerView(context, this)
+                    onChartGestureListener = chartGestureListener
+                }
+                keyFigureLineChart.onChartGestureListener = null
+            } else {
+                keyFigureLineChart.apply {
+                    fillWithChartData(context, chartInformation.chartData, chartInformation.limitLineData)
+                    marker = TacMarkerView(context, this)
+                    onChartGestureListener = chartGestureListener
+                }
+                keyFigureBarChart.onChartGestureListener = null
             }
-            binding.keyFigureLineChart.onChartGestureListener = null
-        } else {
-            binding.keyFigureLineChart.apply {
-                fillWithChartData(context, chartInformation.chartData, chartInformation.limitLineData)
-                marker = TacMarkerView(context, this)
-                onChartGestureListener = chartGestureListener
-            }
-            binding.keyFigureBarChart.onChartGestureListener = null
-        }
-        binding.keyFigureCombinedChart.onChartGestureListener = null
+            keyFigureCombinedChart.onChartGestureListener = null
 
-        binding.chartSerie1LegendTextView.setLegend1FromChartData(chartInformation.chartData)
-        binding.chartSerie2LegendTextView.setLegend2FromChartData(chartInformation.chartData)
-        binding.keyFigureLineChart.isVisible = chartInformation.chartType == KeyFigureChartType.LINES
-        binding.keyFigureBarChart.isVisible = chartInformation.chartType == KeyFigureChartType.BARS
-        binding.chartDescriptionTextView.setTextOrHide(chartInformation.chartExplanationLabel)
+            chartSerie1LegendTextView.setLegend1FromChartData(chartInformation.chartData)
+            chartSerie2LegendTextView.setLegend2FromChartData(chartInformation.chartData)
+            chartDescriptionTextView.setTextOrHide(chartInformation.chartExplanationLabel)
+        }
     }
 
     private fun refreshCombinedChart(context: Context, keyFigure: KeyFigure, keyFigure2: KeyFigure) {
+        viewModel.chartData.value?.let { chartData ->
+            val combinedChartData = Pair(keyFigure, keyFigure2).generateCombinedData(context, strings, chartData.minDate)
+            binding.apply {
+                keyFigureLineChart.isVisible = false
+                keyFigureBarChart.isVisible = false
+                keyFigureCombinedChart.isVisible = true
+                // Set legend
+                chartSerie1LegendTextView.text = combinedChartData.dataSets?.get(0)?.label
+                chartSerie2LegendTextView.text = combinedChartData.dataSets?.get(1)?.label
+                combinedChartData.dataSets?.get(0)?.color?.let {
+                    chartSerie1LegendTextView.setTextColor(it)
+                    TextViewCompat.setCompoundDrawableTintList(chartSerie1LegendTextView, ColorStateList.valueOf(it))
+                }
+                combinedChartData.dataSets?.get(1)?.color?.let {
+                    chartSerie2LegendTextView.setTextColor(it)
+                    TextViewCompat.setCompoundDrawableTintList(chartSerie2LegendTextView, ColorStateList.valueOf(it))
+                }
 
-        val chartData = Pair(keyFigure, keyFigure2).generateCombinedData(context, strings, minDate)
-        binding.apply {
-            keyFigureLineChart.isVisible = false
-            keyFigureBarChart.isVisible = false
-            keyFigureCombinedChart.isVisible = true
-            // Set legend
-            chartSerie1LegendTextView.text = chartData.dataSets?.get(0)?.label
-            chartSerie2LegendTextView.text = chartData.dataSets?.get(1)?.label
-            chartData.dataSets?.get(0)?.color?.let {
-                chartSerie1LegendTextView.setTextColor(it)
-                TextViewCompat.setCompoundDrawableTintList(chartSerie1LegendTextView, ColorStateList.valueOf(it))
+                keyFigureCombinedChart.apply {
+                    data = combinedChartData
+                    marker = TacMarkerView(context, this)
+                    onChartGestureListener = chartGestureListener
+                }
+                setupCombinedCharts()
+                keyFigureLineChart.onChartGestureListener = null
+                keyFigureBarChart.onChartGestureListener = null
+                binding.chartDescriptionTextView.isVisible = false
             }
-            chartData.dataSets?.get(1)?.color?.let {
-                chartSerie2LegendTextView.setTextColor(it)
-                TextViewCompat.setCompoundDrawableTintList(chartSerie2LegendTextView, ColorStateList.valueOf(it))
-            }
-
-            keyFigureCombinedChart.apply {
-                data = chartData
-                marker = TacMarkerView(context, this)
-                onChartGestureListener = chartGestureListener
-            }
-            setupCombinedCharts()
-            keyFigureLineChart.onChartGestureListener = null
-            keyFigureBarChart.onChartGestureListener = null
-            binding.chartDescriptionTextView.isVisible = false
         }
     }
 }

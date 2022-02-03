@@ -10,8 +10,11 @@
 
 package com.lunabeestudio.stopcovid.usecase
 
+import com.lunabeestudio.analytics.manager.AnalyticsManager
+import com.lunabeestudio.analytics.model.AppEventName
 import com.lunabeestudio.domain.model.TacResult
 import com.lunabeestudio.domain.model.WalletCertificateType
+import com.lunabeestudio.robert.model.AggregateBackendException
 import com.lunabeestudio.robert.model.RobertResultData
 import com.lunabeestudio.stopcovid.model.EuropeanCertificate
 import com.lunabeestudio.stopcovid.model.UnknownException
@@ -24,13 +27,18 @@ import kotlinx.coroutines.flow.onStart
 class GenerateMultipassUseCase(
     private val walletRepository: WalletRepository,
     private val verifyCertificateUseCase: VerifyCertificateUseCase,
+    private val analyticsManager: AnalyticsManager,
 ) {
     operator fun invoke(certificateList: List<EuropeanCertificate>): Flow<TacResult<EuropeanCertificate>> {
         return flow {
             val dccResult = walletRepository.generateMultipass(certificateList.map(WalletCertificate::value))
 
             when (dccResult) {
-                is RobertResultData.Failure -> emit(TacResult.Failure(dccResult.error))
+                is RobertResultData.Failure -> {
+                    val errors = (dccResult.error as? AggregateBackendException)?.errorCodes?.joinToString()
+                    analyticsManager.reportAppEvent(AppEventName.e25, errors)
+                    emit(TacResult.Failure(dccResult.error))
+                }
                 is RobertResultData.Success -> {
                     val dccValue = dccResult.data
 
@@ -49,6 +57,7 @@ class GenerateMultipassUseCase(
 
                     if (multipass != null) {
                         walletRepository.saveCertificate(multipass)
+                        analyticsManager.reportAppEvent(AppEventName.e24, null)
                         emit(TacResult.Success(multipass))
                     } else {
                         emit(TacResult.Failure(UnknownException("Generated multipass is null")))

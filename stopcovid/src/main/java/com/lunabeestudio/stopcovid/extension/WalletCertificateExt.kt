@@ -97,7 +97,7 @@ fun WalletCertificate.infosDescription(strings: LocalizedStrings, configuration:
             if ((this as? EuropeanCertificate)?.greenCertificate?.testResultIsNegative == true) {
                 strings["wallet.proof.europe.${type.code}.infos"]
             } else {
-                strings["wallet.proof.europe.testPositive.infos"]
+                strings["wallet.proof.europe.positiveTest.infos"]
             }
         }
         WalletCertificateType.EXEMPTION,
@@ -337,10 +337,7 @@ private fun EuropeanCertificate.formatDccText(
                 fromDate = greenCertificate.recoveryDateOfFirstPositiveTest?.time
                     ?.plus(recoveryValidityThreshold.min.inWholeMilliseconds)
                     ?.let { Date(it) }
-                toDate = greenCertificate.recoveryDateOfFirstPositiveTest?.time
-                    ?.plus(recoveryValidityThreshold.min.inWholeMilliseconds)
-                    ?.plus(recoveryValidityThreshold.max.inWholeMilliseconds)
-                    ?.let { Date(it) }
+                toDate = smartWalletState(configuration).expirationDate
             }
 
             formattedText = formattedText?.replace(
@@ -367,10 +364,7 @@ private fun EuropeanCertificate.formatDccText(
                     fromDate = greenCertificate.testDateTimeOfCollection?.time
                         ?.plus(recoveryValidityThreshold.min.inWholeMilliseconds)
                         ?.let { Date(it) }
-                    toDate = greenCertificate.testDateTimeOfCollection?.time
-                        ?.plus(recoveryValidityThreshold.min.inWholeMilliseconds)
-                        ?.plus(recoveryValidityThreshold.max.inWholeMilliseconds)
-                        ?.let { Date(it) }
+                    toDate = smartWalletState(configuration).expirationDate
                 }
             } else {
                 testDateFormat = analysisDateFormat
@@ -573,7 +567,7 @@ suspend fun WalletCertificate.isEligibleForSmartWallet(
     val isCompleteVaccine =
         type == WalletCertificateType.VACCINATION_EUROPE
             && (greenCertificate.vaccineDose?.let { (first, second) -> first == second } == true)
-    val isRecovery = greenCertificate.isRecovery
+    val isRecovery = greenCertificate.isRecoveryOrTestPositive
     val isBlacklisted = isBlacklisted(blacklistDCCManager)
 
     return (isCompleteVaccine || isRecovery) && !isBlacklisted && !isSignatureExpired
@@ -583,12 +577,10 @@ val EuropeanCertificate.isSignatureExpired: Boolean
     get() = expirationTime < System.currentTimeMillis()
 
 fun EuropeanCertificate.isExpired(configuration: Configuration): Boolean {
-    val recoveryValidityThreshold = configuration.recoveryValidityThreshold
     val positiveTestOrRecoveryDate = greenCertificate.positiveTestOrRecoveryDate
 
-    return if (recoveryValidityThreshold != null && positiveTestOrRecoveryDate != null) {
-        positiveTestOrRecoveryDate.time + (recoveryValidityThreshold.min + recoveryValidityThreshold.max).inWholeMilliseconds <
-            System.currentTimeMillis()
+    return if (positiveTestOrRecoveryDate != null) {
+        smartWalletState(configuration).expirationDate?.time ?: Long.MAX_VALUE < System.currentTimeMillis()
     } else {
         isSignatureExpired
     }

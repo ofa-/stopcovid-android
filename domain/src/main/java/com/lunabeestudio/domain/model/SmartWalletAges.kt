@@ -11,6 +11,7 @@
 package com.lunabeestudio.domain.model
 
 class SmartWalletAges(
+    val lowElg: Int,
     val low: Int,
     val lowExpDays: Int,
     val high: Int,

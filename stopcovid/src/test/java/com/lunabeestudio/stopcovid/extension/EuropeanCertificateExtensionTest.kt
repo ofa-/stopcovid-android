@@ -32,9 +32,11 @@ import io.mockk.mockkStatic
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import java.util.Calendar
 import java.util.Date
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
+import kotlin.time.Duration.Companion.days
 
 @Suppress("SpellCheckingInspection")
 class EuropeanCertificateExtensionTest {
@@ -46,6 +48,7 @@ class EuropeanCertificateExtensionTest {
         MockKAnnotations.init(this)
 
         every { configuration.smartWalletAges } returns SmartWalletAges(
+            lowElg = 12,
             low = 18,
             lowExpDays = 152,
             high = 65,
@@ -62,13 +65,21 @@ class EuropeanCertificateExtensionTest {
             vaccJan11DosesNbDays = 67,
             displayExpOnAllDcc = 240,
             displayExpDays = 21,
+            vaccJan22DosesNbDays = 214,
+            vaccJan22DosesNbNewDays = 122,
+            recNbNewDays = 122,
         )
 
         every { configuration.smartWalletElg } returns SmartWalletElg(
             vacc22DosesNbDays = 92,
-            vaccJan11DosesNbDays = 30,
+            vaccJan11DosesNbDays = 31,
             recNbDays = 92,
-            displayElgDays = 21,
+            vacc22DosesNbDaysLow = 184,
+            vaccJan11DosesNbDaysLow = 31,
+            recNbDaysLow = 184,
+            displayElgDays = 26,
+            vaccJan22DosesNbDays = 31,
+            vaccJan22DosesNbDaysLow = 31,
         )
         every { configuration.smartWalletVacc } returns SmartWalletVacc(
             ar = listOf("EU/1/20/1528", "EU/1/20/1507"),
@@ -182,6 +193,78 @@ class EuropeanCertificateExtensionTest {
         assertIs<Expired>(expiredStatePivot3)
     }
 
+    @Test
+    fun expiration_recovery_after_pivot3_more_18years() {
+        mockkStatic(GreenCertificate::isRecoveryOrTestPositive)
+
+        val now = Calendar.getInstance().apply { set(2025, 0, 1, 0, 0, 0) }.time
+
+        val recoDateExp = now.time - configuration.smartWalletExp!!.recNbNewDays.days.inWholeMilliseconds - 1.days.inWholeMilliseconds
+        val dccExp = recoveryDcc(Date(recoDateExp), "2000-01-01")
+
+        val recoDateValid = now.time - configuration.smartWalletExp!!.recNbNewDays.days.inWholeMilliseconds + 1.days.inWholeMilliseconds
+        val dccValid = recoveryDcc(Date(recoDateValid), "2000-01-01")
+
+        assert(dccExp.smartWalletState(configuration).expirationDate!! < now)
+        assert(dccValid.smartWalletState(configuration).expirationDate!! > now)
+    }
+
+    @Test
+    fun expiration_recovery_after_pivot3_less_18years() {
+        mockkStatic(GreenCertificate::isRecoveryOrTestPositive)
+        val recNbNewDaysLow =
+            (configuration.recoveryValidityThreshold!!.min + configuration.recoveryValidityThreshold!!.max).inWholeMilliseconds
+
+        val now = Calendar.getInstance().apply { set(2025, 0, 1, 0, 0, 0) }.time
+
+        val recoDateExp = now.time - recNbNewDaysLow - 1.days.inWholeMilliseconds
+        val dccExp = recoveryDcc(Date(recoDateExp), "2022-01-01")
+
+        val recoDateValid = now.time - recNbNewDaysLow + 1.days.inWholeMilliseconds
+        val dccValid = recoveryDcc(Date(recoDateValid), "2022-01-01")
+
+        assert(dccExp.smartWalletState(configuration).expirationDate!! < now)
+        assert(dccValid.smartWalletState(configuration).expirationDate!! > now)
+    }
+
+    @Test
+    fun expiration_recovery_before_pivot3() {
+        mockkStatic(GreenCertificate::isRecoveryOrTestPositive)
+
+        // 2021-02-01
+        val now = Calendar.getInstance().apply { set(2021, 1, 1, 0, 0, 0) }.time
+
+        val recoDateExp = now.time - configuration.smartWalletExp!!.recNbDays.days.inWholeMilliseconds - 1.days.inWholeMilliseconds
+        val dccExp = recoveryDcc(Date(recoDateExp), "2000-01-01")
+
+        val recoDateValid = now.time - configuration.smartWalletExp!!.recNbDays.days.inWholeMilliseconds + 1.days.inWholeMilliseconds
+        val dccValid = recoveryDcc(Date(recoDateValid), "2000-01-01")
+
+        assert(dccExp.smartWalletState(configuration).expirationDate!! < now)
+        assert(dccValid.smartWalletState(configuration).expirationDate!! > now)
+    }
+
+    @Test
+    fun expiration_recovery_around_pivot3() {
+        mockkStatic(GreenCertificate::isRecoveryOrTestPositive)
+        val calendar = Calendar.getInstance()
+
+        // 2021-10-01
+        val recoDateExpAtPivot3 = calendar.apply { set(2021, 9, 1, 0, 0, 0) }.time
+        val dccExpAtPivot3 = recoveryDcc(recoDateExpAtPivot3, "2000-01-01")
+
+        // 2022-02-01
+        val recoDateExpAfterPivot3 = calendar.apply { set(2022, 1, 1, 0, 0, 0) }.time
+        val dccExpAfterPivot3 = recoveryDcc(recoDateExpAfterPivot3, "2000-01-01")
+
+        // 1644879600000L -> Pivot3
+        assertEquals(Date(1644879600000L), dccExpAtPivot3.smartWalletState(configuration).expirationDate!!)
+        assertEquals(
+            Date(recoDateExpAfterPivot3.time + configuration.smartWalletExp!!.recNbNewDays.days.inWholeMilliseconds),
+            dccExpAfterPivot3.smartWalletState(configuration).expirationDate!!,
+        )
+    }
+
     private fun vaccineDcc(date: String): EuropeanCertificate {
         val vaccination = mockk<Vaccination>(relaxed = true).apply {
             every { dateOfVaccination } returns date
@@ -189,15 +272,18 @@ class EuropeanCertificateExtensionTest {
             every { doseNumber } returns 2
             every { totalSeriesOfDoses } returns 2
         }
-        mockkStatic(GreenCertificate::isRecovery)
         return mockk<EuropeanCertificate>(relaxed = true).apply {
             every { type } returns WalletCertificateType.VACCINATION_EUROPE
-            every { expirationTime } returns Long.MAX_VALUE
-            every { greenCertificate } returns mockk<GreenCertificate>().apply {
-                every { dateOfBirth } returns "1992-06-12"
-                every { vaccinations } returns listOf(vaccination)
-                every { isRecovery } returns false
-            }
+            every { greenCertificate.dateOfBirth } returns "1992-06-12"
+            every { greenCertificate.vaccinations } returns listOf(vaccination)
+        }
+    }
+
+    private fun recoveryDcc(testDate: Date, birthdate: String): EuropeanCertificate {
+        return mockk<EuropeanCertificate>(relaxed = true).apply {
+            every { greenCertificate.isRecoveryOrTestPositive } returns true
+            every { greenCertificate.recoveryDateOfFirstPositiveTestForceTimeZone } returns testDate
+            every { greenCertificate.dateOfBirth } returns birthdate
         }
     }
 }

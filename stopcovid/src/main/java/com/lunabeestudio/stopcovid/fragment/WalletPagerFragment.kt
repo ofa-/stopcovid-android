@@ -21,6 +21,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import com.lunabeestudio.analytics.model.AppEventName
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.activity.MainActivity
@@ -104,6 +105,11 @@ class WalletPagerFragment : BaseFragment() {
                             walletCertificateFragmentPosition -> false
                             else -> true
                         })
+
+                    if (tab?.position == walletMultipassFragmentPosition) {
+                        injectionContainer.analyticsManager.reportAppEvent(AppEventName.e23, null)
+                    }
+
                     view?.postDelayed(
                         {
                             val fragment = getTabFragmentForPosition(tabLayout.selectedTabPosition)

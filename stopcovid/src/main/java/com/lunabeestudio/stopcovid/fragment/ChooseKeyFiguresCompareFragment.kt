@@ -31,7 +31,7 @@ class ChooseKeyFiguresCompareFragment : MainFragment() {
     override fun getTitleKey(): String = "keyfigures.comparison.screen.title"
 
     private val sharedPreferences: SharedPreferences by lazy {
-        PreferenceManager.getDefaultSharedPreferences(context)
+        PreferenceManager.getDefaultSharedPreferences(requireContext())
     }
 
     private val viewModel: ChooseKeyFiguresCompareViewModel by viewModels {
