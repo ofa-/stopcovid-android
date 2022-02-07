@@ -1052,7 +1052,7 @@
     "keyFiguresController.category.health":"Épidémio",
     "keyFiguresController.category.app":"Appli",
     "keyFiguresController.explanations.vaccine":"Appuyez sur \"en savoir plus\" pour découvrir la source des chiffres sanitaires, leur interprétation, ainsi que leur mise à jour.",
-    "keyFiguresController.explanations.health":"Appuyez sur \"en savoir plus\" pour découvrir la source des chiffres, leur interprétation, ainsi que leur mise à jour.",
+    "keyFiguresController.explanations.health":"⚠️ Santé publique France rapporte que certaines données n’ont pas été intégrées dans les indicateurs hospitaliers des 2 et 3 février.\n\nLe 4 février, les nombres de nouvelles hospitalisations, admissions en soins critiques et décès déclarés au cours des dernières 24h intègrent donc un rattrapage de ces données et sont donc surestimés.\n\nAppuyez sur \"en savoir plus\" pour découvrir la source des chiffres, leur interprétation, ainsi que leur mise à jour.",
     "keyFiguresController.explanations.app":"",
     "keyFiguresController.fetchError.message":"⚠️ Votre connexion internet n'a pas permis de récupérer les chiffres clés pour cette localité. Veuillez réessayer ultérieurement avec une meilleure connexion.",
     "keyFiguresController.fetchError.button":"Réessayer",
@@ -1425,8 +1425,8 @@
     
     "keyFiguresController.favorites.segment.title":"Favoris",
     "keyFiguresController.all.segment.title":"Tous",
-    "keyfigures.noFavorite.cell.title":"Vous n'avez aucun chiffre clé favori",
+    "keyfigures.noFavorite.cell.title":"Aucun chiffre clé favori",
     "keyfigures.noFavorite.cell.add.subtitle":"Tapez ici pour en ajouter",
     "keyFiguresController.noFavorite.cell.subtitle":"Vous pouvez en ajouter en appuyant sur l'icône favori ❤️ d'un chiffre clé",
-    "keyFiguresController.resetFavorite.button":"Réinitialiser les chiffres clés favoris par défaut"
+    "keyFiguresController.resetFavorite.button":"Réinitialiser les favoris"
 }
