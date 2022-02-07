@@ -14,15 +14,23 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentOnAttachListener
 
-fun FragmentManager.onFirstFragmentAttached(block: (FragmentManager, Fragment) -> Unit?) {
-    val fragment = fragments.firstOrNull()
+/**
+ * Run code when the first fragment of type [T] is attached to the [FragmentManager] receiver or run it synchronously if a fragment of type
+ * [T] is already attached.
+ *
+ * @param block The block to execute on fragment attached
+ */
+inline fun <reified T : Fragment> FragmentManager.doOnFragmentAttached(crossinline block: (FragmentManager, T) -> Unit?) {
+    val fragment = fragments.filterIsInstance<T>().firstOrNull()
     if (fragment != null) {
         block(this, fragment)
     } else {
         addFragmentOnAttachListener(object : FragmentOnAttachListener {
             override fun onAttachFragment(fragmentManager: FragmentManager, fragment: Fragment) {
-                block(fragmentManager, fragment)
-                removeFragmentOnAttachListener(this)
+                if (fragment is T) {
+                    block(fragmentManager, fragment)
+                    removeFragmentOnAttachListener(this)
+                }
             }
         })
     }

@@ -223,7 +223,13 @@ class EuropeanCertificateExtensionTest {
         val recoDateValid = now.time - recNbNewDaysLow + 1.days.inWholeMilliseconds
         val dccValid = recoveryDcc(Date(recoDateValid), "2022-01-01")
 
-        assert(dccExp.smartWalletState(configuration).expirationDate!! < now)
+        val birthday18Years = Calendar.getInstance().apply {
+            timeZone = currentTimeZone()
+            time = yearMonthDayUsParserForceTimeZone().parse("2040-01-01")!!
+            add(Calendar.DAY_OF_YEAR, configuration.smartWalletAges!!.lowExpDays)
+        }.time
+        
+        assertEquals(birthday18Years, dccExp.smartWalletState(configuration).expirationDate)
         assert(dccValid.smartWalletState(configuration).expirationDate!! > now)
     }
 

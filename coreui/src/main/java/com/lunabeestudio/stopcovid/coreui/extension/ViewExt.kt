@@ -56,8 +56,7 @@ fun View.registerToAppBarLayoutForLiftOnScroll(appBarLayout: AppBarLayout) {
     appBarLayout.post {
         appBarLayout.setLiftableOverrideEnabled(false)
         appBarLayout.isLiftOnScroll = true
-        appBarLayout.liftOnScrollTargetViewId = id
-        appBarLayout.refreshLift(this)
+        appBarLayout.setLiftOnScrollTargetView(this)
     }
 }
 

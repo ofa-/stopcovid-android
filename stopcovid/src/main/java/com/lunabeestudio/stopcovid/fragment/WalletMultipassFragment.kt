@@ -21,6 +21,7 @@ import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.extension.findParentFragmentByType
+import com.lunabeestudio.stopcovid.coreui.extension.setLiftOnScrollTargetView
 import com.lunabeestudio.stopcovid.coreui.fastitem.cardWithActionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.model.Action
@@ -43,10 +44,6 @@ class WalletMultipassFragment : MainFragment(), PagerTabFragment {
     }
 
     private var closeProfiles: List<MultipassProfile> = emptyList()
-        set(value) {
-            field = value
-            refreshScreen()
-        }
 
     override fun getTitleKey(): String = "walletController.title"
 
@@ -100,9 +97,15 @@ class WalletMultipassFragment : MainFragment(), PagerTabFragment {
     }
 
     override fun onTabSelected() {
+        binding?.recyclerView?.let { (activity as? MainActivity)?.binding?.appBarLayout?.setLiftOnScrollTargetView(it) }
+
         findParentFragmentByType<WalletContainerFragment>()?.let { walletContainerFragment ->
             val multipassProfiles = viewModel.getMultipassProfiles()
             closeProfiles = viewModel.getCloseMultipassProfiles(multipassProfiles)
+            // Check if we already have the view, or let onViewCreated call refreshScreen
+            if (view != null) {
+                refreshScreen()
+            }
 
             walletContainerFragment.setupBottomAction(strings["multiPass.tab.generation.button.title"]) {
                 when (multipassProfiles.size) {

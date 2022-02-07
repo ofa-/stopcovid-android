@@ -171,7 +171,7 @@ private fun EuropeanCertificate.expirationDate(configuration: Configuration): Da
                 testDate?.time?.plus(recNewMillis) ?: 0L
             )
 
-            Date(expDcc)
+            Date(max(agePivotLow, expDcc))
         }
         else -> null
     }

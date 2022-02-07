@@ -22,6 +22,7 @@ import com.lunabeestudio.stopcovid.coreui.extension.findParentFragmentByType
 import com.lunabeestudio.stopcovid.coreui.fragment.BaseFragment
 import com.lunabeestudio.stopcovid.viewmodel.WalletViewModel
 import com.lunabeestudio.stopcovid.viewmodel.WalletViewModelFactory
+import timber.log.Timber
 
 val Fragment.injectionContainer: InjectionContainer
     get() = requireActivity().injectionContainer
@@ -31,17 +32,22 @@ inline fun <reified T : Fragment> Fragment.navGraphWalletViewModels(
     noinline factoryProducer: (() -> WalletViewModelFactory)
 ): Lazy<WalletViewModel> {
     val backStackEntry by lazy {
-        findParentFragmentByType<T>()!!.findNavController().getBackStackEntry(R.id.nav_wallet)
+        val navController = findParentFragmentByType<T>()!!.findNavController()
+        try {
+            navController.getBackStackEntry(R.id.nav_wallet)
+        } catch (e: IllegalArgumentException) {
+            Timber.e(e, "Fail to get nav_wallet from backstack for $this")
+            null
+        }
     }
     val storeProducer: () -> ViewModelStore = {
-        backStackEntry.viewModelStore
+        backStackEntry?.viewModelStore ?: viewModelStore
     }
     return createViewModelLazy(
-        WalletViewModel::class, storeProducer,
-        {
-            factoryProducer()
-        }
-    )
+        WalletViewModel::class, storeProducer
+    ) {
+        factoryProducer()
+    }
 }
 
 fun BaseFragment.showErrorSnackBar(message: String) {

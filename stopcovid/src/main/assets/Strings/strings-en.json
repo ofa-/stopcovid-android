@@ -1072,6 +1072,8 @@
     "walletQuantityWarningController.continueAlert.title":"Are you sure?",
     "walletQuantityWarningController.continueAlert.message":"Despite the risks involved, are you sure you want to continue importing this certificate?",
     "walletQuantityWarningController.continueAlert.confirm":"I confirm",
+    "keyFiguresController.explanations.text":"Tap \"find out more\" for sources of these key figures, how they are interpreted and updated.",
+    "keyFiguresController.explanations.button":"Find out more",
     "keyFiguresController.category.vaccine":"Vaccination",
     "keyFiguresController.category.health":"Epidemic",
     "keyFiguresController.category.app":"App",

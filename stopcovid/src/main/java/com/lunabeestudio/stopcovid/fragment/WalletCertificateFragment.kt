@@ -40,6 +40,7 @@ import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.extension.findParentFragmentByType
 import com.lunabeestudio.stopcovid.coreui.extension.formatOrNull
 import com.lunabeestudio.stopcovid.coreui.extension.getApplicationLocale
+import com.lunabeestudio.stopcovid.coreui.extension.setLiftOnScrollTargetView
 import com.lunabeestudio.stopcovid.coreui.extension.toDimensSize
 import com.lunabeestudio.stopcovid.coreui.fastitem.captionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
@@ -292,6 +293,8 @@ class WalletCertificateFragment : MainFragment(), PagerTabFragment {
     }
 
     override fun onTabSelected() {
+        binding?.recyclerView?.let { (activity as? MainActivity)?.binding?.appBarLayout?.setLiftOnScrollTargetView(it) }
+
         findParentFragmentByType<WalletContainerFragment>()?.let { walletContainerFragment ->
             walletContainerFragment.setupBottomAction(strings["walletController.addCertificate"]) {
                 walletContainerFragment.findNavControllerOrNull()
