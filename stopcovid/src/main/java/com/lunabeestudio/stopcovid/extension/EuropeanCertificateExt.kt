@@ -92,11 +92,14 @@ private fun EuropeanCertificate.expirationDate(configuration: Configuration): Da
             val isAr = configuration.smartWalletVacc?.ar?.contains(greenCertificate.vaccineMedicinalProduct) == true
             val isAz = configuration.smartWalletVacc?.az?.contains(greenCertificate.vaccineMedicinalProduct) == true
             val isJa = configuration.smartWalletVacc?.ja?.contains(greenCertificate.vaccineMedicinalProduct) == true
-            val vaccinDoseNumber = greenCertificate.vaccineDose?.first ?: 0
+            val vaccinDoseCurrent = greenCertificate.vaccineDose?.first ?: 0
+            val vaccinDoseTarget = greenCertificate.vaccineDose?.second ?: 0
 
             val expDcc = when {
+                // No expiration
+                vaccinDoseCurrent == 2 && vaccinDoseTarget == 1 -> null
                 // Vaccine 1 dose
-                (isAr || isAz) && vaccinDoseNumber == 1 -> {
+                (isAr || isAz) && vaccinDoseCurrent == 1 -> {
                     val vacc11DosesMillis = configuration.smartWalletExp?.vacc11DosesNbDays?.days?.inWholeMilliseconds ?: 0L
                     val vacc11DosesNewMillis = configuration.smartWalletExp?.vacc11DosesNbNewDays?.days?.inWholeMilliseconds ?: 0L
                     max(
@@ -108,12 +111,12 @@ private fun EuropeanCertificate.expirationDate(configuration: Configuration): Da
                             ?: 0L
                     )
                 }
-                isJa && vaccinDoseNumber == 1 -> {
+                isJa && vaccinDoseCurrent == 1 -> {
                     val vaccJan11DosesMillis = configuration.smartWalletExp?.vaccJan11DosesNbDays?.days?.inWholeMilliseconds ?: 0L
                     max(datePivot1, greenCertificate.vaccineDate?.time?.plus(vaccJan11DosesMillis) ?: 0L)
                 }
                 // Vaccine 2 doses
-                (isAr || isAz) && vaccinDoseNumber == 2 -> {
+                (isAr || isAz) && vaccinDoseCurrent == 2 -> {
                     val vacc22DosesMillis = configuration.smartWalletExp?.vacc22DosesNbDays?.days?.inWholeMilliseconds ?: 0L
                     val vacc22DosesNewMillis = configuration.smartWalletExp?.vacc22DosesNbNewDays?.days?.inWholeMilliseconds ?: 0L
                     max(
@@ -125,7 +128,7 @@ private fun EuropeanCertificate.expirationDate(configuration: Configuration): Da
                             ?: 0L
                     )
                 }
-                isJa && vaccinDoseNumber == 2 -> {
+                isJa && vaccinDoseCurrent == 2 -> {
                     val vaccJan22DosesMillis = configuration.smartWalletExp?.vaccJan22DosesNbDays?.days?.inWholeMilliseconds ?: 0L
                     val vaccJan22DosesNewMillis = configuration.smartWalletExp?.vaccJan22DosesNbNewDays?.days?.inWholeMilliseconds ?: 0L
                     max(
@@ -171,7 +174,7 @@ private fun EuropeanCertificate.expirationDate(configuration: Configuration): Da
                 testDate?.time?.plus(recNewMillis) ?: 0L
             )
 
-            Date(expDcc)
+            Date(max(agePivotLow, expDcc))
         }
         else -> null
     }
@@ -184,7 +187,8 @@ private fun EuropeanCertificate.eligibleDate(configuration: Configuration): Date
     val isAr = configuration.smartWalletVacc?.ar?.contains(greenCertificate.vaccineMedicinalProduct) == true
     val isAz = configuration.smartWalletVacc?.az?.contains(greenCertificate.vaccineMedicinalProduct) == true
     val isJa = configuration.smartWalletVacc?.ja?.contains(greenCertificate.vaccineMedicinalProduct) == true
-    val vaccinDoseNumber = greenCertificate.vaccineDose?.first ?: 0
+    val vaccinDoseCurrent = greenCertificate.vaccineDose?.first ?: 0
+    val vaccinDoseTarget = greenCertificate.vaccineDose?.second ?: 0
 
     val vacc22Doses: Duration
     val vaccJan11Doses: Duration
@@ -204,13 +208,15 @@ private fun EuropeanCertificate.eligibleDate(configuration: Configuration): Date
     }
 
     val elgDcc = when {
-        (isAr || isAz) && (vaccinDoseNumber == 1 || vaccinDoseNumber == 2) -> {
+        // No more dose required
+        vaccinDoseCurrent == 2 && vaccinDoseTarget == 1 -> return null
+        (isAr || isAz) && (vaccinDoseCurrent == 1 || vaccinDoseCurrent == 2) -> {
             greenCertificate.vaccineDateForceTimeZone?.time?.plus(vacc22Doses.inWholeMilliseconds) ?: 0L
         }
-        isJa && vaccinDoseNumber == 1 -> {
+        isJa && vaccinDoseCurrent == 1 -> {
             greenCertificate.vaccineDateForceTimeZone?.time?.plus(vaccJan11Doses.inWholeMilliseconds) ?: 0L
         }
-        isJa && vaccinDoseNumber == 2 -> {
+        isJa && vaccinDoseCurrent == 2 -> {
             greenCertificate.vaccineDateForceTimeZone?.time?.plus(vaccJan22Doses.inWholeMilliseconds) ?: 0L
         }
         greenCertificate.isRecoveryOrTestPositive -> {

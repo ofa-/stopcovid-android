@@ -11,6 +11,7 @@
 package com.lunabeestudio.stopcovid.extension
 
 import com.lunabeestudio.domain.model.Configuration
+import com.lunabeestudio.domain.model.SmartWalletExp
 import com.lunabeestudio.domain.model.WalletCertificateType
 import com.lunabeestudio.stopcovid.manager.BlacklistDCCManager
 import com.lunabeestudio.stopcovid.model.EuropeanCertificate
@@ -51,6 +52,22 @@ class WalletCertificateExtTest {
             every { europeanCertificate.expirationTime } returns Long.MAX_VALUE
             every { europeanCertificate.canRenewActivityPass } returns null
             every { configuration.activityPassSkipNegTestHours } returns Int.MAX_VALUE
+            every { configuration.smartWalletExp } returns SmartWalletExp(
+                pivot1 = "2020-12-15T00:01:00+0200",
+                pivot2 = "2021-01-15T00:01:00+0200",
+                pivot3 = "2022-02-15T00:01:00+0200",
+                vacc22DosesNbDays = 212,
+                vacc11DosesNbDays = 219,
+                vacc22DosesNbNewDays = 122,
+                vacc11DosesNbNewDays = 122,
+                recNbDays = 182,
+                vaccJan11DosesNbDays = 67,
+                displayExpOnAllDcc = 240,
+                displayExpDays = 21,
+                vaccJan22DosesNbDays = 214,
+                vaccJan22DosesNbNewDays = 122,
+                recNbNewDays = 122,
+            )
 
             assert(europeanCertificate.isEligibleForActivityPass(blacklistDCCManager, configuration))
         }

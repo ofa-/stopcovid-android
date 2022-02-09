@@ -337,7 +337,10 @@ private fun EuropeanCertificate.formatDccText(
                 fromDate = greenCertificate.recoveryDateOfFirstPositiveTest?.time
                     ?.plus(recoveryValidityThreshold.min.inWholeMilliseconds)
                     ?.let { Date(it) }
-                toDate = smartWalletState(configuration).expirationDate
+                toDate = greenCertificate.recoveryDateOfFirstPositiveTest?.time
+                    ?.plus(recoveryValidityThreshold.min.inWholeMilliseconds)
+                    ?.plus(recoveryValidityThreshold.max.inWholeMilliseconds)
+                    ?.let { Date(it) }
             }
 
             formattedText = formattedText?.replace(
@@ -364,7 +367,10 @@ private fun EuropeanCertificate.formatDccText(
                     fromDate = greenCertificate.testDateTimeOfCollection?.time
                         ?.plus(recoveryValidityThreshold.min.inWholeMilliseconds)
                         ?.let { Date(it) }
-                    toDate = smartWalletState(configuration).expirationDate
+                    toDate = greenCertificate.recoveryDateOfFirstPositiveTest?.time
+                        ?.plus(recoveryValidityThreshold.min.inWholeMilliseconds)
+                        ?.plus(recoveryValidityThreshold.max.inWholeMilliseconds)
+                        ?.let { Date(it) }
                 }
             } else {
                 testDateFormat = analysisDateFormat
@@ -566,7 +572,7 @@ suspend fun WalletCertificate.isEligibleForSmartWallet(
 
     val isCompleteVaccine =
         type == WalletCertificateType.VACCINATION_EUROPE
-            && (greenCertificate.vaccineDose?.let { (first, second) -> first == second } == true)
+            && (greenCertificate.vaccineDose?.let { (first, second) -> first >= second } == true)
     val isRecovery = greenCertificate.isRecoveryOrTestPositive
     val isBlacklisted = isBlacklisted(blacklistDCCManager)
 

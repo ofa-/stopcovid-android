@@ -2,11 +2,11 @@
     "config":[
         {
             "name":"lastUpdate",
-            "value":"31 Jan 2022"
+            "value":"1 Feb 2022"
         },
         {
             "name":"version",
-            "value":134
+            "value":136
         },
         {
             "name":"versionCalibrationBle",
@@ -158,7 +158,8 @@
             "name":"app.wallet.recoveryValidityThresholdInDays",
             "value":{
                 "minDays":11,
-                "maxDays":180
+                "maxDays":173,
+                "warning":"valid from minDays to minDays plus maxDays (173 for 184), can be overiden by calculated expiration"
             }
         },
         {

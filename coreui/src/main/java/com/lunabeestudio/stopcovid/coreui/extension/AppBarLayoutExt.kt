@@ -12,6 +12,19 @@ package com.lunabeestudio.stopcovid.coreui.extension
 
 import android.view.View
 import com.google.android.material.appbar.AppBarLayout
+import timber.log.Timber
+import java.lang.ref.WeakReference
+
+fun AppBarLayout.setLiftOnScrollTargetView(scrollingView: View) {
+    try {
+        val field = AppBarLayout::class.java.getDeclaredField("liftOnScrollTargetView")
+        field.isAccessible = true
+        field.set(this, WeakReference(scrollingView))
+        refreshLift(scrollingView)
+    } catch (e: Exception) {
+        Timber.e(e, "Lift on scroll failed")
+    }
+}
 
 /**
  * Set the correct elevation state (lift) according to the [scrollingView] scroll position.

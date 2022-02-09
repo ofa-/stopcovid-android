@@ -16,7 +16,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.RecyclerView
+import androidx.fragment.app.FragmentManager
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
@@ -27,11 +27,10 @@ import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.extension.appCompatActivity
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
-import com.lunabeestudio.stopcovid.coreui.extension.refreshLift
 import com.lunabeestudio.stopcovid.coreui.fragment.BaseFragment
 import com.lunabeestudio.stopcovid.extension.injectionContainer
 import com.lunabeestudio.stopcovid.extension.navGraphWalletViewModels
-import com.lunabeestudio.stopcovid.extension.onFirstFragmentAttached
+import com.lunabeestudio.stopcovid.extension.doOnFragmentAttached
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.model.UnknownException
@@ -100,34 +99,26 @@ class WalletPagerFragment : BaseFragment() {
 
             tabSelectedListener = object : TabLayout.OnTabSelectedListener {
                 override fun onTabSelected(tab: TabLayout.Tab?) {
+
                     viewPager.setUserInputEnabled(
                         when (tabLayout.selectedTabPosition) {
                             walletCertificateFragmentPosition -> false
                             else -> true
                         })
 
-                    if (tab?.position == walletMultipassFragmentPosition) {
-                        injectionContainer.analyticsManager.reportAppEvent(AppEventName.e23, null)
+                    val block: (FragmentManager, Fragment) -> Unit = { _, fragment ->
+                        (fragment as? PagerTabFragment)?.onTabSelected()
                     }
 
-                    view?.postDelayed(
-                        {
-                            val fragment = getTabFragmentForPosition(tabLayout.selectedTabPosition)
-                            (fragment as? PagerTabFragment)?.onTabSelected()
-
-                            val appBarLayout = (activity as? MainActivity)?.binding?.appBarLayout ?: return@postDelayed
-
-                            // Force invalidate cached target view
-                            appBarLayout.liftOnScrollTargetViewId = R.id.recycler_view
-
-                            // Refresh current lift state
-                            fragment?.view
-                                ?.findViewById<RecyclerView>(R.id.recycler_view)?.let { recyclerView ->
-                                    appBarLayout.refreshLift(recyclerView)
-                                }
-                        },
-                        100,
-                    )
+                    when (tab?.position) {
+                        walletCertificateFragmentPosition -> childFragmentManager.doOnFragmentAttached<WalletCertificateFragment>(block)
+                        walletMultipassFragmentPosition -> {
+                            injectionContainer.analyticsManager.reportAppEvent(AppEventName.e23, null)
+                            childFragmentManager.doOnFragmentAttached<WalletMultipassFragment>(block)
+                        }
+                        walletInfoFragmentPosition -> childFragmentManager.doOnFragmentAttached<WalletInfoFragment>(block)
+                        else -> throw UnknownException("No fragment for position ${tab?.position}")
+                    }
                 }
 
                 override fun onTabUnselected(tab: TabLayout.Tab?) {
@@ -145,20 +136,8 @@ class WalletPagerFragment : BaseFragment() {
         }
 
         // Call onTabSelected on first fragment attached to emulate the tab selection
-        childFragmentManager.onFirstFragmentAttached { _, fragment ->
+        childFragmentManager.doOnFragmentAttached<Fragment> { _, fragment ->
             (fragment as? PagerTabFragment)?.onTabSelected()
-        }
-    }
-
-    private fun getTabFragmentForPosition(selectedTabPosition: Int): Fragment? {
-        return when (selectedTabPosition) {
-            walletCertificateFragmentPosition ->
-                childFragmentManager.fragments.firstOrNull { it is WalletCertificateFragment }
-            walletMultipassFragmentPosition ->
-                childFragmentManager.fragments.firstOrNull { it is WalletMultipassFragment }
-            walletInfoFragmentPosition ->
-                childFragmentManager.fragments.firstOrNull { it is WalletInfoFragment }
-            else -> throw UnknownException("No fragment for position $selectedTabPosition")
         }
     }
 

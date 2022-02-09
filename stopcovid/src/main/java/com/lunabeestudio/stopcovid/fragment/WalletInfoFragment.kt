@@ -18,6 +18,7 @@ import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.extension.findNavControllerOrNull
 import com.lunabeestudio.stopcovid.coreui.extension.findParentFragmentByType
+import com.lunabeestudio.stopcovid.coreui.extension.setLiftOnScrollTargetView
 import com.lunabeestudio.stopcovid.coreui.fastitem.cardWithActionItem
 import com.lunabeestudio.stopcovid.coreui.fastitem.spaceItem
 import com.lunabeestudio.stopcovid.coreui.model.Action
@@ -170,6 +171,8 @@ class WalletInfoFragment : MainFragment(), PagerTabFragment {
     }
 
     override fun onTabSelected() {
+        binding?.recyclerView?.let { (activity as? MainActivity)?.binding?.appBarLayout?.setLiftOnScrollTargetView(it) }
+
         findParentFragmentByType<WalletContainerFragment>()?.let { walletContainerFragment ->
             if (robertManager.configuration.multipassConfig?.isEnabled == true && (viewModel.certificatesCount.value ?: 0) > 0) {
                 walletContainerFragment.setupBottomAction(null, null)
