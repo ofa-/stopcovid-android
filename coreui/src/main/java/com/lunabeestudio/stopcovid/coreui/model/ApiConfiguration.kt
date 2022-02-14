@@ -14,10 +14,7 @@ import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import com.google.gson.reflect.TypeToken
 import com.lunabeestudio.domain.model.Configuration
-import com.lunabeestudio.domain.model.SmartWalletAges
-import com.lunabeestudio.domain.model.SmartWalletElg
-import com.lunabeestudio.domain.model.SmartWalletExp
-import com.lunabeestudio.domain.model.SmartWalletVacc
+import com.lunabeestudio.domain.model.smartwallet.SmartWalletVacc
 import com.lunabeestudio.domain.model.WalletPublicKey
 
 internal class ApiConfiguration(
@@ -161,12 +158,6 @@ internal class ApiConfiguration(
     val displayActivityPass: Boolean,
     @SerializedName("app.activityPass.renewThreshold")
     val renewThreshold: Int,
-    @SerializedName("app.smartwallet.ages")
-    val smartWalletAges: String,
-    @SerializedName("app.smartwallet.exp")
-    val smartWalletExp: String,
-    @SerializedName("app.smartwallet.elg")
-    val smartWalletElg: String,
     @SerializedName("app.smartwallet.vacc")
     val smartWalletVacc: String,
     @SerializedName("app.smartwallet.notif")
@@ -187,6 +178,8 @@ internal class ApiConfiguration(
     val multipassConfig: String,
     @SerializedName("app.wallet.recoveryValidityThresholdInDays")
     val recoveryValidityThreshold: String,
+    @SerializedName("app.smartwallet.engine")
+    val smartwalletEngine: String,
 )
 
 internal fun ApiConfiguration.toDomain(gson: Gson) = Configuration(
@@ -300,9 +293,6 @@ internal fun ApiConfiguration.toDomain(gson: Gson) = Configuration(
     activityPassSkipNegTestHours = activityPassSkipNegTestHours,
     displayActivityPass = displayActivityPass,
     renewThreshold = renewThreshold,
-    smartWalletAges = gson.fromJson(smartWalletAges, SmartWalletAges::class.java),
-    smartWalletExp = gson.fromJson(smartWalletExp, SmartWalletExp::class.java),
-    smartWalletElg = gson.fromJson(smartWalletElg, SmartWalletElg::class.java),
     smartWalletVacc = gson.fromJson(smartWalletVacc, SmartWalletVacc::class.java),
     smartWalletNotif = smartWalletNotif,
     isSmartWalletOn = isSmartWalletOn,
@@ -346,4 +336,5 @@ internal fun ApiConfiguration.toDomain(gson: Gson) = Configuration(
     multipassConfig = gson.fromJson(multipassConfig, ApiMultipassConfig::class.java)?.toMultipassConfig(displayMultipass),
     recoveryValidityThreshold = gson.fromJson(recoveryValidityThreshold, ApiRecoveryValidityThreshold::class.java)
         ?.toRecoveryValidityThreshold(),
+    smartWalletEngine = gson.fromJson(this.smartwalletEngine, ApiSmartWalletEngine::class.java)?.toSmartWalletEngine(),
 )

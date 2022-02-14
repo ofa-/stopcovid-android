@@ -62,7 +62,8 @@ class WalletFullscreenLegacyDccFragment : BaseFragment() {
             injectionContainer.blacklist2DDOCManager,
             injectionContainer.walletRepository,
             injectionContainer.generateActivityPassUseCase,
-            injectionContainer.getSmartWalletCertificateUseCase,
+            injectionContainer.getSmartWalletMapUseCase,
+            injectionContainer.getSmartWalletStateUseCase,
         )
     }
 
@@ -136,7 +137,7 @@ class WalletFullscreenLegacyDccFragment : BaseFragment() {
     }
 
     private fun showCertificateSharingBottomSheet() {
-        val text = europeanCertificate?.fullDescription(strings, injectionContainer.robertManager.configuration, context)
+        val text = europeanCertificate?.fullDescription(strings, injectionContainer.robertManager.configuration, context, null)
         ShareManager.setupCertificateSharingBottomSheet(this, text) {
             binding.barcodeSecuredView.runUnsecured {
                 binding.let { ShareManager.getShareCaptureUri(it, ShareManager.certificateScreenshotFilename) }
@@ -199,12 +200,14 @@ class WalletFullscreenLegacyDccFragment : BaseFragment() {
         isBorder: Boolean,
         europeanCertificate: EuropeanCertificate
     ) {
+        val smartWalletState = injectionContainer.getSmartWalletStateUseCase(europeanCertificate)
         if (isBorder) {
             detailsTextSwitcher.setCurrentText("")
             detailsTextSwitcher.setText(
                 europeanCertificate.fullScreenBorderDescription(
                     strings = strings,
-                    configuration = injectionContainer.robertManager.configuration
+                    configuration = injectionContainer.robertManager.configuration,
+                    smartWalletState = smartWalletState,
                 )
             )
             explanationTextSwitcher.setCurrentText("")
@@ -212,7 +215,13 @@ class WalletFullscreenLegacyDccFragment : BaseFragment() {
             headerTextView.setTextOrHide(strings["europeanCertificate.fullscreen.${europeanCertificate.type.stringKey}.border.warning"])
         } else {
             detailsTextSwitcher.setCurrentText("")
-            detailsTextSwitcher.setText(context?.let { ctx -> europeanCertificate.fullScreenDescription(strings = strings, context = ctx) })
+            detailsTextSwitcher.setText(context?.let { ctx ->
+                europeanCertificate.fullScreenDescription(
+                    strings = strings,
+                    context = ctx,
+                    smartWalletState = smartWalletState
+                )
+            })
             explanationTextSwitcher.setCurrentText("")
             explanationTextSwitcher.setText(strings["europeanCertificate.fullscreen.type.minimum.footer"])
             headerTextView.isVisible = false

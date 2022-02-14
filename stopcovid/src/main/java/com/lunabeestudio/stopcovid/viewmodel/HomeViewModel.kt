@@ -27,22 +27,18 @@ import com.lunabeestudio.stopcovid.coreui.model.WalletState
 import com.lunabeestudio.stopcovid.coreui.utils.SingleLiveEvent
 import com.lunabeestudio.stopcovid.extension.isExpired
 import com.lunabeestudio.stopcovid.extension.showSmartWallet
-import com.lunabeestudio.stopcovid.extension.smartWalletState
 import com.lunabeestudio.stopcovid.extension.toCovidException
 import com.lunabeestudio.stopcovid.manager.IsolationFormStateEnum
 import com.lunabeestudio.stopcovid.manager.IsolationManager
 import com.lunabeestudio.stopcovid.manager.VaccinationCenterManager
 import com.lunabeestudio.stopcovid.model.CovidException
-import com.lunabeestudio.stopcovid.model.Eligible
-import com.lunabeestudio.stopcovid.model.EligibleSoon
 import com.lunabeestudio.stopcovid.model.EuropeanCertificate
-import com.lunabeestudio.stopcovid.model.ExpireSoon
-import com.lunabeestudio.stopcovid.model.Expired
-import com.lunabeestudio.stopcovid.model.SmartWallet
-import com.lunabeestudio.stopcovid.model.Valid
+import com.lunabeestudio.stopcovid.model.SmartWalletMap
+import com.lunabeestudio.stopcovid.model.SmartWalletState
 import com.lunabeestudio.stopcovid.repository.VenueRepository
 import com.lunabeestudio.stopcovid.repository.WalletRepository
-import com.lunabeestudio.stopcovid.usecase.GetSmartWalletCertificateUseCase
+import com.lunabeestudio.stopcovid.usecase.GetSmartWalletMapUseCase
+import com.lunabeestudio.stopcovid.usecase.GetSmartWalletStateUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -58,7 +54,8 @@ class HomeViewModel(
     venueRepository: VenueRepository,
     walletRepository: WalletRepository,
     private val sharedPreferences: SharedPreferences,
-    getSmartWalletCertificateUseCase: GetSmartWalletCertificateUseCase,
+    getSmartWalletMapMapUseCase: GetSmartWalletMapUseCase,
+    private val getSmartWalletStateUseCase: GetSmartWalletStateUseCase,
 ) : CommonDataViewModel(keystoreDataSource, robertManager, isolationManager, vaccinationCenterManager, venueRepository, walletRepository) {
 
     val activateProximitySuccess: SingleLiveEvent<Unit> = SingleLiveEvent()
@@ -89,7 +86,7 @@ class HomeViewModel(
         )
     }.asLiveData(timeoutInMs = 0)
 
-    val profileCertificates: StateFlow<SmartWallet?> = getSmartWalletCertificateUseCase()
+    val smartWalletMap: StateFlow<SmartWalletMap?> = getSmartWalletMapMapUseCase()
         .stateIn(viewModelScope, SharingStarted.Eagerly, emptyMap())
 
     suspend fun refreshConfig(application: RobertApplication): Boolean {
@@ -134,14 +131,14 @@ class HomeViewModel(
     fun getWalletState(): WalletState {
         var result = WalletState.NONE
         if (sharedPreferences.showSmartWallet && robertManager.configuration.isSmartWalletOn) {
-            profileCertificates.value?.forEach { (_, certificate) ->
-                val smartWalletState = certificate.smartWalletState(robertManager.configuration)
+            smartWalletMap.value?.forEach { (_, certificate) ->
+                val smartWalletState = getSmartWalletStateUseCase(certificate)
                 val state = when (smartWalletState) {
-                    is Expired -> WalletState.ALERT
-                    is ExpireSoon -> WalletState.WARNING
-                    is Eligible -> WalletState.ELIGIBLE
-                    is EligibleSoon -> WalletState.ELIGIBLE_SOON
-                    is Valid -> WalletState.NONE
+                    is SmartWalletState.Expired -> WalletState.ALERT
+                    is SmartWalletState.ExpireSoon -> WalletState.WARNING
+                    is SmartWalletState.Eligible -> WalletState.ELIGIBLE
+                    is SmartWalletState.EligibleSoon -> WalletState.ELIGIBLE_SOON
+                    is SmartWalletState.Valid -> WalletState.NONE
                 }
                 // Take highest state
                 if (result.ordinal < state.ordinal) {
@@ -161,7 +158,8 @@ class HomeViewModelFactory(
     private val venueRepository: VenueRepository,
     private val walletRepository: WalletRepository,
     private val sharedPreferences: SharedPreferences,
-    private val getSmartWalletCertificateUseCase: GetSmartWalletCertificateUseCase,
+    private val getSmartWalletMapUseCase: GetSmartWalletMapUseCase,
+    private val getSmartWalletStateUseCase: GetSmartWalletStateUseCase,
 ) :
     ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -174,7 +172,8 @@ class HomeViewModelFactory(
             venueRepository,
             walletRepository,
             sharedPreferences,
-            getSmartWalletCertificateUseCase,
+            getSmartWalletMapUseCase,
+            getSmartWalletStateUseCase,
         ) as T
     }
 }

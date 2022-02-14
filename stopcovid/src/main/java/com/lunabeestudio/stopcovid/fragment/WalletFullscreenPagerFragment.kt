@@ -60,7 +60,8 @@ class WalletFullscreenPagerFragment : BaseFragment() {
             injectionContainer.blacklist2DDOCManager,
             injectionContainer.walletRepository,
             injectionContainer.generateActivityPassUseCase,
-            injectionContainer.getSmartWalletCertificateUseCase,
+            injectionContainer.getSmartWalletMapUseCase,
+            injectionContainer.getSmartWalletStateUseCase,
         )
     }
 
@@ -191,7 +192,7 @@ class WalletFullscreenPagerFragment : BaseFragment() {
 
     fun showCertificateSharingBottomSheet(barcodeSecuredView: SecuredBitmapView, certificate: WalletCertificate?) {
         val activityBinding = (activity as? MainActivity)?.binding ?: return
-        val text = certificate?.fullDescription(strings, injectionContainer.robertManager.configuration, context)
+        val text = certificate?.fullDescription(strings, injectionContainer.robertManager.configuration, context, null)
         ShareManager.setupCertificateSharingBottomSheet(this, text) {
             barcodeSecuredView.runUnsecured {
                 ShareManager.getShareCaptureUri(activityBinding, ShareManager.certificateScreenshotFilename)

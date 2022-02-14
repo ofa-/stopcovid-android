@@ -52,7 +52,8 @@ class WalletFullscreen2DdocFragment : BaseFragment() {
             injectionContainer.blacklist2DDOCManager,
             injectionContainer.walletRepository,
             injectionContainer.generateActivityPassUseCase,
-            injectionContainer.getSmartWalletCertificateUseCase,
+            injectionContainer.getSmartWalletMapUseCase,
+            injectionContainer.getSmartWalletStateUseCase,
         )
     }
 
@@ -128,7 +129,7 @@ class WalletFullscreen2DdocFragment : BaseFragment() {
 
     fun showCertificateSharingBottomSheet() {
         val activityBinding = (activity as? MainActivity)?.binding ?: return
-        val text = frenchCertificate?.fullDescription(strings, injectionContainer.robertManager.configuration, context)
+        val text = frenchCertificate?.fullDescription(strings, injectionContainer.robertManager.configuration, context, null)
         ShareManager.setupCertificateSharingBottomSheet(this, text) {
             binding.barcodeSecuredView.runUnsecured {
                 ShareManager.getShareCaptureUri(activityBinding, ShareManager.certificateScreenshotFilename)

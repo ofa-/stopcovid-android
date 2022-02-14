@@ -5,9 +5,14 @@
  *
  * Authors
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Created by Lunabee Studio / Date - 2021/3/12 - for the TOUS-ANTI-COVID project
+ * Created by Lunabee Studio / Date - 2022/2/7 - for the TOUS-ANTI-COVID project
  */
 
-package com.lunabeestudio.stopcovid.model
+package com.lunabeestudio.domain.model.smartwallet
 
-typealias SmartWallet = Map<String, EuropeanCertificate>
+import kotlin.time.Duration
+
+class SmartWalletValidityRange(
+    val startAfter: Duration?,
+    val endAfter: Duration?,
+)

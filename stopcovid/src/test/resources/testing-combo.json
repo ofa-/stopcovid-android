@@ -1,0 +1,154 @@
+{
+	"config":{
+		"vaccineProduct":{
+			"ar":["EU/1/20/1528","EU/1/20/1507"],
+			"ja":["EU/1/20/1525","EU/1/21/1618"],
+			"az":["EU/1/21/1529","Covidshield","Covid-19-recombinant","R-COVI","R-Covi"]
+		}
+	},
+	"sections":[
+		{
+			"section":"👉👉👉👉 💉 Eligibles au rappel",
+			"tests":[
+				{
+					"desc":"Vaccin complet non rappel puis un recovery.",
+					"today":"2021-12-03","dob":"1956-02-28",
+					"inputs":[
+						{
+							"id":0,
+							"type":"v","doi":"2021-03-21","products":["EU/1/21/1529", "EU/1/20/1528", "EU/1/20/1507","Covidshield","Covid-19-recombinant","R-COVI","R-Covi"],"doses":[{"c":2,"t":2},{"c":1,"t":1}]
+						},
+						{
+							"id":1,
+							"type":"r","doi":"2021-04-21","prefixes":["AA"]
+						}
+					],
+					"output":{
+						"id":1,
+						"elg":"2021-07-22"
+					}
+				},
+				{
+					"desc":"Vaccin complet JA non rappel moins 18 ans.",
+					"today":"2022-02-10","dob":"2004-02-28",
+					"inputs":[
+						{
+							"id":0,
+							"type":"v","doi":"2021-10-20","products":["EU/1/20/1525", "EU/1/21/1618"],"doses":[{"c":2,"t":2},{"c":1,"t":1}]
+						}
+					],
+					"output":{
+						"id":0,
+						"elg":"2021-11-20"
+					}
+				},
+				{
+					"desc":"Vaccin complet JA non rappel moins 18 ans puis recovery.",
+					"today":"2022-02-10","dob":"2004-02-28",
+					"inputs":[
+						{
+							"id":0,
+							"type":"v","doi":"2021-10-20","products":["EU/1/20/1525", "EU/1/21/1618"],"doses":[{"c":2,"t":2},{"c":1,"t":1}]
+						},
+						{
+							"id":1,
+							"type":"r","doi":"2022-01-10","prefixes":["AA"]
+						}
+					],
+					"output":{
+						"id":1,
+						"elg":"2022-07-13"
+					}
+				},
+				{
+					"desc":"Recovery puis vaccin-non rappel.",
+					"today":"2021-12-03","dob":"1956-02-28",
+					"inputs":[
+						{
+							"id":0,
+							"type":"r","doi":"2021-03-21","prefixes":["AA"]
+						},
+						{
+							"id":1,
+							"type":"v","doi":"2021-06-10","products":["EU/1/21/1529", "EU/1/20/1528", "EU/1/20/1507","Covidshield","Covid-19-recombinant","R-COVI","R-Covi"],"doses":[{"c":2,"t":2},{"c":1,"t":1}]
+						}
+					],
+					"output":{
+						"id":1,
+						"elg":"2021-09-10"
+					}
+				}
+			]
+		},
+		{
+			"section":"👉👉👉👉 🚫 NON éligibles au rappel",
+			"tests":[
+				{
+					"desc":"1 recovery",
+					"today":"2021-12-03","dob":"1956-02-28",
+					"inputs":[
+						{
+							"id":0,
+							"type":"p","doi":"2021-03-21","prefixes":["TV"]
+						}
+					],
+					"output":{
+					}
+				},
+				{
+					"desc":"2 recoveries",
+					"today":"2021-12-03","dob":"1956-02-28",
+					"inputs":[
+						{
+							"id":0,
+							"type":"r","doi":"2021-03-21","prefixes":["AA"]
+						},
+						{
+							"id":1,
+							"type":"r","doi":"2021-04-21","prefixes":["AA"]
+						}
+					],
+					"output":{
+					}
+				},
+				{
+					"desc":"2 vaccins, 1 rappel puis un recovery. Profil pas éligible rappel.",
+					"today":"2021-12-03","dob":"1956-02-28",
+					"inputs":[
+						{
+							"id":0,
+							"type":"v","doi":"2021-03-21","products":["EU/1/21/1529", "EU/1/20/1528", "EU/1/20/1507","Covidshield","Covid-19-recombinant","R-COVI","R-Covi"],"doses":[{"c":2,"t":2},{"c":1,"t":1}]
+						},
+						{
+							"id":1,
+							"type":"v","doi":"2021-03-21","products":["EU/1/21/1529", "EU/1/20/1528", "EU/1/20/1507","Covidshield","Covid-19-recombinant","R-COVI","R-Covi"],"doses":[{"c":3,"t":3},{"c":2,"t":1}]
+						},
+						{
+							"id":2,
+							"type":"r","doi":"2021-04-21","prefixes":["AA"]
+						}
+					],
+					"output":{
+					}
+				},
+				{
+					"desc":"1 vaccin, 1 recovery TV équivalent rappel. Profil pas éligible rappel.",
+					"today":"2021-12-03","dob":"1956-02-28",
+					"inputs":[
+						{
+							"id":0,
+							"type":"v","doi":"2021-03-21","products":["EU/1/21/1529", "EU/1/20/1528", "EU/1/20/1507","Covidshield","Covid-19-recombinant","R-COVI","R-Covi"],"doses":[{"c":2,"t":2},{"c":1,"t":1}]
+						},
+						{
+							"id":1,
+							"type":"r","doi":"2021-04-21","prefixes":["TV"]
+						}
+					],
+					"output":{
+						"id":"1"
+					}
+				}
+			]
+		}
+	]
+}

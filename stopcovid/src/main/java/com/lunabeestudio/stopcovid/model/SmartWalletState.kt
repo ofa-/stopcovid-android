@@ -10,12 +10,29 @@
 
 package com.lunabeestudio.stopcovid.model
 
+import com.lunabeestudio.domain.model.smartwallet.SmartWalletValidity
 import java.util.Date
 
-sealed class SmartWalletState(val expirationDate: Date?, val eligibleDate: Date?)
+sealed class SmartWalletState(val smartWalletValidity: SmartWalletValidity?, val eligibleDate: Date?) {
 
-class Valid(expirationDate: Date?, eligibilityDate: Date?) : SmartWalletState(expirationDate, eligibilityDate)
-class EligibleSoon(expirationDate: Date?, eligibilityDate: Date?) : SmartWalletState(expirationDate, eligibilityDate)
-class Eligible(expirationDate: Date?, eligibilityDate: Date?) : SmartWalletState(expirationDate, eligibilityDate)
-class ExpireSoon(expirationDate: Date?, eligibilityDate: Date?) : SmartWalletState(expirationDate, eligibilityDate)
-class Expired(expirationDate: Date?, eligibilityDate: Date?) : SmartWalletState(expirationDate, eligibilityDate)
+    class Valid(smartWalletValidity: SmartWalletValidity?, eligibilityDate: Date?) : SmartWalletState(smartWalletValidity, eligibilityDate)
+    class EligibleSoon(smartWalletValidity: SmartWalletValidity?, eligibilityDate: Date?) : SmartWalletState(
+        smartWalletValidity,
+        eligibilityDate
+    )
+
+    class Eligible(smartWalletValidity: SmartWalletValidity?, eligibilityDate: Date?) : SmartWalletState(
+        smartWalletValidity,
+        eligibilityDate
+    )
+
+    class ExpireSoon(smartWalletValidity: SmartWalletValidity?, eligibilityDate: Date?) : SmartWalletState(
+        smartWalletValidity,
+        eligibilityDate
+    )
+
+    class Expired(smartWalletValidity: SmartWalletValidity?, eligibilityDate: Date?) : SmartWalletState(
+        smartWalletValidity,
+        eligibilityDate
+    )
+}

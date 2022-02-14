@@ -13,7 +13,7 @@ package com.lunabeestudio.stopcovid.coreui
 object ConfigConstant {
     private const val BASE_URL: String = "https://app.tousanticovid.gouv.fr/"
     private const val STATIC_BASE_URL: String = "https://app-static.tousanticovid.gouv.fr/"
-    private const val VERSIONED_PATH: String = "json/version-37/"
+    private const val VERSIONED_PATH: String = "json/version-38/"
     private const val VERSIONED_SERVER_URL: String = STATIC_BASE_URL + VERSIONED_PATH
 
     object Maintenance {
@@ -156,7 +156,7 @@ object ConfigConstant {
         object DCC {
             private const val ITERATION_PATH_TEMPLATE: String = "dcc/%d/"
             const val FILENAME: String = "certlist.pb.gz"
-            val URL: String = STATIC_BASE_URL + FOLDER + ITERATION_PATH_TEMPLATE + FILENAME
+            const val URL: String = STATIC_BASE_URL + FOLDER + ITERATION_PATH_TEMPLATE + FILENAME
         }
 
         object TwoDDOC {
@@ -171,5 +171,12 @@ object ConfigConstant {
         const val HUAWEI: String = "appmarket://details?id=fr.gouv.android.stopcovid"
         const val TAC_WEBSITE: String = "https://bonjour.tousanticovid.gouv.fr"
         const val STOPCOVID_WEBSITE: String = "https://bonjour.stopcovid.gouv.fr"
+    }
+
+    object SmartWallet {
+        const val EXPIRATION_FILENAME: String = "validity.json"
+        const val ELIGIBILITY_FILENAME: String = "eligibility.json"
+        const val FOLDER: String = "SmartWallet/"
+        const val URL: String = STATIC_BASE_URL + VERSIONED_PATH + FOLDER
     }
 }

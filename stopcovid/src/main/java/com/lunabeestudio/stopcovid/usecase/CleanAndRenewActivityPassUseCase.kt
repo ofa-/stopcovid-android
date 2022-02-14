@@ -10,13 +10,13 @@
 
 package com.lunabeestudio.stopcovid.usecase
 
+import com.lunabeestudio.domain.model.TacResult
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.stopcovid.extension.isBlacklisted
 import com.lunabeestudio.stopcovid.extension.isEligibleForActivityPass
-import com.lunabeestudio.stopcovid.manager.DccCertificatesManager
 import com.lunabeestudio.stopcovid.manager.BlacklistDCCManager
+import com.lunabeestudio.stopcovid.manager.DccCertificatesManager
 import com.lunabeestudio.stopcovid.model.EuropeanCertificate
-import com.lunabeestudio.domain.model.TacResult
 import com.lunabeestudio.stopcovid.repository.WalletRepository
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filterNotNull
@@ -28,6 +28,7 @@ class CleanAndRenewActivityPassUseCase(
     private val dccCertificatesManager: DccCertificatesManager,
     private val robertManager: RobertManager,
     private val generateActivityPassUseCase: GenerateActivityPassUseCase,
+    private val getSmartWalletStateUseCase: GetSmartWalletStateUseCase,
 ) {
     suspend operator fun invoke() {
         val dccList: List<EuropeanCertificate> = walletRepository.walletCertificateFlow
@@ -60,7 +61,8 @@ class CleanAndRenewActivityPassUseCase(
             it.canRenewActivityPass == true &&
                 it.isEligibleForActivityPass(
                     blacklistDCCManager,
-                    robertManager.configuration
+                    robertManager.configuration,
+                    getSmartWalletStateUseCase,
                 )
         }
 
