@@ -18,7 +18,6 @@ import android.content.SharedPreferences
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.navigation.NavDeepLinkBuilder
-import com.lunabeestudio.domain.model.Configuration
 import com.lunabeestudio.robert.RobertManager
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.activity.MainActivity
@@ -28,10 +27,9 @@ import com.lunabeestudio.stopcovid.extension.fullName
 import com.lunabeestudio.stopcovid.extension.midnightDate
 import com.lunabeestudio.stopcovid.extension.notificationSent
 import com.lunabeestudio.stopcovid.extension.showSmartWallet
-import com.lunabeestudio.stopcovid.extension.smartWalletState
 import com.lunabeestudio.stopcovid.extension.stringsManager
 import com.lunabeestudio.stopcovid.model.EuropeanCertificate
-import com.lunabeestudio.stopcovid.model.SmartWallet
+import com.lunabeestudio.stopcovid.model.SmartWalletMap
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import java.util.Date
@@ -39,7 +37,8 @@ import java.util.Date
 class SmartWalletNotificationUseCase(
     private val robertManager: RobertManager,
     private val sharedPreferences: SharedPreferences,
-    private val getSmartWalletCertificateUseCase: GetSmartWalletCertificateUseCase,
+    private val getSmartWalletMapUseCase: GetSmartWalletMapUseCase,
+    private val getSmartWalletStateUseCase: GetSmartWalletStateUseCase,
 ) {
 
     suspend operator fun invoke(
@@ -50,8 +49,8 @@ class SmartWalletNotificationUseCase(
             && sharedPreferences.showSmartWallet
             && robertManager.configuration.isSmartWalletOn
         ) {
-            val smartWallet = getSmartWalletCertificateUseCase().filterNotNull().first()
-            val notificationByProfile = getNotificationByProfile(robertManager.configuration, smartWallet)
+            val smartWallet = getSmartWalletMapUseCase().filterNotNull().first()
+            val notificationByProfile = getNotificationByProfile(smartWallet)
             val notificationByProfileFiltered = filterNotificationSentByProfile(notificationByProfile)
             val soonestNotification = getSoonestNotifToSend(notificationByProfileFiltered)
             if (soonestNotification != null) {
@@ -62,16 +61,15 @@ class SmartWalletNotificationUseCase(
     }
 
     private fun getNotificationByProfile(
-        configuration: Configuration,
-        smartWallet: SmartWallet,
+        smartWalletMap: SmartWalletMap,
     ): Map<String, SmartWalletNotification> {
         val result = mutableMapOf<String, SmartWalletNotification>()
         val today = midnightDate()
 
-        smartWallet.map { (key, certificate) ->
+        smartWalletMap.map { (key, certificate) ->
             var smartWalletNotification: SmartWalletNotification? = null
-            val smartWalletState = certificate.smartWalletState(configuration)
-            val expirationDate = smartWalletState.expirationDate
+            val smartWalletState = getSmartWalletStateUseCase(certificate)
+            val expirationDate = smartWalletState.smartWalletValidity?.end
             if (expirationDate != null) {
                 val daysDiff = today.daysTo(expirationDate)
                 smartWalletNotification = SmartWalletNotificationType.expirationTypeFromDaysDiff(daysDiff)?.let { expirationType ->

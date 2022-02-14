@@ -53,7 +53,8 @@ class WalletPagerFragment : BaseFragment() {
             injectionContainer.blacklist2DDOCManager,
             injectionContainer.walletRepository,
             injectionContainer.generateActivityPassUseCase,
-            injectionContainer.getSmartWalletCertificateUseCase,
+            injectionContainer.getSmartWalletMapUseCase,
+            injectionContainer.getSmartWalletStateUseCase,
         )
     }
 

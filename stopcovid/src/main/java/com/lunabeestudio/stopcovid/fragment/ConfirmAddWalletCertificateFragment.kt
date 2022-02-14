@@ -26,6 +26,7 @@ import com.lunabeestudio.stopcovid.coreui.extension.setTextOrHide
 import com.lunabeestudio.stopcovid.coreui.fragment.BaseFragment
 import com.lunabeestudio.stopcovid.databinding.FragmentConfirmAddWalletCertificateBinding
 import com.lunabeestudio.stopcovid.extension.analyticsManager
+import com.lunabeestudio.stopcovid.extension.future
 import com.lunabeestudio.stopcovid.extension.injectionContainer
 import com.lunabeestudio.stopcovid.extension.isFrench
 import com.lunabeestudio.stopcovid.extension.isSignatureExpired
@@ -34,11 +35,9 @@ import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.extension.safeNavigate
 import com.lunabeestudio.stopcovid.extension.showDbFailure
 import com.lunabeestudio.stopcovid.extension.showUnknownErrorAlert
-import com.lunabeestudio.stopcovid.extension.smartWalletState
 import com.lunabeestudio.stopcovid.extension.toCovidException
 import com.lunabeestudio.stopcovid.extension.walletCertificateError
 import com.lunabeestudio.stopcovid.model.EuropeanCertificate
-import com.lunabeestudio.stopcovid.model.Expired
 import com.lunabeestudio.stopcovid.model.SecretKeyAlreadyGeneratedException
 import com.lunabeestudio.stopcovid.model.WalletCertificate
 import com.lunabeestudio.stopcovid.viewmodel.WalletViewModel
@@ -70,7 +69,8 @@ class ConfirmAddWalletCertificateFragment : BaseFragment() {
             injectionContainer.blacklist2DDOCManager,
             injectionContainer.walletRepository,
             injectionContainer.generateActivityPassUseCase,
-            injectionContainer.getSmartWalletCertificateUseCase,
+            injectionContainer.getSmartWalletMapUseCase,
+            injectionContainer.getSmartWalletStateUseCase,
         )
     }
 
@@ -173,9 +173,8 @@ class ConfirmAddWalletCertificateFragment : BaseFragment() {
             val vaccination = (certificate as? EuropeanCertificate)?.greenCertificate?.vaccinations?.lastOrNull()
 
             val showVaccineCompletion = vaccination != null
-                && vaccination.doseNumber >= vaccination.totalSeriesOfDoses
+                && europeanCertificate?.let { injectionContainer.computeDccValidityUseCase(it)?.end?.future() } != false
                 && !viewModel.isBlacklisted(certificate)
-                && europeanCertificate?.smartWalletState(robertManager.configuration) !is Expired
                 && europeanCertificate?.isSignatureExpired == false
 
             if (showVaccineCompletion) {

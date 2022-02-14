@@ -48,6 +48,8 @@ import com.lunabeestudio.stopcovid.manager.LinksManager
 import com.lunabeestudio.stopcovid.manager.MoreKeyFiguresManager
 import com.lunabeestudio.stopcovid.manager.PrivacyManager
 import com.lunabeestudio.stopcovid.manager.RisksLevelManager
+import com.lunabeestudio.stopcovid.manager.SmartWalletEligibilityManager
+import com.lunabeestudio.stopcovid.manager.SmartWalletValidityManager
 import com.lunabeestudio.stopcovid.manager.TacCalibrationDataSource
 import com.lunabeestudio.stopcovid.manager.TacConfigurationDataSource
 import com.lunabeestudio.stopcovid.manager.VaccinationCenterManager
@@ -55,12 +57,15 @@ import com.lunabeestudio.stopcovid.repository.AttestationRepository
 import com.lunabeestudio.stopcovid.repository.VenueRepository
 import com.lunabeestudio.stopcovid.repository.WalletRepository
 import com.lunabeestudio.stopcovid.usecase.CleanAndRenewActivityPassUseCase
+import com.lunabeestudio.stopcovid.usecase.ComputeDccEligibilityUseCase
+import com.lunabeestudio.stopcovid.usecase.ComputeDccValidityUseCase
 import com.lunabeestudio.stopcovid.usecase.GenerateActivityPassUseCase
 import com.lunabeestudio.stopcovid.usecase.GenerateMultipassUseCase
 import com.lunabeestudio.stopcovid.usecase.GetCloseMultipassProfilesUseCase
 import com.lunabeestudio.stopcovid.usecase.GetFilteredMultipassProfileFromIdUseCase
 import com.lunabeestudio.stopcovid.usecase.GetMultipassProfilesUseCase
-import com.lunabeestudio.stopcovid.usecase.GetSmartWalletCertificateUseCase
+import com.lunabeestudio.stopcovid.usecase.GetSmartWalletMapUseCase
+import com.lunabeestudio.stopcovid.usecase.GetSmartWalletStateUseCase
 import com.lunabeestudio.stopcovid.usecase.SmartWalletNotificationUseCase
 import com.lunabeestudio.stopcovid.usecase.VerifyAndGetCertificateCodeValueUseCase
 import com.lunabeestudio.stopcovid.usecase.VerifyCertificateUseCase
@@ -87,6 +92,8 @@ class InjectionContainer(private val context: StopCovid, val coroutineScope: Cor
     val cryptoManager: LocalCryptoManager by lazy { LocalCryptoManager(context) }
     val certificatesDocumentsManager: CertificatesDocumentsManager by lazy { CertificatesDocumentsManager(serverManager) }
     val dccCertificatesManager: DccCertificatesManager by lazy { DccCertificatesManager(serverManager) }
+    val smartWalletEligibilityManager: SmartWalletEligibilityManager by lazy { SmartWalletEligibilityManager(serverManager) }
+    val smartWalletValidityManager: SmartWalletValidityManager by lazy { SmartWalletValidityManager(serverManager) }
     val calibrationDataSource: RobertCalibrationDataSource by lazy { TacCalibrationDataSource(calibrationManager) }
     val configurationDataSource: RobertConfigurationDataSource by lazy { TacConfigurationDataSource(configManager) }
     val sharedCryptoDataSource: SharedCryptoDataSource = BouncyCastleCryptoDataSource()
@@ -126,7 +133,7 @@ class InjectionContainer(private val context: StopCovid, val coroutineScope: Cor
     }
 
     private val remoteDccLightDataSource: RemoteDccLightDataSource by lazy {
-            DccLightDataSource(sharedCryptoDataSource, EnvConstant.Prod.dcclightBaseUrl, serverManager.okHttpClient, analyticsManager)
+        DccLightDataSource(sharedCryptoDataSource, EnvConstant.Prod.dcclightBaseUrl, serverManager.okHttpClient, analyticsManager)
     }
 
     val isolationManager: IsolationManager by lazy { IsolationManager(context, robertManager, secureKeystoreDataSource) }
@@ -173,6 +180,7 @@ class InjectionContainer(private val context: StopCovid, val coroutineScope: Cor
             dccCertificatesManager = dccCertificatesManager,
             robertManager = robertManager,
             generateActivityPassUseCase = generateActivityPassUseCase,
+            getSmartWalletStateUseCase = getSmartWalletStateUseCase,
         )
 
     val verifyCertificateUseCase: VerifyCertificateUseCase
@@ -192,18 +200,19 @@ class InjectionContainer(private val context: StopCovid, val coroutineScope: Cor
             verifyCertificateUseCase = verifyCertificateUseCase,
         )
 
-    val getSmartWalletCertificateUseCase: GetSmartWalletCertificateUseCase
-        get() = GetSmartWalletCertificateUseCase(
+    val getSmartWalletMapUseCase: GetSmartWalletMapUseCase
+        get() = GetSmartWalletMapUseCase(
             walletRepository = walletRepository,
             blacklistDCCManager = blacklistDCCManager,
-            robertManager = robertManager,
+            getSmartWalletStateUseCase = getSmartWalletStateUseCase,
         )
 
     val smartWalletNotificationUseCase: SmartWalletNotificationUseCase
         get() = SmartWalletNotificationUseCase(
             robertManager = robertManager,
             sharedPreferences = sharedPrefs,
-            getSmartWalletCertificateUseCase = getSmartWalletCertificateUseCase,
+            getSmartWalletMapUseCase = getSmartWalletMapUseCase,
+            getSmartWalletStateUseCase = getSmartWalletStateUseCase,
         )
 
     val getFilteredMultipassProfileFromIdUseCase: GetFilteredMultipassProfileFromIdUseCase
@@ -227,6 +236,25 @@ class InjectionContainer(private val context: StopCovid, val coroutineScope: Cor
 
     val getCloseMultipassProfilesUseCase: GetCloseMultipassProfilesUseCase
         get() = GetCloseMultipassProfilesUseCase()
+
+    val computeDccEligibilityUseCase: ComputeDccEligibilityUseCase
+        get() = ComputeDccEligibilityUseCase(
+            robertManager = robertManager,
+            smartWalletEligibilityManager = smartWalletEligibilityManager,
+        )
+
+    val computeDccValidityUseCase: ComputeDccValidityUseCase
+        get() = ComputeDccValidityUseCase(
+            robertManager = robertManager,
+            smartWalletValidityManager = smartWalletValidityManager,
+        )
+
+    val getSmartWalletStateUseCase: GetSmartWalletStateUseCase
+        get() = GetSmartWalletStateUseCase(
+            computeDccValidityUseCase = computeDccValidityUseCase,
+            computeDccEligibilityUseCase = computeDccEligibilityUseCase,
+            robertManager = robertManager,
+        )
 
     companion object {
         private const val LOCAL_PROXIMITY_DIR = "local_proximity"

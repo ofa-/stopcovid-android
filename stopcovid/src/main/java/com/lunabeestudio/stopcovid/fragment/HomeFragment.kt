@@ -185,7 +185,8 @@ class HomeFragment : TimeMainFragment() {
             venueRepository,
             walletRepository,
             sharedPrefs,
-            injectionContainer.getSmartWalletCertificateUseCase,
+            injectionContainer.getSmartWalletMapUseCase,
+            injectionContainer.getSmartWalletStateUseCase,
         )
     }
 
@@ -497,7 +498,7 @@ class HomeFragment : TimeMainFragment() {
             refreshScreen()
             showRegisterRequiredIfNeeded(venues)
         }
-        viewModel.profileCertificates.collectDataWithLifecycle(viewLifecycleOwner) {
+        viewModel.smartWalletMap.collectDataWithLifecycle(viewLifecycleOwner) {
             refreshScreen()
         }
     }

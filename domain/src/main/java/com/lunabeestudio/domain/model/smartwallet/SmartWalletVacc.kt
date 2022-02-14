@@ -8,16 +8,10 @@
  * Created by Lunabee Studio / Date - 2021/29/11 - for the TOUS-ANTI-COVID project
  */
 
-package com.lunabeestudio.domain.model
+package com.lunabeestudio.domain.model.smartwallet
 
-class SmartWalletElg(
-    val vacc22DosesNbDays: Int,
-    val vaccJan11DosesNbDays: Int,
-    val recNbDays: Int,
-    val vacc22DosesNbDaysLow: Int,
-    val vaccJan11DosesNbDaysLow: Int,
-    val recNbDaysLow: Int,
-    val displayElgDays: Int,
-    val vaccJan22DosesNbDays: Int,
-    val vaccJan22DosesNbDaysLow: Int,
+class SmartWalletVacc(
+    val ar: List<String>,
+    val ja: List<String>,
+    val az: List<String>,
 )

@@ -5,13 +5,9 @@
  *
  * Authors
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Created by Lunabee Studio / Date - 2021/29/11 - for the TOUS-ANTI-COVID project
+ * Created by Lunabee Studio / Date - 2021/3/12 - for the TOUS-ANTI-COVID project
  */
 
-package com.lunabeestudio.domain.model
+package com.lunabeestudio.stopcovid.model
 
-class SmartWalletVacc(
-    val ar: List<String>,
-    val ja: List<String>,
-    val az: List<String>,
-)
+typealias SmartWalletMap = Map<String, EuropeanCertificate>

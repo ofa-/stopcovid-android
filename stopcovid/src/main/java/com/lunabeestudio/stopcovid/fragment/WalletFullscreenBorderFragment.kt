@@ -27,8 +27,8 @@ import com.lunabeestudio.stopcovid.coreui.extension.setTextOrHide
 import com.lunabeestudio.stopcovid.coreui.extension.toDimensSize
 import com.lunabeestudio.stopcovid.coreui.fragment.BaseFragment
 import com.lunabeestudio.stopcovid.databinding.FragmentWalletFullscreenBorderBinding
-import com.lunabeestudio.stopcovid.extension.fullScreenBorderDescription
 import com.lunabeestudio.stopcovid.extension.collectDataWithLifecycle
+import com.lunabeestudio.stopcovid.extension.fullScreenBorderDescription
 import com.lunabeestudio.stopcovid.extension.injectionContainer
 import com.lunabeestudio.stopcovid.extension.isFrench
 import com.lunabeestudio.stopcovid.extension.navGraphWalletViewModels
@@ -52,7 +52,8 @@ class WalletFullscreenBorderFragment : BaseFragment() {
             injectionContainer.blacklist2DDOCManager,
             injectionContainer.walletRepository,
             injectionContainer.generateActivityPassUseCase,
-            injectionContainer.getSmartWalletCertificateUseCase,
+            injectionContainer.getSmartWalletMapUseCase,
+            injectionContainer.getSmartWalletStateUseCase,
         )
     }
 
@@ -132,7 +133,8 @@ class WalletFullscreenBorderFragment : BaseFragment() {
             logosImageView.isVisible = europeanCertificate.greenCertificate.isFrench == true
             certificateDetailsTextView.text = europeanCertificate.fullScreenBorderDescription(
                 strings = strings,
-                configuration = injectionContainer.robertManager.configuration
+                configuration = injectionContainer.robertManager.configuration,
+                smartWalletState = injectionContainer.getSmartWalletStateUseCase(europeanCertificate),
             )
             certificateHashTextView.text = europeanCertificate.sha256
 

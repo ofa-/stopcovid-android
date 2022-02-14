@@ -31,12 +31,13 @@ import com.lunabeestudio.stopcovid.manager.Blacklist2DDOCManager
 import com.lunabeestudio.stopcovid.manager.BlacklistDCCManager
 import com.lunabeestudio.stopcovid.model.EuropeanCertificate
 import com.lunabeestudio.stopcovid.model.FrenchCertificate
-import com.lunabeestudio.stopcovid.model.SmartWallet
+import com.lunabeestudio.stopcovid.model.SmartWalletMap
 import com.lunabeestudio.stopcovid.model.WalletCertificate
 import com.lunabeestudio.stopcovid.repository.WalletRepository
 import com.lunabeestudio.stopcovid.usecase.GenerateActivityPassState
 import com.lunabeestudio.stopcovid.usecase.GenerateActivityPassUseCase
-import com.lunabeestudio.stopcovid.usecase.GetSmartWalletCertificateUseCase
+import com.lunabeestudio.stopcovid.usecase.GetSmartWalletMapUseCase
+import com.lunabeestudio.stopcovid.usecase.GetSmartWalletStateUseCase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -51,7 +52,8 @@ class WalletViewModel(
     private val blacklist2DDOCManager: Blacklist2DDOCManager,
     private val walletRepository: WalletRepository,
     private val generateActivityPassUseCase: GenerateActivityPassUseCase,
-    getSmartWalletCertificateUseCase: GetSmartWalletCertificateUseCase,
+    getSmartWalletMapUseCase: GetSmartWalletMapUseCase,
+    private val getSmartWalletStateUseCase: GetSmartWalletStateUseCase,
 ) : ViewModel() {
 
     val error: SingleLiveEvent<Exception> = SingleLiveEvent()
@@ -75,7 +77,7 @@ class WalletViewModel(
             certificates
         }.stateIn(viewModelScope, SharingStarted.Eagerly, TacResult.Loading(emptyList()))
 
-    val profileCertificates: StateFlow<SmartWallet?> = getSmartWalletCertificateUseCase()
+    val smartWalletProfiles: StateFlow<SmartWalletMap?> = getSmartWalletMapUseCase()
         .stateIn(viewModelScope, SharingStarted.Eagerly, emptyMap())
 
     val blacklistUpdateEvent: LiveData<Event<Unit>> = MediatorLiveData<Event<Unit>>().apply {
@@ -91,13 +93,13 @@ class WalletViewModel(
 
     val recentCertificates: List<WalletCertificate>?
         get() = certificates.value.data?.filter {
-            it.isRecent(robertManager.configuration) &&
+            it.isRecent(robertManager.configuration, getSmartWalletStateUseCase) &&
                 (it as? EuropeanCertificate)?.isFavorite != true
         }?.sortedByDescending { it.timestamp }
 
     val olderCertificates: List<WalletCertificate>?
         get() = certificates.value.data?.filter {
-            it.isOld(robertManager.configuration) &&
+            it.isOld(robertManager.configuration, getSmartWalletStateUseCase) &&
                 (it as? EuropeanCertificate)?.isFavorite != true
         }?.sortedByDescending { it.timestamp }
 
@@ -193,7 +195,8 @@ class WalletViewModelFactory(
     private val blacklist2DDOCManager: Blacklist2DDOCManager,
     private val walletRepository: WalletRepository,
     private val generateActivityPassUseCase: GenerateActivityPassUseCase,
-    private val getSmartWalletCertificateUseCase: GetSmartWalletCertificateUseCase,
+    private val getSmartWalletMapUseCase: GetSmartWalletMapUseCase,
+    private val getSmartWalletStateUseCase: GetSmartWalletStateUseCase,
 ) :
     ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -204,7 +207,8 @@ class WalletViewModelFactory(
             blacklist2DDOCManager,
             walletRepository,
             generateActivityPassUseCase,
-            getSmartWalletCertificateUseCase,
+            getSmartWalletMapUseCase,
+            getSmartWalletStateUseCase,
         ) as T
     }
 }

@@ -293,6 +293,12 @@ class StopCovid : Application(), RobertApplication, LocalizedApplication {
         appCoroutineScope.launch {
             injectionContainer.risksLevelManager.initialize(this@StopCovid)
         }
+        appCoroutineScope.launch {
+            injectionContainer.smartWalletEligibilityManager.initialize(this@StopCovid)
+        }
+        appCoroutineScope.launch {
+            injectionContainer.smartWalletValidityManager.initialize(this@StopCovid)
+        }
 
         runBlocking {
             injectionContainer.dccCertificatesManager.initialize(this@StopCovid)
@@ -333,6 +339,8 @@ class StopCovid : Application(), RobertApplication, LocalizedApplication {
             injectionContainer.vaccinationCenterManager.onAppForeground(this@StopCovid, sharedPrefs)
             injectionContainer.certificatesDocumentsManager.onAppForeground(this@StopCovid)
             injectionContainer.dccCertificatesManager.onAppForeground(this@StopCovid)
+            injectionContainer.smartWalletEligibilityManager.onAppForeground(this@StopCovid)
+            injectionContainer.smartWalletValidityManager.onAppForeground(this@StopCovid)
 
             try {
                 robertManager.refreshConfig(this@StopCovid)

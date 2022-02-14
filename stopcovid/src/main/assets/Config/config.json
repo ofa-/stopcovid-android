@@ -6,7 +6,7 @@
         },
         {
             "name":"version",
-            "value":136
+            "value":139
         },
         {
             "name":"versionCalibrationBle",
@@ -205,45 +205,10 @@
             "value":true
         },
         {
-            "name":"app.smartwallet.ages",
+            "name":"app.smartwallet.engine",
             "value":{
-                "lowElg":12,
-                "low":18,
-                "lowExpDays":31,
-                "high":65
-            }
-        },
-        {
-            "name":"app.smartwallet.exp",
-            "value":{
-                "pivot1":"2021-12-15",
-                "pivot2":"2022-01-15",
-                "pivot3":"2022-02-15",
-                "vacc22DosesNbDays":214,
-                "vaccJan22DosesNbDays":61,
-                "vacc11DosesNbDays":214,
-                "vacc22DosesNbNewDays":122,
-                "vacc11DosesNbNewDays":122,
-                "vaccJan22DosesNbNewDays":61,
-                "recNbDays":180,
-                "recNbNewDays":122,
-                "vaccJan11DosesNbDays":61,
-                "displayExpOnAllDcc":240,
-                "displayExpDays":21
-            }
-        },
-        {
-            "name":"app.smartwallet.elg",
-            "value":{
-                "vacc22DosesNbDays":92,
-                "vaccJan11DosesNbDays":31,
-                "vaccJan22DosesNbDays":31,
-                "recNbDays":92,
-                "vacc22DosesNbDaysLow":184,
-                "vaccJan11DosesNbDaysLow":31,
-                "vaccJan22DosesNbDaysLow":31,
-                "recNbDaysLow":184,
-                "displayElgDays":26
+                "displayExpDays":21,
+                "displayElgDays":60
             }
         },
         {

@@ -22,6 +22,7 @@ import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.lifecycleScope
 import androidx.work.WorkInfo
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.lunabeestudio.domain.model.TacResult
 import com.lunabeestudio.stopcovid.R
 import com.lunabeestudio.stopcovid.activity.MainActivity
 import com.lunabeestudio.stopcovid.coreui.databinding.LayoutButtonBottomSheetBinding
@@ -39,7 +40,6 @@ import com.lunabeestudio.stopcovid.extension.openInExternalBrowser
 import com.lunabeestudio.stopcovid.extension.robertManager
 import com.lunabeestudio.stopcovid.model.EuropeanCertificate
 import com.lunabeestudio.stopcovid.model.NoInternetException
-import com.lunabeestudio.domain.model.TacResult
 import com.lunabeestudio.stopcovid.model.WalletCertificate
 import com.lunabeestudio.stopcovid.usecase.GenerateActivityPassState
 import com.lunabeestudio.stopcovid.usecase.GenerateActivityPassStateName
@@ -68,7 +68,8 @@ class WalletFullscreenActivityPassExplanationFragment : MainFragment() {
             injectionContainer.blacklist2DDOCManager,
             injectionContainer.walletRepository,
             injectionContainer.generateActivityPassUseCase,
-            injectionContainer.getSmartWalletCertificateUseCase,
+            injectionContainer.getSmartWalletMapUseCase,
+            injectionContainer.getSmartWalletStateUseCase,
         )
     }
 
@@ -99,6 +100,7 @@ class WalletFullscreenActivityPassExplanationFragment : MainFragment() {
             certificate?.isEligibleForActivityPass(
                 injectionContainer.blacklistDCCManager,
                 robertManager.configuration,
+                injectionContainer.getSmartWalletStateUseCase,
             ) == true -> if ((certificate as? EuropeanCertificate)?.canRenewActivityPass == true) {
                 ActivityPassState.EligibleRenewFail
             } else {

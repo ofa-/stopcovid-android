@@ -10,6 +10,7 @@
 
 package com.lunabeestudio.domain.model
 
+import com.lunabeestudio.domain.model.smartwallet.SmartWalletVacc
 import kotlin.time.Duration
 
 class Configuration(
@@ -82,9 +83,6 @@ class Configuration(
     val activityPassSkipNegTestHours: Int,
     val displayActivityPass: Boolean,
     val renewThreshold: Int,
-    val smartWalletAges: SmartWalletAges?,
-    val smartWalletExp: SmartWalletExp?,
-    val smartWalletElg: SmartWalletElg?,
     val smartWalletVacc: SmartWalletVacc?,
     var smartWalletNotif: Boolean,
     var isSmartWalletOn: Boolean,
@@ -94,6 +92,7 @@ class Configuration(
     var dccKidsEmoji: DccKidsEmoji?,
     var multipassConfig: MultipassConfig?,
     var recoveryValidityThreshold: RecoveryValidityThreshold?,
+    val smartWalletEngine: SmartWalletEngine?,
 ) {
     class Notification(val title: String, val subtitle: String, val url: String, val version: Int)
     class ColorsCompareKeyFigures(val colorKeyFigure1: ColorCompareKeyFigures, val colorKeyFigure2: ColorCompareKeyFigures)
@@ -102,4 +101,5 @@ class Configuration(
     class DccKidsEmoji(val age: Int, val emojis: List<String>)
     data class MultipassConfig(val isEnabled: Boolean, val testMaxDuration: Duration, val maxDcc: Int, val minDcc: Int)
     class RecoveryValidityThreshold(val min: Duration, val max: Duration)
+    class SmartWalletEngine(val displayExp: Duration, val displayElg: Duration)
 }

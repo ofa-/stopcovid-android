@@ -5,14 +5,14 @@
  *
  * Authors
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Created by Lunabee Studio / Date - 2021/29/11 - for the TOUS-ANTI-COVID project
+ * Created by Lunabee Studio / Date - 2022/2/7 - for the TOUS-ANTI-COVID project
  */
 
-package com.lunabeestudio.domain.model
+package com.lunabeestudio.domain.model.smartwallet
 
-class SmartWalletAges(
-    val lowElg: Int,
-    val low: Int,
-    val lowExpDays: Int,
-    val high: Int,
+import java.util.Date
+
+class SmartWalletValidity(
+    val start: Date?,
+    val end: Date?,
 )

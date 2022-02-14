@@ -26,13 +26,21 @@ fun Date.daysTo(toDate: Date): Float {
     return (toDate.time - time).toFloat() / 1.days.inWholeMilliseconds.toFloat()
 }
 
-fun Date.yearsOld(): Int {
-    val today: Calendar = midnightCalendar()
-    val birthdate: Calendar = Calendar.getInstance().apply {
-        time = this@yearsOld
+fun Date.yearsOld(): Int = yearsOldAt(Date())
+
+fun Date.yearsOldAt(atDate: Date): Int {
+    val atCalendar: Calendar = Calendar.getInstance().apply {
+        time = atDate
+        set(Calendar.HOUR_OF_DAY, 0)
+        set(Calendar.MINUTE, 0)
+        set(Calendar.SECOND, 0)
+        set(Calendar.MILLISECOND, 0)
     }
-    var diff = today[Calendar.YEAR] - birthdate[Calendar.YEAR]
-    if (today[Calendar.DAY_OF_YEAR] < birthdate[Calendar.DAY_OF_YEAR]) {
+    val birthdate: Calendar = Calendar.getInstance().apply {
+        time = this@yearsOldAt
+    }
+    var diff = atCalendar[Calendar.YEAR] - birthdate[Calendar.YEAR]
+    if (atCalendar[Calendar.DAY_OF_YEAR] < birthdate[Calendar.DAY_OF_YEAR]) {
         diff--
     }
     return diff

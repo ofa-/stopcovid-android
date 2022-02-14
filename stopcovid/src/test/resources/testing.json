@@ -1,0 +1,412 @@
+{
+	"config":{
+		"vaccineProduct":{
+			"ar":["EU/1/20/1528","EU/1/20/1507"],
+			"ja":["EU/1/20/1525","EU/1/21/1618"],
+			"az":["EU/1/21/1529","Covidshield","Covid-19-recombinant","R-COVI","R-Covi"]
+		}
+	},
+	"sections":[
+		{
+			"section":"👉👉👉👉 EXPIRATION pivot 15 DEC 2021 for 65+ (and JA)",
+			"tests":[
+				{
+					"desc":"AZ ou ARNm 2/2 ou 1/1, plus de 65 ans, pivot 15/12/2021.",
+					"input":{
+						"today":"2021-12-03","dob":"1956-02-28",
+						"type":"v","doi":"2021-05-10","products":["EU/1/21/1529", "EU/1/20/1528", "EU/1/20/1507","Covidshield","Covid-19-recombinant","R-COVI","R-Covi"],"doses":[{"c":2,"t":2},{"c":1,"t":1}]
+					},
+					"output":{
+						"start":"2021-05-17",
+						"elg":"2021-08-10",
+						"exp":"2021-12-15"
+					}
+				},
+				{
+					"desc":"AZ ou ARNm 2/2 ou 1/1, plus de 65 ans, pivot 15/12/2021, expiration au-dela du pivot.",
+					"input":{
+						"today":"2021-12-03","dob":"1956-02-28",
+						"type":"v","doi":"2021-06-10","products":["EU/1/21/1529", "EU/1/20/1528", "EU/1/20/1507","Covidshield","Covid-19-recombinant","R-COVI","R-Covi"],"doses":[{"c":2,"t":2},{"c":1,"t":1}]
+					},
+					"output":{
+						"start":"2021-06-17",
+						"elg":"2021-09-10",
+						"exp":"2022-01-10"
+					}
+				},
+				{
+					"desc":"JA 1/1 plus de 65 ans, pivot 15/12/2021.",
+					"input":{
+						"today":"2021-12-03","dob":"1956-02-28",
+						"type":"v","doi":"2021-10-13","products":["EU/1/20/1525", "EU/1/21/1618"],"doses":[{"c":1,"t":1}]
+					},
+					"output":{
+						"start":"2021-10-20",
+						"elg":"2021-11-13",
+						"exp":"2021-12-15"
+					}
+				},
+				{
+					"desc":"JA 1/1 plus de 65 ans, pivot 15/12/2021, expiration au-dela du pivot.",
+					"input":{
+						"today":"2021-12-03","dob":"1956-02-28",
+						"type":"v","doi":"2021-10-20","products":["EU/1/20/1525", "EU/1/21/1618"],"doses":[{"c":1,"t":1}]
+					},
+					"output":{
+						"start":"2021-10-27",
+						"elg":"2021-11-20",
+						"exp":"2021-12-20"
+					}
+				},
+				{
+					"desc":"JA 1/1 plus de 18 ans, pivot 15/12/2021 (plus de 18 ans éligibles sur du Janssen meme au 15/12).",
+					"input":{
+						"today":"2021-12-03","dob":"1980-02-28",
+						"type":"v","doi":"2021-10-20","products":["EU/1/20/1525", "EU/1/21/1618"],"doses":[{"c":1,"t":1}]
+					},
+					"output":{
+						"start":"2021-10-27",
+						"elg":"2021-11-20",
+						"exp":"2021-12-20"
+					}
+				},
+				{
+					"desc":"JA 1/1 moins de 18 ans, pivot 15/12/2021 (moins de 18 ans éligibles sur du Janssen meme au 15/12). Eligible, pas d'expiration.",
+					"input":{
+						"today":"2021-12-03","dob":"2004-02-28",
+						"type":"v","doi":"2021-10-20","products":["EU/1/20/1525", "EU/1/21/1618"],"doses":[{"c":1,"t":1}]
+					},
+					"output":{
+						"start":"2021-10-27",
+						"elg":"2021-11-20"
+					}
+				},
+				{
+					"desc":"Vaccin complet JA non rappel moins 18 ans.",
+					"input":{
+						"today":"2022-02-10","dob":"2004-02-28",
+						"type":"v","doi":"2021-10-20","products":["EU/1/20/1525", "EU/1/21/1618"],"doses":[{"c":2,"t":2},{"c":1,"t":1}]
+					},
+					"output":{
+						"start":"2021-10-27",
+						"elg":"2021-11-20"
+					}
+				},
+				{
+					"desc":"recovery moins de 18 ans",
+					"input":{
+						"today":"2021-12-03","dob":"2004-02-28",
+						"type":"r","doi":"2021-04-21","prefixes":["AA"]
+					},
+					"output":{
+						"start":"2021-05-02",
+						"elg":"2021-10-22",
+						"exp":"2021-10-18"
+					}
+				},
+				{
+					"desc":"recovery plus de 65 ans",
+					"input":{
+						"today":"2021-12-03","dob":"1950-02-28",
+						"type":"r","doi":"2021-04-21","prefixes":["AA"]
+					},
+					"output":{
+						"start":"2021-05-02",
+						"elg":"2021-07-22",
+						"exp":"2021-10-18"
+					}
+				},
+				{
+					"desc":"test+ moins de 18 ans",
+					"input":{
+						"today":"2021-12-03","dob":"2004-02-28",
+						"type":"p","doi":"2021-04-21","prefixes":["AA"]
+					},
+					"output":{
+						"start":"2021-05-02",
+						"elg":"2021-10-22",
+						"exp":"2021-10-18"
+					}
+				},
+				{
+					"desc":"test+ plus de 65 ans",
+					"input":{
+						"today":"2021-12-03","dob":"1950-02-28",
+						"type":"p","doi":"2021-04-21","prefixes":["AA"]
+					},
+					"output":{
+						"start":"2021-05-02",
+						"elg":"2021-07-22",
+						"exp":"2021-10-18"
+					}
+				}
+			]
+		},
+		{
+			"section":"👉👉👉👉 VACCINE with EXPIRATION pivot 15 JAN 2022 for 18+",
+			"tests":[
+				{
+					"desc":"ARN 2/2 ou 1/1 plus de 18 ans, pivot 15/1.",
+					"input":{
+						"today":"2022-02-03","dob":"2000-02-28",
+						"type":"v","doi":"2021-05-05","products":["EU/1/21/1529", "EU/1/20/1528", "EU/1/20/1507","Covidshield","Covid-19-recombinant","R-COVI","R-Covi"],"doses":[{"c":2,"t":2},{"c":1,"t":1}]
+					},
+					"output":{
+						"start":"2021-05-12",
+						"elg":"2021-08-05",
+						"exp":"2022-01-15"
+					}
+				},
+				{
+					"desc":"ARN 2/2 ou 1/1 plus de 18 ans, pivot 15/1, expiration au-dela.",
+					"input":{
+						"today":"2022-02-03","dob":"2000-02-28",
+						"type":"v","doi":"2021-07-05","products":["EU/1/21/1529", "EU/1/20/1528", "EU/1/20/1507","Covidshield","Covid-19-recombinant","R-COVI","R-Covi"],"doses":[{"c":2,"t":2},{"c":1,"t":1}]
+					},
+					"output":{
+						"start":"2021-07-12",
+						"elg":"2021-10-05",
+						"exp":"2022-02-04"
+					}
+				},
+				{
+					"desc":"2/2 novavax tout juste 18 ans.",
+					"input":{
+						"today":"2022-02-03","dob":"2004-01-26",
+						"type":"v","doi":"2021-10-20","products":["EU/1/21/1618"],"doses":[{"c":2,"t":2}]
+					},
+					"output":{
+						"start":"2021-10-27",
+						"elg":"2022-01-26",
+						"exp":"2022-02-26"
+					}
+				},
+				{
+					"desc":"recovery moins de 18 ans, avant pivots, pas d'expiration",
+					"input":{
+						"today":"2021-12-03","dob":"2004-02-28",
+						"type":"r","doi":"2021-04-21","prefixes":["AA"]
+					},
+					"output":{
+						"start":"2021-05-02",
+						"elg":"2021-10-22",
+						"exp":"2021-10-18"
+					}
+				},
+				{
+					"desc":"test+ plus de 18 ans",
+					"input":{
+						"today":"2021-12-03","dob":"2004-02-28",
+						"type":"p","doi":"2021-04-21","prefixes":["AA"]
+					},
+					"output":{
+						"start":"2021-05-02",
+						"elg":"2021-10-22",
+						"exp":"2021-10-18"
+					}
+				},
+				{
+					"desc":"recovery plus de 18 ans, expiration au-dela",
+					"input":{
+						"today":"2021-12-03","dob":"2001-02-28",
+						"type":"r","doi":"2021-07-21","prefixes":["AA"]
+					},
+					"output":{
+						"start":"2021-08-01",
+						"elg":"2021-10-21",
+						"exp":"2022-01-17"
+					}
+				},
+				{
+					"desc":"test+ plus de 18 ans, expiration au-dela",
+					"input":{
+						"today":"2021-12-03","dob":"2001-02-28",
+						"type":"p","doi":"2021-07-21","prefixes":["AA"]
+					},
+					"output":{
+						"start":"2021-08-01",
+						"elg":"2021-10-21",
+						"exp":"2022-01-17"
+					}
+				}
+			]
+		},
+		{
+			"section":"👉👉👉👉 DCC with EXPIRATION pivot 15 FEB 2022",
+			"tests":[
+				{
+					"desc":"ARN ou AZ 2/2 ou 1/1 plus de 18 ans, pivot 15/2.",
+					"input":{
+						"today":"2022-02-03","dob":"1950-02-28",
+						"type":"v","doi":"2021-09-05","products":["EU/1/21/1529", "EU/1/20/1528", "EU/1/20/1507","Covidshield","Covid-19-recombinant","R-COVI","R-Covi"],"doses":[{"c":2,"t":2},{"c":1,"t":1}]
+					},
+					"output":{
+						"start":"2021-09-12",
+						"elg":"2021-12-06",
+						"exp":"2022-02-15"
+					}
+				},
+				{
+					"desc":"test+ plus de 18 ans, expiration au 15/2",
+					"input":{
+						"today":"2021-12-03","dob":"2001-02-28",
+						"type":"p","doi":"2021-09-21","prefixes":["AA"]
+					},
+					"output":{
+						"start":"2021-10-02",
+						"elg":"2021-12-22",
+						"exp":"2022-02-15"
+					}
+				},
+				{
+					"desc":"recovery plus de 18 ans, expiration au 15/2",
+					"input":{
+						"today":"2021-12-03","dob":"2001-02-28",
+						"type":"r","doi":"2021-09-21","prefixes":["AA"]
+					},
+					"output":{
+						"start":"2021-10-02",
+						"elg":"2021-12-22",
+						"exp":"2022-02-15"
+					}
+				},
+				{
+					"desc":"recovery plus de 18 ans, expiration au-dela avant 15/2",
+					"input":{
+						"today":"2021-12-03","dob":"2001-02-28",
+						"type":"r","doi":"2021-08-18","prefixes":["AA"]
+					},
+					"output":{
+						"start":"2021-08-29",
+						"elg":"2021-11-18",
+						"exp":"2022-02-14"
+					}
+				},
+				{
+					"desc":"recovery plus de 18 ans, expiration au-dela du 15/2",
+					"input":{
+						"today":"2021-12-03","dob":"2001-02-28",
+						"type":"r","doi":"2021-08-30","prefixes":["AA"]
+					},
+					"output":{
+						"start":"2021-09-10",
+						"elg":"2021-11-30",
+						"exp":"2022-02-15"
+					}
+				},
+				{
+					"desc":"test+ plus de 18 ans, expiration au-dela avant 15/2",
+					"input":{
+						"today":"2021-12-03","dob":"2001-02-28",
+						"type":"p","doi":"2021-08-18","prefixes":["AA"]
+					},
+					"output":{
+						"start":"2021-08-29",
+						"elg":"2021-11-18",
+						"exp":"2022-02-14"
+					}
+				},
+				{
+					"desc":"test+ plus de 18 ans, expiration au-dela du 15/2",
+					"input":{
+						"today":"2021-12-03","dob":"2001-02-28",
+						"type":"p","doi":"2021-08-30","prefixes":["AA"]
+					},
+					"output":{
+						"start":"2021-09-10",
+						"elg":"2021-11-30",
+						"exp":"2022-02-15"
+					}
+				}
+			]
+		},	
+		{
+			"section":"👉👉👉👉 DCC with ELIGIBILITY only",
+			"tests": [				
+				{
+					"desc":"ARN or AZ 2/2 moins de 18 ans.",
+					"input":{
+						"today":"2022-02-07","dob":"2009-02-28",
+						"type":"v","doi":"2021-05-05","products":["EU/1/21/1529", "EU/1/20/1528", "EU/1/20/1507","Covidshield","Covid-19-recombinant","R-COVI","R-Covi"],"doses":[{"c":2,"t":2}]
+					},
+					"output":{
+						"start":"2021-05-12",
+						"elg":"2021-11-05"
+					}
+				},
+				{
+					"desc":"JA 1/1 ou 2/2 moins de 18 ans.",
+					"input":{
+						"today":"2022-02-07","dob":"2009-02-28",
+						"type":"v","doi":"2021-05-05","products":["EU/1/20/1525","EU/1/21/1618"],"doses":[{"c":2,"t":2},{"c":1,"t":1}]
+					},
+					"output":{
+						"start":"2021-05-12",
+						"elg":"2021-06-05"
+					}
+				}
+			]
+		},	
+		{
+			"section":"👉👉👉👉 DCC with nothing (no ELG, no EXP)",
+			"tests":[
+				{
+					"desc":"ARN 3/3 plus de 18 ans.",
+					"input":{
+						"today":"2022-02-03","dob":"1950-02-28",
+						"type":"v","doi":"2021-09-05","products":["EU/1/21/1529", "EU/1/20/1528", "EU/1/20/1507","Covidshield","Covid-19-recombinant","R-COVI","R-Covi"],"doses":[{"c":3,"t":3}]
+					},
+					"output":{
+						"start":"2021-09-12"
+					}
+				},
+				{
+					"desc":"ARN 2/1 plus de 18 ans.",
+					"input":{
+						"today":"2022-02-03","dob":"1950-02-28",
+						"type":"v","doi":"2021-09-05","products":["EU/1/21/1529", "EU/1/20/1528", "EU/1/20/1507","Covidshield","Covid-19-recombinant","R-COVI","R-Covi"],"doses":[{"c":2,"t":1}]
+					},
+					"output":{
+						"start":"2021-09-12"
+					}
+				},
+				{
+					"desc":"recovery, moins de 18 ans, TV sans restriction",
+					"input":{
+						"today":"2022-02-03","dob":"2009-02-28",
+						"type":"r","doi":"2022-02-01","prefixes":["TV"]
+					},
+					"output":{
+						"start":"2022-02-12"
+					}
+				},
+				{
+					"desc":"test+, plus de 18 ans, TV sans restriction",
+					"input":{
+						"today":"2022-02-03","dob":"2001-02-28",
+						"type":"p","doi":"2022-02-01","prefixes":["TV"]
+					},
+					"output":{
+						"start":"2022-02-12"
+					}
+				}
+			]
+		},	
+		{
+			"section":"👉👉👉👉 Test last rule 5+ in 2036",
+			"tests":[
+				{
+					"desc":"recovery, moins de 18 ans",
+					"input":{
+						"today":"2036-01-12","dob":"2030-02-28",
+						"type":"r","doi":"2036-01-10","prefixes":["AA"]
+					},
+					"output":{
+						"start":"2036-01-11",
+						"exp":"2036-01-30"
+					}
+				}
+			]
+		}
+	]
+}

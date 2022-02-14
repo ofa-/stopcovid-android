@@ -14,7 +14,6 @@ import com.lunabeestudio.domain.model.WalletCertificateType
 import com.lunabeestudio.stopcovid.Constants
 import dgca.verifier.app.decoder.model.CertificateType
 import dgca.verifier.app.decoder.model.GreenCertificate
-import java.text.DateFormat
 import java.util.Date
 import java.util.Locale
 
@@ -28,9 +27,6 @@ val GreenCertificate.certificateType: WalletCertificateType
             else -> WalletCertificateType.DCC_LIGHT
         }
     }
-
-fun GreenCertificate.formattedDateOfBirthDate(dateFormat: DateFormat): String =
-    yearMonthDayUsParser().parseOrNull(dateOfBirth)?.let(dateFormat::format) ?: dateOfBirth
 
 val GreenCertificate.countryCode: String?
     get() = when (certificateType) {
